@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4.2. Resonances &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="4.3. Outgoing Distributions" href="outgoingDistributions.html" />
     <link rel="prev" title="4.1. Cross sections" href="crossSections.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +36,8 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U"><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.2. </span>Resonances</a></li> 
       </ul>
     </div>  
 
@@ -55,16 +47,15 @@
           <div class="body" role="main">
             
   <div class="section" id="resonances">
-<h1>4.2. Resonances<a class="headerlink" href="#resonances" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">4.2. </span>Resonances<a class="headerlink" href="#resonances" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="resolved">
-<h2>4.2.1. Resolved<a class="headerlink" href="#resolved" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.2.1. </span>Resolved<a class="headerlink" href="#resolved" title="Permalink to this headline">¶</a></h2>
 <p>In the resolved resonance region, each resonance is listed along with partial widths for the various open outgoing
 reaction channels. From these parameters, cross sections for each open channel can be reconstructed.</p>
-<dl class="docutils">
-<dt>The following formalisms for storing resolved region resonance parameters are supported in GNDS:</dt>
-<dd><ul class="first last simple">
-<li>BreitWigner (used to store equivalent of LRF 1 and 2 in the ENDF-6 format)</li>
-<li>RMatrix (LRF 3 and 7)</li>
+<dl class="simple">
+<dt>The following formalisms for storing resolved region resonance parameters are supported in GNDS:</dt><dd><ul class="simple">
+<li><p>BreitWigner (used to store equivalent of LRF 1 and 2 in the ENDF-6 format)</p></li>
+<li><p>RMatrix (LRF 3 and 7)</p></li>
 </ul>
 </dd>
 </dl>
@@ -73,7 +64,7 @@ this parameterization are present anymore in the ENDF/B-VII.1 library. Thus GNDS
 resonance parameters.</p>
 </div>
 <div class="section" id="unresolved">
-<h2>4.2.2. Unresolved<a class="headerlink" href="#unresolved" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.2.2. </span>Unresolved<a class="headerlink" href="#unresolved" title="Permalink to this headline">¶</a></h2>
 <p>In the unresolved resonance region, the density of available excited nuclear states increases and resonances begin to
 overlap. Here, average widths and level densities are given as a function of resonance L and J values for each energy
 interval. From these parameters, an average cross section for each open channel can be reconstructed.</p>
@@ -82,10 +73,10 @@ the Single-Level Breit Wigner approximation. GNDS always stored unresolved param
 widths for each energy interval, for each combination of resonance L and J.</p>
 </div>
 <div class="section" id="resonance-reconstruction">
-<h2>4.2.3. Resonance reconstruction<a class="headerlink" href="#resonance-reconstruction" title="Permalink to this headline">¶</a></h2>
-<p>Resonance reconstruction in <code class="docutils literal"><span class="pre">Fudge</span></code> is simple: starting with a reactionSuite instance, we use the
+<h2><span class="section-number">4.2.3. </span>Resonance reconstruction<a class="headerlink" href="#resonance-reconstruction" title="Permalink to this headline">¶</a></h2>
+<p>Resonance reconstruction in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code> is simple: starting with a reactionSuite instance, we use the
 ‘reconstructResonances’ method. For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">styles</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">styles</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;gnds_formatted_file.xml&quot;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">evalStyle</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getEvaluatedStyle</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reconStyle</span> <span class="o">=</span> <span class="n">styles</span><span class="o">.</span><span class="n">crossSectionReconstructed</span><span class="p">(</span> <span class="s2">&quot;reconstructed&quot;</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="o">=</span><span class="n">evalStyle</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
@@ -105,7 +96,7 @@ accuracy. The ‘verbose’ option can be used to print out some details during 
 <p>‘reconstructResonances’ is meant as an easy-to-use interface for resonance reconstruction. Under the covers, it uses
 the Python module at
 ‘reconstructResonances’ method. For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">styles</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">styles</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;gnds_formatted_file.xml&quot;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">evalStyle</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getEvaluatedStyle</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reconStyle</span> <span class="o">=</span> <span class="n">styles</span><span class="o">.</span><span class="n">crossSectionReconstructed</span><span class="p">(</span> <span class="s2">&quot;reconstructed&quot;</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="o">=</span><span class="n">evalStyle</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
@@ -125,7 +116,7 @@ accuracy. The ‘verbose’ option can be used to print out some details during 
 <p>‘reconstructResonances’ is meant as an easy-to-use interface for resonance reconstruction. Under the covers, it uses
 the Python module at
 ‘reconstructResonances’ method. For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">styles</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">styles</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;gnds_formatted_file.xml&quot;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">evalStyle</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getEvaluatedStyle</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reconStyle</span> <span class="o">=</span> <span class="n">styles</span><span class="o">.</span><span class="n">crossSectionReconstructed</span><span class="p">(</span> <span class="s2">&quot;reconstructed&quot;</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="o">=</span><span class="n">evalStyle</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
@@ -143,21 +134,22 @@ After reconstruction, cross sections for resonance reactions will have an additi
 during reconstruction to ensure that the resulting cross section can be interpolated to the desired
 accuracy. The ‘verbose’ option can be used to print out some details during resonance reconstruction.</p>
 <p>‘reconstructResonances’ is meant as an easy-to-use interface for resonance reconstruction. Under the covers, it uses
-the Python module at <code class="docutils literal"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances</span></code>. For improved performance
+the Python module at <code class="docutils literal notranslate"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances</span></code>. For improved performance
 that module uses numpy, multiprocessing, and also some compiled extensions, written in C, that handle the most
 computationally intensive tasks.</p>
 </div>
 <div class="section" id="angular-distributions-from-resonances">
-<h2>4.2.4. Angular distributions from resonances<a class="headerlink" href="#angular-distributions-from-resonances" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.2.4. </span>Angular distributions from resonances<a class="headerlink" href="#angular-distributions-from-resonances" title="Permalink to this headline">¶</a></h2>
 <p>Modern resonance parameterizations can be used to describe not only the cross section as a function of incident
 energy, but also the outgoing angular distributions for products. For more detail, see section D.1.7.2 of the
 ENDF-6 manual (available at <a class="reference external" href="https://ndclx4.bnl.gov/gf/project/endf6man">https://ndclx4.bnl.gov/gf/project/endf6man</a>).</p>
-<p>Angular distribution reconstruction capability has not yet been added to <code class="docutils literal"><span class="pre">Fudge</span></code>, although we expect to add
+<p>Angular distribution reconstruction capability has not yet been added to <code class="docutils literal notranslate"><span class="pre">Fudge</span></code>, although we expect to add
 this feature soon.</p>
 </div>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -166,7 +158,7 @@ this feature soon.</p>
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">4.2. Resonances</a><ul>
 <li><a class="reference internal" href="#resolved">4.2.1. Resolved</a></li>
@@ -179,10 +171,10 @@ this feature soon.</p>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="crossSections.html"
-                        title="previous chapter">4.1. Cross sections</a></p>
+                        title="previous chapter"><span class="section-number">4.1. </span>Cross sections</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="outgoingDistributions.html"
-                        title="next chapter">4.3. Outgoing Distributions</a></p>
+                        title="next chapter"><span class="section-number">4.3. </span>Outgoing Distributions</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -191,15 +183,15 @@ this feature soon.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -221,12 +213,13 @@ this feature soon.</p>
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" >4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" ><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.2. </span>Resonances</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

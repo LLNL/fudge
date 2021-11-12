@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.processing package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.processing.deterministic package" href="fudge.processing.deterministic.html" />
-    <link rel="prev" title="fudge.particles package" href="fudge.particles.html" /> 
-  </head>
-  <body>
+    <link rel="prev" title="fudge.legacy.endl.test package" href="fudge.legacy.endl.test.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -41,10 +32,12 @@
           <a href="fudge.processing.deterministic.html" title="fudge.processing.deterministic package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="fudge.particles.html" title="fudge.particles package"
+          <a href="fudge.legacy.endl.test.html" title="fudge.legacy.endl.test package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">fudge Package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.html" accesskey="U">fudge package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing package</a></li> 
       </ul>
     </div>  
 
@@ -62,6 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="fudge.processing.deterministic.html">fudge.processing.deterministic package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.deterministic.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.deterministic.html#module-fudge.processing.deterministic.transferMatrices">fudge.processing.deterministic.transferMatrices module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.processing.deterministic.html#module-fudge.processing.deterministic.multiGroupUpScatter">fudge.processing.deterministic.multiGroupUpScatter module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.deterministic.html#module-fudge.processing.deterministic">Module contents</a></li>
 </ul>
 </li>
@@ -76,7 +70,8 @@
 <li class="toctree-l3"><a class="reference internal" href="fudge.processing.resonances.test.html">fudge.processing.resonances.test package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.test.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.test.html#module-fudge.processing.resonances.test.test_getScatteringMatrices">fudge.processing.resonances.test.test_getScatteringMatrices module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.test.html#fudge-processing-resonances-test-test-reconstructresonances-module">fudge.processing.resonances.test.test_reconstructResonances module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.test.html#module-fudge.processing.resonances.test.test_reconstructResonances">fudge.processing.resonances.test.test_reconstructResonances module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.test.html#module-fudge.processing.resonances.test.test_makeUnresolvedProbabilityTables">fudge.processing.resonances.test.test_makeUnresolvedProbabilityTables module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.test.html#module-fudge.processing.resonances.test">Module contents</a></li>
 </ul>
 </li>
@@ -85,7 +80,12 @@
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.getCoulombWavefunctions">fudge.processing.resonances.getCoulombWavefunctions module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.getScatteringMatrices">fudge.processing.resonances.getScatteringMatrices module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.reconstructResonances">fudge.processing.resonances.reconstructResonances module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.reconstructResonances">fudge.processing.resonances.reconstructResonances module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fudge.processing.resonances.html#basic-usage">Basic usage:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.processing.resonances.html#alternate-uses">Alternate uses:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.makeUnresolvedProbabilityTables">fudge.processing.resonances.makeUnresolvedProbabilityTables module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.html#fudge-processing-resonances-setup-module">fudge.processing.resonances.setup module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances">Module contents</a></li>
 </ul>
@@ -98,140 +98,140 @@
 </div>
 <div class="section" id="module-fudge.processing.miscellaneous">
 <span id="fudge-processing-miscellaneous-module"></span><h2>fudge.processing.miscellaneous module<a class="headerlink" href="#module-fudge.processing.miscellaneous" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.miscellaneous.groupFunctionCrossSectionAndFlux">
-<code class="descclassname">fudge.processing.miscellaneous.</code><code class="descname">groupFunctionCrossSectionAndFlux</code><span class="sig-paren">(</span><em>cls</em>, <em>style</em>, <em>tempInfo</em>, <em>f1</em>, <em>printMutualDomainWarning=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupFunctionCrossSectionAndFlux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupFunctionCrossSectionAndFlux" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.miscellaneous.</code><code class="sig-name descname">groupFunctionCrossSectionAndFlux</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">f1</span></em>, <em class="sig-param"><span class="n">printMutualDomainWarning</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupFunctionCrossSectionAndFlux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupFunctionCrossSectionAndFlux" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.miscellaneous.groupOneFunctionAndFlux">
-<code class="descclassname">fudge.processing.miscellaneous.</code><code class="descname">groupOneFunctionAndFlux</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>f1</em>, <em>styleFilter=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupOneFunctionAndFlux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupOneFunctionAndFlux" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.miscellaneous.</code><code class="sig-name descname">groupOneFunctionAndFlux</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">f1</span></em>, <em class="sig-param"><span class="n">styleFilter</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupOneFunctionAndFlux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupOneFunctionAndFlux" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.miscellaneous.groupTwoFunctionsAndFlux">
-<code class="descclassname">fudge.processing.miscellaneous.</code><code class="descname">groupTwoFunctionsAndFlux</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>f1</em>, <em>f2</em>, <em>norm=None</em>, <em>printMutualDomainWarning=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupTwoFunctionsAndFlux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupTwoFunctionsAndFlux" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.miscellaneous.</code><code class="sig-name descname">groupTwoFunctionsAndFlux</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">f1</span></em>, <em class="sig-param"><span class="n">f2</span></em>, <em class="sig-param"><span class="n">norm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">printMutualDomainWarning</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupTwoFunctionsAndFlux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupTwoFunctionsAndFlux" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-fudge.processing.processingInfo">
 <span id="fudge-processing-processinginfo-module"></span><h2>fudge.processing.processingInfo module<a class="headerlink" href="#module-fudge.processing.processingInfo" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.processing.processingInfo.processInfo">
-<em class="property">class </em><code class="descclassname">fudge.processing.processingInfo.</code><code class="descname">processInfo</code><span class="sig-paren">(</span><em>target</em>, <em>particles=None</em>, <em>flux=None</em>, <em>logFile=None</em>, <em>verbosity=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.processing.processingInfo.</code><code class="sig-name descname">processInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">particles</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flux</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">logFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo.addParticle">
-<code class="descname">addParticle</code><span class="sig-paren">(</span><em>particle</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.addParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.addParticle" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">addParticle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">particle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.addParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.addParticle" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo.getParticleGroups">
-<code class="descname">getParticleGroups</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.getParticleGroups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.getParticleGroups" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getParticleGroups</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.getParticleGroups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.getParticleGroups" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo.getParticle_lMax">
-<code class="descname">getParticle_lMax</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.getParticle_lMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.getParticle_lMax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getParticle_lMax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.getParticle_lMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.getParticle_lMax" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo.getProjectileName">
-<code class="descname">getProjectileName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.getProjectileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.getProjectileName" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getProjectileName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.getProjectileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.getProjectileName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo.getTargetName">
-<code class="descname">getTargetName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.getTargetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.getTargetName" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getTargetName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.getTargetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.getTargetName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo.isProcessParticle">
-<code class="descname">isProcessParticle</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.isProcessParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.isProcessParticle" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">isProcessParticle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.isProcessParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.isProcessParticle" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo.process">
-<code class="descname">process</code><span class="sig-paren">(</span><em>verbosity=None</em>, <em>verbosityIndent=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.process" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbosity</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbosityIndent</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo.process" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.processing.processingInfo.processInfo2">
-<em class="property">class </em><code class="descclassname">fudge.processing.processingInfo.</code><code class="descname">processInfo2</code><span class="sig-paren">(</span><em>style</em>, <em>reactionSuite</em>, <em>flux=None</em>, <em>logFile=None</em>, <em>verbosity=0</em>, <em>verbosityIndentStep='  '</em>, <em>energyAccuracy=1e-06</em>, <em>momentumAccuracy=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.processing.processingInfo.</code><code class="sig-name descname">processInfo2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">reactionSuite</span></em>, <em class="sig-param"><span class="n">flux</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">logFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">verbosityIndentStep</span><span class="o">=</span><span class="default_value">'  '</span></em>, <em class="sig-param"><span class="n">energyAccuracy</span><span class="o">=</span><span class="default_value">1e-06</span></em>, <em class="sig-param"><span class="n">momentumAccuracy</span><span class="o">=</span><span class="default_value">0.001</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.checkStyle">
-<code class="descname">checkStyle</code><span class="sig-paren">(</span><em>_class</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo2.checkStyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.checkStyle" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">checkStyle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_class</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfo2.checkStyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.checkStyle" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.energyAccuracy">
-<code class="descname">energyAccuracy</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.energyAccuracy" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">energyAccuracy</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.energyAccuracy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.flux">
-<code class="descname">flux</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.flux" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">flux</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.flux" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.logFile">
-<code class="descname">logFile</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.logFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">logFile</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.logFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.momentumAccuracy">
-<code class="descname">momentumAccuracy</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.momentumAccuracy" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">momentumAccuracy</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.momentumAccuracy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.reactionSuite">
-<code class="descname">reactionSuite</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.reactionSuite" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">reactionSuite</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.reactionSuite" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.style">
-<code class="descname">style</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.style" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">style</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.style" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.verbosity">
-<code class="descname">verbosity</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.verbosity" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">verbosity</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.verbosity" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.processInfo2.verbosityIndentStep">
-<code class="descname">verbosityIndentStep</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.verbosityIndentStep" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">verbosityIndentStep</code><a class="headerlink" href="#fudge.processing.processingInfo.processInfo2.verbosityIndentStep" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.processing.processingInfo.processInfoLLNL">
-<em class="property">class </em><code class="descclassname">fudge.processing.processingInfo.</code><code class="descname">processInfoLLNL</code><span class="sig-paren">(</span><em>target</em>, <em>groups=None</em>, <em>flux=None</em>, <em>LLNL_Pn=True</em>, <em>lMax=3</em>, <em>logFile=None</em>, <em>verbosity=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfoLLNL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfoLLNL" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.processing.processingInfo.processInfo" title="fudge.processing.processingInfo.processInfo"><code class="xref py py-class docutils literal"><span class="pre">fudge.processing.processingInfo.processInfo</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">fudge.processing.processingInfo.</code><code class="sig-name descname">processInfoLLNL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">groups</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flux</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">LLNL_Pn</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">lMax</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">logFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfoLLNL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfoLLNL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.processingInfo.processInfo" title="fudge.processing.processingInfo.processInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.processing.processingInfo.processInfo</span></code></a></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.processing.processingInfo.processInfoParticle">
-<em class="property">class </em><code class="descclassname">fudge.processing.processingInfo.</code><code class="descname">processInfoParticle</code><span class="sig-paren">(</span><em>name</em>, <em>groups</em>, <em>lMax</em>, <em>conservationFlag='conserveParticle'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfoParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfoParticle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">fudge.processing.processingInfo.</code><code class="sig-name descname">processInfoParticle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">groups</span></em>, <em class="sig-param"><span class="n">lMax</span></em>, <em class="sig-param"><span class="n">conservationFlag</span><span class="o">=</span><span class="default_value">'conserveParticle'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#processInfoParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.processInfoParticle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.processing.processingInfo.tempInfo">
-<em class="property">class </em><code class="descclassname">fudge.processing.processingInfo.</code><code class="descname">tempInfo</code><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#tempInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.tempInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.processing.processingInfo.</code><code class="sig-name descname">tempInfo</code><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#tempInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.tempInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.tempInfo.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#tempInfo.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.tempInfo.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#tempInfo.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.tempInfo.get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.processingInfo.tempInfo.keys">
-<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#tempInfo.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.tempInfo.keys" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#tempInfo.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.processingInfo.tempInfo.keys" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -243,6 +243,7 @@
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -251,7 +252,7 @@
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.processing package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
@@ -264,8 +265,8 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="fudge.particles.html"
-                        title="previous chapter">fudge.particles package</a></p>
+  <p class="topless"><a href="fudge.legacy.endl.test.html"
+                        title="previous chapter">fudge.legacy.endl.test package</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="fudge.processing.deterministic.html"
                         title="next chapter">fudge.processing.deterministic package</a></p>
@@ -277,15 +278,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -303,15 +304,17 @@
           <a href="fudge.processing.deterministic.html" title="fudge.processing.deterministic package"
              >next</a> |</li>
         <li class="right" >
-          <a href="fudge.particles.html" title="fudge.particles package"
+          <a href="fudge.legacy.endl.test.html" title="fudge.legacy.endl.test package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

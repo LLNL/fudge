@@ -1,73 +1,21 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 __metaclass__ = type
 
-from . import base as baseModule
-from . import standards as standardsModule
+import copy
 
 from numericalFunctions import pointwiseXY_C as pointwiseXY_CModule
 floatToShortestString = pointwiseXY_CModule.floatToShortestString
+
+from numericalFunctions import listOfDoubles_C as listOfDoubles_CModule
+
+from . import base as baseModule
+from . import standards as standardsModule
 
 class values( baseModule.xDataCoreMembers )  :
 
@@ -108,7 +56,6 @@ class values( baseModule.xDataCoreMembers )  :
 
     def copy( self, untrimZeros = False ) :
 
-        import copy
         start = self.start
         size = self.size
         _values = copy.copy( self.__values )
@@ -120,7 +67,6 @@ class values( baseModule.xDataCoreMembers )  :
                 label = self.label ) )
 
     __copy__ = copy
-    __deepcopy__ = __copy__
 
     @property
     def end( self ) :
@@ -213,6 +159,27 @@ class values( baseModule.xDataCoreMembers )  :
         if( self.valueType != standardsModule.types.float64Token ) : attributeStr += ' valueType="%s"' % self.valueType
         if( self.valueType == standardsModule.types.integer32Token ) : valueFormatter = intValueFormatter
         attributeStr += baseModule.xDataCoreMembers.attributesToXMLAttributeStr( self )
+
+        HDF_opts = kwargs.get("HDF_opts")
+        if HDF_opts is not None and len(self) >= HDF_opts['minLength']:
+
+            if HDF_opts['flatten']:
+                if self.valueType == standardsModule.types.integer32Token:
+                    datasetName = 'iData'
+                else:
+                    datasetName = 'dData'
+                flatData = HDF_opts[datasetName]
+                startLength = len(flatData)
+                flatData.extend(list(self))
+                XMLList = ['%s<%s href="HDF#/%s" offset="%d" count="%d"%s/>' %
+                        (indent, self.moniker, datasetName, startLength, len(self), attributeStr)]
+            else:
+                datasetName = "data%d" % HDF_opts['index']
+                HDF_opts['index'] += 1
+                HDF_opts['h5file'].create_dataset(datasetName, data=list(self), **HDF_opts['compression'])
+                XMLList = ['%s<%s href="HDF#/%s"%s/>' % (indent, self.moniker, datasetName, attributeStr)]
+            return XMLList
+
         XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
         if( outline ) :                     # Logic above guarantees more than 14 elements in self.
             line = []
@@ -241,21 +208,37 @@ class values( baseModule.xDataCoreMembers )  :
     @staticmethod
     def parseXMLNode( element, xPath, linkData ) :
 
-        from numericalFunctions import listOfDoubles_C
-
         attrs = { 'sep' : ' ', 'valueType' : standardsModule.types.float64Token, 'start' : 0, 'size' : None, 'label' : None }
         attributes = { 'length' : int, 'sep' : str, 'valueType' : str, 'start' : int, 'size' : int, 'label' : str }
-        for key, item in element.items( ) :
+        for key, item in list( element.items( ) ) :
+            if( key in ('href','indices') ): continue   # handled below
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
             attrs[key] = attributes[key]( item )
 
+        href = element.get("href")
+        if href is not None:
+            HDF = linkData['HDF']
+            indices = element.get("indices")
+            s1,s2 = None, None
+            if indices:
+                s1,s2 = map(int,indices.split(','))
+            datasetName = href.split('#')[-1]
+            if datasetName.lstrip('/') in HDF:
+                data = HDF[datasetName.lstrip('/')]
+                return values( data[s1:s2], **attrs )
+            else:
+                data = HDF['h5File'].get( datasetName )
+                return values( data[s1:s2], **attrs )
+
         if( element.text is None ) : element.text = ''
         if attrs['valueType'] == standardsModule.types.integer32Token:
-            if attrs['sep'].isspace(): values1 = map(int, element.text.split())
-            else: values1 = map(int, element.text.split(attrs['sep']))
+            if( attrs['sep'].isspace( ) ) :
+                values1 = list( map( int, element.text.split( ) ) )
+            else :
+                values1 = list( map( int, element.text.split(attrs['sep'] ) ) )
         else:
 # BRB: Need to check extraCharacters
-            values1, extraCharacters = listOfDoubles_C.createFromString( element.text, sep = attrs['sep'] )
+            values1, extraCharacters = listOfDoubles_CModule.createFromString( element.text, sep = attrs['sep'] )
             values1 = [ value for value in values1 ]
 
         length = attrs.pop( 'length', len( values1 ) )
@@ -269,6 +252,33 @@ class values( baseModule.xDataCoreMembers )  :
         from xml.etree import cElementTree
 
         return( values.parseXMLNode( cElementTree.fromstring( XMLString ), xPath=[], linkData={} ) )
+
+    @staticmethod
+    def sortAndThin( _values, rel_tol = 0.0, abs_tol = 0.0 ) :
+        """
+        This function sorts the list of _values into an ascending order and then thins the list. 
+        If there are 2 or fewer points in _values, nothing is done.
+        """
+
+        __values = [ float( value ) for value in _values ]
+        __values.sort( )
+
+        length = len( __values )
+        ___values = __values[:1]
+
+        if( length < 2 ) : return( ___values )
+
+        x1 = ___values[0]
+        for i1 in range( 1, length ) :
+            x2 = __values[i1]
+            deltaMax = max( abs_tol, rel_tol * min( abs( x1 ), abs( x2 ) ) )
+            if( x2 - x1 <= deltaMax ) : continue
+            ___values.append( x2 )
+            x1 = x2
+
+        ___values[-1] = __values[-1]                # If last point of __values did not get added, replace last point with it, otherwise this does nothing.
+            
+        return( ___values )
 
     @staticmethod
     def valuesWithTrimmedZeros( _values, valueType = standardsModule.types.float64Token, sep = ' ' ) :

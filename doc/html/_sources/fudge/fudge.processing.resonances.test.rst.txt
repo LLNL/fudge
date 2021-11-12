@@ -20,6 +20,14 @@ fudge.processing.resonances.test.test_reconstructResonances module
     :undoc-members:
     :show-inheritance:
 
+fudge.processing.resonances.test.test_makeUnresolvedProbabilityTables module
+----------------------------------------------------------------------------
+
+.. automodule:: fudge.processing.resonances.test.test_makeUnresolvedProbabilityTables
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

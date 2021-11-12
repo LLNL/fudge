@@ -1,64 +1,8 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 __metaclass__ = type
@@ -66,6 +10,8 @@ __metaclass__ = type
 import math
 
 from pqu import PQU as PQUModule
+
+from PoPs import IDs as IDsPoPsModule
 
 from xData import ancestry as ancestryModule
 from xData import axes as axesModule
@@ -80,6 +26,11 @@ class gridded1d( griddedModule.gridded1d ) :
     def __init__( self, **kwargs ) :
 
         griddedModule.gridded1d.__init__( self, **kwargs )
+
+    def convertUnits( self, unitMap ) :
+
+        if( 'sh' in self.axes[0].unit ) : return
+        griddedModule.gridded1d.convertUnits( self, unitMap )
 
 class inverseSpeed( ancestryModule.ancestry ) :
     """
@@ -130,35 +81,54 @@ def multiGroupInverseSpeed( style, tempInfo ) :
 
     _groupBoundaries, flux = miscellaneousModule._groupFunctionsAndFluxInit( style, tempInfo, None )
     groupBoundaries = _groupBoundaries.values.values
-#                                         cm/sh
-    const = 2. / ( 3. * math.sqrt( 2 ) * 2.99792458e+02 )     # BRB - speed-of-light should not be hardwired.
-    const *= math.sqrt( float( PQUModule.PQU( 1, 'MeV' ).convertToUnit( _groupBoundaries.unit ) ) )
-    const *= math.sqrt( tempInfo['projectileMass'] )        # Mass is in energy unit / c^2.
-
     numberOfGroups = len( groupBoundaries ) - 1
-    E1 = groupBoundaries[0]
 
-    inverseSpeeds = []
-    for i1 in range( numberOfGroups ) :
-        E2 = groupBoundaries[i1+1]
-        fluxSlice = flux.domainSlice( domainMin = E1, domainMax = E2, fill = True )
-        fluxIntegral = 0
-        inverseSpeedIntegral = 0
-        _E1 = None
-        for _E2, _flux2 in fluxSlice :
-            if( _E1 is not None ) :
-                fluxIntegral += ( _E2 - _E1 ) * ( _flux2 + _flux1 )
-                x1 = math.sqrt( _E1 )
-                x2 = math.sqrt( _E2 )
-                inverseSpeedIntegral += ( x2 - x1 ) * ( _flux1 + _flux2 + ( _flux1 * x2 + _flux2 * x1 ) / ( x1 + x2 ) )
-            _E1 = _E2
-            _flux1 = _flux2
-        inverseSpeed = 0
-        if( fluxIntegral != 0 ) : inverseSpeed = const * inverseSpeedIntegral / ( fluxIntegral / 2 )
-        inverseSpeeds.append( inverseSpeed )
-        E1 = E2
+    speedOfLight_m_mus = PQUModule.PQU( 1, 'c' ).getValueAs( 'm/mus' )
+
+    if( tempInfo['projectile'].id == IDsPoPsModule.photon ) :
+        inverseSpeeds = numberOfGroups * [ 1.0 / speedOfLight_m_mus ]
+    else :
+        inverseSpeeds = []
+        projectileMass = tempInfo['projectileMass']
+        relativisticTreatment = tempInfo.get('relativisticTreatment', 40 * groupBoundaries[-1] > projectileMass) # Treat legacy neutron boundaries as non-relativistic (i.e., 40 * 20 MeV is not greater than neutron mass energy).
+        if relativisticTreatment:
+            lowerRatio = groupBoundaries[0] / projectileMass
+            lowerInverseSpeedValue = math.sqrt( lowerRatio * ( 2.0 + lowerRatio ) )
+            for i1 in range( numberOfGroups ) :         # Note, currently the flux is not included in the group average.
+                upperRatio = groupBoundaries[i1+1] / projectileMass
+                upperInverseSpeedValue = math.sqrt( upperRatio * ( 2.0 + upperRatio ) )
+                inverseSpeed = ( upperInverseSpeedValue - lowerInverseSpeedValue ) / ( upperRatio - lowerRatio ) / speedOfLight_m_mus
+                if( i1 == 0 ) : print( '    ', groupBoundaries[i1+1], upperRatio, upperInverseSpeedValue, inverseSpeed, speedOfLight_m_mus )
+                inverseSpeeds.append( inverseSpeed )
+                lowerRatio = upperRatio
+                lowerInverseSpeedValue = upperInverseSpeedValue
+        else:
+            const = 2. / ( 3. * math.sqrt( 2 ) * speedOfLight_m_mus )
+            const *= math.sqrt( float( PQUModule.PQU( 1, 'MeV' ).convertToUnit( _groupBoundaries.unit ) ) )
+            const *= math.sqrt( projectileMass )                    # Mass is in energy unit / c^2.
+
+            E1 = groupBoundaries[0]
+
+            for i1 in range( numberOfGroups ) :
+                E2 = groupBoundaries[i1+1]
+                fluxSlice = flux.domainSlice( domainMin = E1, domainMax = E2, fill = True )
+                fluxIntegral = 0
+                inverseSpeedIntegral = 0
+                _E1 = None
+                for _E2, _flux2 in fluxSlice :
+                    if( _E1 is not None ) :
+                        fluxIntegral += ( _E2 - _E1 ) * ( _flux2 + _flux1 )
+                        x1 = math.sqrt( _E1 )
+                        x2 = math.sqrt( _E2 )
+                        inverseSpeedIntegral += ( x2 - x1 ) * ( _flux1 + _flux2 + ( _flux1 * x2 + _flux2 * x1 ) / ( x1 + x2 ) )
+                    _E1 = _E2
+                    _flux1 = _flux2
+                inverseSpeed = 0
+                if( fluxIntegral != 0 ) : inverseSpeed = const * inverseSpeedIntegral / ( fluxIntegral / 2 )
+                inverseSpeeds.append( inverseSpeed )
+                E1 = E2
 
     axes = axesModule.axes( rank = 2 )
-    axes[0] = axesModule.axis( label = "inverse speed", unit = "sh/cm", index = 0 )
+    axes[0] = axesModule.axis( label = "inverse speed", unit = "mus/m", index = 0 )     # 'mus/m', which is a standard, is the same as 'sh/cm'.
     axes[1] = flux.axes[1]
-    return( groupModule.toMultiGroup1d( gridded1d, style, tempInfo, axes, inverseSpeeds, addLabel = False ) )
+    return( groupModule.toMultiGroup1d( gridded1d, style, tempInfo, axes, inverseSpeeds, addLabel = False, zeroPerTNSL = False ) )

@@ -58,6 +58,7 @@ Eqs.~(\ref{Inum}) and~(\ref{Ien}) used in the calculation of the
 transfer matrix.  
 
 \section{Newtonian mechanics of discrete 2-body reactions}
+\label{Sec:2-body-Newton}
 Only a summary of the results is given here; for more information,
 see the reference~\cite{endep}.  A relativistic treatment is
 developed in Appendix~\ref{Appendix-relativity}.  It is assumed that the target is at rest 
@@ -287,24 +288,34 @@ and for the Legendre coefficients it is\\
   \Input{Process: Legendre two body transfer matrix}{}
 
 \subsection{Data for both forms of probability density}
+\label{Sec:2-body-data}
 Because the boost from the center-of-mass frame to the laboratory
 frame depends on the rest masses of the particles, these must be included
-in the input file as described in Section~\ref{model-info}.  The format for doing so is\\
+in the input file as described in Section~\ref{model-info}.  
+For most reactions, the format for doing so is\\
   \Input{Projectile's mass:}{$\myi$} \\
  \Input{Target's mass:}{$\mtarg$} \\
  \Input{Product's mass:}{$\myo$} \\
  \Input{Reaction's Q value:}{$Q$} \\
 The values of these quantities must be in the same units as
 the energy bin boundaries.
+The mass of the residual $\mres$ is then computed using
+\begin{equation}
+   \mres = \myi + \mtarg - \myo - Q.
+ \label{2-body-mres}
+\end{equation}
 
-The code computes the rest mass of the residual from the $Q$ value and
-the masses of the other particles.  If the input file also contains the line\\
+The mass of the residual may be given using the command\\
  \Input{Residual's mass:}{$\mres$}\\
-the code compares this value with the mass it computed, printing
-a warning message if they are significantly different.
+but this is overridden by the result of Eq.~(\ref{2-body-mres})
+unless the residual is a photon, $\mres = 0$.  In that case,
+the value of $\myo$ is modified to enforce the
+validity of Eq.~(\ref{2-body-mres}).
 
 The code may use either Newtonian or relativistic mechanics in its
-computations as specified in Section~\ref{Sec:relativistic}.
+computations as specified in Section~\ref{Sec:relativistic}.  Relativistic
+mechanics is used, however, if any of the particles involved in the reaction
+is a photon.
 
 The specifications that the energy $E$ of the incident particle is given in the laboratory
 frame and the direction cosine $\mucm$ in the center-of-mass frame are,
@@ -313,6 +324,7 @@ Section~\ref{Reference-frame},\\
   \Input{Product Frame:  CenterOfMass}{}
 
 \subsection{Angular probability density tables}
+\label{Sec:angular-table}
 The identification line for tabulated angular probability densities
 is\\
   \Input{Angular data:}{$n = K$}\\
@@ -347,6 +359,7 @@ a table of angular probability densities $g( \mucm \mid E)$ may look like\\
     \Input{\indent 1.000000000000e+00  8.262750000000e+00}{}
 
 \subsection{Legendre coefficients of angular probability density}
+\label{Sec:2-bodyLegendreData}
 Legendre coefficient data of the form Eq.~(\ref{cmLegendre})
 for discrete 2-body reactions are given as\\
     \Input{Legendre coefficients:}{$n = K$}\\
@@ -381,5 +394,311 @@ in units of MeV, an example of this portion of the input file is\\
     \Input{\indent 1.150900e-02}{}\\
     \Input{\indent 5.643500e-03}{}
 
+{
+\newcommand{\Vacm}{\textbf{V}_{\text{1,cm}}}
+\newcommand{\vacm}{V_{\text{1,cm}}}
+\newcommand{\muacm}{\mu_{\text{1,cm}}}
+\newcommand{\Valab}{\textbf{V}_{\text{1,lab}}}
+\newcommand{\valab}{V_{\text{1,lab}}}
+\newcommand{\Vbcm}{\textbf{V}_{\text{2,cm}}}
+\newcommand{\Vblab}{\textbf{V}_{\text{2,lab}}}
+\newcommand{\vblab}{V_{\text{2,lab}}}
+\newcommand{\mualab}{\mu_{\text{1,lab}}}
+\newcommand{\vbcm}{V_{\text{2,cm}}}
+\newcommand{\mubcm}{\mu_{\text{2,cm}}}
+\newcommand{\mayo}{m_{1,e}}
+\newcommand{\mares}{m_{1,r}}
+\newcommand{\mbyo}{m_{2,e}}
+\newcommand{\mbres}{m_{2,r}}
 
+\section{Two consecutive discrete 2-body reactions}
+\label{Sec:2-step-2-body}
+The \ENDFdata\ library~\cite{ENDFdata} contains data for one
+reaction in the form of a sequence of two discrete 2-body reactions.
+In this reaction, an incident deuteron hits a triton, with 
+an outgoing excited ${}_2^4\text{He}$ nucleus and a neutron residual. 
+The  excited ${}_2^4\text{He}$ nucleus then decays into a proton plus
+a triton.  
 
+\begin{figure}
+\input{fig4-4}
+\end{figure}
+
+In the current version of \gettransfer, the probability
+density $g( \muacm \mid E)$ 
+for the outgoing excited particle from the first step
+must be represented as a table of Legendre
+coefficients $c_\ell(E)$ 
+for the expansion Eq.~(\ref{cmLegendre}).
+The breakup second step is assumed
+to be isotropic in the frame of the excited outgoing particle
+from the first step.  A Newtonian analysis is given
+here; see Appendix~\ref{Sec:2-step-2-body-rel} for a
+relativistic version.
+
+For the first step of the
+reaction the masses are $\myi$ for the incident particle,
+$\mtarg$ for the target, $\mayo$ for the outgoing particle 
+which breaks up, and $\mares$ for the residual.  The $Q$-value
+of the first step is denoted by~$Q_1$.
+
+Figure~\ref{Fig:2-step-2-body-step1} illustrates
+the notation used in analysis of the first step of this reaction.  
+This figure is basically a copy of Figure~\ref{Fig:2-body-boost}.
+In the discussion of
+this figure, velocity vectors are denoted with bold 
+face~$\textbf{V}$ and their
+lengths with math italics~$V$.  
+
+In Figure~\ref{Fig:2-step-2-body-step1}, the vector $\Vtrans$ 
+is the velocity of the center of
+mass for the first step of the reaction, and its magnitude is
+as in Eq.~(\ref{Vtrans-length}).  For determination of the 
+center-of-mass velocity $\vacm'$
+of the excited outgoing particle from the first step,
+Equation~(\ref{E_cm}) is modified to the form
+$$
+  \frac{\mayo ({\vacm'})^2}{2} =
+    \frac{ \mtarg \mares E} { ( \myi + \mtarg ) ( \mayo + \mares ) } +
+    \frac{ \mares Q_1} { ( \mayo + \mares ) },
+$$
+where $E$ is the energy of the incident particle and the
+target is at rest.
+If $\muacm$ is the direction cosine for~$\Vacm'$, 
+then the velocity $\Valab'$ in the laboratory frame of the
+excited outgoing particle from the first step satisfies the equation
+$$
+  ({\valab'})^2 = \vtrans^2 + ({\vacm'})^2 +
+    2 \muacm \vtrans \vacm'.
+$$
+
+According to Eq.~(\ref{get_mu}), if $\valab' > 0$, then
+the direction cosine~$\mualab$ is given by
+\begin{equation*}
+  \mualab  = \frac
+   { \vtrans'  + \muacm  \vacm' }
+    {\valab'}
+\end{equation*}
+For $\valab' = 0$, one may set $\mualab = 1$.
+
+For the second (breakup) step, 
+$\mbyo$ denotes the mass of the outgoing particle and
+$\mbres$ the mass of the residual, and $Q_2$ is
+the $Q$-value.  
+
+Figure~\ref{Fig:2-step-2-body-step2} shows this second step
+projected onto the plane determined by the vectors of the first step.
+In this figure the full 3-dimensional geometry must be taken into
+account because the emission is isotropic.  The point~$O'$ in the figure
+identifies the center of mass of the breakup step.  An orthonormal 
+$(\xi, \eta, \zeta)$-coordinate system
+is introduced with origin at~$O'$. If $\valab' > 0$, the $\xi$-axis 
+is chosen parallel to
+the vector~$\Valab'$; otherwise, it is taken parallel to~$\Vtrans$.
+If  the vectors $\Vtrans$ and~$\Valab'$ generate a plane, then
+the $\eta$-axis is selected to lie in this plane.  For colinear
+$\Vtrans$ and~$\Valab'$, the $\eta$-axis may be in any direction
+perpendicular to the $\xi$-axis.
+The $\zeta$-axis is chosen perpendicular to the $(\xi, \eta)$-plane.
+  
+In this reference frame the magnitude of the
+velocity~$\Vbcm'$ of the outgoing
+particle from the breakup step is obtained from Equation~(\ref{E_cm})
+as
+$$
+  \frac{\mbyo (\vbcm')^2}{2} =
+    \frac{ \mbres Q_2} { ( \mbyo + \mbres ) }.
+$$
+Because the breakup is isotropic, the vector~$\Vbcm'$ in 
+Figure~\ref{Fig:2-step-2-body-step2} 
+with tail at~$O'$ has its head uniformly distributed on
+the sphere~$\Sigma_0$.  For a fixed $\Valab'$ and angle~$\theta_2$
+between $\Vbcm'$ and the $\xi$-axis, the head of~$\Vbcm'$ lies
+on a circle on~$\Sigma_0$, which is projected as the line segment from
+$A$ to~$B$ in  Figure~\ref{Fig:2-step-2-body-step2}.
+The magnitude~$\vblab'$ of the velocity of the final emitted
+particle is the same for all vectors~$\Vbcm'$ with heads on
+the segment from $A$ to~$B$, and in the case that the head is
+at~$B$ it is clear that
+\begin{equation}
+  ({\vblab'})^2 = (\valab')^2 + (\vbcm')^2 +
+    2 \mubcm \valab' \vbcm',
+ \label{2-step-2-body-V}
+\end{equation}
+where $\mubcm = \cos \theta_2$.
+Furthermore, the energy of the final outgoing particle in the
+laboratory frame is
+\begin{equation}
+  \Elab' = \frac{ \mbyo (\vblab')^2 }{2}.
+ \label{2-step-2-body-E}
+\end{equation}
+
+For this 2-step reaction, in the computation of the
+elements of the transfer matrix Eq.~(\ref{muEint}) is
+replaced by
+\begin{equation}
+    \Inum_{g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) w(E) \widetilde \phi_\ell(E) 
+    \int_{\muacm} d\muacm  \, g(\muacm \mid E)
+    \int_{\Sigma_{0,h}} d\sigma_0 \, P_\ell( \mulab ).
+  \label{2-step-muEint}
+\end{equation}
+In this integral $\Sigma_{0,h}$ is the subset of $\Sigma_0$ on which
+$\Elab'$ from Eqs.~(\ref{2-step-2-body-V}) and~(\ref{2-step-2-body-E})
+lies in the outgoing energy bin~$\calE_h'$,
+and $d\sigma_0$ is the differential surface area
+on the sphere~$\Sigma_0$ normalized so that
+$$
+  \int_{\Sigma_0} d\sigma_0 = 1.
+$$
+
+The direction cosine~$\mulab$ in Eq.~(\ref{2-step-muEint})
+is obtained from
+\begin{equation}
+  \Vblab' \cdot \Vtrans = \mulab  \vblab' \vtrans.
+  \label{2-step-mulab}
+\end{equation}
+The geometry used in the computation of $\mulab$ is illustrated
+in Figure~\ref{Fig:2-step-2-body-step2}.  
+This figure shows a case in which
+$\Vbcm'$ lies outside of the $(\xi, \eta)$-plane.  The
+$\zeta$-component of~$\Vbcm'$ is orthogonal to~$\Vtrans$,
+so it suffices to work with the projection of $\Vbcm'$ onto
+the $(\xi, \eta)$-plane in the computation of~$\mulab$
+in Eq.~(\ref{2-step-mulab}).  Consequently, if $\vblab' > 0$, it easily seen that
+\begin{equation}
+  \mulab = \frac{ \mualab ( \valab' + \xi ) - \eta \sqrt{ 1 - \mualab^2 } }
+             { \vblab'}.
+  \label{2-step-mulab-xi}
+\end{equation} 
+For $\vblab' = 0$, the value of~$\mulab$
+is taken as~$\mulab = 1$.
+
+\begin{figure}
+\input{fig4-5}
+\end{figure}
+
+It remains to identify the set~$\Sigma_{0, h}$ in the integral
+Eq.~(\ref{2-step-muEint}).
+In terms of the coordinate~$\zeta$, the surface of the sphere~$\Sigma_0$ may
+be written as
+\begin{equation}
+  \zeta = \pm \sqrt{
+     (\vbcm')^2 - \xi^2 - \eta^2 }
+     \quad \text{for $\xi^2 + \eta^2 \le (\vbcm')^2.$}
+  \label{2-step-Sigma-xi}
+\end{equation} 
+Because of the mirror symmetry in the $(\xi, \eta)$ plane, it suffices to work with the
+positive square root
+\begin{equation}
+  \zeta = \sqrt{
+     (\vbcm')^2 - \xi^2 - \eta^2 }
+     \quad \text{for $\xi^2 + \eta^2 \le (\vbcm')^2.$}
+  \label{2-step-def-zeta}
+\end{equation}
+The energy
+$\Elab'$ in Eq.~(\ref{2-step-2-body-E}) may lie in the outgoing 
+energy bin~$\calE_h'$ for fixed incident energy~$E$
+and for step~1 direction cosine~$\muacm$.  If it does so
+for at least 2 values of the step~2 direction cosine~$\mubcm$,
+then $\Elab'$ is in~$\calE_h'$ for $\mubcm$
+on an interval
+\begin{equation}
+  a_h \le \mubcm \le b_h
+  \label{2-step-ab-range}
+\end{equation}
+with
+$$
+  -1 \le a_h < b_h \le 1.
+$$
+Consequently, for the hemisphere in Eq.~(\ref{2-step-Sigma-xi}) the integral
+over $\Sigma_{0,h}$ in Eq.~(\ref{2-step-muEint}) may be written as
+\begin{equation}
+   \int_{\Sigma_{0,h}} d\sigma_0 \, P_\ell( \mulab ) =
+   \frac{1}{2 \pi \vbcm' }
+   \int_{ a_h \vbcm}^{b_h \vbcm} d\xi \int_{- \sqrt{ (\vbcm')^2 - \xi^2 }}
+                           ^{\sqrt{ (\vbcm')^2 - \xi^2 }} d\eta \,
+          \frac {P_\ell( \mulab ) } { \sqrt{ (\vbcm')^2 - \xi^2 - \eta^2}}.
+  \label{2-step-Sigma-int}
+\end{equation}
+In this integral the change of variables
+\begin{alignat}{2}
+  \xi &= \vbcm' \, \mubcm 
+    \quad &\text{for $a_h \le \mubcm \le b_h$,}
+      \label{2-step-def-xi} \\
+  \eta &= \vbcm' \sqrt{ 1 - \mubcm^2 } \, \sin w 
+    \quad &\text{for $-\pi/2 \le w \le \pi/2$}
+  \label{2-step-def-eta}
+\end{alignat}
+leads to the relation
+\begin{equation}
+   \int_{\Sigma_{0,h}} d\sigma_0 \, P_\ell( \mulab ) =
+   \frac{1}{2 \pi }
+   \int_{ a_h}^{b_h} d\mubcm \int_{- \pi/2}
+                           ^{\pi/2} dw \,
+          P_\ell( \mulab ) .
+ \label{2-step-int-sigma}
+\end{equation}
+This representation is used in the calculation of the
+subintegral over $\Sigma_{0,h}$ in Eq.~(\ref{2-step-muEint}).
+
+\subsection{The input file for a 2-step 2-body reaction}
+In the input file to \gettransfer, the identifier for this reaction is\\
+  \Input{Process: two step two body reaction}{}\\
+The particle masses and the $Q$-values for this reaction are
+given by\\
+ \Input{Target's mass:}{$\mtarg$}\\ 
+ \Input{Projectile's mass:}{$\myi$}\\
+ \Input{First residual's mass:}{$\mares$}\\
+ \Input{First product's mass:}{$\mayo$}\\
+ \Input{First step's Q value:}{$Q_1$}\\
+ \Input{Second product's mass:}{$\mbyo$}\\
+ \Input{Second residual's mass:}{$\mbres$}\\ 
+ \Input{Second step's Q value:}{$Q_2$}\\
+The mass $\mayo$ of the excited outgoing particle
+from the first step is recalculated using
+\begin{equation}
+   \mayo = \myi + \mtarg - \mares - Q_1.
+ \label{2-step-mayo}
+\end{equation}
+This is because the values on the right-hand side
+of Eq.~(\ref{2-step-mayo}) are usually known to high accuracy.
+In addition, the value of $Q_2$ is computed using
+$$
+  Q_2 = \mayo - \mbyo - \mbres.
+$$
+
+For the first step of the reaction, the Legendre
+coefficients $c_\ell(E)$ for the expansion 
+Eq.~(\ref{cmLegendre}) of the probability
+density $g( \muacm \mid E)$ 
+for the outgoing excited particle are given as
+in Section~\ref{Sec:2-bodyLegendreData}.
+
+An example of the model-dependent portion of the input
+file, Section~\ref{model-info}, is as follows.\\
+ \Input{Target's mass:  2.808921000497e+03}{}\\
+ \Input{Projectile's mass:  1.876124078321e+03}{}\\
+ \Input{First residual's mass: 939.565413016980301}{}\\
+ \Input{First product's mass: 3747.70426580102}{}\\
+  \Input{First step's Q value: -2.2246}{}\\
+ \Input{Second product's mass: 938.782992507523659}{}\\
+ \Input{Second residual's mass:  2.808921000497e+03}{}\\
+ \Input{Second step's Q value: 0.0002728}{}\\
+\vskip 5pt
+ \Input{Legendre coefficients: n = 30}{}\\
+ \Input{Interpolation: lin-lin}{}\\
+ \Input{ Ein: 3.71:  n = 3}{}\\
+  \Input{ \indent 1.0}{}\\
+  \Input{ \indent 0.0}{}\\
+  \Input{ \indent 0.0}{}\\
+ \Input{ Ein: 3.9:  n = 3}{}\\
+  \Input{ \indent 1.0}{}\\
+  \Input{ \indent -0.14079}{}\\
+  \Input{ \indent 0.026804}{}\\
+    \Input{ $\cdots$}{}\\
+  \Input{ Ein: 10.0:  n = 3}{}\\
+  \Input{ \indent 1.0}{}\\
+  \Input{ \indent 0.24417}{}\\
+  \Input{ \indent 0.011232}{}\\
+}

@@ -1,70 +1,12 @@
-#!/usr/bin/env python
+#! /usr/bin/env python3
 #encoding: utf-8
 
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-
-from __future__ import print_function
 
 """
 reconstruct resonance region
@@ -111,21 +53,32 @@ Alternate uses:
         >> new_energy_grid, new_crossSections, messages = s.refineInterpolation(energy_grid, crossSections, tolerance=0.01)
 
 """
-import numpy, collections, math, copy
+import sys
+import numpy, collections, math
 import abc
 
 from pqu import PQU
 
-from fudge.gnds.reactionData import crossSection
-from fudge.gnds.productData import distributions
-import fudge.gnds.resonances
+from fudge import reactionSuite as reactionSuiteModule
+from fudge.reactionData import crossSection
+from fudge.productData import distributions
+
+from fudge.resonances import resolved as resolvedModule, common as commonResonancesModule
+
 import fudge.processing.resonances.getCoulombWavefunctions as getCoulombWavefunctions
+from fudge.core.math.fudgemath import RoundToSigFigs
 
 from xData import XYs as XYsModule
-from xData.isclose import isclose
 
 from PoPs.groups import misc as chemicalElementMiscPoPsModule
 from PoPs.families import nuclide as nuclidePoPsModule
+
+if sys.version_info.major > 2:
+    import multiprocessing
+    try:
+        multiprocessing.set_start_method("fork")
+    except RuntimeError:    # multiprocessing context may have already been set
+        pass
 
 __metaclass__ = type
 
@@ -133,7 +86,7 @@ debug = False   # recommend setting to True before debugging (disables multiproc
 
 VERBOSE = False
 
-FISSIONCHANNEL, NEUTRONCHANNEL, CPCHANNEL, GAMMACHANNEL, COMPETATIVECHANNEL = range(5)
+FISSIONCHANNEL, NEUTRONCHANNEL, CPCHANNEL, GAMMACHANNEL, COMPETITIVECHANNEL = range(5)
 
 class ChannelDesignator:
     __slots__=[ 'l', 'J', 'reaction', 'index', 's', 'gfact', 'particleA', 'particleB', 'Xi', 'isElastic', 'channelClass', 'useRelativistic', 'eliminated' ]
@@ -175,10 +128,14 @@ class ChannelDesignator:
         self.eliminated=eliminated
 
     def __eq__(self, other):
+        if self.gfact is None or other.gfact is None:
+            gfact_identical = self.gfact is other.gfact
+        else:
+            gfact_identical = math.isclose(self.gfact, other.gfact, rel_tol=1e-6, abs_tol=1e-5)
         return self.l==other.l and \
                int(2.0*self.J)==int(2.0*other.J) and \
                int(2.0*self.s)==int(2.0*other.s) and \
-               isclose(self.gfact,other.gfact,rel_tol=1e-6,abs_tol=1e-5) and \
+               gfact_identical and \
                self.particleA==other.particleA and \
                self.particleB==other.particleB and \
                self.isElastic==other.isElastic and \
@@ -189,12 +146,12 @@ class ChannelDesignator:
     def __hash__(self):
         theHash=0
         for s in ChannelDesignator.__slots__:
-            if s == 'Xi':continue # is computable and is real, so lousy for hashing
+            if s == 'Xi': continue # is computable and is real, so lousy for hashing
             if s == 'gfact': continue # is computable and is real, so lousy for hashing
             if s == 'reaction': continue # LRF=7 calls 'elastic' 'n+Target', so the name is kinda meaningless
             if s == 'eliminated': continue # different approximations treat this field differently
             if s == 'index': continue # this isn't used except for printing out
-            theHash+=eval("hash(self.%s)"%s)
+            theHash += hash(getattr(self, s))
         return theHash
 
     def __repr__(self):
@@ -211,14 +168,14 @@ def spins_equal(s1,s2): return int(2.0*s1)==int(2.0*s2)
 
 
 def getResonanceReconstructionClass( formalism ):
-    if formalism.moniker == fudge.gnds.resonances.BreitWigner.moniker:
-        gndsClass = fudge.gnds.resonances.BreitWigner
+    if formalism.moniker == resolvedModule.BreitWigner.moniker:
+        gndsClass = resolvedModule.BreitWigner
         proc = {
             gndsClass.singleLevel: SLBWcrossSection,
             gndsClass.multiLevel: MLBWcrossSection
         }[ formalism.approximation ]
         return proc
-    elif formalism.moniker == fudge.gnds.resonances.RMatrix.moniker:
+    elif formalism.moniker == resolvedModule.RMatrix.moniker:
         return RMatrixLimitedcrossSection
     else:
         raise TypeError("Don't recognize resonance type %s" % formalism.moniker)
@@ -236,38 +193,8 @@ def getAllowedTotalSpins( L, S, useFactor2Trick=True ):
     most C/C++/Fortran codes that compute angular momentum-stuff use the trick so they can use integer math.
     Also, it makes the use of the Python range() function possible.
     """
-    if useFactor2Trick: return range( abs(L-S), L+S+2, 2 )
+    if useFactor2Trick: return list( range( abs(L-S), L+S+2, 2 ) )
     else: return [ j/2.0 for j in getAllowedTotalSpins( int(L*2), int(S*2) ) ]
-
-
-def RoundToSigFigs( x, sigfigs ):
-    """
-    Rounds the value(s) in x to the number of significant figures in sigfigs.
-
-    Restrictions:
-    sigfigs must be an integer type and store a positive value.
-    x must be a real value or an array like object containing only real values.
-    """
-    #The following constant was computed in maxima 5.35.1 using 64 bigfloat digits of precision
-    __logBase10of2 = 3.010299956639811952137388947244930267681898814621085413104274611e-1
-
-    if not ( type(sigfigs) is int or numpy.issubdtype(sigfigs, numpy.integer)):
-        raise TypeError( "RoundToSigFigs: sigfigs must be an integer." )
-
-    if not numpy.all(numpy.isreal( x )):
-        raise TypeError( "RoundToSigFigs: all x must be real." )
-
-    if sigfigs <= 0:
-        raise ValueError( "RoundtoSigFigs: sigfigs must be positive." )
-
-    mantissas, binaryExponents = numpy.frexp( x )
-
-    decimalExponents = __logBase10of2 * binaryExponents
-    intParts = numpy.floor(decimalExponents)
-
-    mantissas *= 10.0**(decimalExponents - intParts)
-
-    return numpy.around( mantissas, decimals=sigfigs - 1 ) * 10.0**intParts
 
 
 def reconstructResonances(reactionSuite, tolerance=None, verbose=False, significantDigits=None, energyUnit='eV',
@@ -285,7 +212,7 @@ def reconstructResonances(reactionSuite, tolerance=None, verbose=False, signific
     'significantDigits': Controls how many digits can be used to represent the energy grid. For example,
         if significantDigits=4 the resulting energy grid can contain 1.034, 1.035, 1.036 but not 1.0345.
         Using significantDigits=8 should allow data to be written back to ENDF-6 without loss of precision.
-        
+
     'energyUnit': unit to use for reconstruction. Resonance energies and widths will be converted to this unit.
 
     'disableUnresolvedWidthInterpolation': set 'True' to reproduce old ENDF recommendation to interpolate
@@ -294,15 +221,10 @@ def reconstructResonances(reactionSuite, tolerance=None, verbose=False, signific
 
     egrids, xsecs = [], []
 
-    if not reactionSuite.resonances.reconstructCrossSection:
-        print ("      Resonance reconstruction was already done. Reconstruct again? y/N")
-        if not raw_input().lower().startswith('y'): # bug!!!
-            return xsecs
-
     # Helper function to reconstruct one region, used for single & multiple regions as well as URR ensembles
-    def resolvedReconstruct( formalism, sectionIndex = None ):
-        resCls = getResonanceReconstructionClass(formalism)
-        reconstructClass = resCls( reactionSuite, sectionIndex, enableAngDists=False, verbose=verbose, energyUnit=energyUnit )
+    def resolvedReconstruct( resolvedForm ):
+        resCls = getResonanceReconstructionClass(resolvedForm)
+        reconstructClass = resCls( resolvedForm, enableAngDists=False, verbose=verbose, energyUnit=energyUnit )
         egrid = reconstructClass.generateEnergyGrid()
         if significantDigits is not None:
             egrid = sorted( set( RoundToSigFigs(egrid,significantDigits).tolist() ) )
@@ -317,19 +239,19 @@ def reconstructResonances(reactionSuite, tolerance=None, verbose=False, signific
     # Resolved resonance reconstruction
     if reactionSuite.resonances.resolved:
         # For multiple regions, we need to do each region separately, then add them to the unified xs table & egrid
-        if isinstance( reactionSuite.resonances.resolved.evaluated, fudge.gnds.resonances.energyIntervals):
+        if isinstance(reactionSuite.resonances.resolved.evaluated, commonResonancesModule.energyIntervals):
             if verbose:
                 print( "      WARNING! Multiple resolved/unresolved energy intervals are deprecated\n"
                         +"        and should be consolidated into single section")
-            for RRidx, interval in enumerate( reactionSuite.resonances.resolved.evaluated ):
-                egrid_now, xsecs_now = resolvedReconstruct( interval.evaluated, RRidx )
+            for interval in reactionSuite.resonances.resolved.evaluated:
+                egrid_now, xsecs_now = resolvedReconstruct( interval.evaluated )
                 # merge with 'full' energy grid:
                 egrids.append( egrid_now )
                 xsecs.append( xsecs_now )
         # Single region, everything goes on unified grid
         else:
-            formalism = reactionSuite.resonances.resolved.evaluated
-            egrid_now, xsecs_now = resolvedReconstruct( formalism )
+            resolvedForm = reactionSuite.resonances.resolved.evaluated
+            egrid_now, xsecs_now = resolvedReconstruct( resolvedForm )
             # merge with 'full' energy grid:
             egrids.append( egrid_now )
             xsecs.append( xsecs_now )
@@ -343,8 +265,8 @@ def reconstructResonances(reactionSuite, tolerance=None, verbose=False, signific
             if verbose:
                 print ("Skipping unresolved: for self shielding only")
         else:
-            formalism = reactionSuite.resonances.unresolved.evaluated
-            reconstructClass = URRcrossSection( reactionSuite, verbose, energyUnit=energyUnit )
+            unresolvedForm = reactionSuite.resonances.unresolved.evaluated
+            reconstructClass = URRcrossSection( unresolvedForm, verbose, energyUnit=energyUnit )
             egrid, interpolateWidths = reconstructClass.generateEnergyGrid()
             xsecs_now = reconstructClass.getCrossSection( egrid )
 
@@ -391,11 +313,11 @@ def reconstructAngularDistributions(reactionSuite, tolerance=None, verbose=False
     egrids = []
 
     # Helper function to compute the per-region angular distributions
-    def resolvedReconstruct( formalism, sectionIndex = None ):
+    def resolvedReconstruct( resolvedForm ):
 
         # Get the correct class
-        resCls = getResonanceReconstructionClass(formalism)
-        reconstructClass = resCls( reactionSuite, sectionIndex, enableAngDists=True, verbose=verbose, energyUnit=energyUnit )
+        resCls = getResonanceReconstructionClass(resolvedForm)
+        reconstructClass = resCls( resolvedForm, enableAngDists=True, verbose=verbose, energyUnit=energyUnit )
 
         # Deal with potential thresholds by splitting up the energy grid at the thresholds
         fullEgrid = reconstructClass.generateEnergyGrid()
@@ -408,10 +330,6 @@ def reconstructAngularDistributions(reactionSuite, tolerance=None, verbose=False
             subgrids = [fullEgrid[thresholdIndices[i]:thresholdIndices[i+1]] for i in range(len(thresholdIndices[:-1]))]
         else: subgrids=[fullEgrid]
 
-        #for egrid in subgrids:
-        #    print type(reconstructClass),"[%s, ..., %s]"%(str(egrid[0]),str(egrid[-1]))
-        #exit()
-
         # Now do the calculation & merge the different regions
         angularResults={}
         for egrid in subgrids:
@@ -421,20 +339,20 @@ def reconstructAngularDistributions(reactionSuite, tolerance=None, verbose=False
                 raise NotImplementedError("Refining interpolation grid for angular distributions")
             for reaction, results in thisAngularResults.items():
                 if reaction not in angularResults: angularResults[reaction] = []
-                angularResults[reaction] += zip( egrid, numpy.array( results ).squeeze().T )
+                angularResults[reaction] += list( zip( egrid, numpy.array( results ).squeeze().T ) )
         return angularResults
 
     if reactionSuite.resonances.resolved:
 
         # Compute the per-region angular distributions & make a list of regional distributions
-        if isinstance( reactionSuite.resonances.resolved.evaluated, fudge.gnds.resonances.energyIntervals):
+        if isinstance(reactionSuite.resonances.resolved.evaluated, commonResonancesModule.energyIntervals):
             raise NotImplementedError("Angular reconstruction for multiple resolved regions, untested")
             if verbose:
                 print( "      WARNING! Multiple resolved/unresolved energy regions are deprecated\n"
                         +"        and should be consolidated into single section")
             for RRidx in range(len(reactionSuite.resonances.resolved.regions)):
                 formalism = reactionSuite.resonances.resolved.regions[RRidx].evaluated
-                angdistRegions.append( resolvedReconstruct( formalism, RRidx ) )
+                angdistRegions.append( resolvedReconstruct( formalism ) )
         else:
             formalism = reactionSuite.resonances.resolved.evaluated
             angdistRegions.append( resolvedReconstruct( formalism ) )
@@ -450,12 +368,13 @@ def reconstructAngularDistributions(reactionSuite, tolerance=None, verbose=False
         # 'angdistRegions' list holds one or more regions.  Convert to one Legendre coefficient table
         # right now only do elastic scattering (OK for MLBW & RM, but (unimplemented) RML can do more)
         angdists_final={}
-        angularAxes = distributions.angular.defaultAxes( energyUnit )
+        angularAxes = distributions.angular.defaultAxes(energyUnit)
         if len(angdistRegions) == 1:    # only one region, treat as XYs2d
             for key in angdistRegions[0]:
-                form = distributions.angular.XYs2d( axes = angularAxes )
-                for i1, E_Bs in enumerate( angdistRegions[0][key] ):
-                    form.append( distributions.angular.Legendre( coefficients = E_Bs[1], value = E_Bs[0], axes = angularAxes ) )
+                form = distributions.angular.XYs2d(axes=angularAxes)
+                for i1, E_Bs in enumerate(angdistRegions[0][key]):
+                    form.append(distributions.angular.Legendre(
+                        coefficients=E_Bs[1], outerDomainValue=E_Bs[0], axes=angularAxes))
                 angdists_final[key] = form
         else:
             raise NotImplementedError("Still TBD")
@@ -463,98 +382,78 @@ def reconstructAngularDistributions(reactionSuite, tolerance=None, verbose=False
     return angdists_final
 
 
-def reconstructURRCrossSectionPDF(reactionSuite, tolerance=None, verbose=False, reconstructionScheme=None):
-
-    # Determine how to represent the resonance region we are going to make up
-    if reconstructionScheme is None:
-        if reactionSuite.resonances.resolved.multipleRegions:
-            reconstructionScheme = reactionSuite.resonances.resolved.regions[-1].evaluated.moniker
-        else:
-            reconstructionScheme = reactionSuite.resonances.resolved.evaluated.moniker
-
-    # Set the resonance reconstruction class that will generate fake resonance regions for us
-    resCls=getResonanceReconstructionClass(reconstructionScheme)
-
-    return URRcrossSection( reactionSuite, verbose ).getURRPDF( resCls )
-
-
 """
 @blockwise: function decorator for improving performance in resolved region.
 Each 'getCrossSection' and 'getAngularDistribution' method is wrapped by this function.
 If we have lots of incident energies, this splits up a calculation using the multiprocessing module.
-May still need to tweak the 'NE' and 'nprocesses' variables for best performance.
+May need to tweak the 'NEmax' and 'numTasks' variables for best performance.
 """
 def blockwise(function):
+    NEmax = 1000
     def wrapped(self,E,**kwargs):
-        if debug:
-            # disable multiprocessing
-            if numpy.isscalar(E):
-                E = numpy.array([[E]])
-            else:
-                E = numpy.array(E).reshape(len(E),1)
-            return function(self,E,**kwargs)
-
         if numpy.isscalar(E):
+            NE = 1
             E = numpy.array([[E]])
-            return function(self,E,**kwargs)
         else:
             NE = len(E)
-            # turn E into a column vector
             E = numpy.array(E).reshape(NE,1)
-            if NE < 1000: # faster to run directly
-                return function(self,E,**kwargs)
-            else:
-                from multiprocessing import Process, Queue
-                queue = Queue()
 
-                def enqueue_result(elist, Slice, queue):
-                    # perform the calculation, put result in the queue
-                    try:
-                        result = function(self, elist, **kwargs)
-                        queue.put( (Slice, result) )
-                    except Exception as err:
-                        queue.put( (Slice, err) )
+        if debug: # disable multiprocessing
+            return function(self,E,**kwargs)
+        elif NE < NEmax: # faster to run directly
+            return function(self,E,**kwargs)
+        else:
+            from multiprocessing import Process, Queue
+            queue = Queue()
 
-                jobs = []
-                nprocesses = 8  # number of processes to spawn
-                errorsEncountered = False
-                result = None
-                # how many energies does each process calculate?
-                chunk = int(numpy.ceil((NE+0.) / nprocesses))
-                for pid in range(nprocesses): # start the calculations
-                    Slice = slice(pid*chunk, (pid+1)*chunk)
-                    p = Process(target=enqueue_result, args=(E[Slice], Slice, queue))
-                    jobs.append(p)
-                    p.start()
+            def enqueue_result(elist, Slice, queue):
+                # perform the calculation, put result in the queue
+                try:
+                    result = function(self, elist, **kwargs)
+                    queue.put( (Slice, result) )
+                except Exception as err:
+                    queue.put( (Slice, err) )
 
-                for pid in range(nprocesses): # collect results as they finish
-                    Slice, vals = queue.get()
-                    if isinstance(vals, Exception):
-                        print("Error in child process #%d: %s" % (pid,vals))
-                        errorsEncountered = True
-                        continue
-                    if function.__name__ == 'getCrossSection':
-                        if result is None:
-                            result = dict.fromkeys( vals )
-                            for key in result: result[key] = numpy.zeros(NE)
-                        for key in result:
-                            result[key][Slice] = vals[key]
-                    elif function.__name__ == 'getAngularDistribution':
-                        if result is None:
-                            result = dict.fromkeys( vals )
-                            for key in result: result[key] = [numpy.zeros((NE,1)) for L in range(len(vals[key]))]
-                        for key in result:
-                            for L in range(len(vals[key])):
-                                result[key][L][Slice] = vals[key][L]
-                    else:
-                        raise NotImplementedError("Blockwise computation for function %s" % function.__name__)
+            jobs = []
+            from fudge.defaults import numTasks # number of processes to spawn
+            errorsEncountered = False
+            result = None
+            # how many energies does each process calculate?
+            chunk = int(numpy.ceil((NE+0.) / numTasks))
+            for pid in range(numTasks): # start the calculations
+                Slice = slice(pid*chunk, (pid+1)*chunk)
+                p = Process(target=enqueue_result, args=(E[Slice], Slice, queue))
+                jobs.append(p)
+                p.start()
 
-                # allow child processes to exit:
-                for job in jobs: job.join()
+            for pid in range(numTasks): # collect results as they finish
+                Slice, vals = queue.get()
+                if isinstance(vals, Exception):
+                    print("Error in child process #%d: %s" % (pid,vals))
+                    errorsEncountered = True
+                    continue
+                if function.__name__ == 'getCrossSection':
+                    if result is None:
+                        result = dict.fromkeys( vals )
+                        for key in result: result[key] = numpy.zeros(NE)
+                    for key in result:
+                        result[key][Slice] = vals[key]
+                elif function.__name__ == 'getAngularDistribution':
+                    if result is None:
+                        result = dict.fromkeys( vals )
+                        for key in result: result[key] = [numpy.zeros((NE,1)) for L in range(len(vals[key]))]
+                    for key in result:
+                        for L in range(len(vals[key])):
+                            result[key][L][Slice] = vals[key][L]
+                else:
+                    raise NotImplementedError("Blockwise computation for function %s" % function.__name__)
 
-                if errorsEncountered:
-                    raise Exception("Aborting due to errors in child processes")
-                return result
+            # allow child processes to exit:
+            for job in jobs: job.join()
+
+            if errorsEncountered:
+                raise Exception("Aborting due to errors in child processes")
+            return result
     return wrapped
 
 
@@ -563,10 +462,11 @@ class resonanceReconstructionBaseClass:
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__( self, reactionSuite, energyUnit = 'eV', **kw ) :
+    def __init__( self, resonanceForm, energyUnit = 'eV', **kw ) :
 
+        reactionSuite = resonanceForm.findClassInAncestry(reactionSuiteModule.reactionSuite)
         try:
-            neutron = reactionSuite.PoPs['n']
+            neutron = resonanceForm.PoPs['n']
             self.neutronMass_amu = float( neutron.mass[0].pqu( 'amu' ) )
         except KeyError:
             self.neutronMass_amu = 1.00866491574
@@ -574,7 +474,7 @@ class resonanceReconstructionBaseClass:
         self.energyUnit = energyUnit
 
         self.projectile = reactionSuite.projectile
-        projectile = reactionSuite.PoPs[reactionSuite.projectile]
+        projectile = resonanceForm.PoPs[reactionSuite.projectile]
         self.projectileMass_amu = float( projectile.mass[0].pqu( 'amu' ) )
         if isinstance(projectile, nuclidePoPsModule.particle):
             self.projectileSpin = projectile.nucleus.spin[0].value
@@ -582,9 +482,9 @@ class resonanceReconstructionBaseClass:
             self.projectileSpin = projectile.spin[0].value
 
         targetID = reactionSuite.target
-        if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs.aliases[targetID].pid
+        if( resonanceForm.PoPs.hasAlias( targetID ) ) : targetID = resonanceForm.PoPs[targetID].pid
         self.target = targetID
-        target = reactionSuite.PoPs[targetID]
+        target = resonanceForm.PoPs[targetID]
         if( isinstance( target, nuclidePoPsModule.particle ) ) :
             nuclide = target.ancestor[0]
             self.targetMass_amu = nuclide.mass[0].float( 'amu' )
@@ -602,7 +502,7 @@ class resonanceReconstructionBaseClass:
     def k(self, energy):
         """
         For an incident neutron, with energy in eV, the ENDF manual states
-        :math:`k = \frac{\sqrt{2m_n}}{\hbar}\frac{AWRI}{AWRI+1}\sqrt{|E|}`
+        :math:`k = \frac{\\sqrt{2m_n}}{hbar}\frac{AWRI}{AWRI+1}\\sqrt{|E|}`
 
         sqrt( 2 * neutronMass ) / hbar == 2.196807e-3 (eV*barn)**-1/2. Thus for energy in eV, k is in b**-1/2
         """
@@ -754,27 +654,16 @@ class RRBaseClass(resonanceReconstructionBaseClass):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, reactionSuite, sectionIndex=None, lowerBound=None, upperBound=None, RR=None, **kw):
-        resonanceReconstructionBaseClass.__init__(self, reactionSuite, **kw)
+    def __init__(self, resolvedForm, lowerBound, upperBound, **kw):
+        resonanceReconstructionBaseClass.__init__(self, resolvedForm, **kw)
         """ store resonance parameters in convenient structure for quick cross section calculations: """
 
-        if sectionIndex is not None:
-            # energy boundaries for this region (multiple regions are deprecated):
-            energyRegion = reactionSuite.resonances.resolved.evaluated[sectionIndex]
-        else:
-            # only one energy region:
-            energyRegion = reactionSuite.resonances.resolved
+        self.RR = resolvedForm
 
-        if RR is None: self.RR = energyRegion.evaluated
-        else: self.RR = RR
+        self.lowerBound = lowerBound
+        self.upperBound = upperBound
 
-        if lowerBound is None:
-            self.lowerBound = PQU.PQU( energyRegion.domainMin, energyRegion.domainUnit ).getValueAs(self.energyUnit)
-        else: self.lowerBound = lowerBound
-
-        if upperBound is None:
-            self.upperBound = PQU.PQU( energyRegion.domainMax, energyRegion.domainUnit ).getValueAs(self.energyUnit)
-        else: self.upperBound = upperBound
+        self.removeNegatives = True # set to False to allow returning negative cross section values
 
     def sortLandJ(self):
         """
@@ -808,7 +697,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                     spinRes = LJres[ :, LJres[ params.index('channelSpin') ]==spin ]
                     energies = spinRes[ params.index('energy') ]
                     neutronWidth = ( spinRes[ params.index('neutronWidth') ] /
-                        self.penetrationFactor(L,self.rho(abs(energies),L)) )
+                        self.penetrationFactor(L,self.rho(abs(energies))) )
                     # FIXME for easier-to-read code, should I wait until getCrossSection
                     # to adjust the neutronWidth for penetrability at resonances?
 
@@ -857,18 +746,25 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                 a = self.RR.scatteringRadius.getValueAs( '10**-12*cm', L=c.l )   # a in b^-1/2
         return a
 
-    def rho(self, E, L=None):
-        """get the channel radius, rho. If L is specified try to get L-dependent value"""
-        if self.RR.calculateChannelRadius:
+    def rho(self, E, forceUseTabulated=False):
+        """
+        Get the channel radius rho. May be computed from a simple expression or from the tabulated scattering radius.
+
+        :param E: incident energy grid, necessary if the tabulated scattering radius is energy-dependent
+        :param forceUseTabulated: override 'calculateChannelRadius' flag (should be used for computing phase shift)
+        :return:
+        """
+        if self.RR.calculateChannelRadius and not forceUseTabulated:
             a = 0.123 * self.targetMass_amu**( 1. / 3. ) + 0.08  # eq. D.14 in ENDF manual, a in b^-1/2
         else:
             if self.RR.scatteringRadius.isEnergyDependent():
-                a = self.RR.scatteringRadius.getValueAs('10**-12*cm', energyGrid=E[:,0])   # a in b^-1/2
+                a = self.RR.scatteringRadius.getValueAs('10**-12*cm', energy_grid=numpy.ravel(E))   # a in b^-1/2
+                a = numpy.array(a).reshape(E.shape)
             else:
                 a = self.RR.scatteringRadius.getValueAs( '10**-12*cm' )   # a in b^-1/2
         return self.k(E) * a # dimensionless
 
-    def generateEnergyGrid(self):
+    def generateEnergyGrid(self, lowBound=None, highBound=None, stride=1):
         """ Create an initial energy grid by merging a rough mesh for the entire region (~10 points / decade)
         with a denser grid around each resonance. For the denser grid, multiply the total resonance width by
         the 'resonancePos' array defined below. """
@@ -876,13 +772,16 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         thresholds = []
         if hasattr(self, '_thresholds'):
             thresholds = self._thresholds
-        lowBound, highBound = self.lowerBound, self.upperBound
+        if lowBound is None:
+            lowBound = self.lowerBound
+        if highBound is None:
+            highBound = self.upperBound
         # ignore negative resonances
         for lidx in range(len(energies)):
             if energies[lidx] > 0: break
         energies = energies[lidx:]
         widths = widths[lidx:]
-        # generate grid for a single peak, should be good to 1% using linear interpolation:
+        # generate grid for a single peak, should be good to 1% using linear interpolation using default stride
         resonancePos = numpy.array([
             0.000e+00, 1.000e-03, 2.000e-03, 3.000e-03, 4.000e-03, 5.000e-03, 6.000e-03, 7.000e-03, 8.000e-03, 9.000e-03, 1.000e-02, 2.000e-02,
             3.000e-02, 4.000e-02, 5.000e-02, 6.000e-02, 7.000e-02, 8.000e-02, 9.000e-02, 1.000e-01, 1.100e-01, 1.200e-01, 1.300e-01, 1.400e-01,
@@ -901,29 +800,29 @@ class RRBaseClass(resonanceReconstructionBaseClass):
             8.600e+01, 9.000e+01, 9.400e+01, 9.800e+01, 1.020e+02, 1.060e+02, 1.098e+02, 1.140e+02, 1.180e+02, 1.232e+02, 1.260e+02, 1.300e+02,
             1.382e+02, 1.550e+02, 1.600e+02, 1.739e+02, 1.800e+02, 1.951e+02, 2.000e+02, 2.100e+02, 2.189e+02, 2.300e+02, 2.456e+02, 2.500e+02,
             2.600e+02, 2.756e+02, 3.092e+02, 3.200e+02, 3.469e+02, 3.600e+02, 3.892e+02, 4.000e+02, 4.200e+02, 4.367e+02, 4.600e+02, 4.800e+02,
-            5.000e+02, 6.000e+02, 7.000e+02, 8.000e+02, 9.000e+02, 1.000e+03 ])
+            5.000e+02, 6.000e+02, 7.000e+02, 8.000e+02, 9.000e+02, 1.000e+03][::stride])
 
         grid = []
         # get the midpoints (on log10 scale) between each resonance:
         # emid = [lowBound] + list(10**( ( numpy.log10(energies[1:])+numpy.log10(energies[:-1]) ) / 2.0)) + [highBound]
         # or get midpoints on linear scale:
-        emid = [lowBound] + [(e1+e2)/2.0 for e1,e2 in zip(energies[1:],energies[:-1])] + [highBound]
-        for e,w,lowedge,highedge in zip(energies,widths,emid[:-1],emid[1:]):
+        emid = [lowBound] + [(e1+e2)/2.0 for e1, e2 in zip(energies[1:], energies[:-1])] + [highBound]
+        for e, w, lowedge, highedge in zip(energies, widths, emid[:-1], emid[1:]):
             points = e-w*resonancePos
             grid += [lowedge] + list(points[points>lowedge])
             points = e+w*resonancePos[1:]
-            grid += list(points[points<highedge])
+            grid += list(points[points < highedge])
         # also add rough grid, to cover any big gaps between resonances, should give at least 10 points per decade:
-        npoints = numpy.ceil( numpy.log10(highBound)-numpy.log10(lowBound) ) * 10
-        grid += list( numpy.logspace(numpy.log10(lowBound),numpy.log10(highBound), npoints) )[1:-1]
+        npoints = int(numpy.ceil(numpy.log10(highBound)-numpy.log10(lowBound)) * 10)
+        grid += list(numpy.logspace(numpy.log10(lowBound), numpy.log10(highBound), npoints))[1:-1]
         grid += [lowBound, highBound, 0.0253]   # region boundaries + thermal
         # if threshold reactions present, add dense grid at and above threshold
         for threshold in thresholds:
             grid += [threshold]
-            grid += list( threshold + resonancePos * 1e-2 )
+            grid += list(threshold + resonancePos * 1e-2)
         grid = sorted(set(grid))
         # toss any points outside of energy bounds:
-        grid = grid[ grid.index(lowBound) : grid.index(highBound)+1 ]
+        grid = grid[grid.index(lowBound) : grid.index(highBound)+1]
         return grid
 
     def setResonanceParametersByChannel( self, multipleSScheme='ENDF', useReichMooreApproximation=False, Ein=None, warnOnly=False ):
@@ -970,6 +869,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
             GF = data[7][iR]
             GX = data[8][iR]
             JisAllowed = False
+            if( self.lMax is None ) : self.lMax = L
             self.lMax = max( self.lMax, L )
             if L not in lList: lList.append(L)
             allowedSByThisJl = []
@@ -979,7 +879,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                     allowedSByThisJl.append( SS )
             if not JisAllowed:
                 if warnOnly:
-                    from fudge.gnds import warning
+                    from fudge import warning
                     warnings.append(warning.invalidAngularMomentaCombination(L, S, abs(J), 'all channels'))
                 else:
                     raise ValueError( "Invalid total angular momentum and/or orbital momentum: cannot couple up to J = "
@@ -995,12 +895,12 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                     addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'elastic', 0, allowedSByThisJl[0], gfact, pA2, pB2, 0.0, True, NEUTRONCHANNEL, False, False ), ( iR, GN ) )
                     addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'capture', 0, allowedSByThisJl[0], gfact, pA102, pB102, 0.0, False, GAMMACHANNEL, False, useReichMooreApproximation ), ( iR, GG ) )
                     if GF != 0.0: addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'fission', 0, allowedSByThisJl[0], gfact, None, None, 0.0, False, FISSIONCHANNEL, False, False ), ( iR, GF ) )
-                    if GX != 0.0: addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'competitive', 0, allowedSByThisJl[0], gfact, None, None, 0.0, False, COMPETATIVECHANNEL, False, False ), ( iR, GX ) )
+                    if GX != 0.0: addOrUpdateDict(channelDict, ChannelDesignator(L, abs(J), 'competitive', 0, allowedSByThisJl[0], gfact, None, None, 0.0, False, COMPETITIVECHANNEL, False, False), (iR, GX))
                     for SS in allowedSByThisJl[1:]:
                         addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'elastic', 0, SS, gfact, pA2, pB2, 0.0, True, NEUTRONCHANNEL, False, False ), ( iR, 0.0 ) )
                         addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'capture', 0, SS, gfact, pA102, pB102, 0.0, False, GAMMACHANNEL, False, useReichMooreApproximation ), ( iR, 0.0 ) )
                         if GF != 0.0: addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'fission', 0, SS, gfact, None, None, 0.0, False, FISSIONCHANNEL, False, False ), ( iR, 0.0 ) )
-                        if GX != 0.0: addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'competitive', 0, SS, gfact, None, None, 0.0, False, COMPETATIVECHANNEL, False, False ), ( iR, 0.0 ) )
+                        if GX != 0.0: addOrUpdateDict(channelDict, ChannelDesignator(L, abs(J), 'competitive', 0, SS, gfact, None, None, 0.0, False, COMPETITIVECHANNEL, False, False), (iR, 0.0))
 
             # Way mandated by ENDF manual:
             #   * Width divided between channels with valid S's based on sign of J:
@@ -1016,7 +916,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                     addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'elastic', 0, SS, gfact, pA2, pB2, 0.0, True, NEUTRONCHANNEL, False, False ), ( iR, GN ) )
                     addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'capture', 0, SS, gfact, pA102, pB102, 0.0, False, GAMMACHANNEL, False, useReichMooreApproximation ), ( iR, GG ) )
                     if GF != 0.0: addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'fission', 0, SS, gfact, None, None, 0.0, False, FISSIONCHANNEL, False, False ), ( iR, GF ) )
-                    if GX != 0.0: addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'competitive', 0, SS, gfact, None, None, 0.0, False, COMPETATIVECHANNEL, False, False ), ( iR, GX ) )
+                    if GX != 0.0: addOrUpdateDict(channelDict, ChannelDesignator(L, abs(J), 'competitive', 0, SS, gfact, None, None, 0.0, False, COMPETITIVECHANNEL, False, False), (iR, GX))
 
             # Ignore problem:
             #   * Ignore spin of channels and the fact may be multiple valid spins
@@ -1025,7 +925,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                 addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'elastic', 0, S, gfact, pA2, pB2, 0.0, True, NEUTRONCHANNEL, False, False ), ( iR, GN ) )
                 addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'capture', 0, S, gfact, pA102, pB102, 0.0, False, GAMMACHANNEL, False, useReichMooreApproximation ), ( iR, GG ) )
                 if GF != 0.0: addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'fission', 0, S, gfact, None, None, 0.0, False, FISSIONCHANNEL, False, False ), ( iR, GF ) )
-                if GX != 0.0: addOrUpdateDict( channelDict, ChannelDesignator( L, abs(J), 'competitive', 0, S, gfact, None, None, 0.0, False, COMPETATIVECHANNEL, False, False ), ( iR, GX ) )
+                if GX != 0.0: addOrUpdateDict(channelDict, ChannelDesignator(L, abs(J), 'competitive', 0, S, gfact, None, None, 0.0, False, COMPETITIVECHANNEL, False, False), (iR, GX))
 
         # Take care of extra l's needed to get potential scattering correct
         # Make a single elastic channel with a zero width resonance at the energy of the first real resonance
@@ -1052,16 +952,17 @@ class RRBaseClass(resonanceReconstructionBaseClass):
     def resetResonanceParametersByChannel(self, multipleSScheme='ENDF', useReichMooreApproximation=False, Ein=None ): pass
 
     def penetrationFactorByChannel(self,c,Ein):
-        if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]: return 1.0
-        return self.penetrationFactor(c.l, self.rho(Ein, c.l))
+        if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]:
+            return numpy.ones(len(Ein))
+        return self.penetrationFactor(c.l, self.rho(Ein))
 
     def phiByChannel(self,c,Ein):
         if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]: return 0.0
-        return self.phi( c.l, self.rho(Ein,c.l) )
+        return self.phi( c.l, self.rho(Ein) )
 
     def shiftFactorByChannel(self,c,Ein):
         if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]: return 0.0
-        return self.shiftFactor(c.l, self.rho(Ein,c.l))
+        return self.shiftFactor(c.l, self.rho(Ein))
 
     def getChannelConstantsBc( self ):
         raise NotImplementedError( "Override in derived classes if used" )
@@ -1077,7 +978,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         Get the L0 matrix of Froehner:
 
             ..math::
-                {\bf L^0}_{cc'} = \delta_{cc'} (L_c-B_c)
+                {\\bf L^0}_{cc'} = \\delta_{cc'} (L_c-B_c)
 
         where
 
@@ -1088,7 +989,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         if self.channelConstantsBc == []: self.channelConstantsBc = self.getChannelConstantsBc()
         L0 = numpy.zeros( (len(Ein), self.nChannels, self.nChannels), dtype=complex )
         for ic,c in enumerate(self.channels):
-            rho = self.rho( Ein-c.Xi, c.l )
+            rho = self.rho( Ein-c.Xi )
             shift = self.shiftFactor( c.l, rho ).flatten()
             penet = self.penetrationFactor( c.l, rho ).flatten()
 
@@ -1103,7 +1004,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         Get the X matrix for use in computing W.  X is:
 
             ..math::
-                {\bf X}_{cc'} = P^{-1/2}_c ( ( {\bf I} - {\bf R}{\bf L^0} )^{-1}{\bf R} )_{cc'} P_{c'}^{-1/2}\delta_{JJ'}
+                {\\bf X}_{cc'} = P^{-1/2}_c ( ( {\\bf I} - {\\bf R}{\\bf L^0} )^{-1}{\\bf R} )_{cc'} P_{c'}^{-1/2}\\delta_{JJ'}
         """
         L0 = self.getL0Matrix( Ein )
         penFact = numpy.ones( ( len(Ein), self.nChannels ), dtype=float )
@@ -1117,9 +1018,9 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         # Hafta be real careful about combining numpy's broadcasting rules with numpy's linear algebra
         R = self.getRMatrix( Ein )
         for iE in range(len(Ein)):
-            thisR = numpy.mat(R[iE])
-            thisL0 = numpy.mat(L0[iE])
-            X[iE] = numpy.linalg.inv( numpy.mat(self.identityMatrix) - thisR * thisL0 ) * thisR
+            thisR = numpy.array(R[iE])
+            thisL0 = numpy.array(L0[iE])
+            X[iE] = numpy.linalg.inv( numpy.array(self.identityMatrix) - thisR * thisL0 ) * thisR
 
         # Apply the sqrt(Penetrability) rescaling
         for ic1, c1 in enumerate( self.channels ):
@@ -1146,7 +1047,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         The phase factor for the collision matrix:
 
             ..math::
-                \Omega_c = e^{-\varphi_c}
+                \\Omega_c = e^{-\\varphi_c}
         """
 
         # Precompute phase factor
@@ -1159,7 +1060,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                         rhohat = self.RR.scatteringRadius.getValueAs('10*fm', Ein-c.Xi) * self.k(Ein-c.Xi)
                     else:
                         rhohat = self.RR.scatteringRadius.getValueAs('10*fm') * self.k(Ein-c.Xi)
-                else: rhohat = self.rho(Ein-c.Xi, L=c.l)
+                else: rhohat = self.rho(Ein-c.Xi)
                 phi = self.phi( c.l, rhohat )
                 eiphis.append( numpy.exp( -1j * phi ) )
             else:
@@ -1235,12 +1136,12 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         return r[0][0], r[1][0]
 
     def getParticleSpinParities(self, rxn):
-        '''
+        """
         6 cases:
             rxn=='capture'
             rxn=='elastic' (equivalent to 'projectile + target')
             rxn=='fission' or 'fissionA' or 'fissionB'
-            rxn=='competative'
+            rxn=='competitive'
             rxn=='something + something' where one of somethings is photon (same as 'capture')
             rxn=='something + something' where neither something is a photon
 
@@ -1250,7 +1151,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
             difficult since it really corresponds to a bunch of states.  Here, we just compute the lowest spin
             consistent with the target & photon and leave it up to the code to override these values as needed.
 
-            A word about fission and competative channels:
+            A word about fission and competitive channels:
             Here we don't really know or need the spins & parities of the particles.  Both are many channels
             lumped together, in a way that makes capture look simple.  We'll just return the elastic parameters
             under the assumption that they're not needed.
@@ -1260,7 +1161,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         :return: a tuple: (JPi_a, JPi_b).  JPi itself is a tuple (J,Pi).
                  J is float (either integer or 1/2 integer) and Pi is -1 or +1.
                  It doesn't matter whether particle a or b is heaviest
-        '''
+        """
 
         def get_spin_parity(_p):
             s, par = None, None
@@ -1269,6 +1170,10 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                     s = _p.nucleus.spin.float('hbar')
                 except KeyError as err:
                     raise KeyError(err.message + ' for particle ' + _p.id)
+                except IndexError as err:
+                    # Sometimes (mainly with MLBW and SLBW), there's no spin given for a nucleus.
+                    # In that case, an IndexError gets raised.  We have to punt.
+                    pass
                 try:
                     par = _p.nucleus.parity[0].value
                 except IndexError as err:
@@ -1280,17 +1185,17 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                     s=_p.spin.float('hbar')
                     par=_p.parity[0].value
                 except IndexError as err:
-#                    print(_p)
+                    #print(_p)
                     raise err
             return s, par
 
         # Treat elastic, fission and competitive channels as elastic
         # for elastic is appropriate, for others it doesn't matter
         if rxn=='elastic' or 'fission' in rxn or "competitive" in rxn:
-            spinA, parityA = get_spin_parity(self.reactionSuite.PoPs[self.reactionSuite.projectile])
-            target = self.reactionSuite.PoPs[self.reactionSuite.target]
-            if (target.id in self.reactionSuite.PoPs.aliases):
-                target = self.reactionSuite.PoPs[target.pid]
+            spinA, parityA = get_spin_parity(self.RR.PoPs[self.reactionSuite.projectile])
+            target = self.RR.PoPs[self.target]
+            if (target.id in self.RR.PoPs.aliases):
+                target = self.RR.PoPs[target.pid]
             spinB, parityB = get_spin_parity(target)
             return (spinA, parityA), (spinB, parityB)
 
@@ -1298,9 +1203,9 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         if rxn=='capture' or 'photon' in rxn:
             spinA = min(self.projectileSpin+0.5, abs(self.projectileSpin-0.5))
             parityA = 1
-            compound = self.reactionSuite.PoPs[self.reactionSuite.compound_nucleus]
-            if (compound.id in self.reactionSuite.PoPs.aliases):
-                compound = self.reactionSuite.PoPs[compound.pid]
+            compound = self.RR.PoPs[self.reactionSuite.compound_nucleus]
+            if (compound.id in self.RR.PoPs.aliases):
+                compound = self.RR.PoPs[compound.pid]
             spinB, parityB = get_spin_parity(compound)
             return (spinA, parityA), (spinB, parityB)
 
@@ -1309,7 +1214,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
             spinA, parityA = None, None
             spinB, parityB = None, None
             pa,pb=rxn.split(' + ')
-            for p in self.RR.getRootAncestor().PoPs:
+            for p in self.RR.PoPs:
                 if pa==p.id: spinA,parityA=get_spin_parity(p)
                 if pb==p.id: spinB,parityB=get_spin_parity(p)
 
@@ -1317,8 +1222,6 @@ class RRBaseClass(resonanceReconstructionBaseClass):
 
         else:
             raise ValueError('Cannot determine spins for reactants in reaction "%s"'%rxn)
-
-        return (None, None), (None, None)
 
     @blockwise
     def getAngularDistribution(self, E, keepL0Term=True, renormalize=True, outChannelNames=None,
@@ -1328,7 +1231,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         :param numpy.array(type=float) E:
         :param bool keepL0Term:
         :param bool renormalize:
-        :param str reactionp:
+        :param list(str) outChannelNames:
         :param bool useTabulatedScatteringRadius:
         :param bool enableExtraCoulombPhase:
         :return:
@@ -1424,7 +1327,9 @@ class RRBaseClass(resonanceReconstructionBaseClass):
 
     def getBackgroundRMatrix(self, Ein, Emin, Emax, gamWidth, pole_strength, Rinf=None):
         """
-        Froehner's background R matrix.  This could be vectorized for speed.  Not sure if it would be useful though.
+        Froehner's background R matrix.  See JEFF Report 18, Eq. (212).
+
+        This could be vectorized for speed.  Not sure if it would be useful though.
         """
         Rbackground = numpy.zeros( len(Ein), dtype=complex )
         I = (Emax-Emin)
@@ -1439,14 +1344,12 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                 Rbackground[iEE] = 0.0j
                 continue
             if Rinf is not None:
-                Rbackground[iEE] = \
-                    2.0*pole_strength*complex(numpy.arctanh(A), gamWidth*I/4.0/B)+Rinf
+                Rbackground[iEE] = 2.0*pole_strength*complex(numpy.arctanh(A), gamWidth*I/4.0/B)+Rinf
             else:
-                Rbackground[iEE] = \
-                    2.0*pole_strength*complex(numpy.arctanh(A), gamWidth*I/4.0/B)
+                Rbackground[iEE] = 2.0*pole_strength*complex(numpy.arctanh(A), gamWidth*I/4.0/B)
         return Rbackground
 
-    def getAverageQuantities(self, nBins=1, binScheme='linspacing', computeUncertainty=False):
+    def getAverageQuantities(self, nBins=1, binScheme='linspacing', computeUncertainty=False, verbose=False):
         """
         Computes average widths and level spacings from the set of resonance parameters in self, on a per-channel basis
 
@@ -1457,7 +1360,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         :param nBins: the number of resonances per logrithmic bin to aim for, on average
         :param binScheme: the scheme to use to determine the binning
         :param computeUncertainty: toggle the calculation of the uncertainty of the quantities
-        :return: a dictionary of results, sorted by channel
+        :return: a dictionary of results, sorted by channel.  If an entry is None, this indicates it could not be computed
         """
         from numpy import mean,var
         import pqu.PQU
@@ -1466,163 +1369,254 @@ class RRBaseClass(resonanceReconstructionBaseClass):
             raise ValueError("Allowed binning schemes are 'linspacing' and 'logspacing'")
 
         for c in self.allChannels:
+            # initialize the acumulators
+            numResonancesUsed=0
+            results[c] = {'energyGrid': [], 'widths': [], 'spacings': []}
 
             # determine if we have resonances to average
-            if len(self.allChannels[c])==0:
-                results[c]={'energyGrid':[],'widths':[],'spacings':[]}
-                continue
-            try:
-                ERmin=min( [ xx for xx in self.allChannels[c].values() if xx>0 ] )
-            except ValueError: ERmin=1.0
+            if len(self.allChannels[c]) == 0: continue
+            try:                ERmin = min( [ xx for xx in self.allChannels[c].values() if xx>0 ] )
+            except ValueError:  ERmin = 1.0
 
             # get the resonances for this channel
-            res=[]
-            for iR in self.allChannels[c]:
-                res.append((self._energies[iR],self.allChannels[c][iR]))
+            res=[ (self._energies[iR], self.allChannels[c][iR]) for iR in self.allChannels[c] ]
             res.sort(key=lambda x:x[0])
 
-            # compute the number of bins to use in practice
-            nBins=min(nBins,len(res))
+            # compute the number of bins to use in practice, must be at least 1 bin
+            nBins=max(min(nBins,len(res)),1)
 
             # compute the bin boundaries
+            lowerBound = min(max(self.lowerBound, 25.85e-3), ERmin)
+            upperBound = self.upperBound
             if binScheme=='logspacing':
-                bins = list(numpy.logspace(
-                    math.log10(max( self.lowerBound, 25.85e-3, ERmin )),
-                    math.log10(self.upperBound), nBins+1))
+                bins = list(numpy.logspace(math.log10(lowerBound), math.log10(upperBound), nBins+1))
             else:
-                bins=list(numpy.linspace( max( self.lowerBound, 25.85e-3, ERmin ), self.upperBound, nBins+1))
+                bins = list(numpy.linspace(lowerBound, upperBound, nBins+1))
+            results[c]['energyGrid'] = bins
 
-            # initialize the acumulators
-            results[c]={'energyGrid':bins,'widths':[0.0 for x in bins[0:-1]],'spacings':[0.0 for xx in bins[0:-1]]}
-            numResonancesUsed=0
+            if verbose: print(c.reaction, c.l, c.s, c.J, 'bins:',bins)
 
             # compute averages in a bin
             for i1 in range(len(bins)-1):
-                spacingsList=[]
-                widthList=[]
-                lastER=None
-                for r in res:
-                    ER=r[0]
-                    if ER >= bins[i1] and ER <= bins[i1 + 1]:
-                        if lastER is not None and lastER > self.lowerBound and ER > self.lowerBound:
-                            spacingsList.append(ER - lastER)
-                        widthList.append(r[1])
-                    lastER = ER
-                actualResonancesPerBin=len(widthList)
-                numResonancesUsed+=actualResonancesPerBin
+                # note filters out negative energy resonances and high energy resonances whose tails make a background
+                EGam = [(self._energies[i], v) for i, v in self.allChannels[c].items() if
+                        self._energies[i] >= bins[i1] and self._energies[i] <= bins[i1+1]]
+                EGam.sort(key=lambda x: x[0])
+
+                # Compute mean level spacing
+                spacingsList=[abs(EGam[i + 1][0] - EGam[i][0]) for i in range(len(EGam) - 1)]
+                widthList=[x[1] for x in EGam]
+
+                # initialization
+                actualResonancesPerBin =  len(widthList)
+                numResonancesUsed      += actualResonancesPerBin
+                D     = None
+                Gamma = None
+
+                if verbose: print(spacingsList, widthList)
+
+                # enough resonances to make an average D, Gamma
                 if len(spacingsList)>1:
                     if computeUncertainty:
-                        results[c]['spacings'][i1]=pqu.PQU.PQU(value=mean(spacingsList),uncertainty=math.sqrt(var(spacingsList)),unit='eV')
-                        results[c]['widths'][i1]=pqu.PQU.PQU(value=mean(widthList),uncertainty=math.sqrt(var(widthList)),unit='eV')
+                        D     = pqu.PQU.PQU(value=mean(spacingsList), uncertainty=math.sqrt(var(spacingsList)), unit='eV')
+                        Gamma = pqu.PQU.PQU(value=mean(widthList), uncertainty=math.sqrt(var(widthList)), unit='eV')
                     else:
-                        results[c]['spacings'][i1]=pqu.PQU.PQU(value=mean(spacingsList),unit='eV')
-                        results[c]['widths'][i1]=pqu.PQU.PQU(value=mean(widthList),unit='eV')
+                        D     = pqu.PQU.PQU(value=mean(spacingsList), unit='eV')
+                        Gamma = pqu.PQU.PQU(value=mean(widthList), unit='eV')
+
+                # only one width, we can "average" it, but the spacing is meaningless
                 elif len(widthList)==1:
-                    results[c]['spacings'][i1]=pqu.PQU.PQU(value=-1e9,unit='eV')
-                    results[c]['widths'][i1]=pqu.PQU.PQU(value=widthList[0],unit='eV')
-                elif all([w==0.0 for w in widthList]): pass
-                else:
-                    results[c]['spacings'][i1]=pqu.PQU.PQU(value=-2e9,unit='eV')
-                    results[c]['widths'][i1]=pqu.PQU.PQU(value=0.0,unit='eV')
+                    Gamma = pqu.PQU.PQU(value=widthList[0], unit='eV')
+
+                # save results
+                results[c]['spacings'].append(D)
+                results[c]['widths'].append(Gamma)
 
         return results
 
-    def getTransmissionCoefficientsFromSumRule(self,resonancesPerBin=10,computeUncertainty=False):
+    def getTransmissionCoefficients(self, resonancesPerBin=10, computeUncertainty=False, method='weakCoupling'):
         """
-        Use Moldauer's sum rule to extract the transmission coefficients directly from the RRR tables
-            P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967)
+        Compute the effective transmission coefficient in the resolved resonance regime.
+        The method argument controls the schemes to do this.
+
+        In each case, define the variable tau as::
+
+            ..math::
+                x_c = \\pi\\overline{\\Gamma}_c/D
+
+        These are the options:
+
+            * `method=='weakCoupling'`:  This is the traditional weak coupling limit::
+
+                ..math::
+                    T_c=2x_c
+
+            * `method=='1stOrder'`: This is the same as the weak coupling limit.
+
+            * `method=='2ndOrder'`: This is the 2nd order correction to the weak coupling limit::
+
+                ..math::
+                    T_c=2x_c(1-x_c)
+
+            * `method=='sumRule'`: Use Moldauer's sum rule to extract the transmission coefficients directly from
+                the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::
+
+                ..math::
+                    T_c=2x_c\\left[\\sqrt{1+x_c^2}-x_c\\right]
+
+            * `method=='opticalModel'`: Use Moldauer's 'optical model' transmission coefficient::
+
+                ..math::
+                    T_c=1-\\exp{(-2x_c)}
+
+            * `method`==`SPRT`: Use the
+
+                ..math::
+                    T_c=\\frac{2x_c}{ (1 + x_c/2)^2 + (P_c R^\\inf_c)^2 }
 
         :param computeUncertainty: toggle the calculation of the uncertainty of the transmission coefficients
-        :return: a dictionary of results, sorted by channel
+        :param resonancesPerBin: we'll try to get at least this number of resonances in each energy bin
+        :param method: method to compute the transmission coefficient
+        :return: a dictionary of results, sorted by channel.  Tc entries are all PQU's or None if it cannot be computed
         """
+        allowedMethods=["weakCoupling", '1stOrder', '2ndOrder', 'sumRule', 'opticalModel', 'SPRT']
+        if method not in allowedMethods:
+            raise ValueError('Transmission coefficient calculation method must be one of '+', '.join(allowedMethods))
         import pqu.PQU
         nBins=min([len(self.allChannels[c]) for c in self.allChannels if len(self.allChannels[c]) > 0])//resonancesPerBin
         aves=self.getAverageQuantities(nBins=nBins,computeUncertainty=computeUncertainty)
         results={}
         for c in aves:
             results[c]={'Tc':[],'energyGrid':aves[c]['energyGrid']}
-            if len(self.allChannels[c])==0: continue
             for i in range(len(aves[c]['energyGrid'])-1):
+                if not aves[c]['spacings'][i] or not aves[c]['widths'][i]:
+                    results[c]['Tc'].append(None)
+                    continue
                 try:
                     twoPiGOverD=2.0*math.pi*aves[c]['widths'][i]/aves[c]['spacings'][i]
-                except ZeroDivisionError: continue
-                if twoPiGOverD < 1e-16: results[c]['Tc'].append(pqu.PQU.PQU(value=0.0,unit=''))
-                else: results[c]['Tc'].append(0.5*twoPiGOverD*twoPiGOverD*( math.sqrt(1.0+4.0/twoPiGOverD/twoPiGOverD) - 1.0))
+                except ZeroDivisionError:
+                    continue
+                if method in ["weakCoupling",'1stOrder']:
+                    results[c]['Tc'].append(twoPiGOverD)
+                elif method == '2ndOrder':
+                    results[c]['Tc'].append(twoPiGOverD*(1.0-twoPiGOverD/2.0))
+                elif method == 'sumRule':
+                    if twoPiGOverD < 1e-16: results[c]['Tc'].append(pqu.PQU.PQU(value=0.0,unit=''))
+                    else: results[c]['Tc'].append(0.5*twoPiGOverD*twoPiGOverD*( math.sqrt(1.0+4.0/twoPiGOverD/twoPiGOverD) - 1.0))
+                elif method=='opticalModel':
+                    results[c]['Tc'].append(PQU.PQU(1.0-math.exp(-twoPiGOverD), ""))
+                else: #method=="SPRT"
+                    xx=1.0+twoPiGOverD*twoPiGOverD/4.0
+                    results[c]['Tc'].append(twoPiGOverD/xx/xx)
         return results
 
-    def getPoleStrength(self,computeUncertainty=False):
+    def getPoleStrength(self, computeUncertainty=False):
         """
-        Computes the neutron pole strength from the transmission coefficients
+        Computes the (usu. neutron) pole strength from Eq. (209) from JEFF Report 18::
 
-        ..math::
-            s_c(E) = \rho_c(E)\overline{\Gamma_c}/2P_c = T_c(E)/4\pi P_c
+            ..math::
+                s_c(E) = \\frac{\\left<\\gamma_c^2\\right>}{D} = \\frac{\\overline{\\Gamma_c}(ER)}{2 D P_c(ER)}
+
+        In the weak coupling limit, we could also use the transmission coefficient :math:`s_c(E)=T_c(ER)/4\\pi P_c`
 
         :param computeUncertainty:
-        :return:
+        :return:  a dictionary of results, sorted by channel.
+                  Pole strength entries are all PQU's or None if it cannot be computed
         """
         results = {}
-        Tcs = self.getTransmissionCoefficientsFromSumRule(computeUncertainty=computeUncertainty)
-        results.update(Tcs)
-        for c in Tcs:
-            #if not c.isElastic: continue
-            results[c]['sc']=[]
-            if len(self.allChannels[c])==0: continue
-            for i in range(len(Tcs[c]['energyGrid'])-1):
-                penFact = self.penetrationFactorByChannel(c,Tcs[c]['energyGrid'][i])
-                if penFact>0.0 and i<len(results[c]['Tc']):
-                    results[c]['sc'].append( (results[c]['Tc'][i])/(4.0*math.pi*penFact) )
+        aves = self.getAverageQuantities(computeUncertainty=computeUncertainty)
+        for c in aves:
+            results[c]={'sc':[], 'energyGrid':aves[c]['energyGrid']}
+            for i in range(len(aves[c]['energyGrid'])-1):
+                if (not aves[c]['spacings'][i] or not aves[c]['widths'][i]) or len(self.allChannels[c]) == 0:
+                    results[c]['sc'].append(None)
+                    continue
+                Emin=aves[c]['energyGrid'][i]
+                Emax=aves[c]['energyGrid'][i+1]
+                redWidths=self.getReducedWidths(c, Emin=Emin, Emax=Emax)
+                if len(redWidths) == 0: continue
+                gg=numpy.mean([g*g for g in redWidths])
+                ggUnc=numpy.sqrt(numpy.var([g*g for g in redWidths]))
+                results[c]['sc'].append(PQU.PQU(gg, unit='eV', uncertainty=ggUnc)/aves[c]['spacings'][i])
         return results
 
-    def getStrengthFunction(self,computeUncertainty=False):
-        results={}
-        sc = self.getPoleStrength(computeUncertainty=computeUncertainty)
-        for c in sc:
-            if len(self.allChannels[c])==0 or not 'sc' in sc[c] or len(sc[c]['sc'])==0:  results[c]=-1
-            elif sc[c]['sc'][0]>0.0 or len(sc[c]['sc'])==1: results[c]=sc[c]['sc'][0]
-            else: results[c]=sc[c]['sc'][1]
-        return results
+    def getScatteringLength(self, L=None):
+        """
+        Said Mughabghab (Atlas of Neutron Resonances, 5th edition (2006) p. 19, eq. (1.54))
+        defines R' as the s-wave scattering length, calculable from the potential
+        scattering cross section sigPot = 4 Pi (R')^2.
 
-    def getScatteringLength(self):
-        '''
-        Compute R' in b**1/2, should be close to AP
+        We compute the potential scattering cross section at E=1e-5 eV via
 
-        The potential scattering cross section sigPot = 4 Pi (R')^2, so we compute the potential scattering cross section at E=1e-5 eV
-        :return:
-        '''
+        ..math::
+            \\sigma_{pot} = \\sum_L 4\\pi g_J\\frac{\\sin(\\phi_L(E))}{k^2}
+
+        As Mughabghab only gives the S-wave scattering length, we provide the option of choosing an L as an argument
+        to the function.  If L is supplied by the user, only that L is used in the calculation of R', otherwise all
+        L's are used.
+
+        R' is given in in b**1/2 and should be close to AP.  It won't be exactly the same because of the
+        contribution of distant levels.  Froehner (JEFF Report 18) Eq. (214) and the Atlas Eq. (1.51) give
+
+        ..math::
+            R' = AP*(1-R^\\infty)
+
+        where AP is the scattering length given in the file for the R-matrix parameterization and R^\\infty is the
+        distant level parameter, related to the pole strength (call getPoleStrength) as a Hilbert transform, or
+        by direct summation such as Atlas Eq. (1.52):
+
+        ..math::
+            R^\\infty=\\sum_n \\frac{\\gamma_n^2}{E_n-E}
+
+        :param L: either an integer (the angular momentum to use) or None (all angular momentum)
+        :return: R', the scattering radius, in b**1/2
+        """
         E=numpy.array([ PQU.PQU(1e-5, 'eV').getValueAs(self.energyUnit) ])
         sigPotL = []
-        for c in self.channels:
+        for c in self.allChannels:
             if not c.isElastic: continue
-            sigPotL.append( ( ( 2.0 * c.l + 1 ) ) * 4.0 * numpy.pi * ( numpy.sin( self.phiByChannel(c,E) ) )**2 / self.k(E)**2 )
+            if L is None or c.l == L:
+                sigPotL.append( c.gfact * 4.0 * numpy.pi * ( numpy.sin( self.phiByChannel(c,E) ) )**2 / self.k(E)**2 )
         sigPot = sum(sigPotL)
         return numpy.sqrt(sigPot/4.0/numpy.pi)[0]
 
-    def getReducedWidths(self, channel, Emin=None, Emax=None):
+    def getReducedWidths(self, channel, Emin=0.0, Emax=None):
         """
-        Convert the list of widths to reduced widths:
+        Convert the widths corresponding to `channel` to reduced widths in the usual way (JEFF Report 18, Eq. (174))::
 
-            redWidth = width/2*penetrability
+            ..math::
+                \\gamma_c = \\sqrt{\\Gamma_c(E_R)/2P_c(E_R)}
 
-        :param widthList:
-        :param channel:
-        :return:
+        Here :math:`\\gamma_c` is the reduced width, :math:`\\Gamma_c` is the regular width, tabulated in the ENDF file,
+        :math:`E_R` is the resonance energy (ignoring shifts), and :math:`P_c(E)` is the penetrability factor.
+
+        :param Emin: The minimum resonance energy to convert to reduced width (in eV), defaults to 0.0.
+                     If set to None, all resonances will be converted.
+        :param Emax: The maximum resonance energy to convert to reduced width (in eV), defaults to None.
+                     If set to None, all resonances will be converted.
+        :param channel: The ChannelDesignator of the widths to be converted.
+        :return: the list of reduced widths corresponding to the resonances in the range [Emin, Emax]
         """
-        reducedWidthList=[]
+        reducedWidthList = []
+        ERs=[]
         for iR in self.allChannels[channel]:
             ER=self._energies[iR]
             if Emin is not None and ER < Emin: continue
             if Emax is not None and ER > Emax: continue
-            reducedWidthList.append(self.allChannels[channel][iR]/2.0/self.penetrationFactorByChannel(channel,ER))
+            ERs.append(ER)
+        reducedWidthList=numpy.sqrt(
+            numpy.abs(self.allChannels[channel][iR])/2.0/self.penetrationFactorByChannel(channel, numpy.array(ERs)))
         return reducedWidthList
 
     def getPorterThomasFitToWidths(self, Emin=0.0, Emax=None, verbose=False):
-        '''
+        """
         Perform a channel-by-channel fit of the histogram of widths to a Porter-Thomas distribution.
 
         :param verbose:
         :return:
-        '''
-        try: import scipy.optimize
+        """
+        try:
+            import scipy.optimize
         except ImportError:
             print("WARNING: scipy.optimize not imported, Porter-Thomas analysis not done")
             return {}
@@ -1635,19 +1629,22 @@ class RRBaseClass(resonanceReconstructionBaseClass):
         for c in self.allChannels:
             if verbose: print()
             if verbose: print(c)
-#            if c.eliminated:
-#                if verbose: print '    eliminated'
-#                results[c]={'dof':1.e6,'ddof':0.0}
-#            elif len(self.allChannels[c])<2:
             if len(self.allChannels[c]) < 2:
                 if verbose: print( '    not enough data' )
                 results[c]={'dof':1.0,'ddof':0.0}
             else:
                 reducedWidthList=self.getReducedWidths(c, Emin=Emin, Emax=Emax)
                 aveWidth = numpy.mean(reducedWidthList)
-                norm=len(reducedWidthList)
-                if verbose: print( '    widths', reducedWidthList )
-                if all([w==reducedWidthList[0] for w in reducedWidthList]):
+                if not isinstance(reducedWidthList, numpy.ndarray):
+                    norm=1
+                else:
+                    norm=len(reducedWidthList)
+                if verbose:
+                    print( '    widths', reducedWidthList )
+                if norm == 1:
+                    if verbose: print('    not enough widths to fit')
+                    results[c] = {'dof': 1.0, 'ddof': 0.0}
+                elif all([w==reducedWidthList[0] for w in reducedWidthList]):
                     if verbose: print( '    widths identical' )
                     results[c]={'dof':1.0,'ddof':0.0}
                 elif aveWidth == 0.0 or numpy.isnan(aveWidth):
@@ -1691,18 +1688,18 @@ class RRBaseClass(resonanceReconstructionBaseClass):
 #### Single-level Breit-Wigner ###
 class SLBWcrossSection(RRBaseClass):
     """
-    given a resonance region in SLBW format,
-    create a class with all data required to reconstruct
+    Resonance reconstructor for Singe-level Breit Wigner.
 
     Note, the resonances in the SLBW format each correspond to different "levels" and so do not
-    interfere.  This is unlike all of the other RRR formats.  So, while one resonance energy
+    interfere.  This is unlike all of the other resolved resonance formats.  So, while one resonance energy
     and one width go with one channel and all the channels associated with one resonance energy
     go together to make one reaction, the reactions for each resonance are added incoherently (no
     interference effects at all).
     """
 
-    def __init__(self, reactionSuite, sectionIndex=None, enableAngDists=False, verbose=True, **kw):
-        RRBaseClass.__init__(self, reactionSuite, sectionIndex, **kw)
+    def __init__(self, BreitWignerForm, enableAngDists=False, verbose=True, **kw):
+        parent = BreitWignerForm.ancestor
+        RRBaseClass.__init__(self, BreitWignerForm, parent.domainMin, parent.domainMax, **kw)
         self.verbose = verbose
         self.sortLandJ()
         if self.verbose:
@@ -1752,7 +1749,7 @@ class SLBWcrossSection(RRBaseClass):
             if not JisAllowed:
                 if warnOnly:
                     allowedSByThisJl.append( SS )
-                    from fudge.gnds import warning
+                    from fudge import warning
                     warnings.append(warning.invalidAngularMomentaCombination(L, SS, abs(J), 'SLBW'))
                 else: raise ValueError( "Invalid total angular momentum and/or orbital momentum: cannot couple up to J = "+str(J)+" with I = "+str(self.targetSpin)+", i = 0.5 and L = "+str(L) )
             gfact = (2.0*abs(J)+1)/((2*self.projectileSpin+1)*(2*self.targetSpin+1))
@@ -1767,12 +1764,12 @@ class SLBWcrossSection(RRBaseClass):
                 channelDict[ ChannelDesignator( L, abs(J), 'elastic', iR, allowedSByThisJl[0], gfact, None, None, 0.0, True, NEUTRONCHANNEL, False, False )] = [ ( ER, GN ) ]
                 channelDict[ ChannelDesignator( L, abs(J), 'capture', iR, allowedSByThisJl[0], gfact, None, None, 0.0, False, GAMMACHANNEL, False, False )] = [ ( ER, GG ) ]
                 if GF != 0.0: channelDict[ ChannelDesignator( L, abs(J), 'fission', iR, allowedSByThisJl[0], gfact, None, None, 0.0, False, FISSIONCHANNEL, False, False )]     = [ ( ER, GF ) ]
-                if GX != 0.0: channelDict[ ChannelDesignator( L, abs(J), 'competitive', iR, allowedSByThisJl[0], gfact, None, None, 0.0, False, COMPETATIVECHANNEL, False, False )] = [ ( ER, GX ) ]
+                if GX != 0.0: channelDict[ ChannelDesignator(L, abs(J), 'competitive', iR, allowedSByThisJl[0], gfact, None, None, 0.0, False, COMPETITIVECHANNEL, False, False)] = [(ER, GX)]
                 for SS in allowedSByThisJl[1:]:
                     channelDict[ ChannelDesignator( L, abs(J), 'elastic', iR, SS, gfact, None, None, 0.0, True, NEUTRONCHANNEL, False, False )] = [ ( ER, 0.0 ) ]
                     channelDict[ ChannelDesignator( L, abs(J), 'capture', iR, SS, gfact, None, None, 0.0, False, GAMMACHANNEL, False, False )] = [ ( ER, 0.0 ) ]
                     if GF != 0.0: channelDict[ ChannelDesignator( L, abs(J), 'fission', iR, SS, gfact, None, None, 0.0, False, FISSIONCHANNEL, False, False )]     = [ ( ER, 0.0 ) ]
-                    if GX != 0.0: channelDict[ ChannelDesignator( L, abs(J), 'competitive', iR, SS, gfact, None, None, 0.0, False, COMPETATIVECHANNEL, False, False )] = [ ( ER, 0.0 ) ]
+                    if GX != 0.0: channelDict[ ChannelDesignator(L, abs(J), 'competitive', iR, SS, gfact, None, None, 0.0, False, COMPETITIVECHANNEL, False, False)] = [(ER, 0.0)]
 
             # Way mandated by ENDF manual:
             #   * Width divided between channels with valid S's based on sign of J:
@@ -1788,7 +1785,7 @@ class SLBWcrossSection(RRBaseClass):
                     channelDict[ ChannelDesignator( L, abs(J), 'elastic', iR, SS, gfact, None, None, 0.0, True, NEUTRONCHANNEL, False, False )] = [ ( ER, GN/numAllowedSByThisJl ) ]
                     channelDict[ ChannelDesignator( L, abs(J), 'capture', iR, SS, gfact, None, None, 0.0, False, GAMMACHANNEL, False, False )] = [ ( ER, GG/numAllowedSByThisJl ) ]
                     if GF != 0.0: channelDict[ ChannelDesignator( L, abs(J), 'fission', iR, SS, gfact, None, None, 0.0, False, FISSIONCHANNEL, False, False )]     = [ ( ER, GF/numAllowedSByThisJl ) ]
-                    if GX != 0.0: channelDict[ ChannelDesignator( L, abs(J), 'competitive', iR, SS, gfact, None, None, 0.0, False, COMPETATIVECHANNEL, False, False )] = [ ( ER, GX/numAllowedSByThisJl ) ]
+                    if GX != 0.0: channelDict[ ChannelDesignator(L, abs(J), 'competitive', iR, SS, gfact, None, None, 0.0, False, COMPETITIVECHANNEL, False, False)] = [(ER, GX / numAllowedSByThisJl)]
 
             # Ignore problem:
             #   * Ignore spin of channels and the fact may be multiple valid spins
@@ -1797,7 +1794,7 @@ class SLBWcrossSection(RRBaseClass):
                 channelDict[ ChannelDesignator( L, abs(J), 'elastic', iR, S, gfact, None, None, 0.0, True, NEUTRONCHANNEL, False, False )] = [ ( ER, GN ) ]
                 channelDict[ ChannelDesignator( L, abs(J), 'capture', iR, S, gfact, None, None, 0.0, False, GAMMACHANNEL, False, False )] = [ ( ER, GG ) ]
                 if GF != 0.0: channelDict[ ChannelDesignator( L, abs(J), 'fission', iR, S, gfact, None, None, 0.0, False, FISSIONCHANNEL, False, False )]     = [ ( ER, GF ) ]
-                if GX != 0.0: channelDict[ ChannelDesignator( L, abs(J), 'competitive', iR, S, gfact, None, None, 0.0, False, COMPETATIVECHANNEL, False, False )] = [ ( ER, GX ) ]
+                if GX != 0.0: channelDict[ ChannelDesignator(L, abs(J), 'competitive', iR, S, gfact, None, None, 0.0, False, COMPETITIVECHANNEL, False, False)] = [(ER, GX)]
             channelDicts.append( channelDict )
 
         self.channels = channelDicts
@@ -1834,12 +1831,12 @@ class SLBWcrossSection(RRBaseClass):
             for c in channels:
                 if c.reaction == 'elastic':
                     Gam = ( channels[c][0][1] *
-                        self.penetrationFactor( c.l, self.rho( Ein,       c.l ) ) /
-                        self.penetrationFactor( c.l, self.rho( abs( ER ), c.l ) ) )
+                        self.penetrationFactor( c.l, self.rho( Ein ) ) /
+                        self.penetrationFactor( c.l, self.rho( abs( ER ) ) ) )
                     ERp += (
-                            self.shiftFactor( c.l, self.rho( abs( ER ), c.l ) ) -
-                            self.shiftFactor( c.l, self.rho( Ein,       c.l ) )
-                        ) * channels[c][0][1] / (2.0 * self.penetrationFactor( c.l, self.rho( abs(ER), c.l) ) )
+                            self.shiftFactor( c.l, self.rho( abs( ER ) ) ) -
+                            self.shiftFactor( c.l, self.rho( Ein ) )
+                        ) * channels[c][0][1] / (2.0 * self.penetrationFactor( c.l, self.rho( abs(ER) ) ) )
                     eiphis.append( numpy.exp( complex( 0.0, -self.phi( c.l, rhohat ) ) ) )
                 else:
                     Gam = channels[c][0][1]
@@ -1864,8 +1861,7 @@ class SLBWcrossSection(RRBaseClass):
         elasticSum = 0
         fissionSum = 0
         rho = self.rho(E)
-        # for calculating phi, always use tabulated scattering radius:
-        rhohat = self.RR.scatteringRadius.getValueAs('10*fm') * self.k(E)
+        rhohat = self.rho(E, forceUseTabulated=True)    # for calculating phi, always use tabulated scattering radius
         for L in self.Ls:
             l = L['L']
             phi = self.phi(l,rhohat)
@@ -1874,14 +1870,23 @@ class SLBWcrossSection(RRBaseClass):
             for J in L['Js']:
                 gfactor = J['gfact']
                 for spin in J['channelSpins']:
-                    dE = (E-(spin['energy']+spin['neutronWidth']*(spin['shiftFactor']-S)))
-                    totalWidth = P*spin['neutronWidth'] + spin['captureWidth'] + spin['fissionWidth']
-                    denominator = dE**2 + totalWidth**2 / 4
-                    captureSum += gfactor * numpy.sum( ( P * spin['neutronWidth'] * spin['captureWidth'] ) / denominator , axis=1)
-                    fissionSum += gfactor * numpy.sum( ( P * spin['neutronWidth'] * spin['fissionWidth'] ) / denominator , axis=1)
-                    elasticSum += gfactor * numpy.sum( ( P*spin['neutronWidth'] * ( P*spin['neutronWidth']
-                        - 2 * numpy.sin(phi)**2 * totalWidth + 4 * numpy.sin(phi)*numpy.cos(phi) * (E-spin['energy']) ) )
-                        / denominator , axis=1)
+                    try:                    # use C extension if available
+                        from . import getBreitWignerSums
+                        capt, elas, fiss = getBreitWignerSums.getBreitWignerSums(E, spin['energy'],
+                                spin['captureWidth'], spin['neutronWidth'], spin['fissionWidth'], spin['shiftFactor'],
+                                P, S, phi, 'SingleLevel')
+                        captureSum += gfactor * capt
+                        elasticSum += gfactor * elas
+                        fissionSum += gfactor * fiss
+                    except ImportError:     # numpy version (memory-intensive)
+                        dE = (E-(spin['energy']+spin['neutronWidth']*(spin['shiftFactor']-S)))
+                        totalWidth = P*spin['neutronWidth'] + spin['captureWidth'] + spin['fissionWidth']
+                        denominator = dE**2 + totalWidth**2 / 4
+                        captureSum += gfactor * numpy.sum( ( P * spin['neutronWidth'] * spin['captureWidth'] ) / denominator , axis=1)
+                        fissionSum += gfactor * numpy.sum( ( P * spin['neutronWidth'] * spin['fissionWidth'] ) / denominator , axis=1)
+                        elasticSum += gfactor * numpy.sum( ( P*spin['neutronWidth'] * ( P*spin['neutronWidth']
+                            - 2 * numpy.sin(phi)**2 * totalWidth + 4 * numpy.sin(phi)*numpy.cos(phi) * (E-spin['energy']) ) )
+                            / denominator , axis=1)
             # numpy.sum(..., axis=1) returns row vector, so also convert first term to row vector:
             elasticSum += 4*(2*l+1)*numpy.sin(phi)[:,0]**2
 
@@ -1890,20 +1895,22 @@ class SLBWcrossSection(RRBaseClass):
         capture = beta * captureSum
         elastic = beta * elasticSum
         fission = beta * fissionSum
-        for reaction in (capture,elastic,fission):
-            reaction[ reaction<=0 ] = 0
+        if self.removeNegatives:
+            for reaction in (capture,elastic,fission):
+                reaction[ reaction<=0 ] = 0
         total = elastic + capture + fission
         nonelastic = capture + fission
         result = {'total':total, 'elastic':elastic, 'capture':capture, 'fission':fission, 'nonelastic':nonelastic}
         return result
 
-    def getScatteringLength(self):
-        '''
+    def getScatteringLength(self, **kwargs):
+        """
         Compute R' in b**1/2, should be close to AP
 
         The potential scattering cross section sigPot = 4 Pi (R')^2, so we compute the potential scattering cross section at E=1e-5 eV
+        :param **kwargs:
         :return:
-        '''
+        """
         E=numpy.array([ PQU.PQU(1e-5, 'eV').getValueAs(self.energyUnit) ])
         sigPotL = []
         for l in self.channels:
@@ -1916,14 +1923,13 @@ class SLBWcrossSection(RRBaseClass):
 #### Multi-level Breit-Wigner ###
 class MLBWcrossSection(RRBaseClass):
     """
-    Given a resonance region in MLBW format,
-    create a class with all data required to reconstruct
-
-    Only the elastic channel differs from SLBW
+    Resonance reconstructor for Multi-level Breit-Wigner parameters.
+    Only the elastic channel differs from SLBW.
     """
 
-    def __init__(self, reactionSuite, sectionIndex=None, enableAngDists=False, verbose=True, **kw):
-        RRBaseClass.__init__(self, reactionSuite, sectionIndex, **kw)
+    def __init__(self, BreitWignerForm, enableAngDists=False, verbose=True, **kw):
+        parent = BreitWignerForm.ancestor
+        RRBaseClass.__init__(self, BreitWignerForm, parent.domainMin, parent.domainMax, **kw)
         self.verbose = verbose
         self.sortLandJ()
         if self.verbose:
@@ -1943,6 +1949,11 @@ class MLBWcrossSection(RRBaseClass):
         Compute the scattering matrix.  We could have used the generic U function in the base class,
         but Froehner has "simplifications" that we took advantage of here (that and I don't know what the
         R matrix is exactly in the case of MLBW).
+
+        :param Ein: numpy.array(type=float)
+        :param boolean useTabulatedScatteringRadius:
+        :param boolean enableExtraCoulombPhase:
+        :return:
         """
         # Initialize lists and matrices
         sqrtGam = numpy.zeros( ( len(Ein), self.nChannels, self.nResonances ) )
@@ -1960,12 +1971,12 @@ class MLBWcrossSection(RRBaseClass):
                 for iR, G in self.channels[c].items():
                     ER = self._energies[iR]
                     Gam = ( G *
-                        self.penetrationFactor( c.l, self.rho( Ein,       c.l ) ) /
-                        self.penetrationFactor( c.l, self.rho( abs( ER ), c.l ) ) )
+                        self.penetrationFactor( c.l, self.rho( Ein ) ) /
+                        self.penetrationFactor( c.l, self.rho( abs( ER ) ) ) )
                     ERp[iR] += (
-                            self.shiftFactor( c.l, self.rho( abs( ER ), c.l ) ) -
-                            self.shiftFactor( c.l, self.rho( Ein,       c.l ) )
-                        ) * G / 2.0 / self.penetrationFactor( c.l, self.rho( abs(ER), c.l) )
+                            self.shiftFactor( c.l, self.rho( abs( ER ) ) ) -
+                            self.shiftFactor( c.l, self.rho( Ein ) )
+                        ) * G / 2.0 / self.penetrationFactor( c.l, self.rho( abs(ER) ) )
                     sqrtGam[ :, ic, iR ] = numpy.sqrt(Gam).T
                     Gtots[ iR ] += Gam
             else:
@@ -1983,12 +1994,12 @@ class MLBWcrossSection(RRBaseClass):
         # Compute the denominator
         DEN = ERp - Ein - 1j*numpy.array(Gtots)/2.0
 
-        # Compute U itself.  Can we accelerate this with numpy routines?
+        # Compute U itself.
         for i1 in range( self.nChannels ):
             for i2 in range( i1, self.nChannels ):
                 U[:,i1,i2] += 1j * numpy.sum( sqrtGam[:,i1,:] * sqrtGam[:,i2,:] / DEN[:,:,0].T, axis=1 )
                 U[:,i1,i2] *= (eiphis[i1] * eiphis[i2]).flatten()
-                U[:,i2,i1] = U[:,i1,i2]
+                U[:,i2,i1] = U[:,i1,i2]     # symmetrize
         return U
 
     @blockwise
@@ -1997,11 +2008,7 @@ class MLBWcrossSection(RRBaseClass):
         elasticSum = 0
         fissionSum = 0
         rho = self.rho(E)
-        # for phi:
-        if self.RR.scatteringRadius.isEnergyDependent():
-            rhohat = numpy.array(self.RR.scatteringRadius.getValueAs('10*fm', E[:,0]))[:,numpy.newaxis] * self.k(E)
-        else:
-            rhohat = self.RR.scatteringRadius.getValueAs('10*fm') * self.k(E)
+        rhohat = self.rho(E, forceUseTabulated=True)    # for phi
         for L in self.Ls:
             l = L['L']
             phi = self.phi(l,rhohat)
@@ -2010,24 +2017,33 @@ class MLBWcrossSection(RRBaseClass):
             for J in L['Js']:
                 gfactor = J['gfact']
                 for spin in J['channelSpins']:
-                    dE = (E-(spin['energy']+spin['neutronWidth']*(spin['shiftFactor']-S)))
-                    totalWidth = P*spin['neutronWidth'] + spin['captureWidth'] + spin['fissionWidth']
-                    denominator = dE**2 + totalWidth**2 / 4
-                    commonFactor = P * spin['neutronWidth'] / denominator
-                    captureSum += gfactor * numpy.sum( commonFactor * spin['captureWidth'] , axis=1)
-                    fissionSum += gfactor * numpy.sum( commonFactor * spin['fissionWidth'] , axis=1)
+                    try:                    # use C extension if available
+                        from . import getBreitWignerSums
+                        capt, elas, fiss = getBreitWignerSums.getBreitWignerSums(E, spin['energy'],
+                                spin['captureWidth'], spin['neutronWidth'], spin['fissionWidth'], spin['shiftFactor'],
+                                P, S, phi, 'MultiLevel')
+                        captureSum += gfactor * capt
+                        elasticSum += gfactor * elas
+                        fissionSum += gfactor * fiss
+                    except ImportError:     # numpy version (memory-intensive)
+                        dE = (E-(spin['energy']+spin['neutronWidth']*(spin['shiftFactor']-S)))
+                        totalWidth = P*spin['neutronWidth'] + spin['captureWidth'] + spin['fissionWidth']
+                        denominator = dE**2 + totalWidth**2 / 4
+                        commonFactor = P * spin['neutronWidth'] / denominator
+                        captureSum += gfactor * numpy.sum( commonFactor * spin['captureWidth'] , axis=1)
+                        fissionSum += gfactor * numpy.sum( commonFactor * spin['fissionWidth'] , axis=1)
 
-                    # simple elastic method, Eq D.19 - D.21 in ENDF 102. This has numerical issues, however:
-                    # U_nn = numpy.exp(-2*1j*phi[:,0]) * (1 + numpy.sum( 1j*P*spin['neutronWidth'] /
-                    #     (spin['energy']-E-1j*totalWidth/2) , axis=1))
-                    # elasticSum += gfactor * abs( (1-U_nn)**2 )
+                        # simple elastic method, Eq D.19 - D.21 in ENDF 102. This has numerical issues, however:
+                        # U_nn = numpy.exp(-2*1j*phi[:,0]) * (1 + numpy.sum( 1j*P*spin['neutronWidth'] /
+                        #     (spin['energy']-E-1j*totalWidth/2) , axis=1))
+                        # elasticSum += gfactor * abs( (1-U_nn)**2 )
 
-                    # Instead of the above, use the following from RECENT:
-                    elasticTerm1 = numpy.sum( totalWidth/2 * commonFactor, axis=1 )
-                    elasticTerm2 = numpy.sum( dE * commonFactor, axis=1 )
-                    sin2ps = 2*numpy.sin(phi[:,0])*numpy.cos(phi[:,0])
-                    sinps2 = 2*numpy.sin(phi[:,0])**2
-                    elasticSum += gfactor * ((sinps2-elasticTerm1)**2 + (sin2ps+elasticTerm2)**2)
+                        # Instead of the above, use the following from RECENT:
+                        elasticTerm1 = numpy.sum( totalWidth/2 * commonFactor, axis=1 )
+                        elasticTerm2 = numpy.sum( dE * commonFactor, axis=1 )
+                        sin2ps = 2*numpy.sin(phi[:,0])*numpy.cos(phi[:,0])
+                        sinps2 = 2*numpy.sin(phi[:,0])**2
+                        elasticSum += gfactor * ((sinps2-elasticTerm1)**2 + (sin2ps+elasticTerm2)**2)
             if True: #addMissingGfactor:
                 elasticSum += 2*numpy.sin(phi[:,0])**2 * 2*self.missingGfactor[l]
 
@@ -2036,8 +2052,9 @@ class MLBWcrossSection(RRBaseClass):
         capture = beta * captureSum
         elastic = beta * elasticSum
         fission = beta * fissionSum
-        for reaction in (capture,elastic,fission):
-            reaction[ reaction<=0 ] = 0
+        if self.removeNegatives:
+            for reaction in (capture,elastic,fission):
+                reaction[ reaction<=0 ] = 0
         total = elastic + capture + fission
         nonelastic = capture + fission
         return {'total':total, 'elastic':elastic, 'capture':capture, 'fission':fission, 'nonelastic':nonelastic}
@@ -2072,7 +2089,7 @@ def getR_S(E, Eres, captureWidth, widths, penetrabilities):
     dim = len(widths)   # dimension of matrix at each energy
     try:
         # use wrapped c version if available:
-        import getScatteringMatrices
+        from . import getScatteringMatrices
         # convert any constant width/penetrability data to array w/correct dimensions:
         nRes = len(Eres)
         for i1 in range(dim):
@@ -2129,6 +2146,7 @@ def invertMatrices( R, S ):
         # have competition and/or fission, must invert matrices:
         def dotproduct(*args):
             # helper function: dotproduct(A,B,C) == numpy.dot(A, numpy.dot(B,C))
+            import functools
             def quickdot(a,b):
                 # take dot product of two Nx(MxM) arrays (containing MxM matrices):
                 result = numpy.zeros( a.shape )
@@ -2137,7 +2155,7 @@ def invertMatrices( R, S ):
                     for j in range(dim):
                         result[:,i,j] = numpy.sum( a[:,i,:] * b[:,:,j], axis=1 )
                 return result
-            return reduce( quickdot, args )
+            return functools.reduce( quickdot, args )
 
         def vectorInv(arr):
             # invert all MxM matrices in Nx(MxM) array
@@ -2183,167 +2201,6 @@ def invertMatrices( R, S ):
         return RI, SI
 
 
-#### Reich_Moore ####
-class RMcrossSection(RRBaseClass):
-    """
-    simplified Reich_Moore (LRF=3 in ENDF)
-    More complex than Breit-Wigner approximations, but we can still use same __init__
-    """
-
-    def __init__(self, reactionSuite, sectionIndex=None, enableAngDists=False, verbose=False, **kw):
-        RRBaseClass.__init__(self, reactionSuite, sectionIndex, **kw)
-        self.verbose = verbose
-        self.sortLandJ()
-        if self.verbose:
-            print ("From %f to %f %s, reconstructing using Reich_Moore (LRF=3)" %
-                    (self.lowerBound,self.upperBound, self.energyUnit))
-        if enableAngDists: self.setResonanceParametersByChannel( useReichMooreApproximation = True )
-
-    def getChannelConstantsBc( self ):
-        """
-        For ENDF's Reich-Moore, should be
-
-            ..math::
-                B_c = -\ell
-
-        where $ell$ is the channel angular momentum
-
-        what is not clearly stated in the ENDF manual is that Bc = 0 for this case
-        """
-        return [ 0.0 for c in self.channels ]
-
-    def getL0Matrix( self, Ein, Bc=None ):
-        """
-        Get the L0 matrix of Froehner:
-
-            ..math::
-
-                {\bf L^0}_{cc'} = \delta_{cc'} (L_c-B_c)
-
-        where
-
-            ..math::
-
-                L_c = S_c + i P_c
-
-        But.... ENDF's RM formulation uses a shift of 0 and a Bc of 0!!!
-
-        """
-        L0 = numpy.zeros( (len(Ein), self.nChannels, self.nChannels), dtype=complex )
-        for ic,c in enumerate(self.channels):
-            L0[:,ic,ic] = (1j*self.penetrationFactor( c.l, self.rho( Ein, c.l ) )).flatten()
-        return L0
-
-    def getRMatrix( self, Ein ):
-        """
-        The R matrix in the Reich-Moore approximation,
-        :math:`R_{cc'} = \sum_\lambda \frac{\gamma_{\lambda c}\gamma_{\lambda c'}{E_\lambda - E - i\Gamma_{\lambda\gamma}/2}`
-        """
-
-        R = numpy.zeros( (len(Ein), self.nChannels, self.nChannels), dtype=complex )
-
-        # Loop through all resonances
-        for iR, ER in enumerate( self._energies ):
-
-            # Extract the gamma width for the first gamma channel that has this resonance
-            gamWidth = 0.0
-            for cg in self.eliminatedChannels:
-                if iR in self.eliminatedChannels[ cg ]:
-                    gamWidth = self.eliminatedChannels[ cg ][ iR ]
-                    if gamWidth != 0.0: break
-            if gamWidth == 0.0:
-                print( self.eliminatedChannels )
-                raise ValueError("Can't find gamma for resonance at ER = %s %s" % (ER, self.energyUnit))
-
-            # Precompute the reduced widths
-            redWidth = []
-            for c in self.channels:
-                if iR in self.channels[ c ]:
-                    if c.reaction == 'elastic': pen = self.penetrationFactor( c.l, self.rho( abs( ER ), c.l ) )
-                    else:                       pen = 1.0
-                    redWidth.append( numpy.copysign( numpy.sqrt( abs( self.channels[ c ][ iR ] ) /
-                        ( 2.0*abs( pen ) ) ), self.channels[ c ][ iR ] ) )
-                else: redWidth.append( 0.0 )
-
-            # Loop through all channels to accumulate the R Matrix elements
-            for ic1, c1 in enumerate( self.channels ):
-                if not iR in self.channels[ c1 ]: continue
-                for ic2, c2 in enumerate( self.channels ):
-                    if ic2 > ic1: break     # matrix is symmetric
-                    if not iR in self.channels[ c2 ]: continue
-                    if numpy.any(ER-Ein == 0.0) and gamWidth == 0.0:
-                        raise ValueError( 'yikes! %s  vs.  %s'%(str(c1),str(c2)))
-                    dR = (redWidth[ ic1 ] * redWidth[ ic2 ] / ( ER-Ein - 1j * gamWidth / 2.0 ))
-                    R[:, ic1, ic2] += dR[:,0]
-                    if ic1 != ic2:
-                        R[:, ic2, ic1] += dR[:,0]
-
-        return R
-
-    @blockwise
-    def getCrossSection(self, E):
-        elasticSum = 0
-        absorbtionSum = 0
-        fissionSum = 0
-        haveFission = self.RR.resonanceParameters.table.getColumn('fissionWidth',unit=self.energyUnit) is not None
-        # for calculating phi, always use tabulated scattering radius:
-        for L in self.Ls:
-            l = L['L']
-            rho = self.rho(E,l)
-            rhohat = self.RR.scatteringRadius.getValueAs('10*fm', L=l) * self.k(E)
-            phi = self.phi(l, rhohat)
-            P = numpy.sqrt( self.penetrationFactor(l,rho) )
-
-            for J in L['Js']:
-                gfactor = J['gfact']
-                for spin in J['channelSpins']:
-                    captureWidth = spin['captureWidth'] * 0.5
-                    widths = []
-                    penetrabilities = []
-                    # FIXME note that spin['neutronWidth'] already includes the penetrablity (calculated at resonances)
-                    # That got wrapped in during sortLandJ, but may wish to move it back to here for readability
-                    widths.append( numpy.sqrt( spin['neutronWidth'] * 0.5 ) )
-                    penetrabilities.append(P)
-                    if haveFission:
-                        fissWidthA = numpy.sqrt(numpy.abs(spin['fissionWidth'] * 0.5))
-                        fissWidthB = numpy.sqrt(numpy.abs(spin['fissionWidthB'] * 0.5))
-                        fissWidthA[ spin['fissionWidth']<0 ] *= -1
-                        fissWidthB[ spin['fissionWidthB']<0 ] *= -1
-                        widths += [fissWidthA, fissWidthB]
-                        penetrabilities += [numpy.array([[1]]),numpy.array([[1]])]
-
-                        RI,SI = invertMatrices(
-                                *getR_S(E, spin['energy'], captureWidth, widths, penetrabilities)
-                                )
-
-                        elasticSum += gfactor * ((2*numpy.sin(phi[:,0])**2+2*RI[:,0,0])**2 +
-                                (2*numpy.sin(phi[:,0])*numpy.cos(phi[:,0]) + 2*SI[:,0,0])**2)
-                        absorbtionSum += -4*gfactor * (RI[:,0,0]+RI[:,0,0]**2+SI[:,0,0]**2)
-                        fissionSum += 4*gfactor * (RI[:,0,1]**2+RI[:,0,2]**2+SI[:,0,1]**2+SI[:,0,2]**2)
-
-                    else: # faster method when we don't have fission:
-                        RI, SI = invertMatrices(
-                                *getR_S(E, spin['energy'], captureWidth, widths, penetrabilities)
-                                )
-                        RI, SI = numpy.squeeze(RI), numpy.squeeze(SI)
-                        elasticSum += gfactor * ((2*numpy.sin(phi[:,0])**2+2*RI)**2 +
-                                (2*numpy.sin(phi[:,0])*numpy.cos(phi[:,0]) + 2*SI)**2)
-                        absorbtionSum += -4*gfactor * (RI + RI**2 + SI**2)
-
-            if True: #addMissingGfactor:
-                elasticSum += 2*numpy.sin(phi[:,0])**2 * 2*self.missingGfactor[l]
-
-        # get common factor 'beta' as a row vector:
-        beta = numpy.pi / self.k(E)[:,0]**2
-        elastic = beta * elasticSum
-        absorbtion = beta * absorbtionSum
-        fission = beta * fissionSum
-        capture = absorbtion - fission
-        total = elastic + absorbtion
-
-        return {'total':total, 'elastic':elastic, 'capture':capture, 'fission':fission, 'nonelastic':absorbtion}
-
-
 #### R-Matrix Limited ####
 class RMatrixLimitedcrossSection(RRBaseClass):
     """
@@ -2353,8 +2210,9 @@ class RMatrixLimitedcrossSection(RRBaseClass):
     Also, each resonance may have contributions from multiple l-waves
     """
 
-    def __init__(self, reactionSuite, sectionIndex=None, enableAngDists=False, verbose=True, **kw):
-        RRBaseClass.__init__(self, reactionSuite, sectionIndex, **kw)
+    def __init__(self, RMatrixForm, enableAngDists=False, verbose=True, **kw):
+        parent = RMatrixForm.ancestor
+        RRBaseClass.__init__(self, RMatrixForm, parent.domainMin, parent.domainMax, **kw)
         self.verbose = verbose
         if self.verbose:
             print ("From %f to %f %s, reconstructing using RMatrix (approximation %s)" %
@@ -2365,15 +2223,15 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         for rreac in self.RR.resonanceReactions:
             reaction = rreac.reactionLink.link
             # elastic, capture or competitive?
-            if reaction == reactionSuite.getReaction('capture'): rreac.tag = 'capture'
-            elif reaction == reactionSuite.getReaction('elastic'): rreac.tag = 'elastic'
+            if reaction == self.reactionSuite.getReaction('capture'): rreac.tag = 'capture'
+            elif reaction == self.reactionSuite.getReaction('elastic'): rreac.tag = 'elastic'
             elif 'fission' in rreac.label: rreac.tag = rreac.label
             else: rreac.tag = 'competitive'
 
             if rreac.Q is not None:
                 Q = rreac.Q.getConstantAs(self.energyUnit)
             else:
-                Q = reaction.getQ(self.energyUnit)
+                Q = reaction.getQ(self.energyUnit, final=False)
             # adjust Q value for residual in excited state:
             for particle in reaction.outputChannel.products:
                 if( hasattr( particle, 'getLevelAsFloat' ) ) : Q -= particle.getLevelAsFloat( self.energyUnit )
@@ -2401,36 +2259,34 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     sg.resonanceParameters.table.columns if col.name != 'energy']
             totalWidths.extend( numpy.sum( widths, axis=0 ) )
         zipped = sorted(zip(energies,totalWidths))
-        self._energies, self._widths = zip(*zipped)
+        self._energies, self._widths = list( zip(*zipped) )
         self._thresholds = thresholds
 
-        if enableAngDists: self.setResonanceParametersByChannel()
+        if enableAngDists:
+            self.setResonanceParametersByChannel()
 
-    def penetrationFactorByChannel(self,c,Ein):
+    def penetrationFactorByChannel(self, c, Ein):
         if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]: return 1.0
         rho = self.rho(Ein-c.Xi, c)
         if c.channelClass == CPCHANNEL:
-            import getCoulombWavefunctions
             pA, pB = self.particlePairs[c].reactionInfo['particles']
             eta = self.eta(Ein-c.Xi, pA, pB)
             return getCoulombWavefunctions.coulombPenetrationFactor(c.l,rho,eta)
         return self.penetrationFactor(c.l, rho)
 
-    def phiByChannel(self,c,Ein):
+    def phiByChannel(self, c, Ein):
         if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]: return 0.0
         rho = self.rhohat(Ein-c.Xi, c)
         if c.channelClass == CPCHANNEL:
-            import getCoulombWavefunctions
             pA, pB = self.particlePairs[c].reactionInfo['particles']
             eta = self.eta(Ein-c.Xi, pA, pB)
             return getCoulombWavefunctions.coulombPhi(c.l,rho,eta)
         return self.phi( c.l, self.rho(Ein,c) )
 
-    def shiftFactorByChannel(self,c,Ein):
+    def shiftFactorByChannel(self, c, Ein):
         if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]: return 0.0
         rho = self.rho(Ein-c.Xi, c)
         if c.channelClass == CPCHANNEL:
-            import getCoulombWavefunctions
             pA, pB = self.particlePairs[c].reactionInfo['particles']
             eta = self.eta(Ein-c.Xi, pA, pB)
             return getCoulombWavefunctions.coulombShiftFactor(c.l,rho,eta)
@@ -2470,9 +2326,12 @@ class RMatrixLimitedcrossSection(RRBaseClass):
 
         # The unified table of resonance parameter data
         channelDict = collections.OrderedDict()
-        def addOrUpdateDict( theDict, theKey, theValue ):
-            if not theKey in theDict: theDict[ theKey ] = {}
-            theDict[ theKey ][ theValue[0] ] = theValue[1]
+
+        def addOrUpdateDict(theDict, theKey, theValue):
+            if theKey not in theDict:
+                theDict[theKey] = {}
+            if theValue is not None:
+                theDict[theKey][theValue[0]] = theValue[1]
 
         # Pack the channels
         channelIndex=0
@@ -2488,7 +2347,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     # Check validity of channel spin
                     if channel.channelSpin not in getAllowedTotalSpins( Ia, Ib, useFactor2Trick=False ):
                         if warnOnly:
-                            from fudge.gnds import warning
+                            from fudge import warning
                             warnings.append(warning.invalidSpinCombination( Ia, Ib, channel.channelSpin, channel.label))
                         else:
                             raise ValueError( 'Invalid spin combination: cannot couple Ia = %s and Ib = %s up to S = %s for channel "%s"' %
@@ -2496,24 +2355,24 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     # Check the validity of total angular momenta
                     if sg.spin not in getAllowedTotalSpins( channel.L, channel.channelSpin, useFactor2Trick=False ):
                         if warnOnly:
-                            from fudge.gnds import warning
+                            from fudge import warning
                             warnings.append(warning.invalidAngularMomentaCombination(channel.L, channel.channelSpin, sg.spin, channel.label))
                         else:
                             raise ValueError( 'Invalid spin combination: cannot couple L = %s and S = %s up to J = %s for channel "%s"' %
                                     (str(channel.L), str(channel.channelSpin), str(sg.spin), channel.label ) )
                     # Check the validity of the channel parity
                     if Pia is not None and Pib is not None:
-#                        print(Pia,Pib)
+                        #print(Pia,Pib)
                         expectedPi=Pia*Pib*pow(-1,channel.L)
                         if expectedPi != int(sg.parity):
                             if warnOnly:
-                                from fudge.gnds import warning
+                                from fudge import warning
                                 warnings.append(
                                     warning.invalidParity(channel.L, channel.channelSpin, sg.spin, sg.parity, channel.label))
                             else:
                                 raise ValueError(
                                     'Invalid parity: cannot couple L = %s and S = %s up to J = %s for channel "%s"' %
-                                    (str(channel.L), str(channel.channelSpin), str(sg.spin), sg.parity, channel.label))
+                                    (str(channel.L), str(channel.channelSpin), str(sg.spin), channel.label))
                     gfact = (2.0 * abs(sg.spin) + 1) / ((2 * float(Ia) + 1) * (2 * float(Ib) + 1))
 
                 else:
@@ -2542,7 +2401,6 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     useRelativistic=self.RR.relativisticKinematics,
                     eliminated=pp.eliminated )
                 channelIndex+=1
-#                print channelIndex, c
 
                 # Don't put closed channels onto lists
                 if Ein is not None and not numpy.all(c.is_open(Ein)):
@@ -2555,16 +2413,15 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                 self.particlePairs[c]=pp
 
                 # Log the channels
+                addOrUpdateDict(channelDict, c, None)  # This catches potential scattering only channels
                 if channel.scatteringRadius or channel.hardSphereRadius:
-                    self.overrides[c]=channel
+                    self.overrides[c] = channel
                 else:
-                    self.overrides[c]=None
+                    self.overrides[c] = None
 
                 # Now do the actual resonance packing
                 for iR, width in enumerate(sg.resonanceParameters.table[:,channel.columnIndex]):
-                    addOrUpdateDict( channelDict, c, ( self._energies.index(ERs[iR]), width ) )
-
-#        print 'mid:\n\t','\n\t'.join(map(str,channelDict.keys()))
+                    addOrUpdateDict(channelDict, c, (self._energies.index(ERs[iR]), width))
 
         # Set up the channel->resonance mappings
         self.allChannels = channelDict
@@ -2581,7 +2438,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
     def resetResonanceParametersByChannel(self, multipleSScheme='ENDF', useReichMooreApproximation=False, Ein=None ):
         return self.setResonanceParametersByChannel( multipleSScheme=multipleSScheme, useReichMooreApproximation=useReichMooreApproximation, Ein=Ein )
 
-    def getChannelConstantsBc( self ):
+    def getChannelConstantsBc(self):
         """
         For ENDF's Reich-Moore, should be :math:`B_c = -\\ell`
         where :math:`\\ell` is the channel angular momentum, but the ENDF manual says nothing about it.
@@ -2597,7 +2454,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                 Bc.append(0.0)
         return Bc
 
-    def getAPByChannel(self,c,trueOrEffective='true'):
+    def getAPByChannel(self, c, trueOrEffective='true'):
         if trueOrEffective=='true': return self.getChannelScatteringRadiiTrue()[c]
         elif trueOrEffective=='effective': return self.getChannelScatteringRadiiEffective()[c]
         else: raise ValueError( "trueOrEffective must be 'true' or 'effective'")
@@ -2653,11 +2510,11 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         pA,pB = self.particlePairs[c].reactionInfo['particles']
         return self.k_competitive(Ein, pA, pB) * self.scatteringRadiiEffective[c] # dimensionless
 
-    def omega(self,eta,L):
+    def omega(self, eta, L):
         if L > 0: return sum( [numpy.arctan2(eta,n) for n in range(1,L+1)] )
         return numpy.zeros_like(eta)
 
-    def getL0Matrix( self, Ein ):
+    def getL0Matrix(self, Ein):
         """
         Get the :math:`L^0` matrix of Froehner, :math:`{\\bf L^0}_{cc'} = \\delta_{cc'} (L_c-B_c)`
         where :math:`L_c = S_c + i P_c`
@@ -2668,11 +2525,11 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         L0 = numpy.zeros( (len(Ein), self.nChannels, self.nChannels), dtype=complex )
 
         for ic,c in enumerate(self.channels):
+            # FIXME use resonanceReaction.computePenetrability and computeShiftFactor rather than hard-coding by channel
             if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]:
                 shift = 0.0
                 penet = 1.0
             elif c.channelClass == CPCHANNEL:
-                import getCoulombWavefunctions
                 rho = self.rho(Ein-c.Xi, c)
                 pA, pB = self.particlePairs[c].reactionInfo['particles']
                 eta = self.eta(Ein-c.Xi, pA, pB)
@@ -2691,9 +2548,10 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                 L0[:,ic,ic] = (1j*penet).flatten()
         return L0
 
-    def getRMatrix( self, Ein ):
+    def getRMatrix(self, Ein):
         """
-        The R matrix in the Reich-Moore approximation is :math:`R_{cc'}=\\sum_\\lambda{\\gamma_{\\lambda c}\\gamma_{\\lambda c'}/({E_\\lambda - E - i\\Gamma_{\\lambda\\gamma}/2})`
+        The R matrix in the Reich-Moore approximation is
+        :math:`R_{cc'}=\\sum_\\lambda{\\frac{\\gamma_{\\lambda c}\\gamma_{\\lambda c'}}{E_\\lambda - E - i\\Gamma_{\\lambda\\gamma}/2}}`
 
         :param Ein:
         :type Ein: numpy.array(type=float)
@@ -2751,7 +2609,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                         R[:, ic2, ic1] += dR[:,0]
         return R
 
-    def getScatteringMatrixT( self, Ein, useTabulatedScatteringRadius=True, enableExtraCoulombPhase=False ):
+    def getScatteringMatrixT(self, Ein, useTabulatedScatteringRadius=True, enableExtraCoulombPhase=False):
         """
 
         :param Ein:
@@ -2764,7 +2622,8 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         :rtype:
         """
         # Make sure all channels are open at all requested energies
-        if not numpy.all([c.is_open(Ein) for c in self.channels]): raise ValueError("One or more channels are not open on all energies in requested energy grid")
+        if not numpy.all([c.is_open(Ein) for c in self.channels]):
+            raise ValueError("One or more channels are not open on all energies in requested energy grid")
 
         T = numpy.zeros( ( len(Ein), self.nChannels, self.nChannels ), dtype=complex )
         U = self.getScatteringMatrixU( Ein,
@@ -2783,7 +2642,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     T[:, ic1, ic2] = float(ic1==ic2) - U[:, ic1, ic2]
         return T
 
-    def getEiPhis( self, Ein, useTabulatedScatteringRadius=None, enableExtraCoulombPhase=False ):
+    def getEiPhis(self, Ein, useTabulatedScatteringRadius=None, enableExtraCoulombPhase=False):
         """
         The phase factor for the collision matrix, :math:`\\Omega_c=e^{\\omega_c-\\varphi_c}`
 
@@ -2802,13 +2661,12 @@ class RMatrixLimitedcrossSection(RRBaseClass):
             if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]:
                 eiphis.append( numpy.ones( Ein.shape, dtype=complex ) )
             elif c.channelClass == CPCHANNEL:
-                import getCoulombWavefunctions
                 rho = self.rhohat(Ein-c.Xi, c)
                 pA, pB = self.particlePairs[c].reactionInfo['particles']
                 eta = self.eta(Ein-c.Xi, pA, pB)
                 phic = getCoulombWavefunctions.coulombPhi( c.l, rho, eta ).flatten()
                 if numpy.any(numpy.isnan(phic)):
-                    raise ValueError('phi is NaN for channel %s: %s '%(str(c),str(zip(Ein.flatten()-c.Xi,phic.flatten()))))
+                    raise ValueError( 'phi is NaN for channel %s: %s ' % (str(c),str( list( zip(Ein.flatten()-c.Xi,phic.flatten() ) ) ) ) )
                 if enableExtraCoulombPhase:
                     wc = self.omega(eta,c.l).flatten()
                     eiphis.append( numpy.exp( 1j * wc.flatten() - 1j * phic.flatten() ) )
@@ -2833,9 +2691,9 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         :return: k in b**-1/2
         """
 
-        particleA = self.reactionSuite.PoPs[pA.pid]
+        particleA = self.RR.PoPs[pA.pid]
         pA_mass = particleA.getMass( 'amu' )
-        particleB = self.reactionSuite.PoPs[pB.pid]
+        particleB = self.RR.PoPs[pB.pid]
         pB_mass = particleB.getMass( 'amu' )
         targ_mass = self.targetMass_amu
 
@@ -2858,10 +2716,10 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         :return:   the Sommerfeld parameter [dimensionless]
         """
 
-        particleA = self.reactionSuite.PoPs[pA.pid]
+        particleA = self.RR.PoPs[pA.pid]
         pA_z = chemicalElementMiscPoPsModule.ZAInfo( particleA )[0]
 
-        particleB = self.reactionSuite.PoPs[pB.pid]
+        particleB = self.RR.PoPs[pB.pid]
         pB_z = chemicalElementMiscPoPsModule.ZAInfo( particleB )[0]
 
         if pA_z * pB_z == 0: return numpy.zeros_like(Ex)
@@ -2877,7 +2735,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
     @blockwise
     def getCrossSection(self, E):
         """
-        Return reconstructed cross sections at incident energy E        
+        Return reconstructed cross sections at incident energy E
         :param E: incident energy (unit = self.energyUnit).  May be scalar or vector
         :return: dictionary with cross sections for each reaction.
             Cross sections are either scalar or vector, depending on type of parameter 'E'
@@ -2887,8 +2745,11 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         fissionSum = 0
         nCompetitive = len( [ch for ch in self.RR.resonanceReactions if ch.tag=='competitive'] )
         competitiveSum = [0,] * nCompetitive
-        haveFission = any([rreac.isFission() for rreac in self.RR.resonanceReactions])
-        haveEliminated = False
+
+        eliminatedReaction = [rr for rr in self.RR.resonanceReactions if rr.eliminated]
+        if len(eliminatedReaction) != 1:
+            raise TypeError("Only 1 reaction can be eliminated in Reich-Moore approximation!")
+        haveEliminated = False  # only set to true if at least one non-zero width is present
 
         for sg in self.RR.spinGroups:
             j = sg.spin
@@ -2915,6 +2776,8 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     reducedWidths = numpy.sqrt( abs(chanWidths) / 2 )
                     reducedWidths[ chanWidths<0 ] *= -1
                     widths.append( reducedWidths )
+                    if resonanceReaction.computePenetrability:
+                        raise ValueError("Unsure how to compute penetrability for fission!")
                     penetrabilities.append( numpy.array([[1]]) )
                     chanIds.append( chan.resonanceReaction )
                     continue
@@ -2955,10 +2818,13 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     phis.append( phinow )
 
                     # penetrability:
-                    Ex1 = abs(abs(sg.energy)-Xi)    # evaluated at resonances
+                    Ex1 = abs(sg.energy-Xi)         # evaluated at resonances
                     Ex2 = E-Xi; Ex2[Ex2<0] = 0      # evaluated at each incident energy
                     eta1 = self.eta(Ex1, pA, pB)
-                    if any(eta1 > 0):
+                    if not resonanceReaction.computePenetrability:
+                        penetrabilityAtResonances = numpy.ones_like( Ex1 )
+                        penetrabilityAtEin = numpy.ones_like( Ex2 )
+                    elif any(eta1 > 0):
                         # output channel has two charged particles, need Coulomb penetrability:
                         penetrabilityAtResonances = getCoulombWavefunctions.coulombPenetrationFactor(l, rho(abs(Ex1)), eta1)
                         if thresholdIndex > 0:  # threshold reaction
@@ -2988,10 +2854,10 @@ class RMatrixLimitedcrossSection(RRBaseClass):
             if any( thresholdIndices ):
                 if thresholdIndices != sorted(thresholdIndices):
                     # sort by increasing threshold
-                    (thresholdIndices, chanIds, widths, penetrabilities) = zip(*sorted(
+                    (thresholdIndices, chanIds, widths, penetrabilities) = list( zip( *sorted(
                         zip(thresholdIndices,chanIds,widths,penetrabilities),
                         key=lambda tmp: tmp[0]  # sort only by threshold index (not by id or width)
-                    ))
+                    ) ) )
                 assert thresholdIndices[-1] <= len(E)
                 thresholdIndices = list(thresholdIndices) + [len(E)]
 
@@ -3071,7 +2937,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         if haveEliminated:
             absorbtion = beta * absorbtionSum
         else:
-            absorbtion = sum(competitive) + fission # more numerically stable in abscence of eliminated channel
+            absorbtion = sum(competitive) + fission # more numerically stable in absence of eliminated channel
         total = elastic + absorbtion
 
         retDict = {'total':total, 'elastic':elastic, 'fission':fission, 'nonelastic':absorbtion}
@@ -3079,178 +2945,36 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         for key,val in zip(competitiveNames,competitive):
             retDict[ key ] = val
         if haveEliminated:
-            eliminatedReaction = [rr for rr in self.RR.resonanceReactions if rr.eliminated]
-            if len(eliminatedReaction) != 1:
-                raise TypeError("Only 1 reaction can be eliminated in Reich-Moore approximation!")
             retDict[eliminatedReaction[0].tag] = absorbtion - fission - sum(competitive)
         return retDict
 
 
 ##### unresolved resonance region. Only one formalism here: #####
-class URRPDFTable(collections.OrderedDict):
-    """
-    Lightweight class for storage and IO of URR PDF's
-
-    Test it as follows:
-
-    >>> import xs_pdf as xp
-    >>> import numpy as np
-    >>> u=xp.URRPDFTable()
-    >>> u.eBins=xp.equal_bins(2,0.,4.)
-    >>> u.xsBins=xp.equal_bins(3,1.,1.5)
-    >>> u['capture']=np.zeros(shape=(2,3))
-    >>> u['capture'][0,0]=1.
-    >>> u['capture'][1,2]=2.
-    >>> print(u)
-        {"eBins": "[ 0.  2.  4.]", "urrPdf": {"capture": "[[ 1.  0.  0.]\n [ 0.  0.  2.]]"}, "xsBins": "[ 1.          1.16666667  1.33333333  1.5       ]"}
-    >>> u.save('junk.txt')
-    >>> v=xp.URRPDFTable()
-    >>> v.load('junk.txt')
-    >>> print(v)
-        {"eBins": "[ 0.  2.  4.]", "urrPdf": {"capture": "[[ 1.  0.  0.]\n [ 0.  0.  2.]]"}, "xsBins": "[ 1.          1.16666667  1.33333333  1.5       ]"}
-    """
-
-    def __init__(self, *args, **kwds):
-        collections.OrderedDict.__init__(self,*args,**kwds)
-        if 'eBins' in kwds: self.eBins=kwds['eBins']
-        else: self.eBins=[]
-        if 'xsBins' in kwds: self.xsBins=kwds['xsBins']
-        else: self.xsBins=[]
-        self.NSamples=0
-        self.isNormalized=False
-
-    @property
-    def NE(self):
-        try: return len(self.eBins)-1
-        except: return 0
-
-    @property
-    def NXS(self):
-        try: return len(self.xsBins)-1
-        except: return 0
-
-    @property
-    def XSmin(self): return self.xsBins[0]
-
-    @property
-    def XSmax(self): return self.xsBins[-1]
-
-    @property
-    def Emin(self): return self.eBins[0]
-
-    @property
-    def Emax(self): return self.eBins[-1]
-
-    @property
-    def eBinCenters(self): return numpy.array([(self.eBins[iE] + self.eBins[iE+1]) / 2.0 for iE in range(self.NE)])
-
-    @property
-    def eBinWidths(self): return numpy.array([(self.eBins[iE+1] - self.eBins[iE]) for iE in range(self.NE)])
-
-    @property
-    def xsBinCenters(self): return numpy.array([(self.xsBins[iXS] + self.xsBins[iXS+1]) / 2.0 for iXS in range(self.NXS)])
-
-    @property
-    def xsBinWidths(self): return numpy.array([(self.xsBins[iXS+1]-self.xsBins[iXS]) for iXS in range(self.NXS)])
-
-    def pdf_at_energy(self,key,E):
-        from fudge.core.math.pdf import UnivariatePDF
-        iE = numpy.digitize(E,self.eBins)-1
-        return UnivariatePDF(xGrid=self.xsBins, pdfTable=self[key][iE,:])
-
-    def __str__(self):
-        import json
-        tmp={
-            'eBins':self.eBins.tolist(),
-            'xsBins':self.xsBins.tolist(),
-            'urrPdf':{x:self[x].flatten().tolist() for x in self},
-            'NSamples':self.NSamples,
-            'isNormalized':self.isNormalized}
-        return json.dumps(tmp)
-
-    def normalize(self):
-        """Normalize the binned PDFs using numpy trickery"""
-        if self.isNormalized: return
-        for rxn in self:
-            if rxn in ['eBins','xsBins']: continue
-            for iE in range(self.NE):
-                thesum=sum(self[rxn][iE,:])
-                if thesum == 0.0:continue
-                self[rxn][iE, :] /= thesum
-                self[rxn][iE, :] /= self.xsBinWidths[:]
-            self[rxn][numpy.isnan(self[rxn])]=0.0
-        self.isNormalized=True
-
-    def save(self, fname, verbose=False):
-        if verbose: print("Saving URR PDF to %s"%fname)
-        open(fname,mode='w').write(str(self).replace('}','}\n'))
-
-    def load(self, fname):
-        import json
-        tmp=json.load(open(fname,mode='r'))
-        #def __read_float_list(s):
-        #    return map(float,s.replace(']', '').replace('[', '').split())
-        self.isNormalized=tmp.get('isNormalized',False)
-        self.NSamples=tmp.get('NSamples',None)
-        self.eBins=numpy.fromiter(tmp['eBins'],dtype=float)
-        self.xsBins=numpy.fromiter(tmp['xsBins'],dtype=float)
-        self.update({x:numpy.fromiter(tmp['urrPdf'][x],dtype=float) for x in tmp['urrPdf']})
-        for x in self:
-            self[x]=self[x].reshape((self.NE,self.NXS))
-
 class URRcrossSection(resonanceReconstructionBaseClass):
 
-    def __init__(self, reactionSuite, verbose=True, **kw):
+    def __init__(self, URRform, verbose=True, **kw):
         """
         Initialize the URR management class
 
-        :param reactionSuite: The reactionSuite this class is destined to be part of
+        :param URRform: The tabulatedWidths class to be reconstructed
         :param verbose: duh, verbosity flag
         :param kw: Python dict of keywords, currently none defined
         :return: None
         """
-        resonanceReconstructionBaseClass.__init__(self, reactionSuite)
+        resonanceReconstructionBaseClass.__init__(self, URRform)
         self.verbose = verbose
 
         # energy boundaries for this region:
-        urr = reactionSuite.resonances.unresolved
-        self.reactionSuite = reactionSuite
-        self.URR = urr.evaluated
-        self.lowerBound = urr.domainMin
-        self.upperBound = urr.domainMax
+        self.URR = URRform
+        parent = URRform.ancestor
+        self.lowerBound = parent.domainMin
+        self.upperBound = parent.domainMax
         if self.verbose:
             print ("Unresolved from %f to %f %s" % (self.lowerBound,self.upperBound,self.energyUnit))
         self.levelSpacings=None
         self.averageWidths=None
         self.DOFs=None
         self.egrid=None
-
-    def getLastResolvedResonanceRegion(self):
-        """
-        Get the highest energy resonance ENDF region in the resolved resonance region (which may contain more than one ENDF region)
-
-        :return: The ENDF resolved resonance region, or None if there is no ENDF region in the data
-        """
-        if self.reactionSuite.resonances.resolved:
-            # For multiple regions, we need to do each region separately, then add them to the unified xs table & egrid
-            if isinstance(self.reactionSuite.resonances.resolved.evaluated, fudge.gnds.resonances.energyIntervals):
-                return self.reactionSuite.resonances.resolved.evaluated[-1]
-            else:   # Single region, everything goes on unified grid
-                return self.reactionSuite.resonances.resolved.evaluated
-        else: return None
-
-    def getLastResolvedResonanceEnergy(self,l=None,j=None):
-        """
-        Get the last resonance energy from the resolved region, that will start all the ladders in the URR
-
-        :param l: orbital angular momentum of the resonance to find
-        :param j: total angular momentum of the resonance to find
-        :return: either the energy of the last resonance with requested (l,j) or None if it can't be found
-        """
-        for x in reversed(self.getLastResolvedResonanceRegion().resonanceParameters.table):
-            if x[1]==l and x[2]==j: return x[0]
-
-        return None
 
     def getWidthsAndSpacings(self):
         """
@@ -3271,13 +2995,25 @@ class URRcrossSection(resonanceReconstructionBaseClass):
             - levelDensities: derived from level spacings::
 
                 ..math::
-                    \rho_{L,J}(E)=1/D_{L,J}(E)
+                    \\rho_{L,J}(E)=1/D_{L,J}(E)
 
 
             - averageWidths, assigned simple labels like 'elastic' and 'capture' for convenience::
 
                 ..math::
-                    \Gamma_{L,J,c}
+                    \\Gamma_{L,J,c}
+
+              there is a wrinkle here. The elastic 'width' is, according to the ENDF manual, a "reduced width" GN0.
+              This is misleading since basic science literature (and Froehner in JEFF-18) defines the reduced width
+              as::
+
+                ..math::
+                    \\Gamma_{L,J,n} = 2 P_L \\gamma_{L,J,c}^2
+
+              However, ENDF's reduced neutron width is wildly different (see Eq. (D.99) in ENDF-102)::
+
+                ..math::
+                    \\Gamma{L,J,n} = \\Gamma_{L,J,n}^0 \\sqrt{E} P_L/\rho
 
             - DOFs: degrees of freedom with same labels as averageWidths
 
@@ -3314,11 +3050,11 @@ class URRcrossSection(resonanceReconstructionBaseClass):
 
                 # Set the widths
                 for wid in J.widths:
-                    if wid.label == 'competitive':
-                        simpleLabel = wid.label
+                    if wid.resonanceReaction == 'competitive':
+                        simpleLabel = wid.resonanceReaction
                     else:
-                        simpleLabel = self.reactionLabels[ wid.label ]
-                    self.averageWidths[(l,j)][simpleLabel] = wid.data
+                        simpleLabel = self.reactionLabels[ wid.resonanceReaction ]
+                    self.averageWidths[(l,j)][simpleLabel] = wid.data  # FIXME: average neutron width is funky ENDF "reduced width", we should fix it!
                     self.DOFs[(l, j)][simpleLabel] = wid.degreesOfFreedom
 
     def rho(self, E):
@@ -3326,7 +3062,7 @@ class URRcrossSection(resonanceReconstructionBaseClass):
         The dimensionless parameter rho::
 
             ..math::
-                \rho = k(E) a
+                \\rho = k(E) a
 
         We always calculate channel radius for unresolved region according to the ENDF manual
 
@@ -3557,235 +3293,56 @@ class URRcrossSection(resonanceReconstructionBaseClass):
         xscs = {'total':total, 'elastic':elastic, 'capture':capture, 'fission':fission, 'nonelastic':nonelastic}
         return xscs
 
-    def sampleRR(self, lastResonanceEnergies, lowerBound=None, upperBound=None, style='goe', verbose=True):
+    def getTransmissionCoefficients(self, skipFission=True, method='weakCoupling'):
         """
-        Generate a sample of a resolved resonant set using the average URR parameters
+        Compute the effective transmission coefficient in the resolved resonance regime.
+        The method argument controls the schemes to do this.
 
-        :param lastResonanceEnergies: the energy of the last energy from the RRR
-        :param verbose: turn on verbose output
-        :return: the resonance set as a fudge.core.math.table
-        """
-        import blurr.resonance_generator
-        from xData.table import table as gndsTable, columnHeader as gndsColumnId
-        fakeRRR=[]
-        if lowerBound is None: lowerBound = self.lowerBound
-        if upperBound is None: upperBound = self.upperBound
+        In each case, define the variable tau as::
 
-        # WARNING: be very careful that the columns defined in getFakeResonanceSet match
-        #          in both name and order with those defined below
-        for lj in lastResonanceEnergies.keys():
-            fakeRRR+=blurr.resonance_generator.getFakeResonanceSet(
-                E0=lastResonanceEnergies[lj],
-                style=style,
-                L=lj[0], J=lj[1],
-                levelDensity=self.levelDensities[lj],
-                aveWidthFuncs=self.averageWidths[lj],
-                DOFs=self.DOFs[lj],
-                lowerBound=lowerBound,
-                upperBound=upperBound,
-                verbose=verbose)
-        result = gndsTable( columns = [
-                gndsColumnId( 0, name="energy", unit="eV" ),
-                gndsColumnId( 1, name="L", unit="" ),
-                gndsColumnId( 2, name="J", unit="" ),
-                gndsColumnId( 3, name="totalWidth", unit="eV" ),
-                gndsColumnId( 4, name="neutronWidth", unit="eV" ),
-                gndsColumnId( 5, name="captureWidth", unit="eV" ),
-                gndsColumnId( 6, name="fissionWidthA", unit="eV" ),
-                gndsColumnId( 6, name="competitiveWidth", unit="eV" )],
-                data = sorted( fakeRRR, key=lambda(res): res[0]) )   # sort by energy only
-        for column in ("totalWidth","fissionWidthA","competitiveWidth"):
-            if not any( result.getColumn(column) ):
-                result.removeColumn(column)
-        return result
+            ..math::
+                \\tau_c = \\pi\\overline{\\Gamma}_c/D
 
-    def getURRPDF(self, resClass, nSamples=2000, style='goe', interpolateWidths=True,
-                  NE=100, ELowerBound=None, EUpperBound=None,
-                  NXS=200, XSLowerBound=None, XSUpperBound=None,
-                  verbose=True, restart=False, timing=False, memory=False):
-        """
-        About restart files: they json dumps of the URR PDF, but before being renomalized.  In other words, they are pure histograms
-            of number of points of the cross section curve in an energy/cross section voxel.  This is a poor-mans path-length in the
-            voxel.
+        These are the options:
 
-        At end of the run, the URR PDF (which, as I said, is still just a histogram) is normalized properly, turning it into a true PDF.
+            * `method=='weakCoupling'`:  This is the traditional weak coupling limit::
 
-        :param resClass: The class instance to use for reconstructing realizations of the cross section set.
-        :param nSamples:
-        :param style: not the GNDS style, rather the style of resonance generation (see sampleRR)
-        :param interpolateWidths: interpolate the URR widths or not (just say "True")
-        :param NE: number of energy bins in the PDF (# bin boundaries is NE+1)
-        :param ELowerBound:
-        :param EUpperBound:
-        :param NXS: number of cross section bins in the PDF (# bin boundaries is NXS+1)
-        :param XSLowerBound:
-        :param XSUpperBound:
-        :param verbose: enable verbose output
-        :param restart: enable restart capability
-        :param timing: enable printing out timings
-        :param memory: enable printing out memory usage of the resonance data structure
-        :return:
-        """
-        # Imports for this function
-        import os
-        if timing: import datetime
-        if memory: from sys import getsizeof
+                ..math::
+                    T_c=2\\tau_c
 
-        if NE<1: raise ValueError("Requested energy grid must have at least two point, so you need at least one bin")
+            * `method=='1stOrder'`: This is the same as the weak coupling limit.
 
-        # Fine-grained restart controls
-        save_restart_every_x_runs=100
+            * `method=='2ndOrder'`: This is the 2nd order correction to the weak coupling limit::
 
-        # Start time
-        if timing: lastTime = datetime.datetime.now()
+                ..math::
+                    T_c=2\\tau_c(1-\\tau_c)
 
-        # Helper functions for setting up bins in cross section and energy
-        def equal_lethargy_bins(numBins, domainMin=None, domainMax=None, reverse=False):
-            if reverse: return numpy.logspace(start=math.log10(domainMax), stop=math.log10(domainMin), num=numBins + 1)
-            return numpy.logspace(start=math.log10(domainMin), stop=math.log10(domainMax), num=numBins + 1)
-        def equal_bins(numBins, domainMin=None, domainMax=None, reverse=False):
-            if reverse: return numpy.linspace(start=domainMax, stop=domainMin, num=numBins + 1)
-            return numpy.linspace(start=domainMin, stop=domainMax, num=numBins + 1)
+            * `method=='sumRule'`: Use Moldauer's sum rule to extract the transmission coefficients directly from
+                the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::
 
-        # Initialize the widths, DOFs and level spacings.
-        # Also setup the main egrid for cross section reconstruction.
-        # This is the main grid that spans the whole URR.
-        if self.levelSpacings is None:
-            self.egrid, interpolateWidths = self.generateEnergyGrid(interpolateWidths=interpolateWidths)
-            self.getWidthsAndSpacings()
+                ..math::
+                    T_c=2\\tau_c\\left[\\sqrt{1+\\tau_c^2}-\\tau_c\\right]
 
-        # Get the upper most resonances
-        lastResonances = {}
-        for k in self.levelSpacings: lastResonances[k] = self.getLastResolvedResonanceEnergy(l=k[0], j=k[1])
+            * `method=='opticalModel'`: Use Moldauer's 'optical model' transmission coefficient::
 
-        # Create or read the restart of the binned PDF
-        thisRRSample = copy.copy(self.getLastResolvedResonanceRegion())
-        oldNRes = len(thisRRSample.resonanceParameters.table.data)
-        thePDFs=URRPDFTable()
-        if timing:
-            thisTime = datetime.datetime.now()
-            print('\nTIMING/setup:', thisTime - lastTime)
-            lastTime = thisTime
-        if memory:
-            print('MEMORY/thisRRSample before (',
-                   'type:', type(thisRRSample.resonanceParameters.table.data),
-                   'size:', getsizeof(thisRRSample.resonanceParameters.table.data), ')')
-        if restart:
-            import glob
-            restartFiles=glob.glob('restart*.txt')
-            if restartFiles:
-                lastSample=max(map(int,[x.replace('restart','').replace('.txt','') for x in restartFiles]))
-                restartFile = 'restart%i.txt'%lastSample
-                iSampleStart=int(restartFile.replace('restart','').replace('.txt',''))+1
-                print('Loading results after sample #%i from' % (iSampleStart - 1), restartFile)
-                thePDFs.load(restartFile)
-            else: restart=False
-        if not restart:
-            # Set up domains for energy, cross section
-            if ELowerBound is None: ELowerBound=self.lowerBound
-            if EUpperBound is None: EUpperBound=self.upperBound
-            if XSLowerBound is None: XSLowerBound=1e-10
-            if XSUpperBound is None: XSUpperBound=15.5
-            iSampleStart=0
-            for r in ['total','elastic','capture','fission','nonelastic']:
-                thePDFs[r]=numpy.zeros(shape=(NE,NXS)) # This is where we analyze the accumulated moments to generate the PDF
-            # Sets up the bins for the PDF histogram.  There is a low value logrithmic grid to
-            # handle capture and a high value linear grid to handle total and elastic
-            thePDFs.eBins = equal_bins(NE, domainMin=ELowerBound, domainMax=EUpperBound)
-            nXSlow=int((NXS-5)/3)
-            nXShi=NXS-5-nXSlow
-            thePDFs.xsBins = numpy.array([0.0]+
-                             list(equal_lethargy_bins(nXSlow, domainMin=XSLowerBound, domainMax=0.1))[0:-1]+
-                             list(equal_bins(4, domainMin=0.1, domainMax=0.5))[0:-1]+
-                             list(equal_bins(nXShi, domainMin=0.5, domainMax=XSUpperBound)))
+                ..math::
+                    T_c=1-\\exp{(-2\\tau_c)}
 
-        # Loop through the samples to (continue) build(ing) the PDFs
-        iSamples=range(iSampleStart,nSamples)
-        for iSample in iSamples:
-            rfname = 'restart%i.txt' % (iSample - 1)
-            if timing: sampleTime=datetime.datetime.now()
-            try:
-                if verbose: print("---- you can interupt now and you won't trash a sample")
-                # Splitting and adding the tables this way (with the slice action below)
-                # avoids a memory leak in the Python list() implementation
-                a=self.getLastResolvedResonanceRegion().resonanceParameters.table
-                b=self.sampleRR(lastResonances, style=style, verbose=verbose)
-                if [x.name for x in a.columns] != [x.name for x in b.columns]:
-                    raise ValueError("columns don't match %s vs. %s"%(str([x.name for x in a.columns]),
-                                                                      str([x.name for x in b.columns])))
-                thisRRSample.resonanceParameters.table.data = copy.copy(a.data[:oldNRes])+copy.copy(b.data)
-                if verbose: print("---- you can't interupt for a while without trashing the sample in progress")
-            except KeyboardInterrupt:
-                if iSample > 0 and not os.path.exists(rfname):
-                    print('Interupt... Saving restart file', rfname)
-                    thePDFs.save(rfname, verbose=True)
-                exit()
-            if restart and iSample%save_restart_every_x_runs==0:
-                print('Saving restart file', rfname)
-                thePDFs.save(rfname, verbose=True)
-            if memory:
-                print( 'MEMORY/thisRRSample sample #%i (' % iSample,
-                       'parent type:', type(thisRRSample.resonanceParameters.table),
-                       'table type:', type(thisRRSample.resonanceParameters.table.data),
-                       'final RR size:', getsizeof(thisRRSample.resonanceParameters.table.data),
-                       'base RR size:', getsizeof(a.data[:oldNRes]),
-                       'sampled RR size:', getsizeof(b.data), ')' )
-            for iE in range(NE):
-                if timing:
-                    thisTime = datetime.datetime.now()
-                    print( 'TIMING/    iE=%i:' % iE, thisTime - lastTime, thisTime - sampleTime )
-                    lastTime = thisTime
+            * `method`==`SPRT`: Use the
 
-                # Setup the reconstruction class
-                resonanceGenerator = resClass(
-                    self.reactionSuite,
-                    RR=thisRRSample,
-                    lowerBound=self.egrid[iE], #ELowerBound,
-                    upperBound=self.egrid[iE+1], #EUpperBound,
-                    verbose=self.verbose,
-                    enableAngDists=False)
-                subEGrid = resonanceGenerator.generateEnergyGrid() # the grid within this bin
-
-                # Compute the cross section for this realization
-                # TODO: add in RRR tails from below URR and background R-matrix from above URR
-                thisXSSample = resonanceGenerator.getCrossSection(subEGrid)
-
-                for rxn in thePDFs:
-                    # This is stupid simple.  We made bins in the energy direction (eBins) and the
-                    # cross section direction (xsBins).  We then histogram the data in this 2D grid.
-                    # To turn it into the PDF P(xs|E), we divide all xs bins with the same energy bin
-                    # by the total number of points in that energy bin.  We do have to loop through
-                    # all the xs points in the subEGrid.  This way, if there is a lot of wiggles in the
-                    # cross section within the bin, all the wiggles get counted equally.
-                    for xs in thisXSSample[rxn]:
-                        iXS = min(numpy.digitize(xs, thePDFs.xsBins) - 1, NXS-1)
-                        for ee in subEGrid:
-                            if ee >= self.egrid[iE] and ee <= self.egrid[iE + 1]:
-                                thePDFs[rxn][iE, iXS] += 1.0
-            if timing:
-                thisTime = datetime.datetime.now()
-                print('TIMING/sample #%i:' % iSample, thisTime - lastTime)
-                lastTime = thisTime
-
-        # All done, normalize the result
-        thePDFs.normalize()
-        if timing:
-            thisTime = datetime.datetime.now()
-            print('TIMING/normalization:', thisTime - lastTime)
-            lastTime = thisTime
-
-        return thePDFs
-
-    def getTransmissionCoefficientsFromSumRule(self,skipFission=True):
-        """
-        Use Moldauer's sum rule to extract the transmission coefficients directly from the URR tables
-            P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967)
+                ..math::
+                    T_c=\\frac{2\\tau_c}{ (1 + \\tau_c/2)^2 + (P_c R^\\inf_c)^2 }
 
         :param skipFission: flag to skip fission, what else?
-        :return: a dictionary of results, sorted by channel
+        :param method: method to compute the transmission coefficient
+        :return: a dictionary of results, sorted by channel.  Tc entries are all PQU's or None if it cannot be computed
         """
+        allowedMethods=["weakCoupling", '1stOrder', '2ndOrder', 'sumRule', 'opticalModel', 'SPRT']
+        if method not in allowedMethods:
+            raise ValueError('Transmission coefficient calculation method must be one of '+', '.join(allowedMethods))
         # Initialize the reduced width factors for the elastic channel
         redWidthFactor={}
+        if not self.averageWidths: self.getWidthsAndSpacings()
         for lj in self.averageWidths:
             if lj[0] not in redWidthFactor:
                 redWidthFactor[lj[0]]=XYsModule.XYs1d.createFromFunction(
@@ -3801,20 +3358,31 @@ class URRcrossSection(resonanceReconstructionBaseClass):
 
         # Now compute the Tc's
         Tc={}
-        channelClass={'capture':GAMMACHANNEL,'elastic':NEUTRONCHANNEL,'fission':FISSIONCHANNEL}
+        channelClass={'capture':GAMMACHANNEL, 'elastic':NEUTRONCHANNEL, 'fission':FISSIONCHANNEL}
         for rxn in channelClass.keys():
             for lj in self.averageWidths:
                 if rxn=='elastic':
-                    eta=math.pi*redWidthFactor[lj[0]]*self.averageWidths[lj][rxn]/self.levelSpacings[lj] #*self.levelDensities[lj]
+                    tau=math.pi*redWidthFactor[lj[0]]*self.averageWidths[lj][rxn]/self.levelSpacings[lj] #*self.levelDensities[lj]
                 elif rxn=='fission':
                     if skipFission: continue
                     if rxn not in self.averageWidths[lj]: continue
-                    eta=math.pi*self.averageWidths[lj][rxn]/self.levelSpacings[lj]
+                    tau=math.pi*self.averageWidths[lj][rxn]/self.levelSpacings[lj]
                 else:
-                    eta=math.pi*self.averageWidths[lj][rxn]/self.levelSpacings[lj] #*self.levelDensities[lj]
-                etasqr=eta*eta
+                    tau=math.pi*self.averageWidths[lj][rxn]/self.levelSpacings[lj] #*self.levelDensities[lj]
                 c=ChannelDesignator(lj[0], lj[1], rxn, len(Tc), int(2.0*abs(lj[0]-lj[1])), gfact=None,
                                     particleA=None, particleB=None, isElastic=(rxn=='elastic'),
                                     channelClass=channelClass[rxn], useRelativistic=False, eliminated=False)
-                Tc[c]=2.0*etasqr*((1.0+1.0/etasqr).applyFunction(lambda x,y:math.sqrt(x),None)-1.0)
+                if method in ["weakCoupling", '1stOrder']:
+                    Tc[c] = 2.0 * tau
+                elif method=='2ndOrder':
+                    Tc[c] = 2.0 * tau * (1.0 - tau)
+                elif method=="opticalModel":
+                    Tc[c] = tau.applyFunction(lambda x, par: 1.0 - math.exp(-2.0 * tau.evaluate(x)), None) #FIXME: "tau.evaluate(x)" should only be "x", but applyFunction() is broken as is exp()
+                elif method == 'sumRule':
+                    Tc[c] = tau.applyFunction(lambda x, par: 2.0 * tau.evaluate(x) * (math.sqrt(1.0 + tau.evaluate(x) * tau.evaluate(x)) - tau.evaluate(x)), None)
+                else: #method=="SPRT"
+                    Tc[c] = 2.0*tau/(1.0+tau/2.0)/(1.0+tau/2.0)
+
+                # Fix axis label, still says "Gamma"
+                Tc[c].axes[0].label='Tc(rxn=%s, L=%i, J=%s)'%(c.reaction, c.l, str(c.J))
         return Tc

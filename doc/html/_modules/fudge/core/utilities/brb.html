@@ -1,31 +1,22 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.core.utilities.brb &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -36,7 +27,8 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.core.utilities.brb</a></li> 
       </ul>
     </div>  
 
@@ -46,355 +38,356 @@
           <div class="body" role="main">
             
   <h1>Source code for fudge.core.utilities.brb</h1><div class="highlight"><pre>
-<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
-# &lt;&lt;END-copyright&gt;&gt;
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-&quot;&quot;&quot;
-This module contains a set of functions that are hopefully useful when using python.
-&quot;&quot;&quot;
-import sys
-import os
-import re
-import types
-import glob
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a set of functions that are hopefully useful when using python.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 
-<div class="viewcode-block" id="uniquify"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.uniquify">[docs]</a>def uniquify(seq):
-    &quot;&quot;&quot;
-    Fast implimentation of a function to strip out non-unique entries in a Python list, but preserving list order.
-    Usage:
-        &gt;&gt;&gt; print uniquify( [1,4,2,4,7,2,1,1,1,&#39;s&#39;,&#39;a&#39;,0.1] ) 
-            [1, 4, 2, 7, &#39;s&#39;, &#39;a&#39;, 0.10000000000000001]
-    &quot;&quot;&quot;
-    seen = set()
-    seen_add = seen.add
-    return [ x for x in seq if x not in seen and not seen_add(x)] </div>
+<div class="viewcode-block" id="uniquify"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.uniquify">[docs]</a><span class="k">def</span> <span class="nf">uniquify</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fast implimentation of a function to strip out non-unique entries in a Python list, but preserving list order.</span>
+<span class="sd">    Usage:</span>
+<span class="sd">        &gt;&gt;&gt; print(uniquify( [1,4,2,4,7,2,1,1,1,&#39;s&#39;,&#39;a&#39;,0.1] ) )</span>
+<span class="sd">            [1, 4, 2, 7, &#39;s&#39;, &#39;a&#39;, 0.10000000000000001]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">seen_add</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">add</span>
+    <span class="k">return</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">seq</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">seen_add</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span> </div>
 
-<div class="viewcode-block" id="banner"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.banner">[docs]</a>def banner( s, justification = &#39;c&#39; ):
-    &quot;&quot;&quot;A flower-box ascii banner generator.  The input string can have line feeds.  Each line will get centered in the box.&quot;&quot;&quot;
+<div class="viewcode-block" id="banner"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.banner">[docs]</a><span class="k">def</span> <span class="nf">banner</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">justification</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A flower-box ascii banner generator.  The input string can have line feeds.  Each line will get centered in the box.&quot;&quot;&quot;</span>
 
-    if( justification not in [ &#39;l&#39;, &#39;c&#39;, &#39;r&#39; ] ) : raise Exception( &#39;Invalid justification = &quot;%s&quot;, must be &quot;l&quot;, &quot;c&quot;, &quot;r&quot;&#39; % justification )
-    ss = s.split( &#39;\n&#39;)
-    m = 0
-    for l in ss: m = max( m, len( l ) )
-    ans = &#39;+-&#39; + m*&#39;-&#39; + &#39;-+\n&#39;
-    if(   justification == &#39;l&#39; ) :
-        for l in ss: ans += &#39;| &#39; + l.ljust( m ) + &#39; |\n&#39;
-    elif( justification == &#39;c&#39; ) :
-        for l in ss: ans += &#39;| &#39; + l.center( m ) + &#39; |\n&#39;
-    else :
-        for l in ss: ans += &#39;| &#39; + l.rjust( m ) + &#39; |\n&#39;
-    ans += &#39;+-&#39; + m*&#39;-&#39; + &#39;-+&#39;
-    return ans</div>
+    <span class="k">if</span><span class="p">(</span> <span class="n">justification</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Invalid justification = &quot;</span><span class="si">%s</span><span class="s1">&quot;, must be &quot;l&quot;, &quot;c&quot;, &quot;r&quot;&#39;</span> <span class="o">%</span> <span class="n">justification</span> <span class="p">)</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">:</span> <span class="n">m</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">m</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">l</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">ans</span> <span class="o">=</span> <span class="s1">&#39;+-&#39;</span> <span class="o">+</span> <span class="n">m</span><span class="o">*</span><span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;-+</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">if</span><span class="p">(</span>   <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;l&#39;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">:</span> <span class="n">ans</span> <span class="o">+=</span> <span class="s1">&#39;| &#39;</span> <span class="o">+</span> <span class="n">l</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span> <span class="n">m</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; |</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">:</span> <span class="n">ans</span> <span class="o">+=</span> <span class="s1">&#39;| &#39;</span> <span class="o">+</span> <span class="n">l</span><span class="o">.</span><span class="n">center</span><span class="p">(</span> <span class="n">m</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; |</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">:</span> <span class="n">ans</span> <span class="o">+=</span> <span class="s1">&#39;| &#39;</span> <span class="o">+</span> <span class="n">l</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span> <span class="n">m</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; |</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">ans</span> <span class="o">+=</span> <span class="s1">&#39;+-&#39;</span> <span class="o">+</span> <span class="n">m</span><span class="o">*</span><span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;-+&#39;</span>
+    <span class="k">return</span> <span class="n">ans</span></div>
 
-# Small banner, with wings
-<div class="viewcode-block" id="winged_banner"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.winged_banner">[docs]</a>def winged_banner( x, wingsize=10 ):
-    return wingsize*&#39;*&#39;+&#39; &#39;+x.replace( &#39;\n&#39;, &#39;; &#39; )+&#39; &#39;+wingsize*&#39;*&#39;</div>
+<span class="c1"># Small banner, with wings</span>
+<div class="viewcode-block" id="winged_banner"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.winged_banner">[docs]</a><span class="k">def</span> <span class="nf">winged_banner</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">wingsize</span><span class="o">=</span><span class="mi">10</span> <span class="p">):</span>
+    <span class="k">return</span> <span class="n">wingsize</span><span class="o">*</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;; &#39;</span> <span class="p">)</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="n">wingsize</span><span class="o">*</span><span class="s1">&#39;*&#39;</span></div>
 
-<div class="viewcode-block" id="Pause"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.Pause">[docs]</a>def Pause( Prompt = &quot;Enter &lt;RET&gt; to continue : &quot;, ExtraStr = &quot;&quot; ) :
-    &quot;&quot;&quot;Prompts and waits for user to enter a line. The line is returned. ExtraStr is added to the prompt string.&quot;&quot;&quot;
+<div class="viewcode-block" id="Pause"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.Pause">[docs]</a><span class="k">def</span> <span class="nf">Pause</span><span class="p">(</span> <span class="n">Prompt</span> <span class="o">=</span> <span class="s2">&quot;Enter &lt;RET&gt; to continue : &quot;</span><span class="p">,</span> <span class="n">ExtraStr</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Prompts and waits for user to enter a line. The line is returned. ExtraStr is added to the prompt string.&quot;&quot;&quot;</span>
 
-    if( ExtraStr != &quot;&quot; ) : Prompt = Prompt + &quot;(%s)&quot; % ExtraStr
-    try :
-        s = raw_input( Prompt )
-    except EOFError :
-        print
-        s = None
-    except :
-        raise
-    return( s )</div>
+    <span class="k">if</span><span class="p">(</span> <span class="n">ExtraStr</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">Prompt</span> <span class="o">=</span> <span class="n">Prompt</span> <span class="o">+</span> <span class="s2">&quot;(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">ExtraStr</span>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span> <span class="n">Prompt</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">EOFError</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="tlist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tlist">[docs]</a>def tlist( l, w = 5, sep = None, rightJustify = 0 ) :
-    &quot;&quot;&quot;Calls tylist with arguments passed.&quot;&quot;&quot;
+<div class="viewcode-block" id="tlist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tlist">[docs]</a><span class="k">def</span> <span class="nf">tlist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calls tylist with arguments passed.&quot;&quot;&quot;</span>
 
-    tylist( l, w, sep = sep, rightJustify = rightJustify )</div>
+    <span class="n">tylist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="n">sep</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="o">=</span> <span class="n">rightJustify</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="txlist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.txlist">[docs]</a>def txlist( l, w = 5, sep = None, rightJustify = 0 ) :
-    &quot;&quot;&quot;Prints the list given by the first argument in a tabled format. The purpose of this 
-    function is to print a python list in a more readable format. The number of items from list
-    printed per line is set by w.  The argument sep, if not None, is printed as a separator
-    between each item on a line. The items are left justified unless the argument rightJustify
-    is true. This function prints each w consecutive items horizontally. Also see tylist.&quot;&quot;&quot;
+<div class="viewcode-block" id="txlist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.txlist">[docs]</a><span class="k">def</span> <span class="nf">txlist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Prints the list given by the first argument in a tabled format. The purpose of this </span>
+<span class="sd">    function is to print a python list in a more readable format. The number of items from list</span>
+<span class="sd">    printed per line is set by w.  The argument sep, if not None, is printed as a separator</span>
+<span class="sd">    between each item on a line. The items are left justified unless the argument rightJustify</span>
+<span class="sd">    is true. This function prints each w consecutive items horizontally. Also see tylist.&quot;&quot;&quot;</span>
 
-    if ( w &lt; 0 ) : w = 1
-    s = tlistMaxLen( l, rightJustify )
-    if s == &quot;&quot; :
-        ll = []
-        for i in l : ll.append( `i` )
-        s = tlistMaxLen( ll, rightJustify )
-    else :
-        ll = l
-    Counter = 0
-    for i in ll :
-        print s % i,
-        Counter = Counter + 1
-        if( Counter == w ) :
-            Counter = 0
-            print &quot;&quot;
-        else :
-            if( sep is not None ) : print sep,
-    if( Counter &gt; 0 ) : print &quot;&quot;</div>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">tlistMaxLen</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span> <span class="n">ll</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">repr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">tlistMaxLen</span><span class="p">(</span> <span class="n">ll</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="n">l</span>
+    <span class="n">Counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ll</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">s</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">Counter</span> <span class="o">=</span> <span class="n">Counter</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">Counter</span> <span class="o">==</span> <span class="n">w</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">Counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">sep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">Counter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="tylist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tylist">[docs]</a>def tylist( l, w = 5, sep = None, rightJustify = 0 ) :
-    &quot;&quot;&quot;Prints the list given by the first argument in a tabled format. The purpose of this 
-    function is to print a python list in a more readable format. The number of items from list
-    printed per line is set by w.  The argument sep, if not None, is printed as a separator
-    between each item on a line. The items are left justified unless the argument rightJustify
-    is true. This function prints each consecutive item vertically while maintaining w columns. 
-    Also see txlist.&quot;&quot;&quot;
+<div class="viewcode-block" id="tylist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tylist">[docs]</a><span class="k">def</span> <span class="nf">tylist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Prints the list given by the first argument in a tabled format. The purpose of this </span>
+<span class="sd">    function is to print a python list in a more readable format. The number of items from list</span>
+<span class="sd">    printed per line is set by w.  The argument sep, if not None, is printed as a separator</span>
+<span class="sd">    between each item on a line. The items are left justified unless the argument rightJustify</span>
+<span class="sd">    is true. This function prints each consecutive item vertically while maintaining w columns. </span>
+<span class="sd">    Also see txlist.&quot;&quot;&quot;</span>
 
-    if ( w &lt; 0 ) : w = 1
-    s = tlistMaxLen( l, rightJustify )
-    if s == &quot;&quot; :
-        ll = []
-        for i in l : ll.append( `i` )
-        s = tlistMaxLen( ll, rightJustify )
-    else :
-        ll = l
-    r = ( len( ll ) + w - 1 ) / w
-    for ir in range( r ) :
-        iw = 0
-        for i in range( ir, len( ll ), r ) :
-            print s % ll[ i ],
-            iw += 1
-            if( ( sep is not None ) and ( iw &lt; w ) ) : print sep,
-        print &quot;&quot;</div>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">tlistMaxLen</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span> <span class="n">ll</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">repr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">tlistMaxLen</span><span class="p">(</span> <span class="n">ll</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="n">l</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">ll</span> <span class="p">)</span> <span class="o">+</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">/</span> <span class="n">w</span>
+    <span class="k">for</span> <span class="n">ir</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">r</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">iw</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">ir</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">ll</span> <span class="p">),</span> <span class="n">r</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">s</span> <span class="o">%</span> <span class="n">ll</span><span class="p">[</span> <span class="n">i</span> <span class="p">],</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">iw</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">sep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">iw</span> <span class="o">&lt;</span> <span class="n">w</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="tlistMaxLen"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tlistMaxLen">[docs]</a>def tlistMaxLen( l, rightJustify ) :
-    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+<div class="viewcode-block" id="tlistMaxLen"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tlistMaxLen">[docs]</a><span class="k">def</span> <span class="nf">tlistMaxLen</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
 
-    MaxLen = 2
-    for i in l : 
-        if ( type( i ) == type( 1 ) ) : MaxLen = max( MaxLen, 8 )
-        elif ( type( i ) == type( &quot;&quot; ) ) : MaxLen = max( MaxLen, len( i ) + 1 )
-        else : return &quot;&quot;
-    justify = &quot;-&quot;
-    if( rightJustify ) : justify = &quot;&quot;
-    return &quot;%%%s%ds&quot; % ( justify, MaxLen )</div>
+    <span class="n">MaxLen</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span> 
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">MaxLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">MaxLen</span><span class="p">,</span> <span class="mi">8</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">MaxLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">MaxLen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span> <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">justify</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">rightJustify</span> <span class="p">)</span> <span class="p">:</span> <span class="n">justify</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%%%s%d</span><span class="s2">s&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">justify</span><span class="p">,</span> <span class="n">MaxLen</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="tdir"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tdir">[docs]</a>def tdir( a = None, w = 5, pattern = None, wpattern = None ) :
-    &quot;&quot;&quot;This function is an attempt at improving the output of python&#39;s dir function. It uses
-    tlist to print the output in a more readable format. The argument w is passed to tlist.
-    The argument pattern, if not None, is used to restrict the items displayed to those that match it.
-    Pattern can be any pattern understood by the re module (e.g., to display all items
-    containing the two consecutive letters &quot;2d&quot; set pattern to &quot;.*2d.*&quot;). If pattern is None
-    and wpattern is NOT None then pattern is set to &quot;.*&quot; + wpattern + &quot;.*&quot;.&quot;&quot;&quot;
+<div class="viewcode-block" id="tdir"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tdir">[docs]</a><span class="k">def</span> <span class="nf">tdir</span><span class="p">(</span> <span class="n">a</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">pattern</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wpattern</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This function is an attempt at improving the output of python&#39;s dir function. It uses</span>
+<span class="sd">    tlist to print the output in a more readable format. The argument w is passed to tlist.</span>
+<span class="sd">    The argument pattern, if not None, is used to restrict the items displayed to those that match it.</span>
+<span class="sd">    Pattern can be any pattern understood by the re module (e.g., to display all items</span>
+<span class="sd">    containing the two consecutive letters &quot;2d&quot; set pattern to &quot;.*2d.*&quot;). If pattern is None</span>
+<span class="sd">    and wpattern is NOT None then pattern is set to &quot;.*&quot; + wpattern + &quot;.*&quot;.&quot;&quot;&quot;</span>
 
-    if( ( pattern is None ) and ( wpattern is not None ) ) : pattern = &quot;.*&quot; + wpattern + &quot;.*&quot;
-    if( ( ( type( a ) == type( [] ) ) or ( type( a ) == type( () ) ) ) and ( len( a ) &gt; 0 ) ) :
-        l = a
-    elif ( type( a ) == type( {} ) ) :
-        l = a.keys( )
-    else :
-        l = dir( a )
-    if( pattern is not None ) :
-        m = []
-        p = re.compile( pattern )
-        for i in l :
-            if( p.match( i ) ) : m.append( i )
-        l = m
-    tlist( l, w )</div>
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">wpattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;.*&quot;</span> <span class="o">+</span> <span class="n">wpattern</span> <span class="o">+</span> <span class="s2">&quot;.*&quot;</span>
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">{}</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">a</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span> <span class="n">pattern</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">m</span>
+    <span class="n">tlist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="doc"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.doc">[docs]</a>def doc( a ) :
-    &quot;&quot;&quot;This function simply executes &quot;print a.__doc__&quot; where &quot;a&quot; is the argument.&quot;&quot;&quot;
+<div class="viewcode-block" id="doc"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.doc">[docs]</a><span class="k">def</span> <span class="nf">doc</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This function simply executes &quot;print a.__doc__&quot; where &quot;a&quot; is the argument.&quot;&quot;&quot;</span>
 
-    print a.__doc__</div>
+    <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="docmethods"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.docmethods">[docs]</a>def docmethods( o, Full = 1 ) :
-    &quot;&quot;&quot;This function attempts to print all methods and their documentation contained in the first argument.&quot;&quot;&quot;
+<div class="viewcode-block" id="docmethods"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.docmethods">[docs]</a><span class="k">def</span> <span class="nf">docmethods</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">Full</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This function attempts to print all methods and their documentation contained in the first argument.&quot;&quot;&quot;</span>
 
-    def docmethods2( o, typeslist ) :
-        for i in dir( o ) :
-            a = getattr( o, i )
-            if ( type( a ) in typeslist ) :
-                print &quot;\n------------------ %-30s ------------------&quot; % i
-                print a.__doc__
+    <span class="k">def</span> <span class="nf">docmethods2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">typeslist</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="ow">in</span> <span class="n">typeslist</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">------------------ </span><span class="si">%-30s</span><span class="s2"> ------------------&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
 
-    typeslist = [ types.FunctionType, types.MethodType, types.UnboundMethodType ]
-    if ( Full &gt; 0 ) : typeslist.append( types.ModuleType )
-    if ( Full &gt; 5 ) :
-        typeslist.append( types.BuiltinFunctionType )
-        typeslist.append( types.BuiltinMethodType )
-    if   ( type( o ) == types.InstanceType ) : docmethods2( o.__class__, typeslist )    # Instance of a class.
-    elif ( type( o ) == types.ClassType ) : docmethods2( o, typeslist )                 # Class
-    elif ( type( o ) == types.ModuleType ) : docmethods2( o, typeslist )                # Function</div>
+    <span class="n">typeslist</span> <span class="o">=</span> <span class="p">[</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">UnboundMethodType</span> <span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">Full</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">typeslist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">Full</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">typeslist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">types</span><span class="o">.</span><span class="n">BuiltinFunctionType</span> <span class="p">)</span>
+        <span class="n">typeslist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">types</span><span class="o">.</span><span class="n">BuiltinMethodType</span> <span class="p">)</span>
+    <span class="k">if</span>   <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">docmethods2</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">typeslist</span> <span class="p">)</span>    <span class="c1"># Instance of a class.</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">docmethods2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">typeslist</span> <span class="p">)</span>                 <span class="c1"># Class</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">docmethods2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">typeslist</span> <span class="p">)</span>                <span class="c1"># Function</span></div>
 
-<div class="viewcode-block" id="py"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.py">[docs]</a>def py( depth = 1, start = 0 ) :
-    &quot;&quot;&quot;This routine prints all python scripts in sys.path[start:start+depth] in a nice format.&quot;&quot;&quot;
+<div class="viewcode-block" id="py"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.py">[docs]</a><span class="k">def</span> <span class="nf">py</span><span class="p">(</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This routine prints all python scripts in sys.path[start:start+depth] in a nice format.&quot;&quot;&quot;</span>
 
-    Counter = 0
-    for d in sys.path :
-        if ( not d == &quot;&quot; ) :
-            if( Counter &gt;= start ) :
-                print &quot;\n&quot;, d
-                p = os.path.join( d, &quot;*.py&quot; )
-                fs = glob.glob( p )
-                l = []
-                for f in fs : l.append( os.path.split( f )[1] )
-                txlist( l )
-            Counter = Counter + 1
-            if( Counter == ( start + depth ) ) : return</div>
+    <span class="n">Counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">d</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">Counter</span> <span class="o">&gt;=</span> <span class="n">start</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="s2">&quot;*.py&quot;</span> <span class="p">)</span>
+                <span class="n">fs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span> <span class="n">p</span> <span class="p">)</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fs</span> <span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="n">f</span> <span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">txlist</span><span class="p">(</span> <span class="n">l</span> <span class="p">)</span>
+            <span class="n">Counter</span> <span class="o">=</span> <span class="n">Counter</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">Counter</span> <span class="o">==</span> <span class="p">(</span> <span class="n">start</span> <span class="o">+</span> <span class="n">depth</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span></div>
 
-<div class="viewcode-block" id="objectoutline"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline">[docs]</a>def objectoutline( o, MaxLevel = 1, Full = 1 ) :
-    &quot;&quot;&quot;This routine attempts to print the objects - methods, members and possible other things - that are a part
-    of the first argument. It will recursively traverse each object found down to level MaxLevel.&quot;&quot;&quot;
+<div class="viewcode-block" id="objectoutline"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline">[docs]</a><span class="k">def</span> <span class="nf">objectoutline</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">MaxLevel</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Full</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This routine attempts to print the objects - methods, members and possible other things - that are a part</span>
+<span class="sd">    of the first argument. It will recursively traverse each object found down to level MaxLevel.&quot;&quot;&quot;</span>
 
-    objectoutline2( o, MaxLevel, 0, &quot;&quot;, Full )</div>
+    <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="objectoutline2"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline2">[docs]</a>def objectoutline2( o, MaxLevel, level, name, Full ) :
-    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+<div class="viewcode-block" id="objectoutline2"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline2">[docs]</a><span class="k">def</span> <span class="nf">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
 
-    if( type( name ) != type( &quot;&quot; ) ) : name = str( name )
-    if ( level == ( MaxLevel + 1 ) ) : return
-    DoNextLevel = not ( level == MaxLevel )
-    nextlevel = level + 1
-    sm = &quot; &quot; * ( 4 * level )
-    s = sm
-    isInstance = ( type( o ) == types.InstanceType )
-    if( hasattr( o, &#39;__class__&#39; ) ) : isInstance |= ( type( o ) == o.__class__ )    # New style class instance.
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">level</span> <span class="o">==</span> <span class="p">(</span> <span class="n">MaxLevel</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+    <span class="n">DoNextLevel</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span> <span class="n">level</span> <span class="o">==</span> <span class="n">MaxLevel</span> <span class="p">)</span>
+    <span class="n">nextlevel</span> <span class="o">=</span> <span class="n">level</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">sm</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">level</span> <span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">sm</span>
+    <span class="n">isInstance</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">isInstance</span> <span class="o">|=</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">o</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span>    <span class="c1"># New style class instance.</span>
     
-    try :
-        if ( name != &quot;&quot; ) : s = s + name + &quot;: &quot;
-    except :
-        print &#39;&lt;%s&gt; &lt;%s&gt;, %s, %s&#39; % ( `s`, `name`, `type( s )`, `type( name )` )
-        raise
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">&gt; &lt;</span><span class="si">%s</span><span class="s1">&gt;, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">repr</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span> <span class="n">s</span> <span class="p">)),</span> <span class="nb">repr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span> <span class="n">name</span> <span class="p">))</span> <span class="p">))</span>
+        <span class="k">raise</span>
 
-    if ( type( o ) == types.ModuleType ) :                    # Function
-        print &quot;%smethod %s&quot; % ( s, o.__name__ )
-        for i in dir( o ) : objectoutline2( getattr( o, i ), MaxLevel, nextlevel, i, Full )
-    elif ( type( o ) == type( [] ) ) :                          # List of objects
-        print &quot;%slist of len %d&quot; % ( s, len( o ) )
-        if ( ( Full ) and ( CheckListForSameTypeOfObjects( o, [] ) ) ) :
-            if ( DoNextLevel ) :
-                for i in o : objectoutline2( i, MaxLevel, nextlevel, &quot;&quot;, Full )
-        else :
-            if ( o != [] ) : objectoutline2( o[0], MaxLevel, nextlevel, &quot;&quot;, Full )
-    elif ( type( o ) == type( () ) ) :                          # Tuple of objects
-        print &quot;%stuple of len %d&quot; % ( s, len( o ) )
-        if ( Full ) :
-            if ( DoNextLevel ) :
-                for i in o : objectoutline2( i, MaxLevel, nextlevel, &quot;&quot;, Full )
-        else :
-            if ( o != () ) : objectoutline2( o[0], MaxLevel, nextlevel, &quot;&quot;, Full )
-    elif ( type( o ) == type( {} ) ) :                          # Dictionary
-        print &quot;%sdictionary of %d items&quot; % ( s, len( dir( o ) ) )
-        for i in o.keys( ) : objectoutline2( o[i], MaxLevel, nextlevel, i, Full )
-    elif( ( type( o ) == types.ClassType ) or ( type( o ) == types.TypeType ) ) :                     # Class old and new style
-        print &quot;%sclass %s&quot; % ( s, o.__name__ )
-        if ( DoNextLevel ) :
-            if ( len( o.__bases__ ) &gt; 0 ) :
-                print &quot;%s  -- base(s) --&quot; % sm
-                for i in o.__bases__ : objectoutline2( i, MaxLevel, nextlevel, i.__name__, Full )
-            print &quot;%s  -- methods --&quot; % sm
-            for i in dir( o ) : objectoutline2( getattr( o, i ), MaxLevel, nextlevel, i, Full )
-        else :
-            if ( len( o.__bases__ ) &gt; 0 ) :
-                print &quot;%s  -- base(s) --&quot; % sm
-                for i in o.__bases__ : objectoutline2ClassesOnly( i, nextlevel, i.__name__ )
-    elif( type( o ) == type( 1 ) ) or ( type( o ) == type( 1. ) ) or ( type( o ) == type( &quot;&quot; ) ) or ( type( o ) == type( u&quot;&quot; ) ) or ( type( o ) == type( True ) ) :
-        print &quot;%s%s = %s&quot; % ( s, `type( o )`, `o` )
-    elif( isFunctionLike( o ) ) :
-        print &quot;%s %s&quot; % ( s, o.__class__.__name__ )
-    elif( isInstance ) :                  # Instance of a class.
-        print &quot;%sinstance of class %s&quot; % ( s, o.__class__.__name__ )
-        if ( DoNextLevel ) :
-#            if ( len( o.__class__.__bases__ ) &gt; 0 ) :
-#                print &quot;%s  -- bases --&quot; % sm
-#                for i in o.__class__.__bases__ : objectoutline2( i, MaxLevel, nextlevel, i.__name__, Full )
-            print &quot;%s  -- member --&quot; % sm
-            for i in dir( o ) : 
-                obj = get_dict_attr( o, i )
-                if( not( isFunctionLike( obj ) ) ) : objectoutline2( obj, MaxLevel, nextlevel, i, Full )
-            print &quot;%s  -- methods --&quot; % sm
-            for i in dir( o ) :
-                if( isFunctionLike( get_dict_attr( o, i ) ) ) : objectoutline2( get_dict_attr( o, i ), MaxLevel, nextlevel, i, Full )
-    else :                                                      # Integer, Float, etc...
-        print &quot;%s%s&quot; % ( s, `type( o )` )</div>
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span> <span class="p">)</span> <span class="p">:</span>                    <span class="c1"># Function</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">method </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="vm">__name__</span> <span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c1"># List of objects</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">list of len </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="p">(</span> <span class="n">Full</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">CheckListForSameTypeOfObjects</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">DoNextLevel</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">o</span> <span class="o">!=</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c1"># Tuple of objects</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">tuple of len </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">Full</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">DoNextLevel</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">o</span> <span class="o">!=</span> <span class="p">()</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">{}</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c1"># Dictionary</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">dictionary of </span><span class="si">%d</span><span class="s2"> items&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span> <span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">TypeType</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                     <span class="c1"># Class old and new style</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">class </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="vm">__name__</span> <span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">DoNextLevel</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="vm">__bases__</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">  -- base(s) --&quot;</span> <span class="o">%</span> <span class="n">sm</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="vm">__bases__</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">  -- methods --&quot;</span> <span class="o">%</span> <span class="n">sm</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="vm">__bases__</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">  -- base(s) --&quot;</span> <span class="o">%</span> <span class="n">sm</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="vm">__bases__</span> <span class="p">:</span> <span class="n">objectoutline2ClassesOnly</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="vm">__name__</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="sa">u</span><span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="p">))</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">isFunctionLike</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="p">))</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">isInstance</span> <span class="p">)</span> <span class="p">:</span>                  <span class="c1"># Instance of a class.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">instance of class </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">DoNextLevel</span> <span class="p">)</span> <span class="p">:</span>
+<span class="c1">#            if ( len( o.__class__.__bases__ ) &gt; 0 ) :</span>
+<span class="c1">#                print(&quot;%s  -- bases --&quot; % sm)</span>
+<span class="c1">#                for i in o.__class__.__bases__ : objectoutline2( i, MaxLevel, nextlevel, i.__name__, Full )</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">  -- member --&quot;</span> <span class="o">%</span> <span class="n">sm</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span> 
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">get_dict_attr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">isFunctionLike</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">obj</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">  -- methods --&quot;</span> <span class="o">%</span> <span class="n">sm</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">isFunctionLike</span><span class="p">(</span> <span class="n">get_dict_attr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">get_dict_attr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>                                                      <span class="c1"># Integer, Float, etc...</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">))</span> <span class="p">))</span></div>
 
-<div class="viewcode-block" id="isFunctionLike"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.isFunctionLike">[docs]</a>def isFunctionLike( obj ) :
+<div class="viewcode-block" id="isFunctionLike"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.isFunctionLike">[docs]</a><span class="k">def</span> <span class="nf">isFunctionLike</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="p">:</span>
 
-    if( type( obj ) == types.BuiltinFunctionType ) : return( True )
-    if( type( obj ) == types.BuiltinMethodType ) : return( True )
-    if( type( obj ) == types.FunctionType ) : return( True )
-    if( type( obj ) == types.GeneratorType ) : return( True )
-    if( type( obj ) == types.LambdaType ) : return( True )
-    if( type( obj ) == types.MethodType ) : return( True )
-    if( type( obj ) == types.UnboundMethodType ) : return( True )
-    return( False )</div>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">BuiltinFunctionType</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">BuiltinMethodType</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">GeneratorType</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">LambdaType</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">obj</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">UnboundMethodType</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="get_dict_attr"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.get_dict_attr">[docs]</a>def get_dict_attr( obj, attr ) :
-    for obj in [ obj ] + obj.__class__.mro( ) :
-        if( attr in obj.__dict__ ) : return( obj.__dict__[attr] )
-    raise AttributeError</div>
+<div class="viewcode-block" id="get_dict_attr"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.get_dict_attr">[docs]</a><span class="k">def</span> <span class="nf">get_dict_attr</span><span class="p">(</span> <span class="n">obj</span><span class="p">,</span> <span class="n">attr</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">obj</span> <span class="p">]</span> <span class="o">+</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">mro</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">AttributeError</span></div>
 
-<div class="viewcode-block" id="objectoutline2ClassesOnly"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline2ClassesOnly">[docs]</a>def objectoutline2ClassesOnly( o, level, name ) :
-    &quot;&quot;&quot;For internal use only!&quot;&quot;&quot;
+<div class="viewcode-block" id="objectoutline2ClassesOnly"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline2ClassesOnly">[docs]</a><span class="k">def</span> <span class="nf">objectoutline2ClassesOnly</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only!&quot;&quot;&quot;</span>
 
-    sm = &quot; &quot; * ( 4 * level )
-    if( ( type( o ) == types.ClassType ) or ( type( o ) == types.TypeType ) ) :                     # Class old and new style
-        print &quot;%sclass %s&quot; % ( sm, o.__name__ )
-        if ( len( o.__bases__ ) &gt; 0 ) :
-            if( len( o.__bases__[0].__bases__ ) == 0 ) : return
-            print &quot;%s  -- base(s) --&quot; % sm
-            for subo in o.__bases__ : objectoutline2ClassesOnly( subo, level + 1, subo.__name__ )</div>
+    <span class="n">sm</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">level</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">TypeType</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                     <span class="c1"># Class old and new style</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">class </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">sm</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="vm">__name__</span> <span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="vm">__bases__</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__bases__</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">  -- base(s) --&quot;</span> <span class="o">%</span> <span class="n">sm</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">subo</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="vm">__bases__</span> <span class="p">:</span> <span class="n">objectoutline2ClassesOnly</span><span class="p">(</span> <span class="n">subo</span><span class="p">,</span> <span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">subo</span><span class="o">.</span><span class="vm">__name__</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CheckListForSameTypeOfObjects"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.CheckListForSameTypeOfObjects">[docs]</a>def CheckListForSameTypeOfObjects( l, e ) :
-    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+<div class="viewcode-block" id="CheckListForSameTypeOfObjects"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.CheckListForSameTypeOfObjects">[docs]</a><span class="k">def</span> <span class="nf">CheckListForSameTypeOfObjects</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">e</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
 
-    if( l == e ) : return 0
-    t = type( l[0] )
-    for i in l :
-        if ( t != type( i ) ) : return 1
-    return 0</div>
+    <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="o">==</span> <span class="n">e</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">t</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="objectvalues"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectvalues">[docs]</a>def objectvalues( o ) :
-    &quot;&quot;&quot;Prints a list of all objects return by dir( o ) and their data (or object type) where &quot;o&quot; 
-    is the first argument.&quot;&quot;&quot;
+<div class="viewcode-block" id="objectvalues"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectvalues">[docs]</a><span class="k">def</span> <span class="nf">objectvalues</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Prints a list of all objects return by dir( o ) and their data (or object type) where &quot;o&quot; </span>
+<span class="sd">    is the first argument.&quot;&quot;&quot;</span>
 
-    if ( type( o ) == types.InstanceType ) :                  # Instance of a class.
-        print &quot;class %s&quot; % o.__class__.__name__
-        print &quot;  -- member --&quot;
-        for i in dir( o ) : objectvalues2( getattr( o, i ), i )
-    else :
-        objectvalues2( o, &quot;&quot; )</div>
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span> <span class="p">:</span>                  <span class="c1"># Instance of a class.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;class </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">o</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -- member --&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectvalues2</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">i</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">objectvalues2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="objectvalues2"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectvalues2">[docs]</a>def objectvalues2( o, name ) :
-    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
-    if   ( type( o ) == types.InstanceType ) :                  # Instance of a class.
-        return
-    elif ( type( o ) == types.ModuleType ) :                    # Function
-        return
-    if ( type( o ) == type( [] ) ) :                            # List of objects
-        print &quot;  %s: list of len %d&quot; % ( name, len( o ) )
-    elif ( type( o ) == type( () ) ) :                          # Tuple of objects
-        print &quot;  %s: tuple of len %d&quot; % ( name, len( o ) )
-    elif ( type( o ) == type( {} ) ) :                          # Dictionary
-        print &quot;  %s dictionary of %d items&quot; % ( name, len( dir( o ) ) )
-        for i in o.keys( ) : print &quot;    %s = %s&quot; % ( i, o[i] )
-    elif ( type( o ) == types.ClassType ) :                     # Class
-        return
-    else :                                                      # Integer, Float, etc...
-        print &quot;  %s: %s = %s&quot; % ( name, `type( o )`, `o` )</div>
+<div class="viewcode-block" id="objectvalues2"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectvalues2">[docs]</a><span class="k">def</span> <span class="nf">objectvalues2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
+    <span class="k">if</span>   <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span> <span class="p">:</span>                  <span class="c1"># Instance of a class.</span>
+        <span class="k">return</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span> <span class="p">)</span> <span class="p">:</span>                    <span class="c1"># Function</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                            <span class="c1"># List of objects</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2">: list of len </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">))</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c1"># Tuple of objects</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2">: tuple of len </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">))</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">{}</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c1"># Dictionary</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2"> dictionary of </span><span class="si">%d</span><span class="s2"> items&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span> <span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">o</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">))</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span> <span class="p">)</span> <span class="p">:</span>                     <span class="c1"># Class</span>
+        <span class="k">return</span>
+    <span class="k">else</span> <span class="p">:</span>                                                      <span class="c1"># Integer, Float, etc...</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="p">))</span></div>
 
-<div class="viewcode-block" id="getType"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.getType">[docs]</a>def getType( o ) :
+<div class="viewcode-block" id="getType"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.getType">[docs]</a><span class="k">def</span> <span class="nf">getType</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
 
-    try :
-        return( &quot;%s %s&quot; % ( str( o.im_class ), str( o.im_func ) ) )
-    except :
-        try :
-            return( str( o.__class__ ) )
-        except :
-            return( type( o ) )</div>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="n">im_class</span> <span class="p">),</span> <span class="nb">str</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="n">im_func</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="limitObjectToString"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.limitObjectToString">[docs]</a>def limitObjectToString( object ) :
+<div class="viewcode-block" id="limitObjectToString"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.limitObjectToString">[docs]</a><span class="k">def</span> <span class="nf">limitObjectToString</span><span class="p">(</span> <span class="nb">object</span> <span class="p">)</span> <span class="p">:</span>
 
-    if( isinstance( object, str ) ) :
-        s1 = object
-    else :
-        s1 = repr( object )
-    if( len( s1 ) &gt; 64 ) : s1 = s1[:61] + &#39;...&#39;
-    return( s1 )</div>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="nb">object</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span> <span class="nb">object</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">s1</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">64</span> <span class="p">)</span> <span class="p">:</span> <span class="n">s1</span> <span class="o">=</span> <span class="n">s1</span><span class="p">[:</span><span class="mi">61</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;...&#39;</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">s1</span> <span class="p">)</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -404,15 +397,15 @@ import glob
               <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
             </a></p>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -427,12 +420,13 @@ import glob
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.core.utilities.brb</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

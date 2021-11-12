@@ -16,9 +16,11 @@
 
 #include "energy_dist.hpp"
 
+namespace Iso
+{
 //! Class for isotropic distributions in the lab frame
 // ----------------------- class isotropic --------------------------
-class isotropic : public energy_moments
+class isotropic : public Edist::energy_moments
 {
 private:
 
@@ -29,15 +31,17 @@ public:
   //! Reads the data
   //! \param infile input file
   //! \param num_Ein number of incident energies for this reaction
-  void read_data( data_parser& infile, int num_Ein );
+  void read_data( Dpar::data_parser& infile, int num_Ein );
 
   // Calculates the transfer matrix for this particle.
   //! \param sigma the cross section data
   //! \param mult the outgoing particle multiplicity data
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param transfer the transfer matrix
-  void get_T( const dd_vector& sigma, const dd_vector& mult, const dd_vector& weight,
-    T_matrix& transfer );
+  void get_T( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& mult,
+	      const Ddvec::dd_vector& weight,
+    Trf::T_matrix& transfer );
 };
 
+} // end of namespace Iso
 #endif

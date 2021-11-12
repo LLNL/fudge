@@ -6,7 +6,7 @@
   <leptons>
     <lepton id="e-" generation="electronic">
       <mass>
-        <double label="default" value="0.0005485801" unit="amu"/></mass>
+        <double label="default" value="5.485801e-4" unit="amu"/></mass>
       <spin>
         <fraction label="default" value="1/2" unit="hbar"/></spin>
       <parity>
@@ -17,7 +17,7 @@
         <string label="default" value="stable" unit="s"/></halflife></lepton>
     <lepton id="e-_anti" generation="electronic">
       <mass>
-        <double label="default" value="0.0005485801" unit="amu"/></mass>
+        <double label="default" value="5.485801e-4" unit="amu"/></mass>
       <spin>
         <fraction label="default" value="1/2" unit="hbar"/></spin>
       <parity>
@@ -36,7 +36,7 @@
       <charge>
         <integer label="default" value="-1" unit="e"/></charge>
       <halflife>
-        <double label="default" value="2.1969811e-06" unit="s"/></halflife></lepton></leptons>
+        <double label="default" value="2.1969811e-6" unit="s"/></halflife></lepton></leptons>
   <baryons>
     <baryon id="n">
       <mass>
@@ -48,7 +48,7 @@
       <charge>
         <integer label="default" value="0" unit="e"/></charge>
       <halflife>
-        <double label="default" value="881.0" unit="s"/></halflife></baryon>
+        <double label="default" value="881." unit="s"/></halflife></baryon>
     <baryon id="p">
       <mass>
         <double label="default" value="1.00727646681" unit="amu"/></mass>
@@ -74,7 +74,7 @@
                 <charge>
                   <integer label="default" value="8" unit="e"/></charge>
                 <energy>
-                  <double label="default" value="0.0" unit="eV"/></energy></nucleus></nuclide>
+                  <double label="default" value="0." unit="eV"/></energy></nucleus></nuclide>
             <nuclide id="O16_e3">
               <charge>
                 <integer label="default" value="0" unit="e"/></charge>
@@ -82,4 +82,4 @@
                 <charge>
                   <integer label="default" value="8" unit="e"/></charge>
                 <energy>
-                  <double label="default" value="6917100.0" unit="eV"/></energy></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement></chemicalElements></PoPs>
+                  <double label="default" value="6.9171e6" unit="eV"/></energy></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement></chemicalElements></PoPs>

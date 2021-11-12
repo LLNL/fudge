@@ -3,7 +3,7 @@ Process: Watt spectrum
 Comment: U233(n,fission)?; data for outgoing n_1
 outputLegendreOrder: 0
 Conserve: number
-Interpolate Eout integrals: false
+do adaptive quadrature: false
 Quadrature method: Gauss6
 Projectile Frame: lab
 

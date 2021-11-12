@@ -21,43 +21,44 @@
 #include "coef_vector.hpp"
 #include "Legendre_data.hpp"
 #include "data_parser.hpp"
-#include "quadrature.hpp"
+#include "quad_methods.hpp"
 #include "Energy_groups.hpp"
 
-using namespace std;
-
+namespace Trf
+{
 //! Class for the transfer matrix
 //-----------class T_matrix ----------
 class T_matrix
 {
 public:
-  coef_vector *data;
-  coef_vector *row_checks;  // used for verification
-  coef_vector *row_sums;  // used for verification
-  Flux_List e_flux;  // the Legendre coefficients of the incident flux
+  Coef::coef_vector *data;
+  Coef::coef_vector *row_checks;  // used for verification
+  Coef::coef_vector *row_sums;  // used for verification
+  Lgdata::Flux_List e_flux;  // the Legendre coefficients of the incident flux
   int order;   // the Legendre order
   int num_Ein_bins;
   int num_Eout_bins;
-  Conserve conserve;
-  Quadrature_Method Ein_quad_method;  // quadrature method for incident energy
-  Quadrature_Method Eout_quad_method;  // quadrature method for outgoing energy
-  Quadrature_Method mu_quad_method;  // quadrature method for outgoing cosine
-
-  bool interpolate_Eout_integrals;  // do we interpolate the integrals over Eout?
+  Coef::Conserve conserve;
+  Qmeth::Quadrature_Rule Ein_quad_rule;  // quadrature rule for incident energy
+  Qmeth::Quadrature_Rule Eout_quad_rule;  // quadrature rule for outgoing energy
+  Qmeth::Quadrature_Rule mu_quad_rule;  // quadrature rule for outgoing cosine
+  Qmeth::Quadrature_Rule mucm2_quad_rule;  // quadrature rule for second cosine, 2-step reaction
+  Qmeth::Quadrature_Rule w_quad_rule;  // quadrature rule for w parameter, 2-step reaction
 
   //! The energy groups
-  Energy_groups in_groups;
-  Energy_groups out_groups;
+  Egp::Energy_groups in_groups;
+  Egp::Energy_groups out_groups;
 
   //! the weights 1 / \int_(energy group) flux by Legendre order
-  weight_list flux_weight;
+  Lgdata::weight_list flux_weight;
 
   //! Average cross section over energy bins, for checking the contribution of an interval
-  vector< double > averageCrossSections;
+  std::vector< double > averageCrossSections;
 
   //! The maximum average cross section
   double maximumCrossSection;
-  ofstream *output_file;  // pointer to the output file
+  double threshold;  // reaction threshold
+  std::ofstream *output_file;  // pointer to the output file
 
   //! Constructor
   T_matrix( );
@@ -71,13 +72,13 @@ public:
   //! Operator to grab an entry:
   //! \param Ein_count: incident energy group
   //! \param Eout_count: exit energy group
-  coef_vector& operator()( int Ein_count, int Eout_count );
+  Coef::coef_vector& operator()( int Ein_count, int Eout_count );
 
   //! Operator to grab an entry:
   //! \param Ein_count: incident energy group
   //! \param Eout_count: exit energy group
   //! \param ell: the Legendre order of this term
-  coef_vector& operator()( int Ein_count, int Eout_count, int ell );
+  Coef::coef_vector& operator()( int Ein_count, int Eout_count, int ell );
 
   //! Calculates the weights 1 / \int_(energy group) flux
   void get_flux_weight( );
@@ -97,7 +98,7 @@ public:
 
   //! Computes the net cross section for each energy bin
   //! \param sigma a vector of pairs ( incident energy, cross section )
-  void getBinCrossSection( const dd_vector& sigma );
+  void getBinCrossSection( const Ddvec::dd_vector& sigma );
 
   //! Prints the matrix to the output file
   void write_transfer( );
@@ -105,5 +106,7 @@ public:
   //! Prints zeros to the output file for a reaction with high threshold
   void zero_transfer( );
 };
+
+} // end of namespace Trf
 
 #endif

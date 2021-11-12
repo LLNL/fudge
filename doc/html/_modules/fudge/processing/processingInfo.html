@@ -1,31 +1,22 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.processing.processingInfo &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -36,7 +27,8 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.processingInfo</a></li> 
       </ul>
     </div>  
 
@@ -46,212 +38,210 @@
           <div class="body" role="main">
             
   <h1>Source code for fudge.processing.processingInfo</h1><div class="highlight"><pre>
-<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
-# &lt;&lt;END-copyright&gt;&gt;
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-__metaclass__ = type
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
 
-conserveParticle = &#39;conserveParticle&#39;
-conserveEnergy = &#39;conserveEnergy&#39;
-conserveParticleAndEnergy = &#39;conserveParticleAndEnergy&#39;
+<span class="n">conserveParticle</span> <span class="o">=</span> <span class="s1">&#39;conserveParticle&#39;</span>
+<span class="n">conserveEnergy</span> <span class="o">=</span> <span class="s1">&#39;conserveEnergy&#39;</span>
+<span class="n">conserveParticleAndEnergy</span> <span class="o">=</span> <span class="s1">&#39;conserveParticleAndEnergy&#39;</span>
 
-from PoPs import IDs as IDsPoPsModule
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
 
-from fudge.gnds import styles as stylesModule
-from fudge.gnds import reactionSuite as reactionSuiteModule
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">styles</span> <span class="k">as</span> <span class="n">stylesModule</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span> <span class="k">as</span> <span class="n">reactionSuiteModule</span>
 
-<div class="viewcode-block" id="tempInfo"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.tempInfo">[docs]</a>class tempInfo :
+<div class="viewcode-block" id="tempInfo"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.tempInfo">[docs]</a><span class="k">class</span> <span class="nc">tempInfo</span> <span class="p">:</span>
 
-    def __init__( self ) :
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        self.dict = {}
+        <span class="bp">self</span><span class="o">.</span><span class="n">dict</span> <span class="o">=</span> <span class="p">{}</span>
 
-    def __contains__( self, key ) :
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( key in self.dict )
+        <span class="k">return</span><span class="p">(</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict</span> <span class="p">)</span>
 
-    def __delitem__( self, key ) :
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
 
-        del self.dict[key]
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    def __getitem__( self, key ) :
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.dict[key] )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
 
-    def __setitem__( self, key, value ) : 
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span> 
 
-        self.dict[key] = value
+        <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<div class="viewcode-block" id="tempInfo.get"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.tempInfo.get">[docs]</a>    def get( self, key, default=None ):
+<div class="viewcode-block" id="tempInfo.get"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.tempInfo.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 
-        return self.dict.get( key, default )</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="tempInfo.keys"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.tempInfo.keys">[docs]</a>    def keys( self ) :
+<div class="viewcode-block" id="tempInfo.keys"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.tempInfo.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.dict.keys( ) )</div></div>
+        <span class="k">return</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="processInfo2"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo2">[docs]</a>class processInfo2 :
+<div class="viewcode-block" id="processInfo2"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo2">[docs]</a><span class="k">class</span> <span class="nc">processInfo2</span> <span class="p">:</span>
 
-    def __init__( self, style, reactionSuite, flux = None, logFile = None, verbosity = 0, verbosityIndentStep = &#39;  &#39;,
-            energyAccuracy = 1e-6, momentumAccuracy = 1e-3 ) :
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">flux</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">logFile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">verbosityIndentStep</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span><span class="p">,</span>
+            <span class="n">energyAccuracy</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">momentumAccuracy</span> <span class="o">=</span> <span class="mf">1e-3</span> <span class="p">)</span> <span class="p">:</span>
 
-        if( not( isinstance( style, stylesModule.style ) ) ) : raise TypeError( &#39;invalid style&#39; )
-        self.__style = style
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">style</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;invalid style&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__style</span> <span class="o">=</span> <span class="n">style</span>
 
-        if( not( isinstance( reactionSuite, reactionSuiteModule.reactionSuite ) ) ) : raise TypeError( &#39;invalid reactionSuite&#39; )
-        self.__reactionSuite = reactionSuite
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">reactionSuite</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;invalid reactionSuite&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__reactionSuite</span> <span class="o">=</span> <span class="n">reactionSuite</span>
 
-        self.__flux = flux
-        self.__logFile = logFile
-        self.__verbosity = int( verbosity )
+        <span class="bp">self</span><span class="o">.</span><span class="n">__flux</span> <span class="o">=</span> <span class="n">flux</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logFile</span> <span class="o">=</span> <span class="n">logFile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__verbosity</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">verbosity</span> <span class="p">)</span>
 
-        if( not( isinstance( verbosityIndentStep, str ) ) ) : raise TypeError( &#39;invalid verbosityIndentStep&#39; )
-        if( len( verbosityIndentStep ) != verbosityIndentStep.count( &#39; &#39; ) ) :
-            raise ValueError( &#39;verbosityIndentStep must only contain the space character&#39; )
-        self.__verbosityIndentStep = verbosityIndentStep
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">verbosityIndentStep</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;invalid verbosityIndentStep&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">verbosityIndentStep</span> <span class="p">)</span> <span class="o">!=</span> <span class="n">verbosityIndentStep</span><span class="o">.</span><span class="n">count</span><span class="p">(</span> <span class="s1">&#39; &#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;verbosityIndentStep must only contain the space character&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__verbosityIndentStep</span> <span class="o">=</span> <span class="n">verbosityIndentStep</span>
 
-        self.__energyAccuracy = energyAccuracy
-        self.__momentumAccuracy = momentumAccuracy
+        <span class="bp">self</span><span class="o">.</span><span class="n">__energyAccuracy</span> <span class="o">=</span> <span class="n">energyAccuracy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__momentumAccuracy</span> <span class="o">=</span> <span class="n">momentumAccuracy</span>
 
-    @property
-    def energyAccuracy( self ) :
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energyAccuracy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.__energyAccuracy )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__energyAccuracy</span> <span class="p">)</span>
 
-    @property
-    def momentumAccuracy( self ) :
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">momentumAccuracy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.__momentumAccuracy )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__momentumAccuracy</span> <span class="p">)</span>
 
-    @property
-    def reactionSuite( self ) :
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reactionSuite</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.__reactionSuite )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reactionSuite</span> <span class="p">)</span>
 
-    @property
-    def style( self ) :
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">style</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.__style )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__style</span> <span class="p">)</span>
 
-    @property
-    def verbosityIndentStep( self ) :
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">verbosityIndentStep</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.__verbosityIndentStep )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__verbosityIndentStep</span> <span class="p">)</span>
 
-    @property
-    def flux( self ) :
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.__flux )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flux</span> <span class="p">)</span>
 
-    @property
-    def logFile( self ) :
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logFile</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.__logFile )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__logFile</span> <span class="p">)</span>
 
-    @property
-    def verbosity( self ) :
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">verbosity</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.__verbosity )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__verbosity</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="processInfo2.checkStyle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo2.checkStyle">[docs]</a>    def checkStyle( self, _class ) :
+<div class="viewcode-block" id="processInfo2.checkStyle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo2.checkStyle">[docs]</a>    <span class="k">def</span> <span class="nf">checkStyle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_class</span> <span class="p">)</span> <span class="p">:</span>
 
-        if( not( issubclass( _class, stylesModule.style ) ) ) : raise TypeError( &#39;class not a sub-class of style&#39; )
-        if( isinstance( self.style, _class ) ) : return
-        raise TypeError( &#39;style %s not of style %s&#39; % ( _class.moniker, self.style.moniker ) )</div></div>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">issubclass</span><span class="p">(</span> <span class="n">_class</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">style</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;class not a sub-class of style&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="n">_class</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;style </span><span class="si">%s</span><span class="s1"> not of style </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">_class</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="processInfo"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo">[docs]</a>class processInfo :
+<div class="viewcode-block" id="processInfo"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo">[docs]</a><span class="k">class</span> <span class="nc">processInfo</span> <span class="p">:</span>
 
-    def __init__( self, target, particles = None, flux = None, logFile = None, verbosity = 0 ) :
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">particles</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">flux</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">logFile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
 
-        self.target = target
-        self.dict = {}
-        self[&#39;particles&#39;] = {}
-        if( not( particles is None ) ) :
-            for name in particles : self.addParticle( particles[name] )
-        if( not flux is None ) : self[&#39;flux&#39;] = flux
-        self[&#39;verbosityIndent&#39;] = &#39;&#39;
-        self[&#39;verbosity&#39;] = verbosity
-        self[&#39;logFile&#39;] = logFile
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;particles&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">particles</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">particles</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span> <span class="n">particles</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">flux</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flux</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;verbosityIndent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verbosity</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logFile</span>
 
-    def __getitem__( self, key ) :
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.dict[key] )
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
 
-    def __setitem__( self, key, value ) :
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
 
-        self.dict[key] = value
+        <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<div class="viewcode-block" id="processInfo.addParticle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.addParticle">[docs]</a>    def addParticle( self, particle ) :
+<div class="viewcode-block" id="processInfo.addParticle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.addParticle">[docs]</a>    <span class="k">def</span> <span class="nf">addParticle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">particle</span> <span class="p">)</span> <span class="p">:</span>
 
-        self[&#39;particles&#39;][particle.id]  = particle</div>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;particles&#39;</span><span class="p">][</span><span class="n">particle</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>  <span class="o">=</span> <span class="n">particle</span></div>
 
-<div class="viewcode-block" id="processInfo.getParticleGroups"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getParticleGroups">[docs]</a>    def getParticleGroups( self, name ) :
+<div class="viewcode-block" id="processInfo.getParticleGroups"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getParticleGroups">[docs]</a>    <span class="k">def</span> <span class="nf">getParticleGroups</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self[&#39;particles&#39;][name].groups )</div>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;particles&#39;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="processInfo.getParticle_lMax"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getParticle_lMax">[docs]</a>    def getParticle_lMax( self, name ) :
+<div class="viewcode-block" id="processInfo.getParticle_lMax"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getParticle_lMax">[docs]</a>    <span class="k">def</span> <span class="nf">getParticle_lMax</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self[&#39;particles&#39;][name].lMax )</div>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;particles&#39;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">lMax</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="processInfo.getProjectileName"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getProjectileName">[docs]</a>    def getProjectileName( self ) :
+<div class="viewcode-block" id="processInfo.getProjectileName"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getProjectileName">[docs]</a>    <span class="k">def</span> <span class="nf">getProjectileName</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.target.projectile.pid )</div>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">projectile</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="processInfo.getTargetName"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getTargetName">[docs]</a>    def getTargetName( self ) :
+<div class="viewcode-block" id="processInfo.getTargetName"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getTargetName">[docs]</a>    <span class="k">def</span> <span class="nf">getTargetName</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( self.target.target.pid )</div>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="processInfo.isProcessParticle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.isProcessParticle">[docs]</a>    def isProcessParticle( self, name ) :
+<div class="viewcode-block" id="processInfo.isProcessParticle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.isProcessParticle">[docs]</a>    <span class="k">def</span> <span class="nf">isProcessParticle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
 
-        return( name in self[&#39;particles&#39;] )</div>
+        <span class="k">return</span><span class="p">(</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;particles&#39;</span><span class="p">]</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="processInfo.process"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.process">[docs]</a>    def process( self, verbosity = None, verbosityIndent = None ) :
+<div class="viewcode-block" id="processInfo.process"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbosityIndent</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 
-        verbositySave = self[&#39;verbosity&#39;]
-        if( not ( verbosity is None ) ) : self[&#39;verbosity&#39;] = verbosity
-        if( verbosityIndent is None ) : verbosityIndent = self[&#39;verbosityIndent&#39;]
-        doRaise = False
-        try :
-            self.target.process( self, verbosityIndent )
-        except :
-            doRaise = True
-        self[&#39;verbosity&#39;] = verbositySave
-        if( doRaise ) : raise</div></div>
+        <span class="n">verbositySave</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="p">(</span> <span class="n">verbosity</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verbosity</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosityIndent</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">verbosityIndent</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;verbosityIndent&#39;</span><span class="p">]</span>
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">process</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">verbosityIndent</span> <span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verbositySave</span></div></div>
 
-<div class="viewcode-block" id="processInfoParticle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfoParticle">[docs]</a>class processInfoParticle :
+<div class="viewcode-block" id="processInfoParticle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfoParticle">[docs]</a><span class="k">class</span> <span class="nc">processInfoParticle</span> <span class="p">:</span>
 
-    def __init__( self, name, groups, lMax, conservationFlag = conserveParticle ) :
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">lMax</span><span class="p">,</span> <span class="n">conservationFlag</span> <span class="o">=</span> <span class="n">conserveParticle</span> <span class="p">)</span> <span class="p">:</span>
 
-        self.pid = name
-        self.groups = groups
-        self.lMax = lMax
-        self.conservationFlag = conservationFlag
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lMax</span> <span class="o">=</span> <span class="n">lMax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conservationFlag</span> <span class="o">=</span> <span class="n">conservationFlag</span>
 
-    def __repr__( self ) :
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        s = &#39;\n%s %s %s\n&#39; % ( self.pid, self.lMax, self.conservationFlag )
-        s += `self.groups`
-        return( s )</div>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conservationFlag</span> <span class="p">)</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="processInfoLLNL"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfoLLNL">[docs]</a>class processInfoLLNL( processInfo ) :
+<div class="viewcode-block" id="processInfoLLNL"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfoLLNL">[docs]</a><span class="k">class</span> <span class="nc">processInfoLLNL</span><span class="p">(</span> <span class="n">processInfo</span> <span class="p">)</span> <span class="p">:</span>
 
-    def __init__( self, target, groups = None, flux = None, LLNL_Pn = True, lMax = 3, logFile = None, verbosity = 0 ) :
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">groups</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">flux</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">LLNL_Pn</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">lMax</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">logFile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
 
-        particles = {}
-        for particle in groups :
-            lMax_ = 0
-            if( particle == target.projectile.pid ) : lMax_ = lMax
-            conservationFlag = conserveParticleAndEnergy
-            if( particle == &#39;n&#39; ) : conservationFlag = conserveParticle
-            if( particle == IDsPoPsModule.photon ) : conservationFlag = conserveEnergy
-            particles[particle] = processInfoParticle( particle, groups[particle], lMax_, conservationFlag )
-        processInfo.__init__( self, target, particles, flux = flux, logFile = logFile, verbosity = verbosity )
-        self[&#39;workDir&#39;] = &#39;xndfgen.work&#39;
-        styles = []
-        if( LLNL_Pn ) : styles.append( &#39;LLNL_Pn&#39; )
-        self[&#39;styles&#39;] = styles</div>
+        <span class="n">particles</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">particle</span> <span class="ow">in</span> <span class="n">groups</span> <span class="p">:</span>
+            <span class="n">lMax_</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">particle</span> <span class="o">==</span> <span class="n">target</span><span class="o">.</span><span class="n">projectile</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span> <span class="p">:</span> <span class="n">lMax_</span> <span class="o">=</span> <span class="n">lMax</span>
+            <span class="n">conservationFlag</span> <span class="o">=</span> <span class="n">conserveParticleAndEnergy</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">particle</span> <span class="o">==</span> <span class="s1">&#39;n&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">conservationFlag</span> <span class="o">=</span> <span class="n">conserveParticle</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">particle</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span> <span class="n">conservationFlag</span> <span class="o">=</span> <span class="n">conserveEnergy</span>
+            <span class="n">particles</span><span class="p">[</span><span class="n">particle</span><span class="p">]</span> <span class="o">=</span> <span class="n">processInfoParticle</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="n">groups</span><span class="p">[</span><span class="n">particle</span><span class="p">],</span> <span class="n">lMax_</span><span class="p">,</span> <span class="n">conservationFlag</span> <span class="p">)</span>
+        <span class="n">processInfo</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="p">,</span> <span class="n">logFile</span> <span class="o">=</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;xndfgen.work&#39;</span>
+        <span class="n">styles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">LLNL_Pn</span> <span class="p">)</span> <span class="p">:</span> <span class="n">styles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;LLNL_Pn&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;styles&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">styles</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -261,15 +251,15 @@ from fudge.gnds import reactionSuite as reactionSuiteModule
               <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
             </a></p>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -284,12 +274,13 @@ from fudge.gnds import reactionSuite as reactionSuiteModule
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.processingInfo</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

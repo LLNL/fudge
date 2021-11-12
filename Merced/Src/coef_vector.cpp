@@ -18,83 +18,51 @@
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-using namespace std;
 
-// *************** class coef_vector *********************
-// ------------------- coef_vector constructor ------------------------
-coef_vector::coef_vector( int Order, Conserve cons )
+// *************** class Coef::coef_vector *********************
+// ------------------- Coef::coef_vector constructor ------------------------
+Coef::coef_vector::coef_vector( int Order, Conserve cons )
 {
   set_order( Order, cons );
 }
-// ------------------- coef_vector::set_order ------------------------
-void coef_vector::set_order( int Order, Conserve cons )
+// ------------------- Coef::coef_vector::set_order ------------------------
+void Coef::coef_vector::set_order( int Order, Conserve cons )
 {
   conserve = cons;
   order = Order;
   set_zero( );
 }
-// ------------------- coef_vector::set_zero ------------------------
-void coef_vector::set_zero( )
+// ------------------- Coef::coef_vector::set_zero ------------------------
+void Coef::coef_vector::set_zero( )
 {
   // Set the entries to zero
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_1[i] = 0.0;
     }
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_E[i] = 0.0;
     }
   }
 }
-// ------------------- coef_vector::test_zero ------------------------
-void coef_vector::test_zero( double *Norm_1, double *Norm_E, double length )
-{
-  // ensure that our rough estimate is nonzero
-  if( *Norm_1 <= 0.0 )
-  {
-    *Norm_1 = length;
-  }
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
-    for( int i = 0; i <= order; ++i )
-    {
-      if( weight_1[i] == 0.0 )
-      {
-	weight_1[i] = *Norm_1;
-      }
-    }
-  }
-  if( *Norm_E <= 0.0 )
-  {
-    *Norm_E = length;
-  }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
-    for( int i = 0; i <= order; ++i )
-    {
-      if( weight_E[i] == 0.0 )
-      {
-	weight_E[i] = *Norm_E;
-      }
-    }
-  }
-}
-// ------------------- coef_vector::copy ------------------------
-void coef_vector::copy( const coef_vector &to_copy )
+// ------------------- Coef::coef_vector::copy ------------------------
+void Coef::coef_vector::copy( const Coef::coef_vector &to_copy )
 {
   order = to_copy.order;
   conserve = to_copy.conserve;
 
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) )
   {
     for( int i = 0; i <= order; ++i )
     {
       weight_1[i] = to_copy.weight_1[i];
     }
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) )
   {
     for( int i = 0; i <= order; ++i )
     {
@@ -102,19 +70,19 @@ void coef_vector::copy( const coef_vector &to_copy )
     }
   }
 }
-// ------------------- coef_vector::operator= ------------------------
-coef_vector& coef_vector::operator=( const coef_vector &to_copy )
+// ------------------- Coef::coef_vector::operator= ------------------------
+Coef::coef_vector& Coef::coef_vector::operator=( const Coef::coef_vector &to_copy )
 {
   order = to_copy.order;
   conserve = to_copy.conserve;
 
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_1[i] = to_copy.weight_1[i];
     }
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_E[i] = to_copy.weight_E[i];
@@ -122,23 +90,25 @@ coef_vector& coef_vector::operator=( const coef_vector &to_copy )
   }
   return *this;
 }
-// ------------------- coef_vector::operator+= ------------------------
-coef_vector& coef_vector::operator+=( const coef_vector& to_add )
+// ------------------- Coef::coef_vector::operator+= ------------------------
+Coef::coef_vector& Coef::coef_vector::operator+=( const Coef::coef_vector& to_add )
 {
   if( to_add.order != order ){
-    FatalError( "coef_vector::operator+=", "incompatible orders" );
+    Msg::FatalError( "Coef::coef_vector::operator+=",
+		     "incompatible orders" );
   }
   else if( to_add.conserve != conserve ){
-    FatalError( "coef_vector::operator+=", "incompatible conserve" );
+    Msg::FatalError( "Coef::coef_vector::operator+=",
+		     "incompatible conserve" );
   }
 
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_1[i] += to_add.weight_1[i];
     }
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_E[i] += to_add.weight_E[i];
@@ -146,35 +116,37 @@ coef_vector& coef_vector::operator+=( const coef_vector& to_add )
   }
   return *this;
 }
-// ------------------- coef_vector::plus ------------------------
+// ------------------- Coef::coef_vector::plus ------------------------
 // Adds a scalar to the terms of order L_order
-coef_vector& coef_vector::plus( const coef_vector& to_add, int L_order )
+Coef::coef_vector& Coef::coef_vector::plus( const Coef::coef_vector& to_add, int L_order )
 {
   if( to_add.order != 0 ){
-    FatalError( "coef_vector::plus", "wrong order for summand" );
+    Msg::FatalError( "Coef::coef_vector::plus",
+		     "wrong order for summand" );
   }
   else if( to_add.conserve != conserve ){
-    FatalError( "coef_vector::plus", "incompatible conserve" );
+    Msg::FatalError( "Coef::coef_vector::plus",
+		     "incompatible conserve" );
   }
 
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) ){
     weight_1[ L_order ] += to_add.weight_1[ 0 ];
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) ){
     weight_E[ L_order ] += to_add.weight_E[ 0 ];
   }
   return *this;
 }
-// ------------------- coef_vector::operator*= ------------------------
-coef_vector& coef_vector::operator*=( double factor )
+// ------------------- Coef::coef_vector::operator*= ------------------------
+Coef::coef_vector& Coef::coef_vector::operator*=( double factor )
 {
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_1[i] *= factor;
     }
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_E[i] *= factor;
@@ -182,25 +154,25 @@ coef_vector& coef_vector::operator*=( double factor )
   }
   return *this;
 }
-// ------------------- coef_vector::scale_E ------------------------
+// ----------------- Coef::coef_vector::scale_E ---------------------
 // Scales the weight_E terms
-void coef_vector::scale_E( double factor )
+void Coef::coef_vector::scale_E( double factor )
 {
   for( int i = 0; i <= order; ++i )
   {
     weight_E[i] *= factor;
   }
 }
-// ------------------- coef_vector::operator*= ------------------------
-coef_vector& coef_vector::operator*=( Legendre_base &factor )
+// --------------- Coef::coef_vector::operator*= --------------------
+Coef::coef_vector& Coef::coef_vector::operator*=( LgBase::Legendre_base &factor )
 {
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_1[i] *= factor[i];
     }
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) ){
     for( int i = 0; i <= order; ++i )
     {
       weight_E[i] *= factor[i];
@@ -208,43 +180,63 @@ coef_vector& coef_vector::operator*=( Legendre_base &factor )
   }
   return *this;
 }
-// ------------------- coef_vector::max_norm ------------------------
+// ------------------- Coef::coef_vector::max_norm ------------------------
 // Calculates the max norms of weight_1 and weight_E
-void coef_vector::max_norm( double *Norm_1, double *Norm_E )
+void Coef::coef_vector::max_norm( double *Norm_1, double *Norm_E )
 {
   *Norm_1 = 0.0;
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
-    for( int i = 0; i <= order; ++i )
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) )
+  {
+    *Norm_1 = std::abs( weight_1[0] );
+  }
+  
+  *Norm_E = 0.0;
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) )
+  {
+    *Norm_E= std::abs( weight_E[0] );
+  }
+}
+// ------------------- Coef::coef_vector::test_zero ------------------------
+// Makes sure that no entry is zero
+void Coef::coef_vector::test_zero( )
+{
+  // get the max norms
+  double Norm_1;
+  double Norm_E;
+  max_norm( &Norm_1, &Norm_E );
+
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) )
+  {
+    if( Norm_1 <= 0.0 )
     {
-      weight_1[i] =  abs( weight_1[i] );
-      if( weight_1[i] > *Norm_1 ) *Norm_1 = weight_1[i];
+      weight_1[0] = 1.0;
     }
   }
-  *Norm_E = 0.0;
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
-    for( int i = 0; i <= order; ++i )
+
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) )
+  {
+    if( Norm_E <= 0.0 )
     {
-      weight_E[i] = abs( weight_E[i] );
-      if( weight_E[i] > *Norm_E ) *Norm_E = weight_E[i];
+      weight_E[0] = 1.0;
     }
   }
 }
-// ------------------- coef_vector::print ------------------------
-void coef_vector::print( )
+// ------------------- Coef::coef_vector::print ------------------------
+void Coef::coef_vector::print( )
 {
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) ){
-    cout << " weight 1: ";
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) ){
+    std::cout << " weight 1: ";
     for( int i = 0; i <= order; ++i )
     {
-      cout << weight_1[i] << "  ";
+      std::cout << weight_1[i] << "  ";
     }
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) ){
-    cout << " weight E: ";
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) ){
+    std::cout << " weight E: ";
     for( int i = 0; i <= order; ++i )
     {
-      cout << weight_E[i] << "  ";
+      std::cout << weight_E[i] << "  ";
     }
   }
-  cout << endl;
+  std::cout << std::endl;
 }

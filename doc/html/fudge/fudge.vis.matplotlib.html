@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.vis.matplotlib package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="numericalFunctions Package" href="numericalFunctions.html" />
     <link rel="prev" title="fudge.vis.gnuplot package" href="fudge.vis.gnuplot.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +36,9 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.vis.html" accesskey="U">fudge.vis package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="fudge.vis.html" accesskey="U">fudge.vis package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.vis.matplotlib package</a></li> 
       </ul>
     </div>  
 
@@ -61,12 +54,12 @@
 </div>
 <div class="section" id="module-fudge.vis.matplotlib.plot2d">
 <span id="fudge-vis-matplotlib-plot2d-module"></span><h2>fudge.vis.matplotlib.plot2d module<a class="headerlink" href="#module-fudge.vis.matplotlib.plot2d" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.vis.matplotlib.plot2d.AxisSettings">
-<em class="property">class </em><code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">AxisSettings</code><span class="sig-paren">(</span><em>axisMin=None</em>, <em>axisMax=None</em>, <em>autoscale=True</em>, <em>isLog=False</em>, <em>unit=None</em>, <em>gridOn=False</em>, <em>label=None</em>, <em>font=None</em>, <em>fontSize=20</em>, <em>fontWeight='normal'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#AxisSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.AxisSettings" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.vis.matplotlib.plot2d.TextSettings" title="fudge.vis.matplotlib.plot2d.TextSettings"><code class="xref py py-class docutils literal"><span class="pre">fudge.vis.matplotlib.plot2d.TextSettings</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">AxisSettings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axisMin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">axisMax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">autoscale</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">isLog</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gridOn</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fontSize</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">fontWeight</span><span class="o">=</span><span class="default_value">'normal'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#AxisSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.AxisSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.vis.matplotlib.plot2d.TextSettings" title="fudge.vis.matplotlib.plot2d.TextSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.vis.matplotlib.plot2d.TextSettings</span></code></a></p>
 <p>Member data (set these with __init__ function)</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>- `axisMin` :  min value of the axis 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>- `axisMin` :  min value of the axis 
     This is optional and defaults to `None` causing autoscaling.  
     If given as float, we assume in units of `unit`.  
     If given as a PQU instance, we&#39;ll 
@@ -78,151 +71,151 @@
 - `gridOn` : (optional)
 </pre></div>
 </div>
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.AxisSettings.setupAxis">
-<code class="descname">setupAxis</code><span class="sig-paren">(</span><em>theAxis</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#AxisSettings.setupAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.AxisSettings.setupAxis" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setupAxis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theAxis</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#AxisSettings.setupAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.AxisSettings.setupAxis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet2d">
-<em class="property">class </em><code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">DataSet2d</code><span class="sig-paren">(</span><em>data</em>, <em>uncertainty=None</em>, <em>xUnit=None</em>, <em>yUnit=None</em>, <em>dataType=None</em>, <em>infill=False</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.vis.matplotlib.plot2d.DataSetParameters" title="fudge.vis.matplotlib.plot2d.DataSetParameters"><code class="xref py py-class docutils literal"><span class="pre">fudge.vis.matplotlib.plot2d.DataSetParameters</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">DataSet2d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">uncertainty</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xUnit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yUnit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dataType</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">infill</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.vis.matplotlib.plot2d.DataSetParameters" title="fudge.vis.matplotlib.plot2d.DataSetParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.vis.matplotlib.plot2d.DataSetParameters</span></code></a></p>
 <p>Member data (set these with __init__ function):</p>
 <ul class="simple">
-<li>data: the data as either a list of [ x, y ] pairs or as an object that has the method copyDataToXsAndYs
-(and also toPointwise_withLinearXYs if infill is True).</li>
-<li>uncertainty: the uncertainty on the data as either a list of [ x, y ] pairs or as an object that has
-the method evaluate.</li>
-<li>dataType (‘scatter’, ‘line’, or None): by default lists of points are rendered as ‘scatter’ and the
-others as ‘line’.  Override the default behavior with this keyword.</li>
-<li>xUnits: If the data object has an axes member, units are taken from it. Otherwise this argument is used
+<li><p>data: the data as either a list of [ x, y ] pairs or as an object that has the method copyDataToXsAndYs
+(and also toPointwise_withLinearXYs if infill is True).</p></li>
+<li><p>uncertainty: the uncertainty on the data as either a list of [ x, y ] pairs or as an object that has
+the method evaluate.</p></li>
+<li><p>dataType (‘scatter’, ‘line’, or None): by default lists of points are rendered as ‘scatter’ and the
+others as ‘line’.  Override the default behavior with this keyword.</p></li>
+<li><p>xUnits: If the data object has an axes member, units are taken from it. Otherwise this argument is used
 to for the x units. When the units are given as None and the data/uncertainty do not have an axes member
-units are assumed to match those of the plot axis. The default is None.</li>
-<li>yUnits: Units for the y-axis. See xUnits for more information.</li>
+units are assumed to match those of the plot axis. The default is None.</p></li>
+<li><p>yUnits: Units for the y-axis. See xUnits for more information.</p></li>
 </ul>
 <p>type help(DataSetParameters) to find out about how to set the line properties, etc.  
 All of this information is passed on though the __init__ function of DataSet2d to 
 DataSetParameters.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet2d.addToPlot">
-<code class="descname">addToPlot</code><span class="sig-paren">(</span><em>thePlot</em>, <em>logY=False</em>, <em>minY=1e-12</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet2d.addToPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d.addToPlot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">addToPlot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">thePlot</span></em>, <em class="sig-param"><span class="n">logY</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">minY</span><span class="o">=</span><span class="default_value">1e-12</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet2d.addToPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d.addToPlot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet2d.convertUnits">
-<code class="descname">convertUnits</code><span class="sig-paren">(</span><em>xUnit=None</em>, <em>yUnit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet2d.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d.convertUnits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xUnit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yUnit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet2d.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d.convertUnits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert self’s units to xUnit and yUnit</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet2d.dimension">
-<code class="descname">dimension</code><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d.dimension" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">dimension</code><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d.dimension" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet3d">
-<em class="property">class </em><code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">DataSet3d</code><span class="sig-paren">(</span><em>data</em>, <em>dataType=None</em>, <em>xUnit=None</em>, <em>yUnit=None</em>, <em>zUnit=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.vis.matplotlib.plot2d.DataSetParameters" title="fudge.vis.matplotlib.plot2d.DataSetParameters"><code class="xref py py-class docutils literal"><span class="pre">fudge.vis.matplotlib.plot2d.DataSetParameters</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">DataSet3d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">dataType</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xUnit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yUnit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">zUnit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.vis.matplotlib.plot2d.DataSetParameters" title="fudge.vis.matplotlib.plot2d.DataSetParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.vis.matplotlib.plot2d.DataSetParameters</span></code></a></p>
 <p>Member data (set these with __init__ function):</p>
 <ul class="simple">
-<li>data</li>
-<li>dataType (None)</li>
+<li><p>data</p></li>
+<li><p>dataType (None)</p></li>
 </ul>
 <p>type help(DataSetParameters) to find out about how to set the line properties, etc.  
 All of this information is passed on though the __init__ function of DataSet2d to 
 DataSetParameters.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet3d.addToPlot">
-<code class="descname">addToPlot</code><span class="sig-paren">(</span><em>thePlot</em>, <em>plotType='contour'</em>, <em>numContours=10</em>, <em>logX=False</em>, <em>logY=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d.addToPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.addToPlot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">addToPlot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">thePlot</span></em>, <em class="sig-param"><span class="n">plotType</span><span class="o">=</span><span class="default_value">'contour'</span></em>, <em class="sig-param"><span class="n">numContours</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">logX</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">logY</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d.addToPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.addToPlot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default plotType set to ‘contour’ so that can use the __makePlot2d function to drive both the regular 
 2d plotting and contour plotting</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet3d.convertUnits">
-<code class="descname">convertUnits</code><span class="sig-paren">(</span><em>xUnit=None</em>, <em>yUnit=None</em>, <em>zUnit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.convertUnits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xUnit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yUnit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">zUnit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.convertUnits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert self’s units to xUnit and yUnit and zUnit</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet3d.dimension">
-<code class="descname">dimension</code><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.dimension" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">dimension</code><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.dimension" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet3d.getW_XYs">
-<code class="descname">getW_XYs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d.getW_XYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.getW_XYs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getW_XYs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d.getW_XYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.getW_XYs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.vis.matplotlib.plot2d.DataSetParameters">
-<em class="property">class </em><code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">DataSetParameters</code><span class="sig-paren">(</span><em>legend=''</em>, <em>symbol=None</em>, <em>symbolSize=5</em>, <em>color=None</em>, <em>lineStyle=None</em>, <em>lineWidth=None</em>, <em>errorbarCapSize=3</em>, <em>errorbarLineWidth=1.5</em>, <em>errorbarColor=None</em>, <em>formatString=None</em>, <em>dataType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">DataSetParameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">legend</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">symbol</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">symbolSize</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">color</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lineStyle</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lineWidth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">errorbarCapSize</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">errorbarLineWidth</span><span class="o">=</span><span class="default_value">1.5</span></em>, <em class="sig-param"><span class="n">errorbarColor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">formatString</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base class for all DataSet classes (DataSet2d, DataSet3d, …)</p>
 <p>Member data (set these with __init__ function):</p>
 <ul class="simple">
-<li>legend (optional, defaults to ‘’)</li>
-<li>symbol</li>
-<li>symbolColor</li>
-<li>symbolSize</li>
-<li>lineStyle</li>
-<li>lineColor</li>
-<li>lineWidth</li>
+<li><p>legend (optional, defaults to ‘’)</p></li>
+<li><p>symbol</p></li>
+<li><p>symbolColor</p></li>
+<li><p>symbolSize</p></li>
+<li><p>lineStyle</p></li>
+<li><p>lineColor</p></li>
+<li><p>lineWidth</p></li>
 </ul>
 <p>Commands which take color arguments can use several formats to specify the colors. 
 For the basic builtin colors, you can use a single letter</p>
 <blockquote>
-<div><table border="1" class="docutils">
+<div><table class="docutils align-default">
 <colgroup>
-<col width="31%" />
-<col width="69%" />
+<col style="width: 31%" />
+<col style="width: 69%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">character</th>
-<th class="head">description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>character</p></th>
+<th class="head"><p>description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>b</td>
-<td>blue</td>
+<tbody>
+<tr class="row-even"><td><p>b</p></td>
+<td><p>blue</p></td>
 </tr>
-<tr class="row-odd"><td>g</td>
-<td>green</td>
+<tr class="row-odd"><td><p>g</p></td>
+<td><p>green</p></td>
 </tr>
-<tr class="row-even"><td>r</td>
-<td>red</td>
+<tr class="row-even"><td><p>r</p></td>
+<td><p>red</p></td>
 </tr>
-<tr class="row-odd"><td>c</td>
-<td>cyan</td>
+<tr class="row-odd"><td><p>c</p></td>
+<td><p>cyan</p></td>
 </tr>
-<tr class="row-even"><td>m</td>
-<td>magenta</td>
+<tr class="row-even"><td><p>m</p></td>
+<td><p>magenta</p></td>
 </tr>
-<tr class="row-odd"><td>y</td>
-<td>yellow</td>
+<tr class="row-odd"><td><p>y</p></td>
+<td><p>yellow</p></td>
 </tr>
-<tr class="row-even"><td>k</td>
-<td>black</td>
+<tr class="row-even"><td><p>k</p></td>
+<td><p>black</p></td>
 </tr>
-<tr class="row-odd"><td>w</td>
-<td>white</td>
+<tr class="row-odd"><td><p>w</p></td>
+<td><p>white</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
 <p>Gray shades can be given as a string encoding a float in the 0-1 range, e.g.:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;0.75&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;0.75&#39;</span>
 </pre></div>
 </div>
 <p>For a greater range of colors, you have two options. You can specify the color 
 using an html hex string, as in:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;#eeefff&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;#eeefff&#39;</span>
 </pre></div>
 </div>
 <p>or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,1].
@@ -231,131 +224,131 @@ supported.</p>
 <p>The following format string characters are accepted to control the line style or 
 marker:</p>
 <blockquote>
-<div><table border="1" class="docutils">
+<div><table class="docutils align-default">
 <colgroup>
-<col width="30%" />
-<col width="70%" />
+<col style="width: 30%" />
+<col style="width: 70%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">character</th>
-<th class="head">description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>character</p></th>
+<th class="head"><p>description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>‘-‘</td>
-<td>solid line style</td>
+<tbody>
+<tr class="row-even"><td><p>‘-‘</p></td>
+<td><p>solid line style</p></td>
 </tr>
-<tr class="row-odd"><td>‘–’</td>
-<td>dashed line style</td>
+<tr class="row-odd"><td><p>‘–’</p></td>
+<td><p>dashed line style</p></td>
 </tr>
-<tr class="row-even"><td>‘-.’</td>
-<td>dash-dot line style</td>
+<tr class="row-even"><td><p>‘-.’</p></td>
+<td><p>dash-dot line style</p></td>
 </tr>
-<tr class="row-odd"><td>‘:’</td>
-<td>dotted line style</td>
+<tr class="row-odd"><td><p>‘:’</p></td>
+<td><p>dotted line style</p></td>
 </tr>
-<tr class="row-even"><td>‘.’</td>
-<td>point marker</td>
+<tr class="row-even"><td><p>‘.’</p></td>
+<td><p>point marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘,’</td>
-<td>pixel marker</td>
+<tr class="row-odd"><td><p>‘,’</p></td>
+<td><p>pixel marker</p></td>
 </tr>
-<tr class="row-even"><td>‘o’</td>
-<td>circle marker</td>
+<tr class="row-even"><td><p>‘o’</p></td>
+<td><p>circle marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘v’</td>
-<td>triangle_down marker</td>
+<tr class="row-odd"><td><p>‘v’</p></td>
+<td><p>triangle_down marker</p></td>
 </tr>
-<tr class="row-even"><td>‘^’</td>
-<td>triangle_up marker</td>
+<tr class="row-even"><td><p>‘^’</p></td>
+<td><p>triangle_up marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘&lt;’</td>
-<td>triangle_left marker</td>
+<tr class="row-odd"><td><p>‘&lt;’</p></td>
+<td><p>triangle_left marker</p></td>
 </tr>
-<tr class="row-even"><td>‘&gt;’</td>
-<td>triangle_right marker</td>
+<tr class="row-even"><td><p>‘&gt;’</p></td>
+<td><p>triangle_right marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘1’</td>
-<td>tri_down marker</td>
+<tr class="row-odd"><td><p>‘1’</p></td>
+<td><p>tri_down marker</p></td>
 </tr>
-<tr class="row-even"><td>‘2’</td>
-<td>tri_up marker</td>
+<tr class="row-even"><td><p>‘2’</p></td>
+<td><p>tri_up marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘3’</td>
-<td>tri_left marker</td>
+<tr class="row-odd"><td><p>‘3’</p></td>
+<td><p>tri_left marker</p></td>
 </tr>
-<tr class="row-even"><td>‘4’</td>
-<td>tri_right marker</td>
+<tr class="row-even"><td><p>‘4’</p></td>
+<td><p>tri_right marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘s’</td>
-<td>square marker</td>
+<tr class="row-odd"><td><p>‘s’</p></td>
+<td><p>square marker</p></td>
 </tr>
-<tr class="row-even"><td>‘p’</td>
-<td>pentagon marker</td>
+<tr class="row-even"><td><p>‘p’</p></td>
+<td><p>pentagon marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘*’</td>
-<td>star marker</td>
+<tr class="row-odd"><td><p>‘*’</p></td>
+<td><p>star marker</p></td>
 </tr>
-<tr class="row-even"><td>‘h’</td>
-<td>hexagon1 marker</td>
+<tr class="row-even"><td><p>‘h’</p></td>
+<td><p>hexagon1 marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘H’</td>
-<td>hexagon2 marker</td>
+<tr class="row-odd"><td><p>‘H’</p></td>
+<td><p>hexagon2 marker</p></td>
 </tr>
-<tr class="row-even"><td>‘+’</td>
-<td>plus marker</td>
+<tr class="row-even"><td><p>‘+’</p></td>
+<td><p>plus marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘x’</td>
-<td>x marker</td>
+<tr class="row-odd"><td><p>‘x’</p></td>
+<td><p>x marker</p></td>
 </tr>
-<tr class="row-even"><td>‘D’</td>
-<td>diamond marker</td>
+<tr class="row-even"><td><p>‘D’</p></td>
+<td><p>diamond marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘d’</td>
-<td>thin_diamond marker</td>
+<tr class="row-odd"><td><p>‘d’</p></td>
+<td><p>thin_diamond marker</p></td>
 </tr>
-<tr class="row-even"><td>‘|’</td>
-<td>vline marker</td>
+<tr class="row-even"><td><p>‘|’</p></td>
+<td><p>vline marker</p></td>
 </tr>
-<tr class="row-odd"><td>‘_’</td>
-<td>hline marker</td>
+<tr class="row-odd"><td><p>‘_’</p></td>
+<td><p>hline marker</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSetParameters.addToPlot">
-<code class="descname">addToPlot</code><span class="sig-paren">(</span><em>thePlot</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters.addToPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters.addToPlot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">addToPlot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">thePlot</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters.addToPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters.addToPlot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSetParameters.getFormatMap">
-<code class="descname">getFormatMap</code><span class="sig-paren">(</span><em>doErrors=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters.getFormatMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters.getFormatMap" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getFormatMap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">doErrors</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters.getFormatMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters.getFormatMap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSetParameters.getFormatString">
-<code class="descname">getFormatString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters.getFormatString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters.getFormatString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Attempt to make simple format string for maptplotlib use.</p>
+<code class="sig-name descname">getFormatString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters.getFormatString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters.getFormatString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to make simple format string for matplotlib use.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="fudge.vis.matplotlib.plot2d.INCLASSAXISSETTING">
-<code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">INCLASSAXISSETTING</code><em class="property"> = False</em><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.INCLASSAXISSETTING" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">INCLASSAXISSETTING</code><em class="property"> = False</em><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.INCLASSAXISSETTING" title="Permalink to this definition">¶</a></dt>
 <dd><p>A few words about MatPlotLib symbols (“markers” in MatPlotLib-speak)…</p>
 <p>.    point
 ,    pixel
 o    circle
-v    triangle_down
+v    triangle_down 
 ^    triangle_up
-&lt;    triangle_left
-&gt;    triangle_right
-1    tri_down – DAB 11/17/2014: doesn’t show up
-2    tri_up – DAB 11/17/2014: doesn’t show up
-3    tri_left – DAB 11/17/2014: doesn’t show up
-4    tri_right – DAB 11/17/2014: doesn’t show up
+&lt;    triangle_left 
+&gt;    triangle_right 
+1    tri_down – DAB 11/17/2014: doesn’t show up 
+2    tri_up – DAB 11/17/2014: doesn’t show up 
+3    tri_left – DAB 11/17/2014: doesn’t show up 
+4    tri_right – DAB 11/17/2014: doesn’t show up 
 8    octagon
 s    square
 p    pentagon
@@ -366,35 +359,35 @@ H    hexagon2
 x    x – DAB 11/17/2014: barely visable
 D    diamond
 d    thin_diamond
-|    vline – DAB 11/17/2014: doesn’t show up
+|    vline – DAB 11/17/2014: doesn’t show up 
 _    hline – DAB 11/17/2014: doesn’t show up</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.vis.matplotlib.plot2d.TextSettings">
-<em class="property">class </em><code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">TextSettings</code><span class="sig-paren">(</span><em>text=None</em>, <em>font=None</em>, <em>fontSize=12</em>, <em>fontWeight='bold'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#TextSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.TextSettings" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">TextSettings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fontSize</span><span class="o">=</span><span class="default_value">12</span></em>, <em class="sig-param"><span class="n">fontWeight</span><span class="o">=</span><span class="default_value">'bold'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#TextSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.TextSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base class for text objects in plots</p>
 <p>Member data (set these with __init__ function):</p>
 <ul class="simple">
-<li><strong>text</strong> the text itself</li>
-<li><strong>font</strong> the font (e.g. Helvetica) (optional)</li>
-<li><strong>fontSize</strong> font size in points (optional, defaults to 14)</li>
-<li><strong>fontWeight</strong> font weight (e.g. bold) (optional)</li>
+<li><p><strong>text</strong> the text itself</p></li>
+<li><p><strong>font</strong> the font (e.g. Helvetica) (optional)</p></li>
+<li><p><strong>fontSize</strong> font size in points (optional, defaults to 14)</p></li>
+<li><p><strong>fontWeight</strong> font weight (e.g. bold) (optional)</p></li>
 </ul>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.vis.matplotlib.plot2d.convertUnit">
-<code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">convertUnit</code><span class="sig-paren">(</span><em>unitFrom</em>, <em>unitTo</em>, <em>xs</em>, <em>xErrs</em>, <em>legend</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#convertUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.convertUnit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">convertUnit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitFrom</span></em>, <em class="sig-param"><span class="n">unitTo</span></em>, <em class="sig-param"><span class="n">xs</span></em>, <em class="sig-param"><span class="n">xErrs</span></em>, <em class="sig-param"><span class="n">legend</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#convertUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.convertUnit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.vis.matplotlib.plot2d.makePlot2d">
-<code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">makePlot2d</code><span class="sig-paren">(</span><em>datasets</em>, <em>xAxisSettings=None</em>, <em>yAxisSettings=None</em>, <em>title=''</em>, <em>legendOn=False</em>, <em>outFile=None</em>, <em>legendXY=(0.05</em>, <em>0.95)</em>, <em>figsize=(20</em>, <em>10)</em>, <em>infill=False</em>, <em>useBokeh=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#makePlot2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.makePlot2d" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">makePlot2d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datasets</span></em>, <em class="sig-param"><span class="n">xAxisSettings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yAxisSettings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">legendOn</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">outFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">legendXY</span><span class="o">=</span><span class="default_value">0.05, 0.95</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">20, 10</span></em>, <em class="sig-param"><span class="n">infill</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">useBokeh</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#makePlot2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.makePlot2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plain, vanilla, 2d plots.</p>
 <p>Arguments</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">datasets</span> <span class="p">(</span><span class="n">required</span><span class="p">),</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">DataSet</span> <span class="n">objects</span> <span class="n">to</span> <span class="n">plot</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">datasets</span> <span class="p">(</span><span class="n">required</span><span class="p">),</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">DataSet</span> <span class="n">objects</span> <span class="n">to</span> <span class="n">plot</span>
 <span class="o">*</span> <span class="n">xAxisSettings</span> <span class="p">(</span><span class="n">optional</span><span class="p">)</span> 
 <span class="o">*</span> <span class="n">yAxisSettings</span> <span class="p">(</span><span class="n">optional</span><span class="p">)</span>
 <span class="o">*</span> <span class="n">title</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">defaults</span> <span class="n">to</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
@@ -407,46 +400,51 @@ _    hline – DAB 11/17/2014: doesn’t show up</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.vis.matplotlib.plot2d.makePlot2dContour">
-<code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">makePlot2dContour</code><span class="sig-paren">(</span><em>datasets</em>, <em>xAxisSettings=None</em>, <em>yAxisSettings=None</em>, <em>numContours=10</em>, <em>title=''</em>, <em>figsize=(20</em>, <em>10)</em>, <em>legendOn=False</em>, <em>outFile=None</em>, <em>useBokeh=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#makePlot2dContour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.makePlot2dContour" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">makePlot2dContour</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datasets</span></em>, <em class="sig-param"><span class="n">xAxisSettings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yAxisSettings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">numContours</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">20, 10</span></em>, <em class="sig-param"><span class="n">legendOn</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">outFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">useBokeh</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#makePlot2dContour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.makePlot2dContour" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contour plots:</p>
 <ul class="simple">
-<li>datasets (required): list of DataSet objects to plot, one works better than many for a contour plot</li>
-<li>xAxisSettings (optional)</li>
-<li>yAxisSettings (optional)</li>
-<li>numContours (optional, defaults to 10): number of contours in the plot assuming linear spacing between intervals from the min to max data values</li>
-<li>title (optional, defaults to ‘’ )</li>
-<li>legendOn (optional, defaults to True)</li>
-<li>outFile (optional)</li>
+<li><p>datasets (required): list of DataSet objects to plot, one works better than many for a contour plot</p></li>
+<li><p>xAxisSettings (optional)</p></li>
+<li><p>yAxisSettings (optional)</p></li>
+<li><dl class="simple">
+<dt>numContours (optional, defaults to 10): number of contours in the plot assuming linear spacing between intervals</dt><dd><p>from the min to max data values</p>
+</dd>
+</dl>
+</li>
+<li><p>title (optional, defaults to ‘’ )</p></li>
+<li><p>legendOn (optional, defaults to True)</p></li>
+<li><p>outFile (optional)</p></li>
 </ul>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.vis.matplotlib.plot2d.makePlot2dSlice">
-<code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">makePlot2dSlice</code><span class="sig-paren">(</span><em>datasets</em>, <em>xyAxisSettings=None</em>, <em>zAxisSettings=None</em>, <em>sliceXCoords=None</em>, <em>sliceYCoords=None</em>, <em>sliceUnits=''</em>, <em>title=''</em>, <em>legendOn=True</em>, <em>legendXY=(0.05</em>, <em>0.95)</em>, <em>figsize=(20</em>, <em>10)</em>, <em>outFile=None</em>, <em>useBokeh=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#makePlot2dSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.makePlot2dSlice" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">makePlot2dSlice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datasets</span></em>, <em class="sig-param"><span class="n">xyAxisSettings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">zAxisSettings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sliceXCoords</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sliceYCoords</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sliceUnits</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">legendOn</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">legendXY</span><span class="o">=</span><span class="default_value">0.05, 0.95</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">20, 10</span></em>, <em class="sig-param"><span class="n">outFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">useBokeh</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#makePlot2dSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.makePlot2dSlice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a slice of a dataset of 3d data objects along a fixed x line or a fixed y line.</p>
 <p>Any 2d objects get plotted as if they are xy data in the correct plane for plotting.</p>
 <p>In other words, at fixed sliceXCoord = 2, all 3d functions F( x, y ) get plotted 
 as y vs. F( 2.0, y ) and all 2d functions G( x ) are plotted as x vs. G( x ) even 
 if you meant something different.</p>
 <ul class="simple">
-<li>datasets (required): list of DataSet objects to plot</li>
-<li>xyAxisSettings (optional)</li>
-<li>zAxisSettings (optional)</li>
-<li>sliceXCoords: a list or value</li>
-<li>sliceYCoords: a list or value</li>
-<li>title (optional, defaults to ‘’ )</li>
-<li>legendOn (optional, defaults to True)</li>
-<li>outFile (optional)</li>
+<li><p>datasets (required): list of DataSet objects to plot</p></li>
+<li><p>xyAxisSettings (optional)</p></li>
+<li><p>zAxisSettings (optional)</p></li>
+<li><p>sliceXCoords: a list or value</p></li>
+<li><p>sliceYCoords: a list or value</p></li>
+<li><p>title (optional, defaults to ‘’ )</p></li>
+<li><p>legendOn (optional, defaults to True)</p></li>
+<li><p>outFile (optional)</p></li>
 </ul>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="fudge.vis.matplotlib.plot2d.nLineStyles">
-<code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">nLineStyles</code><em class="property"> = 4</em><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.nLineStyles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">nLineStyles</code><em class="property"> = 4</em><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.nLineStyles" title="Permalink to this definition">¶</a></dt>
 <dd><p>A few words about MatPlotLib colors….</p>
-<p>Commands which take color arguments can use several formats to specify the colors. For the basic built-in colors, you can use a single letter</p>
+<p>Commands which take color arguments can use several formats to specify the colors. For the basic built-in colors, you 
+can use a single letter</p>
 <p>b: blue
 g: green
 r: red
@@ -463,22 +461,22 @@ or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,
 <p>Finally, legal html names for colors, like ‘red’, ‘burlywood’ and ‘chartreuse’ are supported.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.vis.matplotlib.plot2d.plotTests">
-<code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">plotTests</code><span class="sig-paren">(</span><em>tests=[False, False, False, False, False, False, False, False, False, False, False]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#plotTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.plotTests" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot2d.</code><code class="sig-name descname">plotTests</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_tests</span><span class="o">=</span><span class="default_value">False, False, False, False, False, False, False, False, False, False, False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#plotTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.plotTests" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-fudge.vis.matplotlib.plot_matrix">
 <span id="fudge-vis-matplotlib-plot-matrix-module"></span><h2>fudge.vis.matplotlib.plot_matrix module<a class="headerlink" href="#module-fudge.vis.matplotlib.plot_matrix" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.vis.matplotlib.plot_matrix.generateColorMap">
-<code class="descclassname">fudge.vis.matplotlib.plot_matrix.</code><code class="descname">generateColorMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot_matrix.html#generateColorMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot_matrix.generateColorMap" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot_matrix.</code><code class="sig-name descname">generateColorMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot_matrix.html#generateColorMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot_matrix.generateColorMap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.vis.matplotlib.plot_matrix.plot_matrix">
-<code class="descclassname">fudge.vis.matplotlib.plot_matrix.</code><code class="descname">plot_matrix</code><span class="sig-paren">(</span><em>matrix</em>, <em>energyBoundariesX=None</em>, <em>energyBoundariesY=None</em>, <em>title='Matrix'</em>, <em>xyTitle='Energy (MeV)'</em>, <em>xylog=False</em>, <em>zlog=False</em>, <em>zRange=()</em>, <em>switchY=True</em>, <em>colorMap='jet'</em>, <em>subplot=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot_matrix.html#plot_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot_matrix.plot_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.vis.matplotlib.plot_matrix.</code><code class="sig-name descname">plot_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matrix</span></em>, <em class="sig-param"><span class="n">energyBoundariesX</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">energyBoundariesY</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">'Matrix'</span></em>, <em class="sig-param"><span class="n">xyTitle</span><span class="o">=</span><span class="default_value">'Energy (MeV)'</span></em>, <em class="sig-param"><span class="n">xylog</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">zlog</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">zRange</span><span class="o">=</span><span class="default_value">()</span></em>, <em class="sig-param"><span class="n">switchY</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">colorMap</span><span class="o">=</span><span class="default_value">'jet'</span></em>, <em class="sig-param"><span class="n">subplot</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot_matrix.html#plot_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot_matrix.plot_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a matrix. Arguments are:
 &#64;matrix (required): 2-dimensional numpy array (or equivalent)
 &#64;energyBoundariesX: list of group boundary edges. If omitted, use matrix indices for axis
@@ -501,6 +499,7 @@ or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -509,7 +508,7 @@ or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.vis.matplotlib package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -534,15 +533,15 @@ or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -564,12 +563,14 @@ or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.vis.html" >fudge.vis package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="fudge.vis.html" >fudge.vis package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.vis.matplotlib package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

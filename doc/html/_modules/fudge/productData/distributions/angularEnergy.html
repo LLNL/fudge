@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.productData.distributions.angularEnergy &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.productData.distributions.angularEnergy</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.productData.distributions.angularEnergy</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Angular/energy double differential distribution classes.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">standards</span> <span class="k">as</span> <span class="n">standardsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">XYs</span> <span class="k">as</span> <span class="n">XYsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">multiD_XYs</span> <span class="k">as</span> <span class="n">multiD_XYsModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">group</span> <span class="k">as</span> <span class="n">groupModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">miscellaneous</span> <span class="k">as</span> <span class="n">miscellaneousModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">angular</span> <span class="k">as</span> <span class="n">angularModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">angularEnergyMC</span> <span class="k">as</span> <span class="n">angularEnergyMCModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="defaultAxes"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.defaultAxes">[docs]</a><span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span><span class="p">,</span> <span class="n">probabilityLabel</span> <span class="o">=</span> <span class="s1">&#39;P(mu,energy_out|energy_in)&#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span> <span class="n">rank</span> <span class="o">=</span> <span class="mi">4</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;energy_in&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;energy_out&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="n">probabilityLabel</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;1/&#39;</span> <span class="o">+</span> <span class="n">energyUnit</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs1d">[docs]</a><span class="k">class</span> <span class="nc">XYs1d</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="XYs1d.averageEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs1d.averageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">averageEnergy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrateWithWeight_x</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+    
+<div class="viewcode-block" id="XYs1d.averageMomentum"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs1d.averageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">averageMomentum</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrateWithWeight_sqrt_x</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d.toLinearXYsClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs1d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span> <span class="p">)</span></div></div>
+    
+<div class="viewcode-block" id="XYs2d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs2d">[docs]</a><span class="k">class</span> <span class="nc">XYs2d</span><span class="p">(</span> <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs2d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span>  <span class="fm">__add__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">functionNd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">interpolationQualifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolationQualifier</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">x2s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">set</span><span class="p">(</span> <span class="p">[</span> <span class="n">function</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="k">for</span> <span class="n">function</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="n">function</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="k">for</span> <span class="n">function</span> <span class="ow">in</span> <span class="n">other</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">x2</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">x2s</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">x2</span> <span class="p">)</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">x2</span> <span class="p">)</span>
+                <span class="n">function</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">x2</span>
+                <span class="n">functionNd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">function</span> <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Adding two angularEnergy.XYs2d instances&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;Other must be a number or a subclass of &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">function</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functionals</span> <span class="p">:</span> <span class="n">functionNd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">function</span> <span class="o">+</span> <span class="n">value</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">functionNd</span> <span class="p">)</span>
+
+    <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
+
+<div class="viewcode-block" id="XYs2d.averageEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs2d.averageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">averageEnergy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">EpOfMu</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">pdfOfEpAtMu</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">pdfOfEpAtMu</span><span class="o">.</span><span class="n">averageEnergy</span><span class="p">(</span> <span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">pdfOfEpAtMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
+        <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">EpOfMu</span> <span class="p">)</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.averageMomentum"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs2d.averageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">averageMomentum</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">MpOfMu</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">pdfOfMpAtMu</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">pdfOfMpAtMu</span><span class="o">.</span><span class="n">averageMomentum</span><span class="p">(</span> <span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">pdfOfMpAtMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
+        <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">MpOfMu</span> <span class="p">)</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.allowedSubElements"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs2d.allowedSubElements">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">allowedSubElements</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">XYs1d</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.subform">[docs]</a><span class="k">class</span> <span class="nc">subform</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">subform</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Abstract base class for angularEnergy forms.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="XYs3d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d">[docs]</a><span class="k">class</span> <span class="nc">XYs3d</span><span class="p">(</span> <span class="n">subform</span><span class="p">,</span> <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs3d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs3d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="XYs3d.check"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check for incomplete angular distributions + any negative probabilities.</span>
+<span class="sd">        Ignore normalization for this double-differential distribution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
+        <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">energy_in</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">integral</span> <span class="o">=</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">integral</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;normTolerance&#39;</span><span class="p">]:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">unnormalizedDistribution</span><span class="p">(</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">),</span> <span class="n">index</span><span class="p">,</span> <span class="n">integral</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">!=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">incompleteDistribution</span><span class="p">(</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">),</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">energy_in</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">mu</span> <span class="ow">in</span> <span class="n">energy_in</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">mu</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">valueOutOfRange</span><span class="p">(</span><span class="s2">&quot;Negative outgoing energy for energy_in=</span><span class="si">%s</span><span class="s2">!&quot;</span>
+                        <span class="o">%</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">),</span> <span class="n">mu</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inf&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">mu</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">negativeProbability</span><span class="p">(</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">),</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">mu</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="XYs3d.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;multiplicity&#39;</span><span class="p">]</span>
+        <span class="n">productMass</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;productMass&#39;</span><span class="p">]</span>
+
+        <span class="n">aveEnergy</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pdfOfMuEpAtE</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="n">pdfOfMuEpAtE</span><span class="o">.</span><span class="n">outerDomainValue</span>
+            <span class="n">aveEnergy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">energy</span><span class="p">,</span> <span class="n">multiplicity</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energy</span> <span class="p">)</span> <span class="o">*</span> <span class="n">pdfOfMuEpAtE</span><span class="o">.</span><span class="n">averageEnergy</span><span class="p">(</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+
+        <span class="n">const</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">productMass</span> <span class="p">)</span>
+        <span class="n">aveMomentum</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pdfOfMuEpAtE</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="n">pdfOfMuEpAtE</span><span class="o">.</span><span class="n">outerDomainValue</span>
+            <span class="n">momemtum</span> <span class="o">=</span> <span class="n">const</span> <span class="o">*</span> <span class="n">multiplicity</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energy</span> <span class="p">)</span> <span class="o">*</span> <span class="n">pdfOfMuEpAtE</span><span class="o">.</span><span class="n">averageMomentum</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">momemtum</span> <span class="o">&lt;</span> <span class="mf">1e-12</span> <span class="p">)</span> <span class="p">:</span> <span class="n">momemtum</span> <span class="o">=</span> <span class="mf">0.</span>          <span class="c1"># This should be less arbitrary????????</span>
+            <span class="n">aveMomentum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">energy</span><span class="p">,</span> <span class="n">momemtum</span> <span class="p">]</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">aveEnergy</span><span class="p">,</span> <span class="n">aveMomentum</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs3d.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;Hi&#39;</span> <span class="p">)</span>
+        <span class="n">position</span><span class="p">,</span> <span class="n">function1</span><span class="p">,</span> <span class="n">function2</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">interpolationQualifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getBoundingSubFunctions</span><span class="p">(</span> <span class="n">domainValue</span> <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">function1</span> <span class="p">),</span> <span class="nb">type</span><span class="p">(</span> <span class="n">function2</span> <span class="p">),</span> <span class="n">position</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">interpolationQualifier</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">position</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;No data to interpolate&quot;</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">frac</span> <span class="o">&lt;=</span> <span class="n">epsilon</span> <span class="p">)</span> <span class="p">:</span>                 <span class="c1"># If close to first point pick it.</span>
+            <span class="n">function</span> <span class="o">=</span> <span class="n">function1</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="p">(</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">frac</span> <span class="p">)</span> <span class="o">&lt;=</span> <span class="n">epsilon</span> <span class="p">)</span> <span class="p">:</span>       <span class="c1"># If close to second point pick it.</span>
+            <span class="n">function</span> <span class="o">=</span> <span class="n">function2</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">position</span> <span class="ow">in</span> <span class="p">(</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">position</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">function</span> <span class="o">=</span> <span class="n">function1</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+                <span class="k">elif</span><span class="p">(</span> <span class="n">position</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">function</span> <span class="o">=</span> <span class="n">function1</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;&lt;&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}[</span><span class="n">position</span><span class="p">]</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;evaluation point = </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> than </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">domainValue</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;&lt;&#39;</span> <span class="p">:</span> <span class="s1">&#39;less&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span> <span class="p">:</span> <span class="s1">&#39;greater&#39;</span> <span class="p">}[</span><span class="n">position</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">function1</span><span class="p">,</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>      <span class="c1"># FIXME, accuracy, lowerEps and upperEps should not be hardwired.</span>
+                    <span class="n">function1</span> <span class="o">=</span> <span class="n">function1</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-6</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">function2</span><span class="p">,</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">function2</span> <span class="o">=</span> <span class="n">function2</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-6</span> <span class="p">)</span>
+
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">function1</span><span class="p">,</span> <span class="n">XYs2d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;function1 must be an XYs2d instance&#39;</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">function2</span><span class="p">,</span> <span class="n">XYs2d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;function2 must be an XYs2d instance&#39;</span> <span class="p">)</span>
+
+                <span class="n">mus</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span> <span class="nb">set</span><span class="p">(</span> <span class="p">[</span> <span class="n">function1d</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="k">for</span> <span class="n">function1d</span> <span class="ow">in</span> <span class="n">function1</span> <span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="n">function1d</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="k">for</span> <span class="n">function1d</span> <span class="ow">in</span> <span class="n">function2</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">function</span> <span class="o">=</span> <span class="n">XYs2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">function1</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
+                <span class="k">for</span> <span class="n">mu</span> <span class="ow">in</span> <span class="n">mus</span> <span class="p">:</span>
+                    <span class="n">function1d1</span> <span class="o">=</span> <span class="n">function1</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">mu</span> <span class="p">)</span>
+                    <span class="n">function1d2</span> <span class="o">=</span> <span class="n">function2</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">mu</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">function1d1</span><span class="p">,</span> <span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">function1d2</span><span class="p">,</span> <span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;function1d1 and function1d2 must be an XYs1d instance&#39;</span> <span class="p">)</span>
+                    <span class="n">xy</span> <span class="o">=</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">pointwiseXY_C</span><span class="o">.</span><span class="n">unitbaseInterpolate</span><span class="p">(</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">function1</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">function1d1</span><span class="p">,</span> <span class="n">function2</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">function1d2</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+                    <span class="n">xy</span> <span class="o">=</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">xy</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">mu</span> <span class="p">)</span>
+                    <span class="n">function</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">xy</span> <span class="p">)</span>
+
+        <span class="n">function</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">domainValue</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">function</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;   ii  &#39;</span><span class="p">,</span> <span class="n">ii</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">ii</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">function</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span> <span class="n">insitu</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">function</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;   ii2 &#39;</span><span class="p">,</span> <span class="n">ii</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">ii</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">function</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs3d.integrate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">productToken</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">energyIn</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.0</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">energyIn</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span> <span class="p">:</span> <span class="n">energyIn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span>
+        <span class="n">function2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span>
+
+        <span class="n">muMin</span><span class="p">,</span> <span class="n">muMax</span> <span class="o">=</span> <span class="n">miscellaneousModule</span><span class="o">.</span><span class="n">domainLimits</span><span class="p">(</span> <span class="n">muOut</span><span class="p">,</span> <span class="n">function2d</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">function2d</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">muMax</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">function1d</span> <span class="o">=</span> <span class="n">function2d</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">muMin</span> <span class="p">)</span>
+            <span class="n">energyOutMin</span><span class="p">,</span> <span class="n">energyOutMax</span> <span class="o">=</span> <span class="n">miscellaneousModule</span><span class="o">.</span><span class="n">domainLimits</span><span class="p">(</span> <span class="n">energyOut</span><span class="p">,</span> <span class="n">function1d</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">function1d</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">energyOutMax</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">muEnergyOutEvaluate</span> <span class="o">=</span> <span class="n">function1d</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyOutMin</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">muEnergyOutEvaluate</span> <span class="o">=</span> <span class="n">function1d</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="n">energyOutMin</span><span class="p">,</span> <span class="n">energyOutMax</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">xys</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">function1d</span> <span class="ow">in</span> <span class="n">function2d</span> <span class="p">:</span>
+                <span class="n">energyOutMin</span><span class="p">,</span> <span class="n">energyOutMax</span> <span class="o">=</span> <span class="n">miscellaneousModule</span><span class="o">.</span><span class="n">domainLimits</span><span class="p">(</span> <span class="n">energyOut</span><span class="p">,</span> <span class="n">function1d</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">function1d</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">energyOutMax</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">function1d</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyOutMin</span> <span class="p">)</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">function1d</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="n">energyOutMin</span><span class="p">,</span> <span class="n">energyOutMax</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">xys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">function1d</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">value</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="n">xys</span> <span class="o">=</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">xys</span> <span class="p">)</span>
+            <span class="n">muEnergyOutEvaluate</span> <span class="o">=</span> <span class="n">xys</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="n">muMin</span><span class="p">,</span> <span class="n">muMax</span> <span class="p">)</span>
+
+        <span class="n">phiEvaluate</span> <span class="o">=</span> <span class="n">miscellaneousModule</span><span class="o">.</span><span class="n">muPhiEvaluate</span><span class="p">(</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">phiEvaluate</span> <span class="o">*</span> <span class="n">muEnergyOutEvaluate</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs3d.normalize"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">insitu</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">insitu</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">E_MuEpPs</span> <span class="ow">in</span> <span class="n">n</span> <span class="p">:</span>
+            <span class="nb">sum</span> <span class="o">=</span> <span class="n">E_MuEpPs</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">muEpPs</span> <span class="ow">in</span> <span class="n">E_MuEpPs</span> <span class="p">:</span> <span class="n">muEpPs</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span> <span class="n">muEpPs</span> <span class="o">/</span> <span class="nb">sum</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs3d.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="kn">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
+
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+        <span class="n">productFrame</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productFrame&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Grouping </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="o">=</span> <span class="n">transferMatricesModule</span><span class="o">.</span><span class="n">ENDFEMuEpP_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;crossSection&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;multiplicity&#39;</span><span class="p">],</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;transferMatrixComment&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; outgoing data for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productLabel&#39;</span><span class="p">]</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">TMs2Form</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs3d.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">angular</span> <span class="o">=</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">PofEpGivenMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">PofEp</span> <span class="ow">in</span> <span class="n">PofEpGivenMu</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="n">angular</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="p">),</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">PofEpGivenMu</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">xys3d</span> <span class="o">=</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">XYs3d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">PofEpGivenMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="n">xys2d</span> <span class="o">=</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="p">(</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">PofEpGivenMu</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">PofEp</span> <span class="ow">in</span> <span class="n">PofEpGivenMu</span> <span class="p">:</span>
+                <span class="n">_PofEp</span> <span class="o">=</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span>
+                <span class="n">xys2d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span> <span class="n">_PofEp</span><span class="p">,</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">xys3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">xys2d</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">angular</span><span class="p">(</span> <span class="n">angular</span> <span class="p">),</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">angularEnergy</span><span class="p">(</span> <span class="n">xys3d</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs3d.allowedSubElements"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.allowedSubElements">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">allowedSubElements</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">XYs2d</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="form"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.form">[docs]</a><span class="k">class</span> <span class="nc">form</span><span class="p">(</span>  <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;angularEnergy&#39;</span>
+    <span class="n">subformAttributes</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;angularEnergySubform&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">subformAttributes</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">angularEnergySubform</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">angularEnergySubform</span><span class="p">,</span> <span class="n">subform</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;instance is not an angularEnergy subform&#39;</span> <span class="p">)</span>
+        <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="p">(</span> <span class="n">angularEnergySubform</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="form.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.form.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="o">==</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">centerOfMassToken</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;center of mass calculation not supported for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;productFrame&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span>
+        <span class="n">aveEnergy</span><span class="p">,</span> <span class="n">aveMomentum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">aveEnergy</span> <span class="p">],</span> <span class="p">[</span> <span class="n">aveMomentum</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.form.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.form.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="o">==</span> <span class="n">frame</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span>
+            <span class="n">function2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1"> translation not supported.&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="n">frame</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.integrate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.form.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">productToken</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="n">energyOut</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="n">muOut</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="n">phiOut</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="n">LegendreOrder</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.processMC_cdf"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.form.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">angular</span><span class="p">,</span> <span class="n">angularEnergy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">form</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">angularEnergy</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.form.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productFrame&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.form.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">formElement</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">subformClass</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">XYs3d</span><span class="o">.</span><span class="n">moniker</span> <span class="p">:</span>  <span class="n">XYs3d</span><span class="p">,</span>
+        <span class="p">}[</span> <span class="n">formElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="n">subformClass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;encountered unknown angularEnergy subform: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">formElement</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="n">subform</span> <span class="o">=</span> <span class="n">XYs3d</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">formElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">AEC</span> <span class="o">=</span> <span class="n">form</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;productFrame&#39;</span><span class="p">),</span> <span class="n">subform</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">AEC</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.productData.distributions.angularEnergy</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

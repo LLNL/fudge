@@ -1,0 +1,25 @@
+Code coverage for Merced with the gcc compiler is evaluated as follows:
+
+1) Generate an executable with the necessary code coverage information. The command
+     `make build`
+   creates the executable "./mercedWithCoverage" and the files ../Src/*.gcno (for each
+   corresponding ../Src/*.cpp file). The ../Src/*.gcno files do not containany coverage
+   information but provide the basic data on code blocks and source code line numbers.
+   The executable ./mercedWithCoverage is executated to generate the coverage data for
+   a given execution instance.
+
+2) Run the above executable for each test case to determine the corresponding code coverage
+
+     The command `make` loops over each of the test cases in ../TestSuite/*/in.* and generate
+     the corresponding code coverage. After each case, the files ../Src/*.gcda are created for
+     each ../Src/*.cpp file. The ../Src/*.gcda files contain the coverage data for a given test
+     case but need further post-processing to make the information human-readable.
+
+     The utility lcov is the graphical front-end for gcov and summarizes the code coverage data.
+     After each test case ../TestSuite/*/in.*, the corresponding coverage information is summarized
+     to the files ./individualCoverage.*.
+
+3) After all the test cases are excuted the lcov utility is used to combine the individual code 
+   coverage summaries to the file ./coverage.info
+
+4) Finaly an HTML representation of the coverage data for the above cases with the genhtml utility.

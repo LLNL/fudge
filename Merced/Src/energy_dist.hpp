@@ -19,8 +19,8 @@
 #include "standard_Legendre.hpp"
 #include "energy_dist_base.hpp"
 
-using namespace std;
-
+namespace Edist
+{
 //! Class for energy distributions, one Legendre order
 //--------------- class energy_dist ----------------
 class energy_dist
@@ -29,12 +29,12 @@ private:
 
 public:
   //! the ENDL data
-  Eprob_vector *EProb_data;
+  Ebase::Eprob_vector *EProb_data;
 
   //! the number of incident energies
   int number_Ein;
-  two_d_interp Ein_interp;  // interpolation between incident enrgies
-  Interp_Type Eout_interp;  // interpolation between outgoing enrgies
+  Terp::two_d_interp Ein_interp;  // interpolation between incident enrgies
+  Terp::Interp_Type Eout_interp;  // interpolation between outgoing enrgies
 
   inline energy_dist( ): number_Ein( 0 ) {}
 
@@ -43,7 +43,7 @@ public:
   //! Reads the ENDL data
   //! \param infile input file
   //! \param num_Ein number of incident energies for this reaction
-  void read_data( data_parser& infile, int num_Ein );
+  void read_data( Dpar::data_parser& infile, int num_Ein );
 
   //! Maps the data to unit base
   //! \param L_order the Legendre order of the current data
@@ -69,10 +69,10 @@ class energy_moments
 
  protected:
   //! Use the coding for this data in ENDF format
-  standard_Legendre ENDF_data;
+  StdLg::standard_Legendre ENDF_data;
 
   //! The original ENDL data
-  energy_dist *ENDL_data;
+  Edist::energy_dist *ENDL_data;
 
   int data_order;  // the Legendre order of the data
  
@@ -80,8 +80,8 @@ class energy_moments
   void zero_order( );
 
  public:
-  two_d_interp Ein_interp;  // interpolation between incident enrgies
-  Interp_Type Eout_interp;  // interpolation between outgoing enrgies
+  Terp::two_d_interp Ein_interp;  // interpolation between incident enrgies
+  Terp::Interp_Type Eout_interp;  // interpolation between outgoing enrgies
 
   inline energy_moments( ): output_order( -1 ), data_order( -1 ) {}
   ~energy_moments( );
@@ -89,18 +89,20 @@ class energy_moments
   //! Reads the ENDL data
   //! \param infile input file
   //! \param num_moments number of Legendre moments for this reaction
-  void read_data( data_parser& input_file, int num_moments );
+  void read_data( Dpar::data_parser& input_file, int num_moments );
 
    // Calculates the transfer matrix for this particle.
   //! \param sigma the cross section data
   //! \param mult the outgoing particle multiplicity data
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param transfer the transfer matrix
-  void get_T( const dd_vector& sigma, const dd_vector& mult,
-    const dd_vector& weight, T_matrix& transfer );
+  void get_T( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& mult,
+    const Ddvec::dd_vector& weight, Trf::T_matrix& transfer );
 
   // Prints the lists for debugging
   void print( );
 };
+
+} // end of namespace Edist
 
 #endif

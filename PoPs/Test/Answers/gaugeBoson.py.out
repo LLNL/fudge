@@ -1,6 +1,6 @@
 <gaugeBoson id="photon">
   <mass>
-    <double label="base" value="0.0" unit="amu"/></mass>
+    <double label="base" value="0." unit="amu"/></mass>
   <spin>
     <fraction label="base" value="1" unit="hbar"/></spin>
   <parity>
@@ -8,12 +8,12 @@
   <charge>
     <integer label="base" value="0" unit="e"/></charge>
   <halflife>
-    <double label="base" value="1e+100" unit="s"/></halflife></gaugeBoson>
+    <double label="base" value="1.e100" unit="s"/></halflife></gaugeBoson>
 
 <gaugeBosons>
   <gaugeBoson id="photon">
     <mass>
-      <double label="base" value="0.0" unit="amu"/></mass>
+      <double label="base" value="0." unit="amu"/></mass>
     <spin>
       <fraction label="base" value="1" unit="hbar"/></spin>
     <parity>
@@ -21,4 +21,4 @@
     <charge>
       <integer label="base" value="0" unit="e"/></charge>
     <halflife>
-      <double label="base" value="1e+100" unit="s"/></halflife></gaugeBoson></gaugeBosons>
+      <double label="base" value="1.e100" unit="s"/></halflife></gaugeBoson></gaugeBosons>

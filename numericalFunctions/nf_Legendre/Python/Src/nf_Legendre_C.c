@@ -1,65 +1,9 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 */
 
@@ -73,16 +17,19 @@
 #include <pointwiseXY_C.h>
 #include <nf_Legendre.h>
 
-#if( PY_VERSION_HEX < 0x02050000 )
-#define Py_ssize_t int64_t 
-#define lenfunc inquiry
-#define ssizeargfunc intargfunc
-#define ssizessizeargfunc intintargfunc
-#define ssizeobjargproc intobjargproc
-#define ssizessizeobjargproc intintobjargproc
+#if PY_MAJOR_VERSION < 3
+    #define PYUNICODE_FROMSTRING PyString_FromString
+
+    #define STATICFORWARD staticforward
+
+#else
+    #define PYUNICODE_FROMSTRING PyUnicode_FromString
+
+    #define STATICFORWARD static
+    #define Py_TPFLAGS_CHECKTYPES 0
 #endif
 
-staticforward PyTypeObject nf_Legendre_CPyType;
+STATICFORWARD PyTypeObject nf_Legendre_CPyType;
 
 typedef struct nf_Legendre_CPy_s {
     PyObject_HEAD
@@ -90,7 +37,7 @@ typedef struct nf_Legendre_CPy_s {
     nf_Legendre *nfL;
 } nf_Legendre_CPy;
 
-#define is_nf_Legendre_CPyObject( v ) ((v)->ob_type == &nf_Legendre_CPyType)
+#define is_nf_Legendre_CPyObject( v ) ( Py_TYPE( v ) == &nf_Legendre_CPyType )
 
 static char nf_Legendre_C__doc__[] = 
     "The Legendre class stores the coefficients for a Legendre series.\n" \
@@ -121,7 +68,6 @@ static int nf_Legendre_C_checkStatus( nf_Legendre_CPy *self );
 static PyObject *nf_Legendre_C_from_pointwiseXY_C( PyObject *self, PyObject *args );
 static PyObject *nf_Legendre_C_getMaxMaxOrder( PyObject *self );
 
-DL_EXPORT( void ) initLegendre( void );
 /*
 ******************** nf_Legendre_CNewInitialize ************************
 */
@@ -157,7 +103,9 @@ static int nf_Legendre_C__init__( nf_Legendre_CPy *self, PyObject *args, PyObjec
         PyErr_NoMemory( );
         return( -1 );
     }
+
     if( Cls != NULL ) free( Cls );
+
     return( 0 );
 }
 /*
@@ -170,7 +118,7 @@ static void nf_Legendre_C_dealloc( PyObject *self ) {
     if( nfL->nfL != NULL ) {
         nf_Legendre_free( nfL->nfL );
     }
-    self->ob_type->tp_free( self );
+    Py_TYPE( self )->tp_free( self );
 }
 /*
 ************************************************************
@@ -208,12 +156,16 @@ static PyObject *nf_Legendre_C__getitem__( nf_Legendre_CPy *self, Py_ssize_t l )
     nf_Legendre_maxOrder( NULL, self->nfL, &maxOrder );
 
     if( l < 0 ) l += maxOrder + 1;
+    if( ( l < 0 ) || ( l > maxOrder ) ) {
+        PyErr_SetString( PyExc_IndexError, "index out of range" );
+        return( NULL );
+    }
     if( nf_Legendre_getCl( smr, self->nfL, (int) l, &Cl ) != nfu_Okay ) {
         nf_Legendre_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
         return( NULL );
     }
 
-    return( (PyObject *) Py_BuildValue( "d", Cl ) );
+    return( Py_BuildValue( "d", Cl ) );
 }
 /*
 ************************************************************
@@ -347,7 +299,7 @@ static PyObject *nf_Legendre_C_toString2( nf_Legendre_CPy *self, char *format, c
     if( nf_Legendre_C_checkStatus( self ) != 0 ) return( NULL );
 
     nf_Legendre_maxOrder( NULL, self->nfL, &length );
-    if( length < 0 ) return( PyString_FromString( "" ) );
+    if( length < 0 ) return( PYUNICODE_FROMSTRING( "" ) );
     length++;
 
     s = nf_Legendre_C_toString_isFormatForDouble( format, 0 );
@@ -372,7 +324,7 @@ static PyObject *nf_Legendre_C_toString2( nf_Legendre_CPy *self, char *format, c
             *e = 0;
         }
     }
-    str = PyString_FromString( s );
+    str = PYUNICODE_FROMSTRING( s );
     free( s );
     return( str );
 }
@@ -524,8 +476,7 @@ static PyMethodDef nf_Legendre_CPyMethods[] = {
 ************************************************************
 */
 static PyTypeObject nf_Legendre_CPyType = {
-    PyObject_HEAD_INIT( NULL )
-    0,                                          /* ob_size        */
+    PyVarObject_HEAD_INIT( NULL, 0 )
     "Legendre.Series",                          /* tp_name        */
     sizeof( nf_Legendre_CPy ),                  /* tp_basicsize   */
     0,                                          /* tp_itemsize    */
@@ -620,17 +571,50 @@ static PyMethodDef nf_Legendre_CMiscPyMethods[] = {
 /*
 ************************************************************
 */
-DL_EXPORT( void ) initLegendre( void ) {
 
-    PyObject *m;
+static char const doc[] = "A module that contains the Legendre class.";
 
-    nf_Legendre_CPyType.tp_new = PyType_GenericNew;
-    if( PyType_Ready( &nf_Legendre_CPyType ) < 0 ) return;
+#if PY_MAJOR_VERSION < 3
 
-    if( ( m = Py_InitModule3( "Legendre", nf_Legendre_CMiscPyMethods, "A module that contains the Legendre class." ) ) == NULL ) return;
+    PyMODINIT_FUNC initLegendre( void ) {
 
-    if( import_pointwiseXY_C( ) < 0 ) return;
+        PyObject *module;
 
-    Py_INCREF( &nf_Legendre_CPyType );
-    PyModule_AddObject( m, "Series", (PyObject *) &nf_Legendre_CPyType );
-}
+        nf_Legendre_CPyType.tp_new = PyType_GenericNew;
+        if( PyType_Ready( &nf_Legendre_CPyType ) < 0 ) return;
+
+        if( ( module = Py_InitModule3( "Legendre", nf_Legendre_CMiscPyMethods, doc ) ) == NULL ) return;
+
+        if( import_pointwiseXY_C( ) < 0 ) return;
+
+        Py_INCREF( &nf_Legendre_CPyType );
+        PyModule_AddObject( module, "Series", (PyObject *) &nf_Legendre_CPyType );
+    }
+
+#else
+
+    static struct PyModuleDef Legendre_CModule = {
+        PyModuleDef_HEAD_INIT,
+        "Legendre",             /* name of module */
+        doc,                    /* module documentation, may be NULL */
+        -1,                     /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+       nf_Legendre_CMiscPyMethods 
+    };
+
+    PyMODINIT_FUNC PyInit_Legendre( void ) {
+
+        PyObject *module;
+
+        if( ( module = PyModule_Create( &Legendre_CModule ) ) == NULL ) return( NULL );
+
+        if( import_pointwiseXY_C( ) < 0 ) return( NULL );
+
+        nf_Legendre_CPyType.tp_new = PyType_GenericNew;
+        if( PyType_Ready( &nf_Legendre_CPyType ) < 0 ) return( NULL );
+        Py_INCREF( &nf_Legendre_CPyType );
+        PyModule_AddObject( module, "Series", (PyObject *) &nf_Legendre_CPyType );
+
+        return( module );
+    }
+
+#endif

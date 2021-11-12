@@ -18,52 +18,52 @@
 #include <fstream>
 #include <cstring>
 
-using namespace std;
-
 // ------------------- string routines ----------------
 namespace string_F
 {
   //! Removes extra blanks from a string
   //! \param s the string to modify
-  void remove_all_blanks( string &s );
+  void remove_all_blanks( std::string &s );
 
   //! Removes final blanks from a string.
   //! \param s the string to modify
-  void remove_final_blanks( string &s );
+  void remove_final_blanks( std::string &s );
 
   //! A function that lower-cases strings
   //! \param s the string to modify
-  void Tolower( string& s);
+  void Tolower( std::string& s);
 }
 
+namespace Dpar
+{
 // ------------------- class data_parser ---------------
 //! Base class for reading Python file sections
 class data_parser
 {
 private:
-  ifstream infile;
+  std::ifstream infile;
 
   //! the current position in next_line
-  string::size_type pos;
+  std::string::size_type pos;
 
   //! Reads in a new line and deletes trailing blanks, returns "false" at end of file
   bool get_new_line( );
 
 public:
   //! the next line in the file
-  string next_line;
+  std::string next_line;
 
   //! original line, in case of trouble
-  string original_line;
+  std::string original_line;
 
   int line_count;
 
-  data_parser( const string &inFileName );
+  data_parser( const std::string &inFileName );
 
   inline ~data_parser( ) { }
 
   //! Gets the data identifier
-  string get_dataID( );
+  std::string get_dataID( );
 
   //! Gets the next integer in next_line, starting at pos
   int get_next_int(  );
@@ -73,15 +73,17 @@ public:
 
   //! Extracts and prints a comment
   //! \param output_file the output file
-  void get_comment( ofstream &output_file );
+  void get_comment( std::ofstream &output_file );
 
   //! Extracts text to the end of this line
-  string get_text( );
+  std::string get_text( );
 
   //! Reads the interpolation rule for 2-dimensional tables
   //! \param interpolation: lin-lin, etc.
   //! \param qualifier: direct, unitbase, etc.
-  void read_2d_interp( string *interpolation, string *qualifier );
+  void read_2d_interp( std::string *interpolation, std::string *qualifier );
 };
+
+} // end of namespace Dpar
 
 #endif

@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Fudge Tutorial &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="1. Basic translating between ENDF and GNDS" href="translating.html" />
     <link rel="prev" title="Generalized Interaction Data Interface (GIDI)" href="../gidi.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +34,8 @@
         <li class="right" >
           <a href="../gidi.html" title="Generalized Interaction Data Interface (GIDI)"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The Fudge Tutorial</a></li> 
       </ul>
     </div>  
 
@@ -54,61 +46,59 @@
             
   <div class="section" id="the-fudge-tutorial">
 <h1>The Fudge Tutorial<a class="headerlink" href="#the-fudge-tutorial" title="Permalink to this headline">¶</a></h1>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Release:</th><td class="field-body">4.2.3</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Mar 19, 2018</td>
-</tr>
-</tbody>
-</table>
-<p>The Generalized Nuclear Database Structure (GNDS) is a proposed successor to the venerable
-Evaluated Nuclear Data File (ENDF) format.  Currently, GNDS can be expressed in either
-the XML or HDF5 formats.  The <code class="docutils literal"><span class="pre">fudge</span></code> Python package provides tools to read, write,
+<dl class="field-list simple">
+<dt class="field-odd">Release</dt>
+<dd class="field-odd"><p>4.2.3</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>Nov 12, 2021</p>
+</dd>
+</dl>
+<p>The Generalized Nuclear Database Structure (GNDS) has been accepted by the international
+Nuclear Data community as the successor to the venerable
+Evaluated Nuclear Data File (ENDF) format.  Currently, GNDS can be written out in either
+the XML or HDF5 format (or in a hybrid mixture of the two).
+The <code class="docutils literal notranslate"><span class="pre">fudge</span></code> Python package provides tools to read, write,
 manipulate and process nuclear reaction evaluations in either the ENDF format or GNDS
-formats.  You can find more about <code class="docutils literal"><span class="pre">fudge</span></code> from the <a class="reference external" href="https://ndclx4.bnl.gov/gf/project/gnd/">GNDS Project Page</a> and about GNDS from <a class="reference external" href="http://dx.doi.org/10.1016/j.nds.2012.11.008">C. Mattoon, et al.,
+formats.  You can find more about <code class="docutils literal notranslate"><span class="pre">fudge</span></code> from the <a class="reference external" href="https://github.com/LLNL/fudge/">github site</a> and about GNDS from <a class="reference external" href="http://dx.doi.org/10.1016/j.nds.2012.11.008">C. Mattoon, et al.,
 Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145–3171</a>.</p>
 <p>In this tutorial, we will work through the development of several simple
 fudge scripts that will:</p>
 <blockquote>
 <div><ul class="simple">
-<li>translate to/from the GNDS and ENDF nuclear reaction data formats;</li>
-<li>check the physics content of an evaluation in either GNDS or ENDF format;</li>
-<li>dig deeper into the GNDS hierarchy and the <code class="docutils literal"><span class="pre">fudge</span></code> code</li>
-<li>outline a larger script for processing an evaluation for use
-in a transport code;</li>
+<li><p>translate to/from the GNDS and ENDF nuclear reaction data formats;</p></li>
+<li><p>check the physics content of an evaluation in either GNDS or ENDF format;</p></li>
+<li><p>dig deeper into the GNDS hierarchy and the <code class="docutils literal notranslate"><span class="pre">fudge</span></code> code</p></li>
+<li><p>outline a larger script for processing an evaluation for use
+in a transport code;</p></li>
 </ul>
 </div></blockquote>
 <p>I will assume throughout this tutorial that you have correctly installed fudge
-(see <a class="reference internal" href="../installation.html#installation"><span class="std std-ref">Installation</span></a> if you haven’t), the Python scripting language (version 2.7.x) and the Python
-extensions numpy and matplotlib.  I will also assume that you have working knowledge
+(see <a class="reference internal" href="../installation.html#installation"><span class="std std-ref">Installation</span></a> if you haven’t), the Python scripting language (version 2.7.x or 3.6.x and later)
+and the Python extensions numpy and matplotlib.  I will also assume that you have working knowledge
 of the Python scripting language and that you are involved in nuclear data enterprise in
 some fashion (so I don’t have to define things like “evaluation”).</p>
 <p>Let’s begin with the most important thing.  Make sure fudge is in your PYTHONPATH!
 You can do this a few different ways:</p>
 <blockquote>
 <div><ul>
-<li><p class="first">Using the bash shell, at the command line do:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ export PYTHONPATH=&quot;/full/path/to/directory/containing/fudge&quot;
+<li><p>Using the bash shell, at the command line do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export PYTHONPATH=&quot;/full/path/to/directory/containing/fudge&quot;
 </pre></div>
 </div>
 </li>
-<li><p class="first">Add this export directive to your <code class="docutils literal"><span class="pre">.bashrc</span></code> file.</p>
-</li>
-<li><p class="first">Alternatively, you can amend the <code class="docutils literal"><span class="pre">sys.path</span></code> variable to point to the directory
-containing the <code class="docutils literal"><span class="pre">fudge</span></code> python module <em>inside</em> any python script you write.</p>
-</li>
+<li><p>Add this export directive to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> file.</p></li>
+<li><p>Alternatively, you can amend the <code class="docutils literal notranslate"><span class="pre">sys.path</span></code> variable to point to the directory
+containing the <code class="docutils literal notranslate"><span class="pre">fudge</span></code> python module <em>inside</em> any python script you write.</p></li>
 </ul>
 </div></blockquote>
-<p>OK, with that settled, you can start with the section on translating between ENDF and GNDS.</p>
+<p>With that settled, you can start with the section on translating between ENDF and GNDS.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">If you find yourself lost, the Python interpretor has excellent built-in help
-(just type <code class="docutils literal"><span class="pre">help(</span> <span class="pre">object</span> <span class="pre">)</span></code> to learn about an object.  Then, of course, there
+<p class="admonition-title">Note</p>
+<p>If you find yourself lost, the Python interpretor has excellent built-in help
+(just type <code class="docutils literal notranslate"><span class="pre">help(</span> <span class="pre">object</span> <span class="pre">)</span></code> to learn about an object.  Then, of course, there
 is the Fudge Documentation itself which should have been included with your
-Fudge installation in <code class="docutils literal"><span class="pre">doc/html/index.html</span></code>.</p>
+Fudge installation in <code class="docutils literal notranslate"><span class="pre">doc/html/index.html</span></code>.</p>
 </div>
 <p><strong>Contents:</strong></p>
 <div class="toctree-wrapper compound">
@@ -116,7 +106,7 @@ Fudge installation in <code class="docutils literal"><span class="pre">doc/html/
 <li class="toctree-l1"><a class="reference internal" href="translating.html">1. Basic translating between ENDF and GNDS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="checking.html">2. Checking ENDF or GNDS files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="navigating.html">3. Navigating</a></li>
-<li class="toctree-l1"><a class="reference internal" href="diggingDeeper.html">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="diggingDeeper.html">4. Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="processing.html">5. Processing GNDS files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="other-examples.html">6. Other Fudge Examples</a></li>
 </ul>
@@ -124,6 +114,7 @@ Fudge installation in <code class="docutils literal"><span class="pre">doc/html/
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -137,7 +128,7 @@ Fudge installation in <code class="docutils literal"><span class="pre">doc/html/
                         title="previous chapter">Generalized Interaction Data Interface (GIDI)</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="translating.html"
-                        title="next chapter">1. Basic translating between ENDF and GNDS</a></p>
+                        title="next chapter"><span class="section-number">1. </span>Basic translating between ENDF and GNDS</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -146,15 +137,15 @@ Fudge installation in <code class="docutils literal"><span class="pre">doc/html/
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -174,12 +165,13 @@ Fudge installation in <code class="docutils literal"><span class="pre">doc/html/
         <li class="right" >
           <a href="../gidi.html" title="Generalized Interaction Data Interface (GIDI)"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The Fudge Tutorial</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

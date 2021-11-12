@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.processing.montecarlo package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.processing.resonances package" href="fudge.processing.resonances.html" />
     <link rel="prev" title="fudge.processing.deterministic package" href="fudge.processing.deterministic.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +36,9 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.processing.html" accesskey="U">fudge.processing package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="fudge.processing.html" accesskey="U">fudge.processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.montecarlo package</a></li> 
       </ul>
     </div>  
 
@@ -61,33 +54,33 @@
 </div>
 <div class="section" id="module-fudge.processing.montecarlo.fudge2dEqualProbableBinning">
 <span id="fudge-processing-montecarlo-fudge2dequalprobablebinning-module"></span><h2>fudge.processing.montecarlo.fudge2dEqualProbableBinning module<a class="headerlink" href="#module-fudge.processing.montecarlo.fudge2dEqualProbableBinning" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData">
-<em class="property">class </em><code class="descclassname">fudge.processing.montecarlo.fudge2dEqualProbableBinning.</code><code class="descname">equalProbableBinnedData</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBinnedData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.processing.montecarlo.fudge2dEqualProbableBinning.</code><code class="sig-name descname">equalProbableBinnedData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBinnedData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
 <dt id="fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getData">
-<code class="descname">getData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBinnedData.getData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getData" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBinnedData.getData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the data of self.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getEnd">
-<code class="descname">getEnd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBinnedData.getEnd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getEnd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getEnd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBinnedData.getEnd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getEnd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the number of data points in self.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getStart">
-<code class="descname">getStart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBinnedData.getStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getStart" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getStart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBinnedData.getStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBinnedData.getStart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Always returns 0.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBins">
-<code class="descclassname">fudge.processing.montecarlo.fudge2dEqualProbableBinning.</code><code class="descname">equalProbableBins</code><span class="sig-paren">(</span><em>nBins</em>, <em>xy</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBins" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.montecarlo.fudge2dEqualProbableBinning.</code><code class="sig-name descname">equalProbableBins</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nBins</span></em>, <em class="sig-param"><span class="n">xy</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBins" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -97,6 +90,7 @@
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -105,7 +99,7 @@
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.processing.montecarlo package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -129,15 +123,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -159,12 +153,14 @@
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.processing.html" >fudge.processing package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="fudge.processing.html" >fudge.processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.montecarlo package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

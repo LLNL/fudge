@@ -1,0 +1,14 @@
+Intellectual Property Notice
+------------------------------
+
+gidiplus is licensed under the BSD 3-clause license
+(see file LICENSE or https://opensource.org/licenses/BSD-3-Clause).
+
+
+SPDX usage
+------------
+
+Individual files contain SPDX tags instead of the full license text.
+This enables machine processing of license information based on the SPDX
+License Identifiers that are available here: https://spdx.org/licenses/
+

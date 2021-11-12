@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.processing.deterministic.multiGroupUpScatter &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.deterministic.multiGroupUpScatter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.processing.deterministic.multiGroupUpScatter</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">subprocess</span>
+
+<span class="kn">import</span> <span class="nn">fudge</span> <span class="k">as</span> <span class="nn">fudgeModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">subprocessing</span><span class="p">,</span> <span class="n">times</span>
+<span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="kn">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
+
+<div class="viewcode-block" id="SnElasticUpScatter"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter">[docs]</a><span class="k">def</span> <span class="nf">SnElasticUpScatter</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate input and call processing code to generate a transfer matrix for two-body angular distribution.</span>
+<span class="sd">    If the distribution is actually made up of two different forms in different energy regions, this function</span>
+<span class="sd">    calls itself in the two regions and sums the result.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
+    <span class="n">workDir</span> <span class="o">=</span> <span class="s1">&#39;upscatter.work&#39;</span>
+    
+    <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">workDir</span><span class="p">))</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">workDir</span><span class="p">)</span>
+    <span class="n">projectileGroupBoundaries</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupBoundaries&#39;</span><span class="p">]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">transferMatricesModule</span><span class="o">.</span><span class="n">GBToString</span><span class="p">(</span> <span class="s1">&#39;Projectile&#39;</span><span class="p">,</span> <span class="n">projectileGroupBoundaries</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">8</span><span class="p">:])</span>  <span class="c1">### exclude some header stuff we dont want to parse in C</span>
+    <span class="n">dataFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/groupStructure.dat&#39;</span><span class="o">%</span><span class="n">workDir</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span> <span class="p">)</span>
+    <span class="n">dataFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+    <span class="n">dataFile</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+    
+    <span class="c1">### run the calcUpscatter code -- ./calcUpscatterKernel 42092 3.1e-8 ==&gt; upscatterEMuEp.out</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fudgeModule</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="s1">&#39;calcUpscatterKernel&#39;</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="s1">&#39;  </span><span class="si">%s</span><span class="s1"> </span><span class="si">%g</span><span class="s1"> </span><span class="si">%g</span><span class="s1"> </span><span class="si">%g</span><span class="s1"> </span><span class="si">%g</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="s1">&#39;groupStructure.dat&#39;</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;targetMassRatio&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">],</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;minEval&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;maxEval&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;legendreOrder&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">logFile</span> <span class="o">=</span> <span class="n">executeCommand</span><span class="p">(</span>  <span class="n">cmd</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="s1">&#39;legendre&#39;</span> <span class="p">)</span>
+    
+    <span class="c1">### call the transferMatrix parseOutput on the outfile</span>
+    <span class="n">TM1</span><span class="p">,</span> <span class="n">TME</span><span class="p">,</span> <span class="n">paras</span> <span class="o">=</span> <span class="n">transferMatricesModule</span><span class="o">.</span><span class="n">parseOutputFile</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/upscatterLegendre.out&#39;</span><span class="o">%</span><span class="n">workDir</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">firstLine</span> <span class="o">=</span> <span class="s2">&quot;upscatter: version 1 </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">maxG</span> <span class="o">=</span> <span class="n">paras</span><span class="p">[</span><span class="s1">&#39;maxIncidentEnergyGroup&#39;</span><span class="p">]</span>
+    
+    <span class="k">if</span><span class="p">(</span> <span class="n">TM1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">negative_l0Counter</span> <span class="o">=</span> <span class="n">checkNegative_l0</span><span class="p">(</span> <span class="n">TM1</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">logFile</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">TME</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">negative_l0Counter</span> <span class="o">+=</span> <span class="n">checkNegative_l0</span><span class="p">(</span> <span class="n">TME</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="n">logFile</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">negative_l0Counter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: </span><span class="si">%d</span><span class="s1"> negative l=0 elements found in transfer matrix&#39;</span> <span class="o">%</span> <span class="n">negative_l0Counter</span><span class="p">)</span>
+    <span class="n">APE</span> <span class="o">=</span> <span class="n">parseAveEnergyOutputFile</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/AveEnergy.out&#39;</span><span class="o">%</span><span class="n">workDir</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">TM1</span><span class="p">,</span> <span class="n">TME</span><span class="p">,</span> <span class="n">APE</span><span class="p">,</span> <span class="n">paras</span><span class="p">[</span><span class="s1">&#39;maxIncidentEnergyGroup&#39;</span><span class="p">]</span> <span class="p">)</span></div>
+        
+<div class="viewcode-block" id="executeCommand"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.executeCommand">[docs]</a><span class="k">def</span> <span class="nf">executeCommand</span><span class="p">(</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">workFile</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="n">transferMatrixExecute</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">transferMatrixExecute</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">srcPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span> <span class="s1">&#39;./&#39;</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">transferMatrixExecute</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">transferMatrixExecute</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">srcPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">srcPath</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">transferMatrixExecute</span> <span class="o">=</span> <span class="n">srcPath</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">srcPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="n">fudgeModule</span><span class="o">.</span><span class="vm">__file__</span> <span class="p">)</span> <span class="p">),</span> <span class="s1">&#39;bin&#39;</span> <span class="p">)</span>
+            <span class="n">transferMatrixExecute</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">srcPath</span><span class="p">,</span> <span class="n">transferMatrixExecute</span> <span class="p">)</span>
+    
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">transferMatrixExecute</span><span class="p">]</span><span class="o">+</span><span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">workDir</span><span class="p">))</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">workDir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workDir</span><span class="p">)</span>
+    <span class="n">fullFileName</span> <span class="o">=</span> <span class="s1">&#39;upscatter_</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">workFile</span> 
+    <span class="n">infoFile</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.log&#39;</span> <span class="o">%</span> <span class="n">fullFileName</span>
+    
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">times</span><span class="o">.</span><span class="n">times</span><span class="p">(</span> <span class="p">)</span>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="c1">#print(cmd)</span>
+        <span class="n">status</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocessing</span><span class="o">.</span><span class="n">executeCommand</span><span class="p">(</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">infoFile</span> <span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="n">fErr</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fullFileName</span> <span class="o">+</span> <span class="s2">&quot;.err&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span> <span class="p">)</span>
+        <span class="n">fErr</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">raise</span>
+        
+    <span class="n">fOut</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">infoFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
+    <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">t0</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">status</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;status = &quot;</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Upscatter failed for </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">fullFileName</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">fOut</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workDir</span><span class="p">,</span><span class="n">infoFile</span><span class="p">)</span></div>
+
+<span class="c1">### checker for resulting legendre matrices</span>
+<div class="viewcode-block" id="checkNegative_l0"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.checkNegative_l0">[docs]</a><span class="k">def</span> <span class="nf">checkNegative_l0</span><span class="p">(</span> <span class="n">TM_EEpL</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">infoFile</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">fOut</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">infoFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
+    <span class="n">negative_l0Counter</span><span class="p">,</span> <span class="n">largestNegative</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.</span>
+    <span class="k">for</span> <span class="n">ig</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">TM_EEpL</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">TM_EpL</span> <span class="o">=</span> <span class="n">TM_EEpL</span><span class="p">[</span><span class="n">ig</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ih</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">TM_EpL</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">l0Cell</span> <span class="o">=</span> <span class="n">TM_EpL</span><span class="p">[</span><span class="n">ih</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">l0Cell</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">negative_l0Counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">largestNegative</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span> <span class="n">largestNegative</span><span class="p">,</span> <span class="n">l0Cell</span> <span class="p">)</span>
+                <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;negative l=0 for weight </span><span class="si">%s</span><span class="s1"> at row </span><span class="si">%3d</span><span class="s1"> column </span><span class="si">%3d</span><span class="s1">: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">weight</span><span class="p">,</span> <span class="n">ig</span><span class="p">,</span> <span class="n">ih</span><span class="p">,</span> <span class="n">l0Cell</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">fOut</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">negative_l0Counter</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parseAveEnergyOutputFile"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.parseAveEnergyOutputFile">[docs]</a><span class="k">def</span> <span class="nf">parseAveEnergyOutputFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span> <span class="p">:</span>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fileName</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Could not open file = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fileName</span> <span class="p">)</span>
+    <span class="n">ls</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">(</span> <span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+    
+    <span class="n">APE</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ls</span><span class="p">:</span>
+        <span class="n">APE</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]])</span>
+    
+    <span class="k">return</span> <span class="n">APE</span>    </div>
+        
+
+
+<div class="viewcode-block" id="rescaleCrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.rescaleCrossSection">[docs]</a><span class="k">def</span> <span class="nf">rescaleCrossSection</span><span class="p">(</span> <span class="n">groupedCrossSec</span><span class="p">,</span> <span class="n">UpScatterMatrix</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span><span class="n">sigma</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groupedCrossSec</span><span class="p">):</span>
+        <span class="n">summedarray</span> <span class="o">=</span> <span class="p">[</span> <span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">h</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">]))</span> <span class="p">]</span>
+        <span class="n">sumXS</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">summedarray</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="n">sumXS</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">ratio</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">/</span><span class="n">sumXS</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>
+                <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">]))</span> <span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">h</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">):</span>
+                        <span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">h</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">h</span><span class="p">][</span><span class="n">l</span><span class="p">]</span><span class="o">*</span><span class="n">ratio</span>
+
+    <span class="k">return</span> <span class="n">UpScatterMatrix</span></div>
+
+    
+<div class="viewcode-block" id="analyzeMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.analyzeMatrix">[docs]</a><span class="k">def</span> <span class="nf">analyzeMatrix</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">):</span>
+    <span class="c1">#import numpy as np</span>
+        
+    <span class="k">def</span> <span class="nf">plotMatrix</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">lastElement</span><span class="p">):</span>
+        
+        
+        <span class="c1">#s = &#39;\n&#39;.join(transferMatricesModule.GBToString( &#39;Projectile&#39;, gb, None ).split()[8:])  ### exclude some header stuff we dont want to parse in C</span>
+    
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+        <span class="kn">from</span> <span class="nn">fudge.vis.matplotlib</span> <span class="kn">import</span> <span class="n">plot_matrix</span> <span class="k">as</span> <span class="n">plotModule</span>
+        <span class="c1">#xR,yR,lR = len(TM),len(TM[0]),len(TM[0][0])</span>
+        <span class="n">xR</span><span class="p">,</span><span class="n">yR</span><span class="p">,</span><span class="n">lR</span> <span class="o">=</span> <span class="n">lastElement</span><span class="o">+</span><span class="mi">5</span><span class="p">,</span><span class="n">lastElement</span><span class="o">+</span><span class="mi">5</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">TM</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">gb</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupBoundaries&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">boundaries</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">xR</span><span class="p">]</span>
+        <span class="n">TM_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">xR</span><span class="p">,</span><span class="n">yR</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xR</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">yR</span><span class="p">):</span>
+                <span class="n">TM_A</span><span class="p">[</span><span class="n">g</span><span class="p">,</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">TM</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">h</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">plotModule</span><span class="o">.</span><span class="n">plot_matrix</span><span class="p">(</span><span class="n">TM_A</span><span class="p">,</span><span class="n">zlog</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">xyTitle</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Outgoing Energy Group&#39;</span><span class="p">,</span><span class="s1">&#39;Incident Energy Group&#39;</span><span class="p">))</span> <span class="c1">#,energyBoundariesX=gb)  #,xylog=True,energyBoundariesX=,energyBoundariesY=</span>
+        <span class="n">plotModule</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">tempStr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="s1">&#39;over&#39;</span><span class="p">)</span>
+        <span class="n">plotModule</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;upscatterTM_L0_</span><span class="si">%s</span><span class="s1">.png&#39;</span><span class="o">%</span><span class="n">tempStr</span><span class="p">)</span>
+
+    <span class="n">xR</span><span class="p">,</span><span class="n">yR</span><span class="p">,</span><span class="n">lR</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">TM</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">TM</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nb">len</span><span class="p">(</span><span class="n">TM</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1">#print(xR,yR,lR)</span>
+    
+    <span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>        
+    <span class="n">lastElement</span> <span class="o">=</span> <span class="mi">0</span>        
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xR</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">TM</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">g</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="p">:</span> 
+            <span class="n">lastElement</span> <span class="o">=</span> <span class="n">g</span>
+            <span class="k">break</span>
+                
+    <span class="c1">#print(&#39;last nonzero matrix element = &#39;, lastElement)</span>
+    <span class="n">plotMatrix</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">lastElement</span><span class="p">)</span>
+            
+            
+    <span class="k">return</span> <span class="n">lastElement</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.deterministic.multiGroupUpScatter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

@@ -1,7 +1,6 @@
 xndfgenTransferMatrix: version 1.0
 Process: Legendre energy-angle data
 Comment: n + Ti49 --> n + Ti49_c outgoing data for n
-Quadrature method: adaptive
 outputLegendreOrder: 3
 Projectile Frame: lab
 

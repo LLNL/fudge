@@ -1,65 +1,18 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
+
+"""
+Module containing dictionaries and helper functions for handling particle ids and symbols.
+
+Defines the following dictionaries:
+    symbolFromZ, nameFromZ          # look up chemical symbol or name by Z
+    ZfromSymbol, nameFromSymbol     # look up Z or name by chemical symbol
+    ZfromName, symbolFromName       # look up Z or symbol by chemical name
+"""
 
 MaxA = 400
 continuumID = 1000000
@@ -151,6 +104,22 @@ def checkIndex( index ) :
     return( index )
 
 def chemicalElementALevelIDsAndAnti( id, qualifierAllowed = False ) :
+    """
+    Parse a particle id to extract the following information:
+        baseId: particle id with any qualifiers removed
+        chemicalElementSymbol: symbol if id is a chemical element, isotope, nuclide or nucleus. None otherwise
+        A: total nucleon number (as integer) if id is for an isotope, nuclide or nucleus. None otherwise
+        levelId: integer level index if id is a nuclide or nucleus. None otherwise
+        isNucleus: True if id is a nucleus, False if id is a chemical element, isotope or nuclide, None otherwise
+        anti: '_anti' if id contains that string, empty string otherwise
+        qualifier: string qualifier if one is found (qualifiers appear inside {curly brackets}. Empty string otherwise
+
+    Unless qualifierAllowed = True, ValueError will be raised if a qualifier is detected in id
+
+    :param id: string particle id or symbol
+    :param qualifierAllowed: boolean, whether qualifiers are allowed in the id
+    :return: tuple(baseId, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier)
+    """
 
     baseID, anti, qualifier = miscModule.baseAntiQualifierFromID( id, qualifierAllowed = qualifierAllowed )
 
@@ -195,11 +164,19 @@ def chemicalElementALevelIDsAndAnti( id, qualifierAllowed = False ) :
     return( baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier )
 
 def ZAInfo( particle ) :
+    """
+    Compute Z, A, ZA and level index for a particle instance.
+
+    :param particle: PoPs particle instance. If the particle is not a baryon, isotope, nuclide or nucleus,
+        Z, A, ZA and level index will all be 0.
+    :return: tuple( Z, A, ZA, levelIndex ).
+    """
 
     from .. import IDs as IDsModule
     from ..families import nuclide as nuclideModule
     from ..families import nucleus as nucleusModule
     from ..families import baryon as baryonModule
+    from ..families import unorthodox as unorthodoxModule
     from . import isotope as isotopeModule
 
     level = 0
@@ -208,11 +185,11 @@ def ZAInfo( particle ) :
     if( isinstance( particle, ( isotopeModule.isotope, ) ) ) :
         Z = particle.Z
         A = particle.A
-    elif( isinstance( particle, ( nuclideModule.particle, ) ) ) :
+    elif( isinstance( particle, ( nuclideModule.particle, nuclideModule.alias ) ) ) :
         Z = particle.Z
         A = particle.A
         level = particle.index
-    elif( isinstance( particle, ( nucleusModule.particle, ) ) ) :
+    elif( isinstance( particle, ( nucleusModule.particle, nucleusModule.alias ) ) ) :
         Z = particle.Z
         A = particle.A
         level = particle.index
@@ -222,17 +199,90 @@ def ZAInfo( particle ) :
         if( particle.id == IDsModule.proton ) :
             Z = 1
             A = 1
+    elif( isinstance( particle, ( unorthodoxModule.particle, ) ) ) :
+        if( 'FissionProductENDL99120' == particle.id ) :
+            Z = 99
+            A = 120
+        elif( 'FissionProductENDL99125' == particle.id ) :
+            Z = 99
+            A = 125
+        elif len(particle.charge) > 0:
+            Z = particle.charge[0].value
 
     try :
-        return( Z, A, 1000 * Z + A, level )
+        return( Z, A, 1000 * Z + A, level )     # FIXME raise if it didn't match anything?
     except :
         raise
 
+def ZAInfo_fromString( particleName ):
+    """
+    Parses an isotope name (e.g., 'Mn55_e3') to get its Z, A, ZA and nuclear level index.
+    If the level is negative, the particle is a metastable name (e.g., 'Am242_m1').
+    The name can be an isotope which returns ( Z, A, 1000 * Z + A, level ) (e.g., 'O16' returns (8, 16, 8016, 0)), 
+    a natural isotope which returns ( Z, 0, 1000 * Z, level) (e.g., 'O0' returns (8, 0, 8000, 0)) 
+    or just a chemical element's symbol which returns ( Z, 0, 0, 0 ) (e.g., 'O' returns (8, 0, 0, 0)).
+    Also handles PoPs (GNDS) nucleus name which is the nucleus' isotope name but with the first character lower-cased
+    (e.g., 'o16' for the nucleus of Oyxgen-16) as well as 'n', 'p', 'd', 't', 'h' and 'a'.
+    Handles nuclear excited levels (e.g., 'Am242_e2' returns (95, 242, 95242, 2)) and nuclear metastables 
+    (e.g., 'Am242_m1' returns (95, 242, 95242, -1)).
+
+    :param particleName: string
+    :return: tuple( Z, A, ZA, levelIndex )
+    """
+
+    import re
+
+    if( len( particleName ) > 1 ) : particleName = particleName.capitalize( )
+
+    try :
+        return( {   'n' : ( 0, 1, 1, 0 ), 
+                    'p' : ( 1, 1, 1001, 0 ), 'd' : ( 1, 2, 1002, 0 ), 't' : ( 1, 3, 1003, 0 ),
+                    'h' : ( 2, 3, 2003, 0 ), 'a' : ( 2, 4, 2004, 0 )                            }[particleName] )
+    except :
+        pass
+
+
+    pattern = re.compile( "([A-Za-z]+)([0-9]+)(_[em])?([0-9]+)?" )
+    result = pattern.match( particleName )
+    if( result is None ) :
+        try :
+            Z = ZFromSymbol[particleName]                   # Assumes that particleName is just the chemical element part (e.g., 'Xe').
+        except :
+            Z = 0                                           # Not a valid isotope or chemical element name so return all 0's.
+        return( Z, 0, 0, 0 )
+
+    symbol, A, levelIndicator, level = result.groups( )
+
+    reconstructed = symbol + A
+    if( levelIndicator is not None ) :
+        if( level is not None ) : reconstructed += levelIndicator + level
+    if( particleName != reconstructed ) : return( 0, 0, 0, 0 )
+
+    A = int( A )
+    if( level is None ) :
+        level = 0
+    else :
+        level = int( level )
+        if( levelIndicator == '_m' ) : level = -level
+
+    Z = ZFromSymbol[symbol]
+
+    return( Z, A, 1000 * Z + A, level )
+
 def ZA( particle ) :
+    """
+    Uses ZAInfo to compute the particle ZA. See ZAInfo for more detail
+    """
 
     return( ZAInfo( particle )[2] )
 
 def idFromZAndA( Z, A ) :
+    """
+    Compute the PoPs id for a particle given Z and A
+    :param Z: atomic number (int)
+    :param A: nucleon number (int)
+    :return: string particle id
+    """
 
     from .. import IDs as IDsModule
 
@@ -240,15 +290,27 @@ def idFromZAndA( Z, A ) :
     return( isotopeSymbolFromChemicalElementIDAndA( symbolFromZ[Z], A ) )
 
 def idFromZA( ZA ) :
+    """
+    Compute the PoPs id for a particle given ZA
+    :param ZA: 1000 * Z + A  (int)
+    :return: string particle id
+    """
 
-    return( idFromZAndA( ZA / 1000, ZA % 1000 ) )
+    return( idFromZAndA( ZA // 1000, ZA % 1000 ) )
 
 def nucleusIDFromZAndA( Z, A ) :
+    """ Equivalent to calling nucleusIDFromNuclideID( idFromZAndA( Z, A ) ) """
 
     nucleusID = idFromZAndA( Z, A )
     return( nucleusID[0].lower( ) + nucleusID[1:] )
 
 def hasNucleus( particle, nucleusReturnsTrue = False ) :
+    """
+    Checks whether particle contains a nucleus.
+
+    :param particle: PoPs particle instance
+    :param nucleusReturnsTrue: boolean. If False, hasNucleus returns False when particle IS a nucleus instance
+    """
 
     from . import isotope as isotopeModule
     from ..families import nuclide as nuclideModule
@@ -271,9 +333,11 @@ def nuclideIDFromIsotopeSymbolAndIndex( isotopeSymbol, index ) :
     return( "%s_e%s" % ( isotopeSymbol, index ) )
 
 def nucleusIDFromNuclideID( nuclideID ) :
+    """ The nucleus id is computed from nuclide id by converting 1st letter to lower case """
 
     return( nuclideID[0].lower( ) + nuclideID[1:] )
 
 def nuclideIDFromNucleusID( nucleusID ) :
+    """ The nuclide id is computed from nucleus id by converting 1st letter to upper case """
 
     return( nucleusID[0].upper( ) + nucleusID[1:] )

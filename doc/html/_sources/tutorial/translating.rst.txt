@@ -1,5 +1,5 @@
 Basic translating between ENDF and GNDS
-======================================
+=======================================
 
 Fudge comes with a tool (fudge/bin/rePrint.py) for translating ENDF-6 evaluations to and from GNDS.
 For the purpose of demonstrating how Fudge works, in this tutorial we will reproduce the capability of rePrint.py
@@ -12,7 +12,7 @@ In both scripts (and all the others we will write), we will use the Python `argp
 manage the command line options of the scripts.  Before we get to that, lets just start by learning how to translate between ENDF and GNDS.
 
 Translating from ENDF into GNDS
-------------------------------
+-------------------------------
 Let's experiment with fudge in the Python shell.
 
 ::
@@ -77,9 +77,19 @@ In both cases, we may hand the ``toXMLList()`` member function extra processing 
 (in this case, we simply set 'verbosity' to 0 to indicate that we want the output to be quiet).
 
 Translating GNDS files back into ENDF
-------------------------------------
+-------------------------------------
 
 Now let us reconstruct the original ENDF file.  First we need to import an additional module that supports writing
+GNDS back to ENDF:
+
+    >>> from brownies.legacy.toENDF6 import toENDF6
+
+After this import, all
+GNDS back to ENDF:
+
+    >>> from brownies.legacy.toENDF6 import toENDF6
+
+After this import, all
 GNDS back to ENDF:
 
     >>> from site_packages.legacy.toENDF6 import toENDF6
@@ -198,28 +208,28 @@ MF 1 MT 460 are not yet translated). Other differences include:
 
 
 Reading GNDS XML files
----------------------
+----------------------
 
 If I didn't have pre-made instances of ``reactionSuite`` and ``covarianceSuite``, how would I read in the XML files?
-For this purpose, both the ``fudge.gnds.reactionSuite`` and ``fudge.gnds.covariances`` have the factory function ``readXML()``.
+For this purpose, both the ``fudge.reactionSuite`` and ``fudge.covariances`` have the factory function ``readXML()``.
 To use them do:
 
-    >>> from fudge.gnds import reactionSuite
-    >>> from fudge.gnds.covariances import covarianceSuite
+    >>> from fudge import reactionSuite
+    >>> from fudge.covariances import covarianceSuite
     >>> myOtherEval = reactionSuite.readXML( "n-001_H_001.gnds.xml" )
 
 This reads in the evaluation itself.  To read in the covariances, we need to tell the
 To use them do:
 
-    >>> from fudge.gnds import reactionSuite
-    >>> from fudge.gnds.covariances import covarianceSuite
+    >>> from fudge import reactionSuite
+    >>> from fudge.covariances import covarianceSuite
     >>> myOtherEval = reactionSuite.readXML( "n-001_H_001.gnds.xml" )
 
 This reads in the evaluation itself.  To read in the covariances, we need to tell the
 To use them do:
 
-    >>> from fudge.gnds import reactionSuite
-    >>> from fudge.gnds.covariances import covarianceSuite
+    >>> from fudge import reactionSuite
+    >>> from fudge.covariances import covarianceSuite
     >>> myOtherEval = reactionSuite.readXML( "n-001_H_001.gnds.xml" )
 
 This reads in the evaluation itself.  To read in the covariances, we need to tell the `covariances.readXML()` function
@@ -275,8 +285,8 @@ and optionally the  output file name.  This is my version of ``gnds2endf.py`` (d
 
     #! /usr/bin/env python
     import argparse, os
-    from fudge.gnds import reactionSuite
-    from fudge.gnds.covariances import covarianceSuite
+    from fudge import reactionSuite
+    from fudge.covariances import covarianceSuite
     
     # Process command line options
     parser = argparse.ArgumentParser(description='Translate GNDS into ENDF')

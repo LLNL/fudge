@@ -16,29 +16,29 @@
 #endif
 
 #include "general_evap.hpp"
-#include "math_util.hpp"
+#include "adapt_quad.hpp"
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-// **************** class general_evap_param ********************
-// ---------------- general_evap_param::get_integrals ------------------
+// **************** class Gevap::general_evap_param ********************
+// ---------------- Gevap::general_evap_param::get_integrals ------------------
 // Gets the integrals over this E_out bin
-void general_evap_param::get_integrals( coef_vector *value )
+void Gevap::general_evap_param::get_integrals( Coef::coef_vector *value )
 {
   *value = *current_Eout_int;
 }
 
-// **************** class general_evap ********************
-// ----------- general_evap::get_Ein_range --------------
+// **************** class Gevap::general_evap ********************
+// ----------- Gevap::general_evap::get_Ein_range --------------
 //  Gets the range of nontrivial incident energy bins; computes first_Ein and last_Ein
 // returns true if the threshold is too high for the energy bins
-bool general_evap::get_Ein_range( const dd_vector& sigma, const dd_vector& multiple,
-    const dd_vector& weight,
-    const Flux_List& e_flux, const Energy_groups& Ein_groups )
+bool Gevap::general_evap::get_Ein_range( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& multiple,
+    const Ddvec::dd_vector& weight,
+    const Lgdata::Flux_List& e_flux, const Egp::Energy_groups& Ein_groups )
 {
   double E_last;
 
-  general_evap_param initial_param;
+  Gevap::general_evap_param initial_param;
   bool done = initial_param.get_Ein_range( sigma, multiple, weight, e_flux,
                                          Ein_groups, &E_first, &E_last );
   if( done ) return true;
@@ -49,7 +49,7 @@ bool general_evap::get_Ein_range( const dd_vector& sigma, const dd_vector& multi
 }
 // ---------------- general_evap::setup_Eout_ints ------------------
 // Sets up the integrals over the E_out bins
-void general_evap::setup_Eout_ints( int order, Conserve conserve,
+void Gevap::general_evap::setup_Eout_ints( int order, Coef::Conserve conserve,
   const vector< double >& Eout_groups )
 {
   // ***** CODING ASSUMPTIONS *****
@@ -57,16 +57,16 @@ void general_evap::setup_Eout_ints( int order, Conserve conserve,
   // It is also assumed that the probability density is independent of incident energy.
   // *****************************
 
-  coef_vector new_link;
+  Coef::coef_vector new_link;
   E_out_ints.push_back( new_link );
-  list< coef_vector >::iterator new_entry = E_out_ints.end( );
-  --new_entry;   // points to the new coef_vector
+  std::list< Coef::coef_vector >::iterator new_entry = E_out_ints.end( );
+  --new_entry;   // points to the new Coef::coef_vector
   new_entry->set_order( order, conserve );  // identify space for the integrals
   vector< double >::const_iterator Eout_0 = Eout_groups.begin( );
   vector< double >::const_iterator Eout_1 = Eout_0;
   ++Eout_1;
-  dd_vector::const_iterator data_0 = begin( );
-  dd_vector::const_iterator data_1 = data_0;
+  Ddvec::dd_vector::const_iterator data_0 = begin( );
+  Ddvec::dd_vector::const_iterator data_1 = data_0;
   ++data_1;
 
   // synchronize the data
@@ -76,7 +76,8 @@ void general_evap::setup_Eout_ints( int order, Conserve conserve,
     ++data_1;
     if( data_1 == end( ) )
     {
-      FatalError( "general_evap::setup_Eout_ints", "All data below the lowest bin" );
+      Msg::FatalError( "Gevap::general_evap::setup_Eout_ints",
+		       "All data below the lowest bin" );
     }
   }
   while( *Eout_1 <= data_0->x )
@@ -85,7 +86,8 @@ void general_evap::setup_Eout_ints( int order, Conserve conserve,
     ++Eout_1;
     if( Eout_1 == Eout_groups.end( ) )
     {
-      FatalError( "general_evap::setup_Eout_ints", "All data above the highest bin" );
+      Msg::FatalError( "Gevap::general_evap::setup_Eout_ints",
+		       "All data above the highest bin" );
     }
   }
 
@@ -95,11 +97,11 @@ void general_evap::setup_Eout_ints( int order, Conserve conserve,
     double E_1 = ( data_1->x > *Eout_1 ) ? *Eout_1 : data_1->x;
     double probability = data_0->y;
     double dE = E_1 - E_0;
-    if( ( conserve == NUMBER ) || ( conserve == BOTH ) )
+    if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) )
     {
       new_entry->weight_1[ 0 ] += probability * dE;
     }
-    if( ( conserve == ENERGY ) || ( conserve == BOTH ) )
+    if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) )
     {
       new_entry->weight_E[ 0 ] += probability * dE * ( E_0 + E_1 ) / 2;
     }
@@ -122,7 +124,7 @@ void general_evap::setup_Eout_ints( int order, Conserve conserve,
       }
       E_out_ints.push_back( new_link );
       new_entry = E_out_ints.end( );
-      --new_entry;   // points to the new coef_vector
+      --new_entry;   // points to the new Coef::coef_vector
       new_entry->set_order( order, conserve );  // identify space for the integrals
     }
     else if( data_1->x > *Eout_1 )
@@ -141,41 +143,42 @@ void general_evap::setup_Eout_ints( int order, Conserve conserve,
       }
       E_out_ints.push_back( new_link );
       new_entry = E_out_ints.end( );
-      --new_entry;   // points to the new coef_vector
+      --new_entry;   // points to the new Coef::coef_vector
       new_entry->set_order( order, conserve );  // identify space for the integrals
     }
   }
   check_sum( );
 }
-// ---------------- general_evap::check_sum ------------------
+// ---------------- Gevap::general_evap::check_sum ------------------
 // The probability integals for outgoing energy should add to 1
-void general_evap::check_sum( )
+void Gevap::general_evap::check_sum( )
 {
   double sum = 0.0;
   static double quad_tol = Global.Value( "quad_tol" );
-  for( list< coef_vector >::const_iterator one_term = E_out_ints.begin( );
+  for( std::list< Coef::coef_vector >::const_iterator one_term = E_out_ints.begin( );
        one_term != E_out_ints.end( ); ++one_term )
   {
     sum += one_term->weight_1[ 0 ];
   }
-  if( abs( sum - 1.0 ) > quad_tol )
+  if( std::abs( sum - 1.0 ) > quad_tol )
   {
-    Warning( "general_evap::check_sum",
-           pastenum( "The norm should be 1; it is ", sum ) );
+    Msg::Warning( "Gevap::general_evap::check_sum",
+           Msg::pastenum( "The norm should be 1; it is ", sum ) );
   }
 }
-// ---------------- general_evap::next_ladder ------------------
+// ---------------- Gevap::general_evap::next_ladder ------------------
 // Sets up the integrals over the E_out bins
 // Go to the next pair of incident energies.  Returns "true" when finished.
-bool general_evap::next_ladder( double E_in, general_evap_param *Ein_param )
+bool Gevap::general_evap::next_ladder( double E_in, Gevap::general_evap_param *Ein_param )
 {
   bool done = Ein_param->update_bin_pointers( E_in );
   return done;
 }
-// ---------------- general_evap::Eout_ladder ------------------
+// ---------------- Gevap::general_evap::Eout_ladder ------------------
 // Sets up the integrals over the E_out bins
 // Adds to the transfer matrix for all E_out bins for a pair of incident energies.
-void general_evap::Eout_ladder( T_matrix& transfer, general_evap_param *Ein_param )
+void Gevap::general_evap::Eout_ladder( Trf::T_matrix& transfer,
+				       Gevap::general_evap_param *Ein_param )
 {
   Ein_param->current_Eout_int = E_out_ints.begin( );
   vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( );
@@ -187,17 +190,17 @@ void general_evap::Eout_ladder( T_matrix& transfer, general_evap_param *Ein_para
     update_T( transfer, Eout_count, Ein_param );
   }
 }
-// ---------------- general_evap::update_T ------------------
+// ---------------- Gevap::general_evap::update_T ------------------
 // Sets up the integrals over the E_out bins
 // Adds to an element of transfer the integral over the E-E' box
-void general_evap::update_T( T_matrix &transfer, int Eout_count,
-     general_evap_param *Ein_param )
+void Gevap::general_evap::update_T( Trf::T_matrix &transfer, int Eout_count,
+     Gevap::general_evap_param *Ein_param )
 {
   // a vector to store the integrals
-  coef_vector value( transfer.order, transfer.conserve );
+  Coef::coef_vector value( transfer.order, transfer.conserve );
 
   // parameters for the integration
-  QuadParamBase *params = static_cast< QuadParamBase* >( Ein_param );
+  Qparam::QuadParamBase *params = static_cast< Qparam::QuadParamBase* >( Ein_param );
 
   // loop over the cross section data
   Ein_param->this_sigma = Ein_param->first_ladder_sigma;
@@ -220,13 +223,14 @@ void general_evap::update_T( T_matrix &transfer, int Eout_count,
       Ein_param->next_sigma->x;
     static double tol = Global.Value( "quad_tol" );  // the default tolerance
     // evaluate the integral
-    quad_F::integrate( general_evap_F::Ein_F, transfer.Ein_quad_method, left_E,
+    quad_F::integrate( general_evap_F::Ein_F, transfer.Ein_quad_rule, left_E,
 		       right_E, params, tol, &value );
 
     if( value.weight_1[ 0 ] < 0.0 )
     {
-      Warning( "energy_function::update_T", pastenum( "negative integral ", left_E ) +
-               pastenum(" ", right_E ) );
+      Msg::Warning( "energy_function::update_T",
+		    Msg::pastenum( "negative integral ", left_E ) +
+               Msg::pastenum(" ", right_E ) );
       value.set_zero( );  // throw out these values
     }
 
@@ -237,18 +241,18 @@ void general_evap::update_T( T_matrix &transfer, int Eout_count,
     Ein_param->quad_count += 1;
   }
 }
-// ---------------- general_evap::theta_OK ------------------
+// ---------------- Gevap::general_evap::theta_OK ------------------
 // The code currently handles only theta = constant
-bool general_evap::theta_OK( )
+bool Gevap::general_evap::theta_OK( )
 {
   bool is_OK = true;
-  static double abs_tol = Global.Value( "abs_tol" );
-  dd_vector::const_iterator this_theta = theta.begin( );
+  static double abs_tol = Global.Value( "tight_tol" );
+  Ddvec::dd_vector::const_iterator this_theta = theta.begin( );
   double first_theta = this_theta->y;
 
   for( ++this_theta; this_theta != theta.end( ); ++this_theta )
   {
-    if( abs( this_theta->y - first_theta ) > abs_tol*first_theta )
+    if( std::abs( this_theta->y - first_theta ) > abs_tol*first_theta )
     {
       is_OK = false;
       break;
@@ -256,24 +260,26 @@ bool general_evap::theta_OK( )
   }
   return is_OK;
 }
-// ---------------- general_evap::get_T ------------------
+// ---------------- Gevap::general_evap::get_T ------------------
 // Sets up the integrals over the E_out bins
 // Calculates the transfer matrix for this particle
-void general_evap::get_T( const dd_vector& sigma, const dd_vector& multiple, 
-    const dd_vector& weight, T_matrix& transfer )
+void Gevap::general_evap::get_T( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& multiple, 
+    const Ddvec::dd_vector& weight, Trf::T_matrix& transfer )
 {
-  if( interp_type != LINLIN )
+  if( interp_type != Terp::LINLIN )
   {
-    FatalError( "general_evap::get_T", "interp_type not implemented" );
+    Msg::FatalError( "Gevap::general_evap::get_T",
+		     "interp_type not implemented" );
   }
   if( !theta_OK( ) )
   {
-    FatalError( "general_evap::get_T", "only theta = constant is implemented" );
+    Msg::FatalError( "Gevap::general_evap::get_T",
+		     "only theta = constant is implemented" );
   }
 
   // Scale the x-data by 1/Theta and renorm
   scale_E( theta.begin( )->y );
-  renorm( );
+  renorm( false );
 
   bool done = get_Ein_range( sigma, multiple, weight, transfer.e_flux,
     transfer.in_groups );
@@ -284,6 +290,7 @@ void general_evap::get_T( const dd_vector& sigma, const dd_vector& multiple,
 
   // Set up the integrals over outgoing energy
   setup_Eout_ints( transfer.order, transfer.conserve, transfer.out_groups );
+  transfer.threshold = sigma.begin( )->x;
 
   long int quad_count = 0;  // number of 2-d quadratures
   long int Ein_F_count = 0;  // number of calls to general_evap_F::E_quad_F
@@ -295,7 +302,7 @@ void general_evap::get_T( const dd_vector& sigma, const dd_vector& multiple,
   // now do the integrals over the incident energy bins
   for( int Ein_bin = first_Ein; Ein_bin < last_Ein; ++Ein_bin )
   {
-    general_evap_param Ein_param;
+    Gevap::general_evap_param Ein_param;
     // set up the data range for this bin
     Ein_param.setup_bin( Ein_bin, sigma, multiple, weight, transfer.e_flux,
                          transfer.in_groups );
@@ -316,18 +323,18 @@ void general_evap::get_T( const dd_vector& sigma, const dd_vector& multiple,
   } // end of parallel loop
 
   // print the counts of function evaluations
-  cout << "1d quadratures: " << quad_count << endl;
-  cout << "general_evap_F::Ein_F calls: " << Ein_F_count << endl;
-  cout << "average general_evap_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << endl;
+  std::cout << "1d quadratures: " << quad_count << std::endl;
+  std::cout << "general_evap_F::Ein_F calls: " << Ein_F_count << std::endl;
+  std::cout << "average general_evap_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << std::endl;
  }
 
 // ************** general_evap_F::Ein_F ******************************
 // Integral function for the model
-void general_evap_F::Ein_F( double E_in, QuadParamBase *Ein_param,
-   coef_vector *value )
+bool general_evap_F::Ein_F( double E_in, Qparam::QuadParamBase *Ein_param,
+   Coef::coef_vector *value )
 {
-  // the parameters are really general_evap_param *
-  general_evap_param *e_params = static_cast<general_evap_param *>( Ein_param );
+  // the parameters are really Gevap::general_evap_param *
+  Gevap::general_evap_param *e_params = static_cast<Gevap::general_evap_param *>( Ein_param );
   e_params->func_count += 1;
 
   e_params->get_integrals( value );
@@ -335,4 +342,6 @@ void general_evap_F::Ein_F( double E_in, QuadParamBase *Ein_param,
   // weight it by flux * cross section * multiplicity * model_weight
   e_params->set_weight( E_in );
   *value *= e_params->current_weight;
+
+  return true;
 }

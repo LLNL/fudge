@@ -2,7 +2,6 @@ xndfgenTransferMatrix: version 1.0
 Process: Uncorrelated energy-angle data transfer matrix
 Comment: n + Co58 --> sumOfRemainingOutputChannels outgoing data for n
 outputLegendreOrder: 3
-# Quadrature method: Gauss6
 Projectile Frame: lab
 
 # The energies in this file are all in eV.

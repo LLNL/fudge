@@ -16,11 +16,14 @@
 
 #include "energy_function.hpp"
 
+namespace MNix
+{
+
 class MadlandNix_param;
 
 //! Class for the Madland-Nix model
 // ---------------- class MadlandNix ------------------
-class MadlandNix : public energy_function
+class MadlandNix : public Efunc::energy_function
 {
 private:
 public:
@@ -39,29 +42,29 @@ public:
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param e_flux approximate flux used to weight the transfer matrix
   //! \param Ein_groups the boundaries of the incident energy groups
-  bool get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
-    const dd_vector& weight,
-    const Flux_List& e_flux, const Energy_groups& Ein_groups );
+  bool get_Ein_range( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& mult,
+    const Ddvec::dd_vector& weight,
+    const Lgdata::Flux_List& e_flux, const Egp::Energy_groups& Ein_groups );
 
   //! Calculates the transfer matrix for this particle
   //! \param sigma the cross section data
   //! \param multiple the multiplicity of the outgoing particle
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param transfer the computed transfer matrix
-  void get_T( const dd_vector& sigma, const dd_vector& multiple,
-    const dd_vector& weight, T_matrix& transfer );
+  void get_T( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& multiple,
+    const Ddvec::dd_vector& weight, Trf::T_matrix& transfer );
 
   // *** Implement the virtual functions ***
   // Initializes the quadrature parameters
   //! \param Eout_groups the boundaries of the outgoing energy groups
   //! \param Ein_param parameters for integration over incident energy
-  void setup_data( const Energy_groups& Eout_groups,
-			  E_function_param *Ein_param );
+  void setup_data( const Egp::Energy_groups& Eout_groups,
+			  Efunc::E_function_param *Ein_param );
 
   //! Sets the range of incident energies for this intergration
   //! \param Ein_bin identifies the incident energy bin
   //! \param Ein_param parameters for integration over incident energy
-  inline void set_Ein_range( int Ein_bin, E_function_param *Ein_param )
+  inline void set_Ein_range( int Ein_bin, Efunc::E_function_param *Ein_param )
   {
     set_Ein_range_default( Ein_bin, Ein_param );
   }
@@ -69,7 +72,7 @@ public:
   //! Go to the next pair of incident energies.  Returns "true" when finished.
   //! \param E_in the next incident energy
   //! \param Ein_param parameters for integration over incident energy
-  inline bool next_ladder( double E_in, E_function_param *Ein_param )
+  inline bool next_ladder( double E_in, Efunc::E_function_param *Ein_param )
   {
     return next_ladder_default( E_in, Ein_param );
   }
@@ -78,7 +81,7 @@ public:
 
 //! Class for parameters for the Madland-Nix model
 // ---------------- class MadlandNix_param ------------------
-class MadlandNix_param : public E_function_param
+class MadlandNix_param : public Efunc::E_function_param
 {
 private:
   //! Parameter alpha = sqrt( TM )
@@ -163,20 +166,16 @@ public:
 
   // *** Implement the virtual functions ***
   //! Interpolate the parameters
+  //! Retruns true if the interpolation is OK
   //! \param E_in energy of the incident particle
-  void set_Ein( double E_in );
+  bool set_Ein( double E_in );
 
   //! Gets the integrals over outgoing energy
+  //! Retruns true if the interpolation is OK
   //! \param Eout_0 lower limit of the integral over outgoing energy
   //! \param Eout_1 upper limit of the integral over outgoing energy
   //! \param value the computed integral
-  void get_integrals( double Eout_0, double Eout_1, coef_vector &value );
-
-  //! Gets the integrals over outgoing energy and returns the noise in the calculation
-  //! \param Eout_0 lower limit of the integral over outgoing energy
-  //! \param Eout_1 upper limit of the integral over outgoing energy
-  //! \param value the computed integral
-  double tol_get_integrals( double Eout_0, double Eout_1, coef_vector &value );
+  bool get_integrals( double Eout_0, double Eout_1, Coef::coef_vector &value );
 
   //! Integrate from 0 to E_max to get the norm
   double get_norm( );
@@ -190,5 +189,7 @@ public:
   double set_tol( double left_E, double right_E );
   // *** End of the virtual functions ***
 };
+
+} // end of namespace MNix
 
 #endif

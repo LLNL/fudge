@@ -8,7 +8,9 @@ the rest mass of the residual, but this is not used.  You will get a
 warning message if the calculated rest mass of the residual differs
 too much from the one you provide.
 
-The computation is done with Newtonian mechanics if the input file
+Relativistic mechanics is used if the incident particle or one of the
+outgoing particles is a photon.  Otherwise,
+the computation is done with Newtonian mechanics if the input file
 contains the line
 kinetics: Newtonian
 To specify relativistic mechanics, include the line
@@ -47,6 +49,19 @@ in.Ag110m.rel: This file is for inelastic scattering with a positive Q value, an
 
 in.DD: This file for D + D -> T + p is special in that the outgoing triton is
   so heavy that zero velocity in the lab frame is possible with Q > 0.
-  The kinetics is Newtonian.
+  The kinetics is Newtonian.  The output is out.DD.
 
-in.DD.rel: the relativistic version of the DD file.
+in.DD.rel: the relativistic version of the in.DD file.
+
+in.DT: This file is for the outgoing He4_e1 in the
+  H2 + H3 --> n + He4_e1 reaction.  This is another example of the need
+  for care when mass ratios are unusual.  The output file is out.DT.
+
+in.DT.rel: This the relativistic version of the in.DT file.
+
+in.photon_out: data for the outgoing photon in the
+  H2 + H3 --> (He5 -> n + He4) + photon reaction.  The output file is
+  out.photon_out.
+
+in.photon_res: data for the outgoing deuteron in the
+  n + H1 --> H2 + gamma reaction.  The output file is out.photon_res.

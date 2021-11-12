@@ -1,108 +1,79 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 import os
 import argparse
 
-from fudge.lib import GNDSType as GNDSTypeModule
+from xData import formatVersion as formatVersionModule
 from PoPs import database as databaseModule
+from LUPY import GNDSType as GNDSTypeModule
 
-description1 = """Read one or more GNDS files into Fudge, then write back to GNDS/xml.  Intent is to test 
-    for errors during reading or writing.  Sample use: python gnds2gnds.py n-001_H_001.xml n-001_H_002.xml ...
-    If file n-001_H_001-cov.xml (or -covar.xml) exists, covariances will automatically be read and re-written.
-    Resulting files will be in the local directory, and will have extension '.g2g' appended.
+extensionDefault = '.g2g'
+
+description1 = """Read a GNDS file into Fudge, then write back to the GNDS/xml format.  Intent is to test 
+for errors during reading or writing.  Sample usage: python gnds2gnds.py n-001_H_001.xml 
+If file n-001_H_001-cov.xml (or -covar.xml) exists, covariances will automatically be read and re-written.
+The output file's path and extension can be set via the -p and -e options respectively. If the 'output' argument
+is specified, the path and extension arguments are ignored and it is used as the name of the output file.
 """
 
 __doc__ = description1
 
 parser = argparse.ArgumentParser( description1 )
-parser.add_argument( 'gnds', nargs = '+',                                       help = 'GNDS and/or PoPs file(s) to translate' )
-parser.add_argument( '-o', '--outline', default = False, action = 'store_true', help = 'The outputted GNDS files are written in outline mode' )
-parser.add_argument( '--energyUnit', type = str, default = None,                help = 'Convert all energies in the gnds file to this unit.' )
+parser.add_argument( 'input',                                                           help = 'GNDS and/or PoPs file to translate.' )
+parser.add_argument( 'output', nargs = '?', default = None,                             help = 'The name of the output file.' )
+parser.add_argument( '-e', '--extension', default = extensionDefault,                   help = 'The file extension to add to the output file. Default = "%s"' % extensionDefault )
+parser.add_argument( '-o', '--outline', default = False, action = 'store_true',         help = 'The outputted GNDS files are written in outline mode.' )
+parser.add_argument( '-p', '--path', default = None,                                    help = 'Path to write the file to. If absent, sent to same location as input.' )
+parser.add_argument( '--energyUnit', type = str, default = None,                        help = 'Convert all energies in the gnds file to this unit.' )
+parser.add_argument( '--hybrid', default = False, action = 'store_true',                help = 'Write out hybrid XML/HDF5' )
+parser.add_argument( '--minLength', type = int, default = 50,                           help = 'Min length of datasets to store in HDF5' )
+parser.add_argument( '--flatten', default = False, action = 'store_true',               help = 'Use flattened arrays in HDF5' )
+parser.add_argument( '--compress', default = False, action = 'store_true',              help = 'Use gzip + shuffle compression in HDF5' )
+parser.add_argument( '--formatVersion', default = formatVersionModule.default, choices = formatVersionModule.allowed,
+                                                                                        help = 'Specifies the GNDS format for the outputted file.  Default = "%s".' % formatVersionModule.default )
 
-if __name__ == '__main__' :
-    args = parser.parse_args()
+if( __name__ == '__main__' ) :
 
-    for fileName in args.gnds :
+    args = parser.parse_args( )
 
-        covariance = None
-        name, dummy = GNDSTypeModule.type( fileName )
-        if( name == databaseModule.database.moniker ) :
-            gnds = GNDSTypeModule.read( fileName )
-        else :
-            covarianceFileName = None
-            for extension in ( '-cov.xml', '-covar.xml' ) :
-                tmp = fileName.replace( '.xml', extension )
-                if( os.path.exists( tmp ) ) : covarianceFileName = tmp
+    fileName = args.input
 
-            gnds = GNDSTypeModule.read( fileName )
-            if( covarianceFileName is not None ) :
-                covariance = GNDSTypeModule.read( covarianceFileName, reactionSuite = gnds )
+    covariances = []
+    name, dummy = GNDSTypeModule.type( fileName )
+    if( name == databaseModule.database.moniker ) :
+        gnds = GNDSTypeModule.read( fileName )
+    else :
+        gnds = GNDSTypeModule.read( fileName )
+        if hasattr(gnds, 'loadCovariances'):
+            covariances = gnds.loadCovariances()
 
-        if( args.energyUnit is not None ) :
-            gnds.convertUnits( { 'MeV' : args.energyUnit, 'eV' : args.energyUnit } )
-            if( covariance is not None ) : covariance.convertUnits( { 'MeV' : args.energyUnit, 'eV' : args.energyUnit } )
-        gnds.saveToFile( os.path.basename( fileName ) + '.g2g', outline = args.outline, xs_pdf_cdf1d_singleLine = True )
-        if( covariance is not None ) : covariance.saveToFile( os.path.basename( covarianceFileName ) + '.g2g' )
+    if( args.energyUnit is not None ) :
+        gnds.convertUnits( { 'MeV' : args.energyUnit, 'eV' : args.energyUnit } )
+        for covarianceSuite in covariances:
+            covarianceSuite.convertUnits( { 'MeV' : args.energyUnit, 'eV' : args.energyUnit } )
+
+    output = args.output
+    path = args.path
+    extension = args.extension
+
+    if( output is None ) :
+        if( path is None ) : path = os.path.dirname( fileName )
+        output = os.path.join( path, os.path.basename( fileName ) ) + extension
+
+    if args.hybrid:
+        kwargs = {'minLength':args.minLength, 'flatten':args.flatten, 'compress':args.compress}
+        gnds.saveToHybrid( output, formatVersion = args.formatVersion, **kwargs )
+        # FIXME support hybrid storage for covariances
+    else:
+        gnds.saveToFile( output, outline = args.outline, xs_pdf_cdf1d_singleLine = True, formatVersion = args.formatVersion )
+
+    for covarianceSuite in covariances:
+        output = os.path.join( os.path.dirname( output ), os.path.basename( covarianceSuite.sourcePath ) ) + extension
+        covarianceSuite.saveToFile( output, formatVersion = args.formatVersion )

@@ -1,6 +1,6 @@
 <lepton id="e-" generation="electronic">
   <mass>
-    <double label="base" value="0.00054857990907" unit="amu"/></mass>
+    <double label="base" value="5.4857990907e-4" unit="amu"/></mass>
   <spin>
     <fraction label="base" value="1/2" unit="hbar"/></spin>
   <parity>
@@ -13,7 +13,7 @@
 <leptons>
   <lepton id="e-" generation="electronic">
     <mass>
-      <double label="base" value="0.00054857990907" unit="amu"/></mass>
+      <double label="base" value="5.4857990907e-4" unit="amu"/></mass>
     <spin>
       <fraction label="base" value="1/2" unit="hbar"/></spin>
     <parity>

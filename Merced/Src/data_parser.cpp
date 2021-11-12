@@ -19,12 +19,12 @@
 
 // ------------------- string_F::remove_all_blanks -------------------------
 // Removes all blanks from a string.
-void string_F::remove_all_blanks( string &s )
+void string_F::remove_all_blanks( std::string &s )
 {
   if( s.size() <= 0 ) return;
 
-  string::size_type nspace = s.find(' ');
-  while ( nspace != string::npos )
+  std::string::size_type nspace = s.find(' ');
+  while ( nspace != std::string::npos )
   {
     s.erase( nspace, 1 );
     nspace = s.find(' ');
@@ -32,12 +32,12 @@ void string_F::remove_all_blanks( string &s )
 }
 // ------------------- string_F::remove_final_blanks -------------------------
 // Removes final blanks from a string.
-void string_F::remove_final_blanks( string &s )
+void string_F::remove_final_blanks( std::string &s )
 {
   if( s.size() <= 0 ) return;
   {
-    string::size_type nspace = s.rfind(' ');
-    while ( nspace == s.size()-1 )
+    std::string::size_type nspace = s.rfind(' ');
+    while ( ( s.size( ) > 0 ) && ( nspace == s.size()-1 ) )
     {
       s.erase( s.size()-1,1);
       nspace = s.rfind(' ');
@@ -46,10 +46,10 @@ void string_F::remove_final_blanks( string &s )
 }
 // ------------------- string_F::Tolower -------------------------
 // A function that lower-cases strings
-void string_F::Tolower( string& s)
+void string_F::Tolower( std::string& s)
 {
-  string::size_type length = s.length();
-  for ( string::size_type i = 0; i < length; i++ )
+  std::string::size_type length = s.length();
+  for ( std::string::size_type i = 0; i < length; i++ )
   {
     char this_c = tolower( s[i] );
     s[ i ] = this_c;
@@ -57,22 +57,23 @@ void string_F::Tolower( string& s)
 }
 
 // ********************* data_parser class ******************
-// ------------------- data_parser::data_parser ---------------
+// ------------------- Dpar::data_parser::data_parser ---------------
 // Constructor
-data_parser::data_parser( const string &inFileName )
+Dpar::data_parser::data_parser( const std::string &inFileName )
 {
-  infile.open( inFileName.c_str( ), ios_base::in );
+  infile.open( inFileName.c_str( ), std::ios_base::in );
   if( !infile )
   {
-    FatalError( "data_parser::data_parser", "No input file: " + inFileName );
+    Msg::FatalError( "data_parser::data_parser",
+		     "No input file: " + inFileName );
   }
   next_line = "";
-  pos = string::npos;
+  pos = std::string::npos;
   line_count = 0;
 }
-// ------------------- data_parser::get_new_line ---------------
+// ------------------- Dpar::data_parser::get_new_line ---------------
 // Reads in a new line and deletes trailing blanks, returns "false" at end of file
-bool data_parser::get_new_line( )
+bool Dpar::data_parser::get_new_line( )
 {
   bool got_more = infile.good( );
   while( got_more )
@@ -86,12 +87,12 @@ bool data_parser::get_new_line( )
     }
     original_line = next_line;
     // Delete '\r' from files uploaded from a Mac.
-    string::size_type r_pos = next_line.find_last_of( "\r" );
-    if( r_pos != string::npos )
+    std::string::size_type r_pos = next_line.find_last_of( "\r" );
+    if( r_pos != std::string::npos )
     {
       next_line.erase( r_pos, 1 );
     }
-    string::size_type pound_loc = next_line.find( '#' );  // look for comment marker
+    std::string::size_type pound_loc = next_line.find( '#' );  // look for comment marker
     if( pound_loc <= next_line.size( ) )
     {
       next_line = next_line.erase( pound_loc, next_line.size( ) );
@@ -105,22 +106,22 @@ bool data_parser::get_new_line( )
   return got_more;
 }
 
-// ------------------- data_parser::get_dataID ---------------
+// ------------------- Dpar::data_parser::get_dataID ---------------
 // Gets the data identifier
-string data_parser::get_dataID( )
+std::string Dpar::data_parser::get_dataID( )
 {
-  string dataID;
-  if( pos == string::npos )
+  std::string dataID;
+  if( pos == std::string::npos )
   {
     if( !get_new_line( ) )
     {
-      //      Info( "data_parser::get_dataID", "End of input" );
+      //      Msg::Info( "Dpar::data_parser::get_dataID", "End of input" );
       dataID = "DONE";
     }
     else
     {
       pos = next_line.find_first_of( ':' );
-      if( pos == string::npos )
+      if( pos == std::string::npos )
       {
 	dataID = "Bad dataID";
       }
@@ -134,54 +135,56 @@ string data_parser::get_dataID( )
   return dataID;
 }
 
-// ------------------- data_parser::get_next_int ---------------
+// ------------------- Dpar::data_parser::get_next_int ---------------
 // Gets the next integer in next_line, starting at pos
-int data_parser::get_next_int(  )
+int Dpar::data_parser::get_next_int(  )
 {
-  if( pos == string::npos )
+  if( pos == std::string::npos )
   {
     if( !get_new_line( ) )
     {
-      FatalError( "data_parser::get_next_int", "End of input" );
+      Msg::FatalError( "Dpar::data_parser::get_next_int",
+		       "End of input" );
     }
     pos = 0;
   }
-  string numerics( "+-0123456789" );
+  std::string numerics( "+-0123456789" );
   pos = next_line.find_first_of( numerics, pos );
-  string::size_type next_pos = next_line.find_first_of( " ", pos );
-  string number = next_line.substr( pos, next_pos - pos );
-  pos = ( next_pos == string::npos ) ? next_pos : next_pos + 1;
+  std::string::size_type next_pos = next_line.find_first_of( " ", pos );
+  std::string number = next_line.substr( pos, next_pos - pos );
+  pos = ( next_pos == std::string::npos ) ? next_pos : next_pos + 1;
   return atoi( number.c_str( ) );
 }
 
-// ------------------- data_parser::get_next_double ---------------
+// ------------------- Dpar::data_parser::get_next_double ---------------
 // Gets the next double in next_line, starting at pos
-double data_parser::get_next_double( )
+double Dpar::data_parser::get_next_double( )
 {
-  if( pos == string::npos )
+  if( pos == std::string::npos )
   {
     if( !get_new_line( ) )
     {
-      FatalError( "data_parser::get_next_double", "End of input" );
+      Msg::FatalError( "Dpar::data_parser::get_next_double",
+		       "End of input" );
     }
     pos = 0;
   }
-  string numerics( "+-0123456789" );
+  std::string numerics( "+-0123456789" );
   pos = next_line.find_first_of( numerics, pos );
-  string::size_type next_pos = next_line.find_first_of( " ", pos );
-  string number = next_line.substr( pos, next_pos - pos );
-  pos = ( next_pos == string::npos ) ? next_pos : next_pos + 1;
+  std::string::size_type next_pos = next_line.find_first_of( " ", pos );
+  std::string number = next_line.substr( pos, next_pos - pos );
+  pos = ( next_pos == std::string::npos ) ? next_pos : next_pos + 1;
   return atof( number.c_str( ) );
 }
 
-// ------------------- data_parser::get_text ---------------
+// ------------------- Dpar::data_parser::get_text ---------------
 //! Extracts text to the end of this line
-string data_parser::get_text( )
+std::string Dpar::data_parser::get_text( )
 {
   // remove possible single quotes
-  string::size_type prev_pos = next_line.find_first_of( "'", pos );
-  string::size_type next_pos;
-  if( prev_pos == string::npos )
+  std::string::size_type prev_pos = next_line.find_first_of( "'", pos );
+  std::string::size_type next_pos;
+  if( prev_pos == std::string::npos )
   {
     next_pos = prev_pos;
     prev_pos = pos;
@@ -192,37 +195,39 @@ string data_parser::get_text( )
     next_pos = next_line.find_last_of( "'" );
     if( next_pos < prev_pos )
     {
-      Warning( "data_parser::get_text", "unmatched single quotes" );
-      next_pos = string::npos;
+      Msg::Warning( "Dpar::data_parser::get_text",
+		    "unmatched single quotes" );
+      next_pos = std::string::npos;
     }
   }
   // remove initial spaces
-  string::size_type length = next_line.length( );
-  for ( string::size_type i = prev_pos; (i < length) && isspace( next_line[i] ); i++ )
+  std::string::size_type length = next_line.length( );
+  for ( std::string::size_type i = prev_pos;
+	(i < length) && isspace( next_line[i] ); i++ )
   {
     ++prev_pos;
   }
-  pos = string::npos;
+  pos = std::string::npos;
   return next_line.substr( prev_pos, next_pos - prev_pos );
 }
 
-// ------------------- data_parser::get_comment ---------------
+// ------------------- Dpar::data_parser::get_comment ---------------
 // Reads a comment
-void data_parser::get_comment( ofstream &output_file )
+void Dpar::data_parser::get_comment( std::ofstream &output_file )
 {
-  string Comment = next_line.substr( pos, next_line.size( ) );
-  output_file << "Comment: " << Comment << endl;
-  Info( "Comment", Comment );
-  pos = string::npos;
+  std::string Comment = next_line.substr( pos, next_line.size( ) );
+  output_file << "Comment: " << Comment << std::endl;
+  Msg::Info( "Comment", Comment );
+  pos = std::string::npos;
 }
-// ------------------- data_parser::read_2d_interp ---------------
+// ------------------- Dpar::data_parser::read_2d_interp ---------------
 // Reads the interpolation rule for 2-dimensional tables
-void data_parser::read_2d_interp( string *interpolation, string *qualifier )
+void Dpar::data_parser::read_2d_interp( std::string *interpolation, std::string *qualifier )
 {
-  string rule = get_text( );
+  std::string rule = get_text( );
   string_F::Tolower( rule );
-  string::size_type space_pos = rule.find_first_of( " " );
-  if( space_pos == string::npos )
+  std::string::size_type space_pos = rule.find_first_of( " " );
+  if( space_pos == std::string::npos )
   {
     // histogram in incident energy is special
     if( rule == "flat" )
@@ -232,7 +237,8 @@ void data_parser::read_2d_interp( string *interpolation, string *qualifier )
     }
     else
     {
-      FatalError( " data_parser::read_2d_interp", "no qualifier found" );
+      Msg::FatalError( " Dpar::data_parser::read_2d_interp",
+		       "no qualifier found" );
     }
   }
   else

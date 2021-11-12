@@ -1,36 +1,56 @@
 \subsection{Functions}
-This section decribes all the routines in the file "ptwXY\_functions.c".
+This section decribes all the functions in the file ``ptwXY\_functions.c''.
 
 \subsubsection{ptwXY\_pow}
 \setargumentNameLengths{ptwXY}
-This routine applies the math operation $y_i = y_i^{p}$ to the y-values of \highlight{ptwXY}.
-\CallingC{fnu\_status ptwXY\_pow(}{ptwXYPoints *ptwXY,
+This function applies the math operation $y_i = y_i^{p}$ to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_pow(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{double p );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{p}{The exponent.}
     \vskip 0.05 in \noindent
-This routine infills to maintain the initial accuracy.
+This function infills to maintain the initial accuracy.
 
 \subsubsection{ptwXY\_exp}
 \setargumentNameLengths{ptwXY}
-This routine applies the math operation $y_i = \exp( a \, y_i )$ to the y-values of \highlight{ptwXY}.
-\CallingC{fnu\_status ptwXY\_exp(}{ptwXYPoints *ptwXY,
+This function applies the math operation $y_i = \exp( a \, y_i )$ to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_exp(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{double a );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{a}{The exponent coefficient.}
     \vskip 0.05 in \noindent
-This routine infills to maintain the initial accuracy.
+This function infills to maintain the initial accuracy.
 
 \subsubsection{ptwXY\_convolution}
-This routine returns the convolution of \highlight{ptwXY1} and \highlight{ptwXY2}.
-\setargumentNameLengths{status}
-\CallingC{ptwXYPoints *ptwXY\_convolution(}{ptwXYPoints *ptwXY1,
+This function returns the convolution of \highlight{ptwXY1} and \highlight{ptwXY2}.
+\setargumentNameLengths{ptwXY1}
+\CallingC{ptwXYPoints *ptwXY\_convolution(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY1,}
     \addArgument{ptwXYPoints *ptwXY2,}
-    \addArgument{nfu\_status *status,}
     \addArgument{int mode );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
     \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
-    \argumentBox{status}{On return, the status value.}
     \argumentBox{mode}{Flag to determine the initial x-values for calculating the convolutions.}
     \vskip 0.05 in \noindent
 User should set \highlight{mode} to 0. 
+
+\subsubsection{ptwXY\_inverse}
+This function returns a new instance of \highlight{ptwXYPoints} that is the inverse of \highlight{ptwXY1}.
+That is, the returned points are $(y_{\rm i},x_{\rm i})$ where $(x_{\rm i},y_{\rm i})$ are the points of \highlight{ptwXY1}.
+All y-values of \highlight{ptwXY1} must be descending or increasing. If the y-values of \highlight{ptwXY1} are descending,
+the returned points are reversed to insure that in the returned instance $X_{\rm i} < X_{\rm i+1}$ where $X_{\rm i}$ is a 
+x-value of new returned instance.
+\setargumentNameLengths{ptwXY1}
+\CallingC{ptwXYPoints *ptwXY\_inverse(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY1 );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{mode}{Flag to determine the initial x-values for calculating the convolutions.}
+    \vskip 0.05 in \noindent
+If an error occurs, NULL is returned.

@@ -17,32 +17,31 @@
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-using namespace std;
 
-// ************* class Eprob_vector *****************
-// ----------- Eprob_vector::unit_base --------------
+// ************* class Ebase::Eprob_vector *****************
+// ----------- Ebase::Eprob_vector::unit_base --------------
 // Transform one energy distribuiton to unit base
-void Eprob_vector::unit_base( int L_order )
+void Ebase::Eprob_vector::unit_base( int L_order )
 {
   bool Renorm = ( L_order == 0 );
-  dd_vector::unit_base( Renorm, &ubase_map );
+  Ddvec::dd_vector::unit_base( Renorm, &ubase_map );
 }
-// ----------- Eprob_vector::form_cum_prob --------------
+// ----------- Ebase::Eprob_vector::form_cum_prob --------------
 // Forms the list of cumulative probabilities
-void Eprob_vector::form_cum_prob( )
+void Ebase::Eprob_vector::form_cum_prob( )
 {
   // copy the data
   cum_prob.Eout_interp = interp_type;
-  for( Eprob_vector::const_iterator Eout_ptr = begin( );
+  for( Ebase::Eprob_vector::const_iterator Eout_ptr = begin( );
        Eout_ptr != end( ); ++Eout_ptr )
   {
-    cumulative_prob_list::iterator cum_prob_ptr = cum_prob.insert(
-      cum_prob.end( ), cumulative_prob_entry( ) );
+    Cum::cumulative_prob_list::iterator cum_prob_ptr = cum_prob.insert(
+      cum_prob.end( ), Cum::cumulative_prob_entry( ) );
     cum_prob_ptr->E_out = Eout_ptr->x;
     cum_prob_ptr->Prob = Eout_ptr->y;
   }
   // now form the slopes and cumulative probabilities
-  if( interp_type == HISTOGRAM )
+  if( interp_type == Terp::HISTOGRAM )
   {
     cum_prob.get_cum_prob_flat( );
   }
@@ -52,22 +51,22 @@ void Eprob_vector::form_cum_prob( )
   }
 }
 
-// ************* class energy_dist_base *****************
-// ----------- energy_dist_base::print --------------
-void energy_dist_base::print( )
+// ************* class Ebase::energy_dist_base *****************
+// ----------- Ebase::energy_dist_base::print --------------
+void Ebase::energy_dist_base::print( )
 {
-  for( energy_dist_base::iterator energy_ptr = begin( );
+  for( Ebase::energy_dist_base::iterator energy_ptr = begin( );
        energy_ptr != end( ); ++energy_ptr )
   {
     energy_ptr->print( );
   }
 }
-// ----------- energy_dist_base::unit_base --------------
+// ----------- Ebase::energy_dist_base::unit_base --------------
 // Transform the outgoing energy distribution to the interval [0, 1]
-void energy_dist_base::unit_base( int L_order )
+void Ebase::energy_dist_base::unit_base( int L_order )
 {
   // do the mapping for each incident energy
-  for( energy_dist_base::iterator Ein_ptr = begin( );
+  for( Ebase::energy_dist_base::iterator Ein_ptr = begin( );
        Ein_ptr != end( ); ++Ein_ptr )
   {
     Ein_ptr->unit_base( L_order );

@@ -43,9 +43,9 @@
  *
  * SYNOPSIS:
  *
- * double a, x, y, igamc();
+ * double a, x, y, Proto::igamc();
  *
- * y = igamc( a, x );
+ * y = Proto::igamc( a, x );
  *
  * DESCRIPTION:
  *
@@ -87,10 +87,15 @@ Copyright 1985, 1987, 2000 by Stephen L. Moshier
 
 #include "protos.h"
 
+// error codes may not be defined by math.h:
+#ifndef UNDERFLOW
+#define UNDERFLOW 4
+#endif
+
 static double big = 4.503599627370496e15;
 static double biginv =  2.22044604925031308085e-16;
 
-double igamc( double a, double x )
+double Proto::igamc( double a, double x )
 {
 double MAXLOG = log( DBL_MAX );
 double ans, ax, c, yc, r, t, y, z;
@@ -100,12 +105,12 @@ if( (x <= 0) || ( a <= 0) )
 	return( 1.0 );
 
 if( (x < 1.0) || (x < a) )
-	return( 1.0 - igam(a,x) );
+	return( 1.0 - Proto::igam(a,x) );
 
 ax = a * log(x) - x - lgamma(a);
 if( ax < -MAXLOG )
 	{
-	mtherr( "igamc", UNDERFLOW );
+	mtherr( "Proto::igamc", UNDERFLOW );
 	return( 0.0 );
 	}
 ax = exp(ax);
@@ -165,7 +170,7 @@ return( ans * ax );
  *
  */
 
-double igam( double a, double x )
+double Proto::igam( double a, double x )
 {
 double ans, ax, c, r;
 double MAXLOG = log( DBL_MAX );
@@ -174,13 +179,13 @@ if( (x <= 0) || ( a <= 0) )
 	return( 0.0 );
 
 if( (x > 1.0) && (x > a ) )
-	return( 1.0 - igamc(a,x) );
+	return( 1.0 - Proto::igamc(a,x) );
 
 /* Compute  x**a * exp(-x) / gamma(a)  */
 ax = a * log(x) - x - lgamma(a);
 if( ax < -MAXLOG )
 	{
-	mtherr( "igam", UNDERFLOW );
+	mtherr( "Proto::igam", UNDERFLOW );
 	return( 0.0 );
 	}
 ax = exp(ax);

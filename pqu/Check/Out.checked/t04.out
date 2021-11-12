@@ -74,13 +74,13 @@ value = 6.136363636363636e-02, significantDigits = 3, order = -2, isPercent = Fa
 uncertainty = value = 1.577180718297101e-03, significantDigits = 2, order = -3, isPercent = False
 
 ===== ( 2.2 +/- 0.05 Ang ) / ( 0.1350 +/- 1.2% eV/mm ) =====
-16.3 +/- 0.4 mm*Ang/eV
-value = 1.629629629629629e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mm*Ang/eV"
+16.3 +/- 0.4 Ang*mm/eV
+value = 1.629629629629629e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ang*mm/eV"
 uncertainty = value = 4.188507367109995e-01, significantDigits = 1, order = -1, isPercent = False
 
 ===== ( 0.00 +/- 0.05 Ang ) / ( 0.1350 +/- 1.2% eV/mm ) =====
-0.0 +/- 0.4 mm*Ang/eV
-value = 0.000000000000000e+00, significantDigits = 2, order = 0, isPercent = False, unit = "mm*Ang/eV"
+0.0 +/- 0.4 Ang*mm/eV
+value = 0.000000000000000e+00, significantDigits = 2, order = 0, isPercent = False, unit = "Ang*mm/eV"
 uncertainty = value = 3.703970360771061e-01, significantDigits = 1, order = -1, isPercent = False
 
 ===== ( 0.1350 +/- 1.2% eV/mm ) / ( 0.00 +/- 0.05 Ang ) =====

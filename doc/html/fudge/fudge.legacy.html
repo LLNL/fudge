@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.legacy package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.legacy.converting package" href="fudge.legacy.converting.html" />
-    <link rel="prev" title="fudge.gnds.test package" href="fudge.gnds.test.html" /> 
-  </head>
-  <body>
+    <link rel="prev" title="fudge.covariances package" href="fudge.covariances.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -41,10 +32,12 @@
           <a href="fudge.legacy.converting.html" title="fudge.legacy.converting package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="fudge.gnds.test.html" title="fudge.gnds.test package"
+          <a href="fudge.covariances.html" title="fudge.covariances package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">fudge Package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.html" accesskey="U">fudge package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.legacy package</a></li> 
       </ul>
     </div>  
 
@@ -67,66 +60,67 @@
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endffiletognds-module">fudge.legacy.converting.endfFileToGNDS module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endfformats-module">fudge.legacy.converting.endfFormats module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endfthermscatttognds-module">fudge.legacy.converting.endfThermScattToGNDS module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endf_endl">fudge.legacy.converting.endf_endl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endf-endl-module">fudge.legacy.converting.endf_endl module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endltognds-module">fudge.legacy.converting.endlToGNDS module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-gndstoendf6-module">fudge.legacy.converting.gndsToENDF6 module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-togndsmisc-module">fudge.legacy.converting.toGNDSMisc module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.converting.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="fudge.legacy.endl.html">fudge.legacy.endl package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="fudge.legacy.endl.test.html">fudge.legacy.endl.test package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.test.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.test.html#module-fudge.legacy.endl.test.test_endlProject">fudge.legacy.endl.test.test_endlProject module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.test.html#module-fudge.legacy.endl.test">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.test.html#fudge-legacy-endl-test-test-endlproject-module">fudge.legacy.endl.test.test_endlProject module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.test.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.bdfls">fudge.legacy.endl.bdfls module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl1dmathClasses">fudge.legacy.endl.endl1dmathClasses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl1dmathmisc">fudge.legacy.endl.endl1dmathmisc module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl2">fudge.legacy.endl.endl2 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl2dmathClasses">fudge.legacy.endl.endl2dmathClasses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl2dmathmisc">fudge.legacy.endl.endl2dmathmisc module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl3dmathClasses">fudge.legacy.endl.endl3dmathClasses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl3dmathmisc">fudge.legacy.endl.endl3dmathmisc module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl4dmathClasses">fudge.legacy.endl.endl4dmathClasses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl4dmathmisc">fudge.legacy.endl.endl4dmathmisc module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlFile">fudge.legacy.endl.endlFile module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlIClasses">fudge.legacy.endl.endlIClasses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlIClassesParameters">fudge.legacy.endl.endlIClassesParameters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlNd">fudge.legacy.endl.endlNd module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlParameters">fudge.legacy.endl.endlParameters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlProject">fudge.legacy.endl.endlProject module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlReactionParameters">fudge.legacy.endl.endlReactionParameters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlSplit">fudge.legacy.endl.endlSplit module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlZA">fudge.legacy.endl.endlZA module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl_C">fudge.legacy.endl.endl_C module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl_I">fudge.legacy.endl.endl_I module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl_Z">fudge.legacy.endl.endl_Z module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl_y">fudge.legacy.endl.endl_y module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlmath">fudge.legacy.endl.endlmath module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlmisc">fudge.legacy.endl.endlmisc module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endltdf">fudge.legacy.endl.endltdf module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.fudgeDocumentationFile">fudge.legacy.endl.fudgeDocumentationFile module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.fudgemiscLegacy">fudge.legacy.endl.fudgemiscLegacy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-bdfls-module">fudge.legacy.endl.bdfls module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl1dmathclasses-module">fudge.legacy.endl.endl1dmathClasses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl1dmathmisc-module">fudge.legacy.endl.endl1dmathmisc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl2-module">fudge.legacy.endl.endl2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl2dmathclasses-module">fudge.legacy.endl.endl2dmathClasses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl2dmathmisc-module">fudge.legacy.endl.endl2dmathmisc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl3dmathclasses-module">fudge.legacy.endl.endl3dmathClasses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl3dmathmisc-module">fudge.legacy.endl.endl3dmathmisc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl4dmathclasses-module">fudge.legacy.endl.endl4dmathClasses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl4dmathmisc-module">fudge.legacy.endl.endl4dmathmisc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlfile-module">fudge.legacy.endl.endlFile module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endliclasses-module">fudge.legacy.endl.endlIClasses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endliclassesparameters-module">fudge.legacy.endl.endlIClassesParameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlnd-module">fudge.legacy.endl.endlNd module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlparameters-module">fudge.legacy.endl.endlParameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlproject-module">fudge.legacy.endl.endlProject module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlreactionparameters-module">fudge.legacy.endl.endlReactionParameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlsplit-module">fudge.legacy.endl.endlSplit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlza-module">fudge.legacy.endl.endlZA module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl-c-module">fudge.legacy.endl.endl_C module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl-i-module">fudge.legacy.endl.endl_I module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl-z-module">fudge.legacy.endl.endl_Z module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endl-y-module">fudge.legacy.endl.endl_y module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlmath-module">fudge.legacy.endl.endlmath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endlmisc-module">fudge.legacy.endl.endlmisc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-endltdf-module">fudge.legacy.endl.endltdf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-fudgedocumentationfile-module">fudge.legacy.endl.fudgeDocumentationFile module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-fudgemisclegacy-module">fudge.legacy.endl.fudgemiscLegacy module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-largeanglecoulombscattering-generator-module">fudge.legacy.endl.largeAngleCoulombScattering_generator module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.tdf">fudge.legacy.endl.tdf module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#fudge-legacy-endl-tdf-module">fudge.legacy.endl.tdf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.endl.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div class="section" id="module-fudge.legacy">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.legacy" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -135,18 +129,18 @@
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.legacy package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#module-fudge.legacy">Module contents</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="fudge.gnds.test.html"
-                        title="previous chapter">fudge.gnds.test package</a></p>
+  <p class="topless"><a href="fudge.covariances.html"
+                        title="previous chapter">fudge.covariances package</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="fudge.legacy.converting.html"
                         title="next chapter">fudge.legacy.converting package</a></p>
@@ -158,15 +152,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -184,15 +178,17 @@
           <a href="fudge.legacy.converting.html" title="fudge.legacy.converting package"
              >next</a> |</li>
         <li class="right" >
-          <a href="fudge.gnds.test.html" title="fudge.gnds.test package"
+          <a href="fudge.covariances.html" title="fudge.covariances package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.legacy package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

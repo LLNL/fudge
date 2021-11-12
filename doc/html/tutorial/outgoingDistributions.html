@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4.3. Outgoing Distributions &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="4.4. Fission" href="fission.html" />
     <link rel="prev" title="4.2. Resonances" href="resonances.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +36,8 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U"><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.3. </span>Outgoing Distributions</a></li> 
       </ul>
     </div>  
 
@@ -55,23 +47,23 @@
           <div class="body" role="main">
             
   <div class="section" id="outgoing-distributions">
-<h1>4.3. Outgoing Distributions<a class="headerlink" href="#outgoing-distributions" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">4.3. </span>Outgoing Distributions<a class="headerlink" href="#outgoing-distributions" title="Permalink to this headline">¶</a></h1>
 <p>Applications of nuclear data are often sensitive not only to the reaction cross section, but also to the angular distributions and energy spectra of the reaction products. Each product in GNDS therefore contains a ‘distribution’ element. The distribution data may be given in several different ways:</p>
 <div class="section" id="angular-distributions">
-<h2>4.3.1. Angular distributions<a class="headerlink" href="#angular-distributions" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.3.1. </span>Angular distributions<a class="headerlink" href="#angular-distributions" title="Permalink to this headline">¶</a></h2>
 <p>For reactions producing exactly two outgoing products (such as n + Mn55 -&gt; p + Cr55), the evaluation only needs to include an angular distribution for one product. The kinematics of these ‘two-body’ reactions mean that the angular distribution for the other product (and the energy spectra for both) can be computed from the first product.</p>
 <p>There are several ways of describing angular distributions in GNDS:</p>
 <ul class="simple">
-<li>Isotropic</li>
-<li>Legendre coefficients for each incident energy,</li>
-<li>Pointwise data for each incident energy, where P(mu) is given explicitly for mu from -1 to 1 (mu = cosine of the scattering angle theta)</li>
-<li>‘Mixed’ form, where Legendre coefficients are used at smaller incident energies and pointwise at higher energies (Legendre coefficients can cause trouble with negative probabilities, especially for very forward-peaked distributions).</li>
+<li><p>Isotropic</p></li>
+<li><p>Legendre coefficients for each incident energy,</p></li>
+<li><p>Pointwise data for each incident energy, where P(mu) is given explicitly for mu from -1 to 1 (mu = cosine of the scattering angle theta)</p></li>
+<li><p>‘Mixed’ form, where Legendre coefficients are used at smaller incident energies and pointwise at higher energies (Legendre coefficients can cause trouble with negative probabilities, especially for very forward-peaked distributions).</p></li>
 </ul>
 </div>
 <div class="section" id="energy-distributions">
-<h2>4.3.2. Energy distributions<a class="headerlink" href="#energy-distributions" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.3.2. </span>Energy distributions<a class="headerlink" href="#energy-distributions" title="Permalink to this headline">¶</a></h2>
 <p>For a two-body reaction, an energy distribution could be supplied instead of an angular distribution. In practice, however, energy distributions are only given for non-2-body reactions. In GNDS, these distributions are used when the outgoing angle and energy are assumed to be uncorrelated. There are many ways of storing energy spectra, including:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">Pointwise</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">Pointwise</span>
 <span class="o">-</span> <span class="n">Watt</span> <span class="n">spectra</span>
 <span class="o">-</span> <span class="n">Maxwellian</span>
 <span class="o">-</span> <span class="ow">and</span> <span class="n">many</span> <span class="n">others</span>
@@ -79,39 +71,40 @@
 </div>
 </div>
 <div class="section" id="joint-energy-angle-distributions">
-<h2>4.3.3. Joint energy-angle distributions<a class="headerlink" href="#joint-energy-angle-distributions" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.3.3. </span>Joint energy-angle distributions<a class="headerlink" href="#joint-energy-angle-distributions" title="Permalink to this headline">¶</a></h2>
 <p>For non-two-body reactions, the distribution can be best described using a double-differential form that gives the probability as a functon of both outgoing angle <em>and</em> energy. Some types of double-differential distribution forms include:</p>
 <ul class="simple">
-<li>Legendre coefficients listed as a function of both incident and outgoing energy,</li>
-<li>Pointwise data, where P(mu | E, E’ ) is given for each combination of incident energy E and outgoing energy E’,</li>
-<li>Kalbach-Mann data, a parameterized form that can efficiently describe the average outgoing spectra.</li>
+<li><p>Legendre coefficients listed as a function of both incident and outgoing energy,</p></li>
+<li><p>Pointwise data, where P(mu | E, E’ ) is given for each combination of incident energy E and outgoing energy E’,</p></li>
+<li><p>Kalbach-Mann data, a parameterized form that can efficiently describe the average outgoing spectra.</p></li>
 </ul>
 </div>
 <div class="section" id="multiplicity">
-<h2>4.3.4. Multiplicity<a class="headerlink" href="#multiplicity" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.3.4. </span>Multiplicity<a class="headerlink" href="#multiplicity" title="Permalink to this headline">¶</a></h2>
 <p>Reaction products require a multiplicity. For many common reactions the multiplicity is a constant integer (i.e. n,2n,
 n,n’, elastic, etc.).  In some special cases (mainly gammas and fission neutrons), an average,
 incident-energy-dependent multiplicity is listed instead. Methods for storing the multiplicity include</p>
 <ul class="simple">
-<li>constant1d</li>
-<li>XYs1d</li>
-<li>regions1d</li>
-<li>polynomial1d</li>
-<li>reference (i.e. a link to another product’s multiplicity)</li>
+<li><p>constant1d</p></li>
+<li><p>XYs1d</p></li>
+<li><p>regions1d</p></li>
+<li><p>polynomial1d</p></li>
+<li><p>reference (i.e. a link to another product’s multiplicity)</p></li>
 </ul>
 </div>
 <div class="section" id="where-are-the-discrete-gammas">
-<h2>4.3.5. Where are the discrete gammas?<a class="headerlink" href="#where-are-the-discrete-gammas" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.3.5. </span>Where are the discrete gammas?<a class="headerlink" href="#where-are-the-discrete-gammas" title="Permalink to this headline">¶</a></h2>
 <p>Discrete gammas can appear in several places in a GNDS evaluation. Where possible, they are located inside
 the PoPs particle database, where they are listed as decay modes from excited nuclear states down to lower energy states.
 In other cases, the source of the gamma may not be known exactly (or may not have been included in the ENDF evaluation
 that was translated to GNDS).  In those cases, discrete gammas are listed as normal reaction products,
-with uncorrelated distributions here the energy distribution is listed as <code class="docutils literal"><span class="pre">discreteGamma</span></code>.
-Primary gammas are listed in a similar fashion, as uncorrelated distributions with a <code class="docutils literal"><span class="pre">primaryGamma</span></code> energy distribution.</p>
+with uncorrelated distributions here the energy distribution is listed as <code class="docutils literal notranslate"><span class="pre">discreteGamma</span></code>.
+Primary gammas are listed in a similar fashion, as uncorrelated distributions with a <code class="docutils literal notranslate"><span class="pre">primaryGamma</span></code> energy distribution.</p>
 </div>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -120,7 +113,7 @@ Primary gammas are listed in a similar fashion, as uncorrelated distributions wi
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">4.3. Outgoing Distributions</a><ul>
 <li><a class="reference internal" href="#angular-distributions">4.3.1. Angular distributions</a></li>
@@ -134,10 +127,10 @@ Primary gammas are listed in a similar fashion, as uncorrelated distributions wi
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="resonances.html"
-                        title="previous chapter">4.2. Resonances</a></p>
+                        title="previous chapter"><span class="section-number">4.2. </span>Resonances</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="fission.html"
-                        title="next chapter">4.4. Fission</a></p>
+                        title="next chapter"><span class="section-number">4.4. </span>Fission</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -146,15 +139,15 @@ Primary gammas are listed in a similar fashion, as uncorrelated distributions wi
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -176,12 +169,13 @@ Primary gammas are listed in a similar fashion, as uncorrelated distributions wi
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" >4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" ><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.3. </span>Outgoing Distributions</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

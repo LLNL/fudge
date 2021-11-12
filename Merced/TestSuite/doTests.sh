@@ -4,25 +4,28 @@
 # If no arguments are supplied, runs all available input files.
 # If one or more directories are supplied, only run tests in those directories.
 
+merced=$PWD/../bin/merced
 if [ $# -gt 0 ]; then
-	dirs=$@
+  dirs=$@
 else
-	dirs=*
+  dirs=*
 fi
 
 for dir in $dirs; do
-	if ! [[ -d $dir ]]; then
-		continue
-	fi
+  if ! [[ -d $dir ]]; then
+    continue
+  fi
 
-	echo Entering directory $dir:
-	cd $dir;
-	for fil in `ls in.*`; do
-		merced $fil &> ${fil/in./}.info;
-		if ! cmp ${fil/in/out} utfil >/dev/null 2>&1; then
-			echo '  ' $fil output differs from baseline;
-		fi
-	done
-	rm utfil;
-	cd ..;
+  echo Entering directory $dir:
+  cd $dir;
+  for fil in `ls in.*`; do
+    $merced $fil &> ${fil/in./}.info;
+    if ! cmp ${fil/in/out} utfil >/dev/null 2>&1; then
+      python ../compareUtfils.py ${fil/in/out} utfil
+      #echo '  ' $fil output differs from baseline;
+    fi
+    cp utfil ${fil/in/out}_new
+  done
+  rm utfil;
+  cd ..;
 done

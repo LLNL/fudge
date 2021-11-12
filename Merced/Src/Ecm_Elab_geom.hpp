@@ -18,15 +18,18 @@
 
 #include "Vcm_Vlab_Hit.hpp"
 
+namespace Egeom
+{
+  
 //! Class for parameters for the 2-d quadrature over cm cosine and Eout_cm
 // ---------------- class Ecm_Elab_Ecm_param ------------------
-class Ecm_Elab_Ecm_param : public QuadParamBase
+class Ecm_Elab_Ecm_param : public Qparam::QuadParamBase
 {
 public:
-  map_cm_lab *map;
+  Maps::map_cm_lab *map;
 
   // the data entries for this incident energy
-  list< Vcm_quadBox_Hit > V_cm_limits;  // a list of values of V_cm which give intersections
+  std::list< Vhit::Vcm_quadBox_Hit > V_cm_limits;  // a list of values of V_cm which give intersections
 
   // The V_lab values for this lab E_out bin
   double V_lab_min;
@@ -39,8 +42,8 @@ public:
   double data_Ecm_max;
   double min_V_cm;
   double max_V_cm;
-  Hit_Corner min_hit_corner;
-  Hit_Corner max_hit_corner;
+  Vhit::Hit_Corner min_hit_corner;
+  Vhit::Hit_Corner max_hit_corner;
 
   // lab outgoing energy range
   double lab_Eout_min;
@@ -64,19 +67,19 @@ public:
   //! Returns the tolerance to use in the quadrature over center-of-mass energy and cosine
   double Ecm_range( );
 
-  //! Computes the center-of-mass outgoing energy for a given Hit_Corner
+  //! Computes the center-of-mass outgoing energy for a given Vhit::Hit_Corner
   //! \param hit_corner identifies the type of corner
   //! \param V_trans the velocity of the center of mass in the lab frame
   //! \param V_bottom velocity corresponding to the bottom of the lab energy bin
   //! \param V_top velocity corresponding to the top of the lab energy bin
   //! \param data_Ecm the center of mass energy of the current data, used if this is not a corner
-  double get_Ecm( Hit_Corner hit_corner, double V_trans,
+  double get_Ecm( Vhit::Hit_Corner hit_corner, double V_trans,
     double V_bottom, double V_top, double data_Ecm );
 };
 
 //! Class for parameters for the 1-d quadrature over cm cosine
 // ---------------- class Ecm_Elab_mu_param ------------------
-class Ecm_Elab_mu_param : public QuadParamBase
+class Ecm_Elab_mu_param : public Qparam::QuadParamBase
 {
 public:
   double E_in;
@@ -84,7 +87,7 @@ public:
   double Ecm_prob;  // probability density of outgoing energy
   double mu_cm_min;
   double mu_cm_max;
-  map_cm_lab *map;
+  Maps::map_cm_lab *map;
 
   inline Ecm_Elab_mu_param( ) {}
   inline ~Ecm_Elab_mu_param( ) {}
@@ -98,21 +101,21 @@ public:
 
 //! Class for parameters for the 3-d quadrature over Ein, cm cosine, and Eout_cm
 // ---------------- class Ecm_Elab_Ein_param ------------------
-class Ecm_Elab_Ein_param : public param_base
+class Ecm_Elab_Ein_param : public Pbase::param_base
 {
 private:
 
 public:
-  map_cm_lab *map;
+  Maps::map_cm_lab *map;
 
   // parameters for 2-d integration over cm cosine and Eout_cm
   Ecm_Elab_Ecm_param Ecm_params;
 
-  Vcm_quadBox_Hit Vcm_hit_min;  // range of values of V_cm for one quadrature sector
-  Vcm_quadBox_Hit Vcm_hit_max;
+  Vhit::Vcm_quadBox_Hit Vcm_hit_min;  // range of values of V_cm for one quadrature sector
+  Vhit::Vcm_quadBox_Hit Vcm_hit_max;
 
   // pointer to the lower lab outgoing energy
-  vector< double >::const_iterator Eout_ptr;
+  std::vector< double >::const_iterator Eout_ptr;
 
   Ecm_Elab_Ein_param( ) {}
   ~Ecm_Elab_Ein_param( ) {}
@@ -127,5 +130,7 @@ public:
     const dd_vector& weight, const Flux_List& e_flux,
     const Energy_groups& Ein_groups );*/
 };
+
+} // end of namespace Egeom
 
 #endif

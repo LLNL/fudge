@@ -1,67 +1,13 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
+
+from pqu import PQU as PQUModule
 
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
@@ -70,98 +16,98 @@ from PoPs.quantities import parity as parityModule
 from PoPs.quantities import charge as chargeModule
 from PoPs.quantities import halflife as halflifeModule
 
-print '============== MASS =============='
+print( '============== MASS ==============' )
 m1 = massModule.double( 'atomic', 2.12, quantityModule.stringToPhysicalUnit( 'amu' ) )
 xmlm1 = m1.toXML( )
-print xmlm1
+print( xmlm1 )
 m2 = massModule.double.parseXMLStringAsClass( xmlm1 )
 if( xmlm1 != m2.toXML( ) ) : raise Exception( 'Fix me.' )
 
-print
+print()
 suite = massModule.suite( )
 suite.add( m1 )
 
 m2 = massModule.double( 'nuclear', 2, quantityModule.stringToPhysicalUnit( 'amu' ) )
 suite.add( m2 )
 
-print suite.toXML( )
+print( suite.toXML( ) )
 
 suite2 = massModule.suite.parseXMLStringAsClass( suite.toXML( ) )
 if( suite2.toXML( ) != suite.toXML( ) ) : raise Exception( 'Fix me' )
 
-print '\n============== CHARGE =============='
+print( '\n============== CHARGE ==============' )
 c1 = chargeModule.integer( 'nucleus', 3, quantityModule.stringToPhysicalUnit( 'e' ) )
 xmlc1 = c1.toXML( )
-print xmlc1
+print( xmlc1 )
 c2 = chargeModule.integer.parseXMLStringAsClass( xmlc1 )
 if( xmlc1 != c2.toXML( ) ) : raise Exception( 'Fix me.' )
 
-print
+print()
 suite = chargeModule.suite( )
 suite.add( c1 )
-print suite.toXML( )
+print( suite.toXML( ) )
 
 suite2 = suite.parseXMLStringAsClass( suite.toXML( ) )
 if( suite2.toXML( ) != suite.toXML( ) ) : raise Exception( 'Fix me' )
 
-print '\n============== HALFLIFE =============='
+print( '\n============== HALFLIFE ==============' )
 h1 = halflifeModule.double( 'nucleus', 3.14e6, quantityModule.stringToPhysicalUnit( 'd' ) )
 xmlh1 = h1.toXML( )
-print xmlh1
+print( xmlh1 )
 h2 = halflifeModule.double.parseXMLStringAsClass( xmlh1 )
 if( xmlh1 != h2.toXML( ) ) : raise Exception( 'Fix me.' )
 
-print
+print()
 suite = halflifeModule.suite( )
 suite.add( h1 )
-print suite.toXML( )
+print( suite.toXML( ) )
 
 suite2 = suite.parseXMLStringAsClass( suite.toXML( ) )
 if( suite2.toXML( ) != suite.toXML( ) ) : raise Exception( 'Fix me' )
 
-print
-print h1.pqu( )
-print suite[0].pqu( )
-print suite[0].pqu( 's' )
-print suite[0].pqu( ).getValueAs( 's' )
+print()
+print( h1.pqu( ) )
+print( suite[0].pqu( ) )
+print( suite[0].pqu( 's' ) )
+print( PQUModule.floatToShortestString( suite[0].pqu( ).getValueAs( 's' ), 12 ) )
 
-print
+print()
 suite = halflifeModule.suite( )
 h2 = halflifeModule.string( 'nucleus', 'stable', quantityModule.stringToPhysicalUnit( 's' ) )
 suite.add( h2 )
-print suite.toXML( )
+print( suite.toXML( ) )
 
 suite2 = suite.parseXMLStringAsClass( suite.toXML( ) )
 if( suite2.toXML( ) != suite.toXML( ) ) : raise Exception( 'Fix me' )
 
-print '\n============== SPIN =============='
+print( '\n============== SPIN ==============' )
 fraction = quantityModule.fraction.toValueType( "5/2" )
 s1 = spinModule.fraction( 'nucleus', fraction, quantityModule.stringToPhysicalUnit( 'hbar' ) )
 xmls1 = s1.toXML( )
-print xmls1
+print( xmls1 )
 s2 = s1.parseXMLStringAsClass( xmls1 )
 if( xmls1 != s2.toXML( ) ) : raise Exception( 'Fix me.' )
 
-print
+print()
 suite = spinModule.suite( )
 suite.add( s1 )
-print suite.toXML( )
+print( suite.toXML( ) )
 
 suite2 = suite.parseXMLStringAsClass( suite.toXML( ) )
 if( suite2.toXML( ) != suite.toXML( ) ) : raise Exception( 'Fix me' )
 
-print '\n============== PARITY =============='
+print( '\n============== PARITY ==============' )
 p1 = parityModule.integer( 'nucleus', -1, quantityModule.stringToPhysicalUnit( '' ) )
 xmlp1 = p1.toXML( )
-print xmlp1
+print( xmlp1 )
 p2 = p1.parseXMLStringAsClass( xmlp1 )
 
 if( xmlp1 != p2.toXML( ) ) : raise Exception( 'Fix me.' )
 
-print
+print()
 suite = parityModule.suite( )
 suite.add( p1 )
-print suite.toXML( )
+print( suite.toXML( ) )
 
 suite2 = suite.parseXMLStringAsClass( suite.toXML( ) )
 if( suite2.toXML( ) != suite.toXML( ) ) : raise Exception( 'Fix me' )

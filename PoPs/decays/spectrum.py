@@ -1,71 +1,37 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 """
-This module contains the spectrum classes.
-"""
+This module contains classes for storing an outgoing energy spectrum for decay products.
+The spectrum may include a combination of discrete and continuum contributions.
 
-import abc
+Spectral data are organized as follows::
+
+   - decayMode
+      - ...
+      - spectra
+         - spectrum (1 or more)
+            - discrete (0 or more)
+               - intensity
+               - energy
+               - ...
+            - continuum (0 or more)
+
+Each spectrum corresponds to one type of decay product (e.g. photon, positron or neutron).
+Sometimes a product is broken out into more than one spectrum sections, however. For example, photons
+may be divided into 'gamma' and 'x-ray' parts.
+
+Discrete radiations each have an associated intensity, indicating how often that discrete radiation is emitted
+per decay. The intensity may be > 1, for example for 511 keV photons emitted by beta+ decay.
+Discrete radiation may be accompanied by internalConversionCoefficients, internalPairFormationCoefficients, etc.
+
+Continuum radiation is described by a probability distribution of outgoing energy.
+    FIXME is it really a probability distribution? Not always normalized...
+"""
 
 from xData import ancestry as ancestryModule
 from xData import axes as axesModule
@@ -173,11 +139,21 @@ class positronEmissionIntensity( unitless ) :
     moniker = 'positronEmissionIntensity'
 
 class discrete( ancestryModule.ancestry ) :
+    """Stores a decay particle emitted with discrete energy"""
 
     moniker = 'discrete'
 
     def __init__( self, _intensity, _energy, type = None, _internalPairFormationCoefficient = None,
                   _positronEmissionIntensity = None ) :
+        """
+        :param _intensity: relative intensity for emission of this discrete particle
+        :param _energy: outgoing product energy
+        :param type: optional type of transition (i.e. 'allowed', 'first-forbidden', etc.
+        :param _internalPairFormationCoefficient: optional coefficient for forming an electron/positron pair
+            Should only be used with electromagnetic decays
+        :param _positronEmissionIntensity: optional coefficient for emitting a positron
+            Should only be used with electron capture / beta+ decays
+        """
 
         ancestryModule.ancestry.__init__(self)
         if( not( isinstance( _intensity, intensity ) ) ) : raise TypeError( '_intensity must be an instance of intensity' )
@@ -288,10 +264,14 @@ class discrete( ancestryModule.ancestry ) :
         return _discrete
 
 class continuum( ancestryModule.ancestry ) :
+    """Describes continuum particle emission"""
 
     moniker = 'continuum'
 
     def __init__( self, spectrum ) :
+        """
+        :param spectrum: outgoing energy probability distribution
+        """
 
         ancestryModule.ancestry.__init__( self )
         self.__spectrum = spectrum
@@ -302,10 +282,14 @@ class continuum( ancestryModule.ancestry ) :
         return( self.__spectrum )
 
     def convertUnits( self, unitMap ) :
+        """See convertUnits documentation in PoPs.database"""
 
         self.__spectrum.convertUnits( unitMap )
 
     def copy( self ) :
+        """
+        :return: deep copy of self
+        """
 
         return( self.__class__( self.__spectrum.copy( ) ) )
 
@@ -340,10 +324,17 @@ class continuum( ancestryModule.ancestry ) :
         return( axes )
 
 class spectrum( miscModule.classWithLabelKey ) :
+    """
+    Contains the outgoing spectrum for one type of decay product.
+    """
 
     moniker = 'spectrum'
 
     def __init__( self, label, pid ) :
+        """
+        :param label: unique label for the outgoing product (i.e. 'x-ray' or 'gamma')
+        :param pid: PoPs particle id (i.e. 'photon')
+        """
 
         miscModule.classWithLabelKey.__init__( self, label )
 
@@ -361,21 +352,34 @@ class spectrum( miscModule.classWithLabelKey ) :
         return( self.__emissions[index] )
 
     @property
+    def emissions( self ) :
+        """Returns the list of all discrete and continuum emissions"""
+
+        return( self.__emissions )      # FIXME accesses mutable member
+
+    @property
     def pid( self ) :
 
         return( self.__pid )
 
     def append( self, emission ) :
+        """
+        Add new emitted particle to self
+        :param emission: 'discrete' or 'continuum' instance
+        """
 
         if( not( isinstance( emission, ( discrete, continuum ) ) ) ) : raise TypeError( 'emission must be instance of discrete or continuum' )
         self.__emissions.append( emission )
 
     def convertUnits( self, unitMap ) :
+        """See convertUnits documentation in PoPs.database"""
 
         for emission in self.__emissions : emission.convertUnits( unitMap )
 
     def copy( self ) :
-        """Returns a deep copy of self."""
+        """
+        :return: deep copy of self
+        """
 
         _spectrum = self.__class__( self.label, self.pid )
         for __emission in self.__emissions : _spectrum.append( __emission.copy( ) )
@@ -417,6 +421,7 @@ class spectrum( miscModule.classWithLabelKey ) :
         return _spectrum
 
 class spectra( suiteModule.suite ) :
+    """Contains the outgoing spectrum list for a decayMode"""
 
     moniker = 'spectra'
 

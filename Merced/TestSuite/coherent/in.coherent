@@ -5,8 +5,6 @@ outputLegendreOrder: 3
 inverseWaveLengthToEnergyFactor: 1.2398424421518084e-10
 ThompsonScattering: 0.6652448
 
-ein quadrature method: adaptive
-mu quadrature method: square root
 Projectile Frame: lab
 
 # The scale_rows option assumes that the cross section is piecewise linear; it isn't.
@@ -1300,11 +1298,11 @@ Interpolation: lin-lin
 realAnomalousFactor: n = 2
 Interpolation: lin-lin
  0.0  0.0
- 21.0 0.0
+ 1.0E+20 0.0
 
 
 # Start data
 imaginaryAnomalousFactor: n = 2
 Interpolation: lin-lin
  0.0  0.0
- 21.0 0.0
+ 1.0E+20 0.0

@@ -4,7 +4,6 @@ Comment: n + Fm255 --> n[multiplicity:'3'] + Fm253 + gamma outgoing data for n
 Projectile's mass:  9.395656534709e+08
 Target's mass:  2.376152141971e+11
 Product's mass:  9.395656534709e+08
-Quadrature method: adaptive
 outputLegendreOrder: 3
 Projectile Frame: lab
 

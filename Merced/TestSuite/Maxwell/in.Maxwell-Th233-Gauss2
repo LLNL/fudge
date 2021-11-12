@@ -3,6 +3,7 @@ Process: Maxwell spectrum
 Comment: Th233(n,fission)?; data for outgoing n_1
 outputLegendreOrder: 0
 Conserve: both
+do adaptive quadrature: false
 Quadrature method: Gauss2
 Projectile Frame: lab
 

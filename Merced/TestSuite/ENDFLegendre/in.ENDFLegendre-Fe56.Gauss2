@@ -2,6 +2,7 @@ xndfgenTransferMatrix: version 1.0
 Process: Legendre energy-angle data
 Comment: Fe56(n,2n)Fe55; data for outgoing n
 outputLegendreOrder: 3
+do adaptive quadrature: false
 Quadrature method: Gauss2
 Conserve: number
 Projectile Frame: lab

@@ -17,9 +17,9 @@
 #endif
 
 #include "evaporation.hpp"
+#include "adapt_quad.hpp"
 #include "global_params.hpp"
 #include "messaging.hpp"
-#include "math_util.hpp"
 
 #include "protos.h"
 
@@ -33,15 +33,17 @@ double Evap_param::set_tol( double left_E, double right_E )
 }
 // ---------------- Evap_param::get_integrals --------------------
 // Gets the integrals over outgoing energy
-void Evap_param::get_integrals( double Eout_0, double Eout_1, coef_vector &value )
+bool Evap_param::get_integrals( double Eout_0, double Eout_1, Coef::coef_vector &value )
 {
+  bool is_OK = true;
+  
   if( Eout_0 == 0.0 )
   {
-    if( ( value.conserve == NUMBER ) || ( value.conserve == BOTH ) )
+    if( ( value.conserve == Coef::NUMBER ) || ( value.conserve == Coef::BOTH ) )
     {
       value.weight_1[ 0 ] = integral_prob( Eout_1 );
     }
-    if( ( value.conserve == ENERGY ) || ( value.conserve == BOTH ) )
+    if( ( value.conserve == Coef::ENERGY ) || ( value.conserve == Coef::BOTH ) )
     {
       value.weight_E[ 0 ] = integral_Eprob( Eout_1 );
     }
@@ -49,36 +51,31 @@ void Evap_param::get_integrals( double Eout_0, double Eout_1, coef_vector &value
   else
   {
     static double tol = Global.Value( "quad_tol" );
-    evap_params_1d params_1d;
+    Evap::evap_params_1d params_1d;
     params_1d.Theta = Theta;
-    QuadParamBase *void_params_1d = static_cast< QuadParamBase* >( &params_1d );
-    quad_F::integrate( evaporation_F::Eout_F, Eout_quad_method, Eout_0, Eout_1,
+    Qparam::QuadParamBase *void_params_1d =
+      static_cast< Qparam::QuadParamBase* >( &params_1d );
+    is_OK = quad_F::integrate( evaporation_F::Eout_F, Eout_quad_rule, Eout_0, Eout_1,
 		       void_params_1d, tol, &value );
     Eout_F_count += params_1d.func_count;
   }
   value *= 1.0/norm;
-}
-// ---------------- Evap_param::tol_get_integrals --------------------
-// Gets the integrals over outgoing energy and returns the noise in the calculation
-double Evap_param::tol_get_integrals( double Eout_0, double Eout_1, coef_vector &value )
-{
-  // the default is no noise---Watt and Madland-Nix are special
-  get_integrals( Eout_0, Eout_1, value );
-  return set_tol( Ein_0, Ein_1 );
+
+  return is_OK;
 }
 // ---------------- Evap_param::integral_prob --------------------
 // Integral of the probability density from 0 to E_1
 double Evap_param::integral_prob( double E_1 )
 {
   double y_1 = E_1/Theta;
-  return prob_integral_scale*igam( 2.0, y_1 );
+  return prob_integral_scale*Proto::igam( 2.0, y_1 );
 }
 // ---------------- Evap_param::integral_Eprob --------------------
 // Integral of energy times the probability density from 0 to E_1
 double Evap_param::integral_Eprob( double E_1 )
 {
   double y_1 = E_1/Theta;
-  return Eprob_integral_scale*igam( 3.0, y_1 );
+  return Eprob_integral_scale*Proto::igam( 3.0, y_1 );
 }
 // ---------------- Evap_param::set_scales --------------------
 //! Sets the scale factors for the integrals of probability and energy*probability
@@ -95,13 +92,13 @@ double Evap_param::get_norm( )
   return integral_prob( E_max );
 }
   
-// ****************** class evaporation **********************
-// ----------- evaporation::get_Ein_range --------------
+// ****************** class Evap::evaporation **********************
+// ----------- Evap::evaporation::get_Ein_range --------------
 //  Gets the range of nontrivial incident energy bins; computes first_Ein and last_Ein
 // returns true if the threshold is too high for the energy bins
-bool evaporation::get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
+bool Evap::evaporation::get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
     const dd_vector& weight,
-    const Flux_List& e_flux, const Energy_groups& Ein_groups )
+    const Lgdata::Flux_List& e_flux, const Egp::Energy_groups& Ein_groups )
 {
   double E_first;
   double E_last;
@@ -111,7 +108,7 @@ bool evaporation::get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
   if( done ) return true;
 
   // check the range of incident energies for the probability data
-  evaporation::const_iterator Theta_ptr = begin( );
+  Evap::evaporation::const_iterator Theta_ptr = begin( );
   double E_data = Theta_ptr->x;
   if( E_data > E_first )
   {
@@ -130,17 +127,19 @@ bool evaporation::get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
 
   return false;
 }
-// ----------- evaporation::get_T --------------
+// ----------- Evap::evaporation::get_T --------------
 // Calculates the transfer matrix for this particle.
 // sigma is the cross section.
-void evaporation::get_T( const dd_vector& sigma, const dd_vector& multiple,
-  const dd_vector& weight, T_matrix& transfer )
+void Evap::evaporation::get_T( const dd_vector& sigma, const dd_vector& multiple,
+  const dd_vector& weight, Trf::T_matrix& transfer )
 {
-  if( interp_type != LINLIN )
+  if( interp_type != Terp::LINLIN )
   {
-    FatalError( "evaporation::get_T", "interp_type for Theta not implemented" );
+    Msg::FatalError( "Evap::evaporation::get_T",
+		     "interp_type for Theta not implemented" );
   }
   transfer.getBinCrossSection( sigma );
+  transfer.threshold = sigma.begin( )->x;
 
   // synchronize the starting energies
   bool done = get_Ein_range( sigma, multiple, weight, transfer.e_flux,
@@ -162,7 +161,7 @@ void evaporation::get_T( const dd_vector& sigma, const dd_vector& multiple,
   for( int Ein_bin = first_Ein; Ein_bin < last_Ein; ++Ein_bin )
   {
     Evap_param Ein_param;
-    Ein_param.Eout_quad_method = transfer.Eout_quad_method;
+    Ein_param.Eout_quad_rule = transfer.Eout_quad_rule;
     // set up the data range for this bin
     Ein_param.setup_bin( Ein_bin, sigma, multiple, weight, transfer.e_flux,
                          transfer.in_groups );
@@ -185,29 +184,31 @@ void evaporation::get_T( const dd_vector& sigma, const dd_vector& multiple,
   } // end of parallel loop
 
   // print the counts of function evaluations
-  cout << "2d quadratures: " << quad_count << endl;
-  cout << "Energy_function_F::Ein_F calls: " << Ein_F_count << endl;
-  cout << "evaporation_F::Eout_F calls: " << Eout_F_count << endl;
-  cout << "average Energy_function_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << endl;
-  cout << "average evaporation_F::Eout_F calls: " << 1.0*Eout_F_count/Ein_F_count << endl;
+  std::cout << "2d quadratures: " << quad_count << std::endl;
+  std::cout << "Energy_function_F::Ein_F calls: " << Ein_F_count << std::endl;
+  std::cout << "evaporation_F::Eout_F calls: " << Eout_F_count << std::endl;
+  std::cout << "average Energy_function_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << std::endl;
+  std::cout << "average evaporation_F::Eout_F calls: " << 1.0*Eout_F_count/Ein_F_count << std::endl;
 }
 
 // **************** Function to integrate *********************
 // --------------------  evaporation_F::Eout_F ------------------
 // Function for the 1-d quadrature over outgoing energy
-void evaporation_F::Eout_F( double E_out, QuadParamBase *E_out_param,
-  coef_vector *value )
+bool evaporation_F::Eout_F( double E_out, Qparam::QuadParamBase *E_out_param,
+  Coef::coef_vector *value )
 {   
-  // the parameters are really evap_params_1d
-  evap_params_1d *Eout_params = static_cast< evap_params_1d* >( E_out_param );
+  // the parameters are really Evap::evap_params_1d
+  Evap::evap_params_1d *Eout_params = static_cast< Evap::evap_params_1d* >( E_out_param );
   Eout_params->func_count += 1;
   double Prob = E_out*exp( - E_out/Eout_params->Theta );
-  if( ( value->conserve == NUMBER ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::NUMBER ) || ( value->conserve == Coef::BOTH ) )
   {
     value->weight_1[ 0 ] = Prob;
   }
-  if( ( value->conserve == ENERGY ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::ENERGY ) || ( value->conserve == Coef::BOTH ) )
   {
     value->weight_E[ 0 ] = E_out*Prob;
   }
+
+  return true;
 }

@@ -16,41 +16,50 @@
 #define MESSAGING
 
 #include <string>
-using namespace std;
 
-//! Flags a fatal error
+namespace Msg
+{
+
+//! Flags a fatal error, always printed
 //! \param routine the name of the routine in which the error occurs
 //! \param error the type of error
-void FatalError(string routine, string error);
+void FatalError(std::string routine, std::string error);
 
-//! Flags a severe error
+//! Flags a severe error, always printed
 //! \param routine the name of the routine in which the error occurs
 //! \param error the type of error
-void SevereError(string routine, string error);
+void SevereError(std::string routine, std::string error);
 
-//! Flags a warning
-//! \param routine the name of the routine in which the warning is given
-//! \param warning the type of warning
-void Warning(string routine, string warning);
-
-//! Flags an information message
+//! Flags a debugging information message if message_level >= 1
 //! \param routine the name of the routine in which the information is given
 //! \param info the information message
-void Info(string routine, string info);
+void DebugInfo(std::string routine, std::string info);
 
-//! Flags an unimplemented routine
+//! Flags a warning if message_level >= 2
+//! \param routine the name of the routine in which the warning is given
+//! \param warning the type of warning
+void Warning(std::string routine, std::string warning);
+
+//! Flags an information message if message_level >= 3
+//! \param routine the name of the routine in which the information is given
+//! \param info the information message
+void Info(std::string routine, std::string info);
+
+//! Flags an unimplemented routine if message_level >= 2
 //! \param routine the name of the unimplemented routine
 //! \param info the information message
-void Unimplemented(string routine, string info);
+void Unimplemented(std::string routine, std::string info);
 
 //! Attaches a double to a string
 //! \param front the initial string
 //! \param back the appended double
-string pastenum(string front, double back);
+std::string pastenum(std::string front, double back);
 
 //! Attaches an integer to a string
 //! \param front the initial string
 //! \param back the appended integer
-string pastenum(string front, int back);
+std::string pastenum(std::string front, int back);
+
+} // end of namespace Msg
 
 #endif

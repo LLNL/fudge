@@ -17,109 +17,118 @@
 #endif
 
 #include "uncorrelated.hpp"
+#include "adapt_quad.hpp"
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-// **************** class mu_param ******************
-// ---------------- mu_param::value ------------------
-double mu_param::value( double mu )
+// **************** class Uncor::uncorrelated_param *****************
+// ------------- Uncor::uncorrelated_param::setup_direct ------------
+// Does truncation or extrapolation of data for direct linlin interpolation
+void Uncor::uncorrelated_param::setup_direct( )
 {
-  double p = left_data->linlin_interp( mu, *right_data );
-  return p;
-};
+  // remove previous data
+  if( !this_Ein_direct.empty( ) )
+  {
+    this_Ein_direct.erase( this_Ein_direct.begin( ), this_Ein_direct.end( ) );
+    next_Ein_direct.erase( next_Ein_direct.begin( ), next_Ein_direct.end( ) );
+  }
 
-// **************** class angular_moments ******************
-// ------------------ angular_moments::set_zero --------------
-// Initializes the elements to zero
-void angular_moments::set_zero( )
-{
-  for( int ell = 0; ell <= order; ++ell )
-  {
-    data[ ell ] = 0.0;
-  }
-}
-// ------------------ angular_moments::operator+= --------------
-angular_moments& angular_moments::operator+=( const coef_vector &to_add )
-{
-  if( to_add.conserve != NUMBER )
-  {
-    FatalError( "angular_moments::operator+=", "incompatible conserve" );
-  }
-  for( int ell = 0; ell <= order; ++ell )
-  {
-    data[ ell ] += to_add.weight_1[ ell ];
-  }
-  return *this;
-}
-// ------------------ angular_moments::get_moment --------------
-// Evaluates the Legendre moments
-int angular_moments::get_moment( const dd_vector& this_mu_dist )
-{
-  int mu_quad_count = 0;
-  set_zero( );
-  coef_vector integral( order, NUMBER );
-  integral.set_zero( );
-  set_E_in( this_mu_dist.get_E_in( ) );
-  mu_param mu_params;   // the quadrature parameters
-  QuadParamBase *params = static_cast< QuadParamBase* >( &mu_params );
-  mu_params.left_data = this_mu_dist.begin( );
-  mu_params.right_data = mu_params.left_data;
-  ++mu_params.right_data;
-  for( ; mu_params.right_data != this_mu_dist.end( );
-       mu_params.left_data = mu_params.right_data, ++mu_params.right_data )
-  {
-    static double tol = Global.Value( "quad_tol" );
-    Quadrature_Method quad_method;
-    integral.set_zero( );
-    if( order < 2 )
-    {
-      quad_method = GAUSS2;
-    }
-    else if( order < 7 )
-    {
-      quad_method = GAUSS4;
-    }
-    else if( order < 11 )
-    {
-      quad_method = GAUSS6;
-    }
-    else if( order < 19 )
-    {
-      quad_method = GAUSS10;
-    }
-    else
-    {
-      // use adaptive quadrature
-      quad_method = ADAPTIVE4;
-    }
-    quad_F::integrate( uncorrelated_F::mu_F, quad_method, mu_params.left_data->x,
-		       mu_params.right_data->x, params, tol, &integral );
-    *this += integral;
-    mu_quad_count += mu_params.func_count;
-  }
-  return mu_quad_count;
-}
+  // trancate or extrapolate data?
+  static int truncate = Global.Value( "truncate_direct" );
+  bool use_truncate = ( truncate > 0 );
 
-// **************** class uncorrelated_param ******************
-// ---------------- uncorrelated_param::set_data ------------------
+  // get the outgoing energy range
+  left_data = this_E_dist->begin( );
+  right_data = next_E_dist->begin( );
+
+  double Eout_min;
+  double left_Eout = left_data->x;
+  double right_Eout = right_data->x;
+  if( use_truncate )
+  {
+    Eout_min = ( left_Eout > right_Eout ) ? left_Eout : right_Eout;
+  }
+  else
+  {
+    Eout_min = ( left_Eout < right_Eout ) ? left_Eout : right_Eout;
+  }
+
+  left_data = this_E_dist->end( );
+  --left_data;
+  right_data = next_E_dist->end( );
+  --right_data;
+  double Eout_max;
+  left_Eout = left_data->x;
+  right_Eout = right_data->x;
+  if( use_truncate )
+  {
+    Eout_max = ( left_Eout < right_Eout ) ? left_Eout : right_Eout;
+  }
+  else
+  {
+    Eout_max = ( left_Eout > right_Eout ) ? left_Eout : right_Eout;
+  }
+
+  // make copies, truncated or extrapolated
+  if( use_truncate )
+  {
+    // renormalize the copy
+    bool low_OK = this_Ein_direct.truncate_copy( *this_E_dist, Eout_min, Eout_max, true );
+    bool high_OK = next_Ein_direct.truncate_copy( *next_E_dist, Eout_min, Eout_max, true );
+    if( !low_OK || !high_OK )
+    {
+      Msg::Warning( "standard_Legendre_param::setup_Ein_linlin",
+               "truncation gave norm 0, using histogram" );
+      // we got norm zero; use histogram in incident energy
+      if( !this_Ein_direct.empty( ) )
+      {
+        this_Ein_direct.erase( this_Ein_direct.begin( ), this_Ein_direct.end( ) );
+        next_Ein_direct.erase( next_Ein_direct.begin( ), next_Ein_direct.end( ) );
+      }
+
+      this_Ein_direct.copy( *this_E_dist );
+      next_Ein_direct.copy( *this_E_dist );
+      next_Ein_direct.set_E_in( next_E_dist->get_E_in( ) );
+    }
+  }
+  else
+  {
+    this_Ein_direct.extrapolate_copy( *this_E_dist, Eout_min, Eout_max );
+    next_Ein_direct.extrapolate_copy( *next_E_dist, Eout_min, Eout_max );
+  }
+
+  // set pointers at lower incident energy
+  left_data = this_Ein_direct.begin( );
+  next_left_data = left_data;
+  ++next_left_data;
+  last_left_data = this_Ein_direct.end( );
+
+  // higher incident energy
+  right_data = next_Ein_direct.begin( );
+  next_right_data = right_data;
+  ++next_right_data;
+  last_right_data = next_Ein_direct.end( );
+}
+// ---------------- Uncor::uncorrelated_param::set_data ------------------
 // Sets up the data for interpolation with respect to incident energy
-void uncorrelated_param:: set_data( )
+void Uncor::uncorrelated_param:: set_data( )
 {
   Ein0_data.set_data( *left_data, *next_left_data, current_prev_Eout,
 		      current_next_Eout );
-  if( Ein_interp.qualifier == UNITBASE )
+  if( ( Ein_interp.qualifier == Terp::UNITBASE ) ||
+      ( ( Ein_interp.qualifier == Terp::DIRECT ) && ( Ein_interp.flag == Terp::LINLIN ) ) )
   {
     Ein1_data.set_data( *right_data, *next_right_data, current_prev_Eout,
 		      current_next_Eout );
   }
-  else  // HISTOGRAM
+  else  // DIRECT HISTOGRAM
   {
     Ein1_data.set_pair( Ein0_data.first, Ein0_data.second );
   }
 }
-// ---------------- uncorrelated_param::setup_Ein_cum_prob ------------------
+// ---------------- Uncor::uncorrelated_param::setup_Ein_cum_prob ------------------
 // Sets up the data for cumulative points interpolation in incident energy
-void  uncorrelated_param::setup_Ein_cum_prob( )
+void Uncor::uncorrelated_param::setup_Ein_cum_prob( )
 {
   left_cum_prob = this_E_dist->cum_prob.begin( );
   next_left_cum_prob = left_cum_prob;
@@ -157,13 +166,31 @@ void  uncorrelated_param::setup_Ein_cum_prob( )
 
   setup_high_A( higher_A );
 
-  Ein0_data.to_unit_base( );
-  Ein1_data.to_unit_base( );
+  if( Ein0_data.too_short( ) )
+  {
+    Ein0_data.short_to_unit_base( higher_A );
+  }
+  else
+  {
+    Ein0_data.to_unit_base( );
+  }
+  
+  if( Ein1_data.too_short( ) )
+  {
+    Ein1_data.short_to_unit_base( higher_A );
+  }
+  else
+  {
+    Ein1_data.to_unit_base( );
+  }
 }
-// ---------------- uncorrelated_param::setup_high_A ------------------
+// ---------------- Uncor::uncorrelated_param::setup_high_A ------------------
 // Interpolates (Eout, probability) data to the higher common cumulative probability
-void uncorrelated_param::setup_high_A( double higher_A )
+void Uncor::uncorrelated_param::setup_high_A( double higher_A )
 {
+  // Do not check the interpolations here
+  bool is_OK;
+  
   double higher_Eout;
 
   if( next_left_cum_prob->cum_prob == higher_A )
@@ -174,13 +201,14 @@ void uncorrelated_param::setup_high_A( double higher_A )
   {
     higher_Eout = left_cum_prob->get_cum_inv( higher_A );
     Ein0_data.second.x = higher_Eout;
-    if( Eout_interp == HISTOGRAM )
+    if( Eout_interp == Terp::HISTOGRAM )
     {
       Ein0_data.second.y = left_data->y;
     }
     else
     {
-      Ein0_data.second.y =left_data->linlin_interp( higher_Eout, *next_left_data );
+      Ein0_data.second.y =left_data->linlin_interp( higher_Eout, *next_left_data,
+						    &is_OK );
     }
   }
 
@@ -192,39 +220,40 @@ void uncorrelated_param::setup_high_A( double higher_A )
   {
     higher_Eout = right_cum_prob->get_cum_inv( higher_A );
     Ein1_data.second.x = higher_Eout;
-    if( Eout_interp == HISTOGRAM )
+    if( Eout_interp == Terp::HISTOGRAM )
     {
       Ein1_data.second.y = right_data->y;
     }
     else
     {
-      Ein1_data.second.y =right_data->linlin_interp( higher_Eout, *next_right_data );
+      Ein1_data.second.y =right_data->linlin_interp( higher_Eout, *next_right_data,
+						     &is_OK );
     }
   }
 }
-// ---------------- uncorrelated_param::interp_data_ubase ------------------
-// Interpolates to set up for the integration under unitbase interplation
-void uncorrelated_param::interp_data_ubase( double E_in )
+// ---------------- Uncor::uncorrelated_param::interp_data_ubase ------------------
+// Interpolates to set up for the integration under unitbase interplation over E_in
+bool Uncor::uncorrelated_param::interp_data_ubase( double E_in )
 {
-  // interpolate the unit-base map and the data
+  bool is_OK = true;  // interpolation is OK
+  
+  // interpolate the unit-base map and the data to E_in
   double alpha;
-  dd_pair mid_Ein_data;
-  if( Ein_interp.flag == LINLIN )
+  Ddvec::dd_pair mid_Ein_data;
+  if( Ein_interp.flag == Terp::LINLIN )
   {
-    alpha = ( E_in - Ein0_data.get_E_in( ) )/
-      ( Ein1_data.get_E_in( ) - Ein0_data.get_E_in( ) );
-    mid_Ein_data.linlin_interp( E_in, Ein0_data, Ein1_data );
+    is_OK = mid_Ein_data.linlin_interp( E_in, Ein0_data, Ein1_data );
+    if( !is_OK ) return false;
   }
-  else  // LINLOG
+  else  // Terp::LINLOG
   {
-    alpha = log( E_in / Ein0_data.get_E_in( ) )/
-      log( Ein1_data.get_E_in( ) / Ein0_data.get_E_in( ) );
-    mid_Ein_data.linlog_interp( E_in, Ein0_data, Ein1_data );
+    is_OK = mid_Ein_data.linlog_interp( E_in, Ein0_data, Ein1_data );
+    if( !is_OK ) return false;
   }
   // The energy range interpolates lin-lin
   alpha = ( E_in - Ein0_data.get_E_in( ) )/
       ( Ein1_data.get_E_in( ) - Ein0_data.get_E_in( ) );
-  if( Ein_interp.qualifier == UNITBASE )
+  if( Ein_interp.qualifier == Terp::UNITBASE )
   {
     mid_ubase_map.interpolate( alpha, this_E_dist->ubase_map,
        next_E_dist->ubase_map );
@@ -235,14 +264,15 @@ void uncorrelated_param::interp_data_ubase( double E_in )
        Ein1_data.ubase_map );
   }
 
-  // the range of integration
+  // the range of integration over E_out
   double Eout_min_ubase;
   double Eout_max_ubase;
-  if( Eout_interp == HISTOGRAM )
+  if( Eout_interp == Terp::HISTOGRAM )
   {
     if( use_Eout_min )
     {
-      Eout_min_ubase = mid_ubase_map.to_unit_base( Eout_min );
+      Eout_min_ubase = mid_ubase_map.to_unit_base( Eout_min, &is_OK );
+      if( !is_OK ) return false;
       mid_Eout_data.first.x = Eout_min_ubase;
       mid_Eout_data.first.y = mid_Ein_data.first.y;
     }
@@ -253,7 +283,8 @@ void uncorrelated_param::interp_data_ubase( double E_in )
     }
     if( use_Eout_max )
     {
-      Eout_max_ubase = mid_ubase_map.to_unit_base( Eout_max );
+      Eout_max_ubase = mid_ubase_map.to_unit_base( Eout_max, &is_OK );
+      if( !is_OK ) return false;
       mid_Eout_data.second.x = Eout_max_ubase;
       mid_Eout_data.second.y = mid_Ein_data.first.y;
     }
@@ -263,13 +294,15 @@ void uncorrelated_param::interp_data_ubase( double E_in )
       mid_Eout_data.second.y = mid_Ein_data.first.y;
     }
   }
-  else
+  else  // Terp::LINLIN
   {
     if( use_Eout_min )
     {
-      Eout_min_ubase = mid_ubase_map.to_unit_base( Eout_min );
+      Eout_min_ubase = mid_ubase_map.to_unit_base( Eout_min, &is_OK );
+      if( !is_OK ) return false;
       mid_Eout_data.first.x = Eout_min_ubase;
-      mid_Eout_data.first.y = mid_Ein_data.value( Eout_min_ubase );
+      mid_Eout_data.first.y = mid_Ein_data.value( Eout_min_ubase, &is_OK );
+      if( !is_OK ) return false;
     }
     else
     {
@@ -278,9 +311,11 @@ void uncorrelated_param::interp_data_ubase( double E_in )
     }
     if( use_Eout_max )
     {
-      Eout_max_ubase = mid_ubase_map.to_unit_base( Eout_max );
+      Eout_max_ubase = mid_ubase_map.to_unit_base( Eout_max, &is_OK );
+      if( !is_OK ) return false;
       mid_Eout_data.second.x = Eout_max_ubase;
-      mid_Eout_data.second.y = mid_Ein_data.value( Eout_max_ubase );
+      mid_Eout_data.second.y = mid_Ein_data.value( Eout_max_ubase, &is_OK );
+      if( !is_OK ) return false;
     }
     else
     {
@@ -288,79 +323,185 @@ void uncorrelated_param::interp_data_ubase( double E_in )
       mid_Eout_data.second.y = mid_Ein_data.second.y;
     }
   }
-
-  if( mu_table )
-  {
-    int next_mu = 1 - prev_mu;
-    if( Ein_interp.flag == LINLIN )
-    {
-      mid_mu_integral.linlin_interp( E_in, mu_integral[ prev_mu ],
-        mu_integral[ next_mu ] );
-    }
-    else  // LINLOG
-    {
-      mid_mu_integral.linlog_interp( E_in, mu_integral[ prev_mu ],
-        mu_integral[ next_mu ] );
-    }
-  }
-  else
-  {
-    if( Ein_interp.flag == LINLIN )
-    {
-      mid_mu_integral.linlin_interp( E_in, *prev_L_coefs, *next_L_coefs );
-    }
-    else  //  LINLOG
-    {
-      mid_mu_integral.linlog_interp( E_in, *prev_L_coefs, *next_L_coefs );
-    }
-  }
+  // interpolate mu
+  is_OK = interpolate_mu( E_in );
+  return is_OK;
 }
-// ---------------- uncorrelated_param::interp_data_flat ------------------
-// Interpolates to set up for the integration under histogram interplation
-void uncorrelated_param::interp_data_flat( double E_in )
+// ---------------- Uncor::uncorrelated_param::interp_data_flat ------------------
+// Interpolates to set up for the integration under histogram interplation over E_in
+bool Uncor::uncorrelated_param::interp_data_flat( double E_in )
 {
-  if( use_Eout_min )
+  bool is_OK = true;  // interpolation is OK
+
+  // interpolate the data in E_in
+  
+  // the range of integration over E_out
+  if( Eout_interp == Terp::HISTOGRAM )
   {
-    if( use_Eout_max )
+    mid_Eout_data.first.y = Ein0_data.first.y;
+    mid_Eout_data.second.y = Ein0_data.second.y; // not used
+    
+    if( use_Eout_min )
     {
-      mid_Eout_data.set_data( Ein0_data.first, Ein0_data.second,
- 		      Eout_min, Eout_max );
+      mid_Eout_data.first.x = Eout_min;
     }
     else
     {
-      mid_Eout_data.set_data( Ein0_data.first, Ein0_data.second,
-			      Eout_min, Ein0_data.second.x );
+      mid_Eout_data.first.x = Ein0_data.first.x;
+    }
+
+    if( use_Eout_max )
+    {
+      mid_Eout_data.second.x = Eout_max;
+    }
+    else
+    {
+      mid_Eout_data.second.x = Ein0_data.second.x;
     }
   }
-  else
+  else  // Terp::LINLIN
   {
-    if( use_Eout_max )
+    if( use_Eout_min )
     {
-      mid_Eout_data.set_data( Ein0_data.first, Ein0_data.second,
-			      Ein0_data.first.x, Eout_max );
+      mid_Eout_data.first.x = Eout_min;
+      mid_Eout_data.first.y = Ein0_data.value( Eout_min, &is_OK );
+      if( !is_OK ) return false;
     }
     else
     {
-      mid_Eout_data.set_data( Ein0_data.first, Ein0_data.second,
-			      Ein0_data.first.x, Ein0_data.second.x );
+      mid_Eout_data.first.x = Ein0_data.first.x;
+      mid_Eout_data.first.y = Ein0_data.first.y;
+    }
+    if( use_Eout_max )
+    {
+      mid_Eout_data.second.x = Eout_max;
+      mid_Eout_data.second.y = Ein0_data.value( Eout_max, &is_OK );
+      if( !is_OK ) return false;
+    }
+    else
+    {
+      mid_Eout_data.second.x = Ein0_data.second.x;
+      mid_Eout_data.second.y = Ein0_data.second.y;
     }
   }
 
   mid_mu_integral.set_E_in( E_in );
-  // copy the Legendre coefficients---don't reset the order
-  if( mu_table )
+
+  // interpolate mu
+  is_OK = interpolate_mu( E_in );
+  return is_OK;
+}
+// ---------------- Uncor::uncorrelated_param::interp_linlin_direct -----------------
+// Interpolates to set up for the integration under linlin direct interplation
+bool Uncor::uncorrelated_param::interp_linlin_direct( double E_in )
+{
+  bool is_OK = true;
+  
+  // interpolate the data in E_in
+  Ddvec::dd_pair mid_Ein_data;
+  if( Ein_interp.flag == Terp::LINLIN )
   {
-    mid_mu_integral.only_copy_coef( mu_integral[ prev_mu ] );
+    is_OK = mid_Ein_data.linlin_interp( E_in, Ein0_data, Ein1_data );
+    if( !is_OK ) return false;
+  }
+  else  // Terp::LINLOG
+  {
+    is_OK = mid_Ein_data.linlog_interp( E_in, Ein0_data, Ein1_data );
+    if( !is_OK ) return false;
+  }
+
+  // the range of integration in E_out
+  if( Eout_interp == Terp::HISTOGRAM )
+  {
+    if( use_Eout_min )
+    {
+      mid_Eout_data.first.x = Eout_min;
+      mid_Eout_data.first.y = mid_Ein_data.first.y;
+    }
+    else
+    {
+      mid_Eout_data.first.x = mid_Ein_data.first.x;
+      mid_Eout_data.first.y = mid_Ein_data.first.y;
+    }
+    if( use_Eout_max )
+    {
+      mid_Eout_data.second.x = Eout_max;
+      mid_Eout_data.second.y = mid_Ein_data.first.y;
+    }
+    else
+    {
+      mid_Eout_data.second.x = mid_Ein_data.second.x;
+      mid_Eout_data.second.y = mid_Ein_data.first.y;
+    }
   }
   else
   {
-    mid_mu_integral.only_copy_coef( *prev_L_coefs );
+    if( use_Eout_min )
+    {
+      mid_Eout_data.first.x = Eout_min;
+      mid_Eout_data.first.y = mid_Ein_data.value( Eout_min, &is_OK );
+      if( !is_OK ) return false;
+    }
+    else
+    {
+      mid_Eout_data.first.x = mid_Ein_data.first.x;
+      mid_Eout_data.first.y = mid_Ein_data.first.y;
+    }
+    if( use_Eout_max )
+    {
+      mid_Eout_data.second.x = Eout_max;
+      mid_Eout_data.second.y = mid_Ein_data.value( Eout_max, &is_OK );
+      if( !is_OK ) return false;
+    }
+    else
+    {
+      mid_Eout_data.second.x = mid_Ein_data.second.x;
+      mid_Eout_data.second.y = mid_Ein_data.second.y;
+    }
   }
+  // interpolate mu
+  is_OK = interpolate_mu( E_in );
+  return is_OK;
 }
-// ---------------- uncorrelated_param::next_Eout_cum_prob -----------------
+// ----------- Uncor::uncorrelated_param::interpolate_mu ------------
+// Interpolates the angular data
+bool Uncor::uncorrelated_param::interpolate_mu( double E_in )
+{
+  bool is_OK = true;
+  
+  if( mu_table )
+  {
+    int next_mu = 1 - prev_mu;
+    if( mu_interp == Terp::LINLIN )
+    {
+      is_OK = mid_mu_integral.linlin_interp( E_in, mu_integral[ prev_mu ],
+        mu_integral[ next_mu ] );
+      if( !is_OK ) return false;
+    }
+    else  // Terp::HISTOGRAM
+    {
+      mid_mu_integral.only_copy_coef( mu_integral[ prev_mu ] );
+    }
+  }
+  else
+  {
+    if( mu_interp == Terp::LINLIN )
+    {
+      is_OK = mid_mu_integral.linlin_interp( E_in, *prev_L_coefs, *next_L_coefs );
+      if( !is_OK ) return false;
+    }
+    else  //  Terp::HISTOGRAM
+    {
+      mid_mu_integral.only_copy_coef( *prev_L_coefs );
+    }
+  }
+
+  return true;
+}
+// ------------- Uncor::uncorrelated_param::next_Eout_cum_prob ----
 // Go to the next set of (E_out, probability) pairs for cumulative
 // points interpolation in incident energy.
-bool uncorrelated_param::next_Eout_cum_prob( )
+bool Uncor::uncorrelated_param::next_Eout_cum_prob( )
 {
   // undo the unit-base map before testing data
   Ein0_data.un_unit_base( );
@@ -370,7 +511,7 @@ bool uncorrelated_param::next_Eout_cum_prob( )
   Ein1_data.first = Ein1_data.second;
 
   // ignore intervals with probability less than skip_tol
-  static double skip_tol = Global.Value( "abs_tol" );
+  static double skip_tol = Global.Value( "tight_tol" );
 
   // update the pointers
   if( next_left_cum_prob->E_out <= Ein0_data.first.x )
@@ -423,13 +564,32 @@ bool uncorrelated_param::next_Eout_cum_prob( )
     }
   }
 
+  double lower_A = ( left_cum_prob->cum_prob > right_cum_prob->cum_prob )?
+      left_cum_prob->cum_prob : right_cum_prob->cum_prob;
+
   double higher_A = ( next_left_cum_prob->cum_prob < next_right_cum_prob->cum_prob )?
       next_left_cum_prob->cum_prob : next_right_cum_prob->cum_prob;
 
   setup_high_A( higher_A );
+  double dA = higher_A - lower_A;
 
-  Ein0_data.to_unit_base( );
-  Ein1_data.to_unit_base( );
+  if( Ein0_data.too_short( ) )
+  {
+    Ein0_data.short_to_unit_base( dA );
+  }
+  else
+  {
+    Ein0_data.to_unit_base( );
+  }
+  
+  if( Ein1_data.too_short( ) )
+  {
+    Ein1_data.short_to_unit_base( dA );
+  }
+  else
+  {
+    Ein1_data.to_unit_base( );
+  }
 
   // Reset the physical E_out ranges
   Eout_0_range.x = Ein0_data.ubase_map.un_unit_base( Ein0_data.first.x );
@@ -439,36 +599,38 @@ bool uncorrelated_param::next_Eout_cum_prob( )
   return false;
 }
 
-//*************** class uncorrelated ****************
-// ----------- uncorrelated::constructor --------------
-uncorrelated::uncorrelated( )
+//*************** class Uncor::uncorrelated ****************
+// ----------- Uncor::uncorrelated::constructor --------------
+Uncor::uncorrelated::uncorrelated( )
 {
-  Ein_interp.qualifier = UNITBASE;
-  Ein_interp.flag = LINLIN;
-  Eout_interp = LINLIN;
-  mu_interp = LINLIN;
+  Ein_interp.qualifier = Terp::UNITBASE;
+  Ein_interp.flag = Terp::LINLIN;
+  Eout_interp = Terp::LINLIN;
+  mu_interp = Terp::LINLIN;
 }
-// ----------- uncorrelated::destructor --------------
-uncorrelated::~uncorrelated( )
+// ----------- Uncor::uncorrelated::destructor --------------
+Uncor::uncorrelated::~uncorrelated( )
 {
 }
-// ------------------ uncorrelated::read_data --------------
+// ------------------ Uncor::uncorrelated::read_data --------------
 // Reads the ENDL data
-void uncorrelated::read_data( data_parser& infile, int num_I4, angle_dist *ang )
+void Uncor::uncorrelated::read_data( Dpar::data_parser& infile, int num_I4,
+			      Adist::angle_dist *ang )
 {
   // the angular data
   angles = ang;
   // do some checking
   if( mu_table && ( angles->threshold < 0.0 ) )
   {
-    FatalError( "uncorrelated::read_data", "There is no angular data." );
+    Msg::FatalError( "Uncor::uncorrelated::read_data",
+		     "There is no angular data." );
   }
 
-  uncorrelated::iterator new_energy_ptr;
+  Uncor::uncorrelated::iterator new_energy_ptr;
   for( int Ein_count = 0; Ein_count < num_I4; ++Ein_count )
   {
     // make a new energy distribution
-    new_energy_ptr = insert( end( ), Eprob_vector( ) );
+    new_energy_ptr = insert( end( ), Ebase::Eprob_vector( ) );
     new_energy_ptr->set_E_in( infile.get_next_double( ) );
     new_energy_ptr->interp_type = Eout_interp;
     // read the (energy, probability density) pairs
@@ -480,37 +642,37 @@ void uncorrelated::read_data( data_parser& infile, int num_I4, angle_dist *ang )
       new_energy_ptr->add_entry( E_out, Prob );
     }
     // ensure that the norm is 1
-    new_energy_ptr->renorm( );
+    new_energy_ptr->renorm( false );
 
     // the map to unit base is done in get_T
-    if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+    if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
     {
       new_energy_ptr->form_cum_prob( );
     }
   }
 }
-// ------------------ uncorrelated::read_Legendre --------------
+// ------------------ Uncor::uncorrelated::read_Legendre --------------
 // Reads the Legendre coefficients
-void uncorrelated::read_Legendre( data_parser& infile, int num_Ein )
+void Uncor::uncorrelated::read_Legendre( Dpar::data_parser& infile, int num_Ein )
 {
   Legendre_coef_data.read_data( infile, num_Ein );
 }
-// ----------- uncorrelated::get_Ein_range --------------
+// ----------- Uncor::uncorrelated::get_Ein_range --------------
 //  Gets the range of nontrivial incident energy bins; computes E_first, first_Ein and last_Ein
 // returns true if the threshold is too high for the energy bins
-bool uncorrelated::get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
-    const dd_vector& weight,
-    const Flux_List& e_flux, const Energy_groups& Ein_groups )
+bool Uncor::uncorrelated::get_Ein_range( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& mult,
+    const Ddvec::dd_vector& weight,
+    const Lgdata::Flux_List& e_flux, const Egp::Energy_groups& Ein_groups )
 {
   double E_last;
 
-  uncorrelated_param initial_param;
+  Uncor::uncorrelated_param initial_param;
   bool done = initial_param.get_Ein_range( sigma, mult, weight, e_flux,
                                          Ein_groups, &E_first, &E_last );
   if( done ) return true;
 
   // check the range of incident energies for the probability data
-  uncorrelated::const_iterator Ein_data_ptr = begin( );
+  Uncor::uncorrelated::const_iterator Ein_data_ptr = begin( );
   double E_data = Ein_data_ptr->get_E_in( );
   if( E_data > E_first )
   {
@@ -529,8 +691,8 @@ bool uncorrelated::get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
 
   return false;
 }
-// ----------- uncorrelated::setup_param --------------
-void uncorrelated::setup_param( uncorrelated_param *Ein_param )
+// ----------- Uncor::uncorrelated::setup_param --------------
+void Uncor::uncorrelated::setup_param( Uncor::uncorrelated_param *Ein_param )
 {
   Ein_param->L_order = 0;  // Legendre order of energy data
 
@@ -542,6 +704,7 @@ void uncorrelated::setup_param( uncorrelated_param *Ein_param )
 
   Ein_param->Ein_interp = Ein_interp;
   Ein_param->Eout_interp = Eout_interp;
+  Ein_param->mu_interp = mu_interp;
   Ein_param->mid_Eout_data.Eout_interp = Eout_interp;
   Ein_param->mu_table = mu_table;  // is the angular data a table or Legendre?
 
@@ -554,7 +717,7 @@ void uncorrelated::setup_param( uncorrelated_param *Ein_param )
     ++Ein_param->next_E_dist;
     if( Ein_param->next_E_dist == end( ) )
     {
-      FatalError( "uncorrelated::setup_param",
+      Msg::FatalError( "Uncor::uncorrelated::setup_param",
              "incident energy ranges inconsistent" );
     }
   }
@@ -565,7 +728,8 @@ void uncorrelated::setup_param( uncorrelated_param *Ein_param )
     bool data_bad = Ein_param->update_pointers( first_Ein );
     if( data_bad )
     {
-      FatalError( "uncorrelated::setup_param", "energies inconsistent" );
+      Msg::FatalError( "Uncor::uncorrelated::setup_param",
+		       "energies inconsistent" );
     }
   }
 
@@ -580,7 +744,7 @@ void uncorrelated::setup_param( uncorrelated_param *Ein_param )
       ++Ein_param->next_mu_dist;
       if( Ein_param->next_mu_dist == angles->end( ) )
       {
-        FatalError( "uncorrelated::setup_param",
+        Msg::FatalError( "Uncor::uncorrelated::setup_param",
              "angular data range inconsistent" );
       }
     }
@@ -597,7 +761,7 @@ void uncorrelated::setup_param( uncorrelated_param *Ein_param )
       ++Ein_param->next_L_coefs;
       if( Ein_param->next_L_coefs == Legendre_coef_data.end( ) )
       {
-        FatalError( "uncorrelated::setup_param",
+        Msg::FatalError( "Uncor::uncorrelated::setup_param",
              "Legendre data range inconsistent" );
       }
     }
@@ -613,20 +777,25 @@ void uncorrelated::setup_param( uncorrelated_param *Ein_param )
     Ein_param->prev_mu = 0;
     // do the integrals over mu for the current data
     Ein_param->mu_F_count +=
-      Ein_param->mu_integral[ 0 ].get_moment( *Ein_param->this_mu_dist );
+      to_Legendre_F::from_table( *Ein_param->this_mu_dist,
+				 &Ein_param->mu_integral[ 0 ] );
     Ein_param->mu_F_count +=
-      Ein_param->mu_integral[ 1 ].get_moment( *Ein_param->next_mu_dist );
+      to_Legendre_F::from_table( *Ein_param->next_mu_dist,
+				 &Ein_param->mu_integral[ 1 ] );
+
     Ein_param->prev_mu = 0;
     Ein_param->mu_quad_count += Ein_param->this_mu_dist->size( ) +
       Ein_param->next_mu_dist->size( ) - 2;
   }
 }
-// ----------- uncorrelated::set_Ein_range --------------
+// ----------- Uncor::uncorrelated::set_Ein_range --------------
 // Sets the range of incident energies for this integration
-void uncorrelated::set_Ein_range( uncorrelated_param *Ein_param )
+void Uncor::uncorrelated::set_Ein_range( Uncor::uncorrelated_param *Ein_param )
 {
+  // Don't check the interpolation in this routine
+  
   Ein_param->set_Ein_range( );
-  static double E_tol = Global.Value( "E_tol" );
+  static double E_tol = Global.Value( "tight_tol" );
   double this_E = Ein_param->this_E_dist->get_E_in( );
   if( this_E > Ein_param->data_E_0 * ( 1.0 + E_tol ) )
   {
@@ -636,7 +805,8 @@ void uncorrelated::set_Ein_range( uncorrelated_param *Ein_param )
   if( this_E < Ein_param->data_E_1 * ( 1.0 - E_tol ) ) Ein_param->data_E_1 = this_E;
   if( Ein_param->data_E_1 < Ein_param->data_E_0 )
   {
-    FatalError( "uncorrelated::set_Ein_range", "check the I=4 incident energies" );
+    Msg::FatalError( "Uncor::uncorrelated::set_Ein_range",
+		     "check the I=4 incident energies" );
   }
 
   if( mu_table )
@@ -665,19 +835,27 @@ void uncorrelated::set_Ein_range( uncorrelated_param *Ein_param )
   }
   if( Ein_param->data_E_1 < Ein_param->data_E_0 )
   {
-    FatalError( "uncorrelated::set_Ein_range", "check the angular incident energies" );
+    Msg::FatalError( "Uncor::uncorrelated::set_Ein_range",
+		     "check the angular incident energies" );
   }
   //  Ein_param->set_sigma_range( );
 }
-// ----------- uncorrelated::Eout_ladder --------------
+// ----------- Uncor::uncorrelated::Eout_ladder --------------
 // This routine uses the energy distributions Ein_param->this_E_dist and the
 // next to calculate the contribution to the E_out boxes of the
 // transfer matrix between incident energies E_0 and E_1
-void uncorrelated::Eout_ladder( T_matrix& transfer, uncorrelated_param *Ein_param )
+void Uncor::uncorrelated::Eout_ladder( Trf::T_matrix& transfer,
+				       Uncor::uncorrelated_param *Ein_param )
 {
+  // do truncation or extrapolation of data for direct linlin interpolation
+  if( ( Ein_interp.qualifier == Terp::DIRECT ) && ( Ein_interp.flag ==Terp:: LINLIN ) )
+  {
+    Ein_param->setup_direct( );
+  }
   start_Eout( Ein_param );
+  
   // Save the physical E_out ranges
-  if( Ein_interp.qualifier == UNITBASE )
+  if( Ein_interp.qualifier == Terp::UNITBASE )
   {
     Ein_param->Eout_0_range.x = Ein_param->this_E_dist->ubase_map.Eout_min;
     Ein_param->Eout_1_range.x = Ein_param->next_E_dist->ubase_map.Eout_min;
@@ -686,21 +864,19 @@ void uncorrelated::Eout_ladder( T_matrix& transfer, uncorrelated_param *Ein_para
     Ein_param->Eout_1_range.y =
       Ein_param->next_E_dist->ubase_map.un_unit_base( Ein_param->current_next_Eout );
   }
-  else if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+  else if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
   {
     Ein_param->Eout_0_range.x = Ein_param->Ein0_data.ubase_map.Eout_min;
     Ein_param->Eout_0_range.y = Ein_param->Ein0_data.ubase_map.Eout_max;
     Ein_param->Eout_1_range.x = Ein_param->Ein1_data.ubase_map.Eout_min;
     Ein_param->Eout_1_range.y = Ein_param->Ein1_data.ubase_map.Eout_max;
   }
-  else // histogram
+  else // Terp::DIRECT
   {
-    dd_vector::const_iterator data_ptr = Ein_param->this_E_dist->begin( );
-    Ein_param->Eout_0_range.x = data_ptr->x;
-    Ein_param->Eout_1_range.x = data_ptr->x;
-    ++data_ptr;
-    Ein_param->Eout_0_range.y = data_ptr->x;
-    Ein_param->Eout_1_range.y = data_ptr->x;
+    Ein_param->Eout_0_range.x = Ein_param->Ein0_data.first.x;
+    Ein_param->Eout_0_range.y = Ein_param->Ein0_data.second.x;
+    Ein_param->Eout_1_range.x = Ein_param->Ein1_data.first.x;
+    Ein_param->Eout_1_range.y = Ein_param->Ein1_data.second.x;
   }
 
   // loop through the energy data
@@ -720,7 +896,7 @@ void uncorrelated::Eout_ladder( T_matrix& transfer, uncorrelated_param *Ein_para
     for( int Eout_count = 0; Eout_count < transfer.num_Eout_bins;
       ++Eout_count )
     {
-      vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( )
+      std::vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( )
         + Eout_count;
       // how does the lowest unit-base interpolation line meet this E-E' box?
       Ein_param->lower_hits.hit_box( Ein_param->Ein0_data.first.x, Eout_ptr,
@@ -745,15 +921,16 @@ void uncorrelated::Eout_ladder( T_matrix& transfer, uncorrelated_param *Ein_para
 
     // go to the next pairs of (E_out, probability)
     bool done;
-    if( Ein_interp.qualifier == UNITBASE )
+    if( ( Ein_interp.qualifier == Terp::UNITBASE ) ||
+	( ( Ein_interp.qualifier == Terp::DIRECT ) && ( Ein_interp.flag == Terp::LINLIN ) ) )
     {
       done = next_Eout_ubase( Ein_param );
     }
-    else if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+    else if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
     {
       done = Ein_param->next_Eout_cum_prob( );
     }
-     else  // HISTOGRAM
+     else  // DIRECT HISTOGRAM
     {
       done = next_Eout_flat( Ein_param );
     }
@@ -763,24 +940,42 @@ void uncorrelated::Eout_ladder( T_matrix& transfer, uncorrelated_param *Ein_para
     }
   }
 }
-// ------------------ uncorrelated::start_Eout --------------
+// ------------------ Uncor::uncorrelated::start_Eout --------------
 // Initializes the pointers to the energy probabilities for this E_in range
-void uncorrelated::start_Eout( uncorrelated_param *Ein_param )
+void Uncor::uncorrelated::start_Eout( Uncor::uncorrelated_param *Ein_param )
 {
-  Ein_param->left_data = Ein_param->this_E_dist->begin( );
-  Ein_param->next_left_data = Ein_param->left_data;
-  ++Ein_param->next_left_data;
-  Ein_param->right_data = Ein_param->next_E_dist->begin( );
-  Ein_param->next_right_data = Ein_param->right_data;
-  ++Ein_param->next_right_data;
+  if( ( Ein_interp.qualifier == Terp::DIRECT ) && ( Ein_interp.flag == Terp::LINLIN ) )
+  {
+    Ein_param->left_data = Ein_param->this_Ein_direct.begin( );
+    Ein_param->next_left_data = Ein_param->left_data;
+    ++Ein_param->next_left_data;
+    Ein_param->last_left_data = Ein_param->this_Ein_direct.end( );
 
-  if( Ein_interp.qualifier == UNITBASE )
+    Ein_param->right_data = Ein_param->next_Ein_direct.begin( );
+    Ein_param->next_right_data = Ein_param->right_data;
+    ++Ein_param->next_right_data;
+    Ein_param->last_right_data = Ein_param->next_Ein_direct.end( );
+  }
+  else
+  {
+    Ein_param->left_data = Ein_param->this_E_dist->begin( );
+    Ein_param->next_left_data = Ein_param->left_data;
+    ++Ein_param->next_left_data;
+    Ein_param->last_left_data = Ein_param->this_E_dist->end( );
+
+    Ein_param->right_data = Ein_param->next_E_dist->begin( );
+    Ein_param->next_right_data = Ein_param->right_data;
+    ++Ein_param->next_right_data;
+    Ein_param->last_right_data = Ein_param->next_E_dist->end( );
+  }
+
+  if( Ein_interp.qualifier == Terp::UNITBASE )
   {
     // The following coding is safe, because the unit-base outgoing energies are 0 <= E <= 1.
     Ein_param->current_prev_Eout = 0.0;
     double left_Eout = Ein_param->next_left_data->x;
     double right_Eout = Ein_param->next_right_data->x;
-    static double etol = Global.Value( "E_tol" );
+    static double etol = Global.Value( "tight_tol" );
     if( left_Eout < right_Eout*(1 + etol ) )
     {
       Ein_param->current_next_Eout = left_Eout;
@@ -790,11 +985,11 @@ void uncorrelated::start_Eout( uncorrelated_param *Ein_param )
       Ein_param->current_next_Eout = right_Eout;
     }
   }
-  else if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+  else if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
   {
     Ein_param->setup_Ein_cum_prob( );
   }
-  else // HISTOGRAM
+  else // DIRECT
   {
     Ein_param->current_prev_Eout = Ein_param->left_data->x;
     Ein_param->current_next_Eout = Ein_param->next_left_data->x;
@@ -806,16 +1001,16 @@ void uncorrelated::start_Eout( uncorrelated_param *Ein_param )
   Ein_param->Ein0_data.Eout_interp = Eout_interp;
   Ein_param->Ein1_data.Eout_interp = Eout_interp;
 
-  if ( Ein_interp.qualifier != CUMULATIVE_POINTS )
+  if ( Ein_interp.qualifier != Terp::CUMULATIVE_POINTS )
   {
     Ein_param->set_data( );
   }
 }
-// ----------- uncorrelated::next_ladder --------------
-bool uncorrelated::next_ladder( double E_in, uncorrelated_param *Ein_param )
+// ----------- Uncor::uncorrelated::next_ladder --------------
+bool Uncor::uncorrelated::next_ladder( double E_in, Uncor::uncorrelated_param *Ein_param )
 {
   bool done = Ein_param->update_bin_pointers( E_in );
-  static double etol = Global.Value( "E_tol" );
+  static double etol = Global.Value( "tight_tol" );
   if( !done )
   {
     double E_tol = E_in * etol;
@@ -835,14 +1030,14 @@ bool uncorrelated::next_ladder( double E_in, uncorrelated_param *Ein_param )
   }
   return done;
 }
-// ----------- uncorrelated::next_tabular_ladder --------------
+// ----------- Uncor::uncorrelated::next_tabular_ladder --------------
 // Get the next incident energy range for tabular angular data
-bool uncorrelated::next_tabular_ladder( double E_in, uncorrelated_param *Ein_param )
+bool Uncor::uncorrelated::next_tabular_ladder( double E_in, Uncor::uncorrelated_param *Ein_param )
 {
   bool done = next_ladder( E_in, Ein_param );
   if( !done )
   {
-    static double etol = Global.Value( "E_tol" );
+    static double etol = Global.Value( "tight_tol" );
     double E_tol = E_in * etol;
     //    double E_tol = 0.0;
     // go to the next angular distribution?
@@ -863,18 +1058,23 @@ bool uncorrelated::next_tabular_ladder( double E_in, uncorrelated_param *Ein_par
       if( mu_count == 1 )
       {
         // get the new integral over mu
-        Ein_param->mu_F_count +=
-          Ein_param->mu_integral[ Ein_param->prev_mu ].get_moment( *Ein_param->next_mu_dist );
+	Ein_param->mu_F_count +=
+          to_Legendre_F::from_table( *Ein_param->next_mu_dist,
+				 &Ein_param->mu_integral[ Ein_param->prev_mu ] );
+
 	Ein_param->prev_mu = 1 - Ein_param->prev_mu;
         Ein_param->mu_quad_count += Ein_param->next_mu_dist->size( ) - 1;
       }
       else
       {
         // get both new integrals over mu
+	Ein_param->mu_F_count +=
+          to_Legendre_F::from_table( *Ein_param->this_mu_dist,
+				 &Ein_param->mu_integral[ 0 ] );
         Ein_param->mu_F_count +=
-          Ein_param->mu_integral[ 0 ].get_moment( *Ein_param->this_mu_dist );
-        Ein_param->mu_F_count +=
-          Ein_param->mu_integral[ 1 ].get_moment( *Ein_param->next_mu_dist );
+          to_Legendre_F::from_table( *Ein_param->next_mu_dist,
+				 &Ein_param->mu_integral[ 1 ] );
+
         Ein_param->prev_mu = 0;
         Ein_param->mu_quad_count += Ein_param->this_mu_dist->size( ) +
 	  Ein_param->next_mu_dist->size( ) - 2;
@@ -883,14 +1083,14 @@ bool uncorrelated::next_tabular_ladder( double E_in, uncorrelated_param *Ein_par
   }
   return done;
 }
-// ----------- uncorrelated::next_Legendre_ladder --------------
+// ----------- Uncor::uncorrelated::next_Legendre_ladder --------------
 // Get the next incident energy range for Legendre coefficient angular data
-bool uncorrelated::next_Legendre_ladder( double E_in, uncorrelated_param *Ein_param )
+bool Uncor::uncorrelated::next_Legendre_ladder( double E_in, Uncor::uncorrelated_param *Ein_param )
 {
   bool done = next_ladder( E_in, Ein_param );
   if( !done )
   {
-    static double etol = Global.Value( "E_tol" );
+    static double etol = Global.Value( "tight_tol" );
     double E_tol = E_in * etol;
     // go to the next angular distribution?
     if( E_in + E_tol >= Ein_param->next_L_coefs->get_E_in( ) )
@@ -909,20 +1109,20 @@ bool uncorrelated::next_Legendre_ladder( double E_in, uncorrelated_param *Ein_pa
   }
   return done;
 }
-// ----------- uncorrelated::next_Eout_ubase --------------
+// ----------- Uncor::uncorrelated::next_Eout_ubase --------------
 // go to the next set of (E_out, probability) pairs for unit-base interpolation
-bool uncorrelated::next_Eout_ubase( uncorrelated_param *Ein_param )
+bool Uncor::uncorrelated::next_Eout_ubase( Uncor::uncorrelated_param *Ein_param )
 {
   Ein_param->current_prev_Eout = Ein_param->current_next_Eout;
 
   // which outgoing intervals do we increment?
   double left_Eout = Ein_param->next_left_data->x;
-  static double etol = Global.Value( "E_tol" );
+  static double etol = Global.Value( "tight_tol" );
   if( left_Eout < Ein_param->current_prev_Eout*(1 + etol ) )
   {
     Ein_param->left_data = Ein_param->next_left_data;
     ++Ein_param->next_left_data;
-    if( Ein_param->next_left_data == Ein_param->this_E_dist->end( ) )
+    if( Ein_param->next_left_data == Ein_param->last_left_data )
     {
       return( true );
     }
@@ -932,7 +1132,7 @@ bool uncorrelated::next_Eout_ubase( uncorrelated_param *Ein_param )
   {
     Ein_param->right_data = Ein_param->next_right_data;
     ++Ein_param->next_right_data;
-    if( Ein_param->next_right_data == Ein_param->next_E_dist->end( ) )
+    if( Ein_param->next_right_data == Ein_param->last_right_data )
     {
       return( true );
     }
@@ -955,17 +1155,23 @@ bool uncorrelated::next_Eout_ubase( uncorrelated_param *Ein_param )
   // Reset the physical E_out ranges
   Ein_param->Eout_0_range.x = Ein_param->Eout_0_range.y;
   Ein_param->Eout_1_range.x = Ein_param->Eout_1_range.y;
-  Ein_param->Eout_0_range.y =
+  if( Ein_interp.qualifier == Terp::UNITBASE )
+  {
+    Ein_param->Eout_0_range.y =
       Ein_param->this_E_dist->ubase_map.un_unit_base( Ein_param->current_next_Eout );
-  Ein_param->Eout_1_range.y =
+    Ein_param->Eout_1_range.y =
       Ein_param->next_E_dist->ubase_map.un_unit_base( Ein_param->current_next_Eout );
+  }
+  else
+  {
+    Ein_param->Eout_0_range.y = Ein_param->current_next_Eout;
+    Ein_param->Eout_1_range.y = Ein_param->current_next_Eout;
+  }
   return false;
 }
-// ----------- uncorrelated::next_Eout_cum_prob --------------
-// go to the next set of (E_out, probability) pairs for cumulative points interpolation
-// ----------- uncorrelated::next_Eout_flat --------------
+// ----------- Uncor::uncorrelated::next_Eout_flat --------------
 // go to the next set of (E_out, probability) pairs for histograms in Ein
-bool uncorrelated::next_Eout_flat( uncorrelated_param *Ein_param )
+bool Uncor::uncorrelated::next_Eout_flat( Uncor::uncorrelated_param *Ein_param )
 {
   Ein_param->current_prev_Eout = Ein_param->current_next_Eout;
 
@@ -991,39 +1197,43 @@ bool uncorrelated::next_Eout_flat( uncorrelated_param *Ein_param )
 
   return false;
 }
-// ------------------ uncorrelated::get_T --------------
+// ------------------ Uncor::uncorrelated::get_T --------------
 // Calculates the transfer matrix for this particle.
-void uncorrelated::get_T( const dd_vector& sigma, const dd_vector& mult,
-			       const dd_vector& weight, T_matrix& transfer )
+void Uncor::uncorrelated::get_T( const Ddvec::dd_vector& sigma,
+				 const Ddvec::dd_vector& mult,
+			       const Ddvec::dd_vector& weight,
+				 Trf::T_matrix& transfer )
 {
-  bool interp_OK = ( ( Ein_interp.qualifier == UNITBASE ) &&
-		     ( ( Ein_interp.flag == LINLIN ) ||
-		       ( Ein_interp.flag == LINLOG ) ) ) ||
-    ( ( Ein_interp.qualifier == CUMULATIVE_POINTS ) &&
-      ( ( Ein_interp.flag == LINLIN ) ||
-        ( Ein_interp.flag == HISTOGRAM ) ) ) ||
-    ( ( Ein_interp.qualifier == DIRECT ) &&
-      ( ( Ein_interp.flag == LINLIN ) ||
-        ( Ein_interp.flag == HISTOGRAM ) ) );
+  bool interp_OK = ( ( Ein_interp.qualifier == Terp::UNITBASE ) &&
+		     ( ( Ein_interp.flag == Terp::LINLIN ) ||
+		       ( Ein_interp.flag == Terp::LINLOG ) ) ) ||
+    ( ( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS ) &&
+      ( ( Ein_interp.flag == Terp::LINLIN ) ||
+        ( Ein_interp.flag == Terp::HISTOGRAM ) ) ) ||
+    ( ( Ein_interp.qualifier == Terp::DIRECT ) &&
+      ( ( Ein_interp.flag == Terp::LINLIN ) ||
+        ( Ein_interp.flag == Terp::HISTOGRAM ) ) );
 
   if( !interp_OK )
   {
-    FatalError( "uncorrelated::get_T",
+    Msg::FatalError( "Uncor::uncorrelated::get_T",
       "Incident energy interpolation_type not implemented" );
   }
-  interp_OK = ( Eout_interp == LINLIN ) || ( Eout_interp == HISTOGRAM );
+  interp_OK = ( Eout_interp == Terp::LINLIN ) || ( Eout_interp == Terp::HISTOGRAM );
   if( !interp_OK )
   {
-    FatalError( "uncorrelated::get_T",
+    Msg::FatalError( "Uncor::uncorrelated::get_T",
       "Outgoing energy interpolation not implemented not implemented" );
   }
-  if( mu_interp != LINLIN )
+  interp_OK = ( mu_interp == Terp::LINLIN ) || ( mu_interp == Terp::HISTOGRAM );
+  if( !interp_OK )
   {
-    FatalError( "uncorrelated::get_T", "cosine interpolation not implemented" );
+    Msg::FatalError( "Uncor::uncorrelated::get_T",
+		     "cosine interpolation not implemented" );
   }
 
   // first, do a unit-base transformation
-  if( Ein_interp.qualifier == UNITBASE )
+  if( Ein_interp.qualifier == Terp::UNITBASE )
   {
     unit_base( 0 );
   }
@@ -1032,6 +1242,7 @@ void uncorrelated::get_T( const dd_vector& sigma, const dd_vector& mult,
   {
     transfer.zero_transfer( );
   }
+  transfer.threshold = sigma.begin( )->x;
 
   long int quad_count = 0;  // number of 2-d quadratures
   long int Ein_F_count= 0;  // number of calls to uncorrelated_F::Ein_F
@@ -1046,7 +1257,7 @@ void uncorrelated::get_T( const dd_vector& sigma, const dd_vector& mult,
   reduction( +: mu_quad_count ) reduction( +: mu_F_count )
   for( int Ein_bin = first_Ein; Ein_bin < last_Ein; ++Ein_bin )
   {
-    uncorrelated_param Ein_param;
+    Uncor::uncorrelated_param Ein_param;
     Ein_param.order = transfer.order;
     // set up the data range for this bin
     Ein_param.setup_bin( Ein_bin, sigma, mult, weight, transfer.e_flux,
@@ -1077,20 +1288,20 @@ void uncorrelated::get_T( const dd_vector& sigma, const dd_vector& mult,
   } // end of parallel loop
 
   // print the counts of function evaluations
-  cout << "2d quadratures: " << quad_count << endl;
-  cout << "uncorrelated_F::Ein_F calls: " << Ein_F_count << endl;
-  cout << "average uncorrelated_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << endl;
-  cout << "quadratures over cosine: " << mu_quad_count << endl;
+  std::cout << "2d quadratures: " << quad_count << std::endl;
+  std::cout << "uncorrelated_F::Ein_F calls: " << Ein_F_count << std::endl;
+  std::cout << "average uncorrelated_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << std::endl;
+  std::cout << "quadratures over cosine: " << mu_quad_count << std::endl;
   if( mu_quad_count > 0 )
   {
-    cout << "uncorrelated_F::mu_F calls: " << mu_F_count << endl;
-    cout << "average uncorrelated_F::mu_F calls: " << 1.0*mu_F_count/mu_quad_count << endl;
+    std::cout << "uncorrelated_F::mu_F calls: " << mu_F_count << std::endl;
+    std::cout << "average uncorrelated_F::mu_F calls: " << 1.0*mu_F_count/mu_quad_count << std::endl;
   }
 }
-// ----------- uncorrelated::one_Ebox --------------
+// ----------- Uncor::uncorrelated::one_Ebox --------------
 // Integrate over one E-E' box
-void uncorrelated::one_Ebox( T_matrix& transfer, int Eout_count,
-    uncorrelated_param *Ein_param )
+void Uncor::uncorrelated::one_Ebox( Trf::T_matrix& transfer, int Eout_count,
+    Uncor::uncorrelated_param *Ein_param )
 {
   // the E' energy range
   Ein_param->Eout_min = transfer.out_groups[ Eout_count ];
@@ -1100,32 +1311,32 @@ void uncorrelated::one_Ebox( T_matrix& transfer, int Eout_count,
   Ein_param->lower_hits.common_hits( Ein_param->upper_hits );
 
   // integrate depending on how the hyperbolas eta = const meet the box
-  energy_hit_list::iterator low_hit_ptr = Ein_param->lower_hits.begin( );
-  energy_hit_list::iterator next_low_ptr = low_hit_ptr;
+  Box::energy_hit_list::iterator low_hit_ptr = Ein_param->lower_hits.begin( );
+  Box::energy_hit_list::iterator next_low_ptr = low_hit_ptr;
   ++next_low_ptr;
-  energy_hit_list::iterator high_hit_ptr = Ein_param->upper_hits.begin( );
-  energy_hit_list::iterator next_high_ptr = high_hit_ptr;
+  Box::energy_hit_list::iterator high_hit_ptr = Ein_param->upper_hits.begin( );
+  Box::energy_hit_list::iterator next_high_ptr = high_hit_ptr;
   ++next_high_ptr;
   for( ; ( next_low_ptr != Ein_param->lower_hits.end( ) ) &&
          ( next_high_ptr != Ein_param->upper_hits.end( ) );
        low_hit_ptr = next_low_ptr, ++next_low_ptr,
          high_hit_ptr = next_high_ptr, ++next_high_ptr )
   {
-    if( ( low_hit_ptr->hit_edge == ABOVE ) ||
-        ( low_hit_ptr->hit_edge == TOP_OUT ) )
+    if( ( low_hit_ptr->hit_edge == Box::ABOVE ) ||
+        ( low_hit_ptr->hit_edge == Box::TOP_OUT ) )
     {
       // do nothing---we are above the E-E' box
       continue;
     }
-    else if( ( low_hit_ptr->hit_edge == TOP_IN ) ||
-             ( low_hit_ptr->hit_edge == BOTTOM_IN ) ||
-             ( low_hit_ptr->hit_edge == INSIDE ) )
+    else if( ( low_hit_ptr->hit_edge == Box::TOP_IN ) ||
+             ( low_hit_ptr->hit_edge == Box::BOTTOM_IN ) ||
+             ( low_hit_ptr->hit_edge == Box::INSIDE ) )
     {
       // the lower eta = const hyperbola is inside the E-E' box
       Ein_param->use_Eout_min = false;
       // where is the upper hyperbola?
-      if( ( high_hit_ptr->hit_edge == ABOVE ) ||
-          ( high_hit_ptr->hit_edge == TOP_OUT ) )
+      if( ( high_hit_ptr->hit_edge == Box::ABOVE ) ||
+          ( high_hit_ptr->hit_edge == Box::TOP_OUT ) )
       {
         // integrate up to the top of the E-E' bin
         Ein_param->use_Eout_max = true;
@@ -1142,15 +1353,15 @@ void uncorrelated::one_Ebox( T_matrix& transfer, int Eout_count,
       // integrate from Eout_min
       Ein_param->use_Eout_min = true;
       // where is the upper eta = const hyperbola?
-      if( ( high_hit_ptr->hit_edge == BOTTOM_OUT ) ||
-          ( high_hit_ptr->hit_edge == BELOW ) )
+      if( ( high_hit_ptr->hit_edge == Box::BOTTOM_OUT ) ||
+          ( high_hit_ptr->hit_edge == Box::BELOW ) )
       {
         // do nothing---we are below the E-E' box
         continue;
       }
-      else if( ( high_hit_ptr->hit_edge == TOP_IN ) ||
-               ( high_hit_ptr->hit_edge == BOTTOM_IN ) ||
-               ( high_hit_ptr->hit_edge == INSIDE ) )
+      else if( ( high_hit_ptr->hit_edge == Box::TOP_IN ) ||
+               ( high_hit_ptr->hit_edge == Box::BOTTOM_IN ) ||
+               ( high_hit_ptr->hit_edge == Box::INSIDE ) )
       {
         // the upper eta = const hyperbola is inside the E-E' box
         Ein_param->use_Eout_max = false;
@@ -1167,15 +1378,15 @@ void uncorrelated::one_Ebox( T_matrix& transfer, int Eout_count,
     update_T( transfer, Eout_count, Ein_param );
   }
 }
-// ----------- uncorrelated::update_T --------------
-void uncorrelated::update_T( T_matrix &transfer, int Eout_count,
-   uncorrelated_param *Ein_param )
+// ----------- Uncor::uncorrelated::update_T --------------
+void Uncor::uncorrelated::update_T( Trf::T_matrix &transfer, int Eout_count,
+   Uncor::uncorrelated_param *Ein_param )
 {
   // a vector to store the integrals, one Legendre order
-  coef_vector value( transfer.order, transfer.conserve );
+  Coef::coef_vector value( transfer.order, transfer.conserve );
   value.set_zero( );
   // parameters for the integration
-  QuadParamBase *params = static_cast< QuadParamBase* >( Ein_param );
+  Qparam::QuadParamBase *params = static_cast< Qparam::QuadParamBase* >( Ein_param );
 
   double Ein_0 = Ein_param->Ein_0;
   double Ein_1 = Ein_param->Ein_1;
@@ -1201,17 +1412,17 @@ void uncorrelated::update_T( T_matrix &transfer, int Eout_count,
 
     // evaluate the integral
     static double quad_tol = Global.Value( "quad_tol" );
-    quad_F::integrate( uncorrelated_F::Ein_F, transfer.Ein_quad_method, Ein_param->Ein_0,
+    quad_F::integrate( uncorrelated_F::Ein_F, transfer.Ein_quad_rule, Ein_param->Ein_0,
 		       Ein_param->Ein_1, params, quad_tol, &value );
 
-    if( !isfinite( value.weight_1[ 0 ] ) )
+    if( !std::isfinite( value.weight_1[ 0 ] ) )
     {
-      cout << "energy_dist::update_T: bad Legendre" << endl;
+      std::cout << "energy_dist::update_T: bad Legendre" << std::endl;
     }
 
     // add this integral
     transfer( Ein_param->Ein_count, Eout_count ) += value;
-    //  cout << "E_0: " << E_0 << " E_1: " << E_1 << endl;
+    //  std::cout << "E_0: " << E_0 << " E_1: " << E_1 << std::endl;
     //  value.print( );
     // increment the function counts
     Ein_param->Ein_F_count += Ein_param->func_count;
@@ -1219,26 +1430,16 @@ void uncorrelated::update_T( T_matrix &transfer, int Eout_count,
   }
 }
 
-// **************** uncorrelated_F::mu_F ******************
-// Function for the quadrature over mu: Legendre * probability density table
-void uncorrelated_F::mu_F( double mu_in, QuadParamBase *void_param,
-   coef_vector *value )
-{
-  // the parameters are really mu_param
-  mu_param *params = static_cast<mu_param*>( void_param );
-  params->func_count += 1;
-
-  math_F::Legendre( mu_in, value );   // the Legendre polynomials
-  *value *= params->value( mu_in );
-}
-
 // **************** uncorrelated_F::Ein_F ******************
 // Function for the quadrature over incident energy
-void uncorrelated_F::Ein_F( double E_in, QuadParamBase *void_param,
-   coef_vector *value )
+bool uncorrelated_F::Ein_F( double E_in, Qparam::QuadParamBase *void_param,
+   Coef::coef_vector *value )
 {
-  // the parameters are really uncorrelated_param
-  uncorrelated_param *e_params = static_cast<uncorrelated_param*>( void_param );
+  bool is_OK = true;
+  
+  // the parameters are really Uncor::uncorrelated_param
+  Uncor::uncorrelated_param *e_params =
+    static_cast<Uncor::uncorrelated_param*>( void_param );
   
   e_params->func_count += 1;
   //  if( e_params->func_count % 500 == 0 )
@@ -1247,25 +1448,33 @@ void uncorrelated_F::Ein_F( double E_in, QuadParamBase *void_param,
   //  }
 
   // do the data interpolation
-  if( ( e_params->Ein_interp.qualifier == UNITBASE ) ||
-      ( e_params->Ein_interp.qualifier == CUMULATIVE_POINTS ) )
+  if( ( e_params->Ein_interp.qualifier == Terp::UNITBASE ) ||
+      ( e_params->Ein_interp.qualifier == Terp::CUMULATIVE_POINTS ) )
   {
-    e_params->interp_data_ubase( E_in );
+    is_OK = e_params->interp_data_ubase( E_in );
+    if( !is_OK ) return false;
   }
-  else  // HISTOGRAM
+  else  // DIRECT
   {
-    e_params->interp_data_flat( E_in );
+    if( e_params->Ein_interp.flag == Terp::HISTOGRAM )
+    {
+      e_params->interp_data_flat( E_in );
+    }
+    else
+    {
+      e_params->interp_linlin_direct( E_in );
+    }
   }
 
   double dE_out = e_params->mid_Eout_data.second.x - e_params->mid_Eout_data.first.x;
   if( dE_out <= 0.0 )
   {
     value->set_zero( );
-    return;
+    return false;
   }
 
   double av_number;
-  if( e_params->Eout_interp == LINLIN )
+  if( e_params->Eout_interp == Terp::LINLIN )
   {
     av_number = 0.5*dE_out*
      ( e_params->mid_Eout_data.second.y + e_params->mid_Eout_data.first.y );
@@ -1274,31 +1483,33 @@ void uncorrelated_F::Ein_F( double E_in, QuadParamBase *void_param,
   {
     av_number = dE_out*e_params->mid_Eout_data.first.y;  // histogram
   }
-  if( ( value->conserve == NUMBER ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::NUMBER ) || ( value->conserve == Coef::BOTH ) )
   {
     for( int L_count = 0; L_count <= value->order; ++L_count )
     {
       value->weight_1[ L_count ] = av_number*e_params->mid_mu_integral.value( L_count );
     }
   }
-  if( ( value->conserve == ENERGY ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::ENERGY ) || ( value->conserve == Coef::BOTH ) )
   {
     double phys_Eout_0;
     double phys_Eout_1;
-    if( ( e_params->Ein_interp.qualifier == UNITBASE ) ||
-        ( e_params->Ein_interp.qualifier == CUMULATIVE_POINTS ) )
+    if( ( e_params->Ein_interp.qualifier == Terp::UNITBASE ) ||
+        ( e_params->Ein_interp.qualifier == Terp::CUMULATIVE_POINTS ) )
     {
-      phys_Eout_0 = e_params->mid_ubase_map.un_unit_base( e_params->mid_Eout_data.first.x );
-      phys_Eout_1 = e_params->mid_ubase_map.un_unit_base( e_params->mid_Eout_data.second.x );
+      phys_Eout_0 = e_params->mid_ubase_map.un_unit_base( e_params->mid_Eout_data.first.x, &is_OK );
+      if( !is_OK ) return false;
+      phys_Eout_1 = e_params->mid_ubase_map.un_unit_base( e_params->mid_Eout_data.second.x, &is_OK  );
+      if( !is_OK ) return false;
     }
-    else // HISTOGRAM
+    else // Terp::DIRECT
     {
       phys_Eout_0 = e_params->mid_Eout_data.first.x;
       phys_Eout_1 = e_params->mid_Eout_data.second.x;
     }
 
     double av_E;
-    if( e_params->Eout_interp == LINLIN )
+    if( e_params->Eout_interp == Terp::LINLIN )
     {
       double d_phys_Eout = ( phys_Eout_1 - phys_Eout_0 )/dE_out;
       double d_prob = ( e_params->mid_Eout_data.second.y - e_params->mid_Eout_data.first.y )/dE_out;
@@ -1316,4 +1527,6 @@ void uncorrelated_F::Ein_F( double E_in, QuadParamBase *void_param,
   }
   e_params->set_weight( E_in );
   *value *= e_params->current_weight;
+
+  return is_OK;
 }

@@ -1,6 +1,5 @@
 xndfgenTransferMatrix: version 1.0
 Process: Legendre two body transfer matrix
-Quadrature method: adaptive
 Comment: n + I135 --> n + I135 outgoing data for n
 Projectile's mass:  9.395656534709e+08
 Target's mass:  1.256669061517e+11

@@ -1,0 +1,447 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.covariances.covarianceSuite &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.covariances.covarianceSuite</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.covariances.covarianceSuite</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module with containers for covariances in several different forms</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">formatVersion</span> <span class="k">as</span> <span class="n">formatVersionModule</span>
+<span class="kn">from</span> <span class="nn">xData.ancestry</span> <span class="kn">import</span> <span class="n">ancestry</span>
+
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">styles</span> <span class="k">as</span> <span class="n">stylesModule</span><span class="p">,</span> <span class="n">suites</span> <span class="k">as</span> <span class="n">suitesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">covarianceSection</span> <span class="k">as</span> <span class="n">sectionModule</span><span class="p">,</span> <span class="n">summed</span> <span class="k">as</span> <span class="n">summedModule</span><span class="p">,</span> <span class="n">mixed</span> <span class="k">as</span> <span class="n">mixedModule</span><span class="p">,</span> <span class="n">modelParameters</span> <span class="k">as</span> <span class="n">modelParametersModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+
+<div class="viewcode-block" id="covarianceSections"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSections">[docs]</a><span class="k">class</span> <span class="nc">covarianceSections</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Most covariances are stored in &#39;sections&#39;, each representing either the internal covariance</span>
+<span class="sd">    for a single quantity (i.e. cross section) or the cross-term between two quantities</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;covarianceSections&#39;</span>
+    <span class="n">legacyMemberNameMapping</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;section&#39;</span> <span class="p">:</span> <span class="n">sectionModule</span><span class="o">.</span><span class="n">covarianceSection</span><span class="o">.</span><span class="n">moniker</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">sectionModule</span><span class="o">.</span><span class="n">covarianceSection</span><span class="p">,))</span></div>
+
+<div class="viewcode-block" id="parameterCovariances"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.parameterCovariances">[docs]</a><span class="k">class</span> <span class="nc">parameterCovariances</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Resolved and unresolved resonance parameters are stored inside the parameterCovariances</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;parameterCovariances&#39;</span>
+    <span class="n">legacyMemberNameMapping</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;section&#39;</span> <span class="p">:</span> <span class="n">modelParametersModule</span><span class="o">.</span><span class="n">averageParameterCovariance</span><span class="o">.</span><span class="n">moniker</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">modelParametersModule</span><span class="o">.</span><span class="n">parameterCovariance</span><span class="p">,</span>
+                                           <span class="n">modelParametersModule</span><span class="o">.</span><span class="n">averageParameterCovariance</span><span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="covarianceSuite"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite">[docs]</a><span class="k">class</span> <span class="nc">covarianceSuite</span><span class="p">(</span> <span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    All covariances for a target/projectile combination are stored in a :py:class:`covarianceSuite` in gnds.</span>
+<span class="sd">    The :py:class:`covarianceSuite` is stored in a separate file from the reactionSuite.</span>
+
+<span class="sd">    Within the :py:class:`covarianceSuite`, data is sorted into :py:class:`sections` (see the section module), each</span>
+<span class="sd">    of which contains one section of the full covariance matrix.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;covarianceSuite&#39;</span>
+    <span class="n">childNodeOrder</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span> <span class="p">:</span>       <span class="p">(</span>  <span class="n">suitesModule</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                 <span class="n">stylesModule</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>
+                                                        <span class="n">covarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                         <span class="n">parameterCovariances</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span>
+            <span class="n">formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span> <span class="p">:</span> <span class="p">(</span>  <span class="n">suitesModule</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                 <span class="n">stylesModule</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>
+                                                        <span class="n">covarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                         <span class="n">parameterCovariances</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">formatVersionModule</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">sourcePath</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param projectile:  particle id</span>
+<span class="sd">        :param target:      particle id</span>
+<span class="sd">        :param evaluation:  evaluation id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">formatVersion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formatVersionModule</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unsupported GNDS structure &#39;</span><span class="si">%s</span><span class="s2">&#39;!&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">formatVersion</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span> <span class="o">=</span> <span class="n">projectile</span>            <span class="c1">#: The projectile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>                    <span class="c1">#: The target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span> <span class="o">=</span> <span class="n">evaluation</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span> <span class="o">=</span> <span class="n">sourcePath</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span> <span class="o">=</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span> <span class="o">=</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">styles</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__covarianceSections</span> <span class="o">=</span> <span class="n">covarianceSections</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__covarianceSections</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parameterCovariances</span> <span class="o">=</span> <span class="n">parameterCovariances</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parameterCovariances</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatVersion</span> <span class="o">=</span> <span class="n">formatVersion</span> 
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sourcePath</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the sourcePath member which is the path to the covarianceSuite file for self if self is from a file.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span> <span class="p">)</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">styles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">externalFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">covarianceSections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__covarianceSections</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parameterCovariances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parameterCovariances</span>
+
+<div class="viewcode-block" id="covarianceSuite.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="p">:</span> <span class="n">section</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">mpsection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameterCovariances</span><span class="p">:</span> <span class="n">mpsection</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="covarianceSuite.saveToOpenedFile"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.saveToOpenedFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToOpenedFile</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fOut</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="covarianceSuite.saveToFile"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.saveToFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToFile</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+
+        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="n">fileName</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">saveToOpenedFile</span><span class="p">(</span> <span class="n">fout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
+    
+<div class="viewcode-block" id="covarianceSuite.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check all covariance sections, returning a list of warnings. </span>
+<span class="sd">        </span>
+<span class="sd">        :keyword bool checkUncLimits: Should we check the uncertainty limits? (default: True)</span>
+<span class="sd">        :keyword float minRelUnc: Minimum allowable relative uncertainty (default: 0.0)</span>
+<span class="sd">        :keyword float maxRelUnc: Maximum allowable relative uncertainty (default: 10.0)</span>
+<span class="sd">        :keyword theData: A reference to the data for this covariance.  This is useful for converting between relative and absolute covariance (default: None)</span>
+<span class="sd">        :keyword float negativeEigenTolerance: Ignore negative eigenvalues smaller than this (default: -1e-6) </span>
+<span class="sd">        :keyword float eigenvalueRatioTolerance: Warn if smallest eigenvalue &lt; this value * biggest (default: 1e-8)</span>
+<span class="sd">        :keyword float eigenvalueAbsoluteTolerance: Warn if smallest eigenvalue &lt; this value (default: 1e-14)</span>
+<span class="sd">        :rtype: warning.context</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
+
+        <span class="c1"># default input options</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;checkUncLimits&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;minRelUnc&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s1">&#39;maxRelUnc&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+            <span class="s1">&#39;theData&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1e-6</span><span class="p">,</span>  <span class="c1"># ignore smaller negative eigenvalues</span>
+            <span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="c1"># warn if smallest eival &lt; 1e-8 * biggest</span>
+            <span class="s1">&#39;eigenvalueAbsoluteTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-14</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s2">&quot;check() received unknown keyword argument &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">key</span> <span class="p">)</span>
+
+        <span class="c1"># assemble some useful info, to be handed down to children&#39;s check() functions:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;covarianceSuite&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;style&#39;</span><span class="p">:</span> <span class="s1">&#39;eval&#39;</span> <span class="p">}</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">options</span> <span class="p">)</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1">#: summedReactions are sums of other sections, but that opens the possibility of a cyclic dependency</span>
+        <span class="c1">#: check for that, using algorithm taken from</span>
+        <span class="c1">#:    http://neopythonic.blogspot.com/2009/01/detecting-cycles-in-directed-graph.html </span>
+        <span class="k">def</span> <span class="nf">find_cycle</span><span class="p">(</span><span class="n">NODES</span><span class="p">,</span> <span class="n">EDGES</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
+            <span class="n">todo</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">NODES</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">todo</span><span class="p">:</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="n">todo</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="p">]</span>
+                <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+                    <span class="n">top</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">EDGES</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">stack</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">stack</span><span class="p">[</span><span class="n">stack</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">node</span><span class="p">):]</span>
+                        <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">todo</span><span class="p">:</span>
+                            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                            <span class="n">todo</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                            <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># this node is not in a cycle</span>
+                        <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="nf">get_edges</span><span class="p">(</span> <span class="n">section_</span><span class="p">,</span> <span class="n">style</span> <span class="p">):</span>   <span class="c1">#: return list of all pointers from this section</span>
+            <span class="n">natDat</span> <span class="o">=</span> <span class="n">section_</span><span class="p">[</span><span class="n">style</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">natDat</span><span class="p">,</span> <span class="n">summedModule</span><span class="o">.</span><span class="n">summedCovariance</span><span class="p">):</span> <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">link</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">natDat</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">natDat</span><span class="p">,</span> <span class="n">mixedModule</span><span class="o">.</span><span class="n">mixedForm</span><span class="p">):</span>
+                <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">natDat</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">summedModule</span><span class="o">.</span><span class="n">summedCovariance</span><span class="p">):</span> <span class="n">edges</span> <span class="o">+=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">link</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">part</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">edges</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">sec</span> <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span> <span class="k">if</span> <span class="n">get_edges</span><span class="p">(</span> <span class="n">sec</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">]</span> <span class="p">)]</span>  <span class="c1"># sections that contain pointers</span>
+
+        <span class="k">if</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="n">cycle</span> <span class="o">=</span> <span class="n">find_cycle</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">get_edges</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">cycle</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">cyclicDependency</span><span class="p">(</span> <span class="n">cycle</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="c1"># check each section</span>
+        <span class="k">for</span> <span class="n">section_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="p">:</span>
+            <span class="n">sectionWarnings</span> <span class="o">=</span> <span class="n">section_</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">sectionWarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;covarianceSection &#39;</span><span class="si">%s</span><span class="s2">&#39;:&quot;</span> <span class="o">%</span> <span class="n">section_</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">sectionWarnings</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">parameterCovariance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameterCovariances</span><span class="p">:</span>
+            <span class="n">pcwarnings</span> <span class="o">=</span> <span class="n">parameterCovariance</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">pcwarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;parameterCovariance &#39;</span><span class="si">%s</span><span class="s2">&#39;:&quot;</span> <span class="o">%</span> <span class="n">parameterCovariance</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">pcwarnings</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;CovarianceSuite: </span><span class="si">%s</span><span class="s1"> + </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">),</span> <span class="n">warnings</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="covarianceSuite.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply basic fixes to a covariance</span>
+
+<span class="sd">        :param bool removeNegativeEVs: Should we remove eigenspaces corresponding to negative eigenvalues? (Default: True)</span>
+<span class="sd">        :param bool removeSmallEVs: Should we remove eigenspaces corresponding to small eigenvalues? (Default: False)</span>
+<span class="sd">        :param bool fixUncLimits: Should we fix the uncertainties to lie within bounds imposed by minRelUnc and maxRelUnc? (Default: False)</span>
+<span class="sd">        :param minRelUnc: Minimum allowable uncertainty for this covariance</span>
+<span class="sd">        :type minRelUnc: float or None</span>
+<span class="sd">        :param maxRelUnc: Maximum allowable uncertainty for this covariance</span>
+<span class="sd">        :type maxRelUnc: float or None</span>
+<span class="sd">        :param theData: Reference to the data that accompanies this covariance so that we may convert between absolute and relative covariance as needed.</span>
+<span class="sd">        :type theData: instance or None </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
+        <span class="c1"># default input options</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;removeNegativeEVs&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> 
+            <span class="s1">&#39;removeSmallEVs&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span> 
+            <span class="s1">&#39;fixUncLimits&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span> 
+            <span class="s1">&#39;minRelUnc&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
+            <span class="s1">&#39;maxRelUnc&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
+            <span class="s1">&#39;theData&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1e-6</span><span class="p">,</span>  <span class="c1"># ignore smaller negative eigenvalues</span>
+            <span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="c1"># warn if smallest eival &lt; 1e-8 * biggest</span>
+            <span class="s1">&#39;eigenvalueAbsoluteTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-14</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s2">&quot;fix() received unknown keyword argument &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="c1"># assemble some useful info, to be handed down to children&#39;s check() functions:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;covarianceSuite&#39;</span><span class="p">:</span> <span class="bp">self</span> <span class="p">}</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">options</span> <span class="p">)</span>
+        <span class="c1"># do the fixing</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">section_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="p">:</span> <span class="n">warnings</span> <span class="o">+=</span> <span class="n">section_</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span> <span class="o">**</span><span class="n">info</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;CovarianceSuite: </span><span class="si">%s</span><span class="s1"> + </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">),</span> <span class="n">warnings</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="covarianceSuite.removeExtraZeros"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.removeExtraZeros">[docs]</a>    <span class="k">def</span> <span class="nf">removeExtraZeros</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks all covariance matrices for rows/columns of all zero, removes them if found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">section_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">section_</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="s2">&quot;removeExtraZeros&quot;</span><span class="p">):</span>
+                    <span class="n">form</span><span class="o">.</span><span class="n">removeExtraZeros</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">mixedModule</span><span class="o">.</span><span class="n">mixedForm</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">covar</span> <span class="ow">in</span> <span class="n">form</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">covar</span><span class="p">,</span> <span class="s2">&quot;removeExtraZeros&quot;</span><span class="p">):</span>
+                            <span class="n">covar</span><span class="o">.</span><span class="n">removeExtraZeros</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="covarianceSuite.toXML"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an GNDS/XML string representation of self.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+    
+<div class="viewcode-block" id="covarianceSuite.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of GNDS/XML strings representing self.&quot;&quot;&quot;</span>
+
+        <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
+        <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatVersion</span> <span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatVersion</span>
+        <span class="k">if</span> <span class="n">formatVersion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formatVersionModule</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unsupported GNDS structure &#39;</span><span class="si">%s</span><span class="s2">&#39;!&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">formatVersion</span><span class="p">))</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> projectile=&quot;</span><span class="si">%s</span><span class="s1">&quot; target=&quot;</span><span class="si">%s</span><span class="s1">&quot; evaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot; format=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span>
+                <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="n">formatVersion</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameterCovariances</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">xmlString</span></div>
+
+<div class="viewcode-block" id="covarianceSuite.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.covarianceSuite.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="c1"># keep track of location in the tree, in case errors come up</span>
+
+        <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;sourcePath&#39;</span> <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">)</span>
+            <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatVersion</span>
+            <span class="n">CS</span> <span class="o">=</span> <span class="n">covarianceSuite</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;projectile&#39;</span><span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;evaluation&#39;</span><span class="p">),</span>
+                    <span class="n">formatVersion</span><span class="p">,</span> <span class="n">sourcePath</span><span class="o">=</span><span class="n">sourcePath</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;styles&#39;</span><span class="p">:</span>
+                    <span class="n">CS</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                    <span class="n">CS</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">covarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                    <span class="n">CS</span><span class="o">.</span><span class="n">covarianceSections</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">parameterCovariances</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                    <span class="n">CS</span><span class="o">.</span><span class="n">parameterCovariances</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: encountered unexpected element &#39;</span><span class="si">%s</span><span class="s2">&#39; in covarianceSuite!&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;Error encountered at xpath = /</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">xPath</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="c1"># fix links:</span>
+        <span class="k">for</span> <span class="n">link_</span> <span class="ow">in</span> <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;unresolvedLinks&#39;</span><span class="p">]:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">link_</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span> <span class="n">link_</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/covarianceSuite&#39;</span><span class="p">):</span>
+                    <span class="n">root</span> <span class="o">=</span> <span class="n">CS</span>
+                <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+                    <span class="n">root</span> <span class="o">=</span> <span class="n">link_</span>    <span class="c1"># relative link</span>
+            <span class="k">elif</span> <span class="n">link_</span><span class="o">.</span><span class="n">root</span> <span class="o">==</span> <span class="s1">&#39;$reactions&#39;</span><span class="p">:</span>
+                <span class="n">root</span> <span class="o">=</span> <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>    <span class="c1"># FIXME links to other files (i.e. cross-material covariances) currently broken</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">link_</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+            <span class="n">link_</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">res</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">CS</span></div></div>
+
+<div class="viewcode-block" id="readXML"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.readXML">[docs]</a><span class="k">def</span> <span class="nf">readXML</span><span class="p">(</span> <span class="n">gndsCovariancesFile</span><span class="p">,</span> <span class="n">reactionSuite</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">warningNoReactionSuite</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
+    <span class="k">if</span> <span class="n">reactionSuite</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">warningNoReactionSuite</span> <span class="p">)</span> <span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;WARNING: without a reactionSuite instance, covariances will have unresolved links!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">xml.etree</span> <span class="kn">import</span> <span class="n">cElementTree</span>
+    <span class="n">csElement</span> <span class="o">=</span> <span class="n">cElementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">gndsCovariancesFile</span> <span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+    <span class="c1"># wrapper around the xml parser:</span>
+    <span class="kn">from</span> <span class="nn">LUPY.xmlNode</span> <span class="kn">import</span> <span class="n">xmlNode</span>
+    <span class="n">csElement</span> <span class="o">=</span> <span class="n">xmlNode</span><span class="p">(</span> <span class="n">csElement</span><span class="p">,</span> <span class="n">xmlNode</span><span class="o">.</span><span class="n">etree</span> <span class="p">)</span>
+    <span class="n">linkData</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">:</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="s1">&#39;unresolvedLinks&#39;</span><span class="p">:[]}</span>
+    <span class="n">covSuite</span> <span class="o">=</span> <span class="n">covarianceSuite</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">csElement</span><span class="p">,</span> <span class="n">xPath</span><span class="o">=</span><span class="p">[],</span> <span class="n">linkData</span><span class="o">=</span><span class="n">linkData</span><span class="p">,</span> <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">gndsCovariancesFile</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">reactionSuite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">externalLink</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">_externalLinks</span><span class="p">:</span>
+            <span class="n">externalLink</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">externalLink</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span> <span class="n">covSuite</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">covSuite</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.covariances.covarianceSuite</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

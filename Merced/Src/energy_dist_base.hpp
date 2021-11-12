@@ -20,17 +20,17 @@
 #include "cumulative_points.hpp"
 #include "param_base.hpp"
 
-using namespace std;
-
+namespace Ebase
+{
 //! Class for one energy distribution
 //--------------- class Eprob_vector ----------------
-class Eprob_vector : public dd_vector
+class Eprob_vector : public Ddvec::dd_vector
 {
 public:
   // cumulative probabilities for cumulative points interpolation
-  cumulative_prob_list cum_prob;
+  Cum::cumulative_prob_list cum_prob;
 
-  unit_base_map ubase_map;
+  Ddvec::unit_base_map ubase_map;
 
   inline Eprob_vector( ) {}
 
@@ -46,13 +46,13 @@ public:
 
 //! Class for energy distributions
 //--------------- class energy_dist_base ----------------
-class energy_dist_base : public list< Eprob_vector >
+class energy_dist_base : public std::list< Ebase::Eprob_vector >
 {
 private:
 
 public:
-  two_d_interp Ein_interp;  // interpolation between incident enrgies
-  Interp_Type Eout_interp;
+  Terp::two_d_interp Ein_interp;  // interpolation between incident enrgies
+  Terp::Interp_Type Eout_interp;
 
   inline energy_dist_base( ) {}
 
@@ -65,5 +65,7 @@ public:
   // Prints the lists for debugging
   void print( );
 };
+
+} // end of namespace Ebase
 
 #endif

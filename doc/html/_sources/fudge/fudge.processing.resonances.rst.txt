@@ -35,6 +35,14 @@ fudge.processing.resonances.reconstructResonances module
     :undoc-members:
     :show-inheritance:
 
+fudge.processing.resonances.makeUnresolvedProbabilityTables module
+------------------------------------------------------------------
+
+.. automodule:: fudge.processing.resonances.makeUnresolvedProbabilityTables
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 fudge.processing.resonances.setup module
 ----------------------------------------
 

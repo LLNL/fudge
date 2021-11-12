@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.reactionProducts &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.reactionProducts</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.reactionProducts</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
+
+<span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">This module contains the ReactionProducts class which is used to store a unique list of products for a reaction in a dictionary-like object.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Category"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.Category">[docs]</a><span class="k">class</span> <span class="nc">Category</span> <span class="p">:</span>
+
+    <span class="n">particle</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">intermediate</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">reaction</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+<div class="viewcode-block" id="ReactionProduct"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProduct">[docs]</a><span class="k">class</span> <span class="nc">ReactionProduct</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_category</span><span class="p">,</span> <span class="n">_value</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__category</span> <span class="o">=</span> <span class="n">_category</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">_value</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;c=</span><span class="si">%s</span><span class="s1"> : v=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">ReactionProduct</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Other must be a ReactionProduct instance: </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">category</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">category</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__category</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="p">)</span>
+
+    <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_value</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">_value</span></div>
+
+<div class="viewcode-block" id="ReactionProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts">[docs]</a><span class="k">class</span> <span class="nc">ReactionProducts</span><span class="p">(</span> <span class="nb">dict</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class used to store a unique list of products for a reaction in a dictionary-like object. The key for each item in the dictionary</span>
+<span class="sd">    is a product&#39;s particle id or an outputChannel&#39;s process.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ReactionProducts.asSortedList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts.asSortedList">[docs]</a>    <span class="k">def</span> <span class="nf">asSortedList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">,</span> <span class="n">excludePhotons</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">particles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">intermediates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">processes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">reaction</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">excludePhotons</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">key</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+            <span class="n">reactionProduct</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">particle</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">value</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">intermediate</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">intermediates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">value</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">process</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">value</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">reaction</span> <span class="o">=</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="n">particles</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">]</span> <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">particles</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">intermediates</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">]</span> <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">intermediates</span> <span class="p">)</span> <span class="p">]</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">particles</span><span class="p">,</span> <span class="n">intermediates</span><span class="p">,</span> <span class="n">processes</span><span class="p">,</span> <span class="n">reaction</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReactionProducts.cullPhotons"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts.cullPhotons">[docs]</a>    <span class="k">def</span> <span class="nf">cullPhotons</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a copy of self but with photons removed from the list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">culled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="ow">in</span> <span class="n">culled</span> <span class="p">)</span> <span class="p">:</span> <span class="n">culled</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">culled</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.reactionProducts</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

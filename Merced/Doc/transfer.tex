@@ -122,21 +122,25 @@ These energy groups are also called energy bins.
 According to the normalization for Legendre expansions used in \xendl,
 the angular discretization of $\pi_r$ in Eq.~(\ref{def_pi}) is 
 given by
-$$
+\begin{equation}
   \pi_r( E', \mu \mid E) =
-   \sum_\ell 
+   \sum_{\ell = 0}^{\Lmax}
    \left(
      \ell + \frac{1}{2}
    \right)
    \pi_{r\ell}( E' \mid E) P_\ell( \mu)
-$$
+  \label{def_pi_r}
+\end{equation}
 with $P_\ell( \mu)$ denoting the $\ell$-th Legendre polynomial
 and
 \begin{equation}
   \pi_{r\ell}( E' \mid E) =
-  \int_{-1}^1 d\mu \, \pi_r( E', \mu \mid E) P_\ell( \mu).
+  \int_{-1}^1 d\mu \, \pi_r( E', \mu \mid E) P_\ell( \mu)
   \label{def_piell}
 \end{equation}
+for $\ell = 0,$ 1, \ldots,~$\Lmax$.
+The user may specify the order~$\Lmax$ with the command
+given in Section~\ref{Sec:LegendreOrder}.
 
 The flux $\phi(E, \Omega)$ in Eq.~(\ref{Boltzmann}) is expanded 
 into spherical harmonics
@@ -400,15 +404,25 @@ of the transfer matrix is performed by \xndfgen.
 \section{Numerical quadrature}
 The integrals Eqs.~(\ref{Inum}) and~(\ref{Ien}) require some sort
 of numerical quadrature, and the multiple integrals are computed as
-a sequence of single integrals.  The quadrature method is a modification of an
-adaptive method proposed by Gander and Gautschi~\cite{Gander}.  The
-main difference is that the Simpson rule
-used in~\cite{Gander} is replaced by a second-order Gaussian quadrature.
-The reason for this change is that in the calculations here,
-one of the limits of integration may be a computed quantity,
+a sequence of single integrals.  The user may specify Gaussian quadrature
+of various orders, as explained in Section~\ref{Sec:QuadratureMethods}.
+The reason for the use of Gaussian quadrature in place of, say, Simpson's
+rule, is that in the calculations here,
+one of the limits of integration may be a computed quantity
 such as a threshold energy.  In such cases, computer arithmetic may
 give rise to attempts to evaluate $\pi_r(E', \mu \mid E)$
-where it makes no sense to do so.
+where this function is undefined.
+
+The user may also specify whether or not to employ an adaptive 
+version of one of these Gaussian methods, using
+a modification of the
+adaptive quadrature method proposed by Gander and Gautschi~\cite{Gander}.
+The default is to use adaptive quadrature---the non-adaptive version
+is intended for debugging.  For an explanation of the quadrature options,
+see Sections~\ref{Sec:QuadratureMethods} and~\ref{Sec:adaptive-quadrature}.
+
+Another adaptation of the adaptive quadrature of the reference~\cite{Gander}
+is that in the integrals Eqs.~(\ref{Inum}) and~(\ref{Ien}).
 
 \textbf{Remark.} In the rest of this document the
 subscript~$r$ is omitted from each of the terms in the kernel

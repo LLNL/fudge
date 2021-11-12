@@ -14,151 +14,33 @@
 // routines for the list of (incident energy, flux)
 
 #include <cmath>
+
 #include "Legendre_data.hpp"
+#include "adapt_quad.hpp"
+#include "math_util.hpp"
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-// *************** class Legendre_base *************************
-// ------------------ Legendre_base::clean_data ----------------
-void Legendre_base::clean_data( )
-{
-  if( order >= 0 )
-  {
-    delete [] data;
-  }
-  order = -1;
-}
-// ------------------ Legendre_base::initialize ----------------
-// Sets the incident energy and allocates space
-void Legendre_base::initialize( int Order )
-{
-  if( order != Order )
-  {
-    if( order >= 0 )
-    {
-      clean_data( );
-    }
-    order = Order;
-    data = new double[ order + 1 ];
-    for( int L_count = 0; L_count <= order; ++L_count )
-    {
-      data[ L_count ] = 0.0;
-    }
-  }
-}
-// ------------------ Legendre_base::operator[ ] ----------------
-// access routine
-double& Legendre_base::operator[ ]( int N )
-{
-  if( ( N < 0 ) || ( N > order ) )
-  {
-    FatalError( "Legendre_base::operator[ ]",
-		 "index out of range" );
-  }
-  return data[ N ];
-}
-// ------------------ Legendre_base::value ----------------
-// access routine
-double Legendre_base::value( int N ) const
-{
-  if( ( N < 0 ) || ( N > order ) )
-  {
-    FatalError( "Legendre_base::value",
-		 "index out of range" );
-  }
-  return data[ N ];
-}
-// ------------------ Legendre_base::truncate_zeros ----------------
-// Ignore zero high-order Legendre coefficients
-void Legendre_base::truncate_zeros( )
-{
-  int N = order;
-  for( N = order; N > 0; --N )
-  {
-    if( data[ N ] != 0.0 ) break;
-  }
-  order = N;
-}
-// ------------------ Legendre_base::operator*= ----------------
-// Scales the vector
-Legendre_base& Legendre_base::operator*=( double factor )
-{
-  for( int L_count = 0; L_count <= order; ++L_count )
-  {
-    data[ L_count ] *= factor;
-  }
-  return *this;
-}
-// --------------- Legendre_base::sum_Legendre ---------------
-// Sums the Legenre series
-double Legendre_base::sum_Legendre( double mu )
-{
-  if( order < 0 )
-  {
-    FatalError( "Legendre_data::sum_Legendre", "order not set" );
-  }
-  if( mu > 1.0 )
-  {
-    mu = 1.0;
-  }
-  if( mu < -1.0 )
-  {
-    mu = -1.0;
-  }
-  int ell = 0;
-  double this_coef = value( ell );
-  double sum = this_coef/2;
-  if( order == 0 ) return sum;
 
-  double prevP = 1.0;  // P_0
-  double thisP = mu;   // P_1
-  double nextP;        // P_{ell+1}
-  ell = 1;
-  this_coef = value( ell );
-  sum += 1.5*this_coef*thisP;
-  if( order == 1 ) return sum;
-
-  for( ell = 1; ell < order; ++ell )
-  {
-    this_coef = value( ell + 1 );
-    nextP = ( ( 2*ell + 1 )*mu*thisP - ell*prevP )/(ell + 1.0);
-    sum += ( ell + 1.5 )*this_coef*nextP;
-    prevP = thisP;
-    thisP = nextP;
-  }
-  return sum;
-}
-// ------------------ Legendre_base::print ----------------
-// For debugging
-void Legendre_base::print( ) const
-{
-  cout << "E " << Energy << ":";
-  for( int L_count = 0; L_count <= order; ++L_count )
-  {
-    cout << " " << value( L_count );
-  }
-  cout << endl;
-}
-
-// *************** class Legendre_coefs *************************
-// ------------------ Legendre_coefs::initialize ----------------
+// *************** class Lgdata::Legendre_coefs *********************
+// --------------- Lgdata::Legendre_coefs::initialize ----------------
 // Allocates space
-void Legendre_coefs::initialize( int order )
+void Lgdata::Legendre_coefs::initialize( int order )
 {
-  Legendre_base::initialize( order );
+  LgBase::Legendre_base::initialize( order );
 }
-// ------------------ Legendre_coefs::zero_data ----------------
+// --------------- Lgdata::Legendre_coefs::zero_data ----------------
 // Sets all coefficients to zero
-void Legendre_coefs::zero_data( )
+void Lgdata::Legendre_coefs::zero_data( )
 {
   for( int L_count = 0; L_count <= order; ++L_count )
   {
     data[ L_count ] = 0.0;
   }
 }
-// ------------------ Legendre_coefs::copy_coef ----------------
+// --------------- Lgdata::Legendre_coefs::copy_coef ----------------
 // Copies the Legendre coefficients
-void Legendre_coefs::copy_coef( const Legendre_coefs& to_copy )
+void Lgdata::Legendre_coefs::copy_coef( const Lgdata::Legendre_coefs& to_copy )
 {
   // reset the order if necessary
   if( order != to_copy.order )
@@ -175,14 +57,15 @@ void Legendre_coefs::copy_coef( const Legendre_coefs& to_copy )
     data[ L_count ] = to_copy.data[ L_count ];
   }
 }
-// ------------------ Legendre_coefs::only_copy_coef ----------------
+// -------------- Lgdata::Legendre_coefs::only_copy_coef ------------
 // Copies the Legendre coefficients; do not change the order
-void Legendre_coefs::only_copy_coef( const Legendre_coefs& to_copy )
+void Lgdata::Legendre_coefs::only_copy_coef( const Lgdata::Legendre_coefs& to_copy )
 {
   // make sure that space is allocated
   if( order < 0 )
   {
-    FatalError( "Legendre_coefs::only_copy_coef", "no space allocated" );
+    Msg::FatalError( "Lgdata::Legendre_coefs::only_copy_coef",
+		     "no space allocated" );
   }
   int use_order = ( order <= to_copy.order ) ? order : to_copy.order;
   for( int L_count = 0; L_count <= use_order; ++L_count )
@@ -190,9 +73,9 @@ void Legendre_coefs::only_copy_coef( const Legendre_coefs& to_copy )
     data[ L_count ] = to_copy.data[ L_count ];
   }
 }
-// ------------------ Legendre_coefs::set_max_order ----------------
+// -------------- Lgdata::Legendre_coefs::set_max_order ------------
 // Sets the order for interpolated data
-void Legendre_coefs::set_max_order( int left_order, int right_order )
+void Lgdata::Legendre_coefs::set_max_order( int left_order, int right_order )
 {
   int max_order = ( left_order >= right_order ) ? left_order : right_order;
   if( order != max_order )
@@ -205,10 +88,10 @@ void Legendre_coefs::set_max_order( int left_order, int right_order )
     data = new double[ max_order + 1 ];
   }
 }
-// ------------------ Legendre_coefs::basic_linlin_interp ----------------
+// ----------- Lgdata::Legendre_coefs::basic_linlin_interp ----------
 // Interpolates the flux with weight alpha
-void Legendre_coefs::basic_linlin_interp( double alpha,
-  const Legendre_coefs& prev_flux, const Legendre_coefs& next_flux )
+void Lgdata::Legendre_coefs::basic_linlin_interp( double alpha,
+  const Lgdata::Legendre_coefs& prev_flux, const Lgdata::Legendre_coefs& next_flux )
 {
   int max_order;
   int min_order;
@@ -258,65 +141,86 @@ void Legendre_coefs::basic_linlin_interp( double alpha,
     (*this)[ L_count ] = 0.0;
   }
 }
-// ------------------ Legendre_coefs::linlin_interp ----------------
+// -------------- Lgdata::Legendre_coefs::linlin_interp ------------
 // Interpolates the flux at energy E_in
-void Legendre_coefs::linlin_interp( double E_in, const Legendre_coefs& prev_flux,
-  const Legendre_coefs& next_flux )
+bool Lgdata::Legendre_coefs::linlin_interp( double E_in, const Lgdata::Legendre_coefs& prev_flux,
+  const Lgdata::Legendre_coefs& next_flux )
 {
   if( order < 0 )
   {
-    FatalError( "Legendre_coefs::linlin_interp", "no space for data allocated" );
+    Msg::FatalError( "Lgdata::Legendre_coefs::linlin_interp",
+		     "no space for data allocated" );
   }
   set_E_in( E_in );
   // linearly interpolate
   double denom = next_flux.get_E_in( ) - prev_flux.get_E_in( );
   if( denom <= 0.0 )
   {
-    FatalError( "Legendre_coefs::linlin_interp", "incident energies out of order" );
+    Msg::DebugInfo( "Lgdata::Legendre_coefs::linlin_interp",
+		    "incident energies out of order" );
+    return false;
   }
   double alpha = ( E_in - prev_flux.get_E_in( ) ) / denom;
   basic_linlin_interp( alpha, prev_flux, next_flux );
+
+  return true;
 }
-// ------------------ Legendre_coefs::Ein_linlin_interp ----------------
+// ----------- Lgdata::Legendre_coefs::Ein_linlin_interp ------------
 // Interpolates Legendre-coefficient data at energy E_in
-void Legendre_coefs::Ein_linlin_interp( double E_in, double left_Ein, 
-    const Legendre_coefs& left_flux, double right_Ein,
-    const Legendre_coefs& right_flux )
+bool Lgdata::Legendre_coefs::Ein_linlin_interp( double E_in, double left_Ein, 
+    const Lgdata::Legendre_coefs& left_flux, double right_Ein,
+    const Lgdata::Legendre_coefs& right_flux )
 {
   set_E_in( left_flux.get_E_in( ) );
   // linearly interpolate
   double denom = right_Ein - left_Ein;
   if( denom <= 0.0 )
   {
-    FatalError( "Legendre_coefs::Ein_linlin_interp", "incident energies out of order" );
+    Msg::DebugInfo( "Lgdata::Legendre_coefs::Ein_linlin_interp",
+		    "incident energies out of order" );
+    return false;
   }
   double alpha = ( E_in - left_Ein ) / denom;
   basic_linlin_interp( alpha, left_flux, right_flux );
+
+  return true;
 }
-// ------------------ Legendre_coefs::unitbase_interp ----------------
+// ----------- Lgdata::Legendre_coefs::unitbase_interp ------------
 // Interpolates unit-base Legendre-coefficient data
-void Legendre_coefs::unitbase_interp( double E_in, double alpha, 
-    const Legendre_coefs& left_flux,
-    const Legendre_coefs& right_flux )
+bool Lgdata::Legendre_coefs::unitbase_interp( double E_in, double alpha, 
+    const Lgdata::Legendre_coefs& left_flux,
+    const Lgdata::Legendre_coefs& right_flux )
 {
+  static double E_tol = Global.Value( "looser_tol" );
+  if( ( alpha < 0.0 ) || ( alpha > 1.0 + E_tol ) )
+  {
+    Msg::DebugInfo( "Lgdata::Legendre_coefs::unitbase_interp",
+		    "energies out of order" );
+    return false;
+  }
   set_E_in( left_flux.get_E_in( ) );
   basic_linlin_interp( alpha, left_flux, right_flux );
+
+  return true;
 }
-// ------------------ Legendre_coefs::linlog_interp ----------------
+// ------------- Lgdata::Legendre_coefs::linlog_interp -------------
 // Interpolates the flux linearly with respect to the logarithm of the energy
-void Legendre_coefs::linlog_interp( double E_in, const Legendre_coefs& prev_flux,
-  const Legendre_coefs& next_flux )
+bool Lgdata::Legendre_coefs::linlog_interp( double E_in, const Lgdata::Legendre_coefs& prev_flux,
+  const Lgdata::Legendre_coefs& next_flux )
 {
   if( order < 0 )
   {
-    FatalError( "Legendre_coefs::linlog_interp", "no space for data allocated" );
+    Msg::FatalError( "Lgdata::Legendre_coefs::linlog_interp",
+		     "no space for data allocated" );
   }
   set_E_in( E_in );
   // interpolate
   double denom = log( next_flux.get_E_in( ) / prev_flux.get_E_in( ) );
   if( denom <= 0.0 )
   {
-    FatalError( "Legendre_coefs::linlog_interp", "incident energies out of order" );
+    Msg::DebugInfo( "Lgdata::Legendre_coefs::linlog_interp",
+		    "incident energies out of order" );
+    return false;
   }
   int max_order;
   int min_order;
@@ -366,38 +270,67 @@ void Legendre_coefs::linlog_interp( double E_in, const Legendre_coefs& prev_flux
   {
     (*this)[ L_count ] = 0.0;
   }
+
+  return true;
 }
 
-// *************** class Legendre_data_range *************************
-// ----------- Legendre_data_range::new_Ein --------------
+// ------------------ Lgdata::Legendre_coefs::operator+= --------------
+Lgdata::Legendre_coefs& Lgdata::Legendre_coefs::operator+=( const Coef::coef_vector &to_add )
+{
+  if( to_add.conserve != Coef::NUMBER )
+  {
+    Msg::FatalError( "Lgdata::Legendre_coefs::operator+=",
+		     "incompatible conserve" );
+  }
+  for( int ell = 0; ell <= order; ++ell )
+  {
+    data[ ell ] += to_add.weight_1[ ell ];
+  }
+  return *this;
+}
+
+// ****************** class Lgdata::mu_param ***************
+// ---------------- Lgdata::mu_param::value ------------------
+double Lgdata::mu_param::value( double mu, bool *is_OK )
+{
+  double p = left_data->linlin_interp( mu, *right_data, is_OK );
+  return p;
+};
+
+// ************ class Lgdata::Legendre_data_range *******************
+// ----------- Lgdata::Legendre_data_range::new_Ein --------------
 // Sets up a new incident energy
-void Legendre_data_range::new_Ein( double Ein, const unit_base_map &ubasemap,
-  Interp_Type Eoutinterp )
+void Lgdata::Legendre_data_range::new_Ein( double Ein,
+					   const Ddvec::unit_base_map &ubasemap,
+  Terp::Interp_Type Eoutinterp )
 {
   E_in = Ein;
   Eout_interp = Eoutinterp;
   ubase_map.copy( ubasemap );
 }
-// ----------- Legendre_data_range::set_data --------------
+// ----------- Lgdata::Legendre_data_range::set_data --------------
 // Sets up the data for a given range of outgloing energies
-void Legendre_data_range::set_data(  const Legendre_coefs &prevdata,
-  const Legendre_coefs &nextdata, double Eout_min, double Eout_max )
+void Lgdata::Legendre_data_range::set_data(  const Lgdata::Legendre_coefs &prevdata,
+  const Lgdata::Legendre_coefs &nextdata, double Eout_min, double Eout_max )
 {
   if( Eout_min >= Eout_max )
   {
-    FatalError( "Legendre_data_range::set_data", "improper energy range" );
+    Msg::FatalError( "Lgdata::Legendre_data_range::set_data",
+		     "improper energy range" );
   }
-  static double E_tol = Global.Value( "E_tol" );
+  static double E_tol = Global.Value( "looser_tol" );
   if( Eout_min < ( 1.0 - E_tol )*prevdata.get_E_out( ) )
   {
-    FatalError( "Legendre_data_range::set_data", "Eout_min too low" );
+    Msg::FatalError( "Lgdata::Legendre_data_range::set_data",
+		     "Eout_min too low" );
   }
   if( Eout_max > ( 1.0 + E_tol )*nextdata.get_E_out( ) )
   {
-    FatalError( "Legendre_data_range::set_data", "Eout_max too high" );
+    Msg::FatalError( "Lgdata::Legendre_data_range::set_data",
+		     "Eout_max too high" );
   }
 
-  if( Eout_interp == HISTOGRAM )
+  if( Eout_interp == Terp::HISTOGRAM )
   {
     prev_data.set_E_out( Eout_min );
     prev_data.copy_coef( prevdata );
@@ -427,45 +360,53 @@ void Legendre_data_range::set_data(  const Legendre_coefs &prevdata,
     }
   }
 }
-// ----------- Legendre_data_range::ubase_interpolate --------------
+// ----------- Lgdata::Legendre_data_range::ubase_interpolate --------------
 // Do unit-base interpolation between incident energies
-void Legendre_data_range::ubase_interpolate( double E_in,
-  const Legendre_data_range &left_data, const Legendre_data_range &right_data )
+bool Lgdata::Legendre_data_range::ubase_interpolate( double E_in,
+  const Lgdata::Legendre_data_range &left_data, const Lgdata::Legendre_data_range &right_data )
 {
+  bool is_OK = true;
+  
   Eout_interp = left_data.Eout_interp;
   double left_Ein = left_data.get_E_in( );
   double right_Ein = right_data.get_E_in( );
   double denom = right_Ein - left_Ein;
   if( denom <= 0.0 )
   {
-    FatalError( "Legendre_data_range::ubase_interpolate",
+    Msg::FatalError( "Lgdata::Legendre_data_range::ubase_interpolate",
                 "incident energies out of order" );
+    return false;
   }
   double alpha = ( E_in - left_Ein )/denom;
   if( ( alpha < 0.0 ) || ( alpha > 1.0 ) )
   {
-    FatalError( "Legendre_data_range::ubase_interpolate",
+    Msg::DebugInfo( "Lgdata::Legendre_data_range::ubase_interpolate",
                 "extrapolation" );
+    return false;
   }
   prev_data.set_max_order( left_data.prev_data.order, right_data.prev_data.order );
-  prev_data.unitbase_interp( E_in, alpha, left_data.prev_data,
+  is_OK = prev_data.unitbase_interp( E_in, alpha, left_data.prev_data,
 			     right_data.prev_data );
-  if( Eout_interp == HISTOGRAM )
+  if( !is_OK ) return false;
+  if( Eout_interp == Terp::HISTOGRAM )
   {
     next_data.set_E_out( left_data.next_data.get_E_out( ) );
   }
   else
   {
     next_data.set_max_order( left_data.next_data.order, right_data.next_data.order );
-    next_data.unitbase_interp( E_in, alpha, left_data.next_data,
+    is_OK = next_data.unitbase_interp( E_in, alpha, left_data.next_data,
 			       right_data.next_data );
+    if( !is_OK ) return false;
   }
   set_E_in( E_in );
   ubase_map.interpolate( alpha, left_data.ubase_map, right_data.ubase_map );
+
+  return true;
 }
-// ----------- Legendre_data_range::to_unit_base --------------
+// ----------- Lgdata::Legendre_data_range::to_unit_base --------------
 //  Maps from physical variables to unit-base
-void Legendre_data_range::to_unit_base( )
+bool Lgdata::Legendre_data_range::to_unit_base( )
 {
   double Eout_min = prev_data.get_E_out( );
   double Eout_max = next_data.get_E_out( );
@@ -475,7 +416,8 @@ void Legendre_data_range::to_unit_base( )
     char Str[1024];
 
     sprintf( Str, "bad energy range: (Eout_min = %.17e, Eout_max = %.17e: diff = %e)",  Eout_min, Eout_max, scale );
-    FatalError( "Legendre_data_range::to_unit_base", Str );
+    Msg::DebugInfo( "Lgdata::Legendre_data_range::to_unit_base", Str );
+    return false;
   }
   ubase_map.Eout_min = Eout_min;
   ubase_map.Eout_max = Eout_max;
@@ -484,41 +426,66 @@ void Legendre_data_range::to_unit_base( )
   prev_data *= scale;
   next_data.set_E_out( 1.0 );
   next_data *= scale;
+
+  return true;
 }
-// ----------- Legendre_data_range::un_unit_base --------------
+// ----------- Lgdata::Legendre_data_range::short_to_unit_base --------------
+// Used by cumulative points interpolation for intervals of length zero
+void Lgdata::Legendre_data_range::short_to_unit_base( double dA )
+{
+  double Eout_max = next_data.get_E_out( );
+  double scale = dA;
+  ubase_map.Eout_min = Eout_max;
+  ubase_map.Eout_max = Eout_max;
+
+  prev_data.set_E_out( 0.0 );
+  prev_data *= scale;
+  next_data.set_E_out( 1.0 );
+  next_data *= scale;
+}
+// ----------- Lgdata::Legendre_data_range::un_unit_base --------------
 // Maps from unit-base to physical variables
-void Legendre_data_range::un_unit_base( )
+bool Lgdata::Legendre_data_range::un_unit_base( )
 {
   double scale = ubase_map.Eout_max - ubase_map.Eout_min;
   if( scale <= 0.0 )
   {
-    FatalError( "Legendre_data_range::un_unit_base",
-                "bad unit-base map" );
+    Msg::DebugInfo( "Lgdata::Legendre_data_range::un_unit_base",
+                 "bad unit-base map" );
+    return false;
   }
-  double phys_Eout = ubase_map.un_unit_base( prev_data.get_E_out( ) );
+
+  bool interp_OKL;
+  double phys_Eout = ubase_map.un_unit_base( prev_data.get_E_out( ), &interp_OKL );
   prev_data.set_E_out( phys_Eout );
   prev_data *= 1.0/scale;
-  phys_Eout = ubase_map.un_unit_base( next_data.get_E_out( ) );
+
+  bool interp_OKR;
+  phys_Eout = ubase_map.un_unit_base( next_data.get_E_out( ), &interp_OKR );
   next_data.set_E_out( phys_Eout );
   next_data *= 1.0/scale;
+
+  return( interp_OKL && interp_OKR );
 }
-// ----------- Legendre_data_range::Eout_interpolate --------------
+/*
+// ----------- Lgdata::Legendre_data_range::Eout_interpolate --------------
 // Returns the Legendre coefficients for this outgoing energy
-Legendre_coefs Legendre_data_range::Eout_interpolate( double E_out )
+Lgdata::Legendre_coefs Lgdata::Legendre_data_range::Eout_interpolate( double E_out )
 { 
-  Legendre_coefs interpolated_data;
+  Lgdata::Legendre_coefs interpolated_data;
   interpolated_data.set_max_order( prev_data.order, next_data.order );
   interpolated_data.linlin_interp( E_out, prev_data, next_data );
   return interpolated_data;
 }
+*/
 
-// *************** class Legendre_list_base *************************
-// ----------- Legendre_list_base::to_unit_base --------------
+// *************** class Lgdata::Legendre_list_base *************************
+// ----------- Lgdata::Legendre_list_base::to_unit_base --------------
 // Maps the data to unit base
-void Legendre_list_base::to_unit_base( )
+void Lgdata::Legendre_list_base::to_unit_base( )
 {
   // find the energy range
-  Legendre_list_base::iterator Eprob_ptr = begin( );
+  Lgdata::Legendre_list_base::iterator Eprob_ptr = begin( );
   double Eout_min = Eprob_ptr->get_E_out( );
   ubase_map.Eout_min = Eout_min;
   Eprob_ptr = end( );
@@ -528,7 +495,7 @@ void Legendre_list_base::to_unit_base( )
   double scale = Eout_max - Eout_min;
   if( scale <= 0.0 )
   {
-    FatalError( "Legendre_list_base::to_unit_base",
+    Msg::FatalError( "Lgdata::Legendre_list_base::to_unit_base",
                  "improper energy range" );
   }
 
@@ -538,12 +505,12 @@ void Legendre_list_base::to_unit_base( )
     *Eprob_ptr *= scale;
   }
 }
-// ----------- Legendre_list_base::get_norm --------------
+// ----------- Lgdata::Legendre_list_base::get_norm --------------
 // Finds the total probability
-double Legendre_list_base::get_norm( ) const
+double Lgdata::Legendre_list_base::get_norm( ) const
 {
   // coding based on dd_vector::get_norm
-  Legendre_list_base::const_iterator entry = begin();
+  Lgdata::Legendre_list_base::const_iterator entry = begin();
   
   double norm = 0.0;
   double last_E = entry->get_E_out( );
@@ -559,11 +526,11 @@ double Legendre_list_base::get_norm( ) const
     next_P = entry->value( 0 );
 
     // accumulate the probability
-    if( Eout_interp == LINLIN )
+    if( Eout_interp == Terp::LINLIN )
     {
       norm += 0.5*(next_P + last_P)*(next_E - last_E);
     }
-    else // if( Eout_interp == HISTOGRAM )
+    else // if( Eout_interp == Terp::HISTOGRAM )
     {
       norm += last_P*(next_E - last_E);
     }
@@ -575,29 +542,39 @@ double Legendre_list_base::get_norm( ) const
 
   return norm;
 }
-// ----------- Legendre_list_base::renorm --------------
+// ----------- Lgdata::Legendre_list_base::renorm --------------
 // Normalizes the total probability
-void Legendre_list_base::renorm( )
+bool Lgdata::Legendre_list_base::renorm( bool truncated )
 {
   // coding based on dd_vector::renorm
   double norm = get_norm( );
-  Legendre_list_base::iterator entry = begin( );
+  Lgdata::Legendre_list_base::iterator entry = begin( );
 
   // error check
-  if(norm == 0.0)
+  if( norm == 0.0 )
   {
-    Warning("Legendre_list_base::renorm",
-	    pastenum( "zero norm in renorm routine for E_in: ", get_E_in( ) ) );
-    // fudge something
-    entry->data[ 0 ] = 1.0;
-    norm = get_norm( );
+    if( truncated )
+    {
+      // direct interpolation with truncation gave norm 0
+      return false;
+    }
+    else
+    {
+      Msg::Warning("Lgdata::Legendre_list_base::renorm",
+ 	    Msg::pastenum( "zero norm in renorm routine for E_in: ", get_E_in( ) ) );
+      // fudge something
+      entry->data[ 0 ] = 1.0;
+      norm = get_norm( );
+    }
   }
-  static double etol = 1.0e+4 * Global.Value( "e_tol" );
+
+  static int norm_warn = Global.Value( "norm_warn" );
+  static double norm_tol = Global.Value( "norm_tol" );
   static bool norm_good = true;
-  if( norm_good && ( abs( norm - 1.0 ) > etol ) )
+  if( norm_warn && norm_good && ( std::abs( norm - 1.0 ) > norm_tol ) )
   {
-    Warning("Legendre_list_base::renorm",
-            pastenum( "bad norm in renorm routine: ", norm ) );
+    Msg::Warning("Lgdata::Legendre_list_base::renorm",
+            Msg::pastenum( "bad norm in renorm routine: ", norm ) );
     norm_good = false;
   }
   // Now, renormalize
@@ -605,25 +582,26 @@ void Legendre_list_base::renorm( )
   {
     *entry *= 1.0/norm;
   }
-  //  cout << "E_in: " << get_E_in( ) << " norm: " << norm << endl;
+  // this is not truncated data with zero norm
+  return true;
 }
-// ----------- Legendre_list_base::print --------------
+// ----------- Lgdata::Legendre_list_base::print --------------
 // For debugging
-void Legendre_list_base::print( )
+void Lgdata::Legendre_list_base::print( )
 {
-  cout << "E_in: " << E_in << endl;
-  Legendre_list_base::const_iterator this_entry = begin( );
+  std::cout << "E_in: " << E_in << std::endl;
+  Lgdata::Legendre_list_base::const_iterator this_entry = begin( );
   for( ; this_entry != end( ); ++this_entry )
   {
     this_entry->print( );
   }
-  cout << endl;
+  std::cout << std::endl;
 }
 
-// *************** class Flux_List *************************
-// ------------------ Flux_List::read_flux ----------------
+// *************** class Lgdata::Flux_List *************************
+// ------------------ Lgdata::Flux_List::read_flux ----------------
 // Constructs the list from the Python data
-void Flux_List::read_flux( data_parser &infile, int num_Ein )
+void Lgdata::Flux_List::read_flux( Dpar::data_parser &infile, int num_Ein )
 {
   // Read the interpolation
   interp = interp_flag_F::read_1d_interpolation( infile );
@@ -631,10 +609,11 @@ void Flux_List::read_flux( data_parser &infile, int num_Ein )
   order = Global.Value( "outputLegendreOrder" );
   if( order < 0 )
   {
-    FatalError( "Flux_List::convert_flux", "Desired Legendre order not set" );
+    Msg::FatalError( "Lgdata::Flux_List::convert_flux",
+		     "Desired Legendre order not set" );
   }
 
-  Flux_List::iterator next_ptr;  // point to the next data
+  Lgdata::Flux_List::iterator next_ptr;  // point to the next data
   // read the flux data
   for( int Ein_count = 0; Ein_count < num_Ein; ++Ein_count )
   {
@@ -673,25 +652,25 @@ void Flux_List::read_flux( data_parser &infile, int num_Ein )
     }
   }
 }
-// ------------------ Flux_List::value ----------------
-Legendre_coefs Flux_List::value( double E_in, Flux_List::const_iterator &ptr ) const
+// ------------------ Lgdata::Flux_List::value ----------------
+Lgdata::Legendre_coefs Lgdata::Flux_List::value( double E_in, Lgdata::Flux_List::const_iterator &ptr ) const
 {
-  Flux_List::const_iterator next_ptr = ptr;
+  Lgdata::Flux_List::const_iterator next_ptr = ptr;
   ++next_ptr;  // point to the next data
   if( next_ptr == end( ) )
   {
-    FatalError( "Flux_List::value", pastenum( "energy ", E_in) +
+    Msg::FatalError( "Lgdata::Flux_List::value", Msg::pastenum( "energy ", E_in) +
 		 " out of range" );
   }
   double denom = next_ptr->get_E_in( ) - ptr->get_E_in( );
   if( denom <= 0.0 )
   {
-    FatalError( "Flux_List::value", "energies out of order" );
+    Msg::FatalError( "Lgdata::Flux_List::value", "energies out of order" );
   }
 
   // linear interpolate
   double alpha = ( E_in - ptr->get_E_in( ) ) / denom;
-  Legendre_coefs answer;
+  Lgdata::Legendre_coefs answer;
   answer.initialize( order );
   answer.set_E_in( E_in );
   for( int L_order = 0; L_order <= order; ++L_order )
@@ -702,14 +681,14 @@ Legendre_coefs Flux_List::value( double E_in, Flux_List::const_iterator &ptr ) c
   return answer;
 }
 
-// *************** class weight_vector *************************
-// ------------------ weight_vector::increment ----------------
+// *************** class Lgdata::weight_vector *************************
+// ------------------ Lgdata::weight_vector::increment ----------------
 // Adds the integrals over ( E_left, E_right )
-void weight_vector::increment( Flux_List &e_flux, 
-  Flux_List::const_iterator this_flux, double E_left, double E_right )
+void Lgdata::weight_vector::increment( Lgdata::Flux_List &e_flux, 
+  Lgdata::Flux_List::const_iterator this_flux, double E_left, double E_right )
 {
-  Legendre_coefs left_value = e_flux.value( E_left, this_flux );
-  Legendre_coefs right_value = e_flux.value( E_right, this_flux );
+  Lgdata::Legendre_coefs left_value = e_flux.value( E_left, this_flux );
+  Lgdata::Legendre_coefs right_value = e_flux.value( E_right, this_flux );
   // use the trapezoid rule
   for( int L_count = 0; L_count <= order; ++L_count )
   {
@@ -717,17 +696,87 @@ void weight_vector::increment( Flux_List &e_flux,
       ( left_value[ L_count ] + right_value[ L_count ] );
   }
 }
-// ------------------ weight_vector::invert ----------------
+// ------------------ Lgdata::weight_vector::invert ----------------
 // take the reciprocals
-void weight_vector::invert( )
+void Lgdata::weight_vector::invert( )
 {
   for( int L_count = 0; L_count <= order; ++L_count )
   {
     if( data[ L_count ] <= 0.0 )
     {
-      FatalError( "weight_vector::invert",
+      Msg::FatalError( "Lgdata::weight_vector::invert",
                    "negative flux weight" );
     }
     data[ L_count ] = 1.0 / data[ L_count ];
   }
+}
+
+// **************** functions to integrate ******************
+// ----------------- to_Legendre_F::mu_F ----------------------
+// Function for the quadrature over mu: Legendre * probability density table
+bool to_Legendre_F::mu_F( double mu_in, Qparam::QuadParamBase *void_param,
+   Coef::coef_vector *value )
+{
+  // the parameters are really Lgdata::mu_param
+  Lgdata::mu_param *params = static_cast< Lgdata::mu_param* >( void_param );
+  params->func_count += 1;
+
+  math_F::Legendre( mu_in, value );   // the Legendre polynomials
+  bool is_OK = true;
+  *value *= params->value( mu_in, &is_OK );
+
+  return is_OK;
+}
+
+// ------------------ to_Legendre_F::from_table --------------
+// Evaluates the Legendre moments
+int to_Legendre_F::from_table( const Ddvec::dd_vector& mu_table,
+			       Lgdata::Legendre_coefs *coefs )
+{
+  int mu_quad_count = 0;
+  coefs->zero_data( );
+  
+  Coef::coef_vector integral( coefs->order, Coef::NUMBER );
+  integral.set_zero( );
+  coefs->set_E_in( mu_table.get_E_in( ) );
+  Lgdata::mu_param mu_params;   // the quadrature parameters
+  Qparam::QuadParamBase *params = static_cast< Qparam::QuadParamBase* >( &mu_params );
+  mu_params.left_data = mu_table.begin( );
+  mu_params.right_data = mu_params.left_data;
+  ++mu_params.right_data;
+  for( ; mu_params.right_data != mu_table.end( );
+       mu_params.left_data = mu_params.right_data, ++mu_params.right_data )
+  {
+    static double tol = Global.Value( "quad_tol" );
+    Qmeth::Quadrature_Rule quad_rule;
+    quad_rule.adaptive = false;   // We usually don't need adaptive quadrature
+    integral.set_zero( );
+    if( coefs->order < 2 )
+    {
+      quad_rule.quad_method = Qmeth::GAUSS2;
+    }
+    else if( coefs->order < 7 )
+    {
+      quad_rule.quad_method = Qmeth::GAUSS4;
+    }
+    else if( coefs->order < 11 )
+    {
+      quad_rule.quad_method = Qmeth::GAUSS6;
+    }
+    else if( coefs->order < 19 )
+    {
+      quad_rule.quad_method = Qmeth::GAUSS10;
+    }
+    else
+    {
+      // use adaptive quadrature
+      quad_rule.adaptive = true;
+      quad_rule.quad_method = Qmeth::GAUSS4;
+    }
+    quad_F::integrate( to_Legendre_F::mu_F, quad_rule, mu_params.left_data->x,
+		       mu_params.right_data->x, params, tol, &integral );
+    *coefs += integral;
+    mu_quad_count += mu_params.func_count;
+  }
+  return mu_quad_count;
 }

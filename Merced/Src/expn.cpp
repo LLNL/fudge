@@ -55,7 +55,16 @@
 #define EUL 0.57721566490153286060
 #define BIG  1.44115188075855872E+17
 
-double expn( int n, double x )
+// error types may not be defined by math.h:
+#ifndef DOMAIN
+#define DOMAIN 1
+#endif
+
+#ifndef SING
+#define SING 2
+#endif
+
+double Proto::expn( int n, double x )
 {
 double ans, r, t, yk, xk;
 double pk, pkm1, pkm2, qk, qkm1, qkm2;
@@ -69,7 +78,7 @@ if( n < 0 )
 
 if( x < 0 )
 	{
-domerr:	mtherr( "expn", DOMAIN );
+domerr:	mtherr( "Proto::expn", DOMAIN );
 	return( DBL_MAX );
 	}
 
@@ -80,7 +89,7 @@ if( x == 0.0 )
 	{
 	if( n < 2 )
 		{
-		mtherr( "expn", SING );
+		mtherr( "Proto::expn", SING );
 		return( DBL_MAX );
 		}
 	else

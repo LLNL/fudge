@@ -1,0 +1,19 @@
+The data in this file are for reactions with breakup following
+an inelastic discrete 2-body reaction.  For the first step of the
+reaction, the masses of the incident particle, the target, and the
+outgoing particle must be given, along with the Q value.  If the
+mass of the residual is also given, it is checked agains the value
+computed from the other information.  In any case, the computed value
+is used in the computation.
+
+Fro the breakup reaction, the masses of the outgoing particle and the
+residual are given.  The Q value is computed.  The input files are:
+
+in.two_step: data for the reaction
+    H2 + H3 --> n + (He4_e1 -> H1 + H3) outgoing data for H1.
+  The output file is out.two_step.
+
+in.two_step.rel: data for the relativistic treatment of the reaction
+    H2 + H3 --> n + (He4_e1 -> H1 + H3) outgoing data for H1.
+  The output file is out.two_step.rel.
+  

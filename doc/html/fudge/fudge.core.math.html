@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.core.math package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.core.math.test package" href="fudge.core.math.test.html" />
     <link rel="prev" title="fudge.core package" href="fudge.core.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +36,8 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.core.html" accesskey="U">fudge.core package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.core.html" accesskey="U">fudge.core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.core.math package</a></li> 
       </ul>
     </div>  
 
@@ -102,29 +94,38 @@
 <div class="section" id="module-fudge.core.math.fudgemath">
 <span id="fudge-core-math-fudgemath-module"></span><h2>fudge.core.math.fudgemath module<a class="headerlink" href="#module-fudge.core.math.fudgemath" title="Permalink to this headline">¶</a></h2>
 <p>This module contains useful fudge math routines that do not fit into any other module.</p>
-<dl class="function">
+<dl class="py function">
+<dt id="fudge.core.math.fudgemath.RoundToSigFigs">
+<code class="sig-prename descclassname">fudge.core.math.fudgemath.</code><code class="sig-name descname">RoundToSigFigs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">sigfigs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#RoundToSigFigs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.RoundToSigFigs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rounds the value(s) in x to the number of significant figures in sigfigs.</p>
+<p>Restrictions:
+sigfigs must be an integer type and store a positive value.
+x must be a real value or an array like object containing only real values.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="fudge.core.math.fudgemath.checkForNaN">
-<code class="descclassname">fudge.core.math.fudgemath.</code><code class="descname">checkForNaN</code><span class="sig-paren">(</span><em>v</em>, <em>str</em>, <em>printErrors=True</em>, <em>indentation=''</em>, <em>messages=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#checkForNaN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.checkForNaN" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.fudgemath.</code><code class="sig-name descname">checkForNaN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">str</span></em>, <em class="sig-param"><span class="n">printErrors</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">indentation</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">messages</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#checkForNaN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.checkForNaN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.fudgemath.checkNumber">
-<code class="descclassname">fudge.core.math.fudgemath.</code><code class="descname">checkNumber</code><span class="sig-paren">(</span><em>v</em>, <em>str=''</em>, <em>printErrors=True</em>, <em>indentation=''</em>, <em>messages=None</em>, <em>maxAbsFloatValue=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#checkNumber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.checkNumber" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.fudgemath.</code><code class="sig-name descname">checkNumber</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">str</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">printErrors</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">indentation</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">messages</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxAbsFloatValue</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#checkNumber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.checkNumber" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.fudgemath.getValue">
-<code class="descclassname">fudge.core.math.fudgemath.</code><code class="descname">getValue</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.getValue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.fudgemath.</code><code class="sig-name descname">getValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.getValue" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.fudgemath.isNumber">
-<code class="descclassname">fudge.core.math.fudgemath.</code><code class="descname">isNumber</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#isNumber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.isNumber" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.fudgemath.</code><code class="sig-name descname">isNumber</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#isNumber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.isNumber" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.fudgemath.thickenXYList">
-<code class="descclassname">fudge.core.math.fudgemath.</code><code class="descname">thickenXYList</code><span class="sig-paren">(</span><em>list</em>, <em>tester</em>, <em>biSectionMax=6</em>, <em>interpolation='lin-lin'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#thickenXYList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.thickenXYList" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.fudgemath.</code><code class="sig-name descname">thickenXYList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list</span></em>, <em class="sig-param"><span class="n">tester</span></em>, <em class="sig-param"><span class="n">biSectionMax</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">interpolation</span><span class="o">=</span><span class="default_value">'lin-lin'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#thickenXYList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.thickenXYList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This functions takes a list of (x,y) points and a function, tester.evaluateAtX, and bi-sectionally adds points to 
 obtain linear-linear tolerance of the returned list and tester.evaluateAtX to tester.relativeTolerance. At most 
 biSectionMax bi-sections are performed between each consecutive pair of inputted points. It is assumed that the 
@@ -133,102 +134,95 @@ tester must contain the members relativeTolerance and absoluteTolerance as well 
 method evaluateAtX takes an x-value and returns its y-value.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.fudgemath.toFloat">
-<code class="descclassname">fudge.core.math.fudgemath.</code><code class="descname">toFloat</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#toFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.toFloat" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.fudgemath.</code><code class="sig-name descname">toFloat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#toFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.toFloat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.fudgemath.toInt">
-<code class="descclassname">fudge.core.math.fudgemath.</code><code class="descname">toInt</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#toInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.toInt" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.fudgemath.</code><code class="sig-name descname">toInt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#toInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.toInt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-fudge.core.math.linearAlgebra">
 <span id="fudge-core-math-linearalgebra-module"></span><h2>fudge.core.math.linearAlgebra module<a class="headerlink" href="#module-fudge.core.math.linearAlgebra" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.affine_transform_covariance">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">affine_transform_covariance</code><span class="sig-paren">(</span><em>covarianceMatrix</em>, <em>transformMatrix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#affine_transform_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.affine_transform_covariance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform an affine transformation to a covariance matrix, namely 
-<img class="math" src="../_images/math/9fdc255c0c3cfe1b46820c132fe110b3ec9804af.png" alt="new = A^T \cdot old \cdot A"/>, where <img class="math" src="../_images/math/0043fe6507e9b1d112e07a2801e24927e267dd50.png" alt="A"/> is a orthogonal matrix.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">not implemented</p>
-</div>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">affine_transform_covariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">covarianceMatrix</span></em>, <em class="sig-param"><span class="n">transformMatrix</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#affine_transform_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.affine_transform_covariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform an affine transformation to a covariance matrix, namely
+<img class="math" src="../_images/math/fc107586622456726cf12ecd8431a41f611d9c5b.png" alt="new = A^T \cdot old \cdot A"/>, where <img class="math" src="../_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> is a orthogonal matrix.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.cglsqrSolve">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">cglsqrSolve</code><span class="sig-paren">(</span><em>data</em>, <em>dataUnc=None</em>, <em>dataCov=None</em>, <em>kernel=None</em>, <em>prior=None</em>, <em>priorCov=None</em>, <em>constraintVector=None</em>, <em>constraintMatrix=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#cglsqrSolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.cglsqrSolve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">cglsqrSolve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">dataUnc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dataCov</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kernel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prior</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priorCov</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">constraintVector</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">constraintMatrix</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#cglsqrSolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.cglsqrSolve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constrainted Generalized Least-Squares Solver, based on CorAL routines.
-We are minimizing the following <code class="docutils literal"><span class="pre">chi^2</span></code> (assuming Gaussian statistics)</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">data</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span> <span class="o">*</span> <span class="p">(</span> <span class="n">dataCov</span> <span class="p">)</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span> <span class="n">data</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span> <span class="o">+</span>
+We are minimizing the following <code class="docutils literal notranslate"><span class="pre">chi^2</span></code> (assuming Gaussian statistics)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">data</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span> <span class="o">*</span> <span class="p">(</span> <span class="n">dataCov</span> <span class="p">)</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span> <span class="n">data</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span> <span class="o">+</span>
         <span class="p">(</span> <span class="n">prior</span> <span class="o">-</span> <span class="n">model</span> <span class="p">)</span> <span class="o">*</span> <span class="p">(</span> <span class="n">priorCov</span> <span class="p">)</span><span class="o">^</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span> <span class="n">prior</span> <span class="o">-</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span>
 </pre></div>
 </div>
 <p>subject to the constraint</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">constraintVector</span> <span class="o">=</span> <span class="n">constraintMatrix</span> <span class="o">*</span> <span class="n">model</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">constraintVector</span> <span class="o">=</span> <span class="n">constraintMatrix</span> <span class="o">*</span> <span class="n">model</span>
 </pre></div>
 </div>
-<p>Here, <code class="docutils literal"><span class="pre">^T</span></code> means matrix transpose and <code class="docutils literal"><span class="pre">^-1</span></code> means a (generalized) matrix inverse.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a tuple: <code class="docutils literal"><span class="pre">(model,</span> <span class="pre">modelCovariance)</span></code>:<ul class="simple">
-<li><code class="docutils literal"><span class="pre">model</span></code> : a M x 1 numpy.mat containing the extracted model parameter</li>
-<li><code class="docutils literal"><span class="pre">modelCovariance</span></code> : a M x M numpy.mat containing the covariance on the extracted model paremeters</li>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">^T</span></code> means matrix transpose and <code class="docutils literal notranslate"><span class="pre">^-1</span></code> means a (generalized) matrix inverse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>a tuple: <code class="docutils literal notranslate"><span class="pre">(model,</span> <span class="pre">modelCovariance)</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> : a M x 1 numpy.mat containing the extracted model parameter</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">modelCovariance</span></code> : a M x M numpy.mat containing the covariance on the extracted model paremeters</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Manditory arguments:</strong></p>
+</p>
+</dd>
+</dl>
+<p><strong>Mandatory arguments:</strong></p>
 <blockquote>
 <div><ul class="simple">
-<li><strong>data</strong> : a N x 1 <code class="docutils literal"><span class="pre">numpy.mat</span></code> (a vector!) containing the data to fit</li>
+<li><p><strong>data</strong> : a N x 1 <code class="docutils literal notranslate"><span class="pre">numpy.mat</span></code> (a vector!) containing the data to fit</p></li>
 </ul>
 </div></blockquote>
 <p><strong>Optional arguments:</strong></p>
 <blockquote>
 <div><ul>
-<li><dl class="first docutils">
-<dt><strong>kernel</strong> <span class="classifier-delimiter">:</span> <span class="classifier">a N x M <code class="docutils literal"><span class="pre">numpy.mat</span></code> that maps the model parameters into the data space.  If this </span></dt>
-<dd><p class="first last">is not given, it is assumed that <code class="docutils literal"><span class="pre">kernel</span></code> = the identity matrix and N == M.</p>
+<li><dl>
+<dt><strong>kernel</strong><span class="classifier">a N x M <code class="docutils literal notranslate"><span class="pre">numpy.mat</span></code> that maps the model parameters into the data space.  If this</span></dt><dd><p>is not given, it is assumed that <code class="docutils literal notranslate"><span class="pre">kernel</span></code> = the identity matrix and N == M.</p>
 </dd>
 </dl>
 </li>
-<li><p class="first">either</p>
+<li><p>either</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>– <strong>dataUnc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">a N x 1 <code class="docutils literal"><span class="pre">numpy.mat</span></code> (a vector) of uncertianties on the data vector.</span></dt>
-<dd><p class="first last">This will be converted to the <code class="docutils literal"><span class="pre">dataCov</span></code> if the <code class="docutils literal"><span class="pre">dataCov</span></code> is not specified.</p>
+<div><dl>
+<dt>– <strong>dataUnc</strong><span class="classifier">a N x 1 <code class="docutils literal notranslate"><span class="pre">numpy.mat</span></code> (a vector) of uncertianties on the data vector.</span></dt><dd><p>This will be converted to the <code class="docutils literal notranslate"><span class="pre">dataCov</span></code> if the <code class="docutils literal notranslate"><span class="pre">dataCov</span></code> is not specified.</p>
 </dd>
 </dl>
-<p class="attribution">&mdash;<strong>dataCov</strong> : a N x N <code class="docutils literal"><span class="pre">numpy.mat</span></code> containing the data’s covariance
-If this is specified, the <code class="docutils literal"><span class="pre">dataUnc</span></code> will be ignored.</p>
+<p class="attribution">—<strong>dataCov</strong> : a N x N <code class="docutils literal notranslate"><span class="pre">numpy.mat</span></code> containing the data’s covariance
+If this is specified, the <code class="docutils literal notranslate"><span class="pre">dataUnc</span></code> will be ignored.</p>
 </div></blockquote>
 <blockquote>
-<div><p>If neither the <code class="docutils literal"><span class="pre">dataUnc</span></code> or <code class="docutils literal"><span class="pre">dataCov</span></code> are specified, we will set the covariance to the 
-identity matrix. Instead of minimizing the <code class="docutils literal"><span class="pre">chi^2</span></code>, you will minimize</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">data</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span> <span class="o">|^</span><span class="mi">2</span>
+<div><p>If neither the <code class="docutils literal notranslate"><span class="pre">dataUnc</span></code> or <code class="docutils literal notranslate"><span class="pre">dataCov</span></code> are specified, we will set the covariance to the
+identity matrix. Instead of minimizing the <code class="docutils literal notranslate"><span class="pre">chi^2</span></code>, you will minimize</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">data</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span> <span class="o">|^</span><span class="mi">2</span>
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p class="first">both of</p>
+<li><p>both of</p>
 <blockquote>
-<div><p>– <strong>prior</strong>    : a M x 1 <code class="docutils literal"><span class="pre">numpy.mat</span></code> containing the fitting model’s apriori values</p>
-<p class="attribution">&mdash;<strong>priorCov</strong> : a M x M <code class="docutils literal"><span class="pre">numpy.mat</span></code> containing the fitting model’s apriori covariance</p>
+<div><p>– <strong>prior</strong>    : a M x 1 <code class="docutils literal notranslate"><span class="pre">numpy.mat</span></code> containing the fitting model’s apriori values</p>
+<p class="attribution">—<strong>priorCov</strong> : a M x M <code class="docutils literal notranslate"><span class="pre">numpy.mat</span></code> containing the fitting model’s apriori covariance</p>
 </div></blockquote>
 <blockquote>
-<div><p>If either one is not included, the second term in the <code class="docutils literal"><span class="pre">chi^2</span></code> will be ignored.</p>
+<div><p>If either one is not included, the second term in the <code class="docutils literal notranslate"><span class="pre">chi^2</span></code> will be ignored.</p>
 </div></blockquote>
 </li>
-<li><p class="first">both of</p>
+<li><p>both of</p>
 <blockquote>
-<div><p>– <strong>constraintVector</strong> : a L x 1 <code class="docutils literal"><span class="pre">numpy.mat</span></code> containing values to constrain the model to match</p>
-<p class="attribution">&mdash;<strong>constraintMatrix</strong> : a L x M <code class="docutils literal"><span class="pre">numpy.mat</span></code> relating the model parameters to the <code class="docutils literal"><span class="pre">constraintVector</span></code> values</p>
+<div><p>– <strong>constraintVector</strong> : a L x 1 <code class="docutils literal notranslate"><span class="pre">numpy.mat</span></code> containing values to constrain the model to match</p>
+<p class="attribution">—<strong>constraintMatrix</strong> : a L x M <code class="docutils literal notranslate"><span class="pre">numpy.mat</span></code> relating the model parameters to the <code class="docutils literal notranslate"><span class="pre">constraintVector</span></code>
+values</p>
 </div></blockquote>
 <blockquote>
 <div><p>If either one is not included, the constraint equation will be ignored.</p>
@@ -238,58 +232,58 @@ identity matrix. Instead of minimizing the <code class="docutils literal"><span 
 </div></blockquote>
 <p class="rubric">HOW IT WORKS</p>
 <p>Because the data and the prior are independent and not correlated, we will solve the minimization problem by
-stacking the prior part and the data part to construct a new <code class="docutils literal"><span class="pre">chi^2</span></code> to minimize</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>          <span class="p">[</span> <span class="n">data</span>  <span class="p">]</span>             <span class="p">[</span> <span class="n">dataCov</span> <span class="o">|</span>     <span class="mi">0</span>    <span class="p">]</span>                <span class="p">[</span> <span class="n">kernel</span> <span class="p">]</span>
+stacking the prior part and the data part to construct a new <code class="docutils literal notranslate"><span class="pre">chi^2</span></code> to minimize</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>          <span class="p">[</span> <span class="n">data</span>  <span class="p">]</span>             <span class="p">[</span> <span class="n">dataCov</span> <span class="o">|</span>     <span class="mi">0</span>    <span class="p">]</span>                <span class="p">[</span> <span class="n">kernel</span> <span class="p">]</span>
 <span class="n">newData</span> <span class="o">=</span> <span class="p">[</span> <span class="o">-----</span> <span class="p">],</span>   <span class="n">newCov</span> <span class="o">=</span> <span class="p">[</span> <span class="o">--------|---------</span> <span class="p">],</span>   <span class="n">newKernel</span> <span class="o">=</span> <span class="p">[</span> <span class="o">------</span> <span class="p">]</span>
           <span class="p">[</span> <span class="n">prior</span> <span class="p">]</span>             <span class="p">[</span>    <span class="mi">0</span>    <span class="o">|</span> <span class="n">priorCov</span> <span class="p">]</span>                <span class="p">[</span>    <span class="mi">1</span>   <span class="p">]</span>
 </pre></div>
 </div>
-<p>With these, the <code class="docutils literal"><span class="pre">chi^2</span></code> may be rewritten as</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span>
+<p>With these, the <code class="docutils literal notranslate"><span class="pre">chi^2</span></code> may be rewritten as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span>
 </pre></div>
 </div>
 <p>The solution to the minimization problem is the well known normal equation</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">modelCov</span> <span class="o">=</span> <span class="p">(</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="p">)</span><span class="o">^-</span><span class="mi">1</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">modelCov</span> <span class="o">=</span> <span class="p">(</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="p">)</span><span class="o">^-</span><span class="mi">1</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">modelCov</span> <span class="o">*</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newData</span>
 </pre></div>
 </div>
 <p>Implementing this case where no uncertainty or covariance is given on the data vector is straightforward.
 In this case, we are solving the simple least-squares problem</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">minimize</span><span class="p">:</span>   <span class="o">|</span> <span class="n">data</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span> <span class="o">|^</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span> <span class="n">model</span> <span class="o">-</span> <span class="n">prior</span> <span class="p">)</span><span class="o">*</span><span class="p">(</span> <span class="n">priorCov</span> <span class="p">)</span><span class="o">^-</span><span class="mi">1</span><span class="o">*</span><span class="p">(</span> <span class="n">model</span> <span class="o">-</span> <span class="n">prior</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">minimize</span><span class="p">:</span>   <span class="o">|</span> <span class="n">data</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span> <span class="o">|^</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span> <span class="n">model</span> <span class="o">-</span> <span class="n">prior</span> <span class="p">)</span><span class="o">*</span><span class="p">(</span> <span class="n">priorCov</span> <span class="p">)</span><span class="o">^-</span><span class="mi">1</span><span class="o">*</span><span class="p">(</span> <span class="n">model</span> <span class="o">-</span> <span class="n">prior</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span>
 </pre></div>
 </div>
-<p>In other words, we use a <code class="docutils literal"><span class="pre">dataCov</span> <span class="pre">=</span> <span class="pre">1</span></code>, the identity matrix.</p>
-<p>We comment that the equality constraints can be added in much this same way by adding the constraint 
+<p>In other words, we use a <code class="docutils literal notranslate"><span class="pre">dataCov</span> <span class="pre">=</span> <span class="pre">1</span></code>, the identity matrix.</p>
+<p>We comment that the equality constraints can be added in much this same way by adding the constraint
 vector as a fake data set, with infinitesimal uncertainties</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">+=</span> <span class="k">lambda</span> <span class="o">*</span> <span class="p">(</span> <span class="n">constraintVector</span> <span class="o">-</span> <span class="n">constraintMatrix</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="mi">2</span>    
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">+=</span> <span class="k">lambda</span> <span class="o">*</span> <span class="p">(</span> <span class="n">constraintVector</span> <span class="o">-</span> <span class="n">constraintMatrix</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="mi">2</span>
 </pre></div>
 </div>
-<p>with lambda <img class="math" src="../_images/math/37c6935c1ea98d16c2f980c9f308cab8087f7f03.png" alt="\rightarrow\infty"/>.  This approach works, but can lead to numerical instabilities by 
+<p>with lambda <img class="math" src="../_images/math/a8651a9b2021e0bfb4095fb515e38f82b92a4ebe.png" alt="\rightarrow\infty"/>.  This approach works, but can lead to numerical instabilities by
 adding big number to the original covariances, then taking inverses.</p>
-<p>So, rather than doing this, we will do something different (using Lagrange multipliers).  
-We use the “newData” etc. above and the corresponding <code class="docutils literal"><span class="pre">chi^2</span></code></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span>
+<p>So, rather than doing this, we will do something different (using Lagrange multipliers).
+We use the “newData” etc. above and the corresponding <code class="docutils literal notranslate"><span class="pre">chi^2</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span>
 </pre></div>
 </div>
 <p>subject to the constraint</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">constraintMatrix</span> <span class="o">*</span> <span class="n">model</span> <span class="o">=</span> <span class="n">constraintVector</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">constraintMatrix</span> <span class="o">*</span> <span class="n">model</span> <span class="o">=</span> <span class="n">constraintVector</span>
 </pre></div>
 </div>
-<p>Here we are really solving the quadratic optimization problem here and the way to solve it is with 
+<p>Here we are really solving the quadratic optimization problem here and the way to solve it is with
 Lagrange multipliers.  So, extend the model thusly</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>           <span class="p">[</span>   <span class="n">model</span>  <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>           <span class="p">[</span>   <span class="n">model</span>  <span class="p">]</span>
 <span class="n">newModel</span> <span class="o">=</span> <span class="p">[</span> <span class="o">---------</span><span class="p">]</span>
            <span class="p">[</span>  <span class="k">lambda</span>  <span class="p">]</span>
 </pre></div>
 </div>
-<p>Here lambda is the vector of Lagrange multipliers ( there are L of them ).  
+<p>Here lambda is the vector of Lagrange multipliers ( there are L of them ).
 Minimizing the chi^2, we find the usual normal equation</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="p">)</span> <span class="o">*</span> <span class="n">model</span> <span class="o">=</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newData</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="p">)</span> <span class="o">*</span> <span class="n">model</span> <span class="o">=</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newData</span>
 </pre></div>
 </div>
 <p>So, we’ll stack the normal and constraint equations:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>    <span class="p">[</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="o">|</span> <span class="n">constraintMatrix</span><span class="o">^</span><span class="n">T</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="p">[</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">newKernel</span><span class="o">^</span><span class="n">T</span> <span class="o">|</span> <span class="n">constraintMatrix</span><span class="o">^</span><span class="n">T</span> <span class="p">]</span>
 <span class="n">A</span> <span class="o">=</span> <span class="p">[</span> <span class="o">------------------------------------|-------------------</span> <span class="p">]</span>
     <span class="p">[</span>          <span class="n">constraintMatrix</span>           <span class="o">|</span>         <span class="mi">0</span>          <span class="p">]</span>
 
@@ -307,30 +301,29 @@ Minimizing the chi^2, we find the usual normal equation</p>
 <p>We can solve this a few ways:</p>
 <blockquote>
 <div><ol class="arabic">
-<li><p class="first">Performing a QR decomposition on <img class="math" src="../_images/math/0043fe6507e9b1d112e07a2801e24927e267dd50.png" alt="A"/> gives <img class="math" src="../_images/math/52013162cad013f111e8e38aac471d94ba868199.png" alt="A = QR"/> (using <code class="docutils literal"><span class="pre">numpy.linalg.qr</span></code>) and</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">*</span> <span class="n">newModel</span> <span class="o">=</span> <span class="n">Q</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">y</span>
+<li><p>Performing a QR decomposition on <img class="math" src="../_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> gives <img class="math" src="../_images/math/82aa61a6e3c813362529409ac0675b3dadd8aa52.png" alt="A = QR"/> (using <code class="docutils literal notranslate"><span class="pre">numpy.linalg.qr</span></code>) and</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">*</span> <span class="n">newModel</span> <span class="o">=</span> <span class="n">Q</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">y</span>
 </pre></div>
 </div>
-<p>We can then use the <code class="docutils literal"><span class="pre">numpy.linalg.tensorsolve</span></code> for the <code class="docutils literal"><span class="pre">newModel</span></code></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">newModel</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">tensorsolve</span><span class="p">(</span> <span class="n">R</span><span class="p">,</span> <span class="n">Q</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">y</span> <span class="p">)</span>
+<p>We can then use the <code class="docutils literal notranslate"><span class="pre">numpy.linalg.tensorsolve</span></code> for the <code class="docutils literal notranslate"><span class="pre">newModel</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newModel</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">tensorsolve</span><span class="p">(</span> <span class="n">R</span><span class="p">,</span> <span class="n">Q</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">y</span> <span class="p">)</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Just doing a Moore-Penrose inversion (uses SVD)</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">newModel</span> <span class="o">=</span> <span class="n">A</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">y</span>
+<li><p>Just doing a Moore-Penrose inversion (uses SVD)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newModel</span> <span class="o">=</span> <span class="n">A</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">y</span>
 </pre></div>
 </div>
 </li>
 </ol>
 </div></blockquote>
-<p>But now the meaning of A is clear: it is an “extended” covariance where the first 
-M x M block is the covariance of the model and the rest are the covariance of the 
+<p>But now the meaning of A is clear: it is an “extended” covariance where the first
+M x M block is the covariance of the model and the rest are the covariance of the
 Lagrange multipliers (which are disposable).</p>
 <p class="rubric">TESTING</p>
-<dl class="docutils">
-<dt>Note on construction of dataCov with uncertainty:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unc</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mat</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">diagCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span> <span class="p">[</span> <span class="n">unc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">unc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">unc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+<dl>
+<dt>Note on construction of dataCov with uncertainty:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unc</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="p">]</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">diagCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">unc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">unc</span><span class="o">**</span><span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diagCov</span>
 <span class="go">array([ [ 1.,  0.,  0.],</span>
 <span class="go">        [ 0.,  1.,  0.],</span>
@@ -338,8 +331,7 @@ Lagrange multipliers (which are disposable).</p>
 </pre></div>
 </div>
 </dd>
-<dt>Also, without specifying an uncertainty or covariance, one finds:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+<dt>Also, without specifying an uncertainty or covariance, one finds:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataCov</span>
 <span class="go">array([ [ 1.,  0.,  0.],</span>
 <span class="go">        [ 0.,  1.,  0.],</span>
@@ -350,32 +342,29 @@ Lagrange multipliers (which are disposable).</p>
 </dl>
 <p>So, both alternate methods of defining the data covariance function correctly.</p>
 <p><strong>Define the problem</strong></p>
-<dl class="docutils">
-<dt>Define a test problem:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">answer</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span> <span class="mf">1.34883721</span><span class="p">,</span><span class="o">-</span><span class="mf">0.69767442</span><span class="p">,</span> <span class="mf">0.34883721</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kernel</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mf">5.4</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span> <span class="c1"># Note: lower two subspaces map to 0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kernel</span> <span class="o">*</span> <span class="n">answer</span><span class="o">.</span><span class="n">T</span> 
-<span class="go">    matrix([[ 1.],</span>
-<span class="go">            [ 2.],</span>
-<span class="go">            [ 3.]])</span>
+<dl>
+<dt>Define a test problem:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">answer</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.34883721</span><span class="p">,</span><span class="o">-</span><span class="mf">0.69767442</span><span class="p">,</span> <span class="mf">0.34883721</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kernel</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                      <span class="p">[</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mf">5.4</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span>  <span class="c1"># Note: lower two subspaces map to 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">answer</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span>
+<span class="go">    array([[1.],</span>
+<span class="go">           [2.],</span>
+<span class="go">           [3.]])</span>
 </pre></div>
 </div>
 </dd>
-<dt>Test data:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mat</span><span class="p">([</span> <span class="p">[</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.89</span><span class="p">,</span> <span class="mf">3.05</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mat</span><span class="p">([</span> <span class="p">[</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span> <span class="p">]</span> <span class="p">,</span> <span class="p">[</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+<dt>Test data:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="p">[</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.89</span><span class="p">,</span> <span class="mf">3.05</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="p">[</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span> <span class="p">]</span> <span class="p">,</span> <span class="p">[</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
 </pre></div>
 </div>
 </dd>
-<dt>Constrain the last two elements of the model to add to 42.1:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">constraintVector</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span> <span class="p">[[</span> <span class="mf">42.1</span> <span class="p">]]</span> <span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">constraintMatrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span> <span class="p">[[</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">]]</span> <span class="p">)</span>
+<dt>Constrain the last two elements of the model to add to 42.1:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">constraintVector</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[[</span> <span class="mf">42.1</span> <span class="p">]]</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">constraintMatrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[[</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">]]</span> <span class="p">)</span>
 </pre></div>
 </div>
 </dd>
-<dt>A apriori guess to the result (good to &lt; 5% in all 4 dimensions):</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prior</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span> <span class="mf">1.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">42.2</span> <span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">priorCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">([</span>
+<dt>A apriori guess to the result (good to &lt; 5% in all 4 dimensions):</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prior</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">42.2</span> <span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">priorCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
 <span class="go">    [  0.07      ,   0.        ,   0.        ,   0.        ,   0.        ],</span>
 <span class="go">    [  0.        ,   0.5       ,   0.        ,   0.        ,   0.        ],</span>
 <span class="go">    [  0.        ,   0.        ,   0.4       ,   0.        ,   0.        ],</span>
@@ -387,93 +376,90 @@ Lagrange multipliers (which are disposable).</p>
 </dl>
 <p>This might be a little too good…</p>
 <p><strong>A data only solution</strong></p>
-<dl class="docutils">
-<dt>Using data only, we get:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">kernel</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dataCov</span> <span class="p">)</span> <span class="o">*</span> <span class="n">kernel</span> <span class="p">)</span>
+<dl>
+<dt>Using data only, we get:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dot_product</span><span class="p">(</span> <span class="n">kernel</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dataCov</span> <span class="p">),</span> <span class="n">kernel</span> <span class="p">)</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span>
-<span class="go">matrix([[ 19.2436993 , -17.66414278,   4.23904813,   0.        ,   0.        ],</span>
-<span class="go">        [-17.66414278,  16.28177393,  -3.95484045,   0.        ,   0.        ],</span>
-<span class="go">        [  4.23904813,  -3.95484045,   1.03439697,   0.        ,   0.        ],</span>
-<span class="go">        [  0.        ,   0.        ,   0.        ,   0.        ,   0.        ],</span>
-<span class="go">        [  0.        ,   0.        ,   0.        ,   0.        ,   0.        ]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">modelCov</span> <span class="o">*</span> <span class="n">kernel</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dataCov</span> <span class="p">)</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span>
+<span class="go">array([[ 19.2436993 , -17.66414278,   4.23904813,   0.        ,   0.        ],</span>
+<span class="go">       [-17.66414278,  16.28177393,  -3.95484045,   0.        ,   0.        ],</span>
+<span class="go">       [  4.23904813,  -3.95484045,   1.03439697,   0.        ,   0.        ],</span>
+<span class="go">       [  0.        ,   0.        ,   0.        ,   0.        ,   0.        ],</span>
+<span class="go">       [  0.        ,   0.        ,   0.        ,   0.        ,   0.        ]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">dot_product</span><span class="p">(</span> <span class="n">modelCov</span><span class="p">,</span> <span class="n">kernel</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dataCov</span> <span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
-<span class="go">matrix([[ 0.66232558],</span>
-<span class="go">        [-0.05465116],</span>
-<span class="go">        [ 0.18232558],</span>
-<span class="go">        [ 0.        ],</span>
-<span class="go">        [ 0.        ]])</span>
+<span class="go">array([[ 0.66232558],</span>
+<span class="go">       [-0.05465116],</span>
+<span class="go">       [ 0.18232558],</span>
+<span class="go">       [ 0.        ],</span>
+<span class="go">       [ 0.        ]])</span>
 </pre></div>
 </div>
 </dd>
 </dl>
-<p>Note: the last to elements in the model are zero because there was no way to control them given the kernel in play.  
+<p>Note: the last to elements in the model are zero because there was no way to control them given the kernel in play.
 Without a handle on the last two elements, the fitting cannot do better than this.</p>
 <p><strong>A data+prior solution</strong></p>
-<dl class="docutils">
-<dt>With data+prior, we first repack things:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newData</span> <span class="o">=</span> <span class="n">stackHorizontal</span><span class="p">(</span> <span class="p">[</span> <span class="n">data</span><span class="p">,</span> <span class="n">prior</span> <span class="p">]</span> <span class="p">)</span>
+<dl>
+<dt>With data+prior, we first repack things:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newData</span> <span class="o">=</span> <span class="n">stackHorizontal</span><span class="p">(</span> <span class="p">[</span> <span class="n">data</span><span class="p">,</span> <span class="n">prior</span> <span class="p">]</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newData</span>
-<span class="go">matrix([[  1.1 ,   1.89,   3.05,   1.3 ,  -0.7 ,   0.3 ,   0.11,  42.2 ]])</span>
+<span class="go">array([[  1.1 ,   1.89,   3.05,   1.3 ,  -0.7 ,   0.3 ,   0.11,  42.2 ]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newKernel</span> <span class="o">=</span> <span class="n">stackVertical</span><span class="p">(</span> <span class="p">[</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span> <span class="n">prior</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newKernel</span>
-<span class="go">matrix([[ 1. ,  2. ,  3. ,  0. ,  0. ],</span>
-<span class="go">        [ 2. ,  3. ,  4. ,  0. ,  0. ],</span>
-<span class="go">        [ 4.5,  5.4,  2. ,  0. ,  0. ],</span>
-<span class="go">        [ 1. ,  0. ,  0. ,  0. ,  0. ],</span>
-<span class="go">        [ 0. ,  1. ,  0. ,  0. ,  0. ],</span>
-<span class="go">        [ 0. ,  0. ,  1. ,  0. ,  0. ],</span>
-<span class="go">        [ 0. ,  0. ,  0. ,  1. ,  0. ],</span>
-<span class="go">        [ 0. ,  0. ,  0. ,  0. ,  1. ]])</span>
+<span class="go">array([[ 1. ,  2. ,  3. ,  0. ,  0. ],</span>
+<span class="go">       [ 2. ,  3. ,  4. ,  0. ,  0. ],</span>
+<span class="go">       [ 4.5,  5.4,  2. ,  0. ,  0. ],</span>
+<span class="go">       [ 1. ,  0. ,  0. ,  0. ,  0. ],</span>
+<span class="go">       [ 0. ,  1. ,  0. ,  0. ,  0. ],</span>
+<span class="go">       [ 0. ,  0. ,  1. ,  0. ,  0. ],</span>
+<span class="go">       [ 0. ,  0. ,  0. ,  1. ,  0. ],</span>
+<span class="go">       [ 0. ,  0. ,  0. ,  0. ,  1. ]])</span>
 </pre></div>
 </div>
 </dd>
-<dt>Now, we can rework the algorithm above:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newCov</span> <span class="o">=</span> <span class="n">stackVertical</span><span class="p">(</span> <span class="p">[</span> <span class="n">stackHorizontal</span><span class="p">(</span> <span class="p">[</span> <span class="n">dataCov</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span> <span class="n">dataCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">priorCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">]</span> <span class="p">),</span> <span class="n">stackHorizontal</span><span class="p">(</span> <span class="p">[</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span> <span class="n">priorCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dataCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">),</span> <span class="n">priorCov</span> <span class="p">]</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+<dt>Now, we can rework the algorithm above:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newCov</span> <span class="o">=</span> <span class="n">stackVertical</span><span class="p">([</span><span class="n">stackHorizontal</span><span class="p">([</span><span class="n">dataCov</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dataCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">priorCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))]),</span>
+<span class="go">                            stackHorizontal([numpy.zeros((priorCov.shape[0], dataCov.shape[1])), priorCov])])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newCov</span>
-<span class="go">matrix([[  1.  ,   0.1 ,   0.1 ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ],</span>
-<span class="go">        [  0.1 ,   1.  ,   0.1 ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ],</span>
-<span class="go">        [  0.1 ,   0.1 ,   1.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ],</span>
-<span class="go">        [  0.  ,   0.  ,   0.  ,   0.07,   0.  ,   0.  ,   0.  ,   0.  ],</span>
-<span class="go">        [  0.  ,   0.  ,   0.  ,   0.  ,   0.5 ,   0.  ,   0.  ,   0.  ],</span>
-<span class="go">        [  0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.4 ,   0.  ,   0.  ],</span>
-<span class="go">        [  0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.1 ,   0.  ],</span>
-<span class="go">        [  0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ,  20.  ]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">newKernel</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">newCov</span> <span class="p">)</span> <span class="o">*</span> <span class="n">newKernel</span> <span class="p">)</span> <span class="c1"># use Moore-Penrose generalized inverse (ie SVD inversion)</span>
+<span class="go">array([[  1.  ,   0.1 ,   0.1 ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ],</span>
+<span class="go">       [  0.1 ,   1.  ,   0.1 ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ],</span>
+<span class="go">       [  0.1 ,   0.1 ,   1.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ],</span>
+<span class="go">       [  0.  ,   0.  ,   0.  ,   0.07,   0.  ,   0.  ,   0.  ,   0.  ],</span>
+<span class="go">       [  0.  ,   0.  ,   0.  ,   0.  ,   0.5 ,   0.  ,   0.  ,   0.  ],</span>
+<span class="go">       [  0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.4 ,   0.  ,   0.  ],</span>
+<span class="go">       [  0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.1 ,   0.  ],</span>
+<span class="go">       [  0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ,   0.  ,  20.  ]])</span>
+<span class="go"># use Moore-Penrose generalized inverse (ie SVD inversion)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dot_product</span><span class="p">(</span> <span class="n">newKernel</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">newCov</span> <span class="p">),</span> <span class="n">newKernel</span> <span class="p">)</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span>
-<span class="go">matrix([[  6.30909610e-02,  -5.01795451e-02,   5.99338297e-03,  0.00000000e+00,   0.00000000e+00],</span>
-<span class="go">        [ -5.01795451e-02,   9.30182090e-02,  -5.02878134e-02,  0.00000000e+00,   0.00000000e+00],</span>
-<span class="go">        [  5.99338297e-03,  -5.02878134e-02,   7.63220083e-02,  0.00000000e+00,   0.00000000e+00],</span>
-<span class="go">        [  0.00000000e+00,   0.00000000e+00,   0.00000000e+00,  1.00000000e-01,   0.00000000e+00],</span>
-<span class="go">        [  0.00000000e+00,   0.00000000e+00,   0.00000000e+00,  0.00000000e+00,   2.00000000e+01]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">modelCov</span> <span class="o">*</span> <span class="n">newKernel</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">newCov</span> <span class="p">)</span> <span class="o">*</span> <span class="n">newData</span><span class="o">.</span><span class="n">T</span>
+<span class="go">array([[  6.30909610e-02,  -5.01795451e-02,   5.99338297e-03,  0.00000000e+00,   0.00000000e+00],</span>
+<span class="go">       [ -5.01795451e-02,   9.30182090e-02,  -5.02878134e-02,  0.00000000e+00,   0.00000000e+00],</span>
+<span class="go">       [  5.99338297e-03,  -5.02878134e-02,   7.63220083e-02,  0.00000000e+00,   0.00000000e+00],</span>
+<span class="go">       [  0.00000000e+00,   0.00000000e+00,   0.00000000e+00,  1.00000000e-01,   0.00000000e+00],</span>
+<span class="go">       [  0.00000000e+00,   0.00000000e+00,   0.00000000e+00,  0.00000000e+00,   2.00000000e+01]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">dot_product</span><span class="p">(</span> <span class="n">modelCov</span><span class="p">,</span> <span class="n">newKernel</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">newCov</span> <span class="p">),</span> <span class="n">newData</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
-<span class="go">matrix([[  1.30359097],</span>
-<span class="go">        [ -0.64662084],</span>
-<span class="go">        [  0.32428234],</span>
-<span class="go">        [  0.11      ],</span>
-<span class="go">        [ 42.2       ]])</span>
+<span class="go">array([[  1.30359097],</span>
+<span class="go">       [ -0.64662084],</span>
+<span class="go">       [  0.32428234],</span>
+<span class="go">       [  0.11      ],</span>
+<span class="go">       [ 42.2       ]])</span>
 </pre></div>
 </div>
 </dd>
-<dt>A good prior gives a good result:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">kernel</span> <span class="o">*</span> <span class="n">model</span>
+<dt>A good prior gives a good result:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">dot_product</span><span class="p">(</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">model</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span>
-<span class="go">matrix([[ 0.11680368],</span>
-<span class="go">        [-0.0744488 ],</span>
-<span class="go">        [ 0.02702848]])</span>
+<span class="go">array([[ 0.11680368],</span>
+<span class="go">       [-0.0744488 ],</span>
+<span class="go">       [ 0.02702848]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">error</span> <span class="o">=</span> <span class="n">answer</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">model</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">error</span>
-<span class="go">matrix([[ 0.04524624],</span>
-<span class="go">        [-0.05105358],</span>
-<span class="go">        [ 0.02455487],</span>
-<span class="go">        [-0.01      ],</span>
-<span class="go">        [-0.2       ]])</span>
+<span class="go">array([[ 0.04524624],</span>
+<span class="go">       [-0.05105358],</span>
+<span class="go">       [ 0.02455487],</span>
+<span class="go">       [-0.01      ],</span>
+<span class="go">       [-0.2       ]])</span>
 </pre></div>
 </div>
 </dd>
-<dt>The final uncertainty is not bad:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span> <span class="o">=</span> <span class="p">[</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">modelCov</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">modelCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span>
+<dt>The final uncertainty is not bad:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span> <span class="o">=</span> <span class="p">[</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">modelCov</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">modelCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span>
 <span class="go">    [0.25117914115531315, 0.30498886706247513, 0.2762643810785747, 0.31622776601683794, 4.47213595499958]</span>
 </pre></div>
@@ -481,9 +467,8 @@ Without a handle on the last two elements, the fitting cannot do better than thi
 </dd>
 </dl>
 <p><strong>A data+constraint+prior solution</strong></p>
-<dl class="docutils">
-<dt>Next, with everything (data+constraint+prior)…  First we stack the normal equation and the constraint equation:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reallyNewData</span> <span class="o">=</span> <span class="n">stackHorizontal</span><span class="p">(</span> <span class="p">[</span> <span class="p">(</span> <span class="n">newKernel</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">newCov</span> <span class="p">)</span> <span class="o">*</span> <span class="n">newData</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">constraintVector</span> <span class="p">]</span> <span class="p">)</span>
+<dl>
+<dt>Next, with everything (data+constraint+prior)…  First we stack the normal equation and the constraint equation:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reallyNewData</span> <span class="o">=</span> <span class="n">stackHorizontal</span><span class="p">([(</span><span class="n">newKernel</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">newCov</span><span class="p">)</span> <span class="o">*</span> <span class="n">newData</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">constraintVector</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reallyNewData</span>
 <span class="go">matrix([[ 35.04920635,  19.82814815,  14.56111111, 1.1, 2.11,  42.1 ]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reallyNewKernel</span> <span class="o">=</span> <span class="n">stackVertical</span><span class="p">(</span> <span class="p">[</span> <span class="n">newKernel</span><span class="o">.</span><span class="n">T</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">newCov</span> <span class="p">)</span><span class="o">*</span><span class="n">newKernel</span><span class="p">,</span> <span class="n">constraintMatrix</span> <span class="p">]</span> <span class="p">)</span>
@@ -497,8 +482,7 @@ Without a handle on the last two elements, the fitting cannot do better than thi
 </pre></div>
 </div>
 </dd>
-<dt>Now we just invert the reallyNewKernel </dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">reallyNewKernel</span> <span class="p">)</span> <span class="o">*</span> <span class="n">reallyNewData</span><span class="o">.</span><span class="n">T</span>
+<dt>Now we just invert the reallyNewKernel</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">reallyNewKernel</span> <span class="p">)</span> <span class="o">*</span> <span class="n">reallyNewData</span><span class="o">.</span><span class="n">T</span>
 <span class="go">matrix([[  1.30359097],</span>
 <span class="go">        [ -0.64662084],</span>
 <span class="go">        [  0.32428234],</span>
@@ -507,8 +491,7 @@ Without a handle on the last two elements, the fitting cannot do better than thi
 </pre></div>
 </div>
 </dd>
-<dt>The fit is just a little better than with the prior alone – but now the last element is nailed down:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">kernel</span><span class="o">*</span><span class="n">model</span>
+<dt>The fit is just a little better than with the prior alone – but now the last element is nailed down:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">kernel</span><span class="o">*</span><span class="n">model</span>
 <span class="go">matrix([[ 0.11680368],</span>
 <span class="go">        [-0.0744488 ],</span>
 <span class="go">        [ 0.02702848]])</span>
@@ -524,8 +507,7 @@ Without a handle on the last two elements, the fitting cannot do better than thi
 </pre></div>
 </div>
 </dd>
-<dt>We compute the covariance as the inverse of the reallyNewKernel:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">reallyNewKernel</span> <span class="p">)</span>
+<dt>We compute the covariance as the inverse of the reallyNewKernel:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">reallyNewKernel</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span>
 <span class="go">matrix([[  6.30909610e-02,  -5.01795451e-02,   5.99338297e-03,  0.00000000e+00,   0.00000000e+00,   0.00000000e+00],</span>
 <span class="go">        [ -5.01795451e-02,   9.30182090e-02,  -5.02878134e-02,  0.00000000e+00,   0.00000000e+00,   0.00000000e+00],</span>
@@ -535,8 +517,7 @@ Without a handle on the last two elements, the fitting cannot do better than thi
 </pre></div>
 </div>
 </dd>
-<dt>The new uncertainties are much reduced:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span> <span class="o">=</span> <span class="p">[</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">modelCov</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">modelCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span>
+<dt>The new uncertainties are much reduced:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span> <span class="o">=</span> <span class="p">[</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">modelCov</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">modelCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span>
 <span class="go">[0.25117914115531315, 0.30498886706247513, 0.2762643810785747, 0.316223823100982, 0.22443887510442173]</span>
 </pre></div>
@@ -544,9 +525,9 @@ Without a handle on the last two elements, the fitting cannot do better than thi
 </dd>
 </dl>
 <p><strong>A data+constraint solution</strong></p>
-<p>Let’s see how well we do using just the constraints and the data fitting.  As before, we stack the 
+<p>Let’s see how well we do using just the constraints and the data fitting.  As before, we stack the
 normal and constraint equation, but this time use the old kernel and old data (that is, without the prior):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reallyNewData</span> <span class="o">=</span> <span class="n">stackHorizontal</span><span class="p">(</span> <span class="p">[</span> <span class="p">(</span> <span class="n">kernel</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dataCov</span> <span class="p">)</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">constraintVector</span> <span class="p">]</span> <span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reallyNewData</span> <span class="o">=</span> <span class="n">stackHorizontal</span><span class="p">([(</span><span class="n">kernel</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dataCov</span> <span class="p">)</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">constraintVector</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reallyNewData</span>
 <span class="go">matrix([[ 16.47777778,  21.22814815,  13.81111111,   0.        , 0.        ,  42.1       ]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reallyNewKernel</span> <span class="o">=</span> <span class="n">stackVertical</span><span class="p">(</span> <span class="p">[</span> <span class="n">kernel</span><span class="o">.</span><span class="n">T</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">dataCov</span> <span class="p">)</span><span class="o">*</span><span class="n">kernel</span><span class="p">,</span> <span class="n">constraintMatrix</span> <span class="p">]</span> <span class="p">)</span>
@@ -559,9 +540,8 @@ normal and constraint equation, but this time use the old kernel and old data (t
 <span class="go">        [  0.        ,   0.        ,   0.        ,   1.        ,   1.        ]])</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>Now we just invert the reallyNewKernel </dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">reallyNewKernel</span> <span class="p">)</span> <span class="o">*</span> <span class="n">reallyNewData</span><span class="o">.</span><span class="n">T</span>
+<dl>
+<dt>Now we just invert the reallyNewKernel</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">reallyNewKernel</span> <span class="p">)</span> <span class="o">*</span> <span class="n">reallyNewData</span><span class="o">.</span><span class="n">T</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
 <span class="go">matrix([[  0.66232558],</span>
 <span class="go">        [ -0.05465116],</span>
@@ -571,9 +551,8 @@ normal and constraint equation, but this time use the old kernel and old data (t
 </pre></div>
 </div>
 </dd>
-<dt>Ack!  it made sure the constraint is obeyed, by divying up the 42.1 among the two uncontrolled model parameters!</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">kernel</span><span class="o">*</span><span class="n">model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span> 
+<dt>Ack!  it made sure the constraint is obeyed, by divying up the 42.1 among the two uncontrolled model parameters!</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">kernel</span><span class="o">*</span><span class="n">model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residual</span>
 <span class="go">matrix([[ -1.07913678e-13],</span>
 <span class="go">        [ -2.13828955e-13],</span>
 <span class="go">        [ -4.26325641e-13]])</span>
@@ -588,280 +567,264 @@ normal and constraint equation, but this time use the old kernel and old data (t
 </div>
 </dd>
 </dl>
-<p>What is telling is that, to accomodate the constraint, all the uncertainty had to be shifted to the first 
+<p>What is telling is that, to accomodate the constraint, all the uncertainty had to be shifted to the first
 three components of the model:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">reallyNewKernel</span> <span class="p">)</span> <span class="c1"># use Moore-Penrose generalized inverse (ie SVD inversion)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span> <span class="n">reallyNewKernel</span> <span class="p">)</span> <span class="c1"># use Moore-Penrose generalized inverse (ie SVD inversion)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">modelCov</span>
 <span class="go">matrix([[ 19.2436993 , -17.66414278,   4.23904813,   0.        ,0.        ,   0.        ],</span>
 <span class="go">        [-17.66414278,  16.28177393,  -3.95484045,   0.        ,0.        ,   0.        ],</span>
 <span class="go">        [  4.23904813,  -3.95484045,   1.03439697,   0.        ,0.        ,   0.        ],</span>
 <span class="go">        [  0.        ,   0.        ,   0.        ,   0.        ,0.        ,   0.5       ],</span>
 <span class="go">        [  0.        ,   0.        ,   0.        ,   0.        ,0.        ,   0.5       ]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span> <span class="o">=</span> <span class="p">[</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">modelCov</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">modelCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span> <span class="o">=</span> <span class="p">[</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">modelCov</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">modelCov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uncertainty</span>
 <span class="go">[4.386764103176406, 4.035068020722195, 1.0170530818673396, 0.0, 0.0]</span>
 </pre></div>
 </div>
 <p>The moral is that we’d better know what spaces are constrainted by data and which ones are not!!!</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.check_covariance_element_bounds">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">check_covariance_element_bounds</code><span class="sig-paren">(</span><em>A</em>, <em>warnAll=False</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#check_covariance_element_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.check_covariance_element_bounds" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">check_covariance_element_bounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">A</span></em>, <em class="sig-param"><span class="n">warnAll</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#check_covariance_element_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.check_covariance_element_bounds" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.check_positive_semidefinite">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">check_positive_semidefinite</code><span class="sig-paren">(</span><em>A</em>, <em>warnAll=False</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#check_positive_semidefinite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.check_positive_semidefinite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks that all elements in a matrix are <img class="math" src="../_images/math/b7446cb70fade54a26531ff26628515113bd1552.png" alt="\leq 0"/></p>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">check_positive_semidefinite</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">A</span></em>, <em class="sig-param"><span class="n">warnAll</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#check_positive_semidefinite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.check_positive_semidefinite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that all elements in a matrix are <img class="math" src="../_images/math/9701df3cf30eb7a558c98ef9d7b31aafb6e7aa42.png" alt="&lt;= 0"/></p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.check_real_and_finite">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">check_real_and_finite</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#check_real_and_finite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.check_real_and_finite" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">check_real_and_finite</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">A</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#check_real_and_finite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.check_real_and_finite" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that all elements in a matrix are read and finite</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.check_symmetric">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">check_symmetric</code><span class="sig-paren">(</span><em>A</em>, <em>warnAll=False</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#check_symmetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.check_symmetric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks whether a matrix is symmetric, i.e. <img class="math" src="../_images/math/25d7233626437a5d5c56641990b3b85c6636321e.png" alt="A_{ij} = A_{ji}"/></p>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">check_symmetric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">A</span></em>, <em class="sig-param"><span class="n">warnAll</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#check_symmetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.check_symmetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether a matrix is symmetric, i.e. <img class="math" src="../_images/math/6ee798b8f0b13713b61252ee1b7290c5cf3f95fc.png" alt="A_{ij} = A_{ji}"/></p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.correlation_to_covariance">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">correlation_to_covariance</code><span class="sig-paren">(</span><em>correlationMatrix</em>, <em>variance</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#correlation_to_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.correlation_to_covariance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">correlation_to_covariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">correlationMatrix</span></em>, <em class="sig-param"><span class="n">uncertainty</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#correlation_to_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.correlation_to_covariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a correlation matrix to a covariance matrix</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">not implemented</p>
-</div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.correlation_to_relative">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">correlation_to_relative</code><span class="sig-paren">(</span><em>correlationMatrix</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#correlation_to_relative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.correlation_to_relative" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">correlation_to_relative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">correlationMatrix</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#correlation_to_relative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.correlation_to_relative" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a correlation matrix to a relative covariance matrix</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">not implemented</p>
+<p class="admonition-title">Warning</p>
+<p>not implemented</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.covariance_to_correlation">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">covariance_to_correlation</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#covariance_to_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.covariance_to_correlation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">covariance_to_correlation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matrix</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#covariance_to_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.covariance_to_correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a covariance matrix to a correlation matrix</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.covariance_to_relative">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">covariance_to_relative</code><span class="sig-paren">(</span><em>matrix</em>, <em>rsd</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#covariance_to_relative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.covariance_to_relative" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">covariance_to_relative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matrix</span></em>, <em class="sig-param"><span class="n">rsd</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#covariance_to_relative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.covariance_to_relative" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert an absolute covariance matrix to a relative covariance matrix</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.diff_matrices">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">diff_matrices</code><span class="sig-paren">(</span><em>matrixOne</em>, <em>matrixTwo</em>, <em>printDiagnostics=True</em>, <em>quiet=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#diff_matrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.diff_matrices" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">diff_matrices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matrixOne</span></em>, <em class="sig-param"><span class="n">matrixTwo</span></em>, <em class="sig-param"><span class="n">printDiagnostics</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">quiet</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#diff_matrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.diff_matrices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.dot_product">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">dot_product</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#dot_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.dot_product" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">dot_product</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#dot_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.dot_product" title="Permalink to this definition">¶</a></dt>
 <dd><p>Matrix multiplication (dot product) of all arguments:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dotproduct</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>   <span class="c1"># returns V.T * A * V</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">dotproduct</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>   <span class="c1"># returns V.T * A * V</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.eigenvectors_from_orthoganal_matrix">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">eigenvectors_from_orthoganal_matrix</code><span class="sig-paren">(</span><em>O</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#eigenvectors_from_orthoganal_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.eigenvectors_from_orthoganal_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">eigenvectors_from_orthoganal_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">O</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#eigenvectors_from_orthoganal_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.eigenvectors_from_orthoganal_matrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.extract_uncertainty">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">extract_uncertainty</code><span class="sig-paren">(</span><em>covarianceMatrix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#extract_uncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.extract_uncertainty" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">extract_uncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">covarianceMatrix</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#extract_uncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.extract_uncertainty" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.extract_variance">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">extract_variance</code><span class="sig-paren">(</span><em>covarianceMatrix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#extract_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.extract_variance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">extract_variance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">covarianceMatrix</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#extract_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.extract_variance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.fit_statistics">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">fit_statistics</code><span class="sig-paren">(</span><em>data</em>, <em>dataCov</em>, <em>kernel</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#fit_statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.fit_statistics" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">fit_statistics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">dataCov</span></em>, <em class="sig-param"><span class="n">kernel</span></em>, <em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#fit_statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.fit_statistics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.get_covariances_from_endf">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">get_covariances_from_endf</code><span class="sig-paren">(</span><em>endfFile</em>, <em>MT</em>, <em>MF=33</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#get_covariances_from_endf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.get_covariances_from_endf" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">get_covariances_from_endf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">endfFile</span></em>, <em class="sig-param"><span class="n">MT</span></em>, <em class="sig-param"><span class="n">MF</span><span class="o">=</span><span class="default_value">33</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#get_covariances_from_endf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.get_covariances_from_endf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.get_test_matrix">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">get_test_matrix</code><span class="sig-paren">(</span><em>endfFile=None</em>, <em>MT=None</em>, <em>MF=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#get_test_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.get_test_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">get_test_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">endfFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">MT</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">MF</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#get_test_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.get_test_matrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.hist_interp_of_matrix">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">hist_interp_of_matrix</code><span class="sig-paren">(</span><em>supergrid</em>, <em>mat</em>, <em>erows</em>, <em>ecols=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#hist_interp_of_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.hist_interp_of_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">hist_interp_of_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">supergrid</span></em>, <em class="sig-param"><span class="n">mat</span></em>, <em class="sig-param"><span class="n">erows</span></em>, <em class="sig-param"><span class="n">ecols</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#hist_interp_of_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.hist_interp_of_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Put ‘histogram’ interpolation of matrix onto a new <cite>supergrid</cite>:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>supergrid</strong> – energy list to use for new matrix</li>
-<li><strong>mat</strong> – original matrix to be interpolated</li>
-<li><strong>erows</strong> – energy bins for rows/x-axis of original matrix</li>
-<li><strong>ecols</strong> – energy bins for columns/y-axis, same as ex by default</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>supergrid</strong> – energy list to use for new matrix</p></li>
+<li><p><strong>mat</strong> – original matrix to be interpolated</p></li>
+<li><p><strong>erows</strong> – energy bins for rows/x-axis of original matrix</p></li>
+<li><p><strong>ecols</strong> – energy bins for columns/y-axis, same as ex by default</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>all points in <cite>erows</cite> and <cite>ecols</cite> must also be in supergrid, 
+</dd>
+</dl>
+<p>all points in <cite>erows</cite> and <cite>ecols</cite> must also be in supergrid,
 or ValueError is raised</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.matrix_from_eigendecomposition">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">matrix_from_eigendecomposition</code><span class="sig-paren">(</span><em>e</em>, <em>v</em>, <em>ndim</em>, <em>doInverse=False</em>, <em>onlyLargeEVs=True</em>, <em>onlyPositiveEV=True</em>, <em>smallEVAbsTol=1e-10</em>, <em>smallEVRelTol=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#matrix_from_eigendecomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.matrix_from_eigendecomposition" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">matrix_from_eigendecomposition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">ndim</span></em>, <em class="sig-param"><span class="n">doInverse</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">onlyLargeEVs</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">onlyPositiveEV</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">smallEVAbsTol</span><span class="o">=</span><span class="default_value">1e-10</span></em>, <em class="sig-param"><span class="n">smallEVRelTol</span><span class="o">=</span><span class="default_value">1e-06</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#matrix_from_eigendecomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.matrix_from_eigendecomposition" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.off_diagonals">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">off_diagonals</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#off_diagonals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.off_diagonals" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">off_diagonals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matrix</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#off_diagonals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.off_diagonals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return indices for all off-diagonal elements.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mat</span><span class="p">[</span> <span class="n">offdiag</span><span class="p">(</span> <span class="n">mat</span> <span class="p">)</span> <span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span> <span class="n">numpy</span><span class="o">.</span><span class="n">offdiag</span><span class="p">(</span> <span class="n">mat</span> <span class="p">)</span> <span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.plot_bad_eigenspaces">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">plot_bad_eigenspaces</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#plot_bad_eigenspaces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.plot_bad_eigenspaces" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">plot_bad_eigenspaces</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_A</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#plot_bad_eigenspaces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.plot_bad_eigenspaces" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.plot_matrix">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">plot_matrix</code><span class="sig-paren">(</span><em>m</em>, <em>title='a matrix'</em>, <em>scaling=None</em>, <em>scalingFloor=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#plot_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.plot_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>m</strong> – a numpy.mat instance</li>
-<li><strong>title</strong> – a string to use as the plot title</li>
-<li><strong>scaling</strong> – <p>either None, ‘log’, or ‘asinh’
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">plot_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">m</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">'a matrix'</span></em>, <em class="sig-param"><span class="n">scaling</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalingFloor</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#plot_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.plot_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> – a numpy.mat instance</p></li>
+<li><p><strong>title</strong> – a string to use as the plot title</p></li>
+<li><p><strong>scaling</strong> – <p>either None, ‘log’, or ‘asinh’
 this scales the value of the matrix plotted in the following ways</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="kc">None</span> <span class="p">:</span> <span class="n">no</span> <span class="n">scaling</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="kc">None</span> <span class="p">:</span> <span class="n">no</span> <span class="n">scaling</span>
 <span class="o">*</span> <span class="s1">&#39;log&#39;</span> <span class="p">:</span> <span class="n">each</span> <span class="n">element</span> <span class="ow">is</span> <span class="n">plotted</span> <span class="k">as</span> <span class="n">ln</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">--</span> <span class="n">good</span> <span class="k">for</span> <span class="n">covariances</span>
-  <span class="n">which</span> <span class="n">must</span> <span class="n">always</span> <span class="n">be</span> <span class="n">positive</span> <span class="n">semidefinite</span><span class="o">.</span>  <span class="n">If</span> <span class="n">scalingFloor</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> 
+  <span class="n">which</span> <span class="n">must</span> <span class="n">always</span> <span class="n">be</span> <span class="n">positive</span> <span class="n">semidefinite</span><span class="o">.</span>  <span class="n">If</span> <span class="n">scalingFloor</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span>
   <span class="n">than</span> <span class="n">we</span> <span class="n">do</span> <span class="n">ln</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">scalingFloor</span><span class="p">))</span><span class="o">.</span>
-<span class="o">*</span> <span class="s1">&#39;asinh&#39;</span> <span class="p">:</span> <span class="n">each</span> <span class="n">element</span> <span class="ow">is</span> <span class="n">scaled</span> <span class="k">as</span> <span class="n">asinh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span>  <span class="n">This</span> <span class="n">exaggerates</span> 
+<span class="o">*</span> <span class="s1">&#39;asinh&#39;</span> <span class="p">:</span> <span class="n">each</span> <span class="n">element</span> <span class="ow">is</span> <span class="n">scaled</span> <span class="k">as</span> <span class="n">asinh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span>  <span class="n">This</span> <span class="n">exaggerates</span>
   <span class="n">scale</span> <span class="k">for</span> <span class="n">values</span> <span class="n">of</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&lt;</span><span class="mf">1.0</span><span class="o">.</span>
 </pre></div>
 </div>
-</li>
-<li><strong>scalingFloor</strong> – the minimum value of each element that gets plotted.</li>
+</p></li>
+<li><p><strong>scalingFloor</strong> – the minimum value of each element that gets plotted.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.print_eigenvalues">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">print_eigenvalues</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#print_eigenvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.print_eigenvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">print_eigenvalues</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_A</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#print_eigenvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.print_eigenvalues" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.print_matrix">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">print_matrix</code><span class="sig-paren">(</span><em>M</em>, <em>pretty=True</em>, <em>elementSize=8</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#print_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.print_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">print_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">M</span></em>, <em class="sig-param"><span class="n">pretty</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">elementSize</span><span class="o">=</span><span class="default_value">8</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#print_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.print_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple matrix printer, makes little attempt to be pretty, but does print huge matrices</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.print_vector">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">print_vector</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#print_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.print_vector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">print_vector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#print_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.print_vector" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.pruned_matrix">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">pruned_matrix</code><span class="sig-paren">(</span><em>A</em>, <em>onlyLargeEVs=True</em>, <em>onlyPositiveEV=True</em>, <em>smallEVAbsTol=1e-10</em>, <em>smallEVRelTol=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#pruned_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.pruned_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rebuild <img class="math" src="../_images/math/0043fe6507e9b1d112e07a2801e24927e267dd50.png" alt="A"/> “by hand”, the safe way.   <img class="math" src="../_images/math/0043fe6507e9b1d112e07a2801e24927e267dd50.png" alt="A"/> must admit an eigenvalue decomposition.</p>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">pruned_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">A</span></em>, <em class="sig-param"><span class="n">onlyLargeEVs</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">onlyPositiveEV</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">smallEVAbsTol</span><span class="o">=</span><span class="default_value">1e-10</span></em>, <em class="sig-param"><span class="n">smallEVRelTol</span><span class="o">=</span><span class="default_value">1e-06</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#pruned_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.pruned_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rebuild <img class="math" src="../_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> “by hand”, the safe way.   <img class="math" src="../_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> must admit an eigenvalue decomposition.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.pruned_matrix_inverse">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">pruned_matrix_inverse</code><span class="sig-paren">(</span><em>A</em>, <em>onlyLargeEVs=True</em>, <em>onlyPositiveEV=True</em>, <em>smallEVAbsTol=1e-10</em>, <em>smallEVRelTol=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#pruned_matrix_inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.pruned_matrix_inverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build inverse of <img class="math" src="../_images/math/0043fe6507e9b1d112e07a2801e24927e267dd50.png" alt="A"/> “by hand”, the safe way.   <img class="math" src="../_images/math/0043fe6507e9b1d112e07a2801e24927e267dd50.png" alt="A"/> must admit an eigenvalue decomposition.</p>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">pruned_matrix_inverse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">A</span></em>, <em class="sig-param"><span class="n">onlyLargeEVs</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">onlyPositiveEV</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">smallEVAbsTol</span><span class="o">=</span><span class="default_value">1e-10</span></em>, <em class="sig-param"><span class="n">smallEVRelTol</span><span class="o">=</span><span class="default_value">1e-06</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#pruned_matrix_inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.pruned_matrix_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build inverse of <img class="math" src="../_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> “by hand”, the safe way.   <img class="math" src="../_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> must admit an eigenvalue decomposition.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.rebin_matrix">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">rebin_matrix</code><span class="sig-paren">(</span><em>arr</em>, <em>N=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#rebin_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.rebin_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">rebin_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em>, <em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#rebin_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.rebin_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rebin array by factor of N (not necessarily multiple of 2)</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.reduce_off_diagonals">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">reduce_off_diagonals</code><span class="sig-paren">(</span><em>corr_mat</em>, <em>thresh</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#reduce_off_diagonals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.reduce_off_diagonals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sometimes easiest way to eliminate negative eigenvalues is to 
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">reduce_off_diagonals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">corr_mat</span></em>, <em class="sig-param"><span class="n">thresh</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#reduce_off_diagonals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.reduce_off_diagonals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sometimes easiest way to eliminate negative eigenvalues is to
 reduce off-diagonal portion of the correlation matrix</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.relative_to_correlation">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">relative_to_correlation</code><span class="sig-paren">(</span><em>relativeMatrix</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#relative_to_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.relative_to_correlation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">relative_to_correlation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">relativeMatrix</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#relative_to_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.relative_to_correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a relative covariance matrix to a correlation matrix</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">not implemented</p>
+<p class="admonition-title">Warning</p>
+<p>not implemented</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.relative_to_covariance">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">relative_to_covariance</code><span class="sig-paren">(</span><em>relativeMatrix</em>, <em>variance</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#relative_to_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.relative_to_covariance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">relative_to_covariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">relativeMatrix</span></em>, <em class="sig-param"><span class="n">variance</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#relative_to_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.relative_to_covariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a relative covariance matrix to an absolute covariance matrix</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">not implemented</p>
+<p class="admonition-title">Warning</p>
+<p>not implemented</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.scale_off_diagonals">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">scale_off_diagonals</code><span class="sig-paren">(</span><em>A</em>, <em>onlyScaleThese=None</em>, <em>scaleFactor=0.999999</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#scale_off_diagonals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.scale_off_diagonals" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">scale_off_diagonals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">A</span></em>, <em class="sig-param"><span class="n">onlyScaleThese</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scaleFactor</span><span class="o">=</span><span class="default_value">0.999999</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#scale_off_diagonals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.scale_off_diagonals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sam’s trick for getting UNCOR to cooperate: shrink off diagonal elements by some (small) factor</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.stackDiagonal">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">stackDiagonal</code><span class="sig-paren">(</span><em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#stackDiagonal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.stackDiagonal" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>l</strong> – a list of numpy matrices, elements equal to None are ignored</td>
-</tr>
-</tbody>
-</table>
-<p>A note about numpy.matrix shapes and indexing</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">[</span> <span class="n">nRows</span><span class="p">,</span> <span class="n">nCols</span> <span class="p">]</span>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">stackDiagonal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">l</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#stackDiagonal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.stackDiagonal" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>l</strong> – a list of numpy matrices, elements equal to None are ignored</p>
+</dd>
+</dl>
+<p>A note about numpy.array shapes and indexing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">[</span> <span class="n">nRows</span><span class="p">,</span> <span class="n">nCols</span> <span class="p">]</span>
 </pre></div>
 </div>
-<p>So, we index through <code class="docutils literal"><span class="pre">a[</span> <span class="pre">iRow,</span> <span class="pre">iCol</span> <span class="pre">]</span></code></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a matrix packed as follows<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span>  <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">|</span>  <span class="mf">0.0</span>  <span class="o">|</span>  <span class="mf">0.0</span> <span class="o">|</span> <span class="o">...</span> <span class="o">|</span>   <span class="mf">0.0</span>  <span class="p">]</span>
+<p>So, we index through <code class="docutils literal notranslate"><span class="pre">a[</span> <span class="pre">iRow,</span> <span class="pre">iCol</span> <span class="pre">]</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>a matrix packed as follows</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>  <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">|</span>  <span class="mf">0.0</span>  <span class="o">|</span>  <span class="mf">0.0</span> <span class="o">|</span> <span class="o">...</span> <span class="o">|</span>   <span class="mf">0.0</span>  <span class="p">]</span>
 <span class="p">[</span> <span class="o">------</span> <span class="o">|</span> <span class="o">-----</span> <span class="o">|</span> <span class="o">----</span> <span class="o">|</span> <span class="o">...</span> <span class="o">|</span> <span class="o">------</span> <span class="p">]</span>
 <span class="p">[</span>   <span class="mf">0.0</span>  <span class="o">|</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="o">|</span>  <span class="mf">0.0</span> <span class="o">|</span> <span class="o">...</span> <span class="o">|</span>   <span class="mf">0.0</span>  <span class="p">]</span>
 <span class="p">[</span> <span class="o">------</span> <span class="o">|</span> <span class="o">-----</span> <span class="o">|</span> <span class="o">----</span> <span class="o">|</span> <span class="o">...</span> <span class="o">|</span> <span class="o">------</span> <span class="p">]</span>
@@ -873,52 +836,48 @@ reduce off-diagonal portion of the correlation matrix</p>
 </pre></div>
 </div>
 <p>where n is the number of non-None elements in l</p>
-</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.stackHorizontal">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">stackHorizontal</code><span class="sig-paren">(</span><em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#stackHorizontal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.stackHorizontal" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>l</strong> – a list of numpy matrices, each with same shape[0] (i.e. same number of rows).  Elements equal to None are ignored</td>
-</tr>
-</tbody>
-</table>
-<p>A note about numpy.matrix shapes and indexing</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">[</span> <span class="n">nRows</span><span class="p">,</span> <span class="n">nCols</span> <span class="p">]</span>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">stackHorizontal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">l</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#stackHorizontal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.stackHorizontal" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>l</strong> – a list of numpy matrices, each with same shape[0] (i.e. same number of rows).
+Elements equal to None are ignored</p>
+</dd>
+</dl>
+<p>A note about numpy.array shapes and indexing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">[</span> <span class="n">nRows</span><span class="p">,</span> <span class="n">nCols</span> <span class="p">]</span>
 </pre></div>
 </div>
-<p>So, we index through <code class="docutils literal"><span class="pre">a[</span> <span class="pre">iRow,</span> <span class="pre">iCol</span> <span class="pre">]</span></code></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a matrix packed as follows<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span>  <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">|</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="o">|</span> <span class="o">...</span> <span class="o">|</span> <span class="n">l</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
+<p>So, we index through <code class="docutils literal notranslate"><span class="pre">a[</span> <span class="pre">iRow,</span> <span class="pre">iCol</span> <span class="pre">]</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>a matrix packed as follows</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>  <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">|</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="o">|</span> <span class="o">...</span> <span class="o">|</span> <span class="n">l</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
 </pre></div>
 </div>
 <p>where n is the number of non-None elements in l</p>
-</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.stackVertical">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">stackVertical</code><span class="sig-paren">(</span><em>l</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#stackVertical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.stackVertical" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>l</strong> – a list of numpy matrices, each with same <cite>shape[1]</cite> (i.e. same number of columns).  Elements equal to None are ignored</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a matrix packed as follows<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span>  <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="p">]</span>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">stackVertical</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">l</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#stackVertical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.stackVertical" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>l</strong> – a list of numpy matrices, each with same <cite>shape[1]</cite> (i.e. same number of columns).
+Elements equal to None are ignored</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>a matrix packed as follows</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>  <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="p">]</span>
 <span class="p">[</span> <span class="o">------</span> <span class="p">]</span>
 <span class="p">[</span>  <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="p">]</span>
 <span class="p">[</span> <span class="o">------</span> <span class="p">]</span>
@@ -928,70 +887,37 @@ reduce off-diagonal portion of the correlation matrix</p>
 </pre></div>
 </div>
 <p>where n is the number of non-None elements in l</p>
-</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.core.math.linearAlgebra.switchSymmetry">
-<code class="descclassname">fudge.core.math.linearAlgebra.</code><code class="descname">switchSymmetry</code><span class="sig-paren">(</span><em>mlist</em>, <em>upperToLower=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#switchSymmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.switchSymmetry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.core.math.linearAlgebra.</code><code class="sig-name descname">switchSymmetry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mlist</span></em>, <em class="sig-param"><span class="n">upperToLower</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#switchSymmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.switchSymmetry" title="Permalink to this definition">¶</a></dt>
 <dd><p>A symmetric 2-d NxN array can be stored in memory as a list of (N*(N+1)/2) numbers. The order depends
 on whether the upper-diagonal or lower-diagonal portion of the array is being stored.  This method switches
 between the two representations.
 Note that switching from upper to lower is the same as switching the memory order from ‘column-major’ to ‘row-major’</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mlist</strong> – list, tuple or 1d array representing input matrix</li>
-<li><strong>upperToLower</strong> – boolean, True = convert upper- to lower-symmetric, False = convert lower- to upper-symmetric</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mlist</strong> – list, tuple or 1d array representing input matrix</p></li>
+<li><p><strong>upperToLower</strong> – boolean, True = convert upper- to lower-symmetric, False = convert lower- to upper-symmetric</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list with output matrix</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list with output matrix</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
 <div class="section" id="fudge-core-math-matrix-module">
 <h2>fudge.core.math.matrix module<a class="headerlink" href="#fudge-core-math-matrix-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fudge.core.math.miscellaneous">
-<span id="fudge-core-math-miscellaneous-module"></span><h2>fudge.core.math.miscellaneous module<a class="headerlink" href="#module-fudge.core.math.miscellaneous" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="fudge.core.math.miscellaneous.isclose">
-<code class="descclassname">fudge.core.math.miscellaneous.</code><code class="descname">isclose</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>rel_tol=1e-09</em>, <em>abs_tol=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/miscellaneous.html#isclose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.miscellaneous.isclose" title="Permalink to this definition">¶</a></dt>
-<dd><p>mimics the math.isclose function introduced in Python3</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.miscellaneous.shiftFloatABit">
-<code class="descclassname">fudge.core.math.miscellaneous.</code><code class="descname">shiftFloatABit</code><span class="sig-paren">(</span><em>f</em>, <em>s</em>, <em>r_eps</em>, <em>a_eps</em>, <em>z_eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/miscellaneous.html#shiftFloatABit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.miscellaneous.shiftFloatABit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Only for internal use by shiftFloatDownABit and shiftFloatUpABit.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.miscellaneous.shiftFloatDownABit">
-<code class="descclassname">fudge.core.math.miscellaneous.</code><code class="descname">shiftFloatDownABit</code><span class="sig-paren">(</span><em>f</em>, <em>r_eps</em>, <em>a_eps=0.0</em>, <em>z_eps=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/miscellaneous.html#shiftFloatDownABit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.miscellaneous.shiftFloatDownABit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a float that is slightly less than f. The amount less depends on r_eps, a_eps and z_eps.
-If f is 0., returns -z_eps; otherwise returns ( 1 - r_eps ) * f - a_eps. r_eps, a_eps and z_eps
-all must be between 0. and 0.5 inclusive.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.miscellaneous.shiftFloatUpABit">
-<code class="descclassname">fudge.core.math.miscellaneous.</code><code class="descname">shiftFloatUpABit</code><span class="sig-paren">(</span><em>f</em>, <em>r_eps</em>, <em>a_eps=0.0</em>, <em>z_eps=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/math/miscellaneous.html#shiftFloatUpABit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.miscellaneous.shiftFloatUpABit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a float that is slightly more than f. The amount more depends on r_eps, a_eps and z_eps.
-If f is 0., returns z_eps; otherwise returns ( 1 + r_eps ) * f + a_eps. r_eps, a_eps and z_eps
-all must be between 0. and 0.5 inclusive.</p>
-</dd></dl>
-
+<div class="section" id="fudge-core-math-miscellaneous-module">
+<h2>fudge.core.math.miscellaneous module<a class="headerlink" href="#fudge-core-math-miscellaneous-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="fudge-core-math-pointwisexy-module">
 <h2>fudge.core.math.pointwiseXY module<a class="headerlink" href="#fudge-core-math-pointwisexy-module" title="Permalink to this headline">¶</a></h2>
@@ -1005,6 +931,7 @@ all must be between 0. and 0.5 inclusive.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -1013,7 +940,7 @@ all must be between 0. and 0.5 inclusive.</p>
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.core.math package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
@@ -1022,7 +949,7 @@ all must be between 0. and 0.5 inclusive.</p>
 <li><a class="reference internal" href="#module-fudge.core.math.fudgemath">fudge.core.math.fudgemath module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.math.linearAlgebra">fudge.core.math.linearAlgebra module</a></li>
 <li><a class="reference internal" href="#fudge-core-math-matrix-module">fudge.core.math.matrix module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.miscellaneous">fudge.core.math.miscellaneous module</a></li>
+<li><a class="reference internal" href="#fudge-core-math-miscellaneous-module">fudge.core.math.miscellaneous module</a></li>
 <li><a class="reference internal" href="#fudge-core-math-pointwisexy-module">fudge.core.math.pointwiseXY module</a></li>
 <li><a class="reference internal" href="#fudge-core-math-table-module">fudge.core.math.table module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.math">Module contents</a></li>
@@ -1044,15 +971,15 @@ all must be between 0. and 0.5 inclusive.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1074,12 +1001,13 @@ all must be between 0. and 0.5 inclusive.</p>
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.core.html" >fudge.core package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.core.html" >fudge.core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.core.math package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

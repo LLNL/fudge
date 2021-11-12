@@ -17,15 +17,18 @@
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-// ************* class kalbach_data *****************
-// ----------- kalbach_data::linlin_interp --------------
+// ************* class Kdata::kalbach_data *****************
+// ----------- Kdata::kalbach_data::linlin_interp --------------
 // Does linear interpolation of this data with the next
-void kalbach_data::linlin_interp( double e_in, const kalbach_data& left_data,
-  const kalbach_data& right_data )
+bool Kdata::kalbach_data::linlin_interp( double e_in, const Kdata::kalbach_data& left_data,
+  const Kdata::kalbach_data& right_data )
 {
+  bool is_OK = true;
+  
   if( ( e_in < left_data.E_in ) || ( e_in > right_data.E_in ) )
   {
-    Warning( "kalbach_data::linlin_interp", "extrapolation");
+    Msg::DebugInfo( "Kdata::kalbach_data::linlin_interp", "extrapolation");
+    is_OK = false;
   }
   E_in = e_in;
   Eout_interp = left_data.Eout_interp;
@@ -33,6 +36,8 @@ void kalbach_data::linlin_interp( double e_in, const kalbach_data& left_data,
   double alpha;
   if( denom == 0.0 )
   {
+    Msg::DebugInfo( "Kdata::kalbach_data::linlin_interp", "division by zero");
+    is_OK = false;
     this_Ecm = left_data.this_Ecm;
     this_f0 = left_data.this_f0;
     this_r = left_data.this_r;
@@ -51,60 +56,69 @@ void kalbach_data::linlin_interp( double e_in, const kalbach_data& left_data,
     this_r = ( 1.0 - alpha )*left_data.this_r + alpha*right_data.this_r;
     next_r = ( 1.0 - alpha )*left_data.next_r + alpha*right_data.next_r;
   }
+
+  return is_OK;
 }
-// ----------- kalbach_data::unit_base_interp --------------
+// ----------- Kdata::kalbach_data::unit_base_interp --------------
 // Does (unit-base) linear interpolation of this data with the next
-void kalbach_data::unit_base_interp( double e_in, const kalbach_data& left_data,
-  const kalbach_data& right_data )
+bool Kdata::kalbach_data::unit_base_interp( double e_in, const Kdata::kalbach_data& left_data,
+  const Kdata::kalbach_data& right_data )
 {
-  linlin_interp( e_in, left_data, right_data );
+  bool is_OK = linlin_interp( e_in, left_data, right_data );
 
   double denom = right_data.E_in - left_data.E_in;
   double alpha;
   if( denom == 0.0 )
   {
+    Msg::DebugInfo( "Kdata::kalbach_data::unit_base_interp", "division by zero" );
+    is_OK = false;
     alpha = 0.0;
   }
   else
   {
     alpha = ( e_in - left_data.E_in )/denom;
   }
-  unit_base.interpolate( alpha, left_data.unit_base, right_data.unit_base );
+  bool UB_OK = unit_base.interpolate( alpha, left_data.unit_base, right_data.unit_base );
+
+  return ( is_OK && UB_OK );
 }
-// ----------- kalbach_data::un_unit_base --------------
+// ----------- Kdata::kalbach_data::un_unit_base --------------
 // Undoes the unit-base map for one outgoing energy
-double kalbach_data::un_unit_base( double E_unit )
+double Kdata::kalbach_data::un_unit_base( double E_unit )
 {
   return unit_base.un_unit_base( E_unit );
 }
-// ----------- kalbach_data::un_unit_base --------------
+// ----------- Kdata::kalbach_data::un_unit_base --------------
 // Undoes the unit-base map; used on interpolated data
-void kalbach_data::un_unit_base( )
+void Kdata::kalbach_data::un_unit_base( )
 {
   double scale = unit_base.Eout_max - unit_base.Eout_min;
   if( scale <= 0.0 )
   {
-    FatalError( "kalbach_data::un_unit_base", "Bad unit base scale" );
+    Msg::FatalError( "Kdata::kalbach_data::un_unit_base",
+		     "Bad unit base scale" );
   }
+  // use the version of un_unit_base which does not check the interpolation
   this_Ecm = unit_base.un_unit_base( this_Ecm );
   next_Ecm = unit_base.un_unit_base( next_Ecm );
   this_f0 /= scale;
   next_f0 /= scale;
 }
-// ----------- kalbach_data::get_f0_r --------------
+// ----------- Kdata::kalbach_data::get_f0_r --------------
 // Calculates r and the center-of-mass outgoing energy density
-void kalbach_data::get_f0_r( double Eoutcm, double *Ecm_prob, double *r ) const
+void Kdata::kalbach_data::get_f0_r( double Eoutcm, double *Ecm_prob, double *r ) const
 {
   if( ( Eoutcm < this_Ecm ) || ( Eoutcm > next_Ecm ) )
   {
-    FatalError( "kalbach_data::get_f0_r", "Eoutcm outside its range" );
+    Msg::FatalError( "Kdata::kalbach_data::get_f0_r",
+		     "Eoutcm outside its range" );
   }
-  if( Eout_interp == HISTOGRAM )
+  if( Eout_interp == Terp::HISTOGRAM )
   {
     *Ecm_prob = this_f0;
     *r = this_r;
   }
-  else if( Eout_interp == LINLIN )
+  else if( Eout_interp == Terp::LINLIN )
   {
     double alpha = ( Eoutcm - this_Ecm )/( next_Ecm - this_Ecm );
     *Ecm_prob = ( 1.0 - alpha )*this_f0 + alpha*next_f0;
@@ -112,14 +126,15 @@ void kalbach_data::get_f0_r( double Eoutcm, double *Ecm_prob, double *r ) const
   }
   else
   {
-    FatalError( "kalbach_data::get_f0_r", "interpolation not implemented" );
+    Msg::FatalError( "Kdata::kalbach_data::get_f0_r",
+		     "interpolation not implemented" );
   }
 }
 
-// ************* class nucleon *****************
-// ----------- nucleon::operator= --------------
+// ************* class Kdata::nucleon *****************
+// ----------- Kdata::nucleon::operator= --------------
 //! copies the data
-nucleon& nucleon::operator=( const nucleon& to_copy )
+Kdata::nucleon& Kdata::nucleon::operator=( const Kdata::nucleon& to_copy )
 {
   mass = to_copy.mass;
   Z = to_copy.Z;
@@ -129,9 +144,9 @@ nucleon& nucleon::operator=( const nucleon& to_copy )
   Kalbach_m = to_copy.Kalbach_m;
   return *this;
 }
-// ----------- nucleon::set_params --------------
+// ----------- Kdata::nucleon::set_params --------------
 // Sets Z, A, I, M, m
-void nucleon::set_params( int ZA )
+void Kdata::nucleon::set_params( int ZA )
 {
   A = ZA % 1000;
   Z = ( ZA - A )/1000;
@@ -179,9 +194,9 @@ void nucleon::set_params( int ZA )
     break;
   }
 }
-// ----------- nucleon::get_Sa --------------
+// ----------- Kdata::nucleon::get_Sa --------------
 // Computes the Kalbach S_a function, where *this is the compound nucleus
-double nucleon::get_Sa( const nucleon &in_or_out )
+double Kdata::nucleon::get_Sa( const Kdata::nucleon &in_or_out )
 {
   double S;
   // replace by neutron for incident gammas
@@ -200,38 +215,41 @@ double nucleon::get_Sa( const nucleon &in_or_out )
     1.211*( (1.0*Z*Z)/A - (1.0*resid_Z*resid_Z)/resid_A ) - in_or_out.Kalbach_I;
   return S;
 }
-// ----------- nucleon::check_data --------------
+// ----------- Kdata::nucleon::check_data --------------
 // Checks for proper initialization
-bool nucleon::check_data( )
+bool Kdata::nucleon::check_data( )
 {
   return ( A >= 0 ) && ( mass >= 0.0 );
 }
 
-// ************* class Kalbach_a *****************
-// -----------  Kalbach_a::setup_params ------------------
+// ************* class Kdata::Kalbach_a *****************
+// -----------  Kdata::Kalbach_a::setup_params ------------------
 // Sets up the mass ratios in map
-void Kalbach_a::setup_params( )
+void Kdata::Kalbach_a::setup_params( )
 {
   // verify that we have particle data
   if( !projectile.check_data( ) )
   {
-    FatalError( "Kalbach_a::setup_params", "insufficient projectile data" );
+    Msg::FatalError( "Kdata::Kalbach_a::setup_params",
+		     "insufficient projectile data" );
   }
   if( projectile.Z == 3 )
   {
-    FatalError( "Kalbach_a::setup_params", 
+    Msg::FatalError( "Kdata::Kalbach_a::setup_params", 
       "Kalbach M value is undefined for incident triton and helium-3" );
   }
   if( !target.check_data( ) )
   {
-    FatalError( "Kalbach_a::setup_params", "insufficient target data" );
+    Msg::FatalError( "Kdata::Kalbach_a::setup_params",
+		     "insufficient target data" );
   }
   int Z = projectile.Z + target.Z;
   int A = projectile.A + target.A;
   compound.set_params( 1000*Z + A );
   if( !compound.check_data( ) )
   {
-    FatalError( "Kalbach_a::setup_params", "mass of compound not given" );
+    Msg::FatalError( "Kdata::Kalbach_a::setup_params",
+		     "mass of compound not given" );
   }
   if( eject.get_ZA( ) == projectile.get_ZA( ) )
   {
@@ -245,35 +263,38 @@ void Kalbach_a::setup_params( )
     residual.set_params( 1000*Z + A );
     if( !residual.check_data( ) )
     {
-      FatalError( "Kalbach_a::setup_params", "mass of residual not given" );
+      Msg::FatalError( "Kdata::Kalbach_a::setup_params",
+		       "mass of residual not given" );
     }
   }
   // Do the masses make sense?
   double massSlop = 1.0e-6;  // the masses should agree by at least this much
   double refMass = ( projectile.mass == 0 )? target.mass * massSlop:
     projectile.mass / 40;
-  if( abs( projectile.mass + target.mass - compound.mass ) > refMass )
+  if( std::abs( projectile.mass + target.mass - compound.mass ) > refMass )
   {
-    FatalError( "Kalbach_a::setup_params", "Check the mass of the compound" );
+    Msg::FatalError( "Kdata::Kalbach_a::setup_params",
+		     "Check the mass of the compound" );
   }
   refMass = ( eject.mass == 0 )? compound.mass * massSlop :
     eject.mass / 40;
-  if( abs( eject.mass + residual.mass - compound.mass ) >  eject.mass/40 )
+  if( std::abs( eject.mass + residual.mass - compound.mass ) >  eject.mass/40 )
   {
-    FatalError( "Kalbach_a::setup_params", "Check the mass of the residual" );
+    Msg::FatalError( "Kdata::Kalbach_a::setup_params",
+		     "Check the mass of the residual" );
   }
 
   set_Sab( );
   map->setup_params( projectile.mass, target.mass, eject.mass, residual.mass );
 }
-// ----------- Kalbach_a::set_Sab --------------
+// ----------- Kdata::Kalbach_a::set_Sab --------------
 // Computes the S_a and S_b functions
-void Kalbach_a::set_Sab( )
+void Kdata::Kalbach_a::set_Sab( )
 {
   // There is special coding for photonuclear reactions
   if( projectile.A == 0 )
   {
-    nucleon neutron;
+    Kdata::nucleon neutron;
     neutron.set_params( 1 );
     projectile_S = compound.get_Sa( neutron );
   }
@@ -290,9 +311,9 @@ void Kalbach_a::set_Sab( )
     eject_S = compound.get_Sa( eject );
   }
 }
-// ----------- Kalbach_a::get_a --------------
+// ----------- Kdata::Kalbach_a::get_a --------------
 // Computes the Kalbach a function
-double Kalbach_a::get_a( double E_in, double E_out )
+double Kdata::Kalbach_a::get_a( double E_in, double E_out )
 {
   double slope_a;
   // total center-of-mass kinetic energy of incident particles
@@ -318,13 +339,13 @@ double Kalbach_a::get_a( double E_in, double E_out )
   if( projectile.A == 0 )
   {
     static double m_neutron = Global.Value( "m_neutron" );
-    slope_a *= sqrt( Ecm_proj/(2.0*m_neutron) ) * min( 4.0, max( 1.0, 9.3/sqrt( E_out ) ) );
+    slope_a *= sqrt( Ecm_proj/(2.0*m_neutron) ) * std::min( 4.0, std::max( 1.0, 9.3/sqrt( E_out ) ) );
   }
   return slope_a;
 }
-// ----------- Kalbach_a::copy_masses --------------
+// ----------- Kdata::Kalbach_a::copy_masses --------------
 // Stores the masses
-void Kalbach_a::copy_masses( const particleInfo &particle_info )
+void Kdata::Kalbach_a::copy_masses( const Maps::particleInfo &particle_info )
 {
   projectile.mass = particle_info.mProj;
   target.mass = particle_info.mTarg;

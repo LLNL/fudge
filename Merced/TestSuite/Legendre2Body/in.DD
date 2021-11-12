@@ -1,6 +1,5 @@
 xndfgenTransferMatrix: version 1.0
 Process: 'Legendre two body transfer matrix'
-Quadrature method: adaptive
 Comment: H2 + H2 --> H1 + H3 outgoing data for H3
 Reaction's Q value:  4.032927000000e+06
 outputLegendreOrder: 3

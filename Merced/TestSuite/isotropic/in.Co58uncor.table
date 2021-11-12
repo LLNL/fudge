@@ -2,7 +2,6 @@ xndfgenTransferMatrix: version 1.0
 Process: isotropic table
 Comment: n + Co58 --> sumOfRemainingOutputChannels outgoing data for n
 outputLegendreOrder: 0
-# Quadrature method: Gauss6
 Projectile Frame: lab
 
 # The energies in this file are all in eV.

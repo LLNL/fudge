@@ -1,18 +1,20 @@
 \subsection{Integration}
-This section decribes all the routines in the file "ptwXY\_integration.c".
+This section decribes all the functions in the file ``ptwXY\_integration.c''.
 
 \subsubsection{ptwXY\_f\_integrate}
-This routine returns the integral bewteen two points.
+This function returns the integral between two points using \highlight{interpolation}.
 \setargumentNameLengths{interpolation}
-\CallingC{nfu\_status ptwXY\_f\_integrate(}{ptwXYPoints *ptwXY,
+\CallingC{nfu\_status ptwXY\_f\_integrate(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{ptwXY\_interpolation interpolation,}
     \addArgument{double x1,}
     \addArgument{double y1,}
     \addArgument{double x2,}
     \addArgument{double y2,}
     \addArgument{double *value );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to a \highlight{ptwXYPoints} object.}
-    \argumentBox{interpolation}{The interpolation bewteen the two points.}
+    \argumentBox{interpolation}{The interpolation between the two points.}
     \argumentBox{x2}{The x-value of the lower point.}
     \argumentBox{y2}{The y-value of the lower point}
     \argumentBox{x2}{The x-value of the upper point.}
@@ -21,98 +23,112 @@ This routine returns the integral bewteen two points.
     \vskip 0.05 in \noindent
 
 \subsubsection{ptwXY\_integrate}
-This routine returns the integral of \highlight{ptwXY} from \highlight{xMin} to \highlight{xMax}.
-\setargumentNameLengths{ptwXY}
-\CallingC{ptwXPoints *ptwXY\_integrate(}{ptwXYPoints *ptwXY,
-    \addArgument{double xl,}
-    \addArgument{double xu,}
-    \addArgument{nfu\_status *status );}}
+This function returns the integral of \highlight{ptwXY} from \highlight{domainMin} to \highlight{domainMax}.
+\setargumentNameLengths{domainMax}
+\CallingC{nfu\_status ptwXY\_integrate(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double domainMin,}
+    \addArgument{double domainMax,}
+    \addArgument{double *integral);}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{xl}{The lower limit of integration.}
-    \argumentBox{xu}{The upperlimit of integration.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{domainMin}{The lower limit of integration.}
+    \argumentBox{domainMax}{The upperlimit of integration.}
+    \argumentBox{integral}{On return, the value of the integral.}
     \vskip 0.05 in \noindent
-The return value is $\int_{\rm xl}^{\rm xu} f(x) dx$.
+The return value is $\int_{\rm domainMin}^{\rm domainMax} f(x) dx$.
 
 \subsubsection{ptwXY\_integrateDomain}
-This routine returns the integral of \highlight{ptwXY} over its domain.
-\setargumentNameLengths{ptwXY}
-\CallingC{ptwXPoints *ptwXY\_integrateDomain(}{ptwXYPoints *ptwXY,
-    \addArgument{nfu\_status *status );}}
+This function returns the integral of \highlight{ptwXY} over its domain.
+\setargumentNameLengths{integral}
+\CallingC{nfu\_status ptwXY\_integrateDomain(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double *value );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{integral}{On return, the value of the integral.}
     \vskip 0.05 in \noindent
 The return value is $\int f(x) dx$ over the domain of \highlight{ptwXY}.
 
 \subsubsection{ptwXY\_normalize}
-This routine multiplies each y-value of \highlight{ptwXY} by a constant so that its integral is then normalized to 1.
+This function multiplies each y-value of \highlight{ptwXY} by a constant so that its integral is then normalized to 1.
 \setargumentNameLengths{ptwXY}
-\CallingC{ptwXPoints *ptwXY\_normalize(}{ptwXYPoints *ptwXY );}
+\CallingC{nfu\_status ptwXY\_normalize(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \vskip 0.05 in \noindent
 
 \subsubsection{ptwXY\_integrateDomainWithWeight\_x}
-This routine returns the integral of \highlight{ptwXY} weighted by x over its domain.
-\setargumentNameLengths{ptwXY}
-\CallingC{ptwXPoints *ptwXY\_integrateDomainWithWeight\_x(}{ptwXYPoints *ptwXY,
-    \addArgument{nfu\_status *status );}}
+This function returns the integral of \highlight{ptwXY} weighted by x over its domain.
+\setargumentNameLengths{integral}
+\CallingC{nfu\_status ptwXY\_integrateDomainWithWeight\_x(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double *integral );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{integral}{On return, the value of the integral.}
     \vskip 0.05 in \noindent
 The return value is $\int x f(x) dx$ over the domain of \highlight{ptwXY}.
 
 \subsubsection{ptwXY\_integrateWithWeight\_x}
-This routine returns the integral of \highlight{ptwXY} weighted by x from xMin to xMax.
-\setargumentNameLengths{ptwXY}
-\CallingC{ptwXPoints *ptwXY\_integrateWithWeight\_x(}{ptwXYPoints *ptwXY,
-    \addArgument{double xMin,}
-    \addArgument{double xMax,}
-    \addArgument{nfu\_status *status );}}
+This function returns the integral of \highlight{ptwXY} weighted by x from domainMin to domainMax.
+\setargumentNameLengths{domainMax}
+\CallingC{nfu\_status ptwXY\_integrateWithWeight\_x(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double domainMin,}
+    \addArgument{double domainMax,}
+    \addArgument{double *integral );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{xMin}{The lower limit of the integration.}
-    \argumentBox{xMax}{The upper limit of the integration.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{domainMin}{The lower limit of the integration.}
+    \argumentBox{domainMax}{The upper limit of the integration.}
+    \argumentBox{integral}{On return, the value of the integral.}
     \vskip 0.05 in \noindent
-The return value is $\int_{xMin}^{xMax} x f(x) dx$ over the domain of \highlight{ptwXY}.
+The return value is $\int_{\rm domainMin}^{\rm domainMax} x f(x) dx$ over the domain of \highlight{ptwXY}.
 
 \subsubsection{ptwXY\_integrateDomainWithWeight\_sqrt\_x}
-This routine returns the integral of \highlight{ptwXY} weighted by $\sqrt{ x }$ over its domain.
-\setargumentNameLengths{ptwXY}
-\CallingC{ptwXPoints *ptwXY\_integrateDomainWithWeight\_sqrt\_x(}{ptwXYPoints *ptwXY,
-    \addArgument{nfu\_status *status );}}
+This function returns the integral of \highlight{ptwXY} weighted by $\sqrt{ x }$ over its domain.
+\setargumentNameLengths{integral}
+\CallingC{nfu\_status ptwXY\_integrateDomainWithWeight\_sqrt\_x(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double *integral );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{integral}{On return, the value of the integral.}
     \vskip 0.05 in \noindent
 The return value is $\int \sqrt{ x } f(x) dx$ over the domain of \highlight{ptwXY}.
 
 \subsubsection{ptwXY\_integrateWithWeight\_sqrt\_x}
-This routine returns the integral of \highlight{ptwXY} weighted by x from xMin to xMax.
-\setargumentNameLengths{ptwXY}
-\CallingC{ptwXPoints *ptwXY\_integrateWithWeight\_sqrt\_x(}{ptwXYPoints *ptwXY,
-    \addArgument{double xMin,}
-    \addArgument{double xMax,}
-    \addArgument{nfu\_status *status );}}
+This function returns the integral of \highlight{ptwXY} weighted by x from domainMin to domainMax.
+\setargumentNameLengths{domainMin}
+\CallingC{nfu\_status ptwXY\_integrateWithWeight\_sqrt\_x(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double domainMin,}
+    \addArgument{double domainMax,}
+    \addArgument{double *integral );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{xMin}{The lower limit of the integration.}
-    \argumentBox{xMax}{The upper limit of the integration.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{domainMin}{The lower limit of the integration.}
+    \argumentBox{domainMax}{The upper limit of the integration.}
+    \argumentBox{integral}{On return, the value of the integral.}
     \vskip 0.05 in \noindent
-The return value is $\int_{xMin}^{xMax} \sqrt{ x } f(x) dx$ over the domain of \highlight{ptwXY}.
+The return value is $\int_{\rm domainMin}^{\rm domainMax} \sqrt{ x } f(x) dx$ over the domain of \highlight{ptwXY}.
 
 \subsubsection{ptwXY\_groupOneFunction}
-This routine integrates \highlight{ptwXY} between each pair of consecutive points in \highlight{groupBoundaries} and
+This function integrates \highlight{ptwXY} between each pair of consecutive points in \highlight{groupBoundaries} and
 returns each integral's value as an element of the returned \highlight{ptwXPoints}.
 \setargumentNameLengths{groupBoundaries}
-\CallingC{ptwXPoints *ptwXY\_groupOneFunction(}{ptwXYPoints *ptwXY,
+\CallingC{ptwXPoints *ptwXY\_groupOneFunction(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{ptwXPoints *groupBoundaries,}
     \addArgument{ptwXY\_group\_normType normType,}
-    \addArgument{ptwXPoints *norm,}
-    \addArgument{nfu\_status *status );}}
+    \addArgument{ptwXPoints *norm );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{groupBoundaries}{A list of x-values.}
     \argumentBox{normType}{The type of normalization to apply to integration.}
     \argumentBox{norm}{A list of normalizations to be applied when normType is \highlight{ptwXY\-\_group\-\_normType\-\_norm}.}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
 Let \highlight{groupBoundaries} contain $n$ x-values with $x_i < x_{i+1}$. The returned \highlight{ptwXPoints} will contain $n-1$
 values $I_i$ such that
@@ -127,20 +143,21 @@ where $n_i$ is determined by \highlight{normType} as,
 \end{description}
 
 \subsubsection{ptwXY\_groupTwoFunctions}
-This routine integrates the product of \highlight{ptwXY1} and \highlight{ptwXY2} between each pair of consecutive points in \highlight{groupBoundaries} and
+This function integrates the product of \highlight{ptwXY1} and \highlight{ptwXY2} between each pair of consecutive points in \highlight{groupBoundaries} and
 returns each integral's value as an element of the returned \highlight{ptwXPoints}.
 \setargumentNameLengths{groupBoundaries}
-\CallingC{ptwXPoints *ptwXY\_groupTwoFunctions(}{ptwXYPoints *ptwXY1,
+\CallingC{ptwXPoints *ptwXY\_groupTwoFunctions(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY1,}
     \addArgument{ptwXYPoints *ptwXY2,}
     \addArgument{ptwXPoints *groupBoundaries,}
     \addArgument{ptwXY\_group\_normType normType,}
-    \addArgument{ptwXPoints *norm,}
-    \addArgument{nfu\_status *status );}}
-    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \addArgument{ptwXPoints *norm );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY1}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{groupBoundaries}{A list of x-values.}
     \argumentBox{normType}{The type of normalization to apply to integration.}
     \argumentBox{norm}{A list of normalizations to be applied when normType is \highlight{ptwXY\-\_group\-\_normType\-\_norm}.}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
 Let \highlight{groupBoundaries} contain $n$ x-values with $x_i < x_{i+1}$. The returned \highlight{ptwXPoints} will contain $n-1$
 values $I_i$ such that
@@ -155,27 +172,29 @@ where $n_i$ is determined by \highlight{normType} as,
 \end{description}
 
 \subsubsection{ptwXY\_groupThreeFunctions}
-This routine integrates the product \highlight{ptwXY1}, \highlight{ptwXY2} and \highlight{ptwXY3} between each pair of 
+This function integrates the product \highlight{ptwXY1}, \highlight{ptwXY2} and \highlight{ptwXY3} between each pair of 
 consecutive points in \highlight{groupBoundaries} and
 returns each integral's value as an element of the returned \highlight{ptwXPoints}.
 \setargumentNameLengths{groupBoundaries}
-\CallingC{ptwXPoints *ptwXY\_groupThreeFunctions(}{ptwXYPoints *ptwXY1,
+\CallingC{ptwXPoints *ptwXY\_groupThreeFunctions(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY1,}
     \addArgument{ptwXYPoints *ptwXY2,}
     \addArgument{ptwXYPoints *ptwXY3,}
     \addArgument{ptwXPoints *groupBoundaries,}
     \addArgument{ptwXY\_group\_normType normType,}
-    \addArgument{ptwXPoints *norm,}
-    \addArgument{nfu\_status *status );}}
-    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \addArgument{ptwXPoints *norm );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY1}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY3}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{groupBoundaries}{A list of x-values.}
     \argumentBox{normType}{The type of normalization to apply to integration.}
     \argumentBox{norm}{A list of normalizations to be applied when normType is \highlight{ptwXY\-\_group\-\_normType\-\_norm}.}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
 Let \highlight{groupBoundaries} contain $n$ x-values with $x_i < x_{i+1}$. The returned \highlight{ptwXPoints} will contain $n-1$
 values $I_i$ such that
 \begin{equation}
-    I_i = \int_{x_i}^{x_{i+1}} { f(x) g(x) h(x) \over n_i } dx
+    I_i = { 1 \over n_i } \int_{x_i}^{x_{i+1}} f(x) g(x) h(x) dx
 \end{equation}
 where $n_i$ is determined by \highlight{normType} as,
 \begin{description}

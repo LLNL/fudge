@@ -1,0 +1,708 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.reactions.base &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.reactions.base</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.reactions.base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
+<span class="kn">from</span> <span class="nn">PoPs.groups</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">chemicalElementMiscPoPsModule</span>
+<span class="kn">from</span> <span class="nn">PoPs.families</span> <span class="kn">import</span> <span class="n">nuclide</span> <span class="k">as</span> <span class="n">nuclideModule</span>
+
+<span class="kn">import</span> <span class="nn">xData.ancestry</span> <span class="k">as</span> <span class="nn">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">standards</span> <span class="k">as</span> <span class="n">standardsModule</span>
+
+<span class="kn">import</span> <span class="nn">fudge</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">outputChannel</span> <span class="k">as</span> <span class="n">outputChannelModule</span> 
+<span class="kn">from</span> <span class="nn">..reactionData.doubleDifferentialCrossSection</span> <span class="kn">import</span> <span class="n">doubleDifferentialCrossSection</span> <span class="k">as</span> <span class="n">doubleDifferentialCrossSectionModule</span>
+<span class="kn">from</span> <span class="nn">..reactionData</span> <span class="kn">import</span> <span class="n">crossSection</span> <span class="k">as</span> <span class="n">crossSectionModule</span>
+<span class="kn">from</span> <span class="nn">..reactionData</span> <span class="kn">import</span> <span class="n">availableEnergy</span> <span class="k">as</span> <span class="n">availableEnergyModule</span>
+<span class="kn">from</span> <span class="nn">..reactionData</span> <span class="kn">import</span> <span class="n">availableMomentum</span> <span class="k">as</span> <span class="n">availableMomentumModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="FissionGenre"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.FissionGenre">[docs]</a><span class="k">class</span> <span class="nc">FissionGenre</span> <span class="p">:</span>
+
+    <span class="n">total</span> <span class="o">=</span> <span class="s1">&#39;total&#39;</span>
+    <span class="n">firstChance</span> <span class="o">=</span> <span class="s1">&#39;firstChance&#39;</span>
+    <span class="n">secondChance</span> <span class="o">=</span> <span class="s1">&#39;secondChance&#39;</span>
+    <span class="n">thirdChance</span> <span class="o">=</span> <span class="s1">&#39;thirdChance&#39;</span>
+    <span class="n">fourthChance</span> <span class="o">=</span> <span class="s1">&#39;fourthChance&#39;</span>
+
+    <span class="n">allowed</span> <span class="o">=</span> <span class="p">(</span> <span class="kc">None</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">firstChance</span><span class="p">,</span> <span class="n">secondChance</span><span class="p">,</span> <span class="n">thirdChance</span><span class="p">,</span> <span class="n">fourthChance</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction">[docs]</a><span class="k">class</span> <span class="nc">base_reaction</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base class for all types of reaction.&quot;&quot;&quot;</span>
+
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;crossSection&#39;</span><span class="p">,</span> <span class="s1">&#39;doubleDifferentialCrossSection&#39;</span><span class="p">,</span> <span class="s1">&#39;outputChannel&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">ENDF_MT</span><span class="p">,</span> <span class="n">fissionGenre</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">documentation</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span> <span class="o">=</span> <span class="n">doubleDifferentialCrossSectionModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span> <span class="o">=</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span> <span class="o">=</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">(</span> <span class="n">genre</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="o">=</span> <span class="n">fissionGenre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">ENDF_MT</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">documentation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">addDocumentation</span><span class="p">(</span> <span class="n">documentation</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">doubleDifferentialCrossSection</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">crossSection</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outputChannel</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fissionGenre</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionGenre</span> <span class="p">)</span>
+
+    <span class="nd">@fissionGenre</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">fissionGenre</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FissionGenre</span><span class="o">.</span><span class="n">allowed</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Invalid fission genre &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">value</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fissionGenre</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the reaction&#39;s label.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateLabel</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="base_reaction.updateLabel"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.updateLabel">[docs]</a>    <span class="k">def</span> <span class="nf">updateLabel</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sets the reaction&#39;s label from outputChannel products.&quot;&quot;&quot;</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">MT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;[&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Label already contains a process: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">label</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="o">+</span> <span class="s1">&#39; fission&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">label</span> <span class="o">+=</span> <span class="s1">&#39; [</span><span class="si">%s</span><span class="s1"> fission]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span></div>
+
+<div class="viewcode-block" id="base_reaction.findLinks"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.findLinks">[docs]</a>    <span class="k">def</span> <span class="nf">findLinks</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">links</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="p">(</span> <span class="s1">&#39;doubleDifferentialCrossSection&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+            <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.isBasicReaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.isBasicReaction">[docs]</a>    <span class="k">def</span> <span class="nf">isBasicReaction</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.isCompleteReaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.isCompleteReaction">[docs]</a>    <span class="k">def</span> <span class="nf">isCompleteReaction</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.isFission"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.isFission">[docs]</a>    <span class="k">def</span> <span class="nf">isFission</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionGenre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="base_reaction.isThermalNeutronScatteringLaw"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.isThermalNeutronScatteringLaw">[docs]</a>    <span class="k">def</span> <span class="nf">isThermalNeutronScatteringLaw</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">isThermalNeutronScatteringLaw</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.check"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is usually not called directly. Use reactionSuite.check() instead.</span>
+
+<span class="sd">        Checks cross section and outputChannel (and differential cross sections if available). Checks include:</span>
+<span class="sd">          do Z/A balance? do Q-value and thresholds agree?</span>
+<span class="sd">          Does cross section domain agree with each product distribution/multiplicity domain?</span>
+<span class="sd">          Does energy balance?</span>
+
+<span class="sd">        @:param info: dict</span>
+<span class="sd">        @:return list of warnings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">production</span> <span class="k">as</span> <span class="n">productionModule</span>
+        <span class="kn">from</span> <span class="nn">fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic.CoulombPlusNuclearElastic</span> \
+            <span class="kn">import</span> <span class="nn">CoulombDepositionNotSupported</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">particleZA</span><span class="p">(</span> <span class="n">particleID</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">particle</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">particleID</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
+                <span class="n">particle</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span> <span class="n">particle</span><span class="o">.</span><span class="n">pid</span> <span class="p">]</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">chemicalElementMiscPoPsModule</span><span class="o">.</span><span class="n">ZA</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+<span class="c1"># BRB6 hardwired</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">cpcount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span> <span class="p">(</span> <span class="n">particleZA</span><span class="p">(</span> <span class="n">prod</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="o">//</span> <span class="mi">1000</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;CoulombOutputChannel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpcount</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+        <span class="n">differentialCrossSectionWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">differentialCrossSectionWarnings</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;doubleDifferentialCrossSection:&quot;</span><span class="p">,</span> <span class="n">differentialCrossSectionWarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">crossSectionWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">crossSectionWarnings</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;Cross section:&quot;</span><span class="p">,</span> <span class="n">crossSectionWarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;Q&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span> <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;CoulombOutputChannel&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionOnly&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">warnings</span>             <span class="c1"># otherwise continue to check outputs</span>
+
+        <span class="c1"># compare calculated and listed Q-values:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">productionModule</span><span class="o">.</span><span class="n">production</span><span class="p">):</span> <span class="c1"># can&#39;t reliably compute Q for production reactions</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">Qcalc</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;availableEnergy_eV&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">Qcalc</span> <span class="o">-=</span> <span class="n">prod</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;eV/c**2&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">prod</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>   <span class="c1"># multiplicity is not constant</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">prod</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Non-constant multiplicity&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Q</span><span class="o">-</span><span class="n">Qcalc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;dQ&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="s1">&#39;eV&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">process</span> <span class="o">!=</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">processes</span><span class="o">.</span><span class="n">continuum</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Q_mismatch</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">Qcalc</span><span class="p">,</span><span class="s1">&#39;eV&#39;</span><span class="p">),</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span><span class="s1">&#39;eV&#39;</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>    <span class="c1"># this test only works if multiplicity and Q are both constant for all non-gamma products</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">genre</span> <span class="o">==</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">Genre</span><span class="o">.</span><span class="n">sumOfRemainingOutputChannels</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">isFission</span><span class="p">(</span> <span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">productionModule</span><span class="o">.</span><span class="n">production</span><span class="p">)</span> <span class="p">):</span>
+            <span class="c1"># check that ZA balances:</span>
+            <span class="n">ZAsum</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+                <span class="n">ZAsum</span> <span class="o">+=</span> <span class="n">particleZA</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="o">*</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">ZAsum</span> <span class="o">!=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compoundZA&#39;</span><span class="p">]:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">ZAbalanceWarning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="c1"># disabling for now: only complain if distributions are missing for transportables:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        if (not any( [product.distributions.components for product in self.__outputChannel] ) and not any(</span>
+<span class="sd">                [dProd.distributions.components for prod in [p for p in self.__outputChannel</span>
+<span class="sd">                    if p.outputChannel is not None] for dProd in prod.outputChannel] ) ):</span>
+<span class="sd">            # no distributions found for any reaction product or subsequent decay product</span>
+<span class="sd">            warnings.append( warning.noDistributions( self ) )</span>
+<span class="sd">            return warnings &quot;&quot;&quot;</span>
+
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span>
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">genre</span> <span class="o">==</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">Genre</span><span class="o">.</span><span class="n">twoBody</span>
+
+        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
+            <span class="n">productWarnings</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">productWarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;Product: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">product</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">productWarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">fissionFragmentWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">fissionFragmentData</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">fissionFragmentWarnings</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;Fission fragment info:&quot;</span><span class="p">,</span> <span class="n">fissionFragmentWarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;checkEnergyBalance&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">productionModule</span><span class="o">.</span><span class="n">production</span> <span class="p">):</span>
+            <span class="c1"># Calculate energy deposition data for all products, and for decay products.</span>
+            <span class="c1"># Then recursively check the product list for energy balance at each step of the reaction/decay</span>
+            <span class="c1"># At each step, if we have energy deposition for *every* product in the list, we can rigorously check</span>
+            <span class="c1"># energy balance. Otherwise, can only check that we don&#39;t exceed available energy.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="o">=</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;averageProductDataStyle&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;averageProductDataArgs&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="n">CoulombDepositionNotSupported</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">SkippedCoulombElasticEnergyDeposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">EnergyDepositionExceptionRaised</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;failOnException&#39;</span><span class="p">]:</span> <span class="k">raise</span>
+                <span class="k">return</span> <span class="n">warnings</span>
+
+            <span class="k">def</span> <span class="nf">checkProductsForEnergyBalance</span><span class="p">(</span> <span class="n">products</span><span class="p">,</span> <span class="n">Qs</span><span class="p">,</span> <span class="n">fission</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">decay</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">):</span>
+                <span class="c1"># sample usage: for the reaction n + F19 -&gt; n + (F19_c -&gt; F19 + gamma), this function</span>
+                <span class="c1"># should be called twice, to test energy balance at each step of the reaction.</span>
+                <span class="c1"># First call: products = [n, F19_c] and Qs = [Q_reaction],</span>
+                <span class="c1"># second call: products = [n, F19, gamma] and Qs = [Q_reaction, Q_decay].</span>
+                <span class="n">edepWarnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="n">averageProductDataLabel</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;averageProductDataStyle&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">label</span>
+                <span class="n">energyDep</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">averageProductDataLabel</span> <span class="ow">in</span> <span class="n">prod</span><span class="o">.</span><span class="n">energyDeposition</span><span class="p">:</span>
+                        <span class="n">energyDep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">prod</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">prod</span><span class="o">.</span><span class="n">energyDeposition</span><span class="p">[</span> <span class="n">averageProductDataLabel</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="n">energyDep</span><span class="p">:</span>
+                    <span class="n">totalEDep</span> <span class="o">=</span> <span class="n">energyDep</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">energyDep</span><span class="p">)):</span>
+                        <span class="k">if</span><span class="p">(</span>     <span class="p">(</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">!=</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span> <span class="ow">or</span>
+                                <span class="p">(</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">!=</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                            <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="k">if</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">!=</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMax</span><span class="p">:</span>
+                                <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">totalEDep</span><span class="p">,</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">mutualify</span><span class="p">(</span>
+                                        <span class="mf">1e-8</span><span class="p">,</span><span class="n">upperEps</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1e-8</span><span class="p">,</span><span class="n">upperEps</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                <span class="n">edepWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">EnergyDepositionExceptionRaised</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;failOnException&#39;</span><span class="p">]:</span> <span class="k">raise</span>
+                                <span class="k">return</span> <span class="n">warnings</span>
+                        <span class="n">totalEDep</span> <span class="o">=</span> <span class="n">totalEDep</span> <span class="o">+</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span> <span class="n">totalEDep</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">Qsum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Qs</span><span class="p">)</span>
+
+                <span class="k">def</span> <span class="nf">energyDepositedPerProduct</span><span class="p">(</span> <span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span> <span class="p">):</span>
+                    <span class="sd">&quot;&quot;&quot; if energy doesn&#39;t balance, determine how much is deposited in each product &quot;&quot;&quot;</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">availableEnergy</span> <span class="o">=</span> <span class="n">ein</span> <span class="o">+</span> <span class="n">Qsum</span>
+                    <span class="k">if</span> <span class="n">availableEnergy</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">availableEnergy</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span><span class="n">edep</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ein</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span><span class="n">edep</span> <span class="ow">in</span> <span class="n">energyDep</span><span class="p">]</span> <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">prod</span><span class="p">,</span> <span class="n">edep</span> <span class="ow">in</span> <span class="n">energyDep</span><span class="p">:</span>
+                        <span class="n">edep</span> <span class="o">=</span> <span class="n">edep</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">ein</span> <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">edep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">prod</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span> <span class="n">prod</span><span class="p">,</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">edep</span><span class="o">/</span><span class="n">availableEnergy</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">foo</span><span class="p">:</span> <span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="c1"># now we have total energy deposition for all particles, use to check energy balance.</span>
+                <span class="c1"># a few special cases to consider:</span>
+                <span class="k">if</span> <span class="n">fission</span><span class="p">:</span>
+                    <span class="c1"># fission products aren&#39;t listed (so far, anyway), so about 85% of available energy should be missing:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">ein</span><span class="p">,</span><span class="n">edep</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">totalEDep</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">edep</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">((</span><span class="n">ein</span> <span class="o">+</span> <span class="n">Qsum</span><span class="p">)</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;fissionEnergyBalanceLimit&#39;</span><span class="p">]):</span>
+                            <span class="n">edepWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">fissionEnergyImbalance</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">ein</span><span class="p">,</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                                <span class="n">i</span><span class="p">,</span> <span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">,</span> <span class="n">energyDepositedPerProduct</span><span class="p">(</span><span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">energyDep</span><span class="p">):</span>
+                    <span class="c1"># have full energy dep. data for all products, so we can rigorously check energy balance:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">ein</span><span class="p">,</span><span class="n">edep</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">totalEDep</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">edep</span> <span class="o">-</span> <span class="p">(</span><span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">((</span><span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">)</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;dEnergyBalanceRelative&#39;</span><span class="p">])</span>
+                                <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">edep</span> <span class="o">-</span> <span class="p">(</span><span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;dEnergyBalanceAbsolute&#39;</span><span class="p">]</span> <span class="p">)</span>
+                                    <span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">totalEDep</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="p">):</span>
+                            <span class="n">edepWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">energyImbalance</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">ein</span><span class="p">,</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                                <span class="n">i</span><span class="p">,</span> <span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">,</span> <span class="n">energyDepositedPerProduct</span><span class="p">(</span><span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># missing some products, so just check that outgoing energy doesn&#39;t exceed incoming:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">ein</span><span class="p">,</span><span class="n">edep</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">totalEDep</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">edep</span> <span class="o">-</span> <span class="p">(</span><span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">))</span> <span class="o">&gt;</span> <span class="p">((</span><span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">)</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;dEnergyBalanceRelative&#39;</span><span class="p">])</span>
+                                <span class="ow">and</span> <span class="p">(</span><span class="n">edep</span> <span class="o">-</span> <span class="p">(</span><span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;dEnergyBalanceAbsolute&#39;</span><span class="p">]</span> <span class="p">)</span>
+                                    <span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">totalEDep</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="p">):</span>
+                            <span class="n">edepWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">energyImbalance</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">ein</span><span class="p">,</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                                <span class="n">i</span><span class="p">,</span> <span class="n">ein</span><span class="o">+</span><span class="n">Qsum</span><span class="p">,</span> <span class="n">energyDepositedPerProduct</span><span class="p">(</span><span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">edepWarnings</span><span class="p">:</span>
+                    <span class="n">context</span> <span class="o">=</span> <span class="s2">&quot;Energy balance&quot;</span>
+                    <span class="k">if</span> <span class="n">decay</span><span class="p">:</span> <span class="n">context</span> <span class="o">+=</span> <span class="s2">&quot; (after decay)&quot;</span>
+                    <span class="n">context</span> <span class="o">+=</span> <span class="s2">&quot; for products: &quot;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span><span class="n">prod</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span> <span class="p">)</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span> <span class="n">context</span><span class="p">,</span> <span class="n">edepWarnings</span> <span class="p">)</span> <span class="p">)</span>
+
+                <span class="c1"># now recursively check decay products, if any:</span>
+                <span class="k">for</span> <span class="n">pidx</span><span class="p">,</span> <span class="n">currentProd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">products</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">currentProd</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">checkProductsForEnergyBalance</span><span class="p">(</span>
+                                <span class="n">products</span><span class="p">[:</span><span class="n">pidx</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">currentProd</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">]</span> <span class="o">+</span> <span class="n">products</span><span class="p">[</span><span class="n">pidx</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span>
+                                <span class="n">Qs</span> <span class="o">+</span> <span class="p">[</span><span class="n">currentProd</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()],</span>
+                                <span class="n">decay</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fission</span> <span class="o">=</span> <span class="kc">False</span>        <span class="c1"># FIXME what about spontaneous fission decay?</span>
+                                <span class="p">)</span>
+                <span class="c1"># end of helper function checkProductsForEnergyBalance</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+                <span class="n">checkProductsForEnergyBalance</span><span class="p">(</span> <span class="n">products</span> <span class="o">=</span> <span class="p">[</span><span class="n">p1</span> <span class="k">for</span> <span class="n">p1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">],</span> <span class="n">Qs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Q</span><span class="p">],</span>
+                        <span class="n">fission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isFission</span><span class="p">(),</span> <span class="n">decay</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>    <span class="c1"># FIXME this test currently disabled when Q non-constant</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="base_reaction.domainUnitConversionFactor"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.domainUnitConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">domainUnitConversionFactor</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainUnitConversionFactor</span><span class="p">(</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">reaction</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.amendForPatch"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.amendForPatch">[docs]</a>    <span class="k">def</span> <span class="nf">amendForPatch</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">amendForPatch</span><span class="p">(</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">amendForPatch</span><span class="p">(</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">amendForPatch</span><span class="p">(</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">reaction</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">amendForPatch</span><span class="p">(</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">amendForPatch</span><span class="p">(</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.diff"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">crossSection</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.heatCrossSection"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.heatCrossSection">[docs]</a>    <span class="k">def</span> <span class="nf">heatCrossSection</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">lowerlimit</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">upperlimit</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">interpolationAccuracy</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">heatAllPoints</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">doNotThin</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">heatBelowThreshold</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">heatAllEDomain</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">setThresholdToZero</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">doubleDifferentialCrossSection</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;    Skipping doubleDifferentialCrossSection reaction &quot;</span> <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">crossSection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">heat</span><span class="p">(</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">lowerlimit</span><span class="p">,</span> <span class="n">upperlimit</span><span class="p">,</span> <span class="n">interpolationAccuracy</span><span class="p">,</span> <span class="n">heatAllPoints</span><span class="p">,</span> <span class="n">doNotThin</span><span class="p">,</span>
+                <span class="n">heatBelowThreshold</span><span class="p">,</span> <span class="n">heatAllEDomain</span><span class="p">,</span> <span class="n">setThresholdToZero</span> <span class="o">=</span> <span class="n">setThresholdToZero</span><span class="p">,</span> <span class="n">addToSuite</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">crossSection</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.addDocumentation"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.addDocumentation">[docs]</a>    <span class="k">def</span> <span class="nf">addDocumentation</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">documentation</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">[</span><span class="n">documentation</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">documentation</span></div>
+
+<div class="viewcode-block" id="base_reaction.thresholdQAs"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.thresholdQAs">[docs]</a>    <span class="k">def</span> <span class="nf">thresholdQAs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="n">final</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.getDocumentation"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.getDocumentation">[docs]</a>    <span class="k">def</span> <span class="nf">getDocumentation</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.getQ"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.getQ">[docs]</a>    <span class="k">def</span> <span class="nf">getQ</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Q-value for this reaction. Converted to float if possible, otherwise a string value is returned.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="n">final</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.getReactionSuite"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.getReactionSuite">[docs]</a>    <span class="k">def</span> <span class="nf">getReactionSuite</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">reactionSuite</span> <span class="k">as</span> <span class="n">reactionSuiteModule</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">reactionSuite</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.cullStyles"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+
+<span class="c1">#        self.__doubleDifferentialCrossSection.cullStyles( styleList )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">reaction</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.calculateAverageProductData"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate average product data.</span>
+
+<span class="sd">        :param style: The style to use.</span>
+<span class="sd">        :param indent: string; The amount to indent and verbose output.</span>
+<span class="sd">        :param kwargs: string; All other parameters.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">MT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;reaction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;availableEnergy&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">axes</span> <span class="o">=</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+            <span class="n">QToPointwiseLinear</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">QToPointwiseLinear</span><span class="p">(</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+            <span class="n">availableEnergy</span> <span class="o">=</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">QToPointwiseLinear</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">QToPointwiseLinear</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">],</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">]</span> <span class="p">],</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="p">)</span>
+            <span class="n">availableEnergy</span> <span class="o">+=</span> <span class="n">QToPointwiseLinear</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">availableEnergy</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;availableMomentum&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">massInE</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;projectileMass&#39;</span><span class="p">]</span>
+            <span class="n">availableMomentum</span> <span class="o">=</span> <span class="n">availableMomentumModule</span><span class="o">.</span><span class="n">calculateMomentumPoints</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">massInE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">availableMomentum</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.partialProductionIntegral"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.partialProductionIntegral">[docs]</a>    <span class="k">def</span> <span class="nf">partialProductionIntegral</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">labToken</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">CoulombPlusNuclearElastic</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">issueCounters</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;issueCounters&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">issueCounters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">issueCounter</span> <span class="o">=</span> <span class="n">issueCounters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;partialProductionIntegral:CoulombPlusNuclearElastic&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">True</span> <span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">issueCounter</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">status</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;    WARNING: partialProductionIntegral: skipping elastic Coulomb reaction </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="bp">self</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="mf">0.0</span> <span class="p">)</span>
+
+        <span class="n">crossSection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">crossSection</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.0</span> <span class="p">)</span>
+        <span class="n">_partialProductionIntegral</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">partialProductionIntegral</span><span class="p">(</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="n">energyOut</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="n">muOut</span><span class="p">,</span> 
+                <span class="n">phiOut</span> <span class="o">=</span> <span class="n">phiOut</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="n">LegendreOrder</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">crossSection</span> <span class="o">*</span> <span class="n">_partialProductionIntegral</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.processMC_cdf"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">MT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">processMC_cdf</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.processGriddedCrossSections"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.processGriddedCrossSections">[docs]</a>    <span class="k">def</span> <span class="nf">processGriddedCrossSections</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span><span class="p">,</span> <span class="n">isPhotoAtomic</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">processGriddedCrossSections</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">incrementalIndent</span><span class="p">,</span> <span class="n">isPhotoAtomic</span> <span class="o">=</span> <span class="n">isPhotoAtomic</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.processMultiGroup"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;r</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionIndex&#39;</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;transferMatrixComment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">inputParticlesToReactionString</span><span class="p">(</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot; --&gt; &quot;</span> <span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">MT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reaction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupedFlux&#39;</span><span class="p">]</span>
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupedFlux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">crossSection</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="p">)</span>
+<span class="c1"># BRB FIXME The next line is a kludge, see note on crossSection.resonancesWithBackground.processMultiGroup.</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">reference</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">crossSection</span> <span class="o">=</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">crossSection</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">resonancesWithBackground</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">crossSection</span> <span class="o">=</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="s1">&#39;recon&#39;</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">crossSection</span> <span class="o">=</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span>
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;crossSection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crossSection</span>
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;multiGroupCrossSection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>                             <span class="c1"># Not normalized by tempInfo[&#39;groupedFlux&#39;] so remove.</span>
+
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupedFlux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm</span>
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;multiGroupCrossSectionNormed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>     <span class="c1"># Normalized by tempInfo[&#39;groupedFlux&#39;].</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">reaction</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>
+
+        <span class="k">del</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="base_reaction.removeStyles"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">reaction</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.toString"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="n">MT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.toXML"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+
+        <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
+        <span class="n">indent3</span> <span class="o">=</span> <span class="n">indent2</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
+
+        <span class="n">attributeString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">attributeString</span> <span class="o">+=</span> <span class="s1">&#39; ENDF_MT=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributeString</span> <span class="o">+=</span> <span class="s1">&#39; fissionGenre=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="p">)</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">attributeString</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">:</span>
+<span class="c1"># BRB6 What is this</span>
+            <span class="n">xmlString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;documentations&gt;&#39;</span> <span class="o">%</span> <span class="n">indent2</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">:</span> <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">[</span><span class="n">doc</span><span class="p">]</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+            <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/documentations&gt;&#39;</span>
+
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">reaction</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xmlString</span></div>
+
+<div class="viewcode-block" id="base_reaction.parseNode"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="s1">&#39;documentations&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="s1">&#39;documentations&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addDocumentation</span><span class="p">(</span><span class="n">fudge</span><span class="o">.</span><span class="n">documentation</span><span class="o">.</span><span class="n">documentation</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">doubleDifferentialCrossSectionModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span> <span class="o">=</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">availableMomentumModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span> <span class="o">=</span> <span class="n">availableMomentumModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">availableMomentumModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="base_reaction.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.base_reaction.parseXMLNode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Translate a &lt;reaction&gt; element from xml into a reaction class instance.&quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@label=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">reaction</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">Genre</span><span class="o">.</span><span class="n">NBody</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">),</span> <span class="n">ENDF_MT</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;ENDF_MT&#39;</span> <span class="p">)</span> <span class="p">),</span> 
+                <span class="n">fissionGenre</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;fissionGenre&#39;</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="n">reaction</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">reaction</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="isGNDSReaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.isGNDSReaction">[docs]</a><span class="k">def</span> <span class="nf">isGNDSReaction</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if o is an instance of base_reaction or of a subclass thereof. &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">base_reaction</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.reactions.base</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

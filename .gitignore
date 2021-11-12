@@ -1,7 +1,18 @@
-*.pyc
+__pycache__
 *.so
 
-build
-numericalFunctions/build
-crossSectionAdjustForHeatedTarget/build
+fudge/fudgeVersion.py
 
+.idea
+.vscode
+
+fudge.egg-info
+build
+
+bin/calcUpscatterKernel
+bin/merced
+upscatter/Src/calcUpscatterKernel
+
+# test files
+fudge/gnds/covariances/test/*.xml
+fudge/processing/resonances/test/*.xml

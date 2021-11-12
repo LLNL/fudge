@@ -1,0 +1,183 @@
+#! /usr/bin/env python3
+
+# <<BEGIN-copyright>>
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
+# 
+# SPDX-License-Identifier: BSD-3-Clause
+# <<END-copyright>>
+
+import sys
+import os
+import glob
+import argparse
+
+from LUPY import GNDSType as GNDSTypeModule
+from fudge import map as mapModule
+from PoPs import database as PoPsDatabaseModule
+from fudge import suites as suitesModule
+from fudge import reactionSuite as reactionSuiteModule
+from fudge.covariances import covarianceSuite as covarianceSuiteModule
+
+description = """
+This script checks a map file for consistency. In the following description a protare is considered 
+to be in the map file if it is directly specified in the map file via a **protare** or **TNSL** node,
+or indirectly specified in the map file via an **import** node, including any nesting of **import** 
+nodes. The protare directories are the directories that contain the protares listed in the map file 
+(while all protares can be in the same directory as the map file this is not recommended).
+
+This script prints out the following information:
+
+    -) A list of all sub-directory inside the protare directories.
+    -) A list of all protares in the protare directories but not specified in the map file.
+    -) A list of all protares specified in the map file but not found in the protare directories.
+    -) A list of PoPs files found in the protare directories.
+    -) A list of map files found in the protare directories.
+    -) A list of unknown files found in the protare directories.
+    -) A list of external files referenced in the protares but not found on the disk system.
+    -) A list of non GNDS, HDF5 files found in HDF5 directories.
+
+The header for each item above is only printed if the item contains entries.
+
+If a protare (reactionSuite) file references a non-existance HDF5 values files, then the parser
+for reading a reactionSuite will raise an exception that will exit this script.
+
+Note, here a protare and reactionSuite are synonymous.
+"""
+
+parser = argparse.ArgumentParser( description = description, formatter_class = argparse.RawTextHelpFormatter )
+parser.add_argument( 'mapFile', type = str,                 help = 'The path to a GNDS map file.' )
+
+args = parser.parse_args( )
+
+def simplePrint( _list ) :
+
+    for item in _list : print( '    %s' % item )
+
+def printMissingExternalFile( _list ) :
+
+    for item in _list :
+        externalPath, sourceFile, externalRealPath = item.split( ',' )
+        print( '    "%s" referenced by "%s".' % ( externalPath, sourceFile ) )
+
+def printSet( prefix, _set, printFunction = simplePrint ) :
+
+    _list = sorted( list( _set ) )
+    if( len( _list ) > 0 ) :
+        print( '%s:' % prefix )
+        printFunction( _list )
+#
+# Phase 1: Make a list (i.e., set) of all protare directories and protares.
+#
+
+protareDirectories = set( )
+protaresInMap = set( )
+hdf5ExternalFiles = set( )
+hdf5Directories = set( )
+covarianceExternalFiles = set( )
+missingExternalFiles = set( )
+unsupportedExternalFileTypes = set( )
+
+def checkProtare( protareFileName, map, entry ) :
+
+    protaresInMap.add( protareFileName )
+    protareDirectories.add( os.path.dirname( protareFileName ) )
+    if( os.path.exists( protareFileName ) ) :
+        protare = GNDSTypeModule.preview( protareFileName, haltParsingMoniker = suitesModule.externalFiles.moniker )
+        if protare.evaluation != entry.evaluation or protare.interaction != entry.interaction:
+            print('''For map %s''' % map.fileName)
+            print('''and for path %s''' % entry.path)
+            if protare.evaluation != entry.evaluation:
+                print('''    map's evaluation "%s" does not match protare's evaluation "%s".''' % (entry.evaluation, protare.evaluation))
+            if protare.interaction != entry.interaction:
+                print('''    map's interaction "%s" does not match protare's interaction "%s".''' % (entry.interaction, protare.interaction))
+            print()
+        for externalFile in protare.externalFiles :
+            realpath = externalFile.realpath( )
+            if( os.path.exists( realpath ) ) :
+                name, dummy = GNDSTypeModule.type( realpath )
+                if( name == GNDSTypeModule.HDF5_values ) :
+                    hdf5ExternalFiles.add( realpath )
+                    hdf5Directories.add( os.path.dirname( realpath ) )
+                elif( name == covarianceSuiteModule.covarianceSuite.moniker ) :
+                    covarianceExternalFiles.add( realpath )
+                else :
+                    unsupportedExternalFileTypes.add( realpath )
+            else :
+                missingExternalFiles.add( ','.join( [ externalFile.path, protareFileName, realpath ] ) )
+
+def checkMap( mapFileName, priorMaps = [] ) :
+
+    try :
+        map = mapModule.Map.readXML( mapFileName )
+    except FileNotFoundError :
+        print( 'ERROR: map file %s does not exist.' % mapFileName )
+        for priorMap in priorMaps : print( '    From map file %s' % priorMap )
+        return
+    except :
+        raise
+
+    for entry in map :
+        if( isinstance( entry, mapModule.Import ) ) :
+            checkMap( entry.fileName, [ mapFileName ] + priorMaps )
+        else :
+            checkProtare( entry.fileName, map, entry )
+
+checkMap( args.mapFile )
+
+#
+# Phase 2: Analyze all files in the protare directories.
+#
+
+dirsInDirectories = set( )
+mapsInDirectories = set( )
+protaresInDirectories = set( )
+covariancesInDirectories = set( )
+popsInDirectories = set( )
+unknownsInDirectories = set( )
+
+for protareDirectory in protareDirectories :
+    files = glob.glob( os.path.join( protareDirectory, '*' ) )
+    for file in files :
+        if( os.path.isdir( file ) ) :
+            dirsInDirectories.add( file )
+        else :
+            try:
+                name, dummy = GNDSTypeModule.type( file )
+                if( name == mapModule.Map.moniker ) :
+                    mapsInDirectories.add( file )
+                elif( name == reactionSuiteModule.reactionSuite.moniker ) :
+                    protaresInDirectories.add( file )
+                elif( name == covarianceSuiteModule.covarianceSuite.moniker ) :
+                    covariancesInDirectories.add( file )
+                elif( name == PoPsDatabaseModule.database.moniker ) :
+                    popsInDirectories.add( file )
+                elif( name == GNDSTypeModule.HDF5_values ) : 
+                    pass
+                else :
+                    unknownsInDirectories.add( file )
+            except :
+                unknownsInDirectories.add( file )
+
+unknownsInHDF5_directories = set( )
+for hdf5Directory in hdf5Directories :
+    if( hdf5Directory not in protareDirectories ) :
+        files = glob.glob( os.path.join( hdf5Directory, '*' ) )
+        for file in files :
+            try :
+                if( os.path.isdir( file ) ) :
+                    mapsInDirectories.add( file )
+                else :
+                    name, dummy = GNDSTypeModule.type( file )
+                    if( name != GNDSTypeModule.HDF5_values ) : unknownsInHDF5_directories.add( file )
+            except :
+                unknownsInHDF5_directories.add( file )
+
+printSet( 'Directories in protare directories', dirsInDirectories )
+printSet( 'Protares in protare directories but not in map file', protaresInDirectories.difference( protaresInMap ) )
+printSet( 'Protares in map file but not in protare directories', protaresInMap.difference( protaresInDirectories ) )
+printSet( 'PoPs files in protare directories', popsInDirectories )
+printSet( 'Map files in protare directories', mapsInDirectories )
+printSet( 'Unknown files in protare directories', unknownsInDirectories )
+printSet( 'Missing external files', missingExternalFiles, printFunction = printMissingExternalFile )
+printSet( 'Unknown files in HDF5 directories', unknownsInHDF5_directories )

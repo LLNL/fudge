@@ -5,23 +5,23 @@
         <double label="base" value="15.9949146196" unit="amu"/></mass>
       <nucleus id="o16" index="0">
         <energy>
-          <double label="base" value="0.0" unit="eV"/></energy></nucleus></nuclide>
+          <double label="base" value="0." unit="eV"/></energy></nucleus></nuclide>
     <nuclide id="O16_e1">
       <nucleus id="o16_e1" index="1">
         <energy>
-          <double label="base" value="6049400.0" unit="eV"/></energy></nucleus></nuclide>
+          <double label="base" value="6.0494e6" unit="eV"/></energy></nucleus></nuclide>
     <nuclide id="O16_e2">
       <nucleus id="o16_e2" index="2">
         <energy>
-          <double label="base" value="6129893.0" unit="eV"/></energy></nucleus></nuclide>
+          <double label="base" value="6129893." unit="eV"/></energy></nucleus></nuclide>
     <nuclide id="O16_e3">
       <nucleus id="o16_e3" index="3">
         <energy>
-          <double label="base" value="6917100.0" unit="eV"/></energy></nucleus></nuclide></nuclides></isotope>
+          <double label="base" value="6.9171e6" unit="eV"/></energy></nucleus></nuclide></nuclides></isotope>
 15.99491461956 amu
 14899.16852086884 MeV/c**2
-14899.1685209
+14899.168520868838
 
 0. eV
 0. MeV
-0.0
+0

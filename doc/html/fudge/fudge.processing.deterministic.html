@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.processing.deterministic package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.processing.montecarlo package" href="fudge.processing.montecarlo.html" />
     <link rel="prev" title="fudge.processing package" href="fudge.processing.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +36,9 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.processing.html" accesskey="U">fudge.processing package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="fudge.processing.html" accesskey="U">fudge.processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.deterministic package</a></li> 
       </ul>
     </div>  
 
@@ -61,160 +54,170 @@
 </div>
 <div class="section" id="module-fudge.processing.deterministic.transferMatrices">
 <span id="fudge-processing-deterministic-transfermatrices-module"></span><h2>fudge.processing.deterministic.transferMatrices module<a class="headerlink" href="#module-fudge.processing.deterministic.transferMatrices" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.EEpMuPDataToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">EEpMuPDataToString</code><span class="sig-paren">(</span><em>EEpMuPData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpMuPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpMuPDataToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">EEpMuPDataToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EEpMuPData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpMuPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpMuPDataToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.EEpMuP_TransferMatrix">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">EEpMuP_TransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>crossSection</em>, <em>energyAngularData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpMuP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpMuP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">EEpMuP_TransferMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">energyAngularData</span></em>, <em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpMuP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpMuP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is ENDF MT=6 LAW=1, LANG=1,11-15 type data.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.EEpPDataToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">EEpPDataToString</code><span class="sig-paren">(</span><em>EEpPData</em>, <em>changeInterpolationQualifierWarning=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpPDataToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">EEpPDataToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EEpPData</span></em>, <em class="sig-param"><span class="n">changeInterpolationQualifierWarning</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpPDataToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.ELEpP_TransferMatrix">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">ELEpP_TransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>crossSection</em>, <em>productFrame</em>, <em>LEEpPData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ELEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ELEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">ELEpP_TransferMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">LEEpPData</span></em>, <em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ELEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ELEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is for ENDL I = 4 data with l &gt; 0. This form is deprecated.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.EMuEpPDataToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">EMuEpPDataToString</code><span class="sig-paren">(</span><em>EMuEpPData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EMuEpPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EMuEpPDataToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">EMuEpPDataToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMuEpPData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EMuEpPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EMuEpPDataToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">ENDFEMuEpP_TransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>crossSection</em>, <em>angularEnergyData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ENDFEMuEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">ENDFEMuEpP_TransferMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">angularEnergyData</span></em>, <em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ENDFEMuEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is ENDF MF = 6, LAW = 7 type data.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.ENDLEMuEpP_TransferMatrix">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">ENDLEMuEpP_TransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>crossSection</em>, <em>productFrame</em>, <em>angularData</em>, <em>EMuEpPData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ENDLEMuEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ENDLEMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">ENDLEMuEpP_TransferMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">angularData</span></em>, <em class="sig-param"><span class="n">EMuEpPData</span></em>, <em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ENDLEMuEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ENDLEMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is LLNL I = 1, 3 type data.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.GBToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">GBToString</code><span class="sig-paren">(</span><em>name</em>, <em>gb</em>, <em>energy_in_unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#GBToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.GBToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">GBToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">gb</span></em>, <em class="sig-param"><span class="n">energy_in_unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#GBToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.GBToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.KalbachMannDataToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">KalbachMannDataToString</code><span class="sig-paren">(</span><em>KalbachMannData</em>, <em>energy_in_unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#KalbachMannDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.KalbachMannDataToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">KalbachMannDataToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">KalbachMannData</span></em>, <em class="sig-param"><span class="n">energy_in_unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#KalbachMannDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.KalbachMannDataToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">KalbachMann_TransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>crossSection</em>, <em>particlesData</em>, <em>KalbachMannData</em>, <em>multiplicity=1</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#KalbachMann_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">KalbachMann_TransferMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">particlesData</span></em>, <em class="sig-param"><span class="n">KalbachMannData</span></em>, <em class="sig-param"><span class="n">multiplicity</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#KalbachMann_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.LEEpPDataToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">LEEpPDataToString</code><span class="sig-paren">(</span><em>LEEpPData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#LEEpPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.LEEpPDataToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">LEEpPDataToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">LEEpPData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#LEEpPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.LEEpPDataToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.LegendreDataToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">LegendreDataToString</code><span class="sig-paren">(</span><em>LegendreData</em>, <em>changeInterpolationQualifierWarning=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#LegendreDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.LegendreDataToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">LegendreDataToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">LegendreData</span></em>, <em class="sig-param"><span class="n">changeInterpolationQualifierWarning</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#LegendreDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.LegendreDataToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">Legendre_TransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>crossSection</em>, <em>LegendreData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#Legendre_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">Legendre_TransferMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">LegendreData</span></em>, <em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#Legendre_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">NBodyPhaseSpace</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>crossSection</em>, <em>numberOfProducts</em>, <em>mTotal</em>, <em>Q</em>, <em>multiplicity=1</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#NBodyPhaseSpace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">NBodyPhaseSpace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">numberOfProducts</span></em>, <em class="sig-param"><span class="n">mTotal</span></em>, <em class="sig-param"><span class="n">Q</span></em>, <em class="sig-param"><span class="n">multiplicity</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#NBodyPhaseSpace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.addTMs">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">addTMs</code><span class="sig-paren">(</span><em>TMs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#addTMs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.addTMs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">addTMs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">TMs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#addTMs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.addTMs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.angularToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">angularToString</code><span class="sig-paren">(</span><em>angularData</em>, <em>crossSection</em>, <em>weight=None</em>, <em>twoBody=False</em>, <em>changeInterpolationQualifierWarning=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#angularToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.angularToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">angularToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">angularData</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">twoBody</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">changeInterpolationQualifierWarning</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#angularToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.angularToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.commonDataToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">commonDataToString</code><span class="sig-paren">(</span><em>comment</em>, <em>style</em>, <em>tempInfo</em>, <em>crossSection</em>, <em>productFrame</em>, <em>multiplicity=None</em>, <em>energy_in_unit=None</em>, <em>weight=None</em>, <em>photonFrame='lab'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#commonDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.commonDataToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">commonDataToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">comment</span></em>, <em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">multiplicity</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">energy_in_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">photonFrame</span><span class="o">=</span><span class="default_value">'lab'</span></em>, <em class="sig-param"><span class="n">legendreMax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">modifiedProductGroup</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#commonDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.commonDataToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.comptonScattering">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">comptonScattering</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>scatteringFunction</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#comptonScattering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.comptonScattering" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">comptonScattering</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">scatteringFunction</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#comptonScattering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.comptonScattering" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.crossSectionToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">crossSectionToString</code><span class="sig-paren">(</span><em>style</em>, <em>crossSection</em>, <em>energy_in_unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#crossSectionToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.crossSectionToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">crossSectionToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">energy_in_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#crossSectionToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.crossSectionToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.discreteGammaAngularData">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">discreteGammaAngularData</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>gammaEnergy</em>, <em>crossSection</em>, <em>angularData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#discreteGammaAngularData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.discreteGammaAngularData" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">discreteGammaAngularData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">gammaEnergy</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">angularData</span></em>, <em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#discreteGammaAngularData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.discreteGammaAngularData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
 for pair-production which pass angularData as None.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.doubleDifferential_EEpMuP">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">doubleDifferential_EEpMuP</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>crossSection</em>, <em>EEpMuPData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#doubleDifferential_EEpMuP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.doubleDifferential_EEpMuP" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">doubleDifferential_EEpMuP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">EEpMuPData</span></em>, <em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#doubleDifferential_EEpMuP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.doubleDifferential_EEpMuP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.energyFunctionToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">energyFunctionToString</code><span class="sig-paren">(</span><em>energyData</em>, <em>weight=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#energyFunctionToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.energyFunctionToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">energyFunctionToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energyData</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#energyFunctionToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.energyFunctionToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.executeCommand">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">executeCommand</code><span class="sig-paren">(</span><em>logFile</em>, <em>file</em>, <em>cmd</em>, <em>workDir</em>, <em>workFile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#executeCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.executeCommand" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">executeCommand</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logFile</span></em>, <em class="sig-param"><span class="n">executable</span></em>, <em class="sig-param"><span class="n">cmd</span></em>, <em class="sig-param"><span class="n">workDir</span></em>, <em class="sig-param"><span class="n">workFile</span></em>, <em class="sig-param"><span class="n">restart</span></em>, <em class="sig-param"><span class="n">productOffset</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#executeCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.executeCommand" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Runs executable (presumably Merced) on a single input, parses resulting output file and returns two transfer matrices:</dt><dd><ul class="simple">
+<li><p>1st has constant weight (conserves number of particles)</p></li>
+<li><p>2nd is weighted by E’ (conserves energy)</p></li>
+</ul>
+</dd>
+</dl>
+<p>If executable fails, create a ‘.err’ file in the working directory (for easier searching)</p>
+<p>&#64;param logFile: currently unused! Remove argument?
+&#64;param executable: compiled executable to run, generally FUDGE/bin/merced
+&#64;param cmd: full text of executable input file
+&#64;param workDir: directory where executable will be run. processProtare creates new workDir for each projectile/target/temperature
+&#64;param workFile: list of form [reaction identifier, product identifier], e.g. [‘r0001’,’n’] or [‘r0045’,’photon__b’]. Used to generate unique file names.
+&#64;param restart: boolean. If True, check whether executable was previously run for this input and if so skip re-running (useful for resuming jobs that timed out).</p>
+</dd></dl>
 
-<dl class="function">
-<dt id="fudge.processing.deterministic.transferMatrices.floatToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">floatToString</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#floatToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.floatToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.fluxToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">fluxToString</code><span class="sig-paren">(</span><em>flux</em>, <em>energy_in_unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#fluxToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.fluxToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">fluxToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">flux</span></em>, <em class="sig-param"><span class="n">energy_in_unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#fluxToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.fluxToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.multiplicityToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">multiplicityToString</code><span class="sig-paren">(</span><em>style</em>, <em>_multiplicity</em>, <em>energy_in_unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#multiplicityToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.multiplicityToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">multiplicityToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">_multiplicity</span></em>, <em class="sig-param"><span class="n">energy_in_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#multiplicityToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.multiplicityToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.oneDToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">oneDToString</code><span class="sig-paren">(</span><em>data</em>, <em>factor=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#oneDToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.oneDToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">oneDToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">factor</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#oneDToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.oneDToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.parseOutputFile">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">parseOutputFile</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#parseOutputFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.parseOutputFile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">parseOutputFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">productOffset</span></em>, <em class="sig-param"><span class="n">firstLine</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#parseOutputFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.parseOutputFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.primaryGammaAngularData">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">primaryGammaAngularData</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>crossSection</em>, <em>energyData</em>, <em>angularData</em>, <em>multiplicity=1</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#primaryGammaAngularData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.primaryGammaAngularData" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">primaryGammaAngularData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">energyData</span></em>, <em class="sig-param"><span class="n">angularData</span></em>, <em class="sig-param"><span class="n">multiplicity</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#primaryGammaAngularData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.primaryGammaAngularData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. massRatio is the
 target mass divide by the sum of the projectile and target masses.</p>
 <p>This function perform the integration</p>
 <blockquote>
-<div>TM = int_g dE int_h dE’ S(E) M(E) f(E) P(E -&gt; E’) / int_g dE f(E)</div></blockquote>
+<div><p>TM = int_g dE int_h dE’ S(E) M(E) f(E) P(E -&gt; E’) / int_g dE f(E)</p>
+</div></blockquote>
 <p>where int_g is the integral of E from E_i to E_{i+1}, int_g is the integral of E’ from E’_j to E’_{j+1}, S(E) is the cross section,
 M(E) is the products multiplicity, f(E) is the flux weighting and P(E -&gt; E’) is the probability for a projectile of energy E producing
 a primary gamma of energy E’ for binding energy bindingEnergy. This function assumes that M(E) is a constant. For primary gamma’s captured
@@ -223,44 +226,80 @@ mp is the projectile’s mass and mt is the target’s mass. Note, this formula 
 nucleus.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.threeDListToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">threeDListToString</code><span class="sig-paren">(</span><em>data</em>, <em>linearizeXYs=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#threeDListToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.threeDListToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">threeDListToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">linearizeXYs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#threeDListToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.threeDListToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.threeDToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">threeDToString</code><span class="sig-paren">(</span><em>data</em>, <em>linearizeXYs=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#threeDToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.threeDToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">threeDToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">linearizeXYs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#threeDToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.threeDToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">twoBodyTransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>crossSection</em>, <em>angularData</em>, <em>Q</em>, <em>weight=None</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">twoBodyTransferMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">angularData</span></em>, <em class="sig-param"><span class="n">Q</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
 If the distribution is actually made up of two different forms in different energy regions, this function
 calls itself in the two regions and sums the result.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">twoBodyTransferMatrix2</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>crossSection</em>, <em>angularData</em>, <em>Q</em>, <em>productFrame</em>, <em>weight=None</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">twoBodyTransferMatrix2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">angularData</span></em>, <em class="sig-param"><span class="n">Q</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function for twoBodyTransferMatrix. This should be called separately for every interpolation 
 region within a regions2d form.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.twoDToString">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">twoDToString</code><span class="sig-paren">(</span><em>label</em>, <em>data</em>, <em>addHeader=True</em>, <em>addExtraBlankLine=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoDToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoDToString" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">twoDToString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">addHeader</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">addExtraBlankLine</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoDToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoDToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">uncorrelated_EMuP_EEpP_TransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>crossSection</em>, <em>productFrame</em>, <em>angularData</em>, <em>energyData</em>, <em>multiplicity</em>, <em>comment=None</em>, <em>weight=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#uncorrelated_EMuP_EEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">uncorrelated_EMuP_EEpP_TransferMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">crossSection</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">angularData</span></em>, <em class="sig-param"><span class="n">energyData</span></em>, <em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#uncorrelated_EMuP_EEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="fudge.processing.deterministic.transferMatrices.wholeAtomScattering">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">wholeAtomScattering</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>formFactor</em>, <em>realAnomalousFactor=None</em>, <em>imaginaryAnomalousFactor=None</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#wholeAtomScattering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.wholeAtomScattering" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="sig-name descname">wholeAtomScattering</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">productFrame</span></em>, <em class="sig-param"><span class="n">formFactor</span></em>, <em class="sig-param"><span class="n">realAnomalousFactor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">imaginaryAnomalousFactor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#wholeAtomScattering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.wholeAtomScattering" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-fudge.processing.deterministic.multiGroupUpScatter">
+<span id="fudge-processing-deterministic-multigroupupscatter-module"></span><h2>fudge.processing.deterministic.multiGroupUpScatter module<a class="headerlink" href="#module-fudge.processing.deterministic.multiGroupUpScatter" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter">
+<code class="sig-prename descclassname">fudge.processing.deterministic.multiGroupUpScatter.</code><code class="sig-name descname">SnElasticUpScatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#SnElasticUpScatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
+If the distribution is actually made up of two different forms in different energy regions, this function
+calls itself in the two regions and sums the result.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="fudge.processing.deterministic.multiGroupUpScatter.analyzeMatrix">
+<code class="sig-prename descclassname">fudge.processing.deterministic.multiGroupUpScatter.</code><code class="sig-name descname">analyzeMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">TM</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#analyzeMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.analyzeMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="fudge.processing.deterministic.multiGroupUpScatter.checkNegative_l0">
+<code class="sig-prename descclassname">fudge.processing.deterministic.multiGroupUpScatter.</code><code class="sig-name descname">checkNegative_l0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">TM_EEpL</span></em>, <em class="sig-param"><span class="n">weight</span></em>, <em class="sig-param"><span class="n">infoFile</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#checkNegative_l0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.checkNegative_l0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="fudge.processing.deterministic.multiGroupUpScatter.executeCommand">
+<code class="sig-prename descclassname">fudge.processing.deterministic.multiGroupUpScatter.</code><code class="sig-name descname">executeCommand</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmd</span></em>, <em class="sig-param"><span class="n">workDir</span></em>, <em class="sig-param"><span class="n">workFile</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#executeCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.executeCommand" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="fudge.processing.deterministic.multiGroupUpScatter.parseAveEnergyOutputFile">
+<code class="sig-prename descclassname">fudge.processing.deterministic.multiGroupUpScatter.</code><code class="sig-name descname">parseAveEnergyOutputFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fileName</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#parseAveEnergyOutputFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.parseAveEnergyOutputFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="fudge.processing.deterministic.multiGroupUpScatter.rescaleCrossSection">
+<code class="sig-prename descclassname">fudge.processing.deterministic.multiGroupUpScatter.</code><code class="sig-name descname">rescaleCrossSection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupedCrossSec</span></em>, <em class="sig-param"><span class="n">UpScatterMatrix</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#rescaleCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.rescaleCrossSection" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -270,6 +309,7 @@ region within a regions2d form.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -278,11 +318,12 @@ region within a regions2d form.</p>
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.processing.deterministic package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-fudge.processing.deterministic.transferMatrices">fudge.processing.deterministic.transferMatrices module</a></li>
+<li><a class="reference internal" href="#module-fudge.processing.deterministic.multiGroupUpScatter">fudge.processing.deterministic.multiGroupUpScatter module</a></li>
 <li><a class="reference internal" href="#module-fudge.processing.deterministic">Module contents</a></li>
 </ul>
 </li>
@@ -302,15 +343,15 @@ region within a regions2d form.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -332,12 +373,14 @@ region within a regions2d form.</p>
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.processing.html" >fudge.processing package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="fudge.processing.html" >fudge.processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.deterministic package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

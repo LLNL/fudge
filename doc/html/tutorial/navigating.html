@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3. Navigating &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="4. Digging deeper in Fudge" href="diggingDeeper.html" />
     <link rel="prev" title="2. Checking ENDF or GNDS files" href="checking.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -44,7 +35,8 @@
           <a href="checking.html" title="2. Checking ENDF or GNDS files"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">The Fudge Tutorial</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">The Fudge Tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">3. </span>Navigating</a></li> 
       </ul>
     </div>  
 
@@ -54,94 +46,44 @@
           <div class="body" role="main">
             
   <div class="section" id="navigating">
-<h1>3. Navigating<a class="headerlink" href="#navigating" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">3. </span>Navigating<a class="headerlink" href="#navigating" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="how-to-find-data-within-a-reactionsuite">
-<h2>3.1. How to find data within a <code class="docutils literal"><span class="pre">reactionSuite</span></code><a class="headerlink" href="#how-to-find-data-within-a-reactionsuite" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">3.1. </span>How to find data within a <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code><a class="headerlink" href="#how-to-find-data-within-a-reactionsuite" title="Permalink to this headline">¶</a></h2>
 <p>The Fudge reactionSuite and covarianceSuite classes are meant to reflect the GNDS data hierarchy.
 Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">reactionSuite</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span><span class="s2">&quot;path_to_GNDS_file.xml&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="s2">&quot;elastic&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span>
-<span class="go">&lt;fudge.gnds.reactions.reaction.reaction object at 0x1020dc590&gt;</span>
+<span class="go">&lt;fudge.reactions.reaction.reaction object at 0x1020dc590&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span>
-<span class="go">&lt;fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0&gt;</span>
+<span class="go">&lt;fudge.reactionData.crossSection.component object at 0x10220dcd0&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span>
-<span class="go">&lt;fudge.gnds.channelData.Q.component object at 0x10212a0d0&gt;</span>
+<span class="go">&lt;fudge.channelData.Q.component object at 0x10212a0d0&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span>
-<span class="go">&lt;fudge.gnds.product.products object at 0x102608e10&gt;</span>
+<span class="go">&lt;fudge.product.products object at 0x102608e10&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiplicity</span>
-<span class="go">&lt;fudge.gnds.productData.multiplicity.component object at 0x102610310&gt;</span>
+<span class="go">&lt;fudge.productData.multiplicity.component object at 0x102610310&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">distribution</span>
-<span class="go">&lt;fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0&gt;</span>
+<span class="go">&lt;fudge.productData.distributions.distribution.component object at 0x1026103d0&gt;</span>
 </pre></div>
 </div>
 <p>The ‘getReaction’ method of reactionSuite provides a simple way to search for a desired reaction.
 In addition to strings like “elastic”, “fission” or “n + Fe56_e3” (to search for a reaction that emits a neutron
 plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.</p>
-<p>Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
-can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
-instead they are instances of Fudge classes like
-Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">reactionSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span><span class="s2">&quot;path_to_GNDS_file.xml&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="s2">&quot;elastic&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span>
-<span class="go">&lt;fudge.gnds.reactions.reaction.reaction object at 0x1020dc590&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span>
-<span class="go">&lt;fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span>
-<span class="go">&lt;fudge.gnds.channelData.Q.component object at 0x10212a0d0&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span>
-<span class="go">&lt;fudge.gnds.product.products object at 0x102608e10&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiplicity</span>
-<span class="go">&lt;fudge.gnds.productData.multiplicity.component object at 0x102610310&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">distribution</span>
-<span class="go">&lt;fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0&gt;</span>
-</pre></div>
-</div>
-<p>The ‘getReaction’ method of reactionSuite provides a simple way to search for a desired reaction.
-In addition to strings like “elastic”, “fission” or “n + Fe56_e3” (to search for a reaction that emits a neutron
-plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.</p>
-<p>Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
-can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
-instead they are instances of Fudge classes like
-Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">reactionSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span><span class="s2">&quot;path_to_GNDS_file.xml&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="s2">&quot;elastic&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span>
-<span class="go">&lt;fudge.gnds.reactions.reaction.reaction object at 0x1020dc590&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span>
-<span class="go">&lt;fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span>
-<span class="go">&lt;fudge.gnds.channelData.Q.component object at 0x10212a0d0&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span>
-<span class="go">&lt;fudge.gnds.product.products object at 0x102608e10&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiplicity</span>
-<span class="go">&lt;fudge.gnds.productData.multiplicity.component object at 0x102610310&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">distribution</span>
-<span class="go">&lt;fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0&gt;</span>
-</pre></div>
-</div>
-<p>The ‘getReaction’ method of reactionSuite provides a simple way to search for a desired reaction.
-In addition to strings like “elastic”, “fission” or “n + Fe56_e3” (to search for a reaction that emits a neutron
-plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.</p>
-<p>Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
-can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
-instead they are instances of Fudge classes like <code class="docutils literal"><span class="pre">crossSection.component</span></code>, <code class="docutils literal"><span class="pre">Q.component</span></code>, <code class="docutils literal"><span class="pre">distribution.component</span></code>,
+<p>instead they are instances of Fudge classes like <code class="docutils literal notranslate"><span class="pre">crossSection.component</span></code>, <code class="docutils literal notranslate"><span class="pre">Q.component</span></code>, <code class="docutils literal notranslate"><span class="pre">distribution.component</span></code>,
 etc.  This reflects the basic design of GNDS: each physical quantity can potentially contain more than one form of data
 including the original ‘evaluated’ data as well as other types that may be processed by heating, grouping, etc.
-Each <code class="docutils literal"><span class="pre">component</span></code> class contains a list of one or more <code class="docutils literal"><span class="pre">form</span></code> instances containing the actual data.</p>
+Each <code class="docutils literal notranslate"><span class="pre">component</span></code> class contains a list of one or more <code class="docutils literal notranslate"><span class="pre">form</span></code> instances containing the actual data.</p>
 <p>The components behave like Python dictionaries:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 <span class="go">[&#39;eval&#39;, &#39;recon&#39;]</span>
 </pre></div>
 </div>
-<p>Each of the keys corresponds to a <code class="docutils literal"><span class="pre">style</span></code> of data.</p>
+<p>Each of the keys corresponds to a <code class="docutils literal notranslate"><span class="pre">style</span></code> of data.</p>
 </div>
 <div class="section" id="the-concept-of-styles">
-<h2>3.2. The concept of styles<a class="headerlink" href="#the-concept-of-styles" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">3.2. </span>The concept of styles<a class="headerlink" href="#the-concept-of-styles" title="Permalink to this headline">¶</a></h2>
 <p>Evaluated nuclear data is sometimes stored in a form that is not easily plotted or used by application codes. For
 example, cross section data may be given as a combination of resonance parameters and a piecewise ‘background’, but
 for plotting it must be converted to pointwise, linearly-interpolable data.</p>
@@ -150,12 +92,12 @@ original style used by the evaluator as well as to the reconstructed style that 
 Since multiple styles of data can appear in an evaluation, GNDS needs to be able to keep them straight. A GNDS file contains
 a ‘styles’ section near the top, where each style is defined and given a unique label.  Those same labels are used
 throughout the file to indicate what style each data form is associated with.</p>
-<p>In the example above, the cross section component contains two keys, each corresponding to a <code class="docutils literal"><span class="pre">style</span></code>:
+<p>In the example above, the cross section component contains two keys, each corresponding to a <code class="docutils literal notranslate"><span class="pre">style</span></code>:
 the ‘eval’ key corresponds to the original evaluated data, and ‘recon’
 corresponding to the data with resonances reconstructed. More detail about different styles is available in the
-<code class="docutils literal"><span class="pre">styles</span></code> section of the <code class="docutils literal"><span class="pre">reactionSuite</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">styles</span></code> section of the <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code>.</p>
 <p>The reconstructed data are most useful for viewing and plotting:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span> <span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span><span class="p">[</span><span class="s1">&#39;recon&#39;</span><span class="p">]</span> <span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span> <span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span><span class="p">[</span><span class="s1">&#39;recon&#39;</span><span class="p">]</span> <span class="p">)</span>
 <span class="go">   1.00000000e-05   2.09675600e+00</span>
 <span class="go">   6.19409249e+00   2.17147300e+00</span>
 <span class="go">   1.23695253e+01   2.25184300e+00</span>
@@ -170,18 +112,18 @@ corresponding to the data with resonances reconstructed. More detail about diffe
 <p>(By the way, the example here is the n-025_Mn_055 candidate evaluation in ENDF-VIII-beta4).
 The data has two columns: incident energy in eV, and cross section in b. We can double-check the units by printing
 out the axes information:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span> <span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span><span class="p">[</span><span class="s1">&#39;recon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">toXML</span><span class="p">()</span> <span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span> <span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span><span class="p">[</span><span class="s1">&#39;recon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">toXML</span><span class="p">()</span> <span class="p">)</span>
 <span class="go">&lt;axes&gt;</span>
 <span class="go">  &lt;axis index=&quot;1&quot; label=&quot;energy_in&quot; unit=&quot;eV&quot;/&gt;</span>
 <span class="go">  &lt;axis index=&quot;0&quot; label=&quot;crossSection&quot; unit=&quot;b&quot;/&gt;&lt;/axes&gt;</span>
 </pre></div>
 </div>
-<p>The data are stored in another Fudge class called <code class="docutils literal"><span class="pre">crossSection.XYs1d</span></code> (the name indicates that this is a 1-dimensional
+<p>The data are stored in another Fudge class called <code class="docutils literal notranslate"><span class="pre">crossSection.XYs1d</span></code> (the name indicates that this is a 1-dimensional
 function stored as a list of X-Y pairs). This is a useful class, with methods for integrating, changing interpolations,
 performing mathematical operations on two or more XYs1d instances, etc.  For more information on the capabilities of
 XYs1d see the documentation (FIXME need link to xData here).</p>
 <p>If desired you can also extract the data into a simple Python list of X-Y pairs:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xyPairs</span> <span class="o">=</span> <span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span><span class="p">[</span><span class="s1">&#39;recon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copyDataToXYs</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xyPairs</span> <span class="o">=</span> <span class="n">elastic</span><span class="o">.</span><span class="n">crossSection</span><span class="p">[</span><span class="s1">&#39;recon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copyDataToXYs</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>TO-DO expand discussion to show how to extract data from multiplicities, Q-values, etc.</p>
@@ -189,6 +131,7 @@ XYs1d see the documentation (FIXME need link to xData here).</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -197,10 +140,10 @@ XYs1d see the documentation (FIXME need link to xData here).</p>
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">3. Navigating</a><ul>
-<li><a class="reference internal" href="#how-to-find-data-within-a-reactionsuite">3.1. How to find data within a <code class="docutils literal"><span class="pre">reactionSuite</span></code></a></li>
+<li><a class="reference internal" href="#how-to-find-data-within-a-reactionsuite">3.1. How to find data within a <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code></a></li>
 <li><a class="reference internal" href="#the-concept-of-styles">3.2. The concept of styles</a></li>
 </ul>
 </li>
@@ -208,10 +151,10 @@ XYs1d see the documentation (FIXME need link to xData here).</p>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="checking.html"
-                        title="previous chapter">2. Checking ENDF or GNDS files</a></p>
+                        title="previous chapter"><span class="section-number">2. </span>Checking ENDF or GNDS files</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="diggingDeeper.html"
-                        title="next chapter">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a></p>
+                        title="next chapter"><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -220,15 +163,15 @@ XYs1d see the documentation (FIXME need link to xData here).</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -249,12 +192,13 @@ XYs1d see the documentation (FIXME need link to xData here).</p>
           <a href="checking.html" title="2. Checking ENDF or GNDS files"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">3. </span>Navigating</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

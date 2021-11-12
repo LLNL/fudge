@@ -16,50 +16,55 @@ tabular angular data.
 
 The input files are:
 
-uncorrelated-Li7: Use the default adaptive quadrature.  Its output is
+in.uncorrelated-Li7: Use the default adaptive quadrature.  Its output is
   out.uncorrelated-Li7..
 
-uncorrelated-Li7.Gauss6: Use Gaussian quadrature of order 6.  Its output is
+in.uncorrelated-Li7.Gauss6: Use Gaussian quadrature of order 6.  Its output is
   out.uncorrelated-Li7.Gauss6.  The accuracy for the lowest incident energy
   bins is not great.
 
-uncorrelated-Li7.exact: Use the obsolete exact quadrature.  Its output
+in.uncorrelated-Li7.exact: Use the obsolete exact quadrature.  Its output
   is out.uncorrelated-Li7.exact.
 
-Mg24.flat: Data with histograms in outgoing energy.  Its output is
+in.Mg24.flat: Data with histograms in outgoing energy.  Its output is
   out.Mg24.flat.
 
-F19.correspondingEn: Data with interpolation in incident energy by
+in.F19.correspondingEn: Data with interpolation in incident energy by
   cumulative points, histograms in outgoing energy.  Its output is
   out.F19.correspondingEn.
 
-F19.linlin-cumpoints:  Data with interpolation in incident energy by
+in.F19.linlin-cumpoints:  Data with interpolation in incident energy by
   cumulative points, linear-linear in outgoing energy.  Its output is
   out.F19.linlin-cumpoints.
 
-F19.gammas: histogram data using cumulkative points interpolation
+in.F19.gammas: histogram data using cumulkative points interpolation
   but with intervals of zero probability.  The output file is out.F19.gammas.
 
 In ENDL the angular probability densities are always given as a table,
 but ENDF has the option of using Legendre coefficients.  We include two
 equivalent files for the sake of comparison.
 
-Co58uncor.Legendre: Angular probability densities as Legendre coefficients.
+in.Co58uncor.Legendre: Angular probability densities as Legendre coefficients.
   The output is out.Co58uncor.Legendre.
 
-Co58uncor.table: Angular probability densities as a table.  The output is
+in.Co58uncor.table: Angular probability densities as a table.  The output is
   out.Co58uncor.table.
 
-uncorrelated-Li7.cm: Isotropic energy probability density given in center-of-
+in.uncorrelated-Li7.cm: Isotropic energy probability density given in center-of-
   mass coordinates.  The output is out.uncorrelated-Li7.cm.
 
-N15.flat: A file specifying histogram interpolation with respect to incident
-  energy.  Its output is out.N15.flat.
+in.N15.flat: A file specifying histogram interpolation with respect to incident
+  energy.  The incident energies for the angular and energy distributions
+  are different.  Its output is out.N15.flat.
 
-Co59.linlog: Isotropic energy probability density given in the lab
+in.N15.direct: The same data as in.N15.flat, but here the interpolation
+  with respect to incident energy is direct linear-linear with truncation.
+  Its output is out.N15.direct.
+
+in.Co59.linlog: Isotropic energy probability density given in the lab
   frame, with lin-log unitbase interpolation for incident energy.
   The output file is out.Co59.linlog.
 
-V51-gamma-in: A file with incident gammas and with cumulative points
+in.V51-gamma-in: A file with incident gammas and with cumulative points
   interpolation in incident energy, linlear-linear in outgoing energy.
   The output file is out.V51-gamma-in.

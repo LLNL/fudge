@@ -1,31 +1,96 @@
 \subsection{Miscellaneous}
-This section decribes all the routines in the file "ptwXY\_misc.c".
+This section decribes all the functions in the file ``ptwXY\_misc.c''.
+
+\subsubsection{ptwXY\_limitAccuracy}
+This function returns accuracy limited between \highlight{ptwXY\_minAccuracy} and 1. Ergo, it is similar to the pseudo code
+\begin{equation}
+    {\rm accuracy} = {\rm min}( \ 1, \ {\rm max}( \ {\rm accuracy,}\ {\rm ptwXY\_minAccuracy} \ ) \ ) \ \ \ .
+\end{equation}
+\CallingC{void ptwXY\_limitAccuracy(}{ double accuracy ); }
+    \argumentBox{accuracy}{The desired accuracy.}
 
 \subsubsection{ptwXY\_update\_biSectionMax --- Not for general use}
-This routine is used by \highlight{ptwXY} routines to update the member \highlight{biSectionMax} base on the prior length, given
+This function is used by \highlight{ptwXY} functions to update the member \highlight{biSectionMax} base on the prior length, given
 by \highlight{oldLength}, and the current length of \highlight{ptwXY}.
 \CallingCLimited{void ptwXY\_update\_biSectionMax(}{ptwXYPoints *ptwXY,
     \addArgument{double oldLength );}}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{oldLength}{.}
+    \argumentBox{oldLength}{The prior length of \highlight{ptwXY}.}
 
-\subsubsection{ptwXY\_applyFunction}
-This routine is used by other routines to map $y_i$ to func( $x_i$, $y_i$ ) with infilling as needed. For example,
-this routine is used by \highlight{ptwXY\_pow}.
-\CallingC{nf\_status ptwXY\_applyFunction(}{ptwXYPoints *ptwXY,
-    \addArgument{ptwXY\_applyFunction\_callback func,}
-    \addArgument{void *argList );}}
-    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{func}{A function called to calculate func( $x_i$, $y_i$ ).}
+\subsubsection{ptwXY\_createFromFunction}
+This function creates a \highlight{ptwXYPoints} whose domain ranges from xs[0] to xs[n-1] and whose y-values
+are obtained from \highlight{func}. All values of \highlight{xs} are added
+and infill between them is done until either \highlight{accuracy} or \highlight{biSectionMax} is satisfied.
+\setargumentNameLengths{checkForRoots}
+\CallingC{ptwXYPoints *ptwXY\_createFromFunction(}{statusMessageReporting *smr,
+    \addArgument{int N,}
+    \addArgument{double *xs,}
+    \addArgument{ptwXY\_createFromFunction\_callback func,}
+    \addArgument{void *argList,}
+    \addArgument{double accuracy,}
+    \addArgument{int checkForRoots,}
+    \addArgument{int biSectionMax );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{N}{Number of values in \highlight{xs}}
+    \argumentBox{xs}{Minimum list of x-values to add.}
+    \argumentBox{func}{A function called to calculate $y(x)$.}
     \argumentBox{argList}{A pointer passed to \highlight{func}.}
-This routine infills to maintain the initial accuracy. The function \highlight{func} called as if defined as 
+    \argumentBox{accuracy}{The desired accuracy.}
+    \argumentBox{checkForRoots}{If true, points where $y = 0$ are searched and added.}
+    \argumentBox{biSectionMax}{Maximum number of bisections between consecutive points of \highlight{xs}.}
+The function \highlight{func} is called as:
 \begin{verbatim}
-    nfu_status func( ptwXYPoint *point, void *argList );    .
+    nfu_status func( statusMessageReporting *smr, ptwXYPoint *point, void *argList );    .
 \end{verbatim}
 
+Often, only 2 values in \highlight{xs} are needed. However, in some cases more values help with the bisection algorithm.
+For example, if the function is $y = \sin(x)$ for $0 \le x \le 2 \pi$ and \highlight{xs} only contains the points
+0 and $2 \pi$, then bisection will not add the point at $\pi$ as it, like the bounding points, is 0.0. In this case,
+\highlight{xs} should contain the values 0.0, $\pi$ and $2 \pi$.
+
+\subsubsection{ptwXY\_applyFunction}
+This function is used by other functions to map $y_i$ to func( $x_i$, $y_i$ ) with infilling as needed. For example,
+this function is used by \highlight{ptwXY\_pow}.
+\setargumentNameLengths{argList}
+\CallingC{nf\_status ptwXY\_applyFunction(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{ptwXY\_applyFunction\_callback func,}
+    \addArgument{void *argList );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{func}{A function called to calculate $y(x)$.}
+    \argumentBox{argList}{A pointer passed to \highlight{func}.}
+This function infills to maintain the initial accuracy. The function \highlight{func} is called as:
+\begin{verbatim}
+    nfu_status func( statusMessageReporting *smr, ptwXYPoint *point, void *argList );    .
+\end{verbatim}
+
+\subsubsection{ptwXY\_fromString}
+This function creates a \highlight{ptwXYPoints} from the string of double values in \highlight{str}. There must be an even number
+of string doubles in \highlight{str}.
+\setargumentNameLengths{interpolationString}
+\CallingC{ptwXYPoints *ptwXY\_fromString(}{statusMessageReporting *smr,
+    \addArgument{char const *str,}
+    \addArgument{char sep,}
+    \addArgument{ptwXY\_interpolation interpolation,}
+    \addArgument{char const *interpolationString,}
+    \addArgument{double biSectionMax,}
+    \addArgument{double accuracy,}
+    \addArgument{char **endCharacter,}
+    \addArgument{int useSystem\_strtod );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{str}{The list of double values as a string.}
+    \argumentBox{sep}{The separator character between each double.}
+    \argumentBox{interpolation}{The interpolation of the data.}
+    \argumentBox{interpolationString}{The string representation of the string.}
+    \argumentBox{biSectionMax}{The biSectionMax of the returned \highlight{ptwXYPoints}.}
+    \argumentBox{accuracy}{The accuracy of the returned \highlight{ptwXYPoints}.}
+    \argumentBox{endCharacter}{The pointer to the character after the last character converted.}
+    \argumentBox{useSystem\_strtod}{See the function \highlight{nfu\_stringToListOfDoubles}.}
+
 \subsubsection{ptwXY\_showInteralStructure --- Not for general use}
-This routine writes out details of the data in a \highlight{ptwXYPoints} object, including much of the
-internal data normally not useful to a user. This routine is intended for debugging.
+This function writes out details of the data in a \highlight{ptwXYPoints} object, including much of the
+internal data normally not useful to a user. This function is intended for debugging.
 \setargumentNameLengths{printPointersAsNull}
 \CallingCLimited{void ptwXY\_showInteralStructure(}{ptwXYPoints *ptwXY,
     \addArgument{FILE *f,}
@@ -35,7 +100,7 @@ internal data normally not useful to a user. This routine is intended for debugg
     \argumentBox{printPointersAsNull}{If true, all pointers are printed as if their value is NULL.}
 
 \subsubsection{ptwXY\_simpleWrite}
-This routine writes out the (x,y) points of the \highlight{ptwXYPoints} object to a specified stream.
+This function writes out the (x,y) points of the \highlight{ptwXYPoints} object to a specified stream.
 \setargumentNameLengths{format}
 \CallingC{void ptwXY\_simpleWrite(}{ptwXYPoints *ptwXY,
     \addArgument{FILE *f,}
@@ -44,11 +109,11 @@ This routine writes out the (x,y) points of the \highlight{ptwXYPoints} object t
     \argumentBox{f}{The stream where the points are written.}
     \argumentBox{format}{The format specifier to use for writing an (x,y) point.}
     \vskip 0.05 in \noindent
-The \highlight{format} must contain two C double specifier (e.g., "\%12.4f \%17.7e$\backslash$n"), one each for the x- and y-values of a point.
-No line feed characters (e.g., "$\backslash$n") are printed, except those in \highlight{format}.
+The \highlight{format} must contain two C double specifier (e.g., \texttt{"\%12.4f \%17.7e$\backslash$n"}), one each for the x- and y-values of a point.
+No line feed characters (e.g., \texttt{"$\backslash$n"}) are printed, except those in \highlight{format}.
 
 \subsubsection{ptwXY\_simplePrint}
-This routine calls \highlight{ptwXY\_simpleWrite} with stdout as the output stream.
+This function calls \highlight{ptwXY\_simpleWrite} with stdout as the output stream.
 \CallingC{void ptwXY\_simplePrint(}{ptwXYPoints *ptwXY,
     \addArgument{char *format );}}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}

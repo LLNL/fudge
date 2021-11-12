@@ -21,6 +21,6 @@ uncertainty =
 1.e3 MeV/c**2
 value = 1.000000000000000e+03, significantDigits = 16, order = 3, isPercent = False, unit = "MeV/c**2"
 uncertainty = 
-1.782661805912292e-27 kg
-value = 1.782661805912292e-27, significantDigits = 16, order = -27, isPercent = False, unit = "kg"
+1.782661906940917e-27 kg
+value = 1.782661906940917e-27, significantDigits = 16, order = -27, isPercent = False, unit = "kg"
 uncertainty = 

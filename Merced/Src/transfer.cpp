@@ -18,53 +18,52 @@
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-//****************** class T_matrix  *****************
-//--------------- T_matrix constructor -----------------
-T_matrix::T_matrix( ): order( -1 ), conserve( BOTH ), Ein_quad_method( ADAPTIVE2 ),
-  Eout_quad_method( ADAPTIVE2 ), mu_quad_method( ADAPTIVE2 ),
-  interpolate_Eout_integrals( false )
+//****************** class Trf::T_matrix  *****************
+//--------------- Trf::T_matrix constructor -----------------
+// This makes the code use the lowest cross section energy as the threshold.
+Trf::T_matrix::T_matrix( ): order( -1 ), conserve( Coef::BOTH ), threshold( 0.0 )
 {
 }
-//--------------- T_matrix destructor -----------------
-T_matrix::~T_matrix( )
+//--------------- Trf::T_matrix destructor -----------------
+Trf::T_matrix::~T_matrix( )
 {
-  if( ( conserve != NOT_SET ) && ( order >= 0 ) )
+  if( ( conserve != Coef::NOT_SET ) && ( order >= 0 ) )
   {
     delete [] data;
     delete [] row_sums;
     delete [] row_checks;
   }
 }
-//--------------- T_matrix::allocate -----------------
-void T_matrix::allocate( )
+//--------------- Trf::T_matrix::allocate -----------------
+void Trf::T_matrix::allocate( )
 {
   order = Global.Value( "outputLegendreOrder" );
-  if( order > max_output_order )
+  if( order > Order::max_output_order )
   {
-    FatalError( "T_matrix::allocate",
-                "increase the size of max_output_order and recompile" );
+    Msg::FatalError( "Trf::T_matrix::allocate",
+                "increase the size of Order::max_output_order and recompile" );
   }
   e_flux.order = order;
 
-  if( conserve == NOT_SET )
+  if( conserve == Coef::NOT_SET )
   {
-    FatalError( "T_matrix::allocate", 
+    Msg::FatalError( "Trf::T_matrix::allocate", 
 		 "Set the conservation flag before calling this routine" );
   }
   if( ( num_Ein_bins <= 0 ) || ( num_Eout_bins <= 0 ) )
   {
-    FatalError( "T_matrix::allocate", 
+    Msg::FatalError( "Trf::T_matrix::allocate", 
 		 "Set the energy bins before calling this routine" );
   }
-  data = new coef_vector[ num_Ein_bins * num_Eout_bins ];
+  data = new Coef::coef_vector[ num_Ein_bins * num_Eout_bins ];
   // initialize to zero
   for( int i = 0; i < num_Ein_bins * num_Eout_bins; ++i ){
     data[i].set_order( order, conserve );
   }
 
   // for checking the row sums
-  row_checks = new coef_vector[ num_Ein_bins ];
-  row_sums = new coef_vector[ num_Ein_bins ];
+  row_checks = new Coef::coef_vector[ num_Ein_bins ];
+  row_sums = new Coef::coef_vector[ num_Ein_bins ];
   // initialize to zero
   for( int i = 0; i < num_Ein_bins; ++i )
   {
@@ -72,30 +71,30 @@ void T_matrix::allocate( )
     row_checks[i].set_order( 0, conserve );
   }
 }
-//--------------- T_matrix::operator( ) -----------------
-coef_vector& T_matrix::operator()( int Ein_count, int Eout_count )
+//--------------- Trf::T_matrix::operator( ) -----------------
+Coef::coef_vector& Trf::T_matrix::operator()( int Ein_count, int Eout_count )
 {
   int index = Eout_count + num_Eout_bins * Ein_count;
   return data[ index ];
 }
-//------------ T_matrix::get_flux_weight -------------------
+//------------ Trf::T_matrix::get_flux_weight -------------------
 // Calculates the weights 1 / \int_(energy group) flux
-void T_matrix::get_flux_weight( )
+void Trf::T_matrix::get_flux_weight( )
 {
   // start the list
-  weight_list::iterator next_weight = flux_weight.insert( flux_weight.end( ), weight_vector( ) );
+  Lgdata::weight_list::iterator next_weight = flux_weight.insert( flux_weight.end( ), Lgdata::weight_vector( ) );
   next_weight->initialize( order );
 
   // the current trapezoid to add
   double E_left;
   double E_right;
   // pointers to the incident energy bin edges
-  Energy_groups::const_iterator this_Ein = in_groups.begin( );
-  Energy_groups::const_iterator next_Ein = this_Ein;
+  Egp::Energy_groups::const_iterator this_Ein = in_groups.begin( );
+  Egp::Energy_groups::const_iterator next_Ein = this_Ein;
   ++next_Ein;
   // pointers to the flux data points
-  Flux_List::const_iterator this_flux = e_flux.begin( );
-  Flux_List::const_iterator next_flux = this_flux;
+  Lgdata::Flux_List::const_iterator this_flux = e_flux.begin( );
+  Lgdata::Flux_List::const_iterator next_flux = this_flux;
   ++next_flux;
 
   // do through the energy bins
@@ -108,7 +107,7 @@ void T_matrix::get_flux_weight( )
       ++next_flux;
       if( next_flux == e_flux.end( ) )
       {
-        FatalError( "transfer::get_flux_weight",
+        Msg::FatalError( "transfer::get_flux_weight",
                      "flux data ended early" );
       }
     }
@@ -127,7 +126,7 @@ void T_matrix::get_flux_weight( )
         ++next_flux;
         if( next_flux == e_flux.end( ) )
         {
-          FatalError( "transfer::get_flux_weight",
+          Msg::FatalError( "transfer::get_flux_weight",
                      "Flux data ended early" );
         }
       }
@@ -142,17 +141,17 @@ void T_matrix::get_flux_weight( )
         {
           break;  // we are finished
         }
-        next_weight = flux_weight.insert( flux_weight.end( ), weight_vector( ) );
+        next_weight = flux_weight.insert( flux_weight.end( ), Lgdata::weight_vector( ) );
         next_weight->initialize( order );
       }
     }
   }
 }
-//------------ T_matrix::use_weight -------------------
+//------------ Trf::T_matrix::use_weight -------------------
 // Applies the weights 1 / \int_(energy group) flux
-void T_matrix::use_weight( )
+void Trf::T_matrix::use_weight( )
 {
-  weight_list::iterator this_weight = flux_weight.begin( );
+  Lgdata::weight_list::iterator this_weight = flux_weight.begin( );
   for( int Ein_count = 0; Ein_count < num_Ein_bins; ++Ein_count,
          ++this_weight )
   {
@@ -162,12 +161,12 @@ void T_matrix::use_weight( )
     }
   }
 }
-//------------ T_matrix::scale_E -------------------
+//------------ Trf::T_matrix::scale_E -------------------
 // Scales the weight_E terms by the average E_out, to check gamma output
-void T_matrix::scale_E( )
+void Trf::T_matrix::scale_E( )
 {
-  Energy_groups::const_iterator Eout_ptr = out_groups.begin( );
-  Energy_groups::const_iterator next_Eout = Eout_ptr;
+  Egp::Energy_groups::const_iterator Eout_ptr = out_groups.begin( );
+  Egp::Energy_groups::const_iterator next_Eout = Eout_ptr;
   ++next_Eout;
   for( int Eout_count = 0; Eout_count < num_Eout_bins;
        Eout_ptr = next_Eout, ++next_Eout, ++Eout_count )
@@ -179,12 +178,12 @@ void T_matrix::scale_E( )
     }
   }
 }
-//------------ T_matrix::check_ell0 -------------------
+//------------ Trf::T_matrix::check_ell0 -------------------
 // Prints the sums of the rows of the zero-order term.
 // They should agree with the flux-weighted average cross sections
-void T_matrix::check_ell0( )
+void Trf::T_matrix::check_ell0( )
 {
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) )
   {
     for( int Ein_count = 0; Ein_count < num_Ein_bins;
          ++Ein_count )
@@ -198,7 +197,7 @@ void T_matrix::check_ell0( )
       }
     }
   }
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) )
   {
     for( int Ein_count = 0; Ein_count < num_Ein_bins; 
          ++Ein_count )
@@ -215,13 +214,13 @@ void T_matrix::check_ell0( )
   static int data_precision = Global.Value( "datafield_precision" );
   static int field_width = Global.get_field_width( );
   static int check_row_sum = Global.Value( "check_row_sum" );
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) )
   {
-    cout.setf(ios::scientific,ios::floatfield);
+    std::cout.setf( std::ios::scientific, std::ios::floatfield);
     if( check_row_sum > 0 )
     {
-      cout << "Row sums for number\n";
-      cout << "    integral       row sum       difference       relative\n";
+      std::cout << "Row sums for number\n";
+      std::cout << "    integral       row sum       difference       relative\n";
     }
     for( int Ein_count = 0; Ein_count < num_Ein_bins;
          ++Ein_count )
@@ -240,16 +239,16 @@ void T_matrix::check_ell0( )
       }
       if( check_row_sum > 0 )
       {
-        cout << setw(field_width) <<
-            setprecision(data_precision) <<
+        std::cout << std::setw(field_width) <<
+            std::setprecision(data_precision) <<
             check_sum << " " <<
-          setw(field_width) <<
-            setprecision(data_precision) <<
+          std::setw(field_width) <<
+            std::setprecision(data_precision) <<
             row_sum << " " <<
-          setw(field_width) <<
+          std::setw(field_width) <<
             diff << " " <<
-          setw(field_width) <<
-            relative << endl;
+          std::setw(field_width) <<
+            relative << std::endl;
       }
       static int scale_rows = Global.Value( "scale_rows" );
       if( ( scale_rows > 0 ) && ( row_sum > 0.0 ) )
@@ -263,11 +262,11 @@ void T_matrix::check_ell0( )
     }
   }
 /*
- *  if( ( conserve == ENERGY ) || ( conserve == BOTH ) )
+ *  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) )
  *  {
- *    cout.setf(ios::scientific,ios::floatfield);
- *    cout << "Row sums for energy\n";
- *    cout << "    integral       row sum       difference       relative\n";
+ *    std::cout.setf( std::ios::scientific, std::ios::floatfield);
+ *    std::cout << "Row sums for energy\n";
+ *    std::cout << "    integral       row sum       difference       relative\n";
  *    for( int Ein_count = 0; Ein_count < num_Ein_bins;
  *         ++Ein_count )
  *    {
@@ -276,40 +275,40 @@ void T_matrix::check_ell0( )
  *      double check_sum = row_checks[ Ein_count ].weight_1[ 0 ];
  *      double diff = row_sum - check_sum;
  *      double relative = ( check_sum == 0.0 ) ? 1.0 : diff/check_sum;
- *      cout << setw(field_width) <<
- *            setprecision(data_precision) <<
+ *      std::cout << std::setw(field_width) <<
+ *            std::setprecision(data_precision) <<
  *            check_sum << " " <<
- *          setw(field_width) <<
- *            setprecision(data_precision) <<
+ *          std::setw(field_width) <<
+ *            std::setprecision(data_precision) <<
  *            row_sum << " " <<
- *          setw(field_width) <<
+ *          std::setw(field_width) <<
  *            diff << " " <<
- *          setw(field_width) <<
- *            relative << " "<< endl;
+ *          std::setw(field_width) <<
+ *            relative << " "<< std::endl;
  *    }
  *  }
 */
 }
-//------------ T_matrix::scale_row_check -------------------
+//------------ Trf::T_matrix::scale_row_check -------------------
 // Scales the row check sums by the weights
-void T_matrix::scale_row_check( )
+void Trf::T_matrix::scale_row_check( )
 {
-  weight_list::iterator this_weight = flux_weight.begin( );
+  Lgdata::weight_list::iterator this_weight = flux_weight.begin( );
   for( int Ein_count = 0; Ein_count < num_Ein_bins; ++Ein_count,
          ++this_weight )
   {
     row_checks[ Ein_count ] *= *this_weight;
   }
 }
-//------------ T_matrix::getBinCrossSection -------------------
+//------------ Trf::T_matrix::getBinCrossSection -------------------
 // Computes the average cross section for each energy bin
-void T_matrix::getBinCrossSection( const dd_vector& sigma )
+void Trf::T_matrix::getBinCrossSection( const Ddvec::dd_vector& sigma )
 {
-  Energy_groups::const_iterator nextEinBinPtr = in_groups.begin( );
+  Egp::Energy_groups::const_iterator nextEinBinPtr = in_groups.begin( );
   double prevEinBin = *nextEinBinPtr;
   ++nextEinBinPtr;
   double nextEinBin = *nextEinBinPtr;
-  dd_vector::const_iterator sigmaPtr = sigma.begin( );
+  Ddvec::dd_vector::const_iterator sigmaPtr = sigma.begin( );
   double prevEin = sigmaPtr->x;
   double prevSigma = sigmaPtr->y;
   ++sigmaPtr;
@@ -397,126 +396,127 @@ void T_matrix::getBinCrossSection( const dd_vector& sigma )
     }
   }
 }
-//------------ T_matrix::write_transfer -------------------
+//------------ Trf::T_matrix::write_transfer -------------------
 // Prints the matrix to the output file
-void T_matrix::write_transfer( )
+void Trf::T_matrix::write_transfer( )
 {
-  *output_file << "outputLegendreOrder: " << order << endl;
-  *output_file << "numEinBins: " << num_Ein_bins << endl;
-  *output_file << "numEoutBins: " << num_Eout_bins << endl;
+  *output_file << "outputLegendreOrder: " << order << std::endl;
+  *output_file << "numEinBins: " << num_Ein_bins << std::endl;
+  *output_file << "numEoutBins: " << num_Eout_bins << std::endl;
 
   static int data_precision = Global.Value( "datafield_precision" );
   static int field_width = Global.get_field_width( );
-  coef_vector this_entry( order, conserve );
+  Coef::coef_vector this_entry( order, conserve );
   // print the weight 1 integrals
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) )
   {
     *output_file << "Integrals, weight = 1: numEinBins = " <<
-      num_Ein_bins << endl;
-    output_file->setf(ios::scientific,ios::floatfield);
+      num_Ein_bins << std::endl;
+    output_file->setf( std::ios::scientific, std::ios::floatfield);
     for( int Ein_count = 0; Ein_count < num_Ein_bins;
          ++Ein_count )
     {
       *output_file << "EinBin = " << Ein_count << " : numEoutBins = " <<
-        num_Eout_bins << endl;
+        num_Eout_bins << std::endl;
       for( int Eout_count = 0; Eout_count < num_Eout_bins;
          ++Eout_count )
       {
         this_entry = ( *this )( Ein_count, Eout_count );
         for( int t_count = 0; t_count <= order; ++t_count )
         {
-          *output_file << setw(field_width) <<
-            setprecision(data_precision) <<
+          *output_file << std::setw(field_width) <<
+            std::setprecision(data_precision) <<
             this_entry.weight_1[t_count] << " ";
         }
-        *output_file << endl;
+        *output_file << std::endl;
       }
     }
   }
 
   // print the weight E' integrals
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) )
   {
     *output_file << "Integrals, weight = E': numEinBins = " <<
-      num_Ein_bins << endl;
-    output_file->setf(ios::scientific,ios::floatfield);
+      num_Ein_bins << std::endl;
+    output_file->setf( std::ios::scientific, std::ios::floatfield);
     for( int Ein_count = 0; Ein_count < num_Ein_bins;
          ++Ein_count )
     {
       *output_file << "EinBin = " << Ein_count << " : numEoutBins = " <<
-        num_Eout_bins << endl;
+        num_Eout_bins << std::endl;
       for( int Eout_count = 0; Eout_count < num_Eout_bins;
          ++Eout_count )
       {
         this_entry = ( *this )( Ein_count, Eout_count );
         for( int t_count = 0; t_count <= order; ++t_count )
         {
-          *output_file << setw(field_width) <<
-            setprecision(data_precision) <<
+          *output_file << std::setw(field_width) <<
+            std::setprecision(data_precision) <<
             this_entry.weight_E[t_count] <<  " ";
         }
-        *output_file << endl;
+        *output_file << std::endl;
       }
     }
   }
 }
-//------------ T_matrix::zero_transfer -------------------
+//------------ Trf::T_matrix::zero_transfer -------------------
 // Prints zeros to the output file for a reaction with high threshold
-void T_matrix::zero_transfer( )
+void Trf::T_matrix::zero_transfer( )
 {
-  Warning( "T_matrix::zero_transfer", "omit reaction: all energy data too high" );
-  *output_file << "outputLegendreOrder: " << order << endl;
-  *output_file << "numEinBins: " << num_Ein_bins << endl;
-  *output_file << "numEoutBins: " << num_Eout_bins << endl;
+  Msg::Warning( "Trf::T_matrix::zero_transfer",
+		"omit reaction: all energy data too high" );
+  *output_file << "outputLegendreOrder: " << order << std::endl;
+  *output_file << "numEinBins: " << num_Ein_bins << std::endl;
+  *output_file << "numEoutBins: " << num_Eout_bins << std::endl;
 
   static int data_precision = Global.Value( "datafield_precision" );
   static int field_width = Global.get_field_width( );
   // print the weight 1 integrals
-  if( ( conserve == NUMBER ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::NUMBER ) || ( conserve == Coef::BOTH ) )
   {
     *output_file << "Integrals, weight = 1: numEinBins = " <<
-      num_Ein_bins << endl;
-    output_file->setf(ios::scientific,ios::floatfield);
+      num_Ein_bins << std::endl;
+    output_file->setf( std::ios::scientific, std::ios::floatfield);
     for( int Ein_count = 0; Ein_count < num_Ein_bins;
          ++Ein_count )
     {
       *output_file << "EinBin = " << Ein_count << " : numEoutBins = " <<
-        num_Eout_bins << endl;
+        num_Eout_bins << std::endl;
       for( int Eout_count = 0; Eout_count < num_Eout_bins;
          ++Eout_count )
       {
         for( int t_count = 0; t_count <= order; ++t_count )
         {
-          *output_file << setw(field_width) <<
-            setprecision(data_precision) <<
+          *output_file << std::setw(field_width) <<
+            std::setprecision(data_precision) <<
             0.0 << " ";
         }
-        *output_file << endl;
+        *output_file << std::endl;
       }
     }
   }
 
   // print the weight E' integrals
-  if( ( conserve == ENERGY ) || ( conserve == BOTH ) )
+  if( ( conserve == Coef::ENERGY ) || ( conserve == Coef::BOTH ) )
   {
     *output_file << "Integrals, weight = E': numEinBins = " <<
-      num_Ein_bins << endl;
-    output_file->setf(ios::scientific,ios::floatfield);
+      num_Ein_bins << std::endl;
+    output_file->setf( std::ios::scientific, std::ios::floatfield);
     for( int Ein_count = 0; Ein_count < num_Ein_bins;
          ++Ein_count )
     {
       *output_file << "EinBin = " << Ein_count << " : numEoutBins = " <<
-        num_Eout_bins << endl;
+        num_Eout_bins << std::endl;
       for( int Eout_count = 0; Eout_count < num_Eout_bins;
          ++Eout_count )
       {
         for( int t_count = 0; t_count <= order; ++t_count )
         {
-          *output_file << setw(field_width) <<
-            setprecision(data_precision) <<
+          *output_file << std::setw(field_width) <<
+            std::setprecision(data_precision) <<
             0.0 <<  " ";
         }
-        *output_file << endl;
+        *output_file << std::endl;
       }
     }
   }

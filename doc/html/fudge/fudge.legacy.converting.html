@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.legacy.converting package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.legacy.endl package" href="fudge.legacy.endl.html" />
     <link rel="prev" title="fudge.legacy package" href="fudge.legacy.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +36,9 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.legacy.html" accesskey="U">fudge.legacy package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="fudge.legacy.html" accesskey="U">fudge.legacy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.legacy.converting package</a></li> 
       </ul>
     </div>  
 
@@ -66,31 +59,6 @@
 </div>
 <div class="section" id="fudge-legacy-converting-endffiletognds-module">
 <h2>fudge.legacy.converting.endfFileToGNDS module<a class="headerlink" href="#fudge-legacy-converting-endffiletognds-module" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-fudge.legacy.converting.endfFileToGNDS"></span><dl class="function">
-<dt id="fudge.legacy.converting.endfFileToGNDS.addUnspecifiedDistributions">
-<code class="descclassname">fudge.legacy.converting.endfFileToGNDS.</code><code class="descname">addUnspecifiedDistributions</code><span class="sig-paren">(</span><em>info</em>, <em>outputChannel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endfFileToGNDS.html#addUnspecifiedDistributions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endfFileToGNDS.addUnspecifiedDistributions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endfFileToGNDS.endfFileToGNDS">
-<code class="descclassname">fudge.legacy.converting.endfFileToGNDS.</code><code class="descname">endfFileToGNDS</code><span class="sig-paren">(</span><em>fileName</em>, <em>useFilesQAlways=True</em>, <em>singleMTOnly=None</em>, <em>evaluation=None</em>, <em>MTs2Skip=None</em>, <em>parseCrossSectionOnly=False</em>, <em>toStdOut=True</em>, <em>toStdErr=True</em>, <em>logFile=None</em>, <em>skipBadData=False</em>, <em>doCovariances=True</em>, <em>verboseWarnings=False</em>, <em>verbose=1</em>, <em>reconstructResonances=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endfFileToGNDS.html#endfFileToGNDS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endfFileToGNDS.endfFileToGNDS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="fudge.legacy.converting.endfFileToGNDS.logFiles">
-<em class="property">class </em><code class="descclassname">fudge.legacy.converting.endfFileToGNDS.</code><code class="descname">logFiles</code><span class="sig-paren">(</span><em>toStdOut=False</em>, <em>toStdErr=False</em>, <em>logFile=None</em>, <em>defaultIsStderrWriting=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endfFileToGNDS.html#logFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endfFileToGNDS.logFiles" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="fudge.legacy.converting.endfFileToGNDS.logFiles.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>msg</em>, <em>stderrWriting=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endfFileToGNDS.html#logFiles.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endfFileToGNDS.logFiles.write" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endfFileToGNDS.readMF1MT451">
-<code class="descclassname">fudge.legacy.converting.endfFileToGNDS.</code><code class="descname">readMF1MT451</code><span class="sig-paren">(</span><em>_MAT</em>, <em>_MTDatas</em>, <em>styleName='eval'</em>, <em>logFile=None</em>, <em>verboseWarnings=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endfFileToGNDS.html#readMF1MT451"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endfFileToGNDS.readMF1MT451" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 <div class="section" id="fudge-legacy-converting-endfformats-module">
 <h2>fudge.legacy.converting.endfFormats module<a class="headerlink" href="#fudge-legacy-converting-endfformats-module" title="Permalink to this headline">¶</a></h2>
@@ -98,177 +66,25 @@
 <div class="section" id="fudge-legacy-converting-endfthermscatttognds-module">
 <h2>fudge.legacy.converting.endfThermScattToGNDS module<a class="headerlink" href="#fudge-legacy-converting-endfthermscatttognds-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fudge.legacy.converting.endf_endl">
-<span id="fudge-legacy-converting-endf-endl-module"></span><h2>fudge.legacy.converting.endf_endl module<a class="headerlink" href="#module-fudge.legacy.converting.endf_endl" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="fudge.legacy.converting.endf_endl.ENDF_MTZAEquation">
-<code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">ENDF_MTZAEquation</code><span class="sig-paren">(</span><em>projectileZA</em>, <em>targetZA</em>, <em>MT</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#ENDF_MTZAEquation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.ENDF_MTZAEquation" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns a python list of length 2. The first element is a list of all outgoing particle ZA’s
-(including the residual) for the reaction of projectileZA + targetZA with ENDF’s reaction identifier MT. 
-The second element is a reaction equation for this projectileZA, targetZA and MT. For example
-ENDF_MTZAEquation( 1, 95242, 22 ) returns</p>
-<blockquote>
-<div>([1, 2004, 93238], ‘n + Am242 -&gt; n + He4 + Np238’)</div></blockquote>
-<p>That is, for a neutron ( projectileZA = 1 ) hitting Am242 ( targetZA = 95242 ) with MT = 22 - ENDF (z,na) reaction - 
-the outgoing particle ZA’s are [1, 2004, 93238] and the reaction equation is ‘n + Am242 -&gt; n + He4 + Np238’.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="fudge.legacy.converting.endf_endl.ENDLCS_To_ENDFMT">
-<em class="property">class </em><code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">ENDLCS_To_ENDFMT</code><span class="sig-paren">(</span><em>projectile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#ENDLCS_To_ENDFMT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.ENDLCS_To_ENDFMT" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="fudge.legacy.converting.endf_endl.ENDLCS_To_ENDFMT.getMTFromCS">
-<code class="descname">getMTFromCS</code><span class="sig-paren">(</span><em>C</em>, <em>S</em>, <em>CCounts=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#ENDLCS_To_ENDFMT.getMTFromCS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.ENDLCS_To_ENDFMT.getMTFromCS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endf_endl.ZAAndMATFromParticleName">
-<code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">ZAAndMATFromParticleName</code><span class="sig-paren">(</span><em>particleName</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#ZAAndMATFromParticleName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.ZAAndMATFromParticleName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="fudge.legacy.converting.endf_endl.endfMTtoC_ProductList">
-<em class="property">class </em><code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">endfMTtoC_ProductList</code><span class="sig-paren">(</span><em>C</em>, <em>reactionLabel</em>, <em>isFission=0</em>, <em>ns=0</em>, <em>H1s=0</em>, <em>H2s=0</em>, <em>H3s=0</em>, <em>He3s=0</em>, <em>He4s=0</em>, <em>gammas=0</em>, <em>residualLevel=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#endfMTtoC_ProductList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.endfMTtoC_ProductList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endf_endl.endfMTtoC_ProductList_excitedStateInitializer">
-<code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">endfMTtoC_ProductList_excitedStateInitializer</code><span class="sig-paren">(</span><em>list</em>, <em>MTGround</em>, <em>MTContinuum</em>, <em>C</em>, <em>label</em>, <em>ns=0</em>, <em>H1s=0</em>, <em>H2s=0</em>, <em>H3s=0</em>, <em>He3s=0</em>, <em>He4s=0</em>, <em>gammas=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#endfMTtoC_ProductList_excitedStateInitializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.endfMTtoC_ProductList_excitedStateInitializer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endf_endl.endfZAPFromMT">
-<code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">endfZAPFromMT</code><span class="sig-paren">(</span><em>MT</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#endfZAPFromMT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.endfZAPFromMT" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function identifies the outgoing particle (i.e., ZAP) from the MT number. The outgoing 
-particle is almost always a neutron, except in a few cases.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endf_endl.getCSFromMT">
-<code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">getCSFromMT</code><span class="sig-paren">(</span><em>MT</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#getCSFromMT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.getCSFromMT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endf_endl.getMTFromC">
-<code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">getMTFromC</code><span class="sig-paren">(</span><em>C</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#getMTFromC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.getMTFromC" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endf_endl.getParticleNameFromMAT">
-<code class="descclassname">fudge.legacy.converting.endf_endl.</code><code class="descname">getParticleNameFromMAT</code><span class="sig-paren">(</span><em>MAT</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endf_endl.html#getParticleNameFromMAT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endf_endl.getParticleNameFromMAT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="fudge-legacy-converting-endf-endl-module">
+<h2>fudge.legacy.converting.endf_endl module<a class="headerlink" href="#fudge-legacy-converting-endf-endl-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="fudge-legacy-converting-endltognds-module">
 <h2>fudge.legacy.converting.endlToGNDS module<a class="headerlink" href="#fudge-legacy-converting-endltognds-module" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-fudge.legacy.converting.endlToGNDS"></span><dl class="function">
-<dt id="fudge.legacy.converting.endlToGNDS.getXYInterpolation">
-<code class="descclassname">fudge.legacy.converting.endlToGNDS.</code><code class="descname">getXYInterpolation</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endlToGNDS.html#getXYInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endlToGNDS.getXYInterpolation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endlToGNDS.returnConstantQ">
-<code class="descclassname">fudge.legacy.converting.endlToGNDS.</code><code class="descname">returnConstantQ</code><span class="sig-paren">(</span><em>label</em>, <em>Q_MeV</em>, <em>crossSection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endlToGNDS.html#returnConstantQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endlToGNDS.returnConstantQ" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endlToGNDS.toGNDS">
-<code class="descclassname">fudge.legacy.converting.endlToGNDS.</code><code class="descname">toGNDS</code><span class="sig-paren">(</span><em>self</em>, <em>evaluationLibrary</em>, <em>evaluationVersion</em>, <em>excludeAverageProductData=True</em>, <em>verbose=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endlToGNDS.html#toGNDS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endlToGNDS.toGNDS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an reactionSuite for self where self is an endlZA class.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.endlToGNDS.uncorrelated">
-<code class="descclassname">fudge.legacy.converting.endlToGNDS.</code><code class="descname">uncorrelated</code><span class="sig-paren">(</span><em>style</em>, <em>frame</em>, <em>angularSubform</em>, <em>energySubform</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/endlToGNDS.html#uncorrelated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.endlToGNDS.uncorrelated" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 <div class="section" id="fudge-legacy-converting-gndstoendf6-module">
 <h2>fudge.legacy.converting.gndsToENDF6 module<a class="headerlink" href="#fudge-legacy-converting-gndstoendf6-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="fudge-legacy-converting-togndsmisc-module">
 <h2>fudge.legacy.converting.toGNDSMisc module<a class="headerlink" href="#fudge-legacy-converting-togndsmisc-module" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-fudge.legacy.converting.toGNDSMisc"></span><dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.ZAToName">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">ZAToName</code><span class="sig-paren">(</span><em>ZA</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#ZAToName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.ZAToName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.addNucleusInfoForLightNuclei">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">addNucleusInfoForLightNuclei</code><span class="sig-paren">(</span><em>ZA</em>, <em>nucleus</em>, <em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#addNucleusInfoForLightNuclei"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.addNucleusInfoForLightNuclei" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.addParticleData">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">addParticleData</code><span class="sig-paren">(</span><em>particle</em>, <em>info</em>, <em>massValue</em>, <em>spinValue</em>, <em>parityValue</em>, <em>chargeValue</em>, <em>halflifeValue</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#addParticleData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.addParticleData" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.addUnspecifiedDistributions">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">addUnspecifiedDistributions</code><span class="sig-paren">(</span><em>info</em>, <em>outputChannel</em>, <em>frame=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#addUnspecifiedDistributions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.addUnspecifiedDistributions" title="Permalink to this definition">¶</a></dt>
-<dd><p>For products with no distribution, assign an unspecified distribution.
-Interim products before breakup get an ‘implicitProduct’ conversion flag (so they aren’t written back to ENDF-6),
-as are heavy residuals when the first product is a neutron.
-Others are explicit, to ensure that the product (plus mass) appears in resulting ENDF file.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.getPoPsParticle">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">getPoPsParticle</code><span class="sig-paren">(</span><em>info</em>, <em>ZA</em>, <em>name=None</em>, <em>levelIndex=None</em>, <em>level=0.0</em>, <em>levelUnit='MeV'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#getPoPsParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.getPoPsParticle" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.getTypeName">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">getTypeName</code><span class="sig-paren">(</span><em>info</em>, <em>ZA</em>, <em>name=None</em>, <em>levelIndex=None</em>, <em>level=0.0</em>, <em>levelUnit='MeV'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#getTypeName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.getTypeName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the name for this ZA and level if present. Returned name is of the form Am242, Am242_m1, Am242_e2.
-levelIndex must be None or an integer &gt; 0.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.getTypeNameENDF">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">getTypeNameENDF</code><span class="sig-paren">(</span><em>info</em>, <em>ZA</em>, <em>undefinedLevelInfo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#getTypeNameENDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.getTypeNameENDF" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.getTypeNameGamma">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">getTypeNameGamma</code><span class="sig-paren">(</span><em>info</em>, <em>ZA</em>, <em>level=None</em>, <em>levelIndex=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#getTypeNameGamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.getTypeNameGamma" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="fudge.legacy.converting.toGNDSMisc.infos">
-<em class="property">class </em><code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">infos</code><span class="sig-paren">(</span><em>style</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#infos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.infos" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="fudge.legacy.converting.toGNDSMisc.infos.addMassAWR">
-<code class="descname">addMassAWR</code><span class="sig-paren">(</span><em>ZA</em>, <em>AWR</em>, <em>asTarget=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#infos.addMassAWR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.infos.addMassAWR" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="fudge.legacy.converting.toGNDSMisc.infos.logs">
-<code class="descname">logs</code><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.infos.logs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.newGNDSParticle">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">newGNDSParticle</code><span class="sig-paren">(</span><em>info</em>, <em>particle</em>, <em>crossSection</em>, <em>attributes=None</em>, <em>multiplicity=1</em>, <em>outputChannel=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#newGNDSParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.newGNDSParticle" title="Permalink to this definition">¶</a></dt>
-<dd><p>The arguments to this function must match those of product.product excluding self and label.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.legacy.converting.toGNDSMisc.returnConstantQ">
-<code class="descclassname">fudge.legacy.converting.toGNDSMisc.</code><code class="descname">returnConstantQ</code><span class="sig-paren">(</span><em>style</em>, <em>Q</em>, <em>crossSection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/converting/toGNDSMisc.html#returnConstantQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.converting.toGNDSMisc.returnConstantQ" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
-<div class="section" id="module-fudge.legacy.converting">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.legacy.converting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -277,7 +93,7 @@ levelIndex must be None or an integer &gt; 0.</p>
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.legacy.converting package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
@@ -285,11 +101,11 @@ levelIndex must be None or an integer &gt; 0.</p>
 <li><a class="reference internal" href="#fudge-legacy-converting-endffiletognds-module">fudge.legacy.converting.endfFileToGNDS module</a></li>
 <li><a class="reference internal" href="#fudge-legacy-converting-endfformats-module">fudge.legacy.converting.endfFormats module</a></li>
 <li><a class="reference internal" href="#fudge-legacy-converting-endfthermscatttognds-module">fudge.legacy.converting.endfThermScattToGNDS module</a></li>
-<li><a class="reference internal" href="#module-fudge.legacy.converting.endf_endl">fudge.legacy.converting.endf_endl module</a></li>
+<li><a class="reference internal" href="#fudge-legacy-converting-endf-endl-module">fudge.legacy.converting.endf_endl module</a></li>
 <li><a class="reference internal" href="#fudge-legacy-converting-endltognds-module">fudge.legacy.converting.endlToGNDS module</a></li>
 <li><a class="reference internal" href="#fudge-legacy-converting-gndstoendf6-module">fudge.legacy.converting.gndsToENDF6 module</a></li>
 <li><a class="reference internal" href="#fudge-legacy-converting-togndsmisc-module">fudge.legacy.converting.toGNDSMisc module</a></li>
-<li><a class="reference internal" href="#module-fudge.legacy.converting">Module contents</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -308,15 +124,15 @@ levelIndex must be None or an integer &gt; 0.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -338,12 +154,14 @@ levelIndex must be None or an integer &gt; 0.</p>
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="fudge.legacy.html" >fudge.legacy package</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="fudge.legacy.html" >fudge.legacy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.legacy.converting package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

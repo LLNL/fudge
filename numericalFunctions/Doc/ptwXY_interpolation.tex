@@ -1,16 +1,19 @@
 \subsection{Interpolation}
-This section decribes all the routines in the file "ptwXY\_interpolation.c".
+This section decribes all the functions in the file ``ptwXY\_interpolation.c''.
 
 \subsubsection{ptwXY\_interpolatePoint}
 \setargumentNameLengths{interpolation}
-This routine interpolates an $x$ value between the points (x1,y1) and (x2,y2) to obtain its $y$ value.
-\CallingC{fnu\_status ptwXY\_interpolatePoint(}{ptwXY\_interpolation interpolation,
+This function interpolates an $x$ value between the points (x1,y1) and (x2,y2) to obtain its $y$ value
+for the requested \highlight{interpolation}.
+\CallingC{fnu\_status ptwXY\_interpolatePoint(}{statusMessageReporting *smr,
+    \addArgument{ptwXY\_interpolation interpolation,}
     \addArgument{double x,}
     \addArgument{double *y,}
     \addArgument{double x1,}
     \addArgument{double y1,}
     \addArgument{double x2,}
     \addArgument{double y2 );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{interpolation}{Type of interpolation to perform (see Section~\ref{interpolationSection}).}
     \argumentBox{x}{The $x$ value at which the $y$ value is desired.}
     \argumentBox{x1}{The $x$ value of the first point.}
@@ -24,26 +27,26 @@ then \highlight{nfu\_invalid\-Interpolation} is also returned. If interpolation 
 \highlight{nfu\_otherInterpolation} is returned.
 
 \subsubsection{ptwXY\_flatInterpolationToLinear}
-This routine returns a linear-linear interpolated representation of \highlight{ptwXY}.
+This function returns a linear-linear interpolated representation of \highlight{ptwXY}.
 \setargumentNameLengths{upperEps}
-\CallingC{ptwXYPoints *ptwXY\_flatInterpolationToLinear(}{ptwXYPoints *ptwXY,
+\CallingC{ptwXYPoints *ptwXY\_flatInterpolationToLinear(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{double lowerEps,}
-    \addArgument{double upperEps,}
-    \addArgument{nfu\_status *status );}}
+    \addArgument{double upperEps );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to a \highlight{ptwXYPoints} object.}
     \argumentBox{lowerEps}{The amount to adjust every interior point down in x.}
     \argumentBox{upperEps}{The amount to adjust every interior point up in x}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
-For every interior point (i.e., $x_i,y_i$ for $0 < i < n - 1$ where n is the number of points), two points are added.
+For every interior point (i.e., $(x_i,y_i)$ for $0 < i < n - 1$ where n is the number of points), two points may be added.
 The positions of these points depend on \highlight{lowerEps} and \highlight{upperEps} as follows:
 \begin{description}
     \item[lowerEps ==  0 and upperEps ==  0:] This condition is not allowed. status is set to \highlight{nfu\_bad\-Input} and NULL is returned.
         This condition is also returned if either \highlight{lowerEps} or \highlight{upperEps} is negative.
-    \item[lowerEps $>$ 0 and upperEps ==  0:] At each interior point $x_i,y_i$ the two points $x_m,y_{i-1}$ and $x_i,y_i$ are set.
-    \item[lowerEps ==  0 and upperEps $>$ 0:] At each interior point $x_i,y_i$ the two points $x_i,y_{i-1}$ and $x_p,y_i$ are set.
-    \item[lowerEps $>$ 0 and upperEps $>$ 0:] At each interior point $x_i,y_i$, this point is removed and the two 
-        points $x_m,y_{i-1}$ and $x_p,y_i$ are set.
+    \item[lowerEps $>$ 0 and upperEps ==  0:] At each interior point $(x_i,y_i)$ the two points $(x_m,y_{i-1})$ and $(x_i,y_i)$ are set.
+    \item[lowerEps ==  0 and upperEps $>$ 0:] At each interior point $(x_i,y_i)$ the two points $(x_i,y_{i-1})$ and $(x_p,y_i)$ are set.
+    \item[lowerEps $>$ 0 and upperEps $>$ 0:] At each interior point $(x_i,y_i)$, this point is removed and the two 
+        points $(x_m,y_{i-1})$ and $(x_p,y_i)$ are set.
 \end{description}
 where $x_m$ and $x_p$ are given in Table~\ref{flatInterpolationToLinear}.
 \begin{table}
@@ -60,59 +63,78 @@ where $x_m$ and $x_p$ are given in Table~\ref{flatInterpolationToLinear}.
 \end{table}
 
 \subsubsection{ptwXY\_toOtherInterpolation}
-This routine returns \highlight{ptwXY} converted to interpolation \highlight{interpolation}.
+This function returns \highlight{ptwXY} converted to interpolation \highlight{interpolation}.
 \setargumentNameLengths{interpolation}
-\CallingC{ptwXYPoints *ptwXY\_toOtherInterpolation(}{ptwXYPoints *ptwXY,
+\CallingC{ptwXYPoints *ptwXY\_toOtherInterpolation(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{ptwXY\_interpolation interpolation,}
-    \addArgument{double accuracy,}
-    \addArgument{nfu\_status *status );}}
+    \addArgument{double accuracy );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to a \highlight{ptwXYPoints} object.}
     \argumentBox{interpolation}{The interpolation to convert to.}
     \argumentBox{accuracy}{The accuracy of the conversion.}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
 Currently, \highlight{interpolation} can only be \highlight{ptwXY\_\-interpolation\-LinLin}.
 
 \subsubsection{ptwXY\_toUnitbase}
-This routine returns a unit-based version of \highlight{ptwXY}.
-\setargumentNameLengths{status}
-\CallingC{ptwXYPoints *ptwXY\_toUnitbase(}{ptwXYPoints *ptwXY,
-    \addArgument{nfu\_status *status );}}
+This function returns a unit-based version of \highlight{ptwXY}.
+\setargumentNameLengths{scaleRange}
+\CallingC{ptwXYPoints *ptwXY\_toUnitbase(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{int scaleRange );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{scaleRange}{The y-values are not scaled if this is 0.}
     \vskip 0.05 in \noindent
-Unitbasing maps the domain to 0 to 1 by scaling each x-value as $x_i = ( x_i - x_0 ) / ( x_{n-1} - x_0 )$ and scaling each y-value as
-$y_i = y_i \times ( x_{n-1} - x_0 )$. Unitbasing is most useful on pdf's.
+Unitbasing maps the domain to 0 to 1 by scaling each x-value as 
+\begin{equation}
+    x_i = ( x_i - x_0 ) / ( x_{n-1} - x_0 )
+\end{equation}
+and if \highlight{scaleRange} is not 0, scaling each y-value as
+\begin{equation}
+    y_i = y_i \times ( x_{n-1} - x_0 ) \ \ \ . 
+\end{equation}
+Unitbasing is most useful for pdf's.
 
 \subsubsection{ptwXY\_fromUnitbase}
-This routine undoes the unit base mapping done by \highlight{ptwXY\_toUnitbase}.
-\setargumentNameLengths{accuracy}
-\CallingC{ptwXYPoints *ptwXY\_fromUnitbase(}{ptwXYPoints *ptwXY,
-    \addArgument{double xMin,}
-    \addArgument{double xMax,}
-    \addArgument{nfu\_status *status );}}
+This function undoes the unit base mapping done by \highlight{ptwXY\_toUnitbase}.
+\setargumentNameLengths{scaleRange}
+\CallingC{ptwXYPoints *ptwXY\_fromUnitbase(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double domainMin,}
+    \addArgument{double domainMax,}
+    \addArgument{int scaleRange );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{xMin}{The lower domain for the returned \highlight{ptwXYPoints} instances.}
-    \argumentBox{xMax}{The upper domain for the returned \highlight{ptwXYPoints} instances.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{domainMin}{The lower domain for the returned \highlight{ptwXYPoints} instances.}
+    \argumentBox{domainMax}{The upper domain for the returned \highlight{ptwXYPoints} instances.}
+    \argumentBox{scaleRange}{The y-values are not scaled if this is 0.}
     \vskip 0.05 in \noindent
-Each x-value is scaled as $x_i = ( {\rm xMax} - {\rm xMax} ) \times x_i + {\rm xMax}$ and each y-value is scaled 
-as $y_i = y_i / ( {\rm xMax} - {\rm xMax} )$.
+Each x-value is scaled as 
+\begin{equation}
+    x_i = ( {\rm domainMax} - {\rm domainMin} ) \times x_i + {\rm domainMin}
+\end{equation}
+and if \highlight{scaleRange} is not 0, each y-value is scaled as 
+\begin{equation}
+y_i = y_i / ( {\rm domainMax} - {\rm domainMin} ) \ \ \ \ 
+\end{equation}
 
 \subsubsection{ptwXY\_unitbaseInterpolate}
-This routine returns a \highlight{ptwXYPoints} instance that is the unit-base interpolation of \highlight{ptwXY1} at $w_1$
+This function returns a \highlight{ptwXYPoints} instance that is the unit-base interpolation of \highlight{ptwXY1} at $w_1$
 and \highlight{ptwXY2} at $w_2$ at the w-value $w$.
 \setargumentNameLengths{interpolation}
-\CallingC{nfu\_status ptwXY\_unitbaseInterpolate(}{double w,
+\CallingC{ptwXYPoints *ptwXY\_unitbaseInterpolate(}{statusMessageReporting *smr,
+    \addArgument{double w,}
     \addArgument{double w1,}
     \addArgument{ptwXYPoints *ptwXY1,}
     \addArgument{double w2,}
     \addArgument{ptwXYPoints *ptwXY2,}
-    \addArgument{nfu\_status *status );}}
+    \addArgument{scaleRange );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{w}{The w-value to interpole to.}
     \argumentBox{w1}{The lower w-value}
     \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object at w1.}
     \argumentBox{w2}{The upper w-value}
     \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object at w2.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{scaleRange}{The y-values are not scaled if this is 0.}
     \vskip 0.05 in \noindent

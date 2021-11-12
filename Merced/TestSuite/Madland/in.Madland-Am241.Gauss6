@@ -3,6 +3,7 @@ Process: Madland-Nix spectrum
 Comment: Am241(n,fission)?; data for outgoing n_1
 outputLegendreOrder: 0
 Conserve: number
+do adaptive quadrature: false
 Quadrature method: Gauss6
 Projectile Frame: lab
 

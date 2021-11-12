@@ -1,0 +1,679 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.suites &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.suites</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.suites</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">formatVersion</span> <span class="k">as</span> <span class="n">formatVersionModule</span>
+<span class="kn">from</span> <span class="nn">PoPs.families</span> <span class="kn">import</span> <span class="n">particle</span> <span class="k">as</span> <span class="n">particleModule</span>
+
+<div class="viewcode-block" id="suite"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite">[docs]</a><span class="k">class</span> <span class="nc">suite</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for a class member that is list like. For example, the lists inside the class </span>
+<span class="sd">    reactionSuite (&#39;reactions&#39;, &#39;sums&#39;, &#39;productions&#39; and &#39;fissionComponents&#39;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">allowedClasses</span><span class="p">,</span> <span class="n">allow_href</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">cls</span> <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">allowedClasses</span> <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__allow_href</span> <span class="o">=</span> <span class="n">allow_href</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__hrefInstance</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">hrefInstance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">hrefInstance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">hrefInstance</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="s1">&#39;href suite does not support modification of href instance.&#39;</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">return</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">status</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;key not in suite&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">hrefInstance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">hrefInstance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">hrefInstance</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;label must be a string&quot;</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+
+        <span class="c1"># requested style not found, but what about styles it derives from?</span>
+        <span class="n">requestedStyle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">()</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span> <span class="n">label</span> <span class="p">]</span>
+        <span class="n">parentStyle</span> <span class="o">=</span> <span class="n">requestedStyle</span><span class="o">.</span><span class="n">derivedFromStyle</span>
+
+        <span class="k">while</span> <span class="n">parentStyle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parentStyle</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">parentStyle</span><span class="o">.</span><span class="n">label</span><span class="p">]</span>
+            <span class="n">parentStyle</span> <span class="o">=</span> <span class="n">parentStyle</span><span class="o">.</span><span class="n">derivedFromStyle</span>
+
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s2">&quot;item with label &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in suite &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">hrefInstance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">hrefInstance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">hrefInstance</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">hrefInstance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">hrefInstance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">hrefInstance</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">allowedClasses</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">allow_href</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_href</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="suite.add"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">newItem</span><span class="p">,</span> <span class="n">setAncestor</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds newItem to the suite. If another item in the suite has the same label as newItem, a KeyError is raised.</span>
+<span class="sd">        If newItem is not an allowed class, a TypeError is raised.</span>
+
+<span class="sd">        :param newItem:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="s1">&#39;href suite does not support modification of href instance.&#39;</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">newItem</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span> <span class="s1">&#39;&#39;&#39;Item&#39;s label must be a string: </span><span class="si">%s</span><span class="s1">&#39;&#39;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">newItem</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">newItem</span><span class="p">,</span> <span class="bp">cls</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">found</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid class &quot;</span><span class="si">%s</span><span class="s1">&quot; for suite &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">newItem</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">newItem</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;item with label = &quot;</span><span class="si">%s</span><span class="s1">&quot; already present in suite&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">setAncestor</span> <span class="p">)</span> <span class="p">:</span> <span class="n">newItem</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">newItem</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.amendForPatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.amendForPatch">[docs]</a>    <span class="k">def</span> <span class="nf">amendForPatch</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">amendForPatch</span><span class="p">(</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.convertUnits"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.checkAncestry"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.checkAncestry">[docs]</a>    <span class="k">def</span> <span class="nf">checkAncestry</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">checkAncestry</span><span class="p">(</span> <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="n">level</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.diff"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+
+        <span class="n">labels1</span> <span class="o">=</span> <span class="p">[</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
+        <span class="n">labels2</span> <span class="o">=</span> <span class="p">[</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">other</span> <span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span> <span class="n">label</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels1</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels2</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels</span> <span class="p">)</span> <span class="p">:</span> <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels1</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">diffResults</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> missing - 1&#39;</span> <span class="o">%</span> <span class="n">other</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels2</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">diffResults</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> missing - 2&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(</span> <span class="p">),</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;    Cannot diff type &quot;</span><span class="si">%s</span><span class="s1">&quot; with type &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">self</span> <span class="p">),</span> <span class="nb">type</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="s1">&#39;diff&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span> <span class="n">other</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">diffResults</span> <span class="p">)</span>
+                    <span class="k">else</span> <span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;    Method &quot;diff&quot; missing for object </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.findInstancesOfClassInChildren"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.findInstancesOfClassInChildren">[docs]</a>    <span class="k">def</span> <span class="nf">findInstancesOfClassInChildren</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">9999</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">foundInstances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">level</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">level</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">foundInstances</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="bp">cls</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">foundInstances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="n">foundInstances</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">findInstancesOfClassInChildren</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">foundInstances</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.findLinks"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.findLinks">[docs]</a>    <span class="k">def</span> <span class="nf">findLinks</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">links</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s1">&#39;findLinks&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="nb">getattr</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s1">&#39;findLinks&#39;</span> <span class="p">)(</span> <span class="n">links</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link2</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">item</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">path</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.hrefInstance"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.hrefInstance">[docs]</a>    <span class="k">def</span> <span class="nf">hrefInstance</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__hrefInstance</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_href</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__hrefInstance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootAncestor</span><span class="o">.</span><span class="n">followXPath</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__hrefInstance</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.set_href"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.set_href">[docs]</a>    <span class="k">def</span> <span class="nf">set_href</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">href</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_href</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Suite does not allow href.&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Suite contains items and cannot also have an href.&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">href</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;href instance must be a string.&#39;</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">href</span></div>
+
+<div class="viewcode-block" id="suite.pop"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove item by label, and return it. If the label is not found, raise KeyError</span>
+<span class="sd">        :param label:</span>
+<span class="sd">        :param args:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="s1">&#39;href suite does not support modification of href instance.&#39;</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Only one default value is allowed: got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">i1</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="n">label</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.cullStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.labels"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.labels">[docs]</a>    <span class="k">def</span> <span class="nf">labels</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the list of all the labels in self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">hrefInstance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">hrefInstance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">hrefInstance</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.remove"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove item by label. Returns True if label was present, otherwise returns False</span>
+<span class="sd">        :param label: str</span>
+<span class="sd">        :return: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="s1">&#39;href suite does not support modification of href instance.&#39;</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+                <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="s1">&#39;href suite does not support modification of href instance.&#39;</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.replace"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.replace">[docs]</a>    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">newItem</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replace an existing item with newItem. If no item in the suite has the same label as newItem, a KeyError is raised.</span>
+<span class="sd">        If newItem is not an allowed class, a TypeError is raised.</span>
+
+<span class="sd">        :param newItem:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="s1">&#39;href suite does not support modification of href instance.&#39;</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">newItem</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;&#39;&#39;Item&#39;s label must be a string&#39;&#39;&#39;</span> <span class="p">)</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">newItem</span><span class="p">,</span> <span class="bp">cls</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">found</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid class &quot;</span><span class="si">%s</span><span class="s1">&quot; for suite &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">newItem</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">newItem</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="n">i1</span><span class="p">,</span> <span class="n">newItem</span> <span class="p">)</span>
+                <span class="n">newItem</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;item with label = &quot;</span><span class="si">%s</span><span class="s1">&quot; not present in suite&#39;</span> <span class="o">%</span> <span class="n">newItem</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.clear"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all members of the suite</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hrefInstance</span><span class="p">(</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="s1">&#39;href suite does not support modification of href instance.&#39;</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="suite.toXML"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.toXMLList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> href=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span>
+        <span class="n">moniker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">monikerByFormat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="n">moniker</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span> <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="n">moniker</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.uniqueLabel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.uniqueLabel">[docs]</a>    <span class="k">def</span> <span class="nf">uniqueLabel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If item&#39;s label is the same as another item&#39;s label in self, construct a new unique label</span>
+<span class="sd">        based on item&#39;s label appended with &#39;__&#39; and one or more lower case letters (i.e., &#39;a&#39; to &#39;z&#39;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">incrementSuffix</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">suffix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">!=</span> <span class="mi">26</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">suffix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">incrementSuffix</span><span class="p">(</span> <span class="n">suffix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span>
+            <span class="n">label__</span> <span class="o">=</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;__&#39;</span>
+            <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">label__</span> <span class="p">)</span>
+            <span class="n">l1</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span>          <span class="c1"># Find list of longest labels that start with label__.</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">_item</span><span class="o">.</span><span class="n">label</span><span class="p">[:</span><span class="n">n1</span><span class="p">]</span> <span class="o">==</span> <span class="n">label__</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">suffix</span> <span class="o">=</span> <span class="n">_item</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="n">n1</span><span class="p">:]</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">suffix</span><span class="o">.</span><span class="n">islower</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>       <span class="c1"># Ignore non-standard labels.</span>
+                    <span class="n">l2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">l2</span> <span class="o">&lt;</span> <span class="n">l1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">l2</span> <span class="o">&gt;</span> <span class="n">l1</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">l1</span> <span class="o">=</span> <span class="n">l2</span>
+                        <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">suffixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">suffixes</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="n">incrementSuffix</span><span class="p">(</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">suffixes</span> <span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label__</span> <span class="o">+</span> <span class="n">suffix</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.saveToOpenedFile"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.saveToOpenedFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToOpenedFile</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fOut</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.saveToFile"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.saveToFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToFile</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes to the specified file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="n">fileName</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">dirname</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">dirname</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span> <span class="n">dirname</span> <span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span> <span class="p">)</span> <span class="k">as</span> <span class="n">fout</span> <span class="p">:</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">saveToOpenedFile</span><span class="p">(</span> <span class="n">fout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="suite.parseXMLNode"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">element</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="n">parseClass</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">_class</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">:</span>
+                <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">legacyMemberNameMapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">tag</span> <span class="o">==</span> <span class="n">_class</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">parseClass</span> <span class="o">=</span> <span class="n">_class</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">parseClass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Invalid element &#39;</span><span class="si">%s</span><span class="s2">&#39; encountered in suite &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span> <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">parseClass</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">href</span> <span class="o">=</span> <span class="n">label</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;href&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">href</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_href</span><span class="p">(</span> <span class="n">href</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="suite.readXML"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.suite.readXML">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">readXML</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">fileName</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the file as a suite.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">xml.etree</span> <span class="kn">import</span> <span class="n">cElementTree</span>
+        <span class="kn">from</span> <span class="nn">LUPY.xmlNode</span> <span class="kn">import</span> <span class="n">xmlNode</span>
+
+        <span class="n">element</span> <span class="o">=</span> <span class="n">cElementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">fileName</span> <span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="n">xmlNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xmlNode</span><span class="o">.</span><span class="n">etree</span> <span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{}</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="externalFiles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.externalFiles">[docs]</a><span class="k">class</span> <span class="nc">externalFiles</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;externalFiles&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">externalFile</span> <span class="k">as</span> <span class="n">externalFileModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">externalFileModule</span><span class="o">.</span><span class="n">externalFile</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reactions"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.reactions">[docs]</a><span class="k">class</span> <span class="nc">reactions</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;reactions&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.reactions</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">reaction</span> <span class="p">]</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="reactions.asSortedList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.reactions.asSortedList">[docs]</a>    <span class="k">def</span> <span class="nf">asSortedList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">PoPs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of the reactions sorted. This method uses a reaction&#39;s reactionProducts method to determine sorting order.&quot;&quot;&quot;</span>
+
+        <span class="k">class</span> <span class="nc">Particle</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">particle</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span>
+            <span class="n">familyOrder</span> <span class="o">=</span> <span class="mi">999</span>
+
+            <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrderLessThan</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>        <span class="c1"># Also checks isinstance of other.</span>
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+                <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span>
+
+        <span class="n">listToSort</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">reaction</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">particles</span><span class="p">,</span> <span class="n">intermediates</span><span class="p">,</span> <span class="n">processes</span><span class="p">,</span> <span class="n">_reaction</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">reactionProducts</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">asSortedList</span><span class="p">(</span> <span class="n">PoPs</span><span class="p">,</span> <span class="n">excludePhotons</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">PoPs</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">value</span> <span class="p">]</span> <span class="k">for</span> <span class="n">pid</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">particles</span> <span class="o">+</span> <span class="n">intermediates</span> <span class="p">]</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">999</span>                          <span class="c1"># Make a large number so its at the end of sorting if all else equal.</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">Particle</span><span class="p">(</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">processes</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">Particle</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reaction</span> <span class="o">=</span> <span class="n">reaction</span>
+            <span class="n">listToSort</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">items</span> <span class="p">)</span>
+        <span class="n">listToSort</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">item</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reaction</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">listToSort</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reactions.diff"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.reactions.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">class</span> <span class="nc">TwoPoPs</span> <span class="p">:</span>
+
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">pops1</span><span class="p">,</span> <span class="n">pops2</span> <span class="p">)</span> <span class="p">:</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">pops1</span> <span class="o">=</span> <span class="n">pops1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pops2</span> <span class="o">=</span> <span class="n">pops2</span>
+
+            <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+
+                <span class="k">try</span> <span class="p">:</span>
+                    <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pops1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
+                <span class="k">except</span> <span class="p">:</span>
+                    <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pops2</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
+
+        <span class="n">sortedReactions1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asSortedList</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">PoPs</span> <span class="p">)</span>
+        <span class="n">sortedReactions2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">asSortedList</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">PoPs</span> <span class="p">)</span>
+        <span class="n">twoPoPs</span> <span class="o">=</span> <span class="n">TwoPoPs</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">PoPs</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">PoPs</span> <span class="p">)</span>
+
+        <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">sortedReactions1</span> <span class="p">)</span>
+        <span class="n">index1</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">sortedReactions2</span> <span class="p">)</span>
+        <span class="n">index2</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">reactionPairs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span><span class="p">(</span> <span class="p">(</span> <span class="n">index1</span> <span class="o">&lt;</span> <span class="n">n1</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">index2</span> <span class="o">&lt;</span> <span class="n">n2</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">reaction1</span> <span class="o">=</span> <span class="n">sortedReactions1</span><span class="p">[</span><span class="n">index1</span><span class="p">]</span>
+            <span class="n">reaction2</span> <span class="o">=</span> <span class="n">sortedReactions2</span><span class="p">[</span><span class="n">index2</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">reaction1</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">reaction2</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">compare</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">reaction1</span><span class="o">.</span><span class="n">reactionProducts</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">cullPhotons</span><span class="p">(</span> <span class="p">)</span> <span class="o">==</span> <span class="n">reaction2</span><span class="o">.</span><span class="n">reactionProducts</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">cullPhotons</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">compare</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">dummy</span> <span class="o">=</span> <span class="n">reactions</span><span class="p">(</span> <span class="p">)</span>
+                    <span class="n">dummy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">reaction1</span><span class="p">,</span> <span class="n">setAncestor</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
+                    <span class="n">dummy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">reaction2</span><span class="p">,</span> <span class="n">setAncestor</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
+                    <span class="n">dummy</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">.</span><span class="n">asSortedList</span><span class="p">(</span> <span class="n">twoPoPs</span> <span class="p">)</span>
+                    <span class="n">compare</span> <span class="o">=</span> <span class="s1">&#39;&lt;&#39;</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">dummy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="n">reaction2</span> <span class="p">)</span> <span class="p">:</span> <span class="n">compare</span> <span class="o">=</span> <span class="s1">&#39;&gt;&#39;</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="n">compare</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">reactionPairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">reaction1</span><span class="p">,</span> <span class="n">reaction2</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="n">index1</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">index2</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">compare</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">reactionPairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">reaction1</span><span class="p">,</span> <span class="kc">None</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="n">index1</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">reactionPairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reaction2</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="n">index2</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">reaction1</span><span class="p">,</span> <span class="n">reaction2</span> <span class="ow">in</span> <span class="n">reactionPairs</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">reaction1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">diffResults</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> missing - 1&#39;</span> <span class="o">%</span> <span class="n">other</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">[</span><span class="n">reaction2</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">reaction2</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">diffResults</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> missing - 2&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">reaction1</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(</span> <span class="p">),</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">reaction1</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span> <span class="n">reaction2</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reactions.reactionProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.reactions.reactionProducts">[docs]</a>    <span class="k">def</span> <span class="nf">reactionProducts</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">PoPs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">excludePhotons</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">PoPs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">PoPs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findAttributeInAncestry</span><span class="p">(</span> <span class="s1">&#39;PoPs&#39;</span> <span class="p">)</span>
+
+        <span class="n">sortedReactions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asSortedList</span><span class="p">(</span> <span class="n">PoPs</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">reaction</span><span class="o">.</span><span class="n">reactionProducts</span><span class="p">(</span> <span class="p">)</span> <span class="k">for</span> <span class="n">reaction</span> <span class="ow">in</span> <span class="n">sortedReactions</span> <span class="p">]</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="orphanProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.orphanProducts">[docs]</a><span class="k">class</span> <span class="nc">orphanProducts</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;orphanProducts&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.reactions</span> <span class="kn">import</span> <span class="n">orphanProduct</span> <span class="k">as</span> <span class="n">orphanProductModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">orphanProductModule</span><span class="o">.</span><span class="n">orphanProduct</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSums"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.crossSectionSums">[docs]</a><span class="k">class</span> <span class="nc">crossSectionSums</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;crossSectionSums&#39;</span>
+    <span class="n">monikerByFormat</span> <span class="o">=</span> <span class="p">{</span> <span class="n">formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span> <span class="s1">&#39;crossSections&#39;</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">sums</span> <span class="k">as</span> <span class="n">sumsModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">sumsModule</span><span class="o">.</span><span class="n">crossSectionSum</span><span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="multiplicitySums"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.multiplicitySums">[docs]</a><span class="k">class</span> <span class="nc">multiplicitySums</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;multiplicitySums&#39;</span>
+    <span class="n">monikerByFormat</span> <span class="o">=</span> <span class="p">{</span> <span class="n">formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span> <span class="s1">&#39;multiplicities&#39;</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">sums</span> <span class="k">as</span> <span class="n">sumsModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">sumsModule</span><span class="o">.</span><span class="n">multiplicitySum</span><span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="productions"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.productions">[docs]</a><span class="k">class</span> <span class="nc">productions</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;productions&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.reactions</span> <span class="kn">import</span> <span class="n">production</span> <span class="k">as</span> <span class="n">productionModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">productionModule</span><span class="o">.</span><span class="n">production</span><span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="incompleteReactions"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.incompleteReactions">[docs]</a><span class="k">class</span> <span class="nc">incompleteReactions</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;incompleteReactions&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">.reactions</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+        <span class="kn">from</span> <span class="nn">.reactions</span> <span class="kn">import</span> <span class="n">incompleteReaction</span> <span class="k">as</span> <span class="n">incompleteReactionModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">incompleteReactionModule</span><span class="o">.</span><span class="n">incompleteReaction</span><span class="p">,</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">reaction</span> <span class="p">]</span> <span class="p">)</span>    <span class="c1"># Allow reaction as it is needed at times.</span></div>
+
+<div class="viewcode-block" id="fissionComponents"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.fissionComponents">[docs]</a><span class="k">class</span> <span class="nc">fissionComponents</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;fissionComponents&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.reactions</span> <span class="kn">import</span> <span class="n">fissionComponent</span> <span class="k">as</span> <span class="n">fissionComponentModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">fissionComponentModule</span><span class="o">.</span><span class="n">fissionComponent</span><span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="applicationData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.applicationData">[docs]</a><span class="k">class</span> <span class="nc">applicationData</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;applicationData&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">institution</span> <span class="k">as</span> <span class="n">institutionModule</span>
+
+        <span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">institutionModule</span><span class="o">.</span><span class="n">institution</span><span class="p">,</span> <span class="n">institutionModule</span><span class="o">.</span><span class="n">UnknownInstitution</span> <span class="p">]</span> <span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.suites</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

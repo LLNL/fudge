@@ -1,18 +1,25 @@
-The data in this subdirectory is traditional ENDL I=3 double-differential
-energy-angle probability densities for outgoing particles.  The code first
-converts the data to ENDF Legendre expansions of the energy-angle probability
-densities, and this is done using Gaussian quadrature.  The "Quadrature method"
-in the input files refers to how the ENDF Legendre expansions are integrated
-over the energy bins.  
+The first two data in this subdirectory are traditional ENDL I=3
+double-differential energy-angle probability densities for outgoing
+particles.
 
-*** Warning: because the code first converts the data to Legendre    ***
-*** expansions, interpolation between different values of the cosine ***
-*** is necessarily direct.                                    ***
+The final two input files use a special GND format for tabular
+double-differential tables.
 
-The input files are as follows:
+The ENDL I=3 input files are as follows:
 
 in.doubleDiff-Fe57: Uses the default adaptive quadrature.  The output file is
   out.doubleDiff-Fe57.
 
-in.doubleDiff-Fe57.Gauss4: Uses 4th-order Gaussian quadrature.  The output file is
-  out.doubleDiff-Fe57.Gauss4.
+in.Be9_n-2n: this files uses the ENDL kludge, using a copy to create data
+  at the threshold.  The output file is out.Be9_n-2n.
+
+in.cum_points: a file to test cumulative points interpolation of the
+  energy distributions.  The output file is out.cum_points.
+
+The special GND files are
+in.B11: These data are in the center-of-mass frame.  The output file
+  is out.B11.
+
+in.B11.lab: These data are in the laboratory frame.  The output
+  file is out.B11.lab.
+  

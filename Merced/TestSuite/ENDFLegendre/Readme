@@ -24,8 +24,13 @@ in.unitbase-Ti49: a file with unit-base interpolation for incident energy
   and linear-linear for outgoing energy.  The output is out.unitbase-Ti49.
   The output from the Monte Carlo code is out.unitbase-Ti49.MC.
 
-in.direct-Ti49: a file with linear-linear direct interpolation for incident energy
-  and linear-linear for outgoing energy.  The output is out.direct-Ti49.
+in.direct-Ti49: a file with linear-linear direct interpolation with truncation
+  for incident energy and linear-linear for outgoing energy.  The output is
+  out.direct-Ti49.
+
+in.directExtrapolate-Ti49: a file with linear-linear direct interpolation
+  with extrapolation for incident energy and linear-linear for outgoing energy.
+  The output is out.directExtrapolate-Ti49.
 
 in.cumpoints-Ti49: a file with linear-linear cumulative points interpolation for
   incident energy and linear-linear for outgoing energy.  The output is
@@ -39,6 +44,9 @@ in.Fm255_n_3n.cm: a file with Legendre coefficients given in the center-of-mass
 in.Mo92.cm: Legendre coefficients in the center-of-mass frame, but with
   histogram interpolation in outgoing energy.  The output file is out.Mo92.cm.
   The Monte Carlo code MC_merced produces the output out.Mo92.cm.MC.
+
+in.Mo92.cm.cp: file differs from in.Mo92.cm in that it uses cumulative points
+  interpolation in incident energy.  The output file is out.Mo92.cm.cp.
 
 in.Fe56-flat: The same data as in ENDFLegendre-Fe56, but it uses histogram
   interpolation in incident energy.  Its output is out.Fe56-flat.

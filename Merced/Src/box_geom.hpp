@@ -16,10 +16,10 @@
 
 #include <list>
 #include <vector>
-#include "dd_vector.hpp"  // for dd_pair
+#include "dd_vector.hpp"  // for Ddvec::dd_pair
 
-using namespace std;
-
+namespace Box
+{
 //! How does a curve eta = const intersect an E-E' quadrature box?
 //! center-of-mass data needs the last 4 options later.
 // ---------------- Hit_Edge -----------------------------
@@ -43,20 +43,23 @@ class Ein_Eta_Hit
 {
 public:
   double E_in;
-  Hit_Edge hit_edge;
+  Box::Hit_Edge hit_edge;
 
-  Ein_Eta_Hit( ): E_in(0.0), hit_edge(MISSED) {}
+  Ein_Eta_Hit( ): E_in(0.0), hit_edge( Box::MISSED ) {}
   Ein_Eta_Hit( const Ein_Eta_Hit& ein_eta_hit );
   ~Ein_Eta_Hit( ){}
 
   //! Prints a hit
   void print( ) const;
+
+  //! Return the name of the edge.
+  std::string edge_name( ) const ;
 };
 
 //! General class also used by models in center-of-mass coordinates
 //! Class for all intersections of eta = const with a quadrature box
 // ---------------- class hit_list_base ------------------
-class hit_list_base : public list< Ein_Eta_Hit >
+class hit_list_base : public std::list< Box::Ein_Eta_Hit >
 {
 private:
 
@@ -64,25 +67,21 @@ protected:
   double box_tol;  // When to ignore intersection with the top or bottom of a box
 
   //! Inserts a link in proper order
-  //! \param ein_eta_hit pair: incident energy, value of Hit_Edge
-  void stick_in( const Ein_Eta_Hit& ein_eta_hit );
-
-  //! Fills in the list with energies from Ein_hits
-  //! \param Ein_hits a vector of incident energies to be inserted
-  void fill_in( const vector< double >& Ein_hits );
+  //! \param ein_eta_hit pair: incident energy, value of Box::Hit_Edge
+  void stick_in( const Box::Ein_Eta_Hit& ein_eta_hit );
 
   //! Finds intersections of the curve eta = const with the bottom of the E-E' box
   //! \param Eout_ptr desired lower energy of the outgoing particle
   //! \param E_in_left lower incident energy
   //! \param E_in_right higher incident energy
-  void test_bottom( vector< double >::const_iterator Eout_ptr,
+  void test_bottom( std::vector< double >::const_iterator Eout_ptr,
     double E_in_left, double E_in_right );
 
   //! Finds intersections of the curve eta = const with the top of the E-E' box
   //! \param Eout_ptr desired higher energy of the outgoing particle
   //! \param E_in_left lower incident energy
   //! \param E_in_right higher incident energy
-  void test_top( vector< double >::const_iterator Eout_ptr,
+  void test_top( std::vector< double >::const_iterator Eout_ptr,
     double E_in_left, double E_in_right );
 
   //! Default check for inconsistencies caused by peculiarities of real arithmetic.
@@ -92,29 +91,29 @@ protected:
   //! Where do we hit the left-hand side of the box?
   //! \param Eout_ptr desired lower energy of the outgoing particle
   //! \param E_in lower incident energy
-  void test_left_default( double E_in, vector< double >::const_iterator Eout_ptr );
+  void test_left_default( double E_in, std::vector< double >::const_iterator Eout_ptr );
 
   //! Where do we hit the right-hand side of the box?
   //! \param Eout_ptr desired lower energy of the outgoing particle
   //! \param E_in higher incident energy
-  void test_right_default( double E_in, vector< double >::const_iterator Eout_ptr );
+  void test_right_default( double E_in, std::vector< double >::const_iterator Eout_ptr );
 
   // ****** Virtual routines depending on the model *********
   //! Where do we hit the left-hand side of the box?
   //! \param Eout_ptr desired lower energy of the outgoing particle
   //! \param E_in lower incident energy
-  virtual void test_left( double E_in, vector< double >::const_iterator Eout_ptr ) = 0;
+  virtual void test_left( double E_in, std::vector< double >::const_iterator Eout_ptr ) = 0;
 
   //! Where do we hit the right-hand side of the box?
   //! \param Eout_ptr desired lower energy of the outgoing particle
   //! \param E_in higher incident energy
-  virtual void test_right( double E_in, vector< double >::const_iterator Eout_ptr ) = 0;
+  virtual void test_right( double E_in, std::vector< double >::const_iterator Eout_ptr ) = 0;
 
   //! No top or bottom intersections, so are we above, below, or through the middle?
   //! \param Eout_ptr desired lower energy of the outgoing particle
   //! \param E_in_left lower incident energy
   //! \param E_in_right higher incident energy
-  virtual void test_sides( vector< double >::const_iterator Eout_ptr,
+  virtual void test_sides( std::vector< double >::const_iterator Eout_ptr,
     double E_in_left, double E_in_right ) = 0;
 
   //! Checks for inconsistencies caused by peculiarities of real arithmetic.
@@ -123,15 +122,15 @@ protected:
 
   //! Finds the intersections with the bottom of a box
   //! \param E_out desired lower energy of the outgoing particle
-  //! \param Ein_hits list of pairs ( incident energy internal to the box, Hit_Edge )
+  //! \param Ein_hits list of pairs ( incident energy internal to the box, Box::Hit_Edge )
   virtual void find_bottom_hits( double E_out,
-    vector< Ein_Eta_Hit > *Ein_hits ) = 0;
+    std::vector< Box::Ein_Eta_Hit > *Ein_hits ) = 0;
 
   //! Finds the intersections with the top of a box
   //! \param E_out desired higher energy of the outgoing particle
-  //! \param Ein_hits list of pairs ( incident energy internal to the box, Hit_Edge )
+  //! \param Ein_hits list of pairs ( incident energy internal to the box, Box::Hit_Edge )
   virtual void find_top_hits( double E_out,
-    vector< Ein_Eta_Hit > *Ein_hits ) = 0;
+    std::vector< Box::Ein_Eta_Hit > *Ein_hits ) = 0;
   // ****** End of virtual routines depending on the model ******
 
  public:
@@ -145,7 +144,7 @@ protected:
   //! \param Eout_ptr desired lower energy of the outgoing particle
   //! \param E_in_left lower incident energy
   //! \param E_in_right higher incident energy
-  bool hit_box( double Eta, vector< double >::const_iterator Eout_ptr,
+  bool hit_box( double Eta, std::vector< double >::const_iterator Eout_ptr,
     double E_in_left, double E_in_right );
 
   //! Checks whether this eta = const curve is below the E-E' box
@@ -154,8 +153,12 @@ protected:
   //! Checks whether this eta = const curve is above the E-E' box
   bool is_above( );
 
+  //! Fills in the list with energies from Ein_hits
+  //! \param Ein_hits a vector of incident energies to be inserted
+  void fill_in( const std::vector< double >& Ein_hits );
+
   //! Ensures that these hits and upper_hits are defined at the same incident energies.
-  //! \param upper_hits a second list of pairs (incident energy, Hit_Edge)
+  //! \param upper_hits a second list of pairs (incident energy, Box::Hit_Edge)
   void common_hits( hit_list_base &upper_hits );
 
   //! Prints the list
@@ -164,7 +167,7 @@ protected:
 
 //! Class for all intersections of eta = const with a quadrature box
 // ---------------- class hit_list ------------------
-class hit_list : public hit_list_base
+class hit_list : public Box::hit_list_base
 {
 private:
 
@@ -173,20 +176,20 @@ protected:
   //! Where do we hit the left-hand side of the box?
   //! \param E_in lower incident energy
   //! \param Eout_ptr desired lower energy of the outgoing particle
-  void test_left( double E_in, vector< double >::const_iterator Eout_ptr )
+  void test_left( double E_in, std::vector< double >::const_iterator Eout_ptr )
   { test_left_default( E_in, Eout_ptr ); }
 
   //! Where do we hit the right-hand side of the box?
   //! \param E_in higher incident energy
   //! \param Eout_ptr desired lower energy of the outgoing particle
-  void test_right( double E_in, vector< double >::const_iterator Eout_ptr )
+  void test_right( double E_in, std::vector< double >::const_iterator Eout_ptr )
   { test_right_default( E_in, Eout_ptr ); }
 
   //! No top or bottom intersections, so are we above, below, or through the middle?
   //! \param Eout_ptr desired lower energy of the outgoing particle
   //! \param E_in_left lower incident energy
   //! \param E_in_right higher incident energy
-  void test_sides( vector< double >::const_iterator Eout_ptr,
+  void test_sides( std::vector< double >::const_iterator Eout_ptr,
 		   double E_in_left, double E_in_right );
 
   //! Checks for inconsistencies caused by peculiarities of real arithmetic.
@@ -201,19 +204,19 @@ protected:
   virtual double get_Eout( double E_in ) = 0;
   // ****** End of new virtual routines depending on the model ******
 
-  // ******** hit_list_base virtual functions **************
+  // ******** Box::hit_list_base virtual functions **************
   //! Finds the intersections with the bottom of a box
   //! \param E_out desired lower energy of the outgoing particle
-  //! \param Ein_hits list of pairs ( incident energy internal to the box, Hit_Edge )
+  //! \param Ein_hits list of pairs ( incident energy internal to the box, Box::Hit_Edge )
   virtual void find_bottom_hits( double E_out,
-     vector< Ein_Eta_Hit > *Ein_hits ) {}
+     std::vector< Box::Ein_Eta_Hit > *Ein_hits ) {}
 
   //! Finds the intersections with the top of a box
   //! \param E_out desired higher energy of the outgoing particle
-  //! \param Ein_hits list of pairs ( incident energy internal to the box, Hit_Edge )
+  //! \param Ein_hits list of pairs ( incident energy internal to the box, Box::Hit_Edge )
   virtual void find_top_hits( double E_out,
-    vector< Ein_Eta_Hit > *Ein_hits ) {}
-  // ****** End of hit_list_base virtual routines ******
+    std::vector< Box::Ein_Eta_Hit > *Ein_hits ) {}
+  // ****** End of Box::hit_list_base virtual routines ******
 
  public:
   hit_list( )  {}
@@ -223,7 +226,7 @@ protected:
 
 //! Class for the list of intersections of a unit-base curve with an integration box
 // ---------------- class energy_hit_list ------------------
-class energy_hit_list : public hit_list
+class energy_hit_list : public Box::hit_list
 {
 private:
   // Implement the virtual functions
@@ -234,20 +237,22 @@ private:
   //! Finds the intersections with the bottom of a box
   //! \param E_out energy at the bottom of the outgoing energy bin
   //! \param Ein_hits computed incident energies giving intersections with E_out
-  void find_bottom_hits( double E_out, vector< Ein_Eta_Hit > *Ein_hits );
+  void find_bottom_hits( double E_out, std::vector< Box::Ein_Eta_Hit > *Ein_hits );
 
   //! Finds the intersections with the top of a box
   //! \param E_out energy at the top of the outgoing energy bin
   //! \param Ein_hits computed incident energies giving intersections with E_out
-  void find_top_hits( double E_out, vector< Ein_Eta_Hit > *Ein_hits );
+  void find_top_hits( double E_out, std::vector< Box::Ein_Eta_Hit > *Ein_hits );
 
 public:
   //! A pair of values of (E, E') for this eta value; to determine a line.
   //! We want to know where this line has the desired value, E_out.
-  dd_pair E_Eout;
+  Ddvec::dd_pair E_Eout;
 
   energy_hit_list( ) {}
   ~energy_hit_list( ) {}
 };
+
+} // end of namespace Box
 
 #endif

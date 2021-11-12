@@ -16,9 +16,11 @@
 
 #include "dd_vector.hpp"
 
+namespace Xvec
+{
 // ----------------------- class x_vector -------------------
-//! Special dd_vector used for Compton and coherent scattering data
-class x_vector : public dd_vector
+//! Special Ddvec::dd_vector used for Compton and coherent scattering data
+class x_vector : public Ddvec::dd_vector
 {
 private:
 
@@ -33,6 +35,7 @@ public:
   //! \param x_to_energy the scale factor
   void scale_x_to_energy( double x_to_energy );
 };
+} // end of namespace Xvec
 
 namespace x_vector_F
 {

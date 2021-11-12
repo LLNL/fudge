@@ -1,23 +1,39 @@
 \subsection{Convenient}
-This section decribes all the routines in the file "ptwXY\_convenient.c".
+This section decribes all the functions in the file ``ptwXY\_convenient.c''.
 
 \subsubsection{ptwXY\_getXArray}
-This routine returns, as an \highlight{ptwXPoints}, the list of x values in \highlight{ptwXY}. The returned object is allocated
+This function returns, as an \highlight{ptwXPoints}, the list of x values in \highlight{ptwXY} instance. The returned object is allocated
 by \highlight{ptwXY\_getXArray} and must be freed by the user.
-\CallingC{ptwXPoints *ptwXY\_getXArray(}{ptwXYPoints *ptwXY,
-    \addArgument{fnu\_status *status );}}
+\setargumentNameLengths{ptwXY}
+\CallingC{ptwXPoints *ptwXY\_getXArray(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{*status}{The status.}
+Returns NULL if an error occured.
+
+\subsubsection{ptwXY\_ysMappedToXs}
+This function returns the y-values of \highlight{ptwXY} at the points defined by the values of \highlight{Xs}.
+\setargumentNameLengths{offset}
+\CallingC{ptwXPoints *ptwXY\_ysMappedToXs(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{ptwXPoints *Xs,}
+    \addArgument{int64\_t *offset );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{Xs}{The list of x-values to evaluate \highlight{ptwXY} at.}
+    \argumentBox{offset}{The index in \highlight{ptwXY} of the first point greater than or equal to the first point of \highlight{Xs}.}
 Returns NULL if an error occured.
 
 \subsubsection{ptwXY\_dullEdges}
 This function insures that the y-values at the end-points of  \highlight{ptwXY} are 0. This can be usefull for making
 sure two \highlight{ptwXYPoints} instances have mutual domains.
 \setargumentNameLengths{positiveXOnly}
-\CallingC{nfu\_status ptwXY\_dullEdges(}{ptwXYPoints *ptwXY,
+\CallingC{nfu\_status ptwXY\_dullEdges(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{double lowerEps,}
     \addArgument{double upperEps,}
     \addArgument{int positiveXOnly );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{lowerEps}{The amount to adjust the first points.}
     \argumentBox{upperEps}{The amount to adjust the last points.}
@@ -49,37 +65,66 @@ where $k$ is the index of the last point.
 
 \subsubsection{ptwXY\_mergeClosePoints}
 Removes and/or moves points so that no two consecutive points are too close to others.
-\CallingC{fnu\_status ptwXY\_mergeClosePoints(}{ptwXYPoints *ptwXY,
+\setargumentNameLengths{epsilon}
+\CallingC{fnu\_status ptwXY\_mergeClosePoints(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{double epsilon);}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{epsilon}{The minimum relative spacing desired.}
 Points are removed and/or moved so the $x_{i+1} - x_i \le \highlight{epsilon} \times ( x_i + x_{i+1} ) / 2$.
 
 \subsubsection{ptwXY\_intersectionWith\_ptwX}
-This routine returns an \highlight{ptwXYPoints} instance whose x-values are the intersection of \highlight{ptwXY}'s and
+This function returns an \highlight{ptwXYPoints} instance whose x-values are the intersection of \highlight{ptwXY}'s and
 \highlight{ptwX}'s x-values. The domains of \highlight{ptwXY} and \highlight{ptwX} do not have to be mutual.
-\CallingC{ptwXY\_intersectionWith\_ptwX(}{ptwXYPoints *ptwXY,
-    \addArgument{ptwXPoints *ptwX,}
-    \addArgument{nfu\_status *status );}}
+\setargumentNameLengths{ptwXY}
+\CallingC{ptwXY\_intersectionWith\_ptwX(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{ptwXPoints *ptwX );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{ptwX}{A pointer to the \highlight{ptwXPoints} object.}
-    \argumentBox{status}{On return, the status value.}
 
 \subsubsection{ptwXY\_areDomainsMutual}
-This routine returns \highlight{nfu\_Okay} if \highlight{ptwXY1} and \highlight{ptwXY2} are mutual.
-\CallingC{fnu\_status ptwXY\_areDomainsMutual(}{ptwXYPoints *ptwXY1,
+This function returns \highlight{nfu\_Okay} if \highlight{ptwXY1} and \highlight{ptwXY2} are mutual.
+\CallingC{fnu\_status ptwXY\_areDomainsMutual(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY1,}
     \addArgument{ptwXYPoints *ptwXY2 );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
     \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
 If one or both of \highlight{ptwXY1} and \highlight{ptwXY2} are empty, \highlight{nfu\_empty} is returned.
 If one or both of \highlight{ptwXY1} and \highlight{ptwXY2} has only one point, \highlight{nfu\_tooFewPoints} is returned.
 If the domains are not mutual, \highlight{nfu\_domainsNotMutual} is returned.
 
-\subsubsection{ptwXY\_mutualifyDomains}
-If possible and needed, this routine mutualifies the domains of \highlight{ptwXY1} and \highlight{ptwXY2} by calling 
-\highlight{ptwXY\_dullEdges} on one or both of \highlight{ptwXY1} and \highlight{ptwXY2} if needed.
+\subsubsection{ptwXY\_tweakDomainsToMutualify}
+If a small tweak of one or more end points will make the domains of \highlight{ptwXY1} and \highlight{ptwXY2} mutual, 
+then the tweak is made. A small tweak is defined as
+\begin{equation}
+    | x2 - x1 | \le {\rm Epsilon} ( \ | x1 | + | x2 | \ )
+\end{equation}
+where $x1$ is one endpoint of \highlight{ptwXY1}, $x2$ is the corresponding endpoint of \highlight{ptwXY2} and
+\begin{equation}
+    {\rm Epsilon} = {\rm fabs}( \ {\rm epsilon} \ ) + {\rm fabs}( \ {\rm epsilonFactor} * {\rm DBL\_EPSILON} \ )
+\end{equation}
 \setargumentNameLengths{positiveXOnly1}
-\CallingC{fnu\_status ptwXY\_mutualifyDomains(}{ptwXYPoints *ptwXY1,
+\CallingC{fnu\_status ptwXY\_tweakDomainsToMutualify(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY1,}
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{int epsilonFactor,}
+    \addArgument{double epsilon );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{epsilonFactor}{Relative comparision value.}
+    \argumentBox{epsilon}{Relative comparision value in units of DBL\_EPSILON.}
+
+\subsubsection{ptwXY\_mutualifyDomains}
+If possible and needed, this function mutualifies the domains of \highlight{ptwXY1} and \highlight{ptwXY2} by calling 
+\highlight{ptwXY\_dullEdges} on one or both of \highlight{ptwXY1} and \highlight{ptwXY2} as needed.
+\setargumentNameLengths{positiveXOnly1}
+\CallingC{fnu\_status ptwXY\_mutualifyDomains(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY1,}
     \addArgument{double lowerEps1,}
     \addArgument{double upperEps1,}
     \addArgument{int positiveXOnly1,}
@@ -87,6 +132,7 @@ If possible and needed, this routine mutualifies the domains of \highlight{ptwXY
     \addArgument{double lowerEps2,}
     \addArgument{double upperEps2,}
     \addArgument{int positiveXOnly2 );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
     \argumentBox{lowerEps1}{If needed the value of \highlight{lowerEps} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY1}.}
     \argumentBox{upperEps1}{If needed the value of \highlight{upperEps} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY1}.}
@@ -96,17 +142,18 @@ If possible and needed, this routine mutualifies the domains of \highlight{ptwXY
     \argumentBox{upperEps2}{If needed the value of \highlight{upperEps} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY2}.}
     \argumentBox{positiveXOnly2}{The value of \highlight{positiveXOnly} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY2}.}
 
-\setargumentNameLengths{llocatedSize}
 \subsubsection{ptwXY\_copyToC\_XY}
-This routine copies the points from index \highlight{index1} inclusive to \highlight{index2} exclusive of \highlight{ptwXY}
+This function copies the points from index \highlight{index1} inclusive to \highlight{index2} exclusive of \highlight{ptwXY}
 into the address pointed to by \highlight{xys}.
 \setargumentNameLengths{allocatedSize}
-\CallingC{fnu\_status ptwXY\_copyToC\_XY(}{ptwXYPoints *ptwXY, 
+\CallingC{fnu\_status ptwXY\_copyToC\_XY(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t index1,}
     \addArgument{int64\_t index2,}
     \addArgument{int64\_t allocatedSize,}
     \addArgument{int64\_t numberOfPoints,}
     \addArgument{double *xys );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{index1}{The lower index.}
     \argumentBox{index2}{The upper index.}
@@ -121,53 +168,63 @@ if \highlight{index2} is greater than the length of \highlight{ptwXY}, it is set
 If \highlight{allocatedSize} is less than the number of points to be copied (i.e., \highlight{index2} - \highlight{index1} 
 after \highlight{index1} and \highlight{index2} are adjusted) then \highlight{nfu\_insufficientMemory} is returned;
 
-The returned \highlight{ptwXYPoints} object will always contain no points in the \highlight{overflowPoints} region.
+\subsubsection{ptwXY\_valuesToC\_XsAndYs}
+This function copies the points of \highlight{ptwXY} to \highlight{xs} and \highlight{ys}. Memory for \highlight{xs} and \highlight{ys}
+are allocated and the callers is responsible for free-ing their memory.
+\setargumentNameLengths{ptwXY}
+\CallingC{fnu\_status ptwXY\_valuesToC\_XsAndYs(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double **xs,}
+    \addArgument{double **ys );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{xs}{The x-values of \highlight{ptwXY}}
+    \argumentBox{ys}{The y-values of \highlight{ptwXY}}
+    
 
 \setargumentNameLengths{interpolation}
 \subsubsection{ptwXY\_valueTo\_ptwXY}
-This routine creates a \highlight{ptwXYPoints} object with the two points (x1,y), (x2,y) where x1 $<$ x2.
-\CallingC{ptwXYPoints *ptwXY\_valueTo\_ptwXY(}{ptwXY\_interpolation interpolation, 
+This function creates a \highlight{ptwXYPoints} instance with the two points (x1,y), (x2,y) where x1 $<$ x2.
+\CallingC{ptwXYPoints *ptwXY\_valueTo\_ptwXY(}{statusMessageReporting *smr,
     \addArgument{double x1,}
     \addArgument{double x2,}
-    \addArgument{double y,}
-    \addArgument{fnu\_status *status );}}
-    \argumentBox{interpolation}{Type of interpolation to perform (see Section~\ref{interpolationSection}).}
+    \addArgument{double y );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{x1}{x value for the lower point.}
     \argumentBox{x2}{x value for the upper point.}
     \argumentBox{y}{y value for both points.}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
 If an error occurs, NULL is returned.
 
 \subsubsection{ptwXY\_createGaussianCenteredSigma1}
-This routine returns a \highlight{ptwXYPoints} instance of the simple Gaussian $y(x) = \exp( -x^2 / 2 )$.
+This function returns a \highlight{ptwXYPoints} instance of the simple Gaussian $y(x) = \exp( -x^2 / 2 )$.
 \setargumentNameLengths{status}
-\CallingC{ptwXYPoints *ptwXY\_createGaussianCenteredSigma1(}{double accuracy, 
-    \addArgument{nfu\_status *status );}}
+\CallingC{ptwXYPoints *ptwXY\_createGaussianCenteredSigma1(}{statusMessageReporting *smr,
+    \addArgument{double accuracy );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{accuracy}{The returned points are accurate to accuracy.}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
 The domain ranges from $-\sqrt{ 2 \log( {\rm yMin} )}$ to $\sqrt{ 2 \log( {\rm yMin} )}$ where yMin = $10^{-10}$.
 
 \subsubsection{ptwXY\_createGaussian}
-This routine returns a \highlight{ptwXYPoints} instance of the Gaussian $y(x) = a \exp( -( x - c )^2 / ( 2 s ) )$.
+This function returns a \highlight{ptwXYPoints} instance of the Gaussian $y(x) = a \exp( -( x - c )^2 / ( 2 s ) )$.
+In the equation $a = $ \highlight{amplitude}, $c = $ \highlight{xCenter} and $s = $ \highlight{sigma}. This function calls 
+\highlight{ptwXY\_create\-GaussianCenteredSigma1} and then scales the x and y values.
 \setargumentNameLengths{amplitude}
-\CallingC{ptwXYPoints *ptwXY\_createGaussian(}{double accuracy,
+\CallingC{ptwXYPoints *ptwXY\_createGaussian(}{statusMessageReporting *smr,
+    \addArgument{double accuracy,}
     \addArgument{double xCenter,}
     \addArgument{double sigma,}
     \addArgument{double amplitude,}
-    \addArgument{double xMin,}
-    \addArgument{double xMax,}
-    \addArgument{double dullEps,}
-    \addArgument{nfu\_status *status );}}
+    \addArgument{double domainMin,}
+    \addArgument{double domainMax,}
+    \addArgument{double dullEps );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{accuracy}{The returned points are accurate to accuracy.}
     \argumentBox{xCenter}{The center of the Gaussian.}
     \argumentBox{sigma}{The width of the Gaussian.}
     \argumentBox{amplitude}{The amplitude of the Gaussian.}
-    \argumentBox{xMin}{The lower domain of the returned Gaussian.}
-    \argumentBox{xMax}{The upper lower domain of the returned Gaussian.}
+    \argumentBox{domainMin}{The lower domain of the returned Gaussian.}
+    \argumentBox{domainMax}{The upper lower domain of the returned Gaussian.}
     \argumentBox{dullEps}{Currently not implemented.}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
-In the equation $a = $ \highlight{amplitude}, $c = $ \highlight{xCenter} and $s = $ \highlight{sigma}. This routine calls 
-\highlight{ptwXY\_create\-GaussianCenteredSigma1} and then scales the x and y values.

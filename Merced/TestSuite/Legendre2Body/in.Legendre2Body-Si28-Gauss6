@@ -10,6 +10,7 @@ Comment: You don't need to give the residual's mass---it's calculated from the Q
 Reaction's Q value: -1.77900
 outputLegendreOrder: 3
 Conserve: number
+do adaptive quadrature: false
 Quadrature method: Gauss6
 Projectile Frame: lab
 kinetics: Newtonian

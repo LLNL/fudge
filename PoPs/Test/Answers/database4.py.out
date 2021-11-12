@@ -9,7 +9,7 @@
   <gaugeBosons>
     <gaugeBoson id="photon">
       <mass>
-        <double label="base" value="0.0" unit="amu"/></mass>
+        <double label="base" value="0." unit="amu"/></mass>
       <spin>
         <fraction label="base" value="1" unit="hbar"/></spin>
       <parity>
@@ -21,7 +21,7 @@
   <leptons>
     <lepton id="e-" generation="electronic">
       <mass>
-        <double label="base" value="0.00054857990907" unit="amu"/></mass>
+        <double label="base" value="5.4857990907e-4" unit="amu"/></mass>
       <spin>
         <fraction label="base" value="1/2" unit="hbar"/></spin>
       <parity>
@@ -32,7 +32,7 @@
         <string label="base" value="stable" unit="s"/></halflife></lepton>
     <lepton id="e-_anti" generation="electronic">
       <mass>
-        <double label="base" value="0.00054857990907" unit="amu"/></mass>
+        <double label="base" value="5.4857990907e-4" unit="amu"/></mass>
       <spin>
         <fraction label="base" value="1/2" unit="hbar"/></spin>
       <parity>
@@ -51,7 +51,7 @@
       <charge>
         <integer label="base" value="-1" unit="e"/></charge>
       <halflife>
-        <double label="base" value="2.1969811e-06" unit="s"/></halflife></lepton></leptons>
+        <double label="base" value="2.1969811e-6" unit="s"/></halflife></lepton></leptons>
   <baryons>
     <baryon id="n">
       <mass>
@@ -117,7 +117,7 @@
                 <halflife>
                   <string label="base" value="stable" unit="s"/></halflife>
                 <energy>
-                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope>
+                  <double label="base" value="0." unit="keV"/></energy></nucleus></nuclide></nuclides></isotope>
         <isotope symbol="H2" A="2">
           <nuclides>
             <nuclide id="H2">
@@ -133,7 +133,7 @@
                 <halflife>
                   <string label="base" value="stable" unit="s"/></halflife>
                 <energy>
-                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope>
+                  <double label="base" value="0." unit="keV"/></energy></nucleus></nuclide></nuclides></isotope>
         <isotope symbol="H3" A="3">
           <nuclides>
             <nuclide id="H3">
@@ -151,7 +151,7 @@
                 <halflife>
                   <double label="base" value="12.32" unit="yr"/></halflife>
                 <energy>
-                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement>
+                  <double label="base" value="0." unit="keV"/></energy></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement>
     <chemicalElement symbol="O" Z="8" name="Oxygen">
       <isotopes>
         <isotope symbol="O16" A="16">
@@ -161,7 +161,7 @@
                 <double label="base" value="15.9949146196" unit="amu"/></mass>
               <nucleus id="o16" index="0">
                 <energy>
-                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide>
+                  <double label="base" value="0." unit="keV"/></energy></nucleus></nuclide>
             <nuclide id="O16_e1">
               <nucleus id="o16_e1" index="1">
                 <energy>
@@ -181,7 +181,7 @@
                 <double label="base" value="15.9949146196" unit="amu"/></mass>
               <nucleus id="o17" index="0">
                 <energy>
-                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide>
+                  <double label="base" value="0." unit="keV"/></energy></nucleus></nuclide>
             <nuclide id="O17_e1">
               <nucleus id="o17_e1" index="1">
                 <energy>
@@ -209,7 +209,7 @@
                 <halflife>
                   <double label="base" value="16.02" unit="h"/></halflife>
                 <energy>
-                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide>
+                  <double label="base" value="0." unit="keV"/></energy></nucleus></nuclide>
             <nuclide id="Am242_e1">
               <nucleus id="am242_e1" index="1">
                 <spin>
@@ -225,7 +225,7 @@
                 <parity>
                   <integer label="base" value="-1"/></parity>
                 <halflife>
-                  <double label="base" value="141.0" unit="yr"/></halflife>
+                  <double label="base" value="141." unit="yr"/></halflife>
                 <energy>
                   <double label="base" value="48.6" unit="keV"/></energy></nucleus></nuclide>
             <nuclide id="Am242_e3">

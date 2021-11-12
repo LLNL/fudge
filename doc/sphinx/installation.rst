@@ -3,99 +3,102 @@
 Installation
 ============
 
-Fudge is designed to be simple to install and use. For basic use the package only requires 
-Python (versions 2.6-2.7, not version 3.0 and higher).  Python 2.7 is likely already present
-on all unix-based systems (if in doubt, try entering "python" on the command-line),
-and is available for all platforms at http://www.python.org/getit/.
+The basic use of the FUDGE package requires the following:
 
-To install the package:
------------------------
+* Git distributed version control system 
+* Python (versions 3.6 or higher) general-purpose programming language (with the numpy package included)
+* C compiler for the translation of the compute-intensive modules.
 
-1) Obtain the current version (available online at https://ndclx4.bnl.gov/gf/project/gnd/ or ftp://gdo-nuclear.ucllnl.org/), 
-   and place it on your system.
+While there are numerous options available for the installation of FUDGE, only the following are currently supported:
 
-2) To unzip the package, type
+* Installation via `pip install` in a virtual environment or normal computing environmet that has the necessary installation privileges. This requires the following steps:
 
-    ::
+(i)  Ensure that NumPy (version 1.15 or higher) and wheels are installed in your Python environment
 
-        $tar -xvf fudge-4.2.3.tar.gz
-    
-3) The unzipped directory is named 'fudge-4.2.3'. Navigate into the new directory, and type
+(ii) Run the command
 
     ::
 
-        $make
-    
-   and (following step is only required for generating multi-group processed libraries):
+        pip install git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/fudge.git@fudge4.3-rc5
 
-   ::
+* Installation via Makefiles which is our typical development mode for active FUDGE code maintenance and improvements. The following steps are recommended:
 
-      $make merced
+(i) Ensure that NumPy (version 1.15 or higher) is installed
 
+(ii) Use the following command to clone FUDGE to the current folder:
 
-4) You are now set to use Fudge! For advanced use, see the optional components below.
+    ::
+
+        git clone --recurse-submodules ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/fudge.git
+
+(iii) Build FUDGE with the following command:
+
+    ::
+
+        cd fudge; make -s
 
 
 [Optional] Extra python packages
 --------------------------------
   
-For more advanced use, Fudge depends on these additional, optional packages:
+For more advanced use, Fudge depends on these additional packages:
 
-* gnuplot and Gnuplot.py (for plotting, http://gnuplot-py.sourceforge.net)
-* matplotlib (alternate style of plotting, http://matplotlib.sourceforge.net)
-* numpy (for some advanced features including checking and manipulating covariance matrices, http://numpy.scipy.org)
+* The matplotlib for general plotting. Previous versions of FUDGE used gnuplot but this is being phased out in favor of matplotlib. 
+* PyQt5 and Qt v5 for interactive plotting. The underlying plotting is still done with matplotlib with the Qt toolkit and bindings providing the graphical
+  user interface to interact and modify some of the common matplotlib plot options.
 
 
 [Optional] Setting Environment Variables
 ----------------------------------------
 
-For general use of the fudge package, some changes should be made to your
-computer's environment. The following lines make the required change. 
-Note that <path_to_fudge> indicates the path to
-the directory containing the Fudge README.txt file:
+For general use of the fudge package, some changes should be made to your computer's environment. The following lines make the required change. 
+Note that <path_to_fudge> indicates the path to root FUDGE folder:
 
 * On unix with bash, ksh, etc, put this line in the .bashrc or equivalent:
 
     ::
 
-        $export PYTHONPATH=$PYTHONPATH:<path_to_fudge>
+        export PYTHONPATH=$PYTHONPATH:<path_to_fudge>
 
 * On csh, tcsh or similar, do:
     
     ::
     
-        $setenv PYTHONPATH $PYTHONPATH:<path_to_fudge>
+        setenv PYTHONPATH $PYTHONPATH:<path_to_fudge>
 
-* On Windows, the environment variable should be added to the registry 
-  (see for example http://www.support.tabs3.com/main/R10463.htm)
+* On Windows, the environment variable should be added to the registry (see for example http://www.support.tabs3.com/main/R10463.htm)
 
 
-More information on building Extensions
-------------------------------
-  
-Fudge is primarily written in python, which is easily portable across many different
-systems. Some advanced features of fudge (computationally intensive tasks) are however 
-implemented in C/C++ or fortran, and must be compiled before use. To build these extensions, 
-use the Makefile included in the main Fudge directory:
+Troubleshooting
+---------------
 
-::
-
-    $ make
-
-An additional package called Merced must also be compiled before using Fudge to generate transfer matrices
-for deterministic transport.
+Users on OS X may have trouble compiling Merced (the C++ code responsible for generating transfer matrices
+for deterministic transport). Merced uses OpenMP threading, which is currently not supported by the default
+clang compiler on OS X.
+This problem is associated with an error message like the following:
 
 ::
 
-    $ make merced
+    error: unsupported option '-fopenmp'
 
-Merced uses OpenMP threading. Some users may run into a 'missing omp.h' error when compiling Merced (in particular
-on OS X where the default C++ compiler does not support OpenMP). If so, we recommend installing the g++-mp-4.9
-compiler instead (available via MacPorts) and compiling with that:
+You may safely ignore this error message unless you wish to use the deterministic processing capabilities in Fudge.
+If you encounter this error and do need to use Merced, you will need to install a compiler with OpenMP support,
+then specify which compiler to use when building Merced.
+
+For example, the g++-mp-4.9 compiler (available from Macports) supports openmp
 
 ::
 
-   $ make merced CXX=g++-mp-4.9
+   sudo port install gcc-9
+   # then
+   make merced CXX=g++-mp-4.9
+
+Windows users may also have trouble with installing Merced. The solution here appears to be to install
+VisualStudio, and specify the 'CL' compiler while building Merced:
+
+::
+
+   make merced CXX=CL
 
 If you encounter other trouble with installing, building extensions or setting environment
 variables, please let us know (email: mattoon1@llnl.gov).

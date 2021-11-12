@@ -1,101 +1,41 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 __metaclass__ = type
 
 import abc
+import math
 
 from pqu import PQU as PQUModule
 
-import XYs as XYsModule
-import series1d as series1dModule
-import multiD_XYs as multiD_XYsModule
-import standards as standardsModule
-import base as baseModule
-import axes as axesModule
-import uncertainties as uncertaintiesModule
-
-from isclose import isclose
+from . import formatVersion as formatVersionModule
+from . import XYs as XYsModule
+from . import series1d as series1dModule
+from . import standards as standardsModule
+from . import base as baseModule
+from . import axes as axesModule
+from . import uncertainties as uncertaintiesModule
 
 domainEpsilon = 1e-15
 
 class regions( baseModule.xDataFunctional ) :
     """Abstract base class for regions."""
 
-    __metaclass__ = abc.ABCMeta
     ancestryMembers = baseModule.xDataFunctional.ancestryMembers + ( '[regions', )
 
-    def __init__( self, axes = None, 
-            index = None, valueType = standardsModule.types.float64Token, value = None, label = None ) :
+    def __init__( self, axes = None, index = None, valueType = standardsModule.types.float64Token, outerDomainValue = None, label = None ) :
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
-                value = value, label = label )
-        self.regions = []
+        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType, outerDomainValue = outerDomainValue, label = label )
+        self.__regions = []
 
     def __len__( self ) :
         """Returns the number of regions in self."""
 
-        return( len( self.regions ) )
+        return( len( self.__regions ) )
 
     @staticmethod
     @abc.abstractmethod
@@ -105,7 +45,7 @@ class regions( baseModule.xDataFunctional ) :
     def __getitem__( self, index ) :
         """Returns the (i-1)^th region of self."""
 
-        return( self.regions[index] )
+        return( self.__regions[index] )
 
     def __setitem__( self, index, region ) :
         """
@@ -118,27 +58,25 @@ class regions( baseModule.xDataFunctional ) :
         """
 
 # BRB need to check axes.
-        if( not( isinstance( region, self.allowedSubElements( ) ) ) ) :
-            raise TypeError( 'Invalid class for insertion: %s' % region.__class__ )
+        if( not( isinstance( region, self.allowedSubElements( ) ) ) ) : raise TypeError( 'Invalid class for insertion: %s' % region.__class__ )
+
         n1 = len( self )
+        if( index < 0 ) : index += n1
         if( not( 0 <= index <= n1 ) ) : raise IndexError( 'Index = %s not in range 0 <= index <= %d' % ( index, n1 ) )
+        if( index > 0 ) :
+            if( not( math.isclose( self.__regions[index-1].domainMax, region.domainMin ) ) ) :
+                raise ValueError( "Prior region's domainMax %s != new region's domainMin = %s" % ( self.__regions[index-1].domainMax, region.domainMin ) )
+        if( ( n1 > 0 ) and ( index < ( n1 - 1 ) ) ) :
+            if( not math.isclose( self.__regions[index+1].domainMin, region.domainMax ) ) :
+                raise ValueError(  "Next region's domainMin %s != new region's domainMax = %s" % ( self.__regions[index-1].domainMin, region.domainMax ) )
+
+        if( index == n1 ) :
+            self.__regions.append( region )             # Append to the end.
+        else :
+            self.__regions[index] = region              # Replaces the current contents of index with region.
+
         region.setAncestor( self )
         region.index = index
-        if( len( self ) == 0 ) :
-            self.regions.append( region )
-        else :
-            if( index > 0 ) :
-                if( not( isclose( self.regions[index-1].domainMax, region.domainMin ) ) ) :
-                    raise ValueError( "Prior region's domainMax %s != new region's domainMin = %s" \
-                        % ( self.regions[index-1].domainMax, region.domainMin ) )
-            if( index < ( n1 - 1 ) ) :
-                if( not isclose( self.regions[index+1].domainMin, region.domainMax ) ) :
-                    raise ValueError(  "Next region's domainMin %s != new region's domainMax = %s" \
-                        % ( self.regions[index-1].domainMin, region.domainMax ) )
-            if( index == n1 ) :
-                self.regions.append( region )
-            else :
-                self.regions[index] = region
 
     def __add__( self, other ) :
 
@@ -154,68 +92,15 @@ class regions( baseModule.xDataFunctional ) :
         for i1, region in enumerate( self2 ) : self2[i1] = region - other2[i1]
         return( self2 )
 
-    def append( self, region ) :
-
-            self[len( self )] = region
-
-    def prepend( self, region ) :
-        """
-        Adds region to the beginning of regions.
-        """
-
-        if( not( isinstance( region, self.allowedSubElements( ) ) ) ) :
-            raise TypeError( 'Invalid class for insertion: %s' % region.__class__ )
-
-        if( len( self ) > 0 ) :
-            if( not isclose( region.domainMax( ), self[0].domainMin ) ) :
-                raise ValueError( "Prepending region's domainMax %s != first region's domainMin = %s" \
-                    % ( region.domainMax, self[0].domainMin ) )
-        region.setAncestor( self )
-        self.regions.insert( 0, region )
-
-    def convertUnits( self, unitMap ) :
-
-        factors = self.axes.convertUnits( unitMap )
-        for region in self : region.convertUnits( unitMap )
-        self.fixValuePerUnitChange( factors )
-
-    def copy( self ) :
-        # FIXME some of this should probably move to 'returnAsClass' method
-
-        axes = self.axes
-        if( axes is not None ) : axes = axes.copy( )
-        newRegions = self.__class__( axes = axes, index = self.index,
-                    valueType = self.valueType, value = self.value, label = self.label )
-        for child in self : newRegions.append( child.copy( ) )
-        return( newRegions )
-
-    def splitInTwo( self, domainValue, epsilon = domainEpsilon ) :
-        """
-        Splits the region containing domainValue into two regions.
-        """
-
-        for i1, region in enumerate( self ) :
-            domainMin, domainMax = region.domainMin, region.domainMax
-            if( domainMin < domainValue < domainMax ) :
-                r1, r2 = region.splitInTwo( domainValue, epsilon = domainEpsilon )
-                self.regions[i1] = r2
-                self.regions.insert( i1, r1 )
-                return
-
-    def domainUnitConversionFactor( self, unitTo ) :
-
-        if( unitTo is None ) : return( 1. )
-        return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
-
     @property
     def domainMin( self ) :
 
-        return( self.regions[0].domainMin )
+        return( self.__regions[0].domainMin )
 
     @property
     def domainMax( self ) :
 
-        return( self.regions[-1].domainMax )
+        return( self.__regions[-1].domainMax )
 
     @property
     def domainGrid( self ) :
@@ -228,6 +113,87 @@ class regions( baseModule.xDataFunctional ) :
     def domainUnit( self ) :
 
         return( self.getAxisUnitSafely( self.dimension ) )
+
+    @property
+    def rangeMin( self ) :
+
+        return( min( [ region.rangeMin for region in self ] ) )
+
+    @property
+    def rangeMax( self ) :
+
+        return( max( [ region.rangeMax for region in self ] ) )
+
+    @property
+    def rangeUnit( self ) :
+
+        return( self.getAxisUnitSafely( 0 ) )
+
+    @property
+    def regions( self ) :
+        """Returns self's __region."""
+
+        return( self.__regions )
+
+    @property
+    def functionNdsName( self ) :
+        """Returns the node name for the child "function#ds"."""
+
+        return( "function%dds" % self.dimension )
+
+    def append( self, region ) :
+
+            self[len( self )] = region
+
+    def prepend( self, region ) :
+        """
+        Adds region to the beginning of regions.
+        """
+
+        if( not( isinstance( region, self.allowedSubElements( ) ) ) ) : raise TypeError( 'Invalid class for insertion: %s' % region.__class__ )
+
+        if( len( self ) > 0 ) :
+            if( not math.isclose( region.domainMax( ), self[0].domainMin ) ) :
+                raise ValueError( "Prepending region's domainMax %s != first region's domainMin = %s" % ( region.domainMax, self[0].domainMin ) )
+
+        self.__regions.insert( 0, region )
+        region.setAncestor( self )
+        region.index = 0
+
+    def convertUnits( self, unitMap ) :
+
+        factors = self.axes.convertUnits( unitMap )
+        for region in self : region.convertUnits( unitMap )
+        self.fixValuePerUnitChange( factors )
+
+    def copy( self ) :
+        # FIXME some of this should probably move to 'returnAsClass' method
+
+        axes = self.axes
+        if( axes is not None ) : axes = axes.copy( )
+        newRegions = self.__class__( axes = axes, index = self.index, valueType = self.valueType, outerDomainValue = self.outerDomainValue, label = self.label )
+        for child in self : newRegions.append( child.copy( ) )
+        return( newRegions )
+
+    def splitInTwo( self, domainValue, epsilon = domainEpsilon ) :
+        """
+        Splits the region containing domainValue into two regions.
+        """
+
+        for i1, region in enumerate( self ) :
+            domainMin, domainMax = region.domainMin, region.domainMax
+            if( domainMin < domainValue < domainMax ) :
+                r1, r2 = region.splitInTwo( domainValue, epsilon = domainEpsilon )
+                self.__regions[i1] = r2
+                r1.setAncestor( self )
+                self.__regions.insert( i1, r1 )
+                r2.setAncestor( self )
+                return
+
+    def domainUnitConversionFactor( self, unitTo ) :
+
+        if( unitTo is None ) : return( 1. )
+        return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
     def domainSlice( self, domainMin = None, domainMax = None, fill = 1, dullEps = 0. ) :
         """
@@ -254,31 +220,14 @@ class regions( baseModule.xDataFunctional ) :
         if ridx1 == ridx2:  # only one region left after slicing, return as XYs or multiD_XYs
             return self[ridx1].domainSlice( domainMin=domainMin, domainMax=domainMax, fill=fill, dullEps=dullEps )
         else:
-            newRegions = self.__class__( axes = self.axes, index=self.index, valueType=self.valueType,
-                value=self.value, label=self.label )
-            newRegions.append( self[ridx1].domainSlice(
-                domainMin=domainMin, domainMax=self[ridx1].domainMax, fill=fill, dullEps=dullEps ) )
+            newRegions = self.__class__( axes = self.axes, index = self.index, valueType = self.valueType, outerDomainValue = self.outerDomainValue, label = self.label )
+            newRegions.append( self[ridx1].domainSlice( domainMin = domainMin, domainMax = self[ridx1].domainMax, fill = fill, dullEps = dullEps ) )
             for idx in range(ridx1+1,ridx2):
                 newRegions.append(self[idx])
             newRegions.append( self[ridx2].domainSlice(
                 domainMin=self[ridx2].domainMin, domainMax=domainMax, fill=fill, dullEps=dullEps ) )
 
             return newRegions
-
-    @property
-    def rangeMin( self ) :
-
-        return( min( [ region.rangeMin for region in self ] ) )
-
-    @property
-    def rangeMax( self ) :
-
-        return( max( [ region.rangeMax for region in self ] ) )
-
-    @property
-    def rangeUnit( self ) :
-
-        return( self.getAxisUnitSafely( 0 ) )
 
     def rangeUnitConversionFactor( self, unitTo ) :
 
@@ -293,10 +242,24 @@ class regions( baseModule.xDataFunctional ) :
         :return interpolated point at domainValue:
         """
 
-        for region in self.regions :
+        for region in self.__regions :
             if( domainValue < region.domainMax ) : return( region.evaluate( domainValue ) )
 
-        return( self.regions[-1].evaluate( domainValue ) )  # Domain value is above the last region. Let the last region determine what to do.
+        return( self.__regions[-1].evaluate( domainValue ) )  # Domain value is above the last region. Let the last region determine what to do.
+
+    def findInstancesOfClassInChildren( self, cls, level = 9999 ) :
+        """
+        Finds all instances of class *cls* in self's children, grand-children, etc.
+        """
+
+        foundInstances = []
+        level -= 1
+        if( level < 0 ) : return( foundInstances )
+        for region in self :
+            if( isinstance( region, cls ) ) : foundInstances.append( region )
+            foundInstances += region.findInstancesOfClassInChildren( cls, level = level )
+
+        return( foundInstances )
 
     def integrate( self, **limits ):
         """
@@ -309,6 +272,8 @@ class regions( baseModule.xDataFunctional ) :
 
         :return: float or PQU
         """
+
+        from . import multiD_XYs as multiD_XYsModule
 
         integral = 0
         for region in self:
@@ -334,13 +299,21 @@ class regions( baseModule.xDataFunctional ) :
 
     def toXMLList( self, indent = '', **kwargs ) :
 
+        formatVersion = kwargs.get( 'formatVersion', formatVersionModule.default )
+
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent3 = indent2 + kwargs.get( 'incrementalIndent', '  ' )
+        if( formatVersion == formatVersionModule.version_1_10 ) : indent3 = indent2
 
         attributeStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
         XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
         if self.isPrimaryXData( ) :
             if( self.axes is not None ) : XMLList += self.axes.toXMLList( indent2, **kwargs )
-        for region in self.regions : XMLList += region.toXMLList( indent2, **kwargs )
+
+        if( formatVersion != formatVersionModule.version_1_10 ) : XMLList.append( '%s<%s>' % ( indent2, self.functionNdsName ) )
+        for region in self.__regions : XMLList += region.toXMLList( indent3, **kwargs )
+        if( formatVersion != formatVersionModule.version_1_10 ) : XMLList[-1] += "</%s>" % self.functionNdsName
+
         if( self.uncertainty ) : XMLList += self.uncertainty.toXMLList( indent2, **kwargs )
         XMLList[-1] += '</%s>' % self.moniker
         return( XMLList )
@@ -350,33 +323,37 @@ class regions( baseModule.xDataFunctional ) :
 
         xPath.append( element.tag )
 
-        allowedSubElements = cls.allowedSubElements( )
-
-        if( element.find( 'axes' ) is not None ) :
-            axes = axesModule.axes.parseXMLNode( element.find( 'axes' ), xPath, linkData )
-        index = int( element.get( 'index' ) ) if 'index' in element.keys() else None
-        value = float( element.get( 'value' ) ) if 'value' in element.keys() else None
+        index = int( element.get( 'index' ) ) if 'index' in list( element.keys( ) ) else None
+        outerDomainValue = float( element.get( 'outerDomainValue' ) ) if 'outerDomainValue' in list( element.keys( ) ) else None
         label = element.get( 'label', None )
 
-        regions = cls( axes = axes, index = index, value = value, label = label )
-        uncertainty = None
+        regions = cls( axes = axes, index = index, outerDomainValue = outerDomainValue, label = label )
+
+        functionElements = []                       # This support GNDS 1.10 and 2.0
+        functions = element.find( regions.functionNdsName )
+        if( functions is not None ) :
+            for child in functions : functionElements.append( child )
 
         for child in element :
             if( child.tag == 'axes' ) :
-                continue
+                regions.axes = axesModule.axes.parseXMLNode( child, xPath, linkData )
             elif( child.tag == 'uncertainty' ) :
-                uncertainty = uncertaintiesModule.uncertainty.parseXMLNode( child, xPath, linkData )
+                regions.uncertainty = uncertaintiesModule.uncertainty.parseXMLNode( child, xPath, linkData )
+            elif( child.tag == regions.functionNdsName ) :
                 continue
             else :
-                subElementClass = None
-                for subElement in allowedSubElements :
-                    if( subElement.moniker == child.tag ) :
-                        subElementClass = subElement
-                        break
-                if( subElementClass is None ) : raise TypeError( 'unknown sub-element "%s" in element "%s"' % ( child.tag, cls.moniker ) )
-                regions.append( subElementClass.parseXMLNode( child, xPath, linkData, axes = axes, **kwargs ) )
-# FIXME, Should set regions.uncertainty in method
-        if( uncertainty is not None ) : regions.uncertainty = uncertainty
+                if( functions is not None ) : raise Expeption( 'Unsupported child name = "%s".' % child.tag )
+                functionElements.append( child )
+
+        allowedSubElements = cls.allowedSubElements( )
+        for child in functionElements :
+            subElementClass = None
+            for subElement in allowedSubElements :
+                if( subElement.moniker == child.tag ) :
+                    subElementClass = subElement
+                    break
+            if( subElementClass is None ) : raise TypeError( 'unknown sub-element "%s" in element "%s"' % ( child.tag, cls.moniker ) )
+            regions.append( subElementClass.parseXMLNode( child, xPath, linkData, axes = regions.axes, **kwargs ) )
 
         xPath.pop( )
         return regions
@@ -385,6 +362,17 @@ class regions1d( regions ) :
 
     moniker = 'regions1d'
     dimension = 1
+
+    def __mul__( self, other ) :
+
+        _self, _other = self.copyToCommonRegions( other )
+        _regions1d = self.__class__( )
+        for index, region1 in enumerate( _self ) :
+            region2 = _other[index]
+            region = region1 * region2
+            _regions1d.append( region )
+
+        return( _regions1d )
 
     def copyToCommonRegions( self, other, epsilon = domainEpsilon ) :
         """
@@ -551,7 +539,7 @@ class regions1d( regions ) :
                         else :
                             _region[0] = [ x, XYsModule.pointwiseXY_C.interpolatePoint( standardsModule.interpolation.linlinToken, x, x21, y21, x22, y22 ) ]
             xys += _region
-        pointwise = pointwiseClass( data = xys, axes = self.axes, value = self.value ) # FIXME - need more work to insure all parameters are set properly.
+        pointwise = pointwiseClass( data = xys, axes = self.axes, outerDomainValue = self.outerDomainValue ) # FIXME - need more work to insure all parameters are set properly.
         return( pointwise )
 
     def toLinearXYsClass( self ) :
@@ -564,8 +552,6 @@ class regions1d( regions ) :
         return( ( XYsModule.XYs1d, series1dModule.series ) )
 
 class regionsMultiD( regions ) :
-
-    __metaclass__ = abc.ABCMeta
 
     def getBoundingSubFunctions( self, domainValue ) :
 
@@ -586,6 +572,8 @@ class regions2d( regionsMultiD ) :
     @staticmethod
     def allowedSubElements( ) :
 
+        from . import multiD_XYs as multiD_XYsModule
+
         return( ( multiD_XYsModule.XYs2d, ) )
 
 class regions3d( regionsMultiD ) :
@@ -599,5 +587,7 @@ class regions3d( regionsMultiD ) :
 
     @staticmethod
     def allowedSubElements( ) :
+
+        from . import multiD_XYs as multiD_XYsModule
 
         return( ( multiD_XYsModule.XYs3d, ) )

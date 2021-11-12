@@ -16,10 +16,10 @@
 #include "global_params.hpp"
 #include "messaging.hpp"
 
-//****************** class Energy_groups  *****************
-//--------------- Energy_groups::read_bd -----------------
+//****************** class Egp::Energy_groups  *****************
+//--------------- Egp::Energy_groups::read_bd -----------------
 // Reads the energy group boundaries
-void Energy_groups::read_bd( data_parser &input_file, int num_bd )
+void Egp::Energy_groups::read_bd( Dpar::data_parser &input_file, int num_bd )
 {
   for( int bd_count = 0; bd_count < num_bd; ++bd_count )
   {
@@ -27,12 +27,12 @@ void Energy_groups::read_bd( data_parser &input_file, int num_bd )
     push_back( bound );
   }
 }
-//--------------- Energy_groups::first_bin_ID -----------------
+//--------------- Egp::Energy_groups::first_bin_ID -----------------
 // Returns the index of the left-hand end of the energy bin containing this_E
-int Energy_groups::first_bin_ID( double this_E ) const
+int Egp::Energy_groups::first_bin_ID( double this_E ) const
 {
   int bin_ID = 0;
-  Energy_groups::const_iterator this_bin = begin( );
+  Egp::Energy_groups::const_iterator this_bin = begin( );
   for( ++this_bin; this_bin != end( ); ++this_bin, ++bin_ID )
   {
     if( *this_bin > this_E )
@@ -42,21 +42,21 @@ int Energy_groups::first_bin_ID( double this_E ) const
   }
   if( this_bin == end( ) )
   {
-    FatalError( "Energy_groups::first_bin_ID", "energy too high" );
+    Msg::FatalError( "Egp::Energy_groups::first_bin_ID", "energy too high" );
   }
   return bin_ID;
 }
-//--------------- Energy_groups::last_bin_ID -----------------
+//--------------- Egp::Energy_groups::last_bin_ID -----------------
 // Returns the index of the right-hand end of the energy bin containing this_E
-int Energy_groups::last_bin_ID( double this_E ) const
+int Egp::Energy_groups::last_bin_ID( double this_E ) const
 {
   int bin_ID = size( ) - 1;
-  Energy_groups::const_iterator this_bin = end( );
+  Egp::Energy_groups::const_iterator this_bin = end( );
   --this_bin;
-  Energy_groups::const_iterator lower_bin = this_bin;
+  Egp::Energy_groups::const_iterator lower_bin = this_bin;
   --lower_bin;
 
-  static double skip_tol = Global.Value( "abs_tol" );
+  static double skip_tol = Global.Value( "tight_tol" );
   for( ; this_bin != begin( ); this_bin = lower_bin, --lower_bin, --bin_ID )
   {
     if( *lower_bin < this_E * ( 1.0 - skip_tol ) )
@@ -66,7 +66,14 @@ int Energy_groups::last_bin_ID( double this_E ) const
   }
   if( this_bin == begin( ) )
   {
-    FatalError( "Energy_groups::first_bin_ID", "energy too high" );
+    Msg::FatalError( "Egp::Energy_groups::first_bin_ID", "energy too high" );
   }
   return bin_ID;
+}
+//--------------- Egp::Energy_groups::get_top_E -----------------
+double Egp::Energy_groups::get_top_E( ) const
+{
+  Egp::Energy_groups::const_iterator end_ptr = end( );
+  --end_ptr;
+  return *end_ptr;
 }

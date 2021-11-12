@@ -3,7 +3,6 @@ Process: isotropic table
 Comment: Li7(n,n t)He4; data for outgoing n_1
 outputLegendreOrder: 3
 Conserve: both
-Quadrature method: adaptive
 Projectile's mass: 1.00866491574
 Target's mass:  7.016004548
 Product's mass: 1.00866491574

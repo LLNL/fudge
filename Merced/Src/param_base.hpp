@@ -15,30 +15,21 @@
 #ifndef PARAM_BASE_CLASS
 #define PARAM_BASE_CLASS
 
+#include "quad_param.hpp"
 #include "dd_vector.hpp"
 #include "Legendre_data.hpp"
-#include "Eout_integrals.hpp"
 #include "Energy_groups.hpp"
 
-// ----------- class QuadParamBase ------------------
-//! Base lass for the quadrature parameters
-class QuadParamBase
+namespace Pbase
 {
-public:
-  int func_count;      // the number of function calls
 
-  //! Default constructor
-  inline QuadParamBase(): func_count( 0 )
-   {}
-
-  //! Default destructor
-  inline ~QuadParamBase() {}
-
-};
 // ----------- class param_base ------------------
 //! Base lass for the parameters for integration over incident energy
-class param_base: public QuadParamBase
+class param_base: public Qparam::QuadParamBase
 {
+private:
+  Terp::Interp_Type weight_interp;  // interpolation for the model weight
+  
 public:
   double data_E_0;     // the lower incident energy for the eta ladder
   double data_E_1;     // the upper incident energy for the eta ladder
@@ -52,40 +43,35 @@ public:
                        // otherwise get maximum eta from the upper data point
   
   // pointers to the cross section
-  dd_vector::const_iterator this_sigma;
-  dd_vector::const_iterator next_sigma;
-  dd_vector::const_iterator first_ladder_sigma;  // first sigma for this eta ladder
-  dd_vector::const_iterator last_ladder_sigma;   // last sigma for this eta ladder
-  dd_vector::const_iterator sigma_end;           // final sigma
+  Ddvec::dd_vector::const_iterator this_sigma;
+  Ddvec::dd_vector::const_iterator next_sigma;
+  Ddvec::dd_vector::const_iterator first_ladder_sigma;  // first sigma for this eta ladder
+  Ddvec::dd_vector::const_iterator last_ladder_sigma;   // last sigma for this eta ladder
+  Ddvec::dd_vector::const_iterator sigma_end;           // final sigma
 
   // pointers to the multiplicity
-  dd_vector::const_iterator this_mult;
-  dd_vector::const_iterator next_mult;
-  dd_vector::const_iterator mult_end;
+  Ddvec::dd_vector::const_iterator this_mult;
+  Ddvec::dd_vector::const_iterator next_mult;
+  Ddvec::dd_vector::const_iterator mult_end;
 
   // pointers to the model weights
-  dd_vector::const_iterator this_weight;
-  dd_vector::const_iterator next_weight;
-  dd_vector::const_iterator weight_end;
+  Ddvec::dd_vector::const_iterator this_weight;
+  Ddvec::dd_vector::const_iterator next_weight;
+  Ddvec::dd_vector::const_iterator weight_end;
 
   // pointers to the flux data
-  Flux_List::const_iterator flux_ptr;
-  Flux_List::const_iterator next_flux;
-  Flux_List::const_iterator flux_end;
+  Lgdata::Flux_List::const_iterator flux_ptr;
+  Lgdata::Flux_List::const_iterator next_flux;
+  Lgdata::Flux_List::const_iterator flux_end;
 
   // pointers to the incident energy boundaries
-  Energy_groups::const_iterator Ein_ptr;
-  Energy_groups::const_iterator next_Ein;
-  Energy_groups::const_iterator Ein_end;
+  Egp::Energy_groups::const_iterator Ein_ptr;
+  Egp::Energy_groups::const_iterator next_Ein;
+  Egp::Energy_groups::const_iterator Ein_end;
   int Ein_count;
 
-  // pointers to the integrals over E_out
-  Eout_integrals::const_iterator this_Eout_int;
-  Eout_integrals::const_iterator next_Eout_int;
-  Eout_integrals::const_iterator Eout_int_end;
-
   //! Holds the weight: (cross section) * flux * multiplicity * model weight
-  Legendre_coefs current_weight;
+  Lgdata::Legendre_coefs current_weight;
 
   int order;             // The Legendre order of the problem
 
@@ -106,9 +92,9 @@ public:
   //! \param Ein_groups the boundaried of the incident energy groups
   //! \param first_Ein the first common incident energy bin
   //! \param last_Ein the last common incident energy bin
-  bool get_Ein_range( const dd_vector& sigma_, const dd_vector& mult_,
-    const dd_vector& weight_,
-    const Flux_List& e_flux_, const Energy_groups& Ein_groups,
+  bool get_Ein_range( const Ddvec::dd_vector& sigma_, const Ddvec::dd_vector& mult_,
+    const Ddvec::dd_vector& weight_,
+    const Lgdata::Flux_List& e_flux_, const Egp::Energy_groups& Ein_groups,
     double *first_Ein, double *last_Ein );
 
   //!  Sets up the initial quadrature parameters
@@ -117,9 +103,9 @@ public:
   //! \param weight_ the weighting to apply to the transfer matrix entries
   //! \param e_flux_ the initial approximation to apply to the particle flux
   //! \param Ein_groups the boundaries of the incident energy groups
-   void setup( const dd_vector& sigma_, const dd_vector& mult_,
-    const dd_vector& weight_,
-    const Flux_List& e_flux_, const Energy_groups& Ein_groups );
+   void setup( const Ddvec::dd_vector& sigma_, const Ddvec::dd_vector& mult_,
+    const Ddvec::dd_vector& weight_,
+    const Lgdata::Flux_List& e_flux_, const Egp::Energy_groups& Ein_groups );
 
   //! Sets the first common incident energy
   void common_E0( );
@@ -131,9 +117,9 @@ public:
   //! \param weight_ the weighting to apply to the transfer matrix entries
   //! \param e_flux_ the initial approximation to apply to the particle flux
   //! \param Ein_groups the boundaries of the incident energy groups
-  void setup_bin( int Ein_bin_, const dd_vector& sigma_, const dd_vector& mult_,
-    const dd_vector& weight_,
-    const Flux_List& e_flux_, const Energy_groups& Ein_groups );
+  void setup_bin( int Ein_bin_, const Ddvec::dd_vector& sigma_, const Ddvec::dd_vector& mult_,
+    const Ddvec::dd_vector& weight_,
+    const Lgdata::Flux_List& e_flux_, const Egp::Energy_groups& Ein_groups );
 
   //! Sets the range of integration over incident energy
   void set_Ein_range( );
@@ -160,5 +146,7 @@ public:
   void flux_weight( double E_in );
 
 };
+
+}  // end of namespace Pbase
 
 #endif

@@ -2,7 +2,6 @@ xndfgenTransferMatrix: version 1.0
 Process: Legendre EEpP data transfer matrix
 Comment: n1 + H2 --> n1 + H2_e1 outgoing data for n
 outputLegendreOrder: 3
-Quadrature method: adaptive
 Conserve: both
 Projectile Frame: lab
 Product Frame: lab

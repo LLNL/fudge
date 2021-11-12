@@ -32,7 +32,7 @@ Resonance reconstruction
 Resonance reconstruction in ``Fudge`` is simple: starting with a reactionSuite instance, we use the
 'reconstructResonances' method. For example:
 
-        >>> from fudge.gnds import reactionSuite, styles
+        >>> from fudge import reactionSuite, styles
         >>> RS = reactionSuite.readXML( "gnds_formatted_file.xml" )
         >>> evalStyle = RS.styles.getEvaluatedStyle()
         >>> reconStyle = styles.crossSectionReconstructed( "reconstructed", derivedFrom=evalStyle.label )
@@ -55,7 +55,7 @@ accuracy. The 'verbose' option can be used to print out some details during reso
 the Python module at
 'reconstructResonances' method. For example:
 
-        >>> from fudge.gnds import reactionSuite, styles
+        >>> from fudge import reactionSuite, styles
         >>> RS = reactionSuite.readXML( "gnds_formatted_file.xml" )
         >>> evalStyle = RS.styles.getEvaluatedStyle()
         >>> reconStyle = styles.crossSectionReconstructed( "reconstructed", derivedFrom=evalStyle.label )
@@ -78,7 +78,7 @@ accuracy. The 'verbose' option can be used to print out some details during reso
 the Python module at
 'reconstructResonances' method. For example:
 
-        >>> from fudge.gnds import reactionSuite, styles
+        >>> from fudge import reactionSuite, styles
         >>> RS = reactionSuite.readXML( "gnds_formatted_file.xml" )
         >>> evalStyle = RS.styles.getEvaluatedStyle()
         >>> reconStyle = styles.crossSectionReconstructed( "reconstructed", derivedFrom=evalStyle.label )

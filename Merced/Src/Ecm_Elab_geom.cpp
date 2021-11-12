@@ -18,10 +18,10 @@
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-// ************* class Ecm_Elab_mu_param *****************
-// ----------- Ecm_Elab_mu_param::setup --------------
+// ************* class Egeom::Ecm_Elab_mu_param *****************
+// ----------- Egeom::Ecm_Elab_mu_param::setup --------------
 // Sets up the data for this incident energy
-void Ecm_Elab_mu_param::setup( double Ein, double Eoutcm, const Ecm_Elab_Ecm_param& Ecm_param )
+void Egeom::Ecm_Elab_mu_param::setup( double Ein, double Eoutcm, const Egeom::Ecm_Elab_Ecm_param& Ecm_param )
 {
   map = Ecm_param.map;
   E_in = Ein;
@@ -37,7 +37,7 @@ void Ecm_Elab_mu_param::setup( double Ein, double Eoutcm, const Ecm_Elab_Ecm_par
   {
     if( ( V_trans + V_cm < V_bottom ) || ( V_cm > V_trans + V_top ) )
     {
-      FatalError( "Ecm_Elab_mu_param::setup", "energy error for small Ein" );
+      Msg::FatalError( "Egeom::Ecm_Elab_mu_param::setup", "energy error for small Ein" );
     }
     if( V_trans + V_cm <= V_top )
     {
@@ -64,7 +64,7 @@ void Ecm_Elab_mu_param::setup( double Ein, double Eoutcm, const Ecm_Elab_Ecm_par
   {
     if( ( V_trans > V_top + V_cm ) || ( V_cm > V_trans + V_top ) )
     {
-      FatalError( "Ecm_Elab_mu_param::setup", "energy error for large Ein" );
+      Msg::FatalError( "Egeom::Ecm_Elab_mu_param::setup", "energy error for large Ein" );
     }
     if( ( V_cm < V_trans + V_bottom ) && ( V_trans < V_cm + V_bottom ) )
     {
@@ -80,7 +80,7 @@ void Ecm_Elab_mu_param::setup( double Ein, double Eoutcm, const Ecm_Elab_Ecm_par
   {
     if( V_cm > V_trans + V_top )
     {
-      FatalError( "Ecm_Elab_mu_param::setup", "energy error for intermediate Ein" );
+      Msg::FatalError( "Egeom::Ecm_Elab_mu_param::setup", "energy error for intermediate Ein" );
     }
     if( ( V_cm < V_trans + V_bottom ) && ( V_trans < V_cm + V_bottom ) )
     {
@@ -101,10 +101,10 @@ void Ecm_Elab_mu_param::setup( double Ein, double Eoutcm, const Ecm_Elab_Ecm_par
   }
 }
 
-// ************* class Ecm_Elab_Ecm_param *****************
-// ----------- Ecm_Elab_Ecm_param::setup --------------
+// ************* class Egeom::Ecm_Elab_Ecm_param *****************
+// ----------- Egeom::Ecm_Elab_Ecm_param::setup --------------
 // Sets up the data for this incident energy
-void Ecm_Elab_Ecm_param::setup( double Ein, double Eoutmin, double Eoutmax,
+void Egeom::Ecm_Elab_Ecm_param::setup( double Ein, double Eoutmin, double Eoutmax,
   double data_Ecmmin, double data_Ecmmax )
 {
   E_in = Ein;
@@ -115,36 +115,36 @@ void Ecm_Elab_Ecm_param::setup( double Ein, double Eoutmin, double Eoutmax,
   data_Ecm_min = data_Ecmmin;   //. center of mass energy range for the data
   data_Ecm_max = data_Ecmmax;
 }
-// ----------- Ecm_Elab_Ecm_param::V_lab_sectors --------------
+// ----------- Egeom::Ecm_Elab_Ecm_param::V_lab_sectors --------------
 // Identifies the regions of integration over Eout_lab and mu_cm
-void Ecm_Elab_Ecm_param::V_lab_sectors( )
+void Egeom::Ecm_Elab_Ecm_param::V_lab_sectors( )
 {
   if( V_cm_limits.size( ) > 0 )
   {
     V_cm_limits.erase( V_cm_limits.begin( ), V_cm_limits.end( ) );
   }
-  Ecm_intersect one_intersection;
+  Maps::Ecm_intersect one_intersection;
   one_intersection.gamma = map->gamma;
   one_intersection.set_energies( E_in, data_Ecm_min );
   min_V_cm = one_intersection.V_cm;
   one_intersection.set_energies( E_in, data_Ecm_max );
   max_V_cm = one_intersection.V_cm;
 
-  Vcm_quadBox_Hit Vcm_quadBox_hit;
+  Vhit::Vcm_quadBox_Hit Vcm_quadBox_hit;
   if( V_lab_min > 0.0 )
   {
-    Vcm_quadBox_hit.V_cm = abs( one_intersection.V_trans - V_lab_min );  // mu = 1 for V_lab_min
-    Vcm_quadBox_hit.hit_corner = BOTTOM_FORWARD;
+    Vcm_quadBox_hit.V_cm = std::abs( one_intersection.V_trans - V_lab_min );  // mu = 1 for V_lab_min
+    Vcm_quadBox_hit.hit_corner = Vhit::BOTTOM_FORWARD;
     V_cm_limits.push_back( Vcm_quadBox_hit );
     Vcm_quadBox_hit.V_cm = one_intersection.V_trans + V_lab_min;  // mu = -1 for V_lab_min
-    Vcm_quadBox_hit.hit_corner = BOTTOM_BACKWARD;
+    Vcm_quadBox_hit.hit_corner = Vhit::BOTTOM_BACKWARD;
     V_cm_limits.push_back( Vcm_quadBox_hit );
   }
-  Vcm_quadBox_hit.V_cm = abs( one_intersection.V_trans - V_lab_max );  // mu = 1 for V_lab_max
-  Vcm_quadBox_hit.hit_corner = TOP_FORWARD;
+  Vcm_quadBox_hit.V_cm = std::abs( one_intersection.V_trans - V_lab_max );  // mu = 1 for V_lab_max
+  Vcm_quadBox_hit.hit_corner = Vhit::TOP_FORWARD;
   V_cm_limits.push_back( Vcm_quadBox_hit );
   Vcm_quadBox_hit.V_cm = one_intersection.V_trans + V_lab_max;  // mu = -1 for V_lab_max
-  Vcm_quadBox_hit.hit_corner = TOP_BACKWARD;
+  Vcm_quadBox_hit.hit_corner = Vhit::TOP_BACKWARD;
   V_cm_limits.push_back( Vcm_quadBox_hit );
 
   // add the values of V_cm given by the data
@@ -158,10 +158,10 @@ void Ecm_Elab_Ecm_param::V_lab_sectors( )
 
   V_cm_limits.sort( Vcm_quadBox_Hit_F::lessthan_F );
 }
-// ----------- Ecm_Elab_Ecm_param::Ecm_range --------------
+// ----------- Egeom::Ecm_Elab_Ecm_param::Ecm_range --------------
 // Computes the range of center-of-mass outgoing energies
 // Returns the tolerance to use in the quadrature over center-of-mass energy and cosine
-double Ecm_Elab_Ecm_param::Ecm_range( )
+double Egeom::Ecm_Elab_Ecm_param::Ecm_range( )
 {
   double E_trans = map->get_Etrans( E_in );
   double V_trans = sqrt( E_trans );
@@ -171,7 +171,8 @@ double Ecm_Elab_Ecm_param::Ecm_range( )
   Ecm_max = get_Ecm( max_hit_corner, V_trans, V_bottom, V_top, data_Ecm_max );
   if( Ecm_min > Ecm_max )
   {
-    Warning( "Ecm_Elab_Ecm_param::Ecm_range", "E_cm out of order" );
+    Msg::Warning( "Egeom::Ecm_Elab_Ecm_param::Ecm_range",
+		  "E_cm out of order" );
   }
   static double epsilon = Global.Value( "quad_tol" );
   if( E_trans > lab_Eout_max )
@@ -184,38 +185,38 @@ double Ecm_Elab_Ecm_param::Ecm_range( )
     return epsilon;
   }
 }
-// ----------- Ecm_Elab_Ecm_param::get_Ecm --------------
-// Computes the center-of-mass outgoing energy for a given Hit_Corner
-double Ecm_Elab_Ecm_param::get_Ecm( Hit_Corner hit_corner, double V_trans,
+// ----------- Egeom::Ecm_Elab_Ecm_param::get_Ecm --------------
+// Computes the center-of-mass outgoing energy for a given Vhit::Hit_Corner
+double Egeom::Ecm_Elab_Ecm_param::get_Ecm( Vhit::Hit_Corner hit_corner, double V_trans,
   double V_bottom, double V_top, double data_Ecm )
 {
   double V_cm = 0.0;
   switch( hit_corner )
   {
-  case V_INSIDE:
+  case Vhit::V_INSIDE:
     return data_Ecm;
-  case BOTTOM_FORWARD:
-    V_cm = abs( V_bottom - V_trans );
+  case Vhit::BOTTOM_FORWARD:
+    V_cm = std::abs( V_bottom - V_trans );
     break;
-  case BOTTOM_BACKWARD:
+  case Vhit::BOTTOM_BACKWARD:
     V_cm = V_bottom + V_trans;
     break;
-  case TOP_FORWARD:
-    V_cm = abs( V_top - V_trans );
+  case Vhit::TOP_FORWARD:
+    V_cm = std::abs( V_top - V_trans );
     break;
-  case TOP_BACKWARD:
+  case Vhit::TOP_BACKWARD:
     V_cm = V_top + V_trans;
     break;
   default:
-    FatalError( "Ecm_Elab_Ecm_param::get_Ecm", "bad Hit_Corner" );
+    Msg::FatalError( "Egeom::Ecm_Elab_Ecm_param::get_Ecm",
+		     "bad Vhit::Hit_Corner" );
   }
 
   double E_cm = V_cm*V_cm;
   if( ( E_cm < data_Ecm_min ) || ( E_cm > data_Ecm_max ) )
   {
-    Warning( "Ecm_Elab_Ecm_param::get_Ecm", "E_cm out of data interval" );
+    Msg::Warning( "Egeom::Ecm_Elab_Ecm_param::get_Ecm",
+		  "E_cm out of data interval" );
   }
   return E_cm;
 }
-
-// ************* class Ecm_Elab_Ein_param *****************

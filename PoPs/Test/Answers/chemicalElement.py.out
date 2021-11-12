@@ -9,18 +9,18 @@
             <double label="base" value="15.9949146196" unit="amu"/></mass>
           <nucleus id="o16" index="0">
             <energy>
-              <double label="base" value="0.0" unit="eV"/></energy></nucleus></nuclide>
+              <double label="base" value="0." unit="eV"/></energy></nucleus></nuclide>
         <nuclide id="O16_e1">
           <nucleus id="o16_e1" index="1">
             <energy>
-              <double label="base" value="6049400.0" unit="eV"/></energy></nucleus></nuclide>
+              <double label="base" value="6.0494e6" unit="eV"/></energy></nucleus></nuclide>
         <nuclide id="O16_e2">
           <nucleus id="o16_e2" index="2">
             <energy>
-              <double label="base" value="6129893.0" unit="eV"/></energy></nucleus></nuclide>
+              <double label="base" value="6129893." unit="eV"/></energy></nucleus></nuclide>
         <nuclide id="O16_e3">
           <nucleus id="o16_e3" index="3">
             <energy>
-              <double label="base" value="6917100.0" unit="eV"/></energy></nucleus></nuclide></nuclides></isotope>
+              <double label="base" value="6.9171e6" unit="eV"/></energy></nucleus></nuclide></nuclides></isotope>
     <isotope symbol="O17" A="17"></isotope>
     <isotope symbol="O18" A="18"></isotope></isotopes></chemicalElement>

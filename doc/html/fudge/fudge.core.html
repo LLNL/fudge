@@ -1,33 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fudge.core package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.core.math package" href="fudge.core.math.html" />
     <link rel="prev" title="fudge Package" href="index.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -44,7 +35,8 @@
           <a href="index.html" title="fudge Package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">fudge Package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">fudge Package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.core package</a></li> 
       </ul>
     </div>  
 
@@ -98,7 +90,7 @@
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.fudgemath">fudge.core.math.fudgemath module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.linearAlgebra">fudge.core.math.linearAlgebra module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-matrix-module">fudge.core.math.matrix module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.miscellaneous">fudge.core.math.miscellaneous module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-miscellaneous-module">fudge.core.math.miscellaneous module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-pointwisexy-module">fudge.core.math.pointwiseXY module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-table-module">fudge.core.math.table module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math">Module contents</a></li>
@@ -108,7 +100,7 @@
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="fudge.core.utilities.test.html">fudge.core.utilities.test package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.test.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.test.html#module-fudge.core.utilities.test.testUtilities">fudge.core.utilities.test.testUtilities module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.test.html#fudge-core-utilities-test-testutilities-module">fudge.core.utilities.test.testUtilities module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.test.html#module-fudge.core.utilities.test">Module contents</a></li>
 </ul>
 </li>
@@ -125,12 +117,12 @@
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.brb">fudge.core.utilities.brb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeExceptions">fudge.core.utilities.fudgeExceptions module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeFileMisc">fudge.core.utilities.fudgeFileMisc module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeZA">fudge.core.utilities.fudgeZA module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.pyparsing">fudge.core.utilities.pyparsing module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.reactionStrings">fudge.core.utilities.reactionStrings module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.subprocessing">fudge.core.utilities.subprocessing module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.times">fudge.core.utilities.times module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.xmlNode">fudge.core.utilities.xmlNode module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#fudge-core-utilities-fudgeza-module">fudge.core.utilities.fudgeZA module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#fudge-core-utilities-pyparsing-module">fudge.core.utilities.pyparsing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#fudge-core-utilities-reactionstrings-module">fudge.core.utilities.reactionStrings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#fudge-core-utilities-subprocessing-module">fudge.core.utilities.subprocessing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#fudge-core-utilities-times-module">fudge.core.utilities.times module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#fudge-core-utilities-xmlnode-module">fudge.core.utilities.xmlNode module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities">Module contents</a></li>
 </ul>
 </li>
@@ -143,53 +135,8 @@
 <div class="section" id="fudge-core-ancestry-module">
 <h2>fudge.core.ancestry module<a class="headerlink" href="#fudge-core-ancestry-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fudge.core.fudgemisc">
-<span id="fudge-core-fudgemisc-module"></span><h2>fudge.core.fudgemisc module<a class="headerlink" href="#module-fudge.core.fudgemisc" title="Permalink to this headline">¶</a></h2>
-<p>This module contains useful top-level fudge routines that do not fit into any other module.</p>
-<dl class="function">
-<dt id="fudge.core.fudgemisc.checkMessagesToString">
-<code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">checkMessagesToString</code><span class="sig-paren">(</span><em>message</em>, <em>indentation='  '</em>, <em>subIndentation='  '</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#checkMessagesToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.checkMessagesToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.fudgemisc.findPythonFile">
-<code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">findPythonFile</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#findPythonFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.findPythonFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>For internal use only.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.fudgemisc.getFormat">
-<code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">getFormat</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#getFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.getFormat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks if self has a getFormat method. If it does not, then None is returned. If it does then: 
-1) if getFormat returns a string or None then it is returned else getFormat must return an 
-integer, n1. If n1 is 12 (default for legacy ENDL) then None is returned else returns string 
-‘%n1.n2e’ where n2 = n1 - 7.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.fudgemisc.printWarning">
-<code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">printWarning</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#printWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.printWarning" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.fudgemisc.readOnly">
-<code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">readOnly</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#readOnly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.readOnly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets Fudge’s internal readonly flag which causes fudge to not create working directories 
-for the isotopes read in. Note, you cannot unset this flag once readOnly has been called.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.fudgemisc.stringWithPrefixSuffix">
-<code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">stringWithPrefixSuffix</code><span class="sig-paren">(</span><em>list</em>, <em>Prefix=''</em>, <em>Suffix=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#stringWithPrefixSuffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.stringWithPrefixSuffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>For internal use only.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.fudgemisc.verbose">
-<code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">verbose</code><span class="sig-paren">(</span><em>mode=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#verbose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.verbose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets Fudge’s internal verbose flag to mode. Mode = 0 suppress all informational messages.</p>
-</dd></dl>
-
+<div class="section" id="fudge-core-fudgemisc-module">
+<h2>fudge.core.fudgemisc module<a class="headerlink" href="#fudge-core-fudgemisc-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-fudge.core">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.core" title="Permalink to this headline">¶</a></h2>
@@ -197,6 +144,7 @@ for the isotopes read in. Note, you cannot unset this flag once readOnly has bee
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -205,13 +153,13 @@ for the isotopes read in. Note, you cannot unset this flag once readOnly has bee
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.core package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#fudge-core-ancestry-module">fudge.core.ancestry module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.fudgemisc">fudge.core.fudgemisc module</a></li>
+<li><a class="reference internal" href="#fudge-core-fudgemisc-module">fudge.core.fudgemisc module</a></li>
 <li><a class="reference internal" href="#module-fudge.core">Module contents</a></li>
 </ul>
 </li>
@@ -231,15 +179,15 @@ for the isotopes read in. Note, you cannot unset this flag once readOnly has bee
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -260,12 +208,13 @@ for the isotopes read in. Note, you cannot unset this flag once readOnly has bee
           <a href="index.html" title="fudge Package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.core package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>
