@@ -93,7 +93,7 @@ setup(
         'fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw',
         'fudge.reactions',
         'fudge.resonances',
-        'fudge.lib',
+        'LUPY',
         'fudge.processing',
         'fudge.processing.deterministic',
         'fudge.processing.montecarlo',
