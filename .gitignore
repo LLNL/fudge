@@ -1,4 +1,5 @@
 __pycache__
+*.o
 *.so
 
 fudge.egg-info
@@ -9,5 +10,5 @@ bin/merced
 upscatter/Src/calcUpscatterKernel
 
 # test files
-fudge/gnds/covariances/test/*.xml
+fudge/covariances/test/*.xml
 fudge/processing/resonances/test/*.xml

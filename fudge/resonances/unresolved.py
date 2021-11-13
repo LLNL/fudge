@@ -15,6 +15,7 @@ import abc
 from PoPs import database as PoPsDatabaseModule
 from pqu import PQU as PQUModule
 from xData import ancestry as ancestryModule, XYs as XYsModule, regions as regionsModule
+from xData.Documentation import documentation as documentationModule
 
 from fudge import suites as suitesModule, abstractClasses as abstractClassesModule
 
@@ -130,8 +131,17 @@ class tabulatedWidths(ancestryModule.ancestry):
         self.Ls = Ls_
         self.useForSelfShieldingOnly = useForSelfShieldingOnly
 
+        self.__documentation = documentationModule.Documentation( )
+        self.__documentation.setAncestor( self )
+
     def __len__(self):
         return len(self.Ls)
+
+    @property
+    def documentation( self ) :
+        """Returns the documentation instance."""
+
+        return( self.__documentation )
 
     @property
     def resonanceReactions(self):
@@ -204,6 +214,8 @@ class tabulatedWidths(ancestryModule.ancestry):
 
         xml = ['%s<%s%s>' % (indent, self.moniker, attrs)]
 
+        xml += self.__documentation.toXMLList( indent = indent2, **kwargs )
+
         if self.__PoPs:
             xml += self.__PoPs.toXMLList( indent2, **kwargs )
 
@@ -237,6 +249,9 @@ class tabulatedWidths(ancestryModule.ancestry):
             useForSelfShieldingOnly=element.get('useForSelfShieldingOnly') == 'true'
         )
         del linkData['conversionTable']
+
+        documentation = element.find( documentationModule.Documentation.moniker )
+        if( documentation is not None ) : result.documentation.parseNode( documentation, xPath, linkData )
 
         xPath.pop()
         return result

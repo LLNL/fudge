@@ -11,6 +11,7 @@ Containers for resolved resonance parameters
 
 from pqu import PQU as PQUModule
 from xData import ancestry as ancestryModule
+from xData.Documentation import documentation as documentationModule
 
 from PoPs import database as PoPsDatabaseModule
 from fudge import abstractClasses as abstractClassesModule, suites as suitesModule
@@ -142,6 +143,15 @@ class BreitWigner( ancestryModule.ancestry ) :
         self.scatteringRadius = scatteringRadius
         self.PoPs = PoPs
 
+        self.__documentation = documentationModule.Documentation( )
+        self.__documentation.setAncestor( self )
+
+    @property
+    def documentation( self ) :
+        """Returns the documentation instance."""
+
+        return( self.__documentation )
+
     def check( self, info ):
         return _resonance_checker(self, info, [self.scatteringRadius,self.resonanceParameters])
 
@@ -210,6 +220,8 @@ class BreitWigner( ancestryModule.ancestry ) :
                 xmlString += ' %s="%s"' % (attr, attrVal )
         xmlString = [xmlString+'>']
 
+        xmlString += self.__documentation.toXMLList( indent = indent2, **kwargs )
+
         if self.__PoPs is not None:
             xmlString += self.__PoPs.toXMLList( indent2, **kwargs )
         if self.__scatteringRadius is not None:
@@ -240,6 +252,9 @@ class BreitWigner( ancestryModule.ancestry ) :
         resonanceData = cls( label, approximation, parameters, radius, pops, **attrs )
         del linkData['conversionTable']
 
+        documentation = element.find( documentationModule.Documentation.moniker )
+        if( documentation is not None ) : resonanceData.documentation.parseNode( documentation, xPath, linkData )
+
         xPath.pop()
         return resonanceData
 
@@ -253,7 +268,7 @@ class RMatrix( ancestryModule.ancestry ):
     """
 
     moniker = 'RMatrix'
-    ancestryMembers = ( 'resonanceReactions', 'spinGroups', 'PoPs' )
+    ancestryMembers = ( 'resonanceReactions', 'spinGroups', 'PoPs', 'documentation' )
     ReichMooreToken = "Reich_Moore"
     RMatrixToken = "Full R-Matrix"
 
@@ -280,11 +295,20 @@ class RMatrix( ancestryModule.ancestry ):
         for attr in self.optAttrList:
             setattr(self, attr, kwargs.get(attr))
 
+        self.__documentation = documentationModule.Documentation( )
+        self.__documentation.setAncestor( self )
+
     def __getitem__(self, idx):
         return self.spinGroups[idx]
 
     def __len__(self):
         return len(self.spinGroups)
+
+    @property
+    def documentation( self ) :
+        """Returns the documentation instance."""
+
+        return( self.__documentation )
 
     @property
     def resonanceReactions(self):
@@ -345,6 +369,8 @@ class RMatrix( ancestryModule.ancestry ):
                 xmlString[0] += ' %s="%s"' % (attr,attrVal)
         xmlString[0] += '>'
 
+        xmlString += self.__documentation.toXMLList( indent = indent2, **kwargs )
+
         if self.__PoPs is not None:
             xmlString += self.__PoPs.toXMLList( indent=indent2, **kwargs )
         xmlString += self.resonanceReactions.toXMLList( indent=indent2, **kwargs )
@@ -371,6 +397,9 @@ class RMatrix( ancestryModule.ancestry ):
 
         tmp = RMatrix( label, RRs, SGs, PoPs=pops, **attrs )
         del linkData['conversionTable']
+
+        documentation = element.find( documentationModule.Documentation.moniker )
+        if( documentation is not None ) : tmp.documentation.parseNode( documentation, xPath, linkData )
 
         xPath.pop()
         return tmp
