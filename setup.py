@@ -25,14 +25,6 @@ except (ImportError, ModuleNotFoundError):
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
-        # install submodules
-        #subprocess.call('python ./crossSectionAdjustForHeatedTarget/setup.py install', shell=True)
-        #subprocess.call('python ./numericalFunctions/setup.py install', shell=True)
-        #subprocess.call('python ./pqu/setup.py install', shell=True)
-        #subprocess.call('python ./xData/setup.py install', shell=True)
-        #subprocess.call('python ./PoPs/setup.py install', shell=True)
-        #subprocess.call('python ./brownies/setup.py install', shell=True)
-
         # copy C executables Merced/bin/merced and upscatter/bin/calcUpscatterKernel to Python environment bin folder
         workingFolder = os.getcwd()
         binFolder = os.path.join(sys.prefix, 'bin')
@@ -101,13 +93,7 @@ setup(
         'fudge.vis',
         'fudge.vis.gnuplot',
         'fudge.vis.matplotlib',
-        'LUPY',        
-        #'crossSectionAdjustForHeatedTarget',
-        #'numericalFunctions',
-        #'pqu',
-        #'xData',
-        #'PoPs',
-        #'brownies'
+        'LUPY'
     ],
     package_dir = {'': '.'},
     scripts = glob.glob('bin/*.py'),
@@ -128,8 +114,13 @@ setup(
     ],
     url = 'https://github.com/llnl/fudge',
         install_requires=[
-        'numpy', 
-        'crossSectionAdjustForHeatedTarget @ %s/crossSectionAdjustForHeatedTarget#egg=pqu' % cwd
+        'numpy',
+        'crossSectionAdjustForHeatedTarget @ %s/crossSectionAdjustForHeatedTarget#egg=crossSectionAdjustForHeatedTarget' % cwd,
+        'numericalFunctions @ %s/numericalFunctions#egg=numericalFunctions' % cwd,
+        'pqu @ %s/pqu#egg=pqu' % cwd,
+        'xData @ %s/xData#egg=xData' % cwd,
+        'PoPs @ %s/PoPs#egg=PoPs' % cwd,
+        'brownies @ %s/brownies#egg=brownies' % cwd
     ],
     license = open( 'LICENSE' ).read(),
     description = '',
