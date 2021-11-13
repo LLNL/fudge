@@ -13,6 +13,7 @@ from setuptools import setup, Extension
 import subprocess
 
 minimumNumpy = 1.15
+cwd = 'file://localhost%s/' % os.getcwd()
 try:
     import numpy
     assert float('.'.join(numpy.__version__.split('.')[:2])) >= minimumNumpy, numpyErrorMessage
@@ -128,7 +129,7 @@ setup(
     url = 'https://github.com/llnl/fudge',
         install_requires=[
         'numpy', 
-        'crossSectionAdjustForHeatedTarget @ file://localhost/./crossSectionAdjustForHeatedTarget'
+        'crossSectionAdjustForHeatedTarget @ %s/crossSectionAdjustForHeatedTarget#egg=pqu' % cwd
     ],
     license = open( 'LICENSE' ).read(),
     description = '',
