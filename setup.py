@@ -128,7 +128,7 @@ setup(
     url = 'https://github.com/llnl/fudge',
         install_requires=[
         'numpy', 
-        'crossSectionAdjustForHeatedTarget @ file://localhost/crossSectionAdjustForHeatedTarget'
+        'crossSectionAdjustForHeatedTarget @ file://localhost/./crossSectionAdjustForHeatedTarget'
     ],
     license = open( 'LICENSE' ).read(),
     description = '',
