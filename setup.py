@@ -77,7 +77,6 @@ setup(
         'fudge.core.math',
         'fudge.core.math.test',
         'fudge.core.utilities',
-        'fudge.core.utilities.test',
         'fudge',
         'fudge.channelData',
         'fudge.channelData.fissionFragmentData',
