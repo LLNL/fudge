@@ -93,7 +93,6 @@ setup(
         'fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw',
         'fudge.reactions',
         'fudge.resonances',
-        'LUPY',
         'fudge.processing',
         'fudge.processing.deterministic',
         'fudge.processing.montecarlo',
@@ -101,7 +100,9 @@ setup(
         'fudge.processing.resonances.test',
         'fudge.vis',
         'fudge.vis.gnuplot',
-        'fudge.vis.matplotlib'
+        'fudge.vis.matplotlib',
+        'LUPY',        
+        'crossSectionAdjustForHeatedTarget'
     ],
     package_dir = {'': '.'},
     scripts = glob.glob('bin/*.py'),
