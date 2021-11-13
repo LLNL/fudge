@@ -20,7 +20,7 @@ plus tools for testing, visualizing, and processing GNDS-formatted data.
 
         (i)  Ensure that NumPy (version 1.15 or higher) and wheels are installed in your Python environment
 
-        (ii) Run the command `pip install git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/fudge.git@fudge4.3-rc5`
+        (ii) Run the command `pip install git+ssh://git@github.com/LLNL/fudge.git@v5.0.0`
 
     - Installation via Makefiles: This is the typical development mode for active FUDGE code maintenance and improvements.
       The following steps are recommended:
@@ -28,7 +28,7 @@ plus tools for testing, visualizing, and processing GNDS-formatted data.
         (i)   Ensure that NumPy (version 1.15 or higher) is installed
 
         (ii)  Use the following command to clone FUDGE to the current folder: 
-              `git clone --recurse-submodules ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/fudge.git`
+              `git clone git@github.com:LLNL/fudge.git`
 
         (iii) Build FUDGE with the following command: `cd fudge; make -s`
 
