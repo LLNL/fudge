@@ -93,7 +93,6 @@ setup(
         'fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw',
         'fudge.reactions',
         'fudge.resonances',
-        'fudge.test',
         'fudge.legacy',
         'fudge.legacy.converting',
         'fudge.legacy.converting.ENDFToGNDS',
