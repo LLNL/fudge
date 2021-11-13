@@ -24,6 +24,15 @@ except (ImportError, ModuleNotFoundError):
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
+        # install submodules
+        subprocess.call('python ./crossSectionAdjustForHeatedTarget/setup.py install', shell=True)
+        subprocess.call('python ./numericalFunctions/statusMessageReporting/setup.py', shell=True)
+        subprocess.call('python ./numericalFunctions/setup.py', shell=True)
+        subprocess.call('python ./pqu/setup.py', shell=True)
+        subprocess.call('python ./xData/setup.py', shell=True)
+        subprocess.call('python ./PoPs/setup.py', shell=True)
+        subprocess.call('python ./brownies/setup.py install', shell=True)
+
         # copy C executables Merced/bin/merced and upscatter/bin/calcUpscatterKernel to Python environment bin folder
         workingFolder = os.getcwd()
         binFolder = os.path.join(sys.prefix, 'bin')
@@ -119,16 +128,8 @@ setup(
         Extension( 'fudge.processing.resonances._getCoulombWavefunctions',
             sources = ['fudge/processing/resonances/getCoulombWavefunctions.c', 'fudge/processing/resonances/coulfg2.c'], ),
     ],
-    url = 'http://nuclear.llnl.gov/fudge',
-    install_requires=[
-        'numpy', 
-        'crossSectionAdjustForHeatedTarget @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/crosssectionadjustforheatedtarget.git@fudge4.3-rc7',
-        'numericalFunctions @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/numericalFunctions.git@fudge4.3-rc7',
-        'pqu @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/pqu.git@fudge4.3-rc7',
-        'xData @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/xData.git@fudge4.3-rc7',
-        'PoPs @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/pops/PoPs.git@fudge4.3-rc7',
-        'brownies @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/brownies.git@fudge4.3-rc7'
-    ],
+    url = 'https://github.com/llnl/fudge',
+    install_requires=['numpy'],
     license = open( 'LICENSE.txt' ).read(),
     description = '',
     long_description = open( 'README.txt' ).read(), requires=['numpy'],

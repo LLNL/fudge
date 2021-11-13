@@ -43,7 +43,7 @@ def setup():
         description='Fudge brownies',
         author='David Brown',
         author_email='dbrown@bnl.gov',
-        url='http://www.nndc.bnl.gov',
+        url='',
         download_url='',
         keywords=['ENDF', 'Fudge'],
         classifiers=[
