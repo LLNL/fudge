@@ -25,13 +25,12 @@ class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
         # install submodules
-        subprocess.call('python ./crossSectionAdjustForHeatedTarget/setup.py install', shell=True)
-        subprocess.call('python ./numericalFunctions/statusMessageReporting/setup.py install', shell=True)
-        subprocess.call('python ./numericalFunctions/setup.py install', shell=True)
-        subprocess.call('python ./pqu/setup.py install', shell=True)
-        subprocess.call('python ./xData/setup.py install', shell=True)
-        subprocess.call('python ./PoPs/setup.py install', shell=True)
-        subprocess.call('python ./brownies/setup.py install', shell=True)
+        #subprocess.call('python ./crossSectionAdjustForHeatedTarget/setup.py install', shell=True)
+        #subprocess.call('python ./numericalFunctions/setup.py install', shell=True)
+        #subprocess.call('python ./pqu/setup.py install', shell=True)
+        #subprocess.call('python ./xData/setup.py install', shell=True)
+        #subprocess.call('python ./PoPs/setup.py install', shell=True)
+        #subprocess.call('python ./brownies/setup.py install', shell=True)
 
         # copy C executables Merced/bin/merced and upscatter/bin/calcUpscatterKernel to Python environment bin folder
         workingFolder = os.getcwd()
@@ -127,7 +126,10 @@ setup(
             sources = ['fudge/processing/resonances/getCoulombWavefunctions.c', 'fudge/processing/resonances/coulfg2.c'], ),
     ],
     url = 'https://github.com/llnl/fudge',
-    install_requires=['numpy'],
+        install_requires=[
+        'numpy', 
+        'crossSectionAdjustForHeatedTarget @ file://localhost/crossSectionAdjustForHeatedTarget'
+    ],
     license = open( 'LICENSE' ).read(),
     description = '',
     long_description = open( 'README.md' ).read(), requires=['numpy'],
