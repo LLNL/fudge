@@ -102,7 +102,12 @@ setup(
         'fudge.vis.gnuplot',
         'fudge.vis.matplotlib',
         'LUPY',        
-        'crossSectionAdjustForHeatedTarget'
+        'crossSectionAdjustForHeatedTarget',
+        'numericalFunctions',
+        'pqu',
+        'xData',
+        'PoPs',
+        'brownies'
     ],
     package_dir = {'': '.'},
     scripts = glob.glob('bin/*.py'),
