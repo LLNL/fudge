@@ -26,11 +26,11 @@ class CustomInstall(install):
     def run(self):
         # install submodules
         subprocess.call('python ./crossSectionAdjustForHeatedTarget/setup.py install', shell=True)
-        subprocess.call('python ./numericalFunctions/statusMessageReporting/setup.py', shell=True)
-        subprocess.call('python ./numericalFunctions/setup.py', shell=True)
-        subprocess.call('python ./pqu/setup.py', shell=True)
-        subprocess.call('python ./xData/setup.py', shell=True)
-        subprocess.call('python ./PoPs/setup.py', shell=True)
+        subprocess.call('python ./numericalFunctions/statusMessageReporting/setup.py install', shell=True)
+        subprocess.call('python ./numericalFunctions/setup.py install', shell=True)
+        subprocess.call('python ./pqu/setup.py install', shell=True)
+        subprocess.call('python ./xData/setup.py install', shell=True)
+        subprocess.call('python ./PoPs/setup.py install', shell=True)
         subprocess.call('python ./brownies/setup.py install', shell=True)
 
         # copy C executables Merced/bin/merced and upscatter/bin/calcUpscatterKernel to Python environment bin folder
