@@ -130,7 +130,7 @@ setup(
     ],
     url = 'https://github.com/llnl/fudge',
     install_requires=['numpy'],
-    license = open( 'LICENSE.txt' ).read(),
+    license = open( 'LICENSE' ).read(),
     description = '',
     long_description = open( 'README.txt' ).read(), requires=['numpy'],
     cmdclass={'install': CustomInstall, 'build_ext': CustomBuildExt}
