@@ -132,7 +132,7 @@ setup(
     install_requires=['numpy'],
     license = open( 'LICENSE' ).read(),
     description = '',
-    long_description = open( 'README.txt' ).read(), requires=['numpy'],
+    long_description = open( 'README.md' ).read(), requires=['numpy'],
     cmdclass={'install': CustomInstall, 'build_ext': CustomBuildExt}
 )
 
