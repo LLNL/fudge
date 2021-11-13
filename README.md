@@ -56,20 +56,26 @@ well the translation works. Two tools for translating ENDF are included in the '
 
   rePrint.py: translate one ENDF-formatted file to GNDS, then translate back to ENDF for comparison with the original.
 Usage:
+```
     <path_to_FUDGE>/brownies/bin/rePrint.py filename.endf -v
   Several files are produced:
     -test.endf6.xml	(the gnds-formatted file)
     -test.endf6-covar.xml  (covariances in gnds, produced only if the original file has covariances)
     -test.endf6.noLineNumbers  (the gnds file translated back to ENDF format)
     -test.endf6.orig.noLineNumbers  (the original ENDF file with line numbers stripped for easy comparison)
+```
 
   After running rePrint.py, you may wish to compare the original/new ENDF files using diff,kompare, etc:
+```
     >diff test.endf6.orig.noLineNumbers test.endf6.noLineNumbers
+```
 
   endf2gnds.py: one-way translation from ENDF to GNDS. Useful for translating multiple ENDF-6 files since the GNDS versions will
   follow the same naming convention. For example, n-001_H_001.endf produces n-001_H_001.endf.gnds.xml (and n-001_H_001.endf.gnds-covar.xml)
+```
 Usage:
   <path_to_FUDGE>/brownies/bin/endf2gnds.py filename.endf -v
+```
 
 ## Getting Help:
   The FUDGE documentation is currently undergoing an update but the historical documentation in html is packaged along with FUDGE for 
