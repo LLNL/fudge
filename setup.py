@@ -96,8 +96,7 @@ setup(
         'LUPY'
     ],
     package_dir = {'': '.'},
-    scripts = [x for x in glob.glob('bin/*.py') if 'fudgePipInstallForDevelopers.py' not in x] \
-        + [] + ['brownies/bin/endf2gnds.py', 'brownies/bin/gnds2endf.py'],
+    scripts = [x for x in glob.glob('bin/*.py') if 'fudgePipInstallForDevelopers.py' not in x],
     package_data = {
         'fudge.legacy.endl.test': [ 'testdb/ascii/yi01/za001001/y*', 'testdb/ascii/yi01/za001001/*.txt', 'testdb/ascii/yi01/za001001/*xml' ],
         'fudge.processing.resonances.test': ['*.py'],

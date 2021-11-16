@@ -35,7 +35,8 @@ def setup():
             'brownies.legacy.toENDF6.reactionData', 'brownies.legacy.toENDF6.reactionData.chargedParticleElastic',
             'brownies.legacy.toENDF6.reactionData.photonScattering', 'brownies.legacy.toENDF6.resonances'],
         package_dir={'brownies': '.'},
-        scripts=['legacy/bin/prepro.py']+['bin/check.py', 'bin/grokres.py', 'bin/mcres.py', 'bin/plot_evaluation.py', 'bin/inter.py', 'bin/plot_covariance.py'],
+        scripts=['legacy/bin/prepro.py']+['bin/check.py', 'bin/grokres.py', 'bin/mcres.py', 'bin/plot_evaluation.py', \
+            'bin/inter.py', 'bin/plot_covariance.py', 'bin/endf2gnds.py', 'bin/gnds2endf.py'],
         package_data = {
             'brownies.BNL.inter': ['README.txt', '*.json'],
             'brownies.BNL.inter.test': ['*.endf'],
