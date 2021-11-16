@@ -20,7 +20,7 @@ plus tools for testing, visualizing, and processing GNDS-formatted data.
 
         (i)  Ensure that NumPy (version 1.15 or higher) and wheels are installed in your Python environment
 
-        (ii) Run the command `pip install git+ssh://git@github.com/LLNL/fudge.git@5.0.0`
+        (ii) Run the command `pip install git+https://github.com/LLNL/fudge.git@5.0.0`
 
     - Installation via Makefiles: This is the typical development mode for active FUDGE code maintenance and improvements.
       The following steps are recommended:
