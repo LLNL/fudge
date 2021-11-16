@@ -18,7 +18,8 @@ def setup():
             'xData',
             'xData.Documentation',
             'xData.uncertainty',
-            'xData.uncertainty.physicalQuantity'
+            'xData.uncertainty.physicalQuantity',
+            'xData.interactivePlot'
         ],
         package_dir={'xData': '.'},
         install_requires=[
