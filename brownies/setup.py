@@ -29,7 +29,7 @@ def setup():
             'brownies.legacy.endl.test',
             'brownies.legacy.toENDL', 'brownies.legacy.toENDL.productData', 'brownies.legacy.toENDL.productData.distributions',
             'brownies.legacy.toENDF6', 'brownies.legacy.toENDF6.PoPs_toENDF6', 'brownies.legacy.toENDF6.PoPs_toENDF6.atomic',
-            'brownies.legacy.toENDF6.PoPs_toENDF6.decays',
+            'brownies.legacy.toENDF6.PoPs_toENDF6.decays', 'brownies.legacy.toENDF6.PoPs_toENDF6.fissionFragmentData',
             'brownies.legacy.toENDF6.channelData', 'brownies.legacy.toENDF6.covariances', 'brownies.legacy.toENDF6.differentialCrossSection',
             'brownies.legacy.toENDF6.productData', 'brownies.legacy.toENDF6.productData.distributions', 'brownies.legacy.toENDF6.reactions',
             'brownies.legacy.toENDF6.reactionData', 'brownies.legacy.toENDF6.reactionData.chargedParticleElastic',
