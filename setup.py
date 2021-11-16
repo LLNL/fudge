@@ -65,6 +65,7 @@ setup(
     maintainer_email='mattoon1@llnl.gov',
     packages=[
         'fudge',
+        'fudge.gnds',
         'fudge.core',
         'fudge.core.math',
         'fudge.core.math.test',
