@@ -13,7 +13,7 @@ class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
         # Exclude brownies.bin.lev-vis.py since brownies.BNL.RIPL is not included in 'pip install'
-        filePath = os.path.join(os.path.dirname(os.path.abspath(__file__), 'bin', 'lev-vis.py'))
+        filePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin', 'lev-vis.py')
         os.remove(filePath)
 
         super().run()
