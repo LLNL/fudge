@@ -55,8 +55,7 @@ def setup():
             'brownies.BNL.inter.spectra': ['*.001', 'README.txt', '*.dat', '*.json', '*.endf'],
             'brownies.BNL.reaclib': ['SkyNetReaclib/*'],
             'brownies.BNL.plot_evaluation': ['*.json', '*.DAT'],
-            'brownies.LANL': ['build_xsdir/*.py', 'build_xsdir/*.dat', 'dismemberACE/*.py'],
-            'brownies.bin': [x for x in glob.glob('brownies/bin/*.py') if 'lev-vis.py' not in x]
+            'brownies.LANL': ['build_xsdir/*.py', 'build_xsdir/*.dat', 'dismemberACE/*.py']
         },
         version='0.9.1',
         description='Fudge brownies',
