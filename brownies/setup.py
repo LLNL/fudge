@@ -4,7 +4,19 @@
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-import glob
+
+import os
+
+from setuptools.command.install import install
+
+class CustomInstall(install):
+    """Custom handler for the 'install' command."""
+    def run(self):
+        # Exclude brownies.bin.lev-vis.py since brownies.BNL.RIPL is not included in 'pip install'
+        filePath = os.path.dirname(os.path.abspath(__file__), 'bin', 'lev-vis.py')
+        os.remove(filePath)
+
+        super().run()
 
 def setup():
     from setuptools import setup
@@ -67,7 +79,8 @@ def setup():
             'Topic :: Software Development :: Interpreters',
             'Topic :: Scientific/Engineering',
         ],
-        long_description=''''''
+        long_description='''''',
+        cmdclass={'install': CustomInstall}
     )
 
 
