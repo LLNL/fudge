@@ -7,6 +7,7 @@
 
 import unittest
 import os
+import sys
 from fudge import reactionSuite
 from fudge.processing.resonances.reconstructResonances import *
 import fudge.processing.resonances.getCoulombWavefunctions as getCoulombWavefunctions
@@ -36,6 +37,9 @@ def floatsAlmostEqual(float1, float2, epsilon=1e-15):
     bigger = max(abs(float1), abs(float2))
     return diff <= bigger * epsilon
 
+if not os.path.exists(os.path.join(TEST_DATA_PATH, 'SLBWExample1SRes_testFile.gnds.xml')):
+    print('WARNING: you need to run rebuild_test_data.py before running the test.')
+    sys.exit(0)
 
 if VERBOSE:
     print('reading SLBWExample1SRes...')

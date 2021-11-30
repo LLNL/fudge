@@ -7,6 +7,7 @@
 
 import unittest
 import os
+import sys
 import numpy
 
 from pqu import PQU
@@ -23,6 +24,10 @@ from fudge.processing.resonances import reconstructResonances, makeUnresolvedPro
 TEST_DATA_PATH, this_filename = os.path.split(os.path.realpath(__file__))
 VERBOSE = False
 DOFETESTS = True
+
+if not os.path.exists(os.path.join(TEST_DATA_PATH, 'MLBWExampleZr90_testFile.gnds.xml')):
+    print('WARNING: you need to run rebuild_test_data.py before running the test.')
+    sys.exit(0)
 
 try:
     import brownies.BNL.restools

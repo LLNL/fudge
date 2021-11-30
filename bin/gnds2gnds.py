@@ -36,6 +36,7 @@ parser.add_argument( '--hybrid', default = False, action = 'store_true',        
 parser.add_argument( '--minLength', type = int, default = 50,                           help = 'Min length of datasets to store in HDF5' )
 parser.add_argument( '--flatten', default = False, action = 'store_true',               help = 'Use flattened arrays in HDF5' )
 parser.add_argument( '--compress', default = False, action = 'store_true',              help = 'Use gzip + shuffle compression in HDF5' )
+parser.add_argument( '--skipCovariances', action = 'store_true',                        help = 'If present, any covariance files in are not written.' )
 parser.add_argument( '--formatVersion', default = formatVersionModule.default, choices = formatVersionModule.allowed,
                                                                                         help = 'Specifies the GNDS format for the outputted file.  Default = "%s".' % formatVersionModule.default )
 
@@ -51,8 +52,8 @@ if( __name__ == '__main__' ) :
         gnds = GNDSTypeModule.read( fileName )
     else :
         gnds = GNDSTypeModule.read( fileName )
-        if hasattr(gnds, 'loadCovariances'):
-            covariances = gnds.loadCovariances()
+        if not args.skipCovariances:
+            if hasattr(gnds, 'loadCovariances'): covariances = gnds.loadCovariances()
 
     if( args.energyUnit is not None ) :
         gnds.convertUnits( { 'MeV' : args.energyUnit, 'eV' : args.energyUnit } )
