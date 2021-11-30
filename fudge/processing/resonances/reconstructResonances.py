@@ -204,19 +204,20 @@ def reconstructResonances(reactionSuite, tolerance=None, verbose=False, signific
     and add results together for full (resonance region) pointwise cross section.
 
     Optional arguments:
-    'tolerance': fractional tolerance, used to refine interpolation grid.
-        e.g. if tolerance=0.001, points are added until lin-lin interpolation is good to 0.1% everywhere
 
-    'verbose': print status messages during reconstruction
+        - 'tolerance': fractional tolerance, used to refine interpolation grid.
+          That is, if tolerance = 0.001, points are added until lin-lin interpolation is good to 0.1% everywhere.
 
-    'significantDigits': Controls how many digits can be used to represent the energy grid. For example,
-        if significantDigits=4 the resulting energy grid can contain 1.034, 1.035, 1.036 but not 1.0345.
-        Using significantDigits=8 should allow data to be written back to ENDF-6 without loss of precision.
+        - 'verbose': print status messages during reconstruction
 
-    'energyUnit': unit to use for reconstruction. Resonance energies and widths will be converted to this unit.
+        - 'significantDigits': Controls how many digits can be used to represent the energy grid. For example,
+          if significantDigits=4 the resulting energy grid can contain 1.034, 1.035, 1.036 but not 1.0345.
+          Using significantDigits=8 should allow data to be written back to ENDF-6 without loss of precision.
 
-    'disableUnresolvedWidthInterpolation': set 'True' to reproduce old ENDF recommendation to interpolate
-        in cross sections rather than widths. That recommendation was reversed before ENDF-VIII release
+        - 'energyUnit': unit to use for reconstruction. Resonance energies and widths will be converted to this unit.
+
+        - 'disableUnresolvedWidthInterpolation': set 'True' to reproduce old ENDF recommendation to interpolate
+          in cross sections rather than widths. That recommendation was reversed before ENDF-VIII release
     """
 
     egrids, xsecs = [], []
@@ -502,9 +503,8 @@ class resonanceReconstructionBaseClass:
     def k(self, energy):
         """
         For an incident neutron, with energy in eV, the ENDF manual states
-        :math:`k = \frac{\\sqrt{2m_n}}{hbar}\frac{AWRI}{AWRI+1}\\sqrt{|E|}`
-
-        sqrt( 2 * neutronMass ) / hbar == 2.196807e-3 (eV*barn)**-1/2. Thus for energy in eV, k is in b**-1/2
+        :math:`k = \\frac{\\sqrt{2m_n}}{hbar}\\frac{AWRI}{AWRI+1}\\sqrt{|E|}`
+        sqrt( 2 * neutronMass ) / hbar == 2.196807e-3 (eV*barn)**-1/2. Thus for energy in eV, k is in b**-1/2.
         """
         return (2.196807122623e-3 * self.targetToNeutronMassRatio /
                 (self.targetToNeutronMassRatio+1) * numpy.sqrt(energy))
@@ -1103,9 +1103,11 @@ class RRBaseClass(resonanceReconstructionBaseClass):
     def getLMax(self,maxLmax=10):
         """
         LMax is determined by the behavior of the Blatt-Biedenharn Zbar coefficients.  Inside each one, there is
-        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this:
-                ( l1 l2  L )
-                (  0  0  0 )
+        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this::
+
+            ( l1 l2  L )
+            (  0  0  0 )
+
         So, this means two things.  First, the CG coeff (and hence Zbar) will be zero if l1+l2+L=odd.
         Second, the maximum value of L will be l1max+l2max.  Hence, Lmax=2*lmax.
         """
@@ -1459,7 +1461,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                     T_c=2x_c(1-x_c)
 
             * `method=='sumRule'`: Use Moldauer's sum rule to extract the transmission coefficients directly from
-                the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::
+              the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::
 
                 ..math::
                     T_c=2x_c\\left[\\sqrt{1+x_c^2}-x_c\\right]
@@ -1469,7 +1471,7 @@ class RRBaseClass(resonanceReconstructionBaseClass):
                 ..math::
                     T_c=1-\\exp{(-2x_c)}
 
-            * `method`==`SPRT`: Use the
+            * `method=='SPRT'`: Use the
 
                 ..math::
                     T_c=\\frac{2x_c}{ (1 + x_c/2)^2 + (P_c R^\\inf_c)^2 }
@@ -1905,12 +1907,12 @@ class SLBWcrossSection(RRBaseClass):
 
     def getScatteringLength(self, **kwargs):
         """
-        Compute R' in b**1/2, should be close to AP
-
-        The potential scattering cross section sigPot = 4 Pi (R')^2, so we compute the potential scattering cross section at E=1e-5 eV
-        :param **kwargs:
+        Compute R' in b^2/2, should be close to AP.
+        The potential scattering cross section sigPot = 4 Pi (R')^2, so we compute the potential scattering cross section at E=1e-5 eV.
+        :param kwargs:
         :return:
         """
+
         E=numpy.array([ PQU.PQU(1e-5, 'eV').getValueAs(self.energyUnit) ])
         sigPotL = []
         for l in self.channels:
@@ -2299,9 +2301,11 @@ class RMatrixLimitedcrossSection(RRBaseClass):
     def getLMax(self, maxLmax=10):
         """
         LMax is determined by the behavior of the Blatt-Biedenharn Zbar coefficients.  Inside each one, there is
-        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this:
+        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this::
+
                 ( l1 l2  L )
                 (  0  0  0 )
+
         So, this means two things.  First, the CG coeff (and hence Zbar) will be zero if l1+l2+L=odd.
         Second, the maximum value of L will be l1max+l2max.  Hence, Lmax=2*lmax.
         """
@@ -3318,7 +3322,7 @@ class URRcrossSection(resonanceReconstructionBaseClass):
                     T_c=2\\tau_c(1-\\tau_c)
 
             * `method=='sumRule'`: Use Moldauer's sum rule to extract the transmission coefficients directly from
-                the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::
+              the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::
 
                 ..math::
                     T_c=2\\tau_c\\left[\\sqrt{1+\\tau_c^2}-\\tau_c\\right]

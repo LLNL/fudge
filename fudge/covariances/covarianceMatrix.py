@@ -278,9 +278,9 @@ class covarianceMatrix(ancestryModule.ancestry, base.covariance):
         Rescales self (if it is a relative covariance) using XYs1d rowData and colData
         to convert self into an absolute covariance matrix.
 
-        :param XYs1d rowData: an XYs1d instance containing data to rescale covariance in the "row direction"
+        :param rowData: an XYs1d instance containing data to rescale covariance in the "row direction"
                             if it isn't given, we'll compute it from the corresponding data in the reactionSuite
-        :param XYs1d colData: an XYs1d instance containing data to rescale covariance in the "col direction"
+        :param colData: an XYs1d instance containing data to rescale covariance in the "col direction"
                             if it isn't given, we'll compute it from the corresponding data in the reactionSuite
 
         .. note:    If the column axis is a link, only rowData is needed.
@@ -352,9 +352,9 @@ class covarianceMatrix(ancestryModule.ancestry, base.covariance):
         Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
         to convert self into a relative covariance matrix.
 
-        :param XYs1d rowData: an XYs1d instance containing data to rescale covariance in the "row direction"
+        :param rowData: an XYs1d instance containing data to rescale covariance in the "row direction"
                             if it isn't given, we'll compute it from the corresponding data in the reactionSuite
-        :param XYs1d colData: an XYs1d instance containing data to rescale covariance in the "col direction"
+        :param colData: an XYs1d instance containing data to rescale covariance in the "col direction"
                             if it isn't given, we'll compute it from the corresponding data in the reactionSuite
 
         .. note::   If the column axis is a link, only rowData is needed.

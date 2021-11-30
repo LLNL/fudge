@@ -71,7 +71,7 @@ def twoBodyPhotoNuclearAtThreshold(masses, Q, modifiedProductGroupBoundaries, cr
             LegendreCoefficients = ( legendreMax + 1 ) * [ 0.0 ]
             TME.append(LegendreCoefficients)
         return TM1, TME
-
+        
     PofMuAtMin = angularData.evaluate(EgMin)
 
     K_3_lower = None

@@ -19,9 +19,11 @@ class parameterLink( linkModule.link ):
     Establishes a link between one or more rows of a parameterCovariance and corresponding parameter(s).
     Supports linking to specific parameters inside a table or list.
 
-    For example, if we have a 2x4 table
+    For example, if we have a 2x4 table::
+
       |A B C D|
       |E F G H|
+
     and wish to give a 4x4 covariance matrix for elements in the 2nd and 4th column of the table, we can create
     a parameterLink pointing to the table, with
     'matrixStartIndex=0',  'nParameters=4',  'parameterStartIndex=1',  'parameterStride=2'.

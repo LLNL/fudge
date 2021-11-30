@@ -495,7 +495,7 @@ class resonancesWithBackground( baseCrossSectionForm ) :
     """
     This class stores cross sections that include resonances along with a background contribution.
     Contains a link to the resonances, and the 'background' which consists of up to three terms:
-     resolved, unresolved and fast regions.
+    resolved, unresolved and fast regions.
     The full XYs1d cross section can be obtained by first reconstructing resonances
     and then adding the background contribution (users should use the reactionSuite.reconstructResonances method).
     """

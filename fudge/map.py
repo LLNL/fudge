@@ -83,7 +83,7 @@ class Base( ancestryModule.ancestry ) :
         Returns an XML string of self.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
-        :param **kwargs:        A keyword list passed to self's toXML_list method.
+        :param kwargs:          A keyword list passed to self's toXML_list method.
         """
 
         return( '\n'.join( self.toXML_list( indent, **kwargs ) ) )
@@ -93,7 +93,7 @@ class Base( ancestryModule.ancestry ) :
         Saves the contents of self to an already opened python file object (e.g., one returned by the open function).
 
         :param fOut:            A python file object.
-        :param **kwargs:        A keyword list passed to self's toXML method.
+        :param kwargs:          A keyword list passed to self's toXML method.
         """
 
         xmlString = self.toXML( **kwargs )
@@ -105,7 +105,7 @@ class Base( ancestryModule.ancestry ) :
         Saves the contents of self to the specified path (i.e., fileName).
 
         :param fileName:        The path to save the contents of self to.
-        :param **kwargs:        A keyword list passed to self's saveToOpenedFile method.
+        :param kwargs:          A keyword list passed to self's saveToOpenedFile method.
         """
 
         dirname = os.path.dirname( fileName )
@@ -286,7 +286,7 @@ class Map( Base ) :
         Returns a list of str instances representing the XML lines of self.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
-        :param **kwargs:        A keyword list.
+        :param kwargs:          A keyword list.
 
         :return:                List of str instances representing the XML lines of self.
         """
@@ -483,7 +483,7 @@ class Import( EntryBase ) :
         Returns a list of str instances representing the XML lines of self.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
-        :param **kwargs:        A keyword list.
+        :param kwargs:          A keyword list.
 
         :return:                List of str instances representing the XML lines of self.
         """
@@ -657,7 +657,7 @@ class Protare( ProtareBase ) :
         Returns a list of str instances representing the XML lines of self.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
-        :param **kwargs:        A keyword list.
+        :param kwargs:          A keyword list.
 
         :return:                List of str instances representing the XML lines of self.
         """
@@ -740,7 +740,7 @@ class TNSL( ProtareBase ) :
         Returns a list of str instances representing the XML lines of self.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
-        :param **kwargs:        A keyword list.
+        :param kwargs:          A keyword list.
 
         :return:                List of str instances representing the XML lines of self.
         """
