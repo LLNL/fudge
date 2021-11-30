@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.reactions package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <title>fudge.reactions package &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -14,9 +14,10 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fudge.structure package" href="fudge.structure.html" />
+    <link rel="next" title="numericalFunctions Package" href="numericalFunctions.html" />
     <link rel="prev" title="fudge.reactionData.test package" href="fudge.reactionData.test.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -29,12 +30,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="fudge.structure.html" title="fudge.structure package"
+          <a href="numericalFunctions.html" title="numericalFunctions Package"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="fudge.reactionData.test.html" title="fudge.reactionData.test package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.html" accesskey="U">fudge package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.reactions package</a></li> 
@@ -336,6 +337,44 @@ Does energy balance?</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-fudge.reactions.incompleteReaction">
+<span id="fudge-reactions-incompletereaction-module"></span><h2>fudge.reactions.incompleteReaction  module<a class="headerlink" href="#module-fudge.reactions.incompleteReaction" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the incompleteReaction class, for storing partially evaluated reactions
+that do not have enough information to be used for transport but may still contain useful info.</p>
+<p>Originally designed to store sub-actinide fission and standards cross-sections</p>
+<dl class="py class">
+<dt id="fudge.reactions.incompleteReaction.incompleteReaction">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.incompleteReaction.</code><code class="sig-name descname">incompleteReaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genre</span></em>, <em class="sig-param"><span class="n">ENDF_MT</span></em>, <em class="sig-param"><span class="n">fissionGenre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">documentation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/incompleteReaction.html#incompleteReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.incompleteReaction.incompleteReaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.base.base_reaction" title="fudge.reactions.base.base_reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.reactions.base.base_reaction</span></code></a></p>
+<p>Similar to the base &lt;reaction&gt; class, except it generally does not contain
+a complete description of products, and cannot be used for transport. It must contain a crossSection
+and outputChannel, but the list of products may be empty.</p>
+<dl class="py attribute">
+<dt id="fudge.reactions.incompleteReaction.incompleteReaction.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'reaction'</em><a class="headerlink" href="#fudge.reactions.incompleteReaction.incompleteReaction.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.reactions.orphanProduct">
+<span id="fudge-reactions-orphanproduct-module"></span><h2>fudge.reactions.orphanProduct module<a class="headerlink" href="#module-fudge.reactions.orphanProduct" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the orphanProduct class, for storing orphanProduct reaction data.</p>
+<dl class="py class">
+<dt id="fudge.reactions.orphanProduct.orphanProduct">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.orphanProduct.</code><code class="sig-name descname">orphanProduct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genre</span></em>, <em class="sig-param"><span class="n">ENDF_MT</span></em>, <em class="sig-param"><span class="n">fissionGenre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">documentation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/orphanProduct.html#orphanProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.orphanProduct.orphanProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.base.base_reaction" title="fudge.reactions.base.base_reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.reactions.base.base_reaction</span></code></a></p>
+<p>An orphanProduct reaction is another special case of the &lt;reaction&gt; class, used to store product information
+for a product not in the exclusive reactions. Currently only used for photons (i.e., gammas) from ENDL’s C=55 or the ENDF
+equivalent.</p>
+<dl class="py attribute">
+<dt id="fudge.reactions.orphanProduct.orphanProduct.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'orphanProduct'</em><a class="headerlink" href="#fudge.reactions.orphanProduct.orphanProduct.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-fudge.reactions.production">
 <span id="fudge-reactions-production-module"></span><h2>fudge.reactions.production module<a class="headerlink" href="#module-fudge.reactions.production" title="Permalink to this headline">¶</a></h2>
 <p>This module contains the production class, for storing production cross section of radioactive products.</p>
@@ -410,9 +449,6 @@ As with the summedReaction, ‘outputChannel’ should be a channels.simpleOutpu
 </dd></dl>
 
 </div>
-<div class="section" id="fudge-reactions-summedreaction-module">
-<h2>fudge.reactions.summedReaction module<a class="headerlink" href="#fudge-reactions-summedreaction-module" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="module-fudge.reactions">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.reactions" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -434,9 +470,10 @@ As with the summedReaction, ‘outputChannel’ should be a channels.simpleOutpu
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-fudge.reactions.base">fudge.reactions.base module</a></li>
 <li><a class="reference internal" href="#module-fudge.reactions.fissionComponent">fudge.reactions.fissionComponent module</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions.incompleteReaction">fudge.reactions.incompleteReaction  module</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions.orphanProduct">fudge.reactions.orphanProduct module</a></li>
 <li><a class="reference internal" href="#module-fudge.reactions.production">fudge.reactions.production module</a></li>
 <li><a class="reference internal" href="#module-fudge.reactions.reaction">fudge.reactions.reaction module</a></li>
-<li><a class="reference internal" href="#fudge-reactions-summedreaction-module">fudge.reactions.summedReaction module</a></li>
 <li><a class="reference internal" href="#module-fudge.reactions">Module contents</a></li>
 </ul>
 </li>
@@ -446,8 +483,8 @@ As with the summedReaction, ‘outputChannel’ should be a channels.simpleOutpu
   <p class="topless"><a href="fudge.reactionData.test.html"
                         title="previous chapter">fudge.reactionData.test package</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="fudge.structure.html"
-                        title="next chapter">fudge.structure package</a></p>
+  <p class="topless"><a href="numericalFunctions.html"
+                        title="next chapter">numericalFunctions Package</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -479,12 +516,12 @@ As with the summedReaction, ‘outputChannel’ should be a channels.simpleOutpu
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="fudge.structure.html" title="fudge.structure package"
+          <a href="numericalFunctions.html" title="numericalFunctions Package"
              >next</a> |</li>
         <li class="right" >
           <a href="fudge.reactionData.test.html" title="fudge.reactionData.test package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.reactions package</a></li> 

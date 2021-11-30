@@ -1,7 +1,7 @@
 External Packages used in Fudge
 ===============================
 
-Fudge depends on some stand-alone packages that are also maintained by the LLNL Computational Nuclear Physics group.
+Fudge depends on some stand-alone packages that are also maintained by the LLNL Nuclear Data and Theory group.
 These 'external' packages are distributed with Fudge but have their own source tree and documentation.
 
 pqu

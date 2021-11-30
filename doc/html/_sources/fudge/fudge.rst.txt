@@ -7,17 +7,11 @@ Subpackages
 .. toctree::
 
     fudge.channelData
-    fudge.core
     fudge.covariances
-    fudge
-    fudge.legacy
     fudge.processing
     fudge.productData
     fudge.reactionData
     fudge.reactions
-    fudge.structure
-    fudge.test
-    fudge.vis
 
 Submodules
 ----------
@@ -26,14 +20,6 @@ fudge.abstractClasses module
 ----------------------------
 
 .. automodule:: fudge.abstractClasses
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-fudge.channels module
----------------------
-
-.. automodule:: fudge.channels
     :members:
     :undoc-members:
     :show-inheritance:
@@ -62,22 +48,6 @@ fudge.externalFile module
     :undoc-members:
     :show-inheritance:
 
-fudge.fudgeDefaults module
---------------------------
-
-.. automodule:: fudge.fudgeDefaults
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-fudge.fudgeParameters module
-----------------------------
-
-.. automodule:: fudge.fudgeParameters
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 fudge.fudgeVersion module
 -------------------------
 
@@ -102,10 +72,10 @@ fudge.map module
     :undoc-members:
     :show-inheritance:
 
-fudge.miscellaneous module
+fudge.outputChannel module
 --------------------------
 
-.. automodule:: fudge.miscellaneous
+.. automodule:: fudge.outputChannel
     :members:
     :undoc-members:
     :show-inheritance:
@@ -166,14 +136,6 @@ fudge.sums module
     :undoc-members:
     :show-inheritance:
 
-fudge.thermalScattering module
-------------------------------
-
-.. automodule:: fudge.thermalScattering
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 fudge.warning module
 --------------------
 
@@ -181,7 +143,6 @@ fudge.warning module
     :members:
     :undoc-members:
     :show-inheritance:
-
 
 Module contents
 ---------------

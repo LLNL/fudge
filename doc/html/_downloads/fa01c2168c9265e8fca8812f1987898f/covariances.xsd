@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- xml schema defining structure of a GNDS covarianceSuite file
+       author: cmattoon
+
+       this schema can be used to validate that a covarianceSuite file has the correct structure:
+       >xmllint -schema gnds.xsd filename.gnds  # may wish to use the '-huge' and '-noout' options
+
+       Find definitions of some common data containers at the end of the schema.
+       For example, most covariance matrices are stored as gridded2d containers, which in turn 
+       contain an axes and an array -->
+
+
+  <xs:element name="covarianceSuite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="styles" type="styles"/>
+        <xs:element name="externalFiles" type="externalFiles" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="documentations" type="documentations" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="covarianceSections" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="section" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="parameterCovariances" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="parameterCovariance" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="averageParameterCovariance" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="projectile" type="xs:NCName" use="required"/>
+      <xs:attribute name="target" type="xs:NCName" use="required"/>
+      <xs:attribute name="evaluation" type="xs:string" use="required"/>
+      <xs:attribute name="format" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="styles">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="evaluated">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="temperature" type="PhysicalQuantity"/>
+            <xs:element name="projectileEnergyDomain">
+              <xs:complexType>
+                <xs:attribute name="min" type="xs:double" use="required"/>
+                <xs:attribute name="max" type="xs:double" use="required"/>
+                <xs:attribute name="unit" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="label" type="xs:NCName" use="required"/>
+          <xs:attribute name="library" type="xs:string" use="required"/>
+          <xs:attribute name="version" type="xs:string" use="required"/>
+          <xs:attribute name="date" type="xs:date" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="externalFiles">
+    <xs:sequence>
+      <xs:element name="externalFile" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="label" type="xs:NCName" use="required"/>
+          <xs:attribute name="path" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="documentations">
+    <xs:sequence>
+      <xs:element name="documentation" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="documentation" mixed="true">
+    <xs:attribute name="name" type="xs:NCName" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="section">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rowData" type="dataLink"/>
+        <xs:element name="columnData" type="dataLink" minOccurs="0"/>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="covarianceMatrix" type="covarianceMatrix"/>
+          <xs:element name="shortRangeSelfScalingVariance" type="shortRangeSelfScalingVariance"/>
+          <xs:element name="mixed" type="mixed"/>
+          <xs:element name="sum" type="sum"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="label" type="xs:string" use="required"/>
+      <xs:attribute name="crossTerm" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="dataLink">
+    <xs:attribute name="href" type="xs:string" use="required"/>
+    <xs:attribute name="ENDF_MFMT" type="xs:string"/>
+    <xs:attribute name="L" type="xs:int"/>
+    <xs:attributeGroup ref="dataLinkDomain"/>
+  </xs:complexType>
+
+  <xs:attributeGroup name="dataLinkDomain">
+    <!-- incident energy domain is required for fission neutron spectrum covariances -->
+    <xs:attribute name="domainMin" type="xs:string"/>
+    <xs:attribute name="domainMax" type="xs:string"/>
+    <xs:attribute name="domainUnit" type="xs:string"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="covarianceMatrix">
+    <xs:sequence>
+      <xs:element name="gridded2d" type="gridded2d"/>
+    </xs:sequence>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="productFrame" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="shortRangeSelfScalingVariance">
+    <xs:sequence>
+      <xs:element name="gridded2d" type="gridded2d"/>
+    </xs:sequence>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="dependenceOnProcessedGroupWidth" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="mixed">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="covarianceMatrix" type="covarianceMatrix"/>
+      <xs:element name="shortRangeSelfScalingVariance" type="shortRangeSelfScalingVariance"/>
+      <xs:element name="sum" type="sum"/>
+    </xs:choice>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="sum">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="summand" type="summand"/>
+    </xs:sequence>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+    <xs:attribute name="domainMin" type="xs:string" use="required"/>
+    <xs:attribute name="domainMax" type="xs:string" use="required"/>
+    <xs:attribute name="domainUnit" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="summand">
+    <xs:attribute name="ENDF_MFMT" type="xs:string" use="required"/>
+    <xs:attribute name="href" type="xs:string" use="required"/>
+    <xs:attribute name="coefficient" type="xs:double"/>
+  </xs:complexType>
+
+  <xs:element name="parameterCovariance">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rowData" type="dataLink"/>
+        <xs:element name="parameterCovarianceMatrix" type="parameterCovarianceMatrix"/>
+      </xs:sequence>
+      <xs:attribute name="label" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="parameterCovarianceMatrix">
+    <xs:sequence>
+      <xs:element name="parameters">
+        <xs:complexType>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:element name="parameterLink">
+              <xs:complexType>
+                <xs:attribute name="label" type="xs:string" use="required"/>
+                <xs:attribute name="href" type="xs:string" use="required"/>
+                <xs:attribute name="nParameters" type="xs:int"/>
+                <xs:attribute name="matrixStartIndex" type="xs:int"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="array" type="array"/>
+    </xs:sequence>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+    <xs:attribute name="type" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="averageParameterCovariance">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rowData" type="dataLink"/>
+        <xs:element name="columnData" type="dataLink" minOccurs="0"/>
+        <xs:element name="covarianceMatrix" type="covarianceMatrix"/>
+      </xs:sequence>
+      <xs:attribute name="label" type="xs:string" use="required"/>
+      <xs:attribute name="crossTerm" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- <editor-fold desc="basic data containers" defaultstate="collapsed"> -->
+  <xs:simpleType name="datalist">
+    <xs:list itemType="xs:double"/>
+  </xs:simpleType>
+
+  <xs:complexType name="values">
+    <xs:simpleContent>
+      <xs:extension base="datalist">
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="valueType" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="axes">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="axis">
+        <xs:complexType>
+          <xs:attribute name="index" type="xs:int" use="required"/>
+          <xs:attribute name="label" type="xs:string" use="required"/>
+          <xs:attribute name="unit" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="grid">
+        <xs:complexType>
+          <xs:choice>
+            <xs:element name="values" type="values"/>
+            <xs:element name="link">
+              <xs:complexType>
+                <xs:attribute name="href" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+          <xs:attribute name="index" type="xs:int" use="required"/>
+          <xs:attribute name="label" type="xs:string" use="required"/>
+          <xs:attribute name="unit" type="xs:string" use="required"/>
+          <xs:attribute name="style" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="array">
+    <xs:sequence>
+      <xs:element name="values" type="values" maxOccurs="3"/>
+    </xs:sequence>
+    <xs:attribute name="shape" type="xs:string" use="required"/>
+    <xs:attribute name="symmetry" type="xs:string"/>
+    <xs:attribute name="compression" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="gridded2d">
+    <xs:sequence>
+      <xs:element name="axes" type="axes"/>
+      <xs:element name="array" type="array"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PhysicalQuantity">
+    <xs:attribute name="value" type="xs:double" use="required"/>
+    <xs:attribute name="unit" type="xs:string" use="required"/> <!-- FIXME enumerate allowed units? -->
+  </xs:complexType>
+  <!-- </editor-fold> -->
+
+</xs:schema>

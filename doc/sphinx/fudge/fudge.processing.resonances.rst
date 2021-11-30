@@ -1,13 +1,6 @@
 fudge.processing.resonances package
 ===================================
 
-Subpackages
------------
-
-.. toctree::
-
-    fudge.processing.resonances.test
-
 Submodules
 ----------
 

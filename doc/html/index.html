@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fudge and GNDS &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <title>Fudge and GNDS &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="fudge Package" href="fudge/index.html" /> 
@@ -30,7 +31,7 @@
         <li class="right" >
           <a href="fudge/index.html" title="fudge Package"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Fudge and GNDS</a></li> 
       </ul>
     </div>  
@@ -44,20 +45,26 @@
 <h1>Fudge and GNDS<a class="headerlink" href="#fudge-and-gnds" title="Permalink to this headline">¶</a></h1>
 <dl class="field-list simple">
 <dt class="field-odd">Release</dt>
-<dd class="field-odd"><p>4.2.3</p>
+<dd class="field-odd"><p>5.0</p>
 </dd>
 <dt class="field-even">Date</dt>
-<dd class="field-even"><p>Nov 12, 2021</p>
+<dd class="field-even"><p>Nov 29, 2021</p>
 </dd>
 </dl>
-<p>Welcome to FUDGE (For Updating Data and GEnerating Evaluations), a nuclear data platform built in Python that permits
-reading, viewing, modifying, writing and processing of nuclear data. FUDGE is a product of the Computational Nuclear
-Physics Group (CNP) at Lawrence Livermore National Lab (LLNL).</p>
+<p>Welcome to FUDGE (For Updating Data and GEnerating Evaluations), a nuclear data platform built with Python that permits
+reading, viewing, modifying, writing and processing of nuclear data. FUDGE is a product of the Nuclear Data and
+Theory group (NDT) at Lawrence Livermore National Laboratory (LLNL).</p>
+<p>For installation instruction please review the REAME.md file or visit <a class="reference external" href="https://github.com/llnl/fudge">https://github.com/llnl/fudge</a>.</p>
 <p>This release of Fudge expands support for processing and visualizing data in the Generalized Nuclear Data (GNDS) format.
 GNDS is intended to modernize how nuclear data are stored and used, eventually replacing the legacy ENDF-6 format.
+This version of FUDGE supports GNDS version 2.0.LLNL_4 which is should be nearly identical to GNDS version 2.0.
+However, since 2.0 has not been officially released, FUDGE appends the extension ‘.LLNL_4’ to the GNDS version number
+in GNDS files.
 The package includes tools to translate other formats to and from GNDS, plus tools
-for testing, visualizing and processing GNDS-formatted data.</p>
-<p>As of this release, Fudge is compatible with Python 3 (version 3.6 and higher) as well as Python 2.7.
+for testing, visualizing and processing GNDS-formatted data.
+Python code within the <em>fudge</em> directory only support GNDS formatted data. Python code to support lecagy formats
+(e.g., ENDF-6 and ACE) reside in the brownies directory.</p>
+<p>As of this release, Fudge is compatible with Python 3 (version 3.6 and higher).
 See the installation notes for more details on working with multiple versions of Python.</p>
 <p>New users (and returning users) are encouraged to check out <a class="reference internal" href="tutorial/index.html"><span class="doc">The Fudge Tutorial</span></a>.</p>
 <p>If you just want to see what a GNDS file looks like, visit the ENDF/B-VIII library pages. The library
@@ -69,14 +76,12 @@ is available in both ENDF-6 and <a class="reference external" href="http://www.n
 <li class="toctree-l1"><a class="reference internal" href="fudge/index.html">The Fudge Package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="externals.html">External Packages used in Fudge</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gnds.html">Generalized Nuclear Data (GNDS)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gidi.html">Generalized Interaction Data Interface (GIDI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="downloading.html">Downloading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reporting-bugs.html">Reporting Bugs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="todo.html">To Do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="thanks.html">Thanks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="history.html">History of Fudge and GNDS</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -150,7 +155,7 @@ is available in both ENDF-6 and <a class="reference external" href="http://www.n
         <li class="right" >
           <a href="fudge/index.html" title="fudge Package"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Fudge and GNDS</a></li> 
       </ul>
     </div>

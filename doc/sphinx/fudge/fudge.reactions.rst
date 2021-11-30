@@ -20,6 +20,22 @@ fudge.reactions.fissionComponent module
     :undoc-members:
     :show-inheritance:
 
+fudge.reactions.incompleteReaction  module
+------------------------------------------
+
+.. automodule:: fudge.reactions.incompleteReaction
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+fudge.reactions.orphanProduct module
+------------------------------------
+
+.. automodule:: fudge.reactions.orphanProduct
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 fudge.reactions.production module
 ---------------------------------
 
@@ -35,15 +51,6 @@ fudge.reactions.reaction module
     :members:
     :undoc-members:
     :show-inheritance:
-
-fudge.reactions.summedReaction module
--------------------------------------
-
-.. automodule:: fudge.reactions.summedReaction
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

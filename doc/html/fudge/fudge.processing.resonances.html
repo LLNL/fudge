@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.processing.resonances package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <title>fudge.processing.resonances package &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -14,9 +14,10 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fudge.processing.resonances.test package" href="fudge.processing.resonances.test.html" />
+    <link rel="next" title="fudge.productData package" href="fudge.productData.html" />
     <link rel="prev" title="fudge.processing.montecarlo package" href="fudge.processing.montecarlo.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -29,12 +30,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="fudge.processing.resonances.test.html" title="fudge.processing.resonances.test package"
+          <a href="fudge.productData.html" title="fudge.productData package"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="fudge.processing.montecarlo.html" title="fudge.processing.montecarlo package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="fudge.processing.html" accesskey="U">fudge.processing package</a> &#187;</li>
@@ -49,21 +50,6 @@
             
   <div class="section" id="fudge-processing-resonances-package">
 <h1>fudge.processing.resonances package<a class="headerlink" href="#fudge-processing-resonances-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="fudge.processing.resonances.test.html">fudge.processing.resonances.test package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.test.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.test.html#module-fudge.processing.resonances.test.test_getScatteringMatrices">fudge.processing.resonances.test.test_getScatteringMatrices module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.test.html#module-fudge.processing.resonances.test.test_reconstructResonances">fudge.processing.resonances.test.test_reconstructResonances module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.test.html#module-fudge.processing.resonances.test.test_makeUnresolvedProbabilityTables">fudge.processing.resonances.test.test_makeUnresolvedProbabilityTables module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.processing.resonances.test.html#module-fudge.processing.resonances.test">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -447,10 +433,10 @@ where <img class="math" src="../_images/math/619ecd25490677b64fcbb585be6929080c7
 <code class="sig-name descname">getLMax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">maxLmax</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#RMatrixLimitedcrossSection.getLMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getLMax" title="Permalink to this definition">¶</a></dt>
 <dd><p>LMax is determined by the behavior of the Blatt-Biedenharn Zbar coefficients.  Inside each one, there is
 a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this:</p>
-<blockquote>
-<div><p>( l1 l2  L )
-(  0  0  0 )</p>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span> <span class="n">l1</span> <span class="n">l2</span>  <span class="n">L</span> <span class="p">)</span>
+<span class="p">(</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span> <span class="p">)</span>
+</pre></div>
+</div>
 <p>So, this means two things.  First, the CG coeff (and hence Zbar) will be zero if l1+l2+L=odd.
 Second, the maximum value of L will be l1max+l2max.  Hence, Lmax=2*lmax.</p>
 </dd></dl>
@@ -693,10 +679,10 @@ reasonable average.</p>
 <code class="sig-name descname">getLMax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">maxLmax</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#RRBaseClass.getLMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.RRBaseClass.getLMax" title="Permalink to this definition">¶</a></dt>
 <dd><p>LMax is determined by the behavior of the Blatt-Biedenharn Zbar coefficients.  Inside each one, there is
 a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this:</p>
-<blockquote>
-<div><p>( l1 l2  L )
-(  0  0  0 )</p>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span> <span class="n">l1</span> <span class="n">l2</span>  <span class="n">L</span> <span class="p">)</span>
+<span class="p">(</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span> <span class="p">)</span>
+</pre></div>
+</div>
 <p>So, this means two things.  First, the CG coeff (and hence Zbar) will be zero if l1+l2+L=odd.
 Second, the maximum value of L will be l1max+l2max.  Hence, Lmax=2*lmax.</p>
 </dd></dl>
@@ -906,16 +892,12 @@ The method argument controls the schemes to do this.</p>
 </pre></div>
 </div>
 </li>
-<li><dl>
-<dt><cite>method==’sumRule’</cite>: Use Moldauer’s sum rule to extract the transmission coefficients directly from</dt><dd><p>the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is:</p>
+<li><p><cite>method==’sumRule’</cite>: Use Moldauer’s sum rule to extract the transmission coefficients directly from
+the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span><span class="n">math</span><span class="p">::</span>
+    <span class="n">T_c</span><span class="o">=</span><span class="mi">2</span><span class="n">x_c</span>\<span class="n">left</span><span class="p">[</span>\<span class="n">sqrt</span><span class="p">{</span><span class="mi">1</span><span class="o">+</span><span class="n">x_c</span><span class="o">^</span><span class="mi">2</span><span class="p">}</span><span class="o">-</span><span class="n">x_c</span>\<span class="n">right</span><span class="p">]</span>
 </pre></div>
 </div>
-<blockquote>
-<div><p>T_c=2x_cleft[sqrt{1+x_c^2}-x_cright]</p>
-</div></blockquote>
-</dd>
-</dl>
 </li>
 <li><p><cite>method==’opticalModel’</cite>: Use Moldauer’s ‘optical model’ transmission coefficient:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span><span class="n">math</span><span class="p">::</span>
@@ -923,7 +905,7 @@ The method argument controls the schemes to do this.</p>
 </pre></div>
 </div>
 </li>
-<li><p><cite>method`==`SPRT</cite>: Use the</p>
+<li><p><cite>method==’SPRT’</cite>: Use the</p>
 <blockquote>
 <div><dl class="simple">
 <dt>..math::</dt><dd><p>T_c=frac{2x_c}{ (1 + x_c/2)^2 + (P_c R^inf_c)^2 }</p>
@@ -1047,9 +1029,9 @@ interference effects at all).</p>
 <dl class="py method">
 <dt id="fudge.processing.resonances.reconstructResonances.SLBWcrossSection.getScatteringLength">
 <code class="sig-name descname">getScatteringLength</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#SLBWcrossSection.getScatteringLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.SLBWcrossSection.getScatteringLength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute R’ in b**1/2, should be close to AP</p>
-<p>The potential scattering cross section sigPot = 4 Pi (R’)^2, so we compute the potential scattering cross section at E=1e-5 eV
-:param <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs:
+<dd><p>Compute R’ in b^2/2, should be close to AP.
+The potential scattering cross section sigPot = 4 Pi (R’)^2, so we compute the potential scattering cross section at E=1e-5 eV.
+:param kwargs:
 :return:</p>
 </dd></dl>
 
@@ -1168,16 +1150,12 @@ The method argument controls the schemes to do this.</p>
 </pre></div>
 </div>
 </li>
-<li><dl>
-<dt><cite>method==’sumRule’</cite>: Use Moldauer’s sum rule to extract the transmission coefficients directly from</dt><dd><p>the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is:</p>
+<li><p><cite>method==’sumRule’</cite>: Use Moldauer’s sum rule to extract the transmission coefficients directly from
+the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span><span class="n">math</span><span class="p">::</span>
+    <span class="n">T_c</span><span class="o">=</span><span class="mi">2</span>\<span class="n">tau_c</span>\<span class="n">left</span><span class="p">[</span>\<span class="n">sqrt</span><span class="p">{</span><span class="mi">1</span><span class="o">+</span>\<span class="n">tau_c</span><span class="o">^</span><span class="mi">2</span><span class="p">}</span><span class="o">-</span>\<span class="n">tau_c</span>\<span class="n">right</span><span class="p">]</span>
 </pre></div>
 </div>
-<blockquote>
-<div><p>T_c=2tau_cleft[sqrt{1+tau_c^2}-tau_cright]</p>
-</div></blockquote>
-</dd>
-</dl>
 </li>
 <li><p><cite>method==’opticalModel’</cite>: Use Moldauer’s ‘optical model’ transmission coefficient:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span><span class="n">math</span><span class="p">::</span>
@@ -1350,22 +1328,20 @@ distributions.angular.XYs2d instance containing Legendre expansions for each inc
 <code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">reconstructResonances</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reactionSuite</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">energyUnit</span><span class="o">=</span><span class="default_value">'eV'</span></em>, <em class="sig-param"><span class="n">disableUnresolvedWidthInterpolation</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#reconstructResonances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.reconstructResonances" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reconstruct all resonance cross sections (resolved and unresolved) in reactionSuite,
 and add results together for full (resonance region) pointwise cross section.</p>
-<p>Optional arguments:
-‘tolerance’: fractional tolerance, used to refine interpolation grid.</p>
+<p>Optional arguments:</p>
 <blockquote>
-<div><p>e.g. if tolerance=0.001, points are added until lin-lin interpolation is good to 0.1% everywhere</p>
+<div><ul class="simple">
+<li><p>‘tolerance’: fractional tolerance, used to refine interpolation grid.
+That is, if tolerance = 0.001, points are added until lin-lin interpolation is good to 0.1% everywhere.</p></li>
+<li><p>‘verbose’: print status messages during reconstruction</p></li>
+<li><p>‘significantDigits’: Controls how many digits can be used to represent the energy grid. For example,
+if significantDigits=4 the resulting energy grid can contain 1.034, 1.035, 1.036 but not 1.0345.
+Using significantDigits=8 should allow data to be written back to ENDF-6 without loss of precision.</p></li>
+<li><p>‘energyUnit’: unit to use for reconstruction. Resonance energies and widths will be converted to this unit.</p></li>
+<li><p>‘disableUnresolvedWidthInterpolation’: set ‘True’ to reproduce old ENDF recommendation to interpolate
+in cross sections rather than widths. That recommendation was reversed before ENDF-VIII release</p></li>
+</ul>
 </div></blockquote>
-<p>‘verbose’: print status messages during reconstruction</p>
-<dl class="simple">
-<dt>‘significantDigits’: Controls how many digits can be used to represent the energy grid. For example,</dt><dd><p>if significantDigits=4 the resulting energy grid can contain 1.034, 1.035, 1.036 but not 1.0345.
-Using significantDigits=8 should allow data to be written back to ENDF-6 without loss of precision.</p>
-</dd>
-</dl>
-<p>‘energyUnit’: unit to use for reconstruction. Resonance energies and widths will be converted to this unit.</p>
-<dl class="simple">
-<dt>‘disableUnresolvedWidthInterpolation’: set ‘True’ to reproduce old ENDF recommendation to interpolate</dt><dd><p>in cross sections rather than widths. That recommendation was reversed before ENDF-VIII release</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py class">
@@ -1380,15 +1356,9 @@ Using significantDigits=8 should allow data to be written back to ENDF-6 without
 <dl class="py method">
 <dt id="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.k">
 <code class="sig-name descname">k</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energy</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#resonanceReconstructionBaseClass.k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.k" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>For an incident neutron, with energy in eV, the ENDF manual states
-:math:<a href="#id3"><span class="problematic" id="id4">`</span></a>k =</p>
-</div></blockquote>
-<p>rac{sqrt{2m_n}}{hbar}
-rac{AWRI}{AWRI+1}sqrt{<a href="#id5"><span class="problematic" id="id6">|E|</span></a>}`</p>
-<blockquote>
-<div><p>sqrt( 2 * neutronMass ) / hbar == 2.196807e-3 (eV*barn)**-1/2. Thus for energy in eV, k is in b**-1/2</p>
-</div></blockquote>
+<dd><p>For an incident neutron, with energy in eV, the ENDF manual states
+<img class="math" src="../_images/math/ca75dfd27458a86963e4711143913a062473a020.png" alt="k = \frac{\sqrt{2m_n}}{hbar}\frac{AWRI}{AWRI+1}\sqrt{|E|}"/>
+sqrt( 2 * neutronMass ) / hbar == 2.196807e-3 (eV*barn)**-1/2. Thus for energy in eV, k is in b**-1/2.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1548,7 +1518,6 @@ Modifies the local copy of the resolved parameters (self.RRR)</p>
   <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge.processing.resonances package</a><ul>
-<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-fudge.processing.resonances.getCoulombWavefunctions">fudge.processing.resonances.getCoulombWavefunctions module</a></li>
 <li><a class="reference internal" href="#module-fudge.processing.resonances.getScatteringMatrices">fudge.processing.resonances.getScatteringMatrices module</a></li>
@@ -1568,8 +1537,8 @@ Modifies the local copy of the resolved parameters (self.RRR)</p>
   <p class="topless"><a href="fudge.processing.montecarlo.html"
                         title="previous chapter">fudge.processing.montecarlo package</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="fudge.processing.resonances.test.html"
-                        title="next chapter">fudge.processing.resonances.test package</a></p>
+  <p class="topless"><a href="fudge.productData.html"
+                        title="next chapter">fudge.productData package</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -1601,12 +1570,12 @@ Modifies the local copy of the resolved parameters (self.RRR)</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="fudge.processing.resonances.test.html" title="fudge.processing.resonances.test package"
+          <a href="fudge.productData.html" title="fudge.productData package"
              >next</a> |</li>
         <li class="right" >
           <a href="fudge.processing.montecarlo.html" title="fudge.processing.montecarlo package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="fudge.processing.html" >fudge.processing package</a> &#187;</li>

@@ -27,14 +27,6 @@ fudge.reactionData.availableMomentum module
     :undoc-members:
     :show-inheritance:
 
-fudge.reactionData.base module
-------------------------------
-
-.. automodule:: fudge.reactionData.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 fudge.reactionData.crossSection module
 --------------------------------------
 

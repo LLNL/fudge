@@ -1,5 +1,5 @@
 Checking ENDF or GNDS files
-==========================
+===========================
 
 Let's face it.  ENDF evaluations often have mistakes and bugs.  Fortunately `fudge` comes 
 armed with a large number of pre-made checks.  Running them is as simple as running the 

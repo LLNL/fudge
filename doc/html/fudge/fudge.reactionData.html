@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.reactionData package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <title>fudge.reactionData package &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.reactionData.test package" href="fudge.reactionData.test.html" />
@@ -34,7 +35,7 @@
         <li class="right" >
           <a href="fudge.productData.distributions.test.html" title="fudge.productData.distributions.test package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.html" accesskey="U">fudge package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.reactionData package</a></li> 
@@ -176,9 +177,6 @@ What is really needed is a function like rriint in mcfgen.</p>
 <dd><p>Reads an xml &lt;availableMomentum&gt; component element into fudge, including all forms in the component.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="fudge-reactiondata-base-module">
-<h2>fudge.reactionData.base module<a class="headerlink" href="#fudge-reactiondata-base-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-fudge.reactionData.crossSection">
 <span id="fudge-reactiondata-crosssection-module"></span><h2>fudge.reactionData.crossSection module<a class="headerlink" href="#module-fudge.reactionData.crossSection" title="Permalink to this headline">¶</a></h2>
@@ -739,11 +737,9 @@ for upperEps and the point <img class="math" src="../_images/math/ae7b9d881263a2
 <em class="property">class </em><code class="sig-prename descclassname">fudge.reactionData.crossSection.</code><code class="sig-name descname">resonancesWithBackground</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">resonances</span></em>, <em class="sig-param"><span class="n">background</span></em>, <em class="sig-param"><span class="n">uncertainty</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionData/crossSection.html#resonancesWithBackground"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactionData.crossSection.resonancesWithBackground" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.reactionData.crossSection.baseCrossSectionForm" title="fudge.reactionData.crossSection.baseCrossSectionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.reactionData.crossSection.baseCrossSectionForm</span></code></a></p>
 <p>This class stores cross sections that include resonances along with a background contribution.
-Contains a link to the resonances, and the ‘background’ which consists of up to three terms:</p>
-<blockquote>
-<div><p>resolved, unresolved and fast regions.</p>
-</div></blockquote>
-<p>The full XYs1d cross section can be obtained by first reconstructing resonances
+Contains a link to the resonances, and the ‘background’ which consists of up to three terms:
+resolved, unresolved and fast regions.
+The full XYs1d cross section can be obtained by first reconstructing resonances
 and then adding the background contribution (users should use the reactionSuite.reconstructResonances method).</p>
 <dl class="py attribute">
 <dt id="fudge.reactionData.crossSection.resonancesWithBackground.ancestryMembers">
@@ -864,7 +860,6 @@ and then adding the background contribution (users should use the reactionSuite.
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-fudge.reactionData.availableEnergy">fudge.reactionData.availableEnergy module</a></li>
 <li><a class="reference internal" href="#module-fudge.reactionData.availableMomentum">fudge.reactionData.availableMomentum module</a></li>
-<li><a class="reference internal" href="#fudge-reactiondata-base-module">fudge.reactionData.base module</a></li>
 <li><a class="reference internal" href="#module-fudge.reactionData.crossSection">fudge.reactionData.crossSection module</a></li>
 <li><a class="reference internal" href="#module-fudge.reactionData">Module contents</a></li>
 </ul>
@@ -913,7 +908,7 @@ and then adding the background contribution (users should use the reactionSuite.
         <li class="right" >
           <a href="fudge.productData.distributions.test.html" title="fudge.productData.distributions.test package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.reactionData package</a></li> 

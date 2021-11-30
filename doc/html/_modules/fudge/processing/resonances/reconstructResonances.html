@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.processing.resonances.reconstructResonances &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <title>fudge.processing.resonances.reconstructResonances &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -14,6 +14,7 @@
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
@@ -26,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.resonances.reconstructResonances</a></li> 
       </ul>
@@ -240,19 +241,20 @@
 <span class="sd">    and add results together for full (resonance region) pointwise cross section.</span>
 
 <span class="sd">    Optional arguments:</span>
-<span class="sd">    &#39;tolerance&#39;: fractional tolerance, used to refine interpolation grid.</span>
-<span class="sd">        e.g. if tolerance=0.001, points are added until lin-lin interpolation is good to 0.1% everywhere</span>
 
-<span class="sd">    &#39;verbose&#39;: print status messages during reconstruction</span>
+<span class="sd">        - &#39;tolerance&#39;: fractional tolerance, used to refine interpolation grid.</span>
+<span class="sd">          That is, if tolerance = 0.001, points are added until lin-lin interpolation is good to 0.1% everywhere.</span>
 
-<span class="sd">    &#39;significantDigits&#39;: Controls how many digits can be used to represent the energy grid. For example,</span>
-<span class="sd">        if significantDigits=4 the resulting energy grid can contain 1.034, 1.035, 1.036 but not 1.0345.</span>
-<span class="sd">        Using significantDigits=8 should allow data to be written back to ENDF-6 without loss of precision.</span>
+<span class="sd">        - &#39;verbose&#39;: print status messages during reconstruction</span>
 
-<span class="sd">    &#39;energyUnit&#39;: unit to use for reconstruction. Resonance energies and widths will be converted to this unit.</span>
+<span class="sd">        - &#39;significantDigits&#39;: Controls how many digits can be used to represent the energy grid. For example,</span>
+<span class="sd">          if significantDigits=4 the resulting energy grid can contain 1.034, 1.035, 1.036 but not 1.0345.</span>
+<span class="sd">          Using significantDigits=8 should allow data to be written back to ENDF-6 without loss of precision.</span>
 
-<span class="sd">    &#39;disableUnresolvedWidthInterpolation&#39;: set &#39;True&#39; to reproduce old ENDF recommendation to interpolate</span>
-<span class="sd">        in cross sections rather than widths. That recommendation was reversed before ENDF-VIII release</span>
+<span class="sd">        - &#39;energyUnit&#39;: unit to use for reconstruction. Resonance energies and widths will be converted to this unit.</span>
+
+<span class="sd">        - &#39;disableUnresolvedWidthInterpolation&#39;: set &#39;True&#39; to reproduce old ENDF recommendation to interpolate</span>
+<span class="sd">          in cross sections rather than widths. That recommendation was reversed before ENDF-VIII release</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">egrids</span><span class="p">,</span> <span class="n">xsecs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
@@ -538,9 +540,8 @@
 <div class="viewcode-block" id="resonanceReconstructionBaseClass.k"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.k">[docs]</a>    <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For an incident neutron, with energy in eV, the ENDF manual states</span>
-<span class="sd">        :math:`k = \frac{\\sqrt{2m_n}}{hbar}\frac{AWRI}{AWRI+1}\\sqrt{|E|}`</span>
-
-<span class="sd">        sqrt( 2 * neutronMass ) / hbar == 2.196807e-3 (eV*barn)**-1/2. Thus for energy in eV, k is in b**-1/2</span>
+<span class="sd">        :math:`k = \\frac{\\sqrt{2m_n}}{hbar}\\frac{AWRI}{AWRI+1}\\sqrt{|E|}`</span>
+<span class="sd">        sqrt( 2 * neutronMass ) / hbar == 2.196807e-3 (eV*barn)**-1/2. Thus for energy in eV, k is in b**-1/2.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="mf">2.196807122623e-3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetToNeutronMassRatio</span> <span class="o">/</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetToNeutronMassRatio</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="p">))</span></div>
@@ -1139,9 +1140,11 @@
 <div class="viewcode-block" id="RRBaseClass.getLMax"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getLMax">[docs]</a>    <span class="k">def</span> <span class="nf">getLMax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">maxLmax</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        LMax is determined by the behavior of the Blatt-Biedenharn Zbar coefficients.  Inside each one, there is</span>
-<span class="sd">        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this:</span>
-<span class="sd">                ( l1 l2  L )</span>
-<span class="sd">                (  0  0  0 )</span>
+<span class="sd">        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this::</span>
+
+<span class="sd">            ( l1 l2  L )</span>
+<span class="sd">            (  0  0  0 )</span>
+
 <span class="sd">        So, this means two things.  First, the CG coeff (and hence Zbar) will be zero if l1+l2+L=odd.</span>
 <span class="sd">        Second, the maximum value of L will be l1max+l2max.  Hence, Lmax=2*lmax.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1495,7 +1498,7 @@
 <span class="sd">                    T_c=2x_c(1-x_c)</span>
 
 <span class="sd">            * `method==&#39;sumRule&#39;`: Use Moldauer&#39;s sum rule to extract the transmission coefficients directly from</span>
-<span class="sd">                the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::</span>
+<span class="sd">              the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::</span>
 
 <span class="sd">                ..math::</span>
 <span class="sd">                    T_c=2x_c\\left[\\sqrt{1+x_c^2}-x_c\\right]</span>
@@ -1505,7 +1508,7 @@
 <span class="sd">                ..math::</span>
 <span class="sd">                    T_c=1-\\exp{(-2x_c)}</span>
 
-<span class="sd">            * `method`==`SPRT`: Use the</span>
+<span class="sd">            * `method==&#39;SPRT&#39;`: Use the</span>
 
 <span class="sd">                ..math::</span>
 <span class="sd">                    T_c=\\frac{2x_c}{ (1 + x_c/2)^2 + (P_c R^\\inf_c)^2 }</span>
@@ -1941,12 +1944,12 @@
 
 <div class="viewcode-block" id="SLBWcrossSection.getScatteringLength"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.SLBWcrossSection.getScatteringLength">[docs]</a>    <span class="k">def</span> <span class="nf">getScatteringLength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute R&#39; in b**1/2, should be close to AP</span>
-
-<span class="sd">        The potential scattering cross section sigPot = 4 Pi (R&#39;)^2, so we compute the potential scattering cross section at E=1e-5 eV</span>
-<span class="sd">        :param **kwargs:</span>
+<span class="sd">        Compute R&#39; in b^2/2, should be close to AP.</span>
+<span class="sd">        The potential scattering cross section sigPot = 4 Pi (R&#39;)^2, so we compute the potential scattering cross section at E=1e-5 eV.</span>
+<span class="sd">        :param kwargs:</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">E</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">,</span> <span class="s1">&#39;eV&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energyUnit</span><span class="p">)</span> <span class="p">])</span>
         <span class="n">sigPotL</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
@@ -2335,9 +2338,11 @@
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.getLMax"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getLMax">[docs]</a>    <span class="k">def</span> <span class="nf">getLMax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxLmax</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        LMax is determined by the behavior of the Blatt-Biedenharn Zbar coefficients.  Inside each one, there is</span>
-<span class="sd">        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this:</span>
+<span class="sd">        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this::</span>
+
 <span class="sd">                ( l1 l2  L )</span>
 <span class="sd">                (  0  0  0 )</span>
+
 <span class="sd">        So, this means two things.  First, the CG coeff (and hence Zbar) will be zero if l1+l2+L=odd.</span>
 <span class="sd">        Second, the maximum value of L will be l1max+l2max.  Hence, Lmax=2*lmax.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -3354,7 +3359,7 @@
 <span class="sd">                    T_c=2\\tau_c(1-\\tau_c)</span>
 
 <span class="sd">            * `method==&#39;sumRule&#39;`: Use Moldauer&#39;s sum rule to extract the transmission coefficients directly from</span>
-<span class="sd">                the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::</span>
+<span class="sd">              the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equation is::</span>
 
 <span class="sd">                ..math::</span>
 <span class="sd">                    T_c=2\\tau_c\\left[\\sqrt{1+\\tau_c^2}-\\tau_c\\right]</span>
@@ -3456,7 +3461,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.resonances.reconstructResonances</a></li> 
       </ul>

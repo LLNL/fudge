@@ -10,11 +10,9 @@ Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145--3171
 GNDS-XML
 --------
 
-*Download:* :download:`XML Schema for GNDS <../../fudge.xsd>`
+*Download:* :download:`XML Schema for GNDS <../../fudge/gnds.xsd>`
 
-*Download:* :download:`XML Schema for xlink <../../fudge/xlink.xsd>`
-
-*Download:* :download:`Stylesheet transformation for simple viewing of GNDS files <../../examples/gnds.xsl>`
+*Download:* :download:`XML Schema for xlink <../../fudge/covariances/covariances.xsd>`
 
 GNDS-HDF5
 ---------

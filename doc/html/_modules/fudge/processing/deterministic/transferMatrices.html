@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.processing.deterministic.transferMatrices &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <title>fudge.processing.deterministic.transferMatrices &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -14,6 +14,7 @@
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
@@ -26,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.deterministic.transferMatrices</a></li> 
       </ul>
@@ -53,7 +54,6 @@
 
 <span class="kn">import</span> <span class="nn">fudge</span> <span class="k">as</span> <span class="nn">fudgeModule</span>
 
-<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">brb</span>
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">subprocessing</span><span class="p">,</span> <span class="n">times</span>
 
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">standards</span> <span class="k">as</span> <span class="n">standardsModule</span>
@@ -160,7 +160,7 @@
     <span class="k">if</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="ow">and</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productName&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">neutron</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">group</span> <span class="k">as</span> <span class="n">groupModule</span>
 
-        <span class="n">cutoffEnergy</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="s1">&#39;MeV&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incidentEnergyUnit&#39;</span><span class="p">])</span>
+        <span class="n">cutoffEnergy</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;MeV&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incidentEnergyUnit&#39;</span><span class="p">])</span>
         <span class="n">productName</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productName&#39;</span><span class="p">]</span>
         <span class="n">productGroupBoundaries</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">transportables</span><span class="p">[</span><span class="n">productName</span><span class="p">]</span><span class="o">.</span><span class="n">group</span>
         <span class="k">for</span> <span class="n">modifiedProductGroupIndex</span><span class="p">,</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">productGroupBoundaries</span><span class="o">.</span><span class="n">boundaries</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
@@ -206,9 +206,7 @@
             <span class="n">TM1atThreshold</span><span class="p">,</span> <span class="n">TMEatThreshold</span> <span class="o">=</span> <span class="n">specialCasesModule</span><span class="o">.</span><span class="n">twoBodyPhotoNuclearAtThreshold</span><span class="p">(</span><span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;masses&#39;</span><span class="p">],</span> <span class="n">Q</span><span class="p">,</span> 
                 <span class="n">modifiedProductGroupBoundaries</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;legendreMax&#39;</span><span class="p">],</span> <span class="n">groupFlux</span><span class="p">)</span>
             <span class="n">norm</span> <span class="o">=</span> <span class="n">TM1atThreshold</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">norm</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
-                <span class="n">norm</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TM1atThreshold</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">norm</span>
-            <span class="n">norm</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">norm</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TM1atThreshold</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">norm</span>
             <span class="n">TMEatThreshold</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">TM1atThresholdRow</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">TM1atThreshold</span><span class="p">):</span>
                 <span class="n">TM1atThresholdRow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="n">norm</span>
@@ -1098,10 +1096,7 @@
         <span class="n">interpolationStr</span> <span class="o">=</span> <span class="s1">&#39;Interpolation: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">data</span><span class="o">.</span><span class="n">interpolation</span>
     <span class="k">else</span> <span class="p">:</span>
         <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;ERROR from </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="vm">__file__</span><span class="p">)</span>
-        <span class="k">try</span> <span class="p">:</span>
-            <span class="n">brb</span><span class="o">.</span><span class="n">objectoutline</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
-        <span class="k">except</span> <span class="p">:</span>
-            <span class="k">pass</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Unsupported data type: see prior output&#39;</span> <span class="p">)</span>
     <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">doubleFmt</span><span class="p">,</span> <span class="n">doubleFmt</span> <span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="p">[</span> <span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">]</span>
@@ -1189,7 +1184,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.deterministic.transferMatrices</a></li> 
       </ul>

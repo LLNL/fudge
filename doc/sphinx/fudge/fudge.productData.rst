@@ -11,14 +11,6 @@ Subpackages
 Submodules
 ----------
 
-fudge.productData.base module
------------------------------
-
-.. automodule:: fudge.productData.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 fudge.productData.energyDeposition module
 -----------------------------------------
 

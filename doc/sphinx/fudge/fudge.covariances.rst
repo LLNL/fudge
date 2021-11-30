@@ -44,10 +44,26 @@ fudge.covariances.modelParameters module
     :undoc-members:
     :show-inheritance:
 
-fudge.covariances.section module
---------------------------------
+fudge.covariances.covarianceSection module
+------------------------------------------
 
-.. automodule:: fudge.covariances.section
+.. automodule:: fudge.covariances.covarianceSection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+fudge.covariances.shortRangeSelfScalingVariance module
+------------------------------------------------------
+
+.. automodule:: fudge.covariances.shortRangeSelfScalingVariance
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+fudge.covariances.covarianceMatrix module
+-----------------------------------------
+
+.. automodule:: fudge.covariances.covarianceMatrix
     :members:
     :undoc-members:
     :show-inheritance:
@@ -59,15 +75,6 @@ fudge.covariances.summed module
     :members:
     :undoc-members:
     :show-inheritance:
-
-fudge.covariances.tokens module
--------------------------------
-
-.. automodule:: fudge.covariances.tokens
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.map &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <title>fudge.map &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -14,6 +14,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
@@ -26,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.map</a></li> 
       </ul>
@@ -119,7 +120,7 @@
 <span class="sd">        Returns an XML string of self.</span>
 
 <span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
-<span class="sd">        :param **kwargs:        A keyword list passed to self&#39;s toXML_list method.</span>
+<span class="sd">        :param kwargs:          A keyword list passed to self&#39;s toXML_list method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXML_list</span><span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
@@ -129,7 +130,7 @@
 <span class="sd">        Saves the contents of self to an already opened python file object (e.g., one returned by the open function).</span>
 
 <span class="sd">        :param fOut:            A python file object.</span>
-<span class="sd">        :param **kwargs:        A keyword list passed to self&#39;s toXML method.</span>
+<span class="sd">        :param kwargs:          A keyword list passed to self&#39;s toXML method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xmlString</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
@@ -141,7 +142,7 @@
 <span class="sd">        Saves the contents of self to the specified path (i.e., fileName).</span>
 
 <span class="sd">        :param fileName:        The path to save the contents of self to.</span>
-<span class="sd">        :param **kwargs:        A keyword list passed to self&#39;s saveToOpenedFile method.</span>
+<span class="sd">        :param kwargs:          A keyword list passed to self&#39;s saveToOpenedFile method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="n">fileName</span> <span class="p">)</span>
@@ -322,7 +323,7 @@
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
-<span class="sd">        :param **kwargs:        A keyword list.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
 
 <span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -519,7 +520,7 @@
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
-<span class="sd">        :param **kwargs:        A keyword list.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
 
 <span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -693,7 +694,7 @@
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
-<span class="sd">        :param **kwargs:        A keyword list.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
 
 <span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -776,7 +777,7 @@
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
-<span class="sd">        :param **kwargs:        A keyword list.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
 
 <span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -860,7 +861,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.map</a></li> 
       </ul>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1. Basic translating between ENDF and GNDS &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <title>1. Basic translating between ENDF and GNDS &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="2. Checking ENDF or GNDS files" href="checking.html" />
@@ -34,7 +35,7 @@
         <li class="right" >
           <a href="index.html" title="The Fudge Tutorial"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">The Fudge Tutorial</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Basic translating between ENDF and GNDS</a></li> 
       </ul>
@@ -47,200 +48,29 @@
             
   <div class="section" id="basic-translating-between-endf-and-gnds">
 <h1><span class="section-number">1. </span>Basic translating between ENDF and GNDS<a class="headerlink" href="#basic-translating-between-endf-and-gnds" title="Permalink to this headline">¶</a></h1>
-<p>Fudge comes with a tool (fudge/bin/rePrint.py) for translating ENDF-6 evaluations to and from GNDS.
-For the purpose of demonstrating how Fudge works, in this tutorial we will reproduce the capability of rePrint.py
-by writing two codes:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">endf2gnds.py</span></code> : a code to translate ENDF formatted data into the GNDS format</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">gnds2endf.py</span></code> : a code to translate GNDS formatted data into ENDF</p></li>
-</ul>
-</div></blockquote>
-<p>In both scripts (and all the others we will write), we will use the Python <cite>argparse</cite> module to
-manage the command line options of the scripts.  Before we get to that, lets just start by learning how to translate between ENDF and GNDS.</p>
+<p>Fudge comes with a tools for translating ENDF-6 evaluations to and from GNDS which reside in the brownies/bin directory.</p>
 <div class="section" id="translating-from-endf-into-gnds">
 <h2><span class="section-number">1.1. </span>Translating from ENDF into GNDS<a class="headerlink" href="#translating-from-endf-into-gnds" title="Permalink to this headline">¶</a></h2>
-<p>Let’s experiment with fudge in the Python shell.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python
-Python 2.7.1 (r271:86832, Jun 16 2011, 16:59:05)
-[GCC 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2335.15.00)] on darwin
-Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+<p>The Python script brownies/bin/endf2gnds.py translations an ENDF-6 file to a GNDS file. This script writes a GNDS file containing
+the reactionSuite node and, if covariance data are present in the ENDF-6 file, its also writes a GNDS file containing the
+covarianceSuite node. For example, the following command translating the ENDF/B-VIII.0 file n-001_H_001.endf and outputs the
+files n-001_H_001.xml and n-001_H_001-covar.xml:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">full</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">FUDGE</span><span class="o">/</span><span class="n">brownies</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">endf2gnds</span><span class="o">.</span><span class="n">py</span> <span class="n">n</span><span class="o">-</span><span class="mi">001</span><span class="n">_H_001</span><span class="o">.</span><span class="n">endf</span> <span class="n">n</span><span class="o">-</span><span class="mi">001</span><span class="n">_H_001</span><span class="o">.</span><span class="n">xml</span>
 </pre></div>
 </div>
-<p>First, import the <code class="docutils literal notranslate"><span class="pre">endfFileToGNDS</span></code> function from <code class="docutils literal notranslate"><span class="pre">fudge.legacy.converting</span></code>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.legacy.converting.endfFileToGNDS</span> <span class="kn">import</span> <span class="n">endfFileToGNDS</span>
+<p>If using the <em>pip installed</em> version of <strong>FUDGE</strong>, the one only needs the:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brownies</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">endf2gnds</span><span class="o">.</span><span class="n">py</span> <span class="n">n</span><span class="o">-</span><span class="mi">001</span><span class="n">_H_001</span><span class="o">.</span><span class="n">endf</span> <span class="n">n</span><span class="o">-</span><span class="mi">001</span><span class="n">_H_001</span><span class="o">.</span><span class="n">xml</span>
 </pre></div>
 </div>
-<p>I assume that you have an ENDF formatted file somewhere and for the sake of argument, I’ll
-assume that it is <code class="docutils literal notranslate"><span class="pre">n-001_H_001.endf</span></code> and that it is in the current directory, <code class="docutils literal notranslate"><span class="pre">'.'</span></code>.  Given this,
-simply do:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">resultsDict</span> <span class="o">=</span> <span class="n">endfFileToGNDS</span><span class="p">(</span> <span class="s1">&#39;n-001_H_001.endf&#39;</span><span class="p">,</span> <span class="n">toStdOut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skipBadData</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
-</pre></div>
-</div>
-<p>Before hitting return, note a few things.  First, the <code class="docutils literal notranslate"><span class="pre">endfFileToGNDS()</span></code> function takes one mandatory argument,
-the ENDF file name, and returns a Python dictionary.
-The other arguments <code class="docutils literal notranslate"><span class="pre">toStdOut</span></code> and <code class="docutils literal notranslate"><span class="pre">skipBadData</span></code> do not need to be specified.
-The <code class="docutils literal notranslate"><span class="pre">skipBadData</span></code> option tells <code class="docutils literal notranslate"><span class="pre">fudge</span></code> to keep going when reading an ENDF file, even if it is “broken”.
-<code class="docutils literal notranslate"><span class="pre">Fudge</span></code> is picky and will otherwise throw an exception when it encounters bad or malformed data
-(an all-too-common occurrance sadly).  The <code class="docutils literal notranslate"><span class="pre">toStdOut</span></code> option tells <code class="docutils literal notranslate"><span class="pre">fudge</span></code> to redirect all warnings and errors
-to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> rather than <code class="docutils literal notranslate"><span class="pre">stderr</span></code>.</p>
-<p>So, let’s hit return and see what happens:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">resultsDict</span> <span class="o">=</span> <span class="n">endfFileToGNDS</span><span class="p">(</span> <span class="s1">&#39;n-001_H_001.endf&#39;</span><span class="p">,</span> <span class="n">toStdOut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skipBadData</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
-<span class="go">  2 [3, 4, 33] : MF=4, LTT = 1</span>
-<span class="go">102 [3, 6, 33] : MF=6 : ZAP=0, LAW=2, LANG=0 : ZAP=1002, LAW=4</span>
-<span class="go">  1 [3, 33]</span>
-<span class="go">Reading resonances (MF=2 MT=151)</span>
-<span class="go">Reading covariances (MFs 33)</span>
-</pre></div>
-</div>
-<p>Voila, your ENDF file is translated into GNDS.  The first number listed is the ENDF reaction designator
-MT (2, 102 and 1 are present in this file).  The list following the MT is the list of observables
-for which there is data in this reaction, i.e. the list of MF’s.  The final set of values denote any special formats for those MF’s.</p>
-<p>The dictionary returned by endfFileToGNDS contains several items:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">resultsDict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>[‘info’, ‘reactionSuite’, ‘errors’, ‘covarianceSuite’]</p>
-<p>resultsDict[‘reactionSuite’] is an instance of the Fudge <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> class containing the entire <cite>GNDS</cite> file.
-In other words, endfFileToGNDS reads and translates the data at the same time.
-The dictionary also contains a <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code> instance with covariances from the evaluation.
-If the original ENDF file has no covariances, then the value will be set to <code class="docutils literal notranslate"><span class="pre">None</span></code>.
-The dictionary also contains</p>
-<p>To write translated results to a file, we need to use the <code class="docutils literal notranslate"><span class="pre">toXMLList()</span></code> member functions
-of the <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> and <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code> classes:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">open</span><span class="p">(</span> <span class="n">gnds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span>
-<span class="go">        resultsDict[&#39;reactionSuite&#39;].toXMLList(verbosity=0) )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">myCov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">open</span><span class="p">(</span> <span class="s2">&quot;n-001_H_001.gndsCov.xml&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span> <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;covarianceSuite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="p">)</span>
-</pre></div>
-</div>
-<p>In both cases, we may hand the <code class="docutils literal notranslate"><span class="pre">toXMLList()</span></code> member function extra processing directives
-(in this case, we simply set ‘verbosity’ to 0 to indicate that we want the output to be quiet).</p>
 </div>
 <div class="section" id="translating-gnds-files-back-into-endf">
 <h2><span class="section-number">1.2. </span>Translating GNDS files back into ENDF<a class="headerlink" href="#translating-gnds-files-back-into-endf" title="Permalink to this headline">¶</a></h2>
-<p>Now let us reconstruct the original ENDF file.  First we need to import an additional module that supports writing
-GNDS back to ENDF:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">brownies.legacy.toENDF6</span> <span class="kn">import</span> <span class="n">toENDF6</span>
+<p>The Python script brownies/bin/gnds2endf.py translations a GNDS file to an ENDF-6 file. This script will look for a corresponding
+covariance file and, if present, add its data to the outputted ENDF-6 file. For example, the following translates the n-001_H_001.xml
+file generated in the endf2gnds.py comannd above back into an ENDF-6 file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">full</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">FUDGE</span><span class="o">/</span><span class="n">brownies</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">gnds2endf</span><span class="o">.</span><span class="n">py</span> <span class="n">n</span><span class="o">-</span><span class="mi">001</span><span class="n">_H_001</span><span class="o">.</span><span class="n">xml</span>
 </pre></div>
 </div>
-<p>After this import, all
-GNDS back to ENDF:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">brownies.legacy.toENDF6</span> <span class="kn">import</span> <span class="n">toENDF6</span>
-</pre></div>
-</div>
-<p>After this import, all
-GNDS back to ENDF:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">site_packages.legacy.toENDF6</span> <span class="kn">import</span> <span class="n">toENDF6</span>
-</pre></div>
-</div>
-<p>After this import, all <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> instances contain a member function <code class="docutils literal notranslate"><span class="pre">toENDF6()</span></code>.  Let’s try it out:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">evalStyle</span> <span class="o">=</span> <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">style</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">myENDF</span> <span class="o">=</span> <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">toENDF6</span><span class="p">(</span> <span class="n">evalStyle</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;verbosity&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">},</span>
-<span class="go">        covarianceSuite=resultsDict[&#39;covarianceSuite&#39;], lineNumbers = False )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">open</span><span class="p">(</span> <span class="s2">&quot;junk.endf&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">myENDF</span> <span class="p">)</span>
-</pre></div>
-</div>
-<p>A few comments on the previous lines: the ‘evalStyle’ is needed when going back to ENDF-6 because a GNDS file
-can contain more than one style of data, including one or more evaluations along with processed data.
-Only one style (indicated by a string label) is translated back to ENDF-6.  The <code class="docutils literal notranslate"><span class="pre">{'verbosity':0}</span></code> argument
-contains extra flags used when writing back to ENDF-6. We also supply a <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code> so covariances are
-written back, and tell Fudge not to write line numbers.</p>
-<p>Now you should quit Python (using ^d), and check out what you made.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ diff junk.endf n-001_H_001.endf
-1c1
-&lt;                                                                      1 0  0
----
-&gt;  $Rev:: 532      $  $Date:: 2011-12-05#$                             1 0  0    0
-93c93
-&lt;                                 1        451        101          0 125 1451   92
----
-&gt;                                 1        451        101          5 125 1451   92
-95,102c95,102
-&lt;                                 3          1         35          0 125 1451   94
-&lt;                                 3          2         35          0 125 1451   95
-&lt;                                 3        102         35          0 125 1451   96
-&lt;                                 4          2        196          0 125 1451   97
-&lt;                                 6        102        201          0 125 1451   98
-&lt;                                33          1          5          0 125 1451   99
-&lt;                                33          2         21          0 125 1451  100
-&lt;                                33        102         21          0 125 1451  101
----
-&gt;                                 3          1         35          4 125 1451   94
-&gt;                                 3          2         35          4 125 1451   95
-&gt;                                 3        102         35          5 125 1451   96
-&gt;                                 4          2        196          4 125 1451   97
-&gt;                                 6        102        201          4 125 1451   98
-&gt;                                33          1          5          5 125 1451   99
-&gt;                                33          2         21          5 125 1451  100
-&gt;                                33        102         21          5 125 1451  101
-113c113
-&lt;          30          5         96          2          0          0 125 3  1    3
----
-&gt;          30          5         96          2                       125 3  1    3
-149c149
-&lt;          96          2          0          0          0          0 125 3  2    3
----
-&gt;          96          2                                             125 3  2    3
-185c185
-&lt;          30          5         96          2          0          0 125 3102    3
----
-&gt;          30          5         96          2                       125 3102    3
-223c223
-&lt;          96          2          0          0          0          0 125 4  2    4
----
-&gt;          96          2                                             125 4  2    4
-420c420
-&lt;           2          2          0          0          0          0 125 6102    3
----
-&gt;           2          2                                             125 6102    3
-423c423
-&lt;          96          2          0          0          0          0 125 6102    6
----
-&gt;          96          2                                             125 6102    6
-617c617
-&lt;           2          2          0          0          0          0 125 6102  200
----
-&gt;           2          2                                             125 6102  200
-</pre></div>
-</div>
-<p>Not bad…  There are obviously several differences.  Let’s examine them:</p>
-<dl class="simple">
-<dt><strong>Line 1:</strong></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">$Rev::$</span></code> and <code class="docutils literal notranslate"><span class="pre">$Date::</span></code> fields are put in by the NNDC on the
-very first line of every ENDF file simply to enable subversion version control
-keyword substitutions.  This line is not part of the ENDF standard and may be
-safely ignored.</p>
-</dd>
-<dt><strong>Lines 92-101:</strong></dt><dd><p>These lines are the ENDF dictionary in the end of the free text discriptive
-section (MF1/MT451).  The only difference here is that the ENDF section version numbers
-were are set to 0.  In this case, this messes up the versioning of <code class="docutils literal notranslate"><span class="pre">n-001_H_001.endf</span></code>,
-however we note that few evaluators remember to set these values in practice.</p>
-</dd>
-<dt><strong>Remainder of lines:</strong></dt><dd><p>In each case, the original ENDF file did not quite follow the ENDF format
-strictly and entered empty strings where the integer <code class="docutils literal notranslate"><span class="pre">0</span></code> should have been used.</p>
-</dd>
-</dl>
-<p>When translating from ENDF, you may notice some substantial differences between the original and re-translated file.
-Some differences are due to sections that are not yet translated to the new format (for example, delayed gammas from ENDF
-MF 1 MT 460 are not yet translated). Other differences include:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>masses, which appear many times in ENDF and are often inconsistent. In a GNDS file, the mass is stored only once,
-so upon translation back to ENDF inconsistent masses are overwritten.</p></li>
-<li><p>duplicate points: ENDF files sometimes contain two or more duplicate X-Y pairs in a cross section, multiplicity
-or distribution. Unless these appear at the boundary between interpolation regions, the ENDF-to-GNDS translator
-drops the second point as unnecessary, leading to differences when comparing to the original ENDF file.</p></li>
-<li><p>interpolation regions: ENDF files permit using different interpolation (lin-lin, log-lin, etc) in different
-regions. GNDS also supports this, but where possible we have merged two or more regions into a single region (for
-example, ‘flat’ interpolation regions can be merged with lin-lin regions with no loss of precision). Also, ENDF
-files may contain discontinuous functions within a single interpolation region. Upon translating to GNDS, these are
-converted into multiple regions.</p></li>
-<li><p>Improperly-formatted ENDF files: the GNDS translation tool strictly interprets the ENDF format as defined in the
-June 2010 version of the ENDF manual (available at <a class="reference external" href="https://ndclx4.bnl.gov/gf/project/endf6man">https://ndclx4.bnl.gov/gf/project/endf6man</a>). Some differences come
-from files in the ENDF library that do not strictly follow the format. As a common example, some ENDF files contain
-non-zero data in a reserved field. After translation, the entry is reset to ‘0’.</p></li>
-</ul>
-</div></blockquote>
 </div>
 <div class="section" id="reading-gnds-xml-files">
 <h2><span class="section-number">1.3. </span>Reading GNDS XML files<a class="headerlink" href="#reading-gnds-xml-files" title="Permalink to this headline">¶</a></h2>
@@ -249,96 +79,12 @@ For this purpose, both the <code class="docutils literal notranslate"><span clas
 To use them do:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.covariances</span> <span class="kn">import</span> <span class="n">covarianceSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">myOtherEval</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;n-001_H_001.gnds.xml&quot;</span> <span class="p">)</span>
-</pre></div>
-</div>
-<p>This reads in the evaluation itself.  To read in the covariances, we need to tell the
-To use them do:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.covariances</span> <span class="kn">import</span> <span class="n">covarianceSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">myOtherEval</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;n-001_H_001.gnds.xml&quot;</span> <span class="p">)</span>
-</pre></div>
-</div>
-<p>This reads in the evaluation itself.  To read in the covariances, we need to tell the
-To use them do:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.covariances</span> <span class="kn">import</span> <span class="n">covarianceSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">myOtherEval</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;n-001_H_001.gnds.xml&quot;</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n_H1</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;n-001_H_001.gnds.xml&quot;</span> <span class="p">)</span>
 </pre></div>
 </div>
 <p>This reads in the evaluation itself.  To read in the covariances, we need to tell the <cite>covariances.readXML()</cite> function
 where the evaluation is so that it can set up the hyperlinks correctly:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myOtherCov</span> <span class="o">=</span> <span class="n">covarianceSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;n-001_H_001.gndsCov.xml&quot;</span><span class="p">,</span> <span class="n">reactionSuite</span><span class="o">=</span><span class="n">myOtherEval</span> <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="setting-up-the-translator-scripts">
-<h2><span class="section-number">1.4. </span>Setting up the translator scripts<a class="headerlink" href="#setting-up-the-translator-scripts" title="Permalink to this headline">¶</a></h2>
-<p>In this final section of the first tutorial, we’ll actually make the two scripts <code class="docutils literal notranslate"><span class="pre">endf2gnds.py</span></code> and <code class="docutils literal notranslate"><span class="pre">gnds2endf.py</span></code>.
-Let’s start by making the files and then editing the first:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ touch endf2gnds.py gnds2endf.py
-$ chmod u+x endf2gnds.py gnds2endf.py
-$ vim endf2gnds.py
-</pre></div>
-</div>
-<p>For <code class="docutils literal notranslate"><span class="pre">endf2gnds.py</span></code>, we want to read one ENDF file and write the GNDS evaluation file and (if present) the GNDS covariance file. Since there are two output files, we want them to have the same prefix for bookkeeping purposes.  So, here is my version of <code class="docutils literal notranslate"><span class="pre">endf2gnds.py</span></code> (download it <a class="reference download internal" download="" href="../_downloads/aae8919c0ed919067972440990972bb6/endf2gnds.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env python</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">from</span> <span class="nn">fudge.legacy.converting.endfFileToGNDS</span> <span class="kn">import</span> <span class="n">endfFileToGNDS</span>
-
-<span class="c1"># Process command line options</span>
-<span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Translate ENDF into GNDS&#39;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;inFile&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The ENDF file you want to translate.&#39;</span> <span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;outFilePrefix&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;&#39;&#39;Specify the output file&#39;s prefix to be ``outFilePrefix``.  The outputted files have extensions &quot;.gnds.xml&quot; and &quot;.gndsCov.xml&quot;vfor the GNDS main evaluations and covariance files and &quot;.endf&quot; for ENDF files.&#39;&#39;&#39;</span> <span class="p">)</span>
-<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-
-<span class="c1"># Compute output file names</span>
-<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">outFilePrefix</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">outEvalFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">outFilePrefix</span> <span class="o">+</span> <span class="s1">&#39;.gnds.xml&#39;</span>
-    <span class="n">outCovFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">outFilePrefix</span> <span class="o">+</span> <span class="s1">&#39;.gndsCov.xml&#39;</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">outEvalFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">inFile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s1">&#39;.endf&#39;</span><span class="p">,</span> <span class="s1">&#39;.gnds.xml&#39;</span> <span class="p">)</span>
-    <span class="n">outCovFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">inFile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s1">&#39;.endf&#39;</span><span class="p">,</span> <span class="s1">&#39;.gndsCov.xml&#39;</span> <span class="p">)</span>
-
-<span class="c1"># Now translate</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">endfFileToGNDS</span><span class="p">(</span> <span class="n">args</span><span class="o">.</span><span class="n">inFile</span><span class="p">,</span> <span class="n">toStdOut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skipBadData</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
-<span class="n">myEval</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
-<span class="n">myCov</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;covarianceSuite&#39;</span><span class="p">]</span>
-<span class="nb">open</span><span class="p">(</span> <span class="n">outEvalFile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span> <span class="n">line</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">myEval</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="p">{</span><span class="s1">&#39;verbosity&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
-<span class="k">if</span> <span class="n">myCov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-     <span class="nb">open</span><span class="p">(</span> <span class="n">outCovFile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span> <span class="n">line</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">myCov</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="p">{</span><span class="s1">&#39;verbosity&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
-</pre></div>
-</div>
-<p>I urge you to try it out.  If you are unsure how to use it, type <code class="docutils literal notranslate"><span class="pre">./endf2gnds.py</span> <span class="pre">--help</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">gnds2endf.py</span></code> is similar.  However, we need to specify an input file prefix, the style to translate,
-and optionally the  output file name.  This is my version of <code class="docutils literal notranslate"><span class="pre">gnds2endf.py</span></code> (download it <a class="reference download internal" download="" href="../_downloads/0f58e7f1ab15c94d0fc4b3cfc8e4fdcf/gnds2endf.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env python</span>
-<span class="kn">import</span> <span class="nn">argparse</span><span class="o">,</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
-<span class="kn">from</span> <span class="nn">fudge.covariances</span> <span class="kn">import</span> <span class="n">covarianceSuite</span>
-
-<span class="c1"># Process command line options</span>
-<span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Translate GNDS into ENDF&#39;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;inFilePrefix&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The prefix of the GNDS files you want to translate.&#39;</span> <span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--style&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Data style to translate back to ENDF-6&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span> <span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;outFile&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Specify the output file&#39;</span> <span class="p">)</span>
-<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-
-<span class="c1"># Compute input file names</span>
-<span class="n">inEvalFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">inFilePrefix</span> <span class="o">+</span> <span class="s1">&#39;.gnds.xml&#39;</span>
-<span class="n">inCovFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">inFilePrefix</span> <span class="o">+</span> <span class="s1">&#39;.gndsCov.xml&#39;</span>
-
-<span class="c1"># Compute the output file name</span>
-<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">outFile</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="n">outFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">inFilePrefix</span> <span class="o">+</span> <span class="s1">&#39;.endf&#39;</span>
-<span class="k">else</span><span class="p">:</span>                    <span class="n">outFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">outFile</span>
-
-<span class="c1"># Read in XML files</span>
-<span class="n">myEval</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="n">inEvalFile</span> <span class="p">)</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">inCovFile</span> <span class="p">):</span> <span class="n">myCov</span> <span class="o">=</span> <span class="n">covarianceSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="n">inCovFile</span><span class="p">,</span> <span class="n">reactionSuite</span><span class="o">=</span><span class="n">myEval</span> <span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>                           <span class="n">myCov</span> <span class="o">=</span> <span class="kc">None</span>
-
-<span class="c1"># Now translate</span>
-<span class="nb">open</span><span class="p">(</span> <span class="n">outFile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">myEval</span><span class="o">.</span><span class="n">toENDF6</span><span class="p">(</span> <span class="n">args</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;verbosity&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">},</span> <span class="n">covarianceSuite</span><span class="o">=</span><span class="n">myCov</span> <span class="p">)</span> <span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -360,7 +106,6 @@ and optionally the  output file name.  This is my version of <code class="docuti
 <li><a class="reference internal" href="#translating-from-endf-into-gnds">1.1. Translating from ENDF into GNDS</a></li>
 <li><a class="reference internal" href="#translating-gnds-files-back-into-endf">1.2. Translating GNDS files back into ENDF</a></li>
 <li><a class="reference internal" href="#reading-gnds-xml-files">1.3. Reading GNDS XML files</a></li>
-<li><a class="reference internal" href="#setting-up-the-translator-scripts">1.4. Setting up the translator scripts</a></li>
 </ul>
 </li>
 </ul>
@@ -407,7 +152,7 @@ and optionally the  output file name.  This is my version of <code class="docuti
         <li class="right" >
           <a href="index.html" title="The Fudge Tutorial"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Basic translating between ENDF and GNDS</a></li> 
       </ul>
