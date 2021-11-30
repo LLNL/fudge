@@ -1,7 +1,0 @@
-numpy>=1.15
-git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/crosssectionadjustforheatedtarget.git@fudge4.3-rc7#egg=crossSectionAdjustForHeatedTarget
-git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/numericalFunctions.git@fudge4.3-rc7#egg=numericalFunctions
-git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/pqu.git@fudge4.3-rc7#egg=pqu
-git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/xData.git@fudge4.3-rc7#egg=xData
-git+ssh://git@czgitlab.llnl.gov:7999/nuclear/pops/PoPs.git@fudge4.3-rc7#egg=PoPs
-git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/brownies.git@fudge4.3-rc7#egg=brownies
