@@ -32,6 +32,7 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
   
           python
           import numpy
+          print( numpy.__version__ )
           import wheel
           exit()
 
@@ -48,7 +49,9 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
     - Clone FUDGE in the current directory: 
      
-          git clone ssh://github.com/LLNL/fudge.git
+          git clone https://github.com/LLNL/fudge.git
+          # or using SSH (requires creating a github account and registering an ssh key):
+          git clone git@github.com:LLNL/fudge.git
      
     - Build FUDGE:
 
@@ -94,6 +97,13 @@ python3 -m brownies.bin.endf2gnds.py n-001_H_001.endf n-001_H_001.xml
 
 # or, if FUDGE was installed via pip:
 endf2gnds.py n-001_H_001.endf n-001_H_001.xml
+```
+
+Some ENDF-6 files fail to translate unless the `--continuumSpectraFix` option is included when calling endf2gnds.
+This option addresses a problem with unnormalizeable continuum photon spectra. It has no effect unless an evaluation
+contains an unnormalizeable spectrum so can be used safely for all translations. Sample use:
+```
+endf2gnds.py <originalFile.endf> <newFile.xml> --continuumSpectraFix
 ```
 
 The Python script **gnds2endf.py** translates a **GNDS** file to an **ENDF-6** file. This
