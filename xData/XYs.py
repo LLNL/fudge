@@ -1,67 +1,9 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-
-from __future__ import print_function
 
 """
     This module contains the class ``XYs1d``. This class treats a list of :math:`(x_i, y_i)` pairs as if they were 
@@ -101,46 +43,57 @@ __metaclass__ = type
 
 import math
 
-import base as baseModule
-import link as linkModule
-import axes as axesModule
-import values as valuesModule
-import standards as standardsModule
-import uncertainties as uncertaintiesModule
-from pqu import PQU
+from pqu import PQU as PQUModule
 
 from numericalFunctions import pointwiseXY_C, pointwiseXY
+
+from . import base as baseModule
+from . import link as linkModule
+from . import axes as axesModule
+from . import values as valuesModule
+from . import standards as standardsModule
+from . import uncertainties as uncertaintiesModule
 
 defaultAccuracy = 1e-3
 xAxisIndex = 1
 yAxisIndex = 0
 domainEpsilon = 1e-15
 
-def return_pointwiseXY_AsXYs( self, C, units = None, index = None, value = None, axes = None ) :
+def return_pointwiseXY_AsXYs( self, data, units = None, index = None, outerDomainValue = None, axes = None ) :
+    """For internal use only."""
+
+    if( not( isinstance( self, XYs1d ) ) ) : raise TypeError( 'Self must be an instance of XYs1d.' )
 
     if( index is None ) : index = self.index
     if( axes is None ) : axes = self.axes
-    c = XYs1d( C, axes = axes, infill = True, safeDivide = False, index = index, value = value )
-    if( c.axes is not None and units is not None ) :
-        for k in units : c.axes[k].unit = units[k]
-    return( c )
+    if( outerDomainValue is None ) : outerDomainValue = self.outerDomainValue
+    xys1d = self.__class__( data = data, axes = axes, infill = True, safeDivide = False, index = index, outerDomainValue = outerDomainValue )
+    if( ( xys1d.axes is not None ) and ( units is not None ) ) :
+        for k in units : xys1d.axes[k].unit = units[k]
+    return( xys1d )
 
 def otherToSelfsUnits( self, other, checkXOnly = False ) :
+    """For internal use only."""
 
     if( not( isinstance( other, XYs1d ) ) ) : raise TypeError( 'other instance not XYs1d instance' )
-    if( ( self.axes is None ) and ( other.axes is None ) ) : return( other )
+
+    if( ( self.axes is None ) and ( other.axes is None ) ) : return( other.nf_pointwiseXY )
     yScale = 1
-    xUnitSelf = PQU._getPhysicalUnit( self.axes[xAxisIndex].unit )
+    xUnitSelf = PQUModule._getPhysicalUnit( self.axes[xAxisIndex].unit )
     xScale = xUnitSelf.conversionFactorTo( other.axes[xAxisIndex].unit )
     if( not( checkXOnly ) ) :
-        yUnitSelf = PQU._getPhysicalUnit( self.axes[yAxisIndex].unit )
+        yUnitSelf = PQUModule._getPhysicalUnit( self.axes[yAxisIndex].unit )
         yScale = yUnitSelf.conversionFactorTo( other.axes[yAxisIndex].unit )
+
+    other = other.nf_pointwiseXY
     if( ( xScale != 1 ) or ( yScale != 1 ) ) : other = other.scaleOffsetXAndY( xScale = xScale, yScale = yScale )
+
     return( other )
 
 def getValueAsUnit( unit, quantity ) :
+    """For internal use only."""
 
-    if( not( isinstance( quantity, PQU.PQU ) ) ) : raise TypeError( 'Quantity is not an instance of PQU.PQU' )
+    if( not( isinstance( quantity, PQUModule.PQU ) ) ) : raise TypeError( 'Quantity is not an instance of PQUModule.PQU' )
     return( quantity.getValueAs( unit ) )
 
 def getValueAsAxis( axis, quantity ) :
@@ -149,45 +102,49 @@ def getValueAsAxis( axis, quantity ) :
 
 def getOtherAndUnit( self, other ) :
     """
-    For internal use only. This function is used by the multiply and divide methods. Other must be a XYs1d instance or
-    an object convertible to a PQU object.
+    For internal use only. This function is used by the multiply and divide methods. Other must be a XYs1d instance,
+    a pointwiseXY instance or an object convertible to a PQU object. The first item returned ia a pointwiseXY instance 
+    or number is returned.
     """
 
     if( isinstance( other, XYs1d ) ) :
         yUnit = other.getAxisUnitSafely( yAxisIndex )
-        other = otherToSelfsUnits( self, other, checkXOnly = True )
+        other = otherToSelfsUnits( self, other, checkXOnly = True )                     # Returned other is a pointwiseXY instance
     elif( isinstance( other, pointwiseXY ) ) :
         yUnit = ''
     else :                  # Must be an object convertible to a PQU instance.
-        if( not( isinstance( other, PQU.PQU ) ) ) : other = PQU.PQU( other )
+        if( not( isinstance( other, PQUModule.PQU ) ) ) : other = PQUModule.PQU( other )
         yUnit = other.getUnitSymbol( )
         other = other.getValue( )
     return( other, yUnit )
 
 def allow_XYsWithSameUnits_orNumberWithSameUnit( self, other ) :
+    """
+    For internal use only. Returns a pointwiseXY instance or a number.
+    """
 
     if( isinstance( other, XYs1d ) ) :
-         other = otherToSelfsUnits( self, other )
+         other = otherToSelfsUnits( self, other )                                       # Returned other is a pointwiseXY instance
     else :
         yUnit = self.getAxisUnitSafely( yAxisIndex )
-        other = PQU.PQU( other, checkOrder = False ).getValueAs( yUnit )
+        other = PQUModule.PQU( other, checkOrder = False ).getValueAs( yUnit )
     return( other )
 
-class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
+class XYs1d( baseModule.xDataFunctional ) :
 
     moniker = 'XYs1d'
     dimension = 1
     mutableYUnit = True     # For __imul__ and __idiv__.
 
     def __init__( self, data = None, dataForm = "xys", interpolation = standardsModule.interpolation.linlinToken, axes = None,
-            index = None, valueType = standardsModule.types.float64Token, value = None, label = None, 
+            index = None, valueType = standardsModule.types.float64Token, outerDomainValue = None, label = None, 
             sep = ' ', initialSize = 10, overflowSize = 10, infill = True, safeDivide = False ) :
         """
         Constructor for XYs1d class. dataForm can be 'xys', 'xsandys' or 'list'.
         """
 
         baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
-                value = value, label = label )
+                outerDomainValue = outerDomainValue, label = label )
 
         if( not( isinstance( interpolation, str ) ) ) : raise TypeError( 'interpolation must be a string' )
 
@@ -196,37 +153,69 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         self.__sep = sep
 
         if data is None: data = []
+        if( isinstance( data, XYs1d ) ) : data = data.nf_pointwiseXY
 
         initialSize = max( initialSize, len( data ) )
-        pointwiseXY.__init__( self, data = data, dataForm = dataForm, initialSize = initialSize, overflowSize = overflowSize,
+        self.__nf_pointwiseXY = pointwiseXY( data = data, dataForm = dataForm, initialSize = initialSize, overflowSize = overflowSize,
             accuracy = defaultAccuracy, biSectionMax = 16, interpolation = interpolation, infill = infill, 
             safeDivide = safeDivide )
 
+    def __getstate__( self ) :
+
+        state = self.__dict__.copy( )
+
+        for key in state :
+            item = getattr( self, key )
+            if( isinstance( item, pointwiseXY ) ) : break
+
+        nf_pointwiseXY_pickled = state.pop( key )
+        state['nf_pointwiseXY_pickled'] = { 'name' : key, 'interpolation' : self.interpolation, 'data' : [ xy for xy in self.__nf_pointwiseXY ] }
+
+        return( state )
+
+    def __setstate__( self, state ) :
+
+        nf_pointwiseXY_pickled = state.pop( 'nf_pointwiseXY_pickled' )
+        self.__dict__ = state
+
+        name = nf_pointwiseXY_pickled['name']
+        interpolation = nf_pointwiseXY_pickled['interpolation']
+        data = nf_pointwiseXY_pickled['data']
+
+        nf_pointwiseXY_pickled = pointwiseXY( data = data, initialSize = len( data ), accuracy = defaultAccuracy,
+                biSectionMax = 16, interpolation = interpolation, infill = True, safeDivide = False )
+
+        setattr( self, name, nf_pointwiseXY_pickled )
+
+    def __len__( self ) :
+
+        return( len( self.nf_pointwiseXY ) )
+
     def __abs__( self ) :
 
-        return( self.returnAsClass( self, pointwiseXY.__abs__( self ) ) )
+        return( self.returnAsClass( self, self.nf_pointwiseXY.__abs__( ) ) )
 
     def __neg__( self ) :
 
-        return( self.returnAsClass( self, pointwiseXY.__neg__( self ) ) )
+        return( self.returnAsClass( self, self.nf_pointwiseXY.__neg__( ) ) )
 
     def __add__( self, other ) :
 
-        other_ = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )
-        return( self.returnAsClass( self, pointwiseXY.__add__( self, other_ ) ) )
+        other = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )      # Returned other is a pointwiseXY instance or number.
+        return( self.returnAsClass( self, self.nf_pointwiseXY.__add__( other ) ) )
 
     __radd__ = __add__
 
     def __iadd__( self, other ) :
 
-        other_ = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )
-        pointwiseXY.__iadd__( self, other_ )
+        other = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )      # Returned other is a pointwiseXY instance or number.
+        self.nf_pointwiseXY.__iadd__( other )
         return( self )
 
     def __sub__( self, other ) :
 
-        other_ = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )
-        return( self.returnAsClass( self, pointwiseXY.__sub__( self, other_ ) ) )
+        other = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )      # Returned other is a pointwiseXY instance or number.
+        return( self.returnAsClass( self, self.nf_pointwiseXY.__sub__( other ) ) )
 
     def __rsub__( self, other ) :
 
@@ -235,78 +224,124 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
     def __isub__( self, other ) :
 
-        other_ = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )
-        pointwiseXY.__isub__( self, other_ )
+        other = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )      # Returned other is a pointwiseXY instance or number.
+        self.nf_pointwiseXY.__isub__( other )
         return( self )
 
     def __mul__( self, other ) :
 
         unit1 = self.getAxisUnitSafely( yAxisIndex )
-        other, unit2 = getOtherAndUnit( self, other )
+        other, unit2 = getOtherAndUnit( self, other )                           # Returned other is a pointwiseXY instance or number.
         unit = baseModule.processUnits( unit1, unit2, '*' )
-        points = pointwiseXY.__mul__( self, other )
+        points = self.nf_pointwiseXY.__mul__( other )
         return( return_pointwiseXY_AsXYs( self, points, units = { yAxisIndex : unit } ) )
 
     __rmul__ = __mul__
 
     def __imul__( self, other ) :
 
-        other, otherUnit1 = getOtherAndUnit( self, other )
+        other, otherUnit1 = getOtherAndUnit( self, other )                      # Returned other is a pointwiseXY instance or number.
         if( not( self.mutableYUnit ) ) :
             if( otherUnit1 != '' ) : raise Exception( "Self's y-unit is immutable and other has unit of '%s'" % otherUnit1 )
-        pointwiseXY.__imul__( self, other )
+        self.nf_pointwiseXY.__imul__( other )
         if( otherUnit1 != '' ) : self.axes[yAxisIndex].unit = baseModule.processUnits( self.axes[yAxisIndex].unit, otherUnit1, '*' )
         return( self )
 
+    # division operators for Python 2.7:
     def __div__( self, other ) :
 
         unit1 = self.getAxisUnitSafely( yAxisIndex )
-        other, unit2 = getOtherAndUnit( self, other )
+        other, unit2 = getOtherAndUnit( self, other )                           # Returned other is a pointwiseXY instance or number.
         unit = baseModule.processUnits( unit1, unit2, '/' )
-        points = pointwiseXY.__div__( self, other )
+        points = self.nf_pointwiseXY.__div__( other )
         return( return_pointwiseXY_AsXYs( self, points, units = { yAxisIndex : unit } ) )
 
     def __rdiv__( self, other ) :
 
         unit2 = self.getAxisUnitSafely( yAxisIndex )
-        other, unit1 = getOtherAndUnit( self, other )
-        points = pointwiseXY.__rdiv__( self, other )
+        other, unit1 = getOtherAndUnit( self, other )                           # Returned other is a pointwiseXY instance or number.
+        points = self.nf_pointwiseXY.__rdiv__( other )
         unit = baseModule.processUnits( unit1, unit2, '/' )
         return( return_pointwiseXY_AsXYs( self, points, units = { yAxisIndex : unit } ) )
 
     def __idiv__( self, other ) :
 
-        other, otherUnit1 = getOtherAndUnit( self, other )
+        other, otherUnit1 = getOtherAndUnit( self, other )                      # Returned other is a pointwiseXY instance or number.
         if( not( self.mutableYUnit ) ) :
             if( otherUnit1 != '' ) : raise Exception( "Self's y-unit is immutable and other has unit of '%s'" % otherUnit1 )
-        pointwiseXY.__idiv__( self, other )
+        self.nf_pointwiseXY.__idiv__( other )
         if( otherUnit1 != '' ) : self.axes[yAxisIndex].unit = baseModule.processUnits( self.axes[yAxisIndex].unit, otherUnit1, '/' )
         return( self )
 
-    def __setitem__( self, index, xy ) :
+    # division operators for Python 3.x:
+    def __truediv__( self, other ) :
 
-        if( len( xy ) != 2 ) : raise ValueError( 'right-hand-side must be list of length 2 not %s' % len( xy ) )
-        pointwiseXY.__setitem__( self, index, xy )
+        unit1 = self.getAxisUnitSafely( yAxisIndex )
+        other, unit2 = getOtherAndUnit( self, other )                           # Returned other is a pointwiseXY instance or number.
+        unit = baseModule.processUnits( unit1, unit2, '/' )
+        points = self.nf_pointwiseXY.__truediv__( other )
+        return( return_pointwiseXY_AsXYs( self, points, units = { yAxisIndex : unit } ) )
+
+    def __rtruediv__( self, other ) :
+
+        unit2 = self.getAxisUnitSafely( yAxisIndex )
+        other, unit1 = getOtherAndUnit( self, other )                           # Returned other is a pointwiseXY instance or number.
+        points = self.nf_pointwiseXY.__rtruediv__( other )
+        unit = baseModule.processUnits( unit1, unit2, '/' )
+        return( return_pointwiseXY_AsXYs( self, points, units = { yAxisIndex : unit } ) )
+
+    def __itruediv__( self, other ) :
+
+        other, otherUnit1 = getOtherAndUnit( self, other )                      # Returned other is a pointwiseXY instance or number.
+        if( not( self.mutableYUnit ) ) :
+            if( otherUnit1 != '' ) : raise Exception( "Self's y-unit is immutable and other has unit of '%s'" % otherUnit1 )
+        self.nf_pointwiseXY.__itruediv__( other )
+        if( otherUnit1 != '' ) : self.axes[yAxisIndex].unit = baseModule.processUnits( self.axes[yAxisIndex].unit, otherUnit1, '/' )
+        return( self )
+
+    def __getitem__( self, indexOrSlice ) :
+
+        if( isinstance( indexOrSlice, slice ) ) :
+            start, stop, step = indexOrSlice.indices( len( self ) )
+            if( step != 1 ) :  raise ValueError( "For slicing, only a step of 1 (or None) is allowed. Entered step = %d." % step )
+            return( self.__getslice__( start, stop ) )
+        else :
+            return( self.nf_pointwiseXY.__getitem__( indexOrSlice ) )
+
+    def __setitem__( self, indexOrSlice, xy ) :
+
+        if( isinstance( indexOrSlice, slice ) ) :
+            start, stop, step = indexOrSlice.indices( len( self ) )
+            if( step != 1 ) :  raise ValueError( "For slicing, only a step of 1 (or None) is allowed. Entered step = %d." % step )
+            return( self.__setslice__( start, stop, xy ) )
+        else :
+            if( len( xy ) != 2 ) : raise ValueError( 'right-hand-side must be list of length 2 not %s' % len( xy ) )
+            self.nf_pointwiseXY.__setitem__( indexOrSlice, xy )
 
     def __getslice__( self, index1, index2 ) :
 
-        return( self.returnAsClass( self, pointwiseXY.__getslice__( self, index1, index2 ) ) )
+        return( self.returnAsClass( self, self.nf_pointwiseXY.getslice( index1, index2 ) ) )
 
-    def __setslice__( self, index1, index2, slice ) :
+    def __setslice__( self, index1, index2, slice1 ) :
 
-        slice = otherToSelfsUnits( self, slice )
-        pointwiseXY.__setslice__( self, index1, index2, slice )
+        slice1 = otherToSelfsUnits( self, slice1 )                                  # Returned other is a pointwiseXY instanc
+        self.nf_pointwiseXY.__setslice__( index1, index2, slice1 )
+
+    @property
+    def nf_pointwiseXY( self ) :
+        """Returns a reference to self's hidden nf_pointwiseXY member."""
+
+        return( self.__nf_pointwiseXY )
 
     @property
     def interpolation( self ) :
 
-        return( self.getInterpolation( ) )
-#
-# This property needs setInterpolation defined in pointwiseXY_C
-#    @interpolation.setter
-#    def interpolation( self, interpolation ) :
-#
-#        self.setInterpolation( interpolation )
+        return( self.nf_pointwiseXY.getInterpolation( ) )
+
+    @interpolation.setter
+    def interpolation( self, interpolation ) :
+
+        self.nf_pointwiseXY.setInterpolation( interpolation )
 
     @property
     def sep( self ) :
@@ -325,17 +360,19 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         See XYs.XYs1d documentation for details on 'accuracy' and 'biSectionMax'.
         """
 
-        return( self.returnAsClass( self, pointwiseXY.applyFunction( self, f, parameters, accuracy = accuracy, biSectionMax = biSectionMax, checkForRoots = checkForRoots ) ) )
+        return( self.returnAsClass( self, self.nf_pointwiseXY.applyFunction( f, parameters, accuracy = accuracy, biSectionMax = biSectionMax, checkForRoots = checkForRoots ) ) )
 
     def changeInterpolation( self, interpolation, accuracy, lowerEps = 0, upperEps = 0, cls = None ) :
 
         if( interpolation != standardsModule.interpolation.linlinToken ) : raise ValueError( 'Only "%s" interpolation currently supported: not %s' %
                 ( standardsModule.interpolation.linlinToken, interpolation ) )
-        c1 = pointwiseXY.changeInterpolation( self, interpolation = interpolation, accuracy = accuracy, lowerEps = lowerEps, 
+        c1 = self.nf_pointwiseXY.changeInterpolation( interpolation = interpolation, accuracy = accuracy, lowerEps = lowerEps, 
                 upperEps = upperEps )
+
         axes = self.axes
-        c1 = return_pointwiseXY_AsXYs( self, c1, axes = axes, value = self.value )
+        c1 = return_pointwiseXY_AsXYs( self, c1, axes = axes, outerDomainValue = self.outerDomainValue )
         if( cls is None  ) : cls = self
+
         return( cls.returnAsClass( self, c1, axes = axes, interpolation = interpolation ) )
 
     def changeInterpolationIfNeeded( self, allowedInterpolations, accuracy, lowerEps = 0, upperEps = 0, cls = None ) :
@@ -350,24 +387,24 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
     def cloneToInterpolation( self, interpolation ) :
 
-        c1 = pointwiseXY.cloneToInterpolation( self, interpolation )
+        c1 = self.nf_pointwiseXY.cloneToInterpolation( interpolation )
         return( self.__class__.returnAsClass( self, c1, axes = self.axes, interpolation = interpolation ) )
 
     def convertUnits( self, unitMap ) :
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        unitMap is a dictionary of the form { 'eV' : 'MeV', 'b' : 'mb' }.
         """
 
-        if( self.axes is None ) : print(self.toXLink())
+        if( self.axes is None ) : return
         factors = self.axes.convertUnits( unitMap )
-        if( factors[:2] != [ 1., 1. ] ) : self.scaleOffsetXAndY( xScale = factors[1], yScale = factors[0], insitu = True )
+        if( factors[:2] != [ 1., 1. ] ) : self.nf_pointwiseXY.scaleOffsetXAndY( xScale = factors[1], yScale = factors[0], insitu = True )
         self.fixValuePerUnitChange( factors )
 
     def clip( self, rangeMin = None, rangeMax = None ) :
 
         if( rangeMin is None ) : rangeMin = self.rangeMin
         if( rangeMax is None ) : rangeMax = self.rangeMax
-        return( self.returnAsClass( self, pointwiseXY.clip( self, rangeMin, rangeMax ) ) )
+        return( self.returnAsClass( self, self.nf_pointwiseXY.clip( rangeMin, rangeMax ) ) )
 
     def commonDomainGrid( self, others ) :
         """
@@ -390,7 +427,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
         index = self.getAxisIndexByIndexOrName( indexOrName )
         axis = self.axes[index]
-        factor = PQU.PQU( '1 ' + axis.unit ).getValueAs( newUnit )
+        factor = PQUModule.PQU( '1 ' + axis.unit ).getValueAs( newUnit )
         data = []
         xyIndex = 1 - index
         for xy in self :
@@ -401,32 +438,112 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
     def copy( self ) :
 
-        xys = pointwiseXY.copy( self )
+        xys = self.nf_pointwiseXY.copy( )
         axes = self.axes
         if( axes is not None ) : axes = axes.copy( )
-        return( self.returnAsClass( self, xys, index = self.index, value = self.value, axes = axes ) )
+        return( self.returnAsClass( self, xys, index = self.index, outerDomainValue = self.outerDomainValue, axes = axes ) )
 
     __copy__ = copy
-    __deepcopy__ = __copy__
+
+    def __deepcopy__( self, memodict = {} ) :
+
+        copy_ = self.copy( )
+        memodict[ id(self.axes) ] = copy_.axes
+        return copy_
 
     def copyDataToNestedLists( self ) :
 
-        return( self.copyDataToXYs( ) )
+        return( self.nf_pointwiseXY.copyDataToXYs( ) )
+
+    def areDomainsMutual( self, other ) :
+
+        return( self.nf_pointwiseXY.areDomainsMutual( other.nf_pointwiseXY ) )
+
+    def copyDataToXYs( self ) :
+
+        return( self.__nf_pointwiseXY.copyDataToXYs( ) )
+
+    def copyDataToXsAndYs( self ) :
+
+        return( self.__nf_pointwiseXY.copyDataToXsAndYs( ) )
+
+    def domain( self ) :
+        """This should be deprecated."""
+
+        return( self.nf_pointwiseXY.domain( ) )
 
     def dullEdges( self, lowerEps = 0., upperEps = 0., positiveXOnly = 0 ) :
 
-        d = pointwiseXY.dullEdges( self, lowerEps = lowerEps, upperEps = upperEps, positiveXOnly = positiveXOnly )
-        return( self.returnAsClass( self, d ) )
+        dulled = self.nf_pointwiseXY.dullEdges( lowerEps = lowerEps, upperEps = upperEps, positiveXOnly = positiveXOnly )
+        return( self.returnAsClass( self, dulled ) )
+
+    def equalProbableBins(self, numberOfBins):
+        """Returns a list that that are equal probable bins of self. Currently, only supports lin-lin interpolation."""
+
+        if self.rangeMin < 0.0: raise Exception('Cannot calculate equal probable bins for a function with negative values.')
+
+        trimmed = self.trim()
+        if len(trimmed) == 0: raise Exception('Self does not have any area - 1.')
+        runningIntegrals = trimmed.runningIntegral()
+        runningIntegralMax = runningIntegrals[-1]
+        if runningIntegralMax == 0.0: raise Exception('Self does not have any area - 2.')
+
+        epbs = [ trimmed[0][0] ]
+        indexOfBin = 1
+        integral = runningIntegralMax / numberOfBins
+        absDomainMax = max(abs(trimmed[0][0]), abs(trimmed[-1][0]))
+        for index, runningIntegral in enumerate(runningIntegrals):
+            if indexOfBin >= numberOfBins: break
+            x2, y2 = trimmed[index]
+            if index > 0:
+                while integral <= runningIntegral:
+                    deltaArea = integral - priorRunningIntegral
+                    if deltaArea == 0.0:
+                        nextX = x2
+                    else:
+                        if y1 == y2:
+                            if y1 == 0.0:
+                                nextX = None
+                            else:
+                                nextX = x1 + deltaArea / y1
+                        else:
+                            slope = ( y2 - y1 ) / ( x2 - x1 )
+                            sqrtArgument = y1 * y1 + 2.0 * slope * deltaArea
+                            if sqrtArgument <= 0:
+                                nextX = x2
+                            else:
+                                nextX = x1 + 2.0 * deltaArea / ( y1 + math.sqrt( sqrtArgument ) )
+                    if nextX is not None: epbs.append(nextX)
+                    indexOfBin += 1
+                    if indexOfBin >= numberOfBins: break
+                    integral = runningIntegralMax * indexOfBin / numberOfBins
+            x1 = x2
+            y1 = y2
+            priorRunningIntegral = runningIntegral
+
+        epbs.append(trimmed[-1][0])
+
+# FIXME: Should look for case when one of the epbs is finite and very close to 0.0 (i.e., probably should be 0.0). Logic would look something like:
+# if epbs[index] * epbs[index-1] < 0.0 # going from a negative value to a positive value.
+# Now compare epbs[index] to 1e-12 * epbs[index-1] and to 1e-12 * epbs[index+1]. If smaller, set epbs[index] 0.0.
+# Note, in the above epbs[index-1] may be the smaller value (in magnitude) and should be the one testing.
+
+        return epbs
 
     def evaluate( self, x ) :
 
-        return( pointwiseXY.evaluate( self, x ) )
+        return( self.__nf_pointwiseXY.evaluate( x ) )
+
+    def lowerIndexBoundingX( self, x ) :
+
+        return( self.__nf_pointwiseXY.lowerIndexBoundingX( x ) )
 
     def mutualify( self, lowerEps1, upperEps1, positiveXOnly1, other, lowerEps2, upperEps2, positiveXOnly2 ) :
         '''
         .. note:: Need to check that x units are the same.
         '''
-        m1, m2 = pointwiseXY.mutualify( self, lowerEps1, upperEps1, positiveXOnly1, other, lowerEps2, upperEps2, positiveXOnly2 )
+
+        m1, m2 = self.nf_pointwiseXY.mutualify( lowerEps1, upperEps1, positiveXOnly1, other.nf_pointwiseXY, lowerEps2, upperEps2, positiveXOnly2 )
         return( self.returnAsClass( self, m1 ), other.returnAsClass( other, m2 ) )
 
     def normalize( self, insitu = False, dimension = 1 ) :
@@ -434,23 +551,29 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         The dimension argument is ignored. Only here to be compatable with calling from XYsnd.normalize.
         """
 
-        xys = pointwiseXY.normalize( self )
-        if( insitu ) :
-            pointwiseXY.setData( self, xys )
-            return( self )
+        xys = self.nf_pointwiseXY.normalize( insitu = insitu )
+        if( insitu ) : return( self )
         return( self.returnAsClass( self, xys ) )
+
+    def setData( self, point ) :
+
+        self.nf_pointwiseXY.setData( point )
+
+    def setValue( self, xValue, yValue ) :
+
+        self.nf_pointwiseXY.setValue( xValue, yValue )
 
     def thicken( self, sectionSubdivideMax = 1, dDomainMax = 0., fDomainMax = 1. ) :
         """
         .. note:: Need unit for dDomainMax.
         """
 
-        t = pointwiseXY.thicken( self, sectionSubdivideMax = sectionSubdivideMax, dDomainMax = dDomainMax, fDomainMax = fDomainMax )
+        t = self.nf_pointwiseXY.thicken( sectionSubdivideMax = sectionSubdivideMax, dDomainMax = dDomainMax, fDomainMax = fDomainMax )
         return( self.returnAsClass( self, t ) )
 
     def thin( self, accuracy ) :
 
-        return( self.returnAsClass( self, pointwiseXY.thin( self, accuracy ) ) )
+        return( self.returnAsClass( self, self.nf_pointwiseXY.thin( accuracy ) ) )
 
     def thinToNumberOfPoints( self, maximumNumber, numberFraction = 0.95 ) :
         """
@@ -494,23 +617,23 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
     def trim( self ) :
 
-        return( self.returnAsClass( self, pointwiseXY.trim( self ) ) )
+        return( self.returnAsClass( self, self.nf_pointwiseXY.trim( ) ) )
 
     def union( self, other, fillWithSelf = 1, trim = 0 ) :
 
-        other = otherToSelfsUnits( self, other, checkXOnly = True )
-        t = pointwiseXY.union( self, other, fillWithSelf = fillWithSelf, trim = trim  )
+        other = otherToSelfsUnits( self, other, checkXOnly = True )                         # Returned other is a pointwiseXY instanc
+        t = self.nf_pointwiseXY.union( other, fillWithSelf = fillWithSelf, trim = trim  )
         return( self.returnAsClass( self, t ) )
 
     @property
     def domainMin( self ) :
 
-        return( pointwiseXY.domainMin( self ) )
+        return( self.nf_pointwiseXY.domainMin( ) )
 
     @property
     def domainMax( self ) :
 
-        return( pointwiseXY.domainMax( self ) )
+        return( self.nf_pointwiseXY.domainMax( ) )
 
     @property
     def domainUnit( self ) :
@@ -520,22 +643,22 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
     def domainUnitConversionFactor( self, unitTo ) :
 
         if( unitTo is None ) : return( 1. )
-        return( PQU.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
+        return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
     @property
     def domainGrid( self ) :
 
-        return( pointwiseXY.domainGrid( self, 1 ) )
+        return( self.nf_pointwiseXY.domainGrid( 1.0 ) )
 
     @property
     def rangeMin( self ) :
 
-        return( pointwiseXY.rangeMin( self ) )
+        return( self.nf_pointwiseXY.rangeMin( ) )
 
     @property
     def rangeMax( self ) :
 
-        return( pointwiseXY.rangeMax( self ) )
+        return( self.nf_pointwiseXY.rangeMax( ) )
 
     @property
     def rangeUnit( self ) :
@@ -545,10 +668,10 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
     def rangeUnitConversionFactor( self, unitTo ) :
 
         if( unitTo is None ) : return( 1. )
-        return( PQU.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
+        return( PQUModule.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
 
     def domainSlice( self, domainMin = None, domainMax = None, fill = 1, dullEps = 0. ) :
-        '''
+        """
         Returns a new instance with self sliced between ``domainMin`` and ``domainMax``.
 
         :param domainMin:   [optional] the lower x-value of the slice, default is domain minimum of self,
@@ -556,11 +679,11 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         :param fill:        [optional] if True, points are added at domainMin and domainMax if they are not in self, 
                                        else only existing points in the range [domainMin, domainMax] are included.
         :param dullEps:     [optional] (Currently not implemented) the lower and upper points are dulled, default is 0.
-        '''
+        """
 
         if( domainMin is None ) : domainMin = self.domainMin
         if( domainMax is None ) : domainMax = self.domainMax
-        s = pointwiseXY.domainSlice( self, domainMin = domainMin, domainMax = domainMax, fill = fill, dullEps = dullEps )
+        s = self.nf_pointwiseXY.domainSlice( domainMin = domainMin, domainMax = domainMax, fill = fill, dullEps = dullEps )
         return( self.returnAsClass( self, s ) )
 
     def __mod__( self, other ) : raise NotImplementedError( 'Currently, mod is not implemented' )
@@ -574,8 +697,9 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         Uses pointwiseXY's convolute function to do the grunt work.  
         """
 
+        if( isinstance( func, XYs1d ) ) : func = func.nf_pointwiseXY
         if( not( isinstance( func, pointwiseXY ) ) ) : raise TypeError( 'func argument of convolute() must be an instance of pointwiseXY' )
-        return( self.returnAsClass( self, pointwiseXY.convolute( self, func, 0 ) ) )
+        return( self.returnAsClass( self, self.nf_pointwiseXY.convolute( func, 0 ) ) )
 
     def group( self, xs, f2 = None, f3 = None, norm = None, asXYs = False ) :
         """
@@ -616,22 +740,22 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         Historical note: the word group comes from deterministic neutron transport (e.g., transport used to simulate nuclear reactors).
         """
 
-        yUnit = PQU.PQU( 1, self.getAxisUnitSafely( yAxisIndex ) )
+        yUnit = PQUModule.PQU( 1, self.getAxisUnitSafely( yAxisIndex ) )
         if( f2 is None ) :
             if( f3 is None ) : 
                 grouped = self.groupOneFunction( xs, norm = norm )
             else :
                 grouped = self.groupTwoFunctions( xs, f3, norm = norm )
-                yUnit = yUnit * PQU.PQU( 1,  f3.getAxisUnitSafely( yAxisIndex ) )
+                yUnit = yUnit * PQUModule.PQU( 1,  f3.getAxisUnitSafely( yAxisIndex ) )
         else :
-            yUnit = yUnit * PQU.PQU( 1, f2.getAxisUnitSafely( yAxisIndex ) )
+            yUnit = yUnit * PQUModule.PQU( 1, f2.getAxisUnitSafely( yAxisIndex ) )
             if( f3 is None ) :
                 grouped = self.groupTwoFunctions( xs, f2, norm = norm )
             else :
                 grouped = self.groupThreeFunctions( xs, f2, f3, norm = norm )
-                yUnit = yUnit * PQU.PQU( 1, f3.getAxisUnitSafely( yAxisIndex ) )
+                yUnit = yUnit * PQUModule.PQU( 1, f3.getAxisUnitSafely( yAxisIndex ) )
         if( norm is None ) :
-            yUnit = PQU.PQU( 1, self.getAxisUnitSafely( xAxisIndex ) ) * yUnit
+            yUnit = PQUModule.PQU( 1, self.getAxisUnitSafely( xAxisIndex ) ) * yUnit
         elif( norm != 'dx' ) :
             pass                    # Need to add units to norm. That is, norm, grouped and xs should be an instance of Ys.
         if( asXYs ) :
@@ -645,26 +769,47 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
     def groupOneFunction( self, xs, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        if type(xs)==list:          boundaries = xs
-        elif type(xs.values)==list: boundaries = xs.values
-        else:                       boundaries = xs.values.values
-        return( pointwiseXY.groupOneFunction( self, boundaries, norm = norm ) )
+        if( type( xs ) == list ) :
+            boundaries = xs
+        elif( type( xs.values ) == list ) :
+            boundaries = xs.values
+        else :
+            boundaries = xs.values.values
+
+        if( isinstance( norm, XYs1d ) ) : norm = norm.nf_pointwiseXY
+
+        return( self.nf_pointwiseXY.groupOneFunction( boundaries, norm = norm ) )
 
     def groupTwoFunctions( self, xs, f2, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        if type(xs)==list:          boundaries = xs
-        elif type(xs.values)==list: boundaries = xs.values
-        else:                       boundaries = xs.values.values
-        return( pointwiseXY.groupTwoFunctions( self, boundaries, f2, norm = norm ) )
+        if( type( xs ) == list ) :
+            boundaries = xs
+        elif( type( xs.values ) == list ) :
+            boundaries = xs.values
+        else :
+            boundaries = xs.values.values
+
+        if( isinstance( f2, XYs1d ) ) : f2 = f2.nf_pointwiseXY
+        if( isinstance( norm, XYs1d ) ) : norm = norm.nf_pointwiseXY
+
+        return( self.nf_pointwiseXY.groupTwoFunctions( boundaries, f2, norm = norm ) )
 
     def groupThreeFunctions( self, xs, f2, f3, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        if type(xs)==list:          boundaries = xs
-        elif type(xs.values)==list: boundaries = xs.values
-        else:                       boundaries = xs.values.values
-        return( pointwiseXY.groupThreeFunctions( self, boundaries, f2, f3, norm = norm ) )
+        if( type( xs ) == list ) :
+            boundaries = xs
+        elif( type( xs.values ) == list ) :
+            boundaries = xs.values
+        else :
+            boundaries = xs.values.values
+
+        if( isinstance( f2, XYs1d ) ) : f2 = f2.nf_pointwiseXY
+        if( isinstance( f3, XYs1d ) ) : f3 = f3.nf_pointwiseXY
+        if( isinstance( norm, XYs1d ) ) : norm = norm.nf_pointwiseXY
+
+        return( self.nf_pointwiseXY.groupThreeFunctions(  boundaries, f2, f3, norm = norm ) )
 
     def integrate( self, domainMin = None, domainMax = None ) :
         """
@@ -676,12 +821,31 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         If ``domainMin`` or ``domainMax`` is unspecified, it is taken from the domain of the self.
         """
 
+        if( len( self ) == 0 ) : return( 0.0 )
         unit = self.getAxisUnitSafely( xAxisIndex )
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
         domainMin = max( domainMin, self.domainMin )
         domainMax = min( domainMax, self.domainMax )
-        return( PQU.PQU( pointwiseXY.integrate( self, domainMin = domainMin, domainMax = domainMax ), 
+        return( PQUModule.PQU( self.nf_pointwiseXY.integrate( domainMin = domainMin, domainMax = domainMax ), 
                 baseModule.processUnits( unit, self.getAxisUnitSafely( yAxisIndex ), '*' ), checkOrder = False ) )
+
+    def integrateWithWeight_x( self, domainMin = None, domainMax = None ) :
+
+        if( len( self ) == 0 ) : return( 0.0 )
+        unit = self.getAxisUnitSafely( xAxisIndex )
+        domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
+        domainMin = max( domainMin, self.domainMin )
+        domainMax = min( domainMax, self.domainMax )
+        return( self.__nf_pointwiseXY.integrateWithWeight_x( domainMin, domainMax ) )
+
+    def integrateWithWeight_sqrt_x( self, domainMin = None, domainMax = None ) :
+
+        if( len( self ) == 0 ) : return( 0.0 )
+        unit = self.getAxisUnitSafely( xAxisIndex )
+        domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
+        domainMin = max( domainMin, self.domainMin )
+        domainMax = min( domainMax, self.domainMax )
+        return( self.__nf_pointwiseXY.integrateWithWeight_sqrt_x( domainMin, domainMax ) )
 
     def indefiniteIntegral( self, domainMin = None, domainMax = None ) :
         '''
@@ -699,7 +863,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         for i in range( len( self ) - 1 ):
             domainMin = self[i][0]
             domainMax = self[i+1][0]
-            myData.append( [ domainMax, myData[-1][1]+pointwiseXY.integrate( self, domainMin = domainMin, domainMax = domainMax ) ] )
+            myData.append( [ domainMax, myData[-1][1] + self.nf_pointwiseXY.integrate( domainMin = domainMin, domainMax = domainMax ) ] )
         return XYs1d( myData, axes = myAxes )
 
     def integrateTwoFunctions( self, f2, domainMin = None, domainMax = None ) :
@@ -712,15 +876,21 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         """
 
         if( not isinstance( f2, XYs1d ) ) : raise TypeError( "f2 must be an instance of an XYs1d" )
-        unit = self.axes[xAxisIndex].unit
-        if( f2.axes[xAxisIndex].unit != unit ) :
-            f2 = f2.copy( )
-            f2.convertAxisToUnit( xAxisIndex, unit )
+
+        unit = ''
+        integrationUnit = ''
+        if( ( self.axes is not None ) and ( f2.axes is not None ) ) :
+            unit = self.axes[xAxisIndex].unit
+            if( f2.axes[xAxisIndex].unit != unit ) :
+                f2 = f2.copy( )
+                f2.convertAxisToUnit( xAxisIndex, unit )
+            integrationUnit = baseModule.processUnits( baseModule.processUnits( unit, self.axes[yAxisIndex].unit, '*' ), f2.axes[yAxisIndex].unit, '*' )
+
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
         domainMin = max( domainMin, self.domainMin, f2.domainMin )
         domainMax = min( domainMax, self.domainMax, f2.domainMax )
-        return( PQU.PQU( pointwiseXY.groupTwoFunctions( self, [ domainMin, domainMax ], f2 )[0],
-                baseModule.processUnits( baseModule.processUnits( unit, self.axes[yAxisIndex].unit, '*' ), f2.axes[yAxisIndex].unit, '*' ), checkOrder = False ) )
+
+        return( PQUModule.PQU( self.groupTwoFunctions( [ domainMin, domainMax ], f2.nf_pointwiseXY )[0], integrationUnit, checkOrder = False ) )
 
     def integrateThreeFunctions( self, f2, f3, domainMin = None, domainMax = None ) :
         """
@@ -731,25 +901,120 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         :param domainMax:
         :return:
         """
+
         if( not isinstance( f2, XYs1d ) ) : raise TypeError( "f2 must be an instance of an XYs1d" )
         if( not isinstance( f3, XYs1d ) ) : raise TypeError( "f3 must be an instance of an XYs1d" )
-        unit = self.axes[xAxisIndex].unit
-        if( f2.axes[xAxisIndex].unit != unit ) :
-            f2 = f2.copy( )
-            f2.convertAxisToUnit( xAxisIndex, unit )
-        if( f3.axes[xAxisIndex].unit != unit ) :
-            f3 = f3.copy( )
-            f3.convertAxisToUnit( xAxisIndex, unit )
+
+        unit = ''
+        if( ( self.axes is not None ) and ( f2.axes is not None ) and ( f3.axes is not None ) ) :
+            unit = self.axes[xAxisIndex].unit
+            if( f2.axes[xAxisIndex].unit != unit ) :
+                f2 = f2.copy( )
+                f2.convertAxisToUnit( xAxisIndex, unit )
+            if( f3.axes[xAxisIndex].unit != unit ) :
+                f3 = f3.copy( )
+                f3.convertAxisToUnit( xAxisIndex, unit )
+
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
         domainMin = max( domainMin, self.domainMin, f2.domainMin, f3.domainMin )
         domainMax = min( domainMax, self.domainMax, f2.domainMax, f3.domainMax )
-        return( pointwiseXY.groupThreeFunctions( self, [ domainMin, domainMax ], f2, f3 )[0] )
+
+        return( self.groupThreeFunctions( [ domainMin, domainMax ], f2, f3 )[0] )
+
+    def inverse( self ) :
+
+        return( self.returnAsClass( self, self.nf_pointwiseXY.inverse( ) ) )
+
+    def pdfOfY( self, epsilon, domainMin = None, domainMax = None ) :
+        """     
+        This method calculates the pdf of the y-values of self (i.e., pdf(y)).
+        """
+
+        def addData( pdf, data, epsilon ) :
+
+            if( pdf is None ) : return( XYs1d( data = data ) )
+            data = XYs1d( data = data )
+            pdf, data = pdf.mutualify( epsilon, epsilon, False, data, epsilon, epsilon, False )
+            pdf += data
+            return( pdf )
+                
+        region = self
+        
+        if( domainMin is None ) : domainMin = region.domainMin
+        if( domainMax is None ) : domainMax = region.domainMax
+            
+        if( len( region ) < 2 ) : raise ValueError( 'self must have at least 2 points' )
+        if( domainMin < region.domainMin ) :
+            if( region[0][1] != 0.0 ) : raise ValueError( "Specified domainMin is less than self's domainMin." )
+            region[0] = [ domainMin, 0.0 ]
+        if( domainMax > region.domainMax ) : 
+            if( region[-1][1] != 0.0 ) : raise ValueError( "Specified domainMax is greater than self's domainMax." )
+            region[len(self)] = [ domainMax, 0.0 ]
+
+        region = region.domainSlice( domainMin, domainMax, fill = True )
+
+        domainWidth = domainMax - domainMin
+        deltas = {} 
+        pdf = None
+
+        if( region.interpolation == standardsModule.interpolation.flatToken ) :
+            x1 = None
+            for x2, y2 in region :
+                if( x1 is not None ) :
+                    if( y1 not in deltas ) : deltas[y1] = 0.0
+                    deltas[y1] += ( x2 - x1 ) / domainWidth
+                x1 = x2
+                y1 = y2
+        elif( region.interpolation == standardsModule.interpolation.linlinToken ) :
+            slope = 1
+            data = []
+            for i1, ( x2, y2 ) in enumerate( region ) :
+                if( i1 > 0 ) :
+                    if( y1 == y2 ) :
+                        if( y1 not in deltas ) : deltas[y1] = 0.0
+                        deltas[y1] += ( x2 - x1 ) / domainWidth
+                    else :
+                        dy = y2 - y1
+                        dXdY = ( x2 - x1 ) / ( abs( dy ) * domainWidth )
+                        if( i1 == 1 ) :
+                            data = [ [ y1, dXdY ] ]
+                            slope = dy
+                        if( dy * slope < 0 ) :
+                            pdf = addData( pdf, data, epsilon )
+                            data = [ [ y1, dXdY ] ]
+                        if( dy < 0 ) :
+                            data.insert( 0, [ y2, dXdY ] )
+                        else :
+                            data.append( [ y2, dXdY ] )
+                        slope = dy
+                x1 = x2
+                y1 = y2
+            pdf = addData( pdf, data, epsilon )
+        else :      
+            raise Exception( 'Unsupported interpolation = "%s"' % self.interpolation )
+
+        for yValue in sorted( deltas ) :
+            if( yValue == 0.0 ) :
+                data = [ [ 0.0, 1.0 ], [ epsilon, 0.0 ] ]
+            else :
+                delta = [ [ yValue * ( 1.0 - epsilon ), 0.0 ], [ yValue, 1.0 ], [ yValue * ( 1.0 + epsilon ), 0.0 ] ]
+            delta = XYs1d( data ).normalize( )
+            delta *= deltas[yValue]
+            pdf = addData( pdf, delta, epsilon )
+
+        pdf.normalize( insitu = True )
+
+        return( pdf )
+
+    def runningIntegral( self ) :
+
+        return( self.__nf_pointwiseXY.runningIntegral( ) )
 
     def scaleDependent( self, value, insitu = False ) :
 
         xys = self
         if( not( insitu ) ) : xys = self.copy( )
-        xys.scaleOffsetXAndY( yScale = value, insitu = True )
+        xys.nf_pointwiseXY.scaleOffsetXAndY( yScale = value, insitu = True )
         return( xys )
 
     def splitInTwo( self, domainValue, epsilon = domainEpsilon ) : 
@@ -762,6 +1027,18 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         if( domainValue <= ( 1 + epsilon ) * domainMin ) : return( None )
         if( domainValue >= ( 1 - epsilon ) * domainMax ) : return( None )
         return( self.domainSlice( domainMax = domainValue ), self.domainSlice( domainMin = domainValue ) )
+
+    def toLinearXYsClass( self ) :
+
+        return( XYs1d )
+
+    def toPointwiseLinear( self, **kwargs ) :
+        """
+        Returns a new instance, converted to lin-lin interpolation with added points to maintain desired accuracy.
+        For more details see toPointwise_withLinearXYs.
+        """
+
+        return( self.toPointwise_withLinearXYs( **kwargs ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
         """
@@ -783,6 +1060,10 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         return( self.changeInterpolation( standardsModule.interpolation.linlinToken, accuracy, lowerEps = lowerEps, 
                 upperEps = upperEps, cls = cls ) )
 
+    def toString( self, pairsPerLine = 1, format = " %16.8e %16.8e", pairSeparator = "" ) :
+
+        return( self.nf_pointwiseXY.toString( pairsPerLine = pairsPerLine, format = format, pairSeparator = pairSeparator ) )
+
     def toXMLList( self, indent = '', **kwargs ) :
 
         incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
@@ -798,7 +1079,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         if( self.isPrimaryXData( ) ) : 
             if( self.axes is not None ) : XMLList += self.axes.toXMLList( indent = indent2, **kwargs )
         xys = []
-        for x, y in self.copyDataToXYs( ) :
+        for x, y in self.nf_pointwiseXY.copyDataToXYs( ) :
             xys.append( x )
             xys.append( y )
         XMLList += valuesModule.values( xys, valueType = self.valueType, sep = self.__sep ).toXMLList( indent2, **kwargs )
@@ -817,16 +1098,16 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
             x, y = self[-1]
             if( abs( domainMax - x ) < epsilon * ( max( abs( domainMax ), abs( x ) ) ) ) : self[-1] = domainMax, y
 
-    def plot( self, xylog = 0, domainMin = None, domainMax = None, rangeMin = None , rangeMax = None, title = '' ) :
+    def plot( self, xylog = 0, domainMin = None, domainMax = None, rangeMin = None , rangeMax = None, title = '',
+              multiPlot = False, dataKey = None ) :
 
-        import subprocess, os
-        from fudge.core.utilities import fudgeFileMisc
-        from fudge.vis.gnuplot import plotbase
+        from .interactivePlot import plotbase as plotbaseModule
+        from .interactivePlot import multiplot as interactivePlotModule
 
         def getUnitlessNumber( value, unit, default ) :
 
             if( value is None ) : return( default )
-            if( not( isinstance( value, PQU.PQU ) ) ) : value = PQU.PQU( value )
+            if( not( isinstance( value, PQUModule.PQU ) ) ) : value = PQUModule.PQU( value )
             return( value.getValueAs( unit ) )
 
         if( self.axes is None ) :
@@ -843,23 +1124,31 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         rangeMin = getUnitlessNumber( rangeMin, yUnit, self.rangeMin )
         rangeMax = getUnitlessNumber( rangeMax, yUnit, self.rangeMax )
 
-        dt = plotbase.parsePlotOptions( domainMin, domainMax, rangeMin, rangeMax, xLabel, yLabel, title )
-        f = fudgeFileMisc.fudgeTempFile( )
-        f.write( self.toString( ) )
-        f.close( )
-        p = os.path.join( os.path.realpath( __file__ ).split( '/xData' )[0], "fudge", "vis", "gnuplot", "endl2dplot.py" )
-        args = [ "python", p, 'xylog', str( xylog ) ] + dt + [ f.getName( ) ]
-        subprocess.Popen( args )
+        plotOptions = plotbaseModule.parsePlotOptions( domainMin, domainMax, rangeMin, rangeMax, xLabel, yLabel, title )
+        if dataKey is None:
+            if self.label:
+                dataKey = self.label
+            elif not multiPlot:
+                dataKey = 'noLabel' if title == '' else title
 
-    def ysMappedToXs( self, cls, grid, label = None ) :
+        plotData = {dataKey: self.copyDataToXsAndYs()}
 
-        offset, Ys = pointwiseXY.ysMappedToXs( self, grid.values )
-        Ys1d = cls( valuesModule.values( Ys, start = offset ), axes = self.axes.copy( ), label = label )
+        if multiPlot:
+            return plotOptions, plotData
+
+        else:
+            interactivePlotModule.MultiPlotWithPyQt5(plotOptions, plotData)
+
+    def ysMappedToXs( self, cls, grid, label = None, extendToEnd = False ) :
+
+        offset, Ys = self.nf_pointwiseXY.ysMappedToXs( grid.values )
+        if( extendToEnd ) : Ys += ( len( grid.values ) - ( offset + len( Ys ) ) ) * [ 0.0 ]
+        Ys1d = cls( valuesModule.values( Ys, start = offset ), axes = self.axes, label = label )
         Ys1d.axes[1] = linkModule.link2( grid.moniker, instance = grid, keyName = 'index', keyValue = 1 )
         return( Ys1d )
 
     @classmethod
-    def returnAsClass( cls, self, other, index = None, value = None, axes = None, interpolation = None ) :
+    def returnAsClass( cls, self, other, index = None, outerDomainValue = None, axes = None, interpolation = None ) :
         """
         Returns other as a class of cls. Other must be a sub-class pointwiseXY. cls must be a sub-class of XYs1d. 
         If index and axes are not specified, they are taken from self. The main use of this classmethod is for 
@@ -869,13 +1158,20 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         instance will also be an instance of crossSection.pointwise class.
         """
 
+        if( not( isinstance( self, XYs1d ) ) ) : raise TypeError( 'Self is not a XYs1d instance.' )
+        if( isinstance( other, XYs1d ) ) : other = other.nf_pointwiseXY
+
         if( index is None ) : index = self.index
-        if( value is None ) : value = self.value
+        if( outerDomainValue is None ) : outerDomainValue = self.outerDomainValue
         if( axes is None ) : axes = self.axes
-        if( interpolation is None ) : interpolation = self.interpolation
-        return( cls( data = other, interpolation = interpolation, axes = axes, 
-                overflowSize = 10, infill = other.getInfill( ), 
-                safeDivide = other.getSafeDivide( ), index = index, value = value ) )
+        if( interpolation is None ) :
+            interpolation = self.interpolation
+            if( len( self ) == 0 ) : interpolation = other.getInterpolation( )
+
+        xys = cls( data = other, interpolation = interpolation, axes = axes, overflowSize = 10, infill = other.getInfill( ), 
+                safeDivide = other.getSafeDivide( ), index = index, outerDomainValue = outerDomainValue )
+
+        return( xys )
 
     @classmethod
     def parseXMLNode( cls, xDataElement, xPath, linkData, axes = None, **kwargs ) :
@@ -883,12 +1179,18 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         Translate an XYs1d XML element into the python XYs1d xData class.
         """
 
-        xPath.append( xDataElement.tag )
+        xmlAttr = False
+        for attrName in ( 'label', 'outerDomainValue' ) :
+            if xDataElement.get(attrName) is not None:
+                xmlAttr = True
+                xPath.append( '%s[@%s="%s"]' % (xDataElement.tag, attrName, xDataElement.get(attrName) ) )
+                break
+        if( not xmlAttr ) : xPath.append( xDataElement.tag )
 
         attrs = { 'interpolation' : standardsModule.interpolation.linlinToken, 'label' : None, 
-                'index' : None, 'value' : None }
-        attributes = { 'interpolation' : str, 'label' : str, 'index' : int, 'value' : float }
-        for key, item in xDataElement.items( ) :
+                'index' : None, 'outerDomainValue' : None }
+        attributes = { 'interpolation' : str, 'label' : str, 'index' : int, 'outerDomainValue' : float }
+        for key, item in list( xDataElement.items( ) ) :
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
             attrs[key] = attributes[key]( item )
 
@@ -933,3 +1235,93 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
     def defaultAxes( labelsUnits = None ) :
 
         return( axesModule.axes( rank = 2, labelsUnits = labelsUnits or {} ) )
+
+    @staticmethod
+    def multiPlot( curve1ds, **kwargs ) :
+        """
+        Plots a list of 1d curves on the same plot. Uses each curve's 'plotLegendKey' as the legend key. Each curve must be
+        and XYs1d instance.
+        """
+
+        def argumentValue( name, default ) :
+
+            kwargsValue = kwargs.get( name, None )
+            if( kwargsValue is not None ) : return( kwargsValue )
+            return( default )
+
+        from .interactivePlot import plotbase as plotbaseModule
+        from .interactivePlot import multiplot as multiplotModule
+
+        if( len( curve1ds ) == 0 ) : return
+
+        options = { 'xylog' : 0, 'title' : None, 'title' : None, 'xLabel' : None, 'yLabel' : None, 
+                    'domainMin' : None, 'domainMax' : None, 'rangeMin' : None, 'rangeMax' : None }
+
+        plotData = {}
+        domainMin = []
+        domainMax = []
+        rangeMin = []
+        rangeMax = []
+        for index, curve1d in enumerate( curve1ds ) :
+            if( hasattr( curve1d, 'plotLegendKey' ) ) :
+                plotLegendKey = curve1d.plotLegendKey
+            else :
+                plotLegendKey = 'curve %d' % index
+            if( not( isinstance( curve1d, XYs1d ) ) ) : raise TypeError( 'Curve is not an XYs1d instance.' )
+            plotData[plotLegendKey] = curve1d.copyDataToXsAndYs( )
+            domainMin.append( curve1d.domainMin )
+            domainMax.append( curve1d.domainMax )
+            rangeMin.append( curve1d.rangeMin )
+            rangeMax.append( curve1d.rangeMax )
+        domainMin = argumentValue( 'domainMin', min( domainMin ) )
+        domainMax = argumentValue( 'domainMax', max( domainMax ) )
+        rangeMin =  argumentValue( 'rangeMin',  min( rangeMin ) )
+        rangeMax =  argumentValue( 'rangeMax',  max( rangeMax ) )
+
+        title = kwargs.get( 'title', 'No title' )
+        xLabel = kwargs.get( 'xLabel', 'x' )
+        yLabel = kwargs.get( 'yLabel', 'y' )
+
+        plotOptions = plotbaseModule.parsePlotOptions( domainMin, domainMax, rangeMin, rangeMax, xLabel, yLabel, title )
+        plotOptions['logs'] = kwargs.get( 'logs', 0 )
+
+        multiplotModule.MultiPlotWithPyQt5( plotOptions, plotData )
+
+    def checkEqualProbableBinsResult(self, epbs, epsilon=1e-12, printResults=False):
+        """This method checks the results of XYs1d.equalProbableBins and executes a raise if it finds an issue.
+
+            :param self:            The XYs1d instance that equalProbableBins was call for.
+            :param epbs:            The results returned by equalProbableBins.
+            :param epsilon:         The relative accuracy to compare the values in epbs to.
+            :param printResults:    If true, prints information on each value in epbs.
+
+            :return:                The number of errors found.
+        """
+
+        errCounter = 0
+
+        trimmed = self.trim()
+        runningIntegrals = trimmed.runningIntegral()
+        try:
+            inverse = XYs1d( data = [ [ x, runningIntegrals[index] ] for index, (x, y) in enumerate(trimmed) ] ).inverse()
+        except:
+            print( runningIntegrals )
+            print( self.toString())
+            raise
+
+        numberOfBins = len(epbs) - 1
+        for index in range(numberOfBins+1):
+            runningIntegral = index * runningIntegrals[-1] / numberOfBins
+            integral = float(self.integrate( domainMax = epbs[index] ))
+            delta = runningIntegral - integral
+            ratio = 0.0
+            if( delta != 0 ):
+                ratio = delta / runningIntegral 
+                if abs(ratio) > epsilon:
+                    errCounter += 1
+            if printResults:
+                s = ''
+                if abs(ratio) > epsilon: s = ' *********'
+                print( '%4d %20.13e %10.10e %18.10e %10.2e, %10.2e' % (index, epbs[index], runningIntegral, integral, delta, ratio ), s )
+
+        return errCounter

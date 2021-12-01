@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.reactions.reaction &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.reactions.reaction</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.reactions.reaction</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the reaction class.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">standards</span> <span class="k">as</span> <span class="n">standardsModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">fudgeExceptions</span>
+
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionProducts</span> <span class="k">as</span> <span class="n">reactionProductsModule</span>
+<span class="kn">from</span> <span class="nn">fudge.reactionData</span> <span class="kn">import</span> <span class="n">availableEnergy</span> <span class="k">as</span> <span class="n">availableEnergyModule</span>
+<span class="kn">from</span> <span class="nn">fudge.reactionData</span> <span class="kn">import</span> <span class="n">availableMomentum</span> <span class="k">as</span> <span class="n">availableMomentumModule</span>
+<span class="kn">from</span> <span class="nn">fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic</span> <span class="kn">import</span> <span class="n">CoulombPlusNuclearElastic</span> <span class="k">as</span> <span class="n">CoulombPlusNuclearElasticModule</span>
+<span class="kn">from</span> <span class="nn">..reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw</span> <span class="kn">import</span> \
+    <span class="n">base</span> <span class="k">as</span> <span class="n">thermalNeutronScatteringLawBaseModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.productData.distributions</span> <span class="kn">import</span> <span class="n">angular</span> <span class="k">as</span> <span class="n">angularModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="reaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.reaction">[docs]</a><span class="k">class</span> <span class="nc">reaction</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">base_reaction</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This is the class for a normal gnds reaction.&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;reaction&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">base_reaction</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;availableEnergy&#39;</span><span class="p">,</span> <span class="s1">&#39;availableMomentum&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">ENDF_MT</span><span class="p">,</span> <span class="n">fissionGenre</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">documentation</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new reaction object. Reaction is two-body or uncorrelated-body, depending on</span>
+<span class="sd">        the outputChannel genre. This class is only meant to be used for &#39;distinct&#39; reactions (distinct reactions</span>
+<span class="sd">        do not overlap any other reactions; altogether they sum up to total).</span>
+<span class="sd">        To store a sum over these distinct reactions, use the product class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">baseModule</span><span class="o">.</span><span class="n">base_reaction</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">ENDF_MT</span><span class="p">,</span> <span class="n">fissionGenre</span><span class="p">,</span> <span class="n">documentation</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span> <span class="o">=</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span> <span class="o">=</span> <span class="n">availableMomentumModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__reactionProducts</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">isGNDSReaction</span><span class="p">(</span> <span class="n">other</span> <span class="p">)):</span> <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">selfParent</span><span class="p">,</span> <span class="n">otherParent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">(</span> <span class="p">),</span> <span class="n">other</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">selfParent</span><span class="o">.</span><span class="n">projectile</span> <span class="o">==</span> <span class="n">otherParent</span><span class="o">.</span><span class="n">projectile</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">selfParent</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="n">otherParent</span><span class="o">.</span><span class="n">target</span> <span class="p">)</span> 
+            <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span> <span class="p">)</span> <span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Test if self is &lt;, == or &gt; other.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">isGNDSReaction</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="n">fudgeExceptions</span><span class="o">.</span><span class="n">FUDGE_Exception</span><span class="p">(</span> <span class="s2">&quot;Other not an reaction object.&quot;</span> <span class="p">)</span>
+        <span class="n">selfParent</span><span class="p">,</span> <span class="n">otherParent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">(</span> <span class="p">),</span> <span class="n">other</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">selfParent</span><span class="o">.</span><span class="n">projectile</span> <span class="o">&lt;</span> <span class="n">otherParent</span><span class="o">.</span><span class="n">projectile</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">selfParent</span><span class="o">.</span><span class="n">projectile</span> <span class="o">&gt;</span> <span class="n">otherParent</span><span class="o">.</span><span class="n">projectile</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">selfParent</span><span class="o">.</span><span class="n">target</span> <span class="o">&lt;</span> <span class="n">otherParent</span><span class="o">.</span><span class="n">target</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">selfParent</span><span class="o">.</span><span class="n">target</span> <span class="o">&gt;</span> <span class="n">otherParent</span><span class="o">.</span><span class="n">target</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="reaction.getThreshold"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.reaction.getThreshold">[docs]</a>    <span class="k">def</span> <span class="nf">getThreshold</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">Q</span> <span class="o">&gt;=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.</span> <span class="p">)</span>
+        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">projectile</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span>
+        <span class="n">projectileMass</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span>
+        <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">targetID</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span> <span class="p">)</span> <span class="p">:</span> <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">targetMass</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">targetMass</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="n">Q</span> <span class="o">*</span> <span class="p">(</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">projectileMass</span> <span class="o">/</span> <span class="n">targetMass</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reaction.isBasicReaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.reaction.isBasicReaction">[docs]</a>    <span class="k">def</span> <span class="nf">isBasicReaction</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reaction.isCompleteReaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.reaction.isCompleteReaction">[docs]</a>    <span class="k">def</span> <span class="nf">isCompleteReaction</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reaction.processCoulombPlusNuclearMuCutoff"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.reaction.processCoulombPlusNuclearMuCutoff">[docs]</a>    <span class="k">def</span> <span class="nf">processCoulombPlusNuclearMuCutoff</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">excludeRutherfordScattering</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">doubleDifferentialCrossSection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">doubleDifferentialCrossSection</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">doubleDifferentialCrossSection</span><span class="p">,</span> <span class="n">CoulombPlusNuclearElasticModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">crossSection</span><span class="p">,</span> <span class="n">angular</span> <span class="o">=</span> <span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">processCoulombPlusNuclearMuCutoff</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">crossSection</span> <span class="p">)</span>
+
+                <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="o">!=</span> <span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;First product out not one described in doubleDifferentialCrossSection data.&#39;</span> <span class="p">)</span>
+                <span class="n">product</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">twoBodyForm</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">centerOfMassToken</span><span class="p">,</span> <span class="n">angular</span> <span class="p">)</span> <span class="p">)</span>
+
+                <span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">residual</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">twoBodyForm</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">centerOfMassToken</span><span class="p">,</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">recoil</span><span class="p">(</span> <span class="n">angular</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+                <span class="k">if</span><span class="p">(</span> <span class="n">excludeRutherfordScattering</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">crossSection</span><span class="p">,</span> <span class="n">angular</span> <span class="o">=</span> <span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">processCoulombPlusNuclearMuCutoff</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">excludeRutherfordScattering</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">crossSection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">angular</span> <span class="p">)</span>
+
+                <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reaction.processThermalNeutronScatteringLaw"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.reaction.processThermalNeutronScatteringLaw">[docs]</a>    <span class="k">def</span> <span class="nf">processThermalNeutronScatteringLaw</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">doubleDifferentialCrossSection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">doubleDifferentialCrossSection</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">doubleDifferentialCrossSection</span><span class="p">,</span> <span class="n">thermalNeutronScatteringLawBaseModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+
+                <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="o">!=</span> <span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;First product out not one described in doubleDifferentialCrossSection data.&#39;</span> <span class="p">)</span>
+
+                <span class="n">crossSection</span><span class="p">,</span> <span class="n">averageProductEnergy</span><span class="p">,</span> <span class="n">averageProductMomentum</span><span class="p">,</span> <span class="n">distribution</span> <span class="o">=</span> <span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">processThermalNeutronScatteringLaw</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">crossSection</span> <span class="p">)</span>
+
+                <span class="n">product</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">distribution</span> <span class="p">)</span>
+                <span class="n">product</span><span class="o">.</span><span class="n">energyDeposition</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">averageProductEnergy</span> <span class="p">)</span>
+                <span class="n">product</span><span class="o">.</span><span class="n">momentumDeposition</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">averageProductMomentum</span> <span class="p">)</span>
+
+                <span class="n">axes</span> <span class="o">=</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">],</span> <span class="p">[</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">]</span> <span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">availableEnergyModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span>
+
+                <span class="n">axes</span> <span class="o">=</span> <span class="n">availableMomentumModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;momentumUnit&#39;</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">]</span> <span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">availableMomentumModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span>
+
+                <span class="k">break</span></div>
+
+<div class="viewcode-block" id="reaction.reactionProducts"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.reaction.reactionProducts">[docs]</a>    <span class="k">def</span> <span class="nf">reactionProducts</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reactionProducts</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reactionProducts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">reactionProducts</span><span class="p">(</span> <span class="n">reactionProductsModule</span><span class="o">.</span><span class="n">ReactionProducts</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__reactionProducts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span><span class="p">]</span> <span class="o">=</span> <span class="n">reactionProductsModule</span><span class="o">.</span><span class="n">ReactionProduct</span><span class="p">(</span> <span class="n">reactionProductsModule</span><span class="o">.</span><span class="n">Category</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reactionProducts</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reaction.thermalNeutronScatteringLawTemperatures"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.reaction.thermalNeutronScatteringLawTemperatures">[docs]</a>    <span class="k">def</span> <span class="nf">thermalNeutronScatteringLawTemperatures</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">temperatures</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">doubleDifferentialCrossSection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">doubleDifferentialCrossSection</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">doubleDifferentialCrossSection</span><span class="p">,</span> <span class="n">thermalNeutronScatteringLawBaseModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">temperatures</span><span class="p">(</span> <span class="n">temperatures</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.reactions.reaction</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

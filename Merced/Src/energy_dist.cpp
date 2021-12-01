@@ -17,21 +17,21 @@
 #include "global_params.hpp"
 #include "messaging.hpp"
 
-// ----------- energy_dist::destructor --------------
-energy_dist::~energy_dist( )
+// ----------- Edist::energy_dist::destructor --------------
+Edist::energy_dist::~energy_dist( )
 {
   if( number_Ein > 0 )
   {
     delete [] EProb_data;
   }
 }
-// ----------- energy_dist::read_data --------------
+// ----------- Edist::energy_dist::read_data --------------
 // Reads the ENDL data for one Legendre order
-void energy_dist::read_data( data_parser& input_file, int num_Ein )
+void Edist::energy_dist::read_data( Dpar::data_parser& input_file, int num_Ein )
 {
   number_Ein = num_Ein;
-  EProb_data = new Eprob_vector[ num_Ein ];
-  Eprob_vector *new_energy_ptr;
+  EProb_data = new Ebase::Eprob_vector[ num_Ein ];
+  Ebase::Eprob_vector *new_energy_ptr;
   // loop over incident energy
   for( int Ein_count = 0; Ein_count < num_Ein; ++Ein_count )
   {
@@ -49,9 +49,9 @@ void energy_dist::read_data( data_parser& input_file, int num_Ein )
     }
   }
 }
-// ----------- energy_dist::unit_base --------------
+// ----------- Edist::energy_dist::unit_base --------------
 // Maps the data to unit base
-void energy_dist::unit_base( int L_order )
+void Edist::energy_dist::unit_base( int L_order )
 {
   for( int Ein_count = 0; Ein_count < number_Ein; ++Ein_count )
   {
@@ -59,23 +59,23 @@ void energy_dist::unit_base( int L_order )
   }
 }
 
-// ************* class energy_moments *****************
-// ----------- energy_moments::destructor --------------
-energy_moments::~energy_moments( )
+// ************* class Edist::energy_moments *****************
+// ----------- Edist::energy_moments::destructor --------------
+Edist::energy_moments::~energy_moments( )
 {
   if( data_order >= 0 )
   {
     delete [] ENDL_data;
   }
 }
-// ----------- energy_moments::read_data --------------
-void energy_moments::read_data( data_parser& input_file, int num_moments )
+// ----------- Edist::energy_moments::read_data --------------
+void Edist::energy_moments::read_data( Dpar::data_parser& input_file, int num_moments )
 {
   // Read the interpolation rules
   interp_flag_F::read_2d_interpolation( input_file, &Ein_interp, &Eout_interp );
   data_order = num_moments - 1;
-  ENDL_data = new energy_dist[ data_order + 1 ];
-  energy_dist *new_moment_ptr;
+  ENDL_data = new Edist::energy_dist[ data_order + 1 ];
+  Edist::energy_dist *new_moment_ptr;
 
   // read the data
   for( int Legendre_order = 0; Legendre_order <= data_order;
@@ -87,44 +87,44 @@ void energy_moments::read_data( data_parser& input_file, int num_moments )
     int file_order = input_file.get_next_int( );
     if( file_order != Legendre_order )
     {
-      FatalError( "energy_moments::read_data",
-		  pastenum( "improper Legendre order: ", file_order ) );
+      Msg::FatalError( "Edist::energy_moments::read_data",
+		  Msg::pastenum( "improper Legendre order: ", file_order ) );
     }
     new_moment_ptr->Ein_interp = Ein_interp;
     new_moment_ptr->Eout_interp = Eout_interp;
     // how many incident energies
     int num_Ein = input_file.get_next_int( );
     new_moment_ptr->read_data( input_file, num_Ein );
-    if( Ein_interp.qualifier == UNITBASE )
+    if( Ein_interp.qualifier == Terp::UNITBASE )
     {
       new_moment_ptr->unit_base( Legendre_order );
     }
   }
 }
-// ----------- energy_moments::zero_order --------------
+// ----------- Edist::energy_moments::zero_order --------------
 // Converts isotropic ENDL data to ENDF format
-void energy_moments::zero_order( )
+void Edist::energy_moments::zero_order( )
 {
   // copy the interpolation rules
   ENDF_data.Ein_interp.flag = Ein_interp.flag;
   ENDF_data.Ein_interp.qualifier = Ein_interp.qualifier;
   ENDF_data.Eout_interp = Eout_interp;
 
-  energy_dist *ENDL_ptr = &ENDL_data[ 0 ];
+  Edist::energy_dist *ENDL_ptr = &ENDL_data[ 0 ];
   int num_Ein = ENDL_ptr->number_Ein;
-  Eprob_vector *ENDL_Ein_ptr;
-  Eprob_vector::const_iterator ENDL_Eout_ptr;
-  standard_Legendre::iterator ENDF_Ein_ptr;
-  standard_Legendre_vector::iterator ENDF_Eout_ptr;
+  Ebase::Eprob_vector *ENDL_Ein_ptr;
+  Ebase::Eprob_vector::const_iterator ENDL_Eout_ptr;
+  StdLg::standard_Legendre::iterator ENDF_Ein_ptr;
+  StdLg::standard_Legendre_vector::iterator ENDF_Eout_ptr;
   // iterate through the incident energies
   for( int Ein_count = 0; Ein_count < num_Ein; ++Ein_count )
   {
     ENDL_Ein_ptr = &( ENDL_ptr->EProb_data[ Ein_count ] );
-    // make a new standard_Legendre_vector
-    ENDF_Ein_ptr = ENDF_data.insert( ENDF_data.end( ), standard_Legendre_vector( ) );
+    // make a new StdLg::standard_Legendre_vector
+    ENDF_Ein_ptr = ENDF_data.insert( ENDF_data.end( ), StdLg::standard_Legendre_vector( ) );
     ENDF_Ein_ptr->set_E_in( ENDL_Ein_ptr->get_E_in( ) );  // energy of incident particle
     ENDF_Ein_ptr->Eout_interp = Eout_interp;
-    if( Ein_interp.qualifier == UNITBASE )
+    if( Ein_interp.qualifier == Terp::UNITBASE )
     {
       ENDF_Ein_ptr->ubase_map.copy( ENDL_Ein_ptr->ubase_map );
     }
@@ -134,20 +134,20 @@ void energy_moments::zero_order( )
 	 ENDL_Eout_ptr != ENDL_Ein_ptr->end( ); ++ENDL_Eout_ptr )
     {
       // make a new set of Legendre coefficients
-      ENDF_Eout_ptr = ENDF_Ein_ptr->insert( ENDF_Ein_ptr->end( ), Legendre_coefs( ) );
+      ENDF_Eout_ptr = ENDF_Ein_ptr->insert( ENDF_Ein_ptr->end( ), Lgdata::Legendre_coefs( ) );
       ENDF_Eout_ptr->initialize( 0 );
       ENDF_Eout_ptr->set_E_out( ENDL_Eout_ptr->x );  // energy of outgoing particle
       ( *ENDF_Eout_ptr )[ 0 ] = ENDL_Eout_ptr->y;
     }
-    if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+    if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
     {
       ENDF_Ein_ptr->form_cum_prob( );
     }
   }
 }
-// ----------- energy_moments::to_ENDF --------------
+// ----------- Edist::energy_moments::to_ENDF --------------
 // Converts ENDL data to ENDF format
-void energy_moments::to_ENDF( )
+void Edist::energy_moments::to_ENDF( )
 {
   // Do we need to interpolate with respect to incident energy?
   check_Ein( );
@@ -163,9 +163,9 @@ void energy_moments::to_ENDF( )
     one_Ein_to_ENDF( energy_count );
   }
 }
-// ----------- energy_moments::check_Ein --------------
+// ----------- Edist::energy_moments::check_Ein --------------
 // Checks to see that the incident energies are consistent for all Legendre orders
-void energy_moments::check_Ein( ) const
+void Edist::energy_moments::check_Ein( ) const
 {
   // first, check the amount of data
   int num_Ein = ENDL_data[ 0 ].number_Ein;
@@ -173,49 +173,49 @@ void energy_moments::check_Ein( ) const
   {
     if( ENDL_data[ L_order ].number_Ein != num_Ein )
     {
-      FatalError( "energy_moments::check_Ein",
+      Msg::FatalError( "Edist::energy_moments::check_Ein",
 		"Implement differing numbers of incident energies" );
     }
   }
   // now check the incident energies
-  static double tol = Global.Value( "E_tol" );
+  static double tol = Global.Value( "tight_tol" );
   for( int Ein_count = 0; Ein_count < num_Ein; ++Ein_count )
   {
     double this_Ein = ENDL_data[ 0 ].EProb_data[ Ein_count ].get_E_in( );
     for( int L_order = 1; L_order <= data_order; ++L_order )
     {
-      if( abs( ENDL_data[ L_order ].EProb_data[ Ein_count ].get_E_in( ) - this_Ein )>
+      if( std::abs( ENDL_data[ L_order ].EProb_data[ Ein_count ].get_E_in( ) - this_Ein )>
 	  tol*this_Ein )
       {
-        FatalError( "energy_moments::check_Ein",
+        Msg::FatalError( "Edist::energy_moments::check_Ein",
 		"Implement interpolation with respect to incident energy" );
       }
     }
   }
 }
-// ----------- energy_moments::one_Ein_to_ENDF --------------
+// ----------- Edist::energy_moments::one_Ein_to_ENDF --------------
 //! Converts ENDL data to ENDF format for one incident energy
-void energy_moments::one_Ein_to_ENDF( int Ein_count )
+void Edist::energy_moments::one_Ein_to_ENDF( int Ein_count )
 {
   int L_order;
-  // make a new standard_Legendre_vector for this incident energy
-  standard_Legendre::iterator ENDF_Ein_ptr;
-  standard_Legendre_vector::iterator ENDF_Eout_ptr;
+  // make a new StdLg::standard_Legendre_vector for this incident energy
+  StdLg::standard_Legendre::iterator ENDF_Ein_ptr;
+  StdLg::standard_Legendre_vector::iterator ENDF_Eout_ptr;
   // where we are in the ENDL data
-  Eprob_vector::const_iterator *ENDL_Eout_ptr =
-    new Eprob_vector::const_iterator[ data_order + 1 ];
-  Eprob_vector::const_iterator *next_ENDL_ptr =
-    new Eprob_vector::const_iterator[ data_order + 1 ];
+  Ebase::Eprob_vector::const_iterator *ENDL_Eout_ptr =
+    new Ebase::Eprob_vector::const_iterator[ data_order + 1 ];
+  Ebase::Eprob_vector::const_iterator *next_ENDL_ptr =
+    new Ebase::Eprob_vector::const_iterator[ data_order + 1 ];
   for( L_order = 0; L_order <= data_order; ++L_order )
   {
     ENDL_Eout_ptr[ L_order ] = ENDL_data[ L_order ].EProb_data[ Ein_count ].begin( );
     next_ENDL_ptr[ L_order ] = ENDL_Eout_ptr[ L_order ];
     ++next_ENDL_ptr[ L_order ];
   }
-  ENDF_Ein_ptr = ENDF_data.insert( ENDF_data.end( ), standard_Legendre_vector( ) );
+  ENDF_Ein_ptr = ENDF_data.insert( ENDF_data.end( ), StdLg::standard_Legendre_vector( ) );
   ENDF_Ein_ptr->set_E_in( ENDL_data[ 0 ].EProb_data[ Ein_count ].get_E_in( ) );
   ENDF_Ein_ptr->Eout_interp = Eout_interp;
-  if( Ein_interp.qualifier == UNITBASE )
+  if( Ein_interp.qualifier == Terp::UNITBASE )
   {
     ENDF_Ein_ptr->ubase_map.copy( ENDL_data[ 0 ].EProb_data[ Ein_count ].ubase_map );
   }
@@ -225,15 +225,22 @@ void energy_moments::one_Ein_to_ENDF( int Ein_count )
   for( ; ; )
   {
     // make a new set of Legendre coefficients
-    ENDF_Eout_ptr = ENDF_Ein_ptr->insert( ENDF_Ein_ptr->end( ), Legendre_coefs( ) );
+    ENDF_Eout_ptr = ENDF_Ein_ptr->insert( ENDF_Ein_ptr->end( ), Lgdata::Legendre_coefs( ) );
     ENDF_Eout_ptr->initialize( output_order );
     ENDF_Eout_ptr->set_E_out( next_Eout );  // energy of outgoing particle
     for( L_order = 0; L_order <= data_order; ++L_order )
     {
-      if( Ein_interp.qualifier == UNITBASE )
+      if( Ein_interp.qualifier == Terp::UNITBASE )
       {
+	bool is_OK;
         ( *ENDF_Eout_ptr )[ L_order ] = 
-  	  ENDL_Eout_ptr[ L_order ]->linlin_interp( next_Eout, *next_ENDL_ptr[ L_order ] );
+  	  ENDL_Eout_ptr[ L_order ]->linlin_interp( next_Eout,
+			   *next_ENDL_ptr[ L_order ], &is_OK );
+	if( !is_OK )
+	{
+	  Msg::FatalError( "Edist::energy_moments::one_Ein_to_ENDF",
+			   "bad interpolation" );
+	}
       }
       else
       {
@@ -245,7 +252,7 @@ void energy_moments::one_Ein_to_ENDF( int Ein_count )
       break;
     }
     // get the next outgoing energy
-    static double tol = Global.Value( "E_tol" );
+    static double tol = Global.Value( "tight_tol" );
     double huge_E = 1.0e20;  // a dummy large value
     next_Eout = huge_E;
     for( L_order = 0; L_order <= data_order; ++L_order )
@@ -275,25 +282,26 @@ void energy_moments::one_Ein_to_ENDF( int Ein_count )
   delete [] ENDL_Eout_ptr;
   delete [] next_ENDL_ptr;
 }
-// ----------- energy_moments::get_T --------------
+// ----------- Edist::energy_moments::get_T --------------
 // Calculates the transfer matrix for this particle.
 // sigma is the cross section.
-void energy_moments::get_T( const dd_vector& sigma,
-  const dd_vector& mult, const dd_vector& weight, T_matrix& transfer )
+void Edist::energy_moments::get_T( const Ddvec::dd_vector& sigma,
+  const Ddvec::dd_vector& mult, const Ddvec::dd_vector& weight,
+				   Trf::T_matrix& transfer )
 {
-  bool interp_OK = ( ( Ein_interp.qualifier == UNITBASE ) && 
-                     ( Ein_interp.flag == LINLIN ) ) ||
-    ( ( Ein_interp.qualifier == DIRECT ) &&
-      ( Ein_interp.flag == HISTOGRAM ) );
+  bool interp_OK = ( ( Ein_interp.qualifier == Terp::UNITBASE ) && 
+                     ( Ein_interp.flag == Terp::LINLIN ) ) ||
+    ( ( Ein_interp.qualifier == Terp::DIRECT ) &&
+      ( Ein_interp.flag == Terp::HISTOGRAM ) );
   if( !interp_OK )
   {
-    FatalError( "energy_moments::get_T",
+    Msg::FatalError( "Edist::energy_moments::get_T",
       "Incident energy interpolation not implemented" );
   }
-  interp_OK = ( Eout_interp == LINLIN ) || ( Eout_interp == HISTOGRAM );
+  interp_OK = ( Eout_interp == Terp::LINLIN ) || ( Eout_interp == Terp::HISTOGRAM );
   if( !interp_OK )
   {
-    FatalError( "energy_moments::get_T",
+    Msg::FatalError( "Edist::energy_moments::get_T",
       "Outgoing energy interpolation not implemented" );
   }
   output_order = transfer.order;

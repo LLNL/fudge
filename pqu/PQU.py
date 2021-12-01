@@ -1,64 +1,8 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 # Notes.
@@ -84,9 +28,9 @@ be used to determine the person's speed as:
 >>> distance = PQU.PQU( '100.1(4) m' )
 >>> time = PQU.PQU( '16.3 +/- 0.1 s' )
 >>> speed = distance / time
->>> print speed
+>>> print(speed)
 6.14 +/- 0.04 m/s
->>> print speed.copyToUnit( 'mi/h' )
+>>> print(speed.copyToUnit( 'mi/h' ))
 13.7 +/- 0.1 mi/h
 
 In addition to calculating the speed and unit, the PQU class has also propagated the significant digits and the uncertainty. In this example
@@ -94,11 +38,11 @@ the uncertainty was propagated using Goodman's expression for uncorrelated value
 propagation of significant digits explains why the printed speed has only 3 digits. The following Python code illustrates
 significant digits for the speed calculation:
 
->>> print 100.1 / 16.3
+>>> print(100.1 / 16.3)
 6.14110429448
->>> print float( speed )
+>>> print(float( speed ))
 6.14110429448
->>> print speed.info( )
+>>> print(speed.info( ))
 value = 6.14110429447852724e+00, significantDigits = 3, order = 0, isPercent = False, unit = "m/s"
 uncertainty = value = 4.49629906071862956e-02, significantDigits = 1, order = -2, isPercent = False
 
@@ -108,58 +52,58 @@ method), only at most 'significantDigits' are displayed. The allowed range for '
 1 to sys.float_info.dig + 1 inclusive. For addition and subtraction, the member 'order' is also required and
 is why the following output is the same for both print statements:
 
->>> print distance
+>>> print(distance)
 100.1(4) m
->>> print distance + '100.1(4) mum'         # note 'mum' is micrometer
+>>> print(distance + '100.1(4) mum')        # note 'mum' is micrometer
 100.1 +/- 0.4 m
 
 How is 'significantDigits' determined? That depends on how PQU is called. If a string without
 uncertainty is entered as the only argument then 'significantDigits' is the number of digits in the string
 (ignoring leading '0'). Some examples are:
 
->>> print PQU.PQU( '12.345' ).info( )
+>>> print(PQU.PQU( '12.345' ).info( ))
 value = 1.23450000000000006e+01, significantDigits = 5, order = 1, isPercent = False, unit = ""
 uncertainty = 
->>> print PQU.PQU( '12.34500' ).info( )
+>>> print(PQU.PQU( '12.34500' ).info( ))
 value = 1.23450000000000006e+01, significantDigits = 7, order = 1, isPercent = False, unit = ""
 uncertainty = 
->>> print PQU.PQU( '12.34500e-12' ).info( )
+>>> print(PQU.PQU( '12.34500e-12' ).info( ))
 value = 1.23450000000000004e-11, significantDigits = 7, order = -11, isPercent = False, unit = ""
 uncertainty = 
->>> print PQU.PQU( '0012.34500e-12' ).info( )
+>>> print(PQU.PQU( '0012.34500e-12' ).info( ))
 value = 1.23450000000000004e-11, significantDigits = 7, order = -11, isPercent = False, unit = ""
 uncertainty = 
->>> print PQU.PQU( '00.0012' ).info( )
+>>> print(PQU.PQU( '00.0012' ).info( ))
 value = 1.19999999999999989e-03, significantDigits = 2, order = -3, isPercent = False, unit = ""
 uncertainty = 
 
 If the string has an uncertainty, then it is also used in calculating 'significantDigits'.
 Some examples are (note - these are the same as the last examples, with uncertainties added):
 
->>> print PQU.PQU( '12.345 +/- 1e-8' ).info( )
+>>> print(PQU.PQU( '12.345 +/- 1e-8' ).info( ))
 value = 1.23450000000000006e+01, significantDigits = 10, order = 1, isPercent = False, unit = ""
 uncertainty = value = 1.00000000000000002e-08, significantDigits = 1, order = -8, isPercent = False
->>> print PQU.PQU( '12.345 +/- 1e-8' )
+>>> print(PQU.PQU( '12.345 +/- 1e-8' ))
 12.34500000 +/- 1.e-8
->>> print PQU.PQU( '12.34500 +/- 0.12' ).info( )
+>>> print(PQU.PQU( '12.34500 +/- 0.12' ).info( ))
 value = 1.23450000000000006e+01, significantDigits = 4, order = 1, isPercent = False, unit = ""
 uncertainty = value = 1.19999999999999996e-01, significantDigits = 2, order = -1, isPercent = False
->>> print PQU.PQU( '12.34500 +/- 0.12' )
+>>> print(PQU.PQU( '12.34500 +/- 0.12' ))
 12.35 +/- 0.12
->>> print PQU.PQU( '12.34500e-12(32)' ).info( )
+>>> print(PQU.PQU( '12.34500e-12(32)' ).info( ))
 value = 1.23450000000000004e-11, significantDigits = 7, order = -11, isPercent = False, unit = ""
 uncertainty = value = 3.20000000000000023e-16, significantDigits = 2, order = -16, isPercent = False
->>> print PQU.PQU( '12.34500e-12(32)' )
+>>> print(PQU.PQU( '12.34500e-12(32)' ))
 1.234500e-11(32)
->>> print PQU.PQU( '0012.34500e-12 +/- 32e-15' ).info( )
+>>> print(PQU.PQU( '0012.34500e-12 +/- 32e-15' ).info( ))
 value = 1.23450000000000004e-11, significantDigits = 5, order = -11, isPercent = False, unit = ""
 uncertainty = value = 3.20000000000000025e-14, significantDigits = 2, order = -14, isPercent = False
->>> print PQU.PQU( '0012.34500e-12 +/- 32e-15' )
+>>> print(PQU.PQU( '0012.34500e-12 +/- 32e-15' ))
 1.2345e-11 +/- 3.2e-14
->>> print PQU.PQU( '00.0012 +/- 0.000002' ).info( )
+>>> print(PQU.PQU( '00.0012 +/- 0.000002' ).info( ))
 value = 1.19999999999999989e-03, significantDigits = 4, order = -3, isPercent = False, unit = ""
 uncertainty = value = 1.99999999999999991e-06, significantDigits = 1, order = -6, isPercent = False
->>> print PQU.PQU( '00.0012 +/- 0.000002' )        
+>>> print(PQU.PQU( '00.0012 +/- 0.000002' ))
 1.200e-3 +/- 2.e-6
 
 The PQU constructor (i.e., its __init__ method) allows various input options for creating an instance (see `PQU`_).
@@ -210,10 +154,10 @@ For example, consider the division of '3.2 m' by 11.2 km:
 >>> x = PQU.PQU( '3.2 m' )
 >>> y = PQU.PQU( '11.2 km' )
 >>> slope = x / y
->>> print slope
+>>> print(slope)
 0.29 m/km
 >>> dl = slope.copyToUnit( "" )
->>> print dl
+>>> print(dl)
 2.9e-4
 
 Here the method :py:meth:`PQU.copyToUnit` is used to convert the units into a dimensionless form. Here is another
@@ -222,10 +166,10 @@ example showing the use of the :py:meth:`PQU.copyToUnit` method:
 >>> mass = PQU.PQU( "4.321 g" )
 >>> speed = PQU.PQU( "1.234 inch / mus"  )  
 >>> energy = mass * speed**2
->>> print energy
+>>> print(energy)
 6.580 inch**2*g/mus**2
 >>> energy_joules = energy.copyToUnit( "J" )
->>> print energy_joules
+>>> print(energy_joules)
 4.245e6 J
 
 The method :py:meth:`PQU.inUnitsOf` is useful for returning a physical quantity in units of descending compatible units. 
@@ -250,9 +194,9 @@ the constant and then importing PQU. For example, as of this writing the element
 
 >>> from pqu import PQU
 >>> eV = PQU.PQU( 1, 'eV' )
->>> print eV
+>>> print(eV)
 1. eV
->>> print eV.copyToUnit( 'J' )
+>>> print(eV.copyToUnit( 'J' ))
 1.60217653e-19 J
 
 The following lines change the elementary charge to '1.6 * C':
@@ -261,27 +205,27 @@ The following lines change the elementary charge to '1.6 * C':
 >>> pqu_constants.e = '1.6 * C'
 >>> from pqu import PQU                 # This import does not work with doctest as PQU was previously imported.
 >>> my_eV = PQU.PQU( 1, 'eV' )
->>> print my_eV
+>>> print(my_eV)
 1. eV
->>> print my_eV.copyToUnit( 'J' )
+>>> print(my_eV.copyToUnit( 'J' ))
 1.6 J
 
 The python 'reload' function can also be used as:
 
 >>> from pqu import PQU
 >>> eV = PQU.PQU( 1, 'eV' )
->>> print eV
+>>> print(eV)
 1. eV
->>> print eV.copyToUnit( 'J' )
+>>> print(eV.copyToUnit( 'J' ))
 1.60217653e-19 J
 >>> from pqu import pqu_constants
 >>> pqu_constants.e = '1.6 * C'
 >>> reload( PQU )
 <module 'pqu.PQU' from 'pqu/PQU.pyc'>
 >>> my_eV = PQU.PQU( 1, 'eV' )
->>> print my_eV
+>>> print(my_eV)
 1. eV
->>> print my_eV.copyToUnit( 'J' )
+>>> print(my_eV.copyToUnit( 'J' ))
 1.6 J
 >>> pqu_constants.e = '1.60217653e-19 * C'      # Needs to be the same as in the module pqu_constants.py for stuff below to pass doctest.
 >>> reload( PQU )
@@ -304,40 +248,40 @@ are all equivalent:
 
 >>> from pqu import PQU
 >>> Q1 = PQU.PQU( '12.3 +/- .2 m' )
->>> print Q1 * 0.6
+>>> print(Q1 * 0.6)
 7.4 +/- 0.1 m
->>> print Q1 * PQU.PQU( '0.6' )
+>>> print(Q1 * PQU.PQU( '0.6' ))
 7.4 +/- 0.1 m
->>> print PQU.PQU( '0.6' ) * Q1
+>>> print(PQU.PQU( '0.6' ) * Q1)
 7.4 +/- 0.1 m
 
 All binary operators assume that the two operands are uncorrelated except when they are the same instance. When
 the two operands are the same instance, 100% correlation is assumed. For example,
 
->>> print Q1 - Q1                       # Operands are the same instance
+>>> print(Q1 - Q1)                      # Operands are the same instance
 0. m
->>> print Q1 - PQU.PQU( '12.3 +/- .2 m' )   # Operands are not the same instance
+>>> print(Q1 - PQU.PQU( '12.3 +/- .2 m' ))  # Operands are not the same instance
 0.0 +/- 0.3 m
->>> print Q1 + Q1                       # Operands are the same instance
+>>> print(Q1 + Q1)                      # Operands are the same instance
 24.6 +/- 0.4 m
->>> print Q1 + PQU.PQU( '12.3 +/- .2 m' )   # Operands are not the same instance
+>>> print(Q1 + PQU.PQU( '12.3 +/- .2 m' ))  # Operands are not the same instance
 24.6 +/- 0.3 m
->>> print Q1 * Q1                       # Operands are the same instance
+>>> print(Q1 * Q1)                      # Operands are the same instance
 151. +/- 5. m**2
->>> print Q1 * PQU.PQU( '12.3 +/- .2 m' )   # Operands are not the same instance
+>>> print(Q1 * PQU.PQU( '12.3 +/- .2 m' ))  # Operands are not the same instance
 151. +/- 3. m**2
->>> print Q1 / Q1                       # Operands are the same instance
+>>> print(Q1 / Q1)                      # Operands are the same instance
 1.
->>> print Q1 / PQU.PQU( '12.3 +/- .2 m' )   # Operands are not the same instance
+>>> print(Q1 / PQU.PQU( '12.3 +/- .2 m' ))  # Operands are not the same instance
 1.00 +/- 0.02
 
 There is one exception (depending on your divide-by-zero belief) to this rule of same instance and that happens when the 
 value of the operand is 0. Divide-by-zero always executes a raise of 'ZeroDivisionError', even for 'a / a'.
 
 >>> Q2 = PQU.PQU( "0.00 +/- 0.02" )
->>> print Q2 / "2 +/- 0.5"
+>>> print(Q2 / "2 +/- 0.5")
 0.00 +/- 0.01
->>> print Q2 / Q2
+>>> print(Q2 / Q2)
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
   File "PQU.py", line 1189, in __div__
@@ -366,9 +310,9 @@ For PQU methods that require a second operand (e.g., '+', '/'), the second opera
 staticmethod :py:meth:`PQU._getOtherAsPQU` to determine if it is a suitable object. A suitable object includes any string that
 is a valid PQU. For example: :py:meth:`PQU.toString`
 
->>> print PQU.PQU( '12.345' ) + "3.23"
+>>> print(PQU.PQU( '12.345' ) + "3.23")
 15.58
->>> print PQU.PQU( '12.345 mm' ) + "3.23m"
+>>> print(PQU.PQU( '12.345 mm' ) + "3.23m")
 3242. mm
 
 **isCompatible**
@@ -387,7 +331,7 @@ isAngle, isSolidAngle, isEnergy, isSpin, isCharge**
 
 >>> pqu = PQU.PQU( '13.7 +/- 0.1 mi/h' )
 >>> value = float( pqu )
->>> print type( value ), value
+>>> print(type( value ), value)
 <type 'float'> 13.7
 
 The PQU class has methods for the following arithmetic operations. Unless stated, a new PQU instance is returned.
@@ -428,7 +372,7 @@ The PQU class has methods for the following arithmetic operations. Unless stated
     with epsilonFactor = 5. All methods except 'equivalent' compare 
     self's and other's values only. The 'equivalent' method also considers self's and other's uncertainty.
 
-**__deepcopy__, convertToUnit, copyToUnit, inUnitsOf, getUnitAsString, getValueAs, getUncertaintyValueAs**
+**convertToUnit, copyToUnit, inUnitsOf, getUnitAsString, getValueAs, getUncertaintyValueAs**
 
     These methods change a PQU's unit or return a new instance.
 
@@ -481,16 +425,16 @@ This section describes several oddities about PQU.
 >>> from pqu import PQU
 >>> b1 = PQU.PQU( '1 Bohr' )
 >>> b2 = b1.inBaseUnits( )
->>> print b2
+>>> print(b2)
 5.e-11 m
->>> print b2.value.info( )
+>>> print(b2.value.info( ))
 value = 5.29177208114537818e-11, significantDigits = 1, order = -11, isPercent = False
 >>> 
 >>> b3 = PQU.PQU( 1, 'Bohr' )        # this yields significantDigits = 16.
 >>> b4 = b3.inBaseUnits( )
->>> print b4
+>>> print(b4)
 5.291772081145378e-11 m
->>> print b4.value.info( )
+>>> print(b4.value.info( ))
 value = 5.29177208114537818e-11, significantDigits = 16, order = -11, isPercent = False
 
     - The temperature units are Kelvin (i.e., 'K'), Celsius ('degC'), Rankine ('degR') and Fahrenheit ('degF').
@@ -503,11 +447,11 @@ value = 5.29177208114537818e-11, significantDigits = 16, order = -11, isPercent 
 
 >>> from pqu import PQU
 >>> t1 = PQU.PQU( '40 degC' )
->>> print t1.convertToUnit( 'degF' )
+>>> print(t1.convertToUnit( 'degF' ))
 104. degF
->>> print t1.getValueAs( 'K' )
+>>> print(t1.getValueAs( 'K' ))
 313.15
->>> print t1.convertToUnit( 'degR' )
+>>> print(t1.convertToUnit( 'degR' ))
 564. degR
 
     - PQU, actually PhysicalUnit, allows the unit to have values. For example 'm/s/25**3' is currently a valid
@@ -517,39 +461,39 @@ value = 5.29177208114537818e-11, significantDigits = 16, order = -11, isPercent 
 
 >>> from pqu import PQU
 >>> c1 = PQU.PQU( '2.23 c' )
->>> print c1
+>>> print(c1)
 2.23 c
->>> print c1.getValueAs( 'm/s' )
+>>> print(c1.getValueAs( 'm/s' ))
 668537181.34
->>> print c1.convertToUnit( 'km / s' )
+>>> print(c1.convertToUnit( 'km / s' ))
 6.69e5 km/s
->>> print c1.getValue( )
+>>> print(c1.getValue( ))
 668537.18134
 >>> 
 >>> c2 = PQU.PQU( '2.23 c' ) / 3
->>> print c2
+>>> print(c2)
 0.743 c
->>> print c2.getValueAs( 'm/s' )
+>>> print(c2.getValueAs( 'm/s' ))
 222845727.113
->>> print c2.convertToUnit( 'km / s' )
+>>> print(c2.convertToUnit( 'km / s' ))
 2.23e5 km/s
->>> print c2.getValue( )
+>>> print(c2.getValue( ))
 222845.727113
 >>> 
 >>> c3 = PQU.PQU( '2.23 c / 3' )
->>> print c3
+>>> print(c3)
 2.23 c/3
->>> print c3.getValueAs( 'm/s' )
+>>> print(c3.getValueAs( 'm/s' ))
 222845727.113
->>> print c3.convertToUnit( 'km / s' )
+>>> print(c3.convertToUnit( 'km / s' ))
 2.23e5 km/s
->>> print c3.getValue( )
+>>> print(c3.getValue( ))
 222845.727113
 >>> 
->>> print c1 == c2, c1 == c3, c2 == c3
+>>> print(c1 == c2, c1 == c3, c2 == c3)
 False False True
 >>> 
->>> print PQU.PQU( '2.23 2. * c / 3**2 / pi' )
+>>> print(PQU.PQU( '2.23 2. * c / 3**2 / pi' ))
 2.23 c*2.0/9/3.14159265359
 
 ----------------------------
@@ -560,9 +504,9 @@ Future plans
     - Added uncertainty to data in pqu_constants.py and supporting logic.
 """
 
-import sys, math, re, string
+import sys, math, re, copy
 from functools import reduce
-from NumberDict import NumberDict
+from .NumberDict import NumberDict
 
 MAJORVERSION = 1
 MINORVERSION = 1
@@ -699,7 +643,7 @@ def valueOrPQ( value, unitFrom = None, unitTo = None, asPQU = False, checkOrder 
 
     if( isinstance( value, PQU ) ) :
         if( unitFrom != value.unit ) : raise Exception( "Unit '%s' not compatible with unit '%s'" % ( unitFrom, value.unit ) )
-        value = value.__deepcopy__( )
+        value = copy.deepcopy(value)
     else :
         value = PQU( value, unitFrom, checkOrder = checkOrder )  # At this point unitFrom is a PhysicalUnit instance.
     if( unitTo is not None ) : value.convertToUnit( unitTo )
@@ -919,9 +863,9 @@ class pqu_float :
         self._setFrom( self * other )
         return( self )
 
-    def __div__( self, other ) :
+    def __truediv__( self, other ) :
 
-        if( isinstance( other, PQU ) ) : return( other.__rdiv__( self ) )
+        if( isinstance( other, PQU ) ) : return( other.__rtruediv__( self ) )
         significantDigits = self.significantDigits
         if( isinstance( other, pqu_float ) ) :
             value, significantDigits = other.value, min( self.significantDigits, other.significantDigits )
@@ -929,15 +873,19 @@ class pqu_float :
             value = float( other )
         return( pqu_float( self.value / value, significantDigits, False ) )
 
-    def __rdiv__( self, other ) :
+    def __rtruediv__( self, other ) :
 
         value = float( other )
         return( pqu_float( value / self.value, self.significantDigits ) )
 
-    def __idiv__( self, other ) :
+    def __itruediv__( self, other ) :
 
         self._setFrom( self / other )
         return( self )
+
+    __div__ = __truediv__   # for Python 2.x
+    __rdiv__ = __rtruediv__
+    __idiv__ = __itruediv__
 
     def __pow__( self, other ) :
 
@@ -953,14 +901,6 @@ class pqu_float :
         return( self.value != 0. )
 
     __nonzero__ = __bool__      # for python 2.x
-
-    def __deepcopy__( self ) :
-
-        other = self.__new__( pqu_float )
-        other.value, other.order, other.significantDigits, other._isPercent = self.value, self.order, self.significantDigits, self._isPercent
-        return( other )
-
-    __copy__ = __deepcopy__
 
     def _setFrom( self, other ) :
         """Sets self's members from other. Other must be a pqu_float instance."""
@@ -1091,6 +1031,8 @@ class pqu_float :
 
         value = abs( float( value ) )
         if( value == 0. ) : return( 0 )
+        log10 = math.log10(value)
+        if log10.is_integer(): return int(log10)
         s1 = "%.17e" % value
         return( int( s1.split( 'e' )[1] ) )
 
@@ -1113,7 +1055,7 @@ class pqu_float :
         order1 = pqu_float.calculateOrder( value )
         order2 = pqu_float.calculateOrder( value * ( 1 + 4 * sys.float_info.epsilon ) )
         if( order1 != order2 ) :
-            for i1 in xrange( 5 ) :
+            for i1 in range( 5 ) :
                 value_ = value * ( 1 + i1 * sys.float_info.epsilon )
                 order2 = pqu_float.calculateOrder( value_ )
                 if( order1 != order2 ) : break
@@ -1193,14 +1135,6 @@ class pqu_uncertainty :
     def __float__( self ) :
 
         return( float( self.value ) )
-
-    def __deepcopy__( self ) :
-
-        other = self.__new__( pqu_uncertainty )
-        other.style, other.value = self.style, self.value.__deepcopy__( )
-        return( other )
-
-    __copy__ = __deepcopy__
 
     def _changeUncertaintyStyle( self, style ) :
         """For internal use."""
@@ -1356,15 +1290,14 @@ class PQU :
         if( isinstance( value, PQU ) ) :
             if( unit is not None ) : raise TypeError( 'When value is a PQU instance, unit must be None not type "%s"' % type( unit ) )
             if( uncertainty is not None ) : raise TypeError( 'When value is a PQU instance, uncertainty must be None not type "%s"' % type( uncertainty ) )
-            self.value       = value.value.__deepcopy__( )
-            self.unit        = value.unit.__deepcopy__( )
-            self.uncertainty = value.uncertainty.__deepcopy__( )
+            self.value       = copy.deepcopy( value.value )
+            self.unit        = copy.deepcopy( value.unit )
+            self.uncertainty = copy.deepcopy( value.uncertainty )
             return
 
-        if( isinstance( uncertainty, pqu_uncertainty ) ) : uncertainty = uncertainty.__deepcopy__( )
-        if( isinstance( unit, PhysicalUnit ) ) : unit = unit.__deepcopy__( )
+        if( isinstance( uncertainty, pqu_uncertainty ) ) : uncertainty = copy.deepcopy( uncertainty )
+        if( isinstance( unit, PhysicalUnit ) ) : unit = copy.deepcopy( unit )
 
-        if( isinstance( value, unicode ) ) : value = str( value )
         if( isinstance( value, str  ) ) :
             value, unit_, uncertainty_ = parsers.parsePQUString( value )
             if( uncertainty_.style != pqu_uncertainty.pqu_uncertaintyStyleNone ) :
@@ -1377,7 +1310,7 @@ class PQU :
             if( len( unit_.symbols ) > 0 ) : unit = unit_
         else :
             if( isinstance( value, pqu_float ) ) :
-                value = value.__deepcopy__( )
+                value = copy.deepcopy( value )
             else :
                 try :
                     value = pqu_float( value, maxSignificantDigits + 1, checkOrder = checkOrder )
@@ -1423,9 +1356,9 @@ class PQU :
         if( value.isPercent( ) ) :
             if( uncertainty.isPercent( ) ) : raise Exception( 'Percent for both value and uncertainty is not allowed' )
             if( not( unit.isDimensionless( ) ) ) : raise Exception( 'Percent value and unit is not allowed' )
-        self.value = value                  # Private instance guarantied by logic above.
-        self.unit = unit                    # Private instance guarantied by logic above.
-        self.uncertainty = uncertainty      # Private instance guarantied by logic above.
+        self.value = value                  # Private instance guaranteed by logic above.
+        self.unit = unit                    # Private instance guaranteed by logic above.
+        self.uncertainty = uncertainty      # Private instance guaranteed by logic above.
 
     def __str__( self ) :
 
@@ -1507,22 +1440,26 @@ class PQU :
         self._setFrom( self * other )
         return( self )
 
-    def __div__( self, other ) :
+    def __truediv__( self, other ) :
 
         if( ( self is other ) and ( float( self ) != 0 ) ) : return( PQU( 1. ) )
         other = self._getOtherAsPQU( other )
         inv_other = 1. / float( other )
         return( self * PQU( inv_other, 1 / other.unit, inv_other * inv_other * other.getUncertaintyValueAs( ) ) )
 
-    def __rdiv__( self, other ) :
+    def __rtruediv__( self, other ) :
 
         other = self._getOtherAsPQU( other )
         return( other / self )
 
-    def __idiv__( self, other ) :
+    def __itruediv__( self, other ) :
 
         self._setFrom( self / other )
         return( self )
+
+    __div__ = __truediv__   # for Python 2.x
+    __rdiv__ = __rtruediv__
+    __idiv__ = __itruediv__
 
     def __pow__( self, other ) :
         """Does not include uncertainty of other in calculation. Other must be an object convertible to a float. If it
@@ -1576,14 +1513,6 @@ class PQU :
 
         return( self.compare( other, 5 ) >= 0 )
 
-    def __deepcopy__( self ) :
-
-        other = self.__new__( PQU )
-        other.value, other.unit, other.uncertainty = self.value.__deepcopy__( ), self.unit.__deepcopy__( ), self.uncertainty.__deepcopy__( )
-        return( other )
-
-    __copy__ = __deepcopy__
-
     def _setFrom( self, other ) :
         """
         Sets self's members from other. Other must be an instance of PQU.
@@ -1593,9 +1522,9 @@ class PQU :
         """
 
         if( not( isinstance( other, PQU ) ) ) : raise TypeError( "other type %s not supported" % type( other ) )
-        self.value = other.value.__deepcopy__( )
-        self.unit = other.unit.__deepcopy__( )
-        self.uncertainty = other.uncertainty.__deepcopy__( )
+        self.value = copy.deepcopy(other.value)
+        self.unit = copy.deepcopy(other.unit)
+        self.uncertainty = copy.deepcopy(other.uncertainty)
 
     def changeUncertaintyStyle( self, style ) :
         """
@@ -1676,7 +1605,7 @@ class PQU :
         :rtype: PQU
         """
 
-        return( self.__deepcopy__( ).convertToUnit( unit ) )
+        return( copy.deepcopy(self).convertToUnit( unit ) )
 
     def equivalent( self, other, factor = 1. ) :
         """
@@ -2438,14 +2367,6 @@ class PhysicalUnit :
 
         raise TypeError( 'Only integer and inverse integer exponents are allowed' )
 
-    def __deepcopy__( self ) :
-
-        other = self.__new__( PhysicalUnit )
-        other.symbols, other.factor, other.offset, other.powers = self.symbols.__deepcopy__( ), self.factor, self.offset, self.powers[:]
-        return( other )
-
-    __copy__ = __deepcopy__
-
     def conversionFactorTo( self, other ) :
         """
         :param other: another unit
@@ -2460,6 +2381,10 @@ class PhysicalUnit :
 
         if( ( self.offset != other.offset ) and ( self.factor != other.factor ) ) :
             raise TypeError( 'Unit conversion (%s to %s) cannot be expressed as a simple multiplicative factor' % ( self.symbol( ), other.symbol( ) ) )
+
+        if math.log10( self.factor ).is_integer() and math.log10( other.factor ).is_integer():
+            # special treatment to reduce numeric error in order-of-magnitude conversions
+            return 10**( math.log10( self.factor ) - math.log10( other.factor ) )
 
         return( self.factor / other.factor )
 
@@ -2486,7 +2411,7 @@ class PhysicalUnit :
         #  = (x + d1 - d2*s2/s1) * s1/s2
         # thus, D = d1 - d2*s2/s1 and S = s1/s2
 
-        factor = self.factor / other_.factor
+        factor = self.conversionFactorTo( other_ )
         offset = self.offset - ( other_.offset * other_.factor / self.factor )
         return( factor, offset )
 
@@ -2537,7 +2462,7 @@ class PhysicalUnit :
 
         ignores = []
         result = PQU( 1 )
-        keys = self.symbols.keys( )
+        keys = list( self.symbols.keys( ) )
         for i1, key in enumerate( keys ) :
             if( i1 in ignores ) : continue
             ignores.append( i1 )
@@ -2918,13 +2843,13 @@ __doc__ += '\n' + description( )
 def printPredefinedUnits( ) :
 
     units = []
-    for symbol, unit in _unit_table.iteritems( ) :
+    for symbol, unit in _unit_table.items( ) :
         if( symbol in [ 'pi' ] ) : continue
         s = "    %-10s  %20.12e  %20.12e" % ( symbol, unit.factor, unit.offset )
         for power in unit.powers : s += "  %3d" % power
         units.append( s )
     units.sort( )
-    for unit in units : print unit
+    for unit in units : print(unit)
 
 def convertUnits( unit, unitMap ) :
 

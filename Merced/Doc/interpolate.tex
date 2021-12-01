@@ -146,6 +146,17 @@ in Eq.~(\ref{EPtable}) between any consecutive pair of
 incident energies $E_{k-1} < E_k$.
 
 The methods of 2-dimensional interpolation are described in turn.
+For each of these methods the interpolated probability density $\pi(E' \mid E)$
+for $E_0 < E < E_1$ has the proper norm
+\begin{equation}
+  \int
+  \pi(E' \mid E) \ dE' = 1
+  \label{piNorm}
+\end{equation}
+when the interpolation rule with respect to incident energy~$E$ for the
+data Eq.~\eqref{EPtables} is linear-linear, histogram, or linear-log.
+The norm condition Eq.~\eqref{piNorm} is not usually satisfied when
+log-linear or log-log interpolation is used for the incident energy.
 
 \subsection{Direct interpolation}\label{Sec:direct-interp}
 It is common to do direct interpolation for interpolating tables of angular probability
@@ -378,7 +389,7 @@ in the \ENDF\ manual~\cite{ENDFB}.
 Interpolation by corresponding energies requires the selection of
 $N$ equiprobable energy bins, so the result depends on the value of~$N$.
 It is shown in~\cite{interpolation} that for data Eq.~(\ref{EPtable}) which are
-histogram with respect to outgoing energy $E'$, interpolation by cumulative 
+histograms with respect to outgoing energy $E'$, interpolation by cumulative 
 points is equivalent to interpolation by corresponding energies with~$N = \infty$.
 The \gettransfer\ code therefore uses interpolation by cumulative points
 whenever the data specify interpolation by corresponding energies.
@@ -398,93 +409,337 @@ probability function
 \end{equation}
 for $k = 0$,~1, $\ldots\,$,~$K$.
 
-\textbf{Constraint.}
-Interpolation by cumulative points requires that $\Pi( E' \mid E_k)$
-be strictly increasing with respect to~$E'$ for $k = 0$,~1, $\ldots\,$,~$K$.  
-That is, the 
-condition that
-\begin{equation}
-    \Pi( E'_2 \mid E_k) > \Pi( E'_1 \mid E_k)
-  \label{monotone}
-\end{equation}
-is imposed
-for every $E'_1$ and $E'_2$ in the outgoing energy
-range 
-$$
-  E'_{0,k} \le E'_1 < E'_2 \le E'_{J_k,k}.
-$$
+
+
 
 Because the data $\pi( E' \mid E_k)$ consist of probability densities,
-it follows that $\pi( E' \mid E_k) \ge 0$.  If the interpolation with respect to
-outgoing energy $E'$ is log-linear or log-log, the monotonicity condition
-(\ref{monotone}) implies that $\pi(E'_{j,k} \mid E_k ) > 0$ for all data
-points $E'_{j,k}$ in Eq.~(\ref{EPtable}), and for histograms only the
-highest outgoing energies $E'_{k,\text{max}}$ may have zero probability density.
-For linear-linear and linear-log interpolation, it is permitted that
-$\pi(E'_{j,k} \mid E_k ) = 0$ at local values of $E'_{j,k}$ but not for
- two consecutive outgoing energies $E'_{j-1,k}$ and~$E'_{j,k}$.
+it follows that $\pi( E' \mid E_k) \ge 0$.  Hence, $\pi( E' \mid E_k)$ 
+s a non-decreasing function of~$E'$.  There are
+energy distributions in the data library
+\xendl~\cite{GND} for which $\pi( E' \mid E_k ) = 0$
+on an interval $E_{j - 1,k}' < E' < E_{j,k}$ for $k = 0$~or~1
+and for some values of $j = 1$, 2, $\ldots\,$, $J_k$.
+The corresponding cumulative probability is constant
+on such intervals.  The method of cumulative points
+depends on solutions of the equation
+$$
+  \Pi(E' \mid E_k ) = Y
+$$
+for given value of  $0 \le Y \le 1$.  Denote the
+largest solution by
+$$
+  S = \max \left \{ E': \Pi(E' \mid E_k ) = Y \right \}
+$$
+and the smallest solution by
+$$
+  T = \min \left \{ E': \Pi(E' \mid E_k ) = Y \right \}.
+$$
+If $\pi( E' \mid E_k ) = 0$ only at discrete
+points, then $\Pi(E' \mid E_k )$ is strictly increasing
+and $S = T$.
 
-As with unit-base interpolation, it is sufficient to describe interpolation
-by cumulative points between the incident energies $E_0$ and~$E_1$.
-For incident energy~$E_0$ compute the cumulative probabilities
-at the data points in Eq.~(\ref{EPtables})
+The cumulative points method is defined as
+follows.
+\begin{enumerate}
+\item For probability density data Eqs.~\eqref{EPtables}
+at incident energy~$E_k$ with $k = 0$ and~1, compute the cumulative
+probabilities $\Pi( E' \mid E_k )$ in Eqs.~\eqref{cumProb}
+at the data points~$E_{j,k}'$ for $j = 0$, 1, $\ldots\,$, $J_k$.  
+Denote the result as
 \begin{equation}
-  y_{j,0} = \Pi( E'_{j,0} \mid E_0) \quad
-  \text{for  $j = 0,$ 1, $\ldots\,$, $J_0$}.
- \label{cum-prob0}
+  y_{j,k} = \Pi( E_{j,k}' \mid E_k ).
+ \label{def-phijk}
 \end{equation}
-Analogously, for $E = E_1$ determine the cumulative probabilities
-at the data points in Eq.~(\ref{EPtables})
+\item Form the union of these two sets
 \begin{equation}
-  y_{j,1} = \Pi( E'_{j,1} \mid E_1) \quad
-  \text{for  $j = 0,$ 1, $\ldots\,$, $J_1$}.
-  \label{cum-prob1}
+   \{Y_\ell\} = \{y_{j,0}\} \cup \{y_{j,1}\},
+ \label{def-Phi-cup}
 \end{equation}
-Form the union of the two sets
-$$
-  \{ Y_\ell \} = \{ y_{j,0} \} \cup \{ y_{j,1} \}.
-$$
-The $Y_\ell$ values are then ordered with removal of duplicates, so that
+remove duplicates, and arrange the remaining values
+in increasing order,
 \begin{equation}
-  Y_0 = 0 < Y_1 < \cdots < Y_{L-1} < Y_L = 1.
- \label{order-cum-prob}
+  0 = Y_0 < Y_1 < \cdots < Y_L = 1.
+ \label{Phi-ordered}
 \end{equation}
-
-Interpolation by cumulative points consists of a sequence of unit-base 
-interpolations on subintervals.  These subintervals are obtained as
-follows.  For incident energy~$E_0$ and each cumulative probability~$Y_\ell$
-in Eq.~(\ref{order-cum-prob}), the outgoing 
-energies~$\widetilde E'_{\ell,0}$ are computed such that
-$$
-  \Pi( \widetilde E'_{\ell,0} \mid E_0) = Y_\ell \quad
-  \text{for $\ell = 0,$ 1, $\ldots\,$, $L$}.
-$$
-Note that the construction ensures that each of the original
-data points $E'_{j,0}$ in Eq.~(\ref{EPtables}) is one of the
-$\widetilde E'_{\ell,0}$ values.  The interval~$\calB_0(\ell)$ is defined as
+\item For $k = 0$ and~1 and for each $Y = Y_\ell$ with
+$\ell = 1$, 2, $\ldots\,$, $L$,
+compute the outgoing energies
+$S_{\ell,k}'$ and~$T_{\ell,k}'$ by solving the equations
 \begin{equation}
  \begin{split}
-  \calB_0(\ell) &= \{ E': \widetilde E'_{\ell-1,0} \le E' < \widetilde E'_{\ell,0} \}
-  \quad \text{for $\ell = 1,$ 2, $\ldots\,$, $L-1$}, \\
-  \calB_0(L) &= \{ E': \widetilde E'_{L-1,0} \le E' \le \widetilde E'_{L,0} \}
+     S_{\ell,k}' &= \max \left \{ E': \Pi(E' \mid E_k ) = Y_{\ell-1} \right \}, \\
+      T_{\ell,k}' &= \min \left \{ E': \Pi(E' \mid E_k ) = Y_\ell \right \}.
  \end{split}
- \label{def-B0-ell}
+  \label{T-cum-prob-inv}
 \end{equation}
-The intervals~$\calB_1(\ell)$ for the data Eq.~(\ref{EPtables}) at
-incident energy~$E_1$ and $\ell = 1,$ 2, $\ldots\,$, $L$ are defined
-in a similar manner.
+\item For $k = 0$ and~1 form the intervals $\calB_\ell(E_k)$
+\begin{equation}
+ \begin{split}
+   \calB_\ell(E_k) &= \{E' : S_{\ell,k}' \le E' < T_{\ell,k}' \} 
+     \quad \text{for $\ell = 1$,~2, $\ldots\,$,~$L-1$,} \\
+   \calB_L(E_k) &= \{E' : S_{L,k}' \le E' \le T_{L,k}' \}.
+ \end{split}
+  \label{def-B-ell}
+\end{equation}
+The reason for omitting right-hand endpoints of
+intervals $\calB_\ell(E_k)$ for $\ell < L$ in Eqs.~\eqref{def-B-ell}
+is that they may be points of discontinuity
+of the original energy distributions in Eq.~\eqref{EPtables}.
+\item For incident energy $E$ with $E_0 < E < E_1$ do unit-base
+interpolation of $\pi( E' \mid E_0 )$ on $\calB_\ell(E_0)$ with
+$\pi( E' \mid E_1 )$ on $\calB_\ell(E_1)$
+for $\ell = 1$,~2, $\ldots\,$,~$L$. The interpolation with
+respect to~$E$ may be histogram, linear-linear, or linear-log.
+The linear-linear version is as follows.  
+For $k = 0$ and~1 use
+\begin{equation}
+  \Ehat' = \frac{ E' -  S_{\ell,k}'}{  T_{\ell,k}' -  S_{\ell,k}'}
+  \label{unit-base-map-cum}
+\end{equation}
+to map the interval $\calB_\ell(E_k)$
+to $0 \le \Ehat' < 1$ for $\ell = 1$,~2, $\ldots\,$,~$L-1$ and to
+$0 \le \Ehat' \le 1$ for $\ell = L$.  Scale the probability density
+accordingly,
+\begin{equation}
+  \pihat(\Ehat' \mid E_k) = (T_{\ell,k}' -S_{\ell,k}' )\pi(E' \mid E_0).
+  \label{unit-base-scale}
+\end{equation}
+Define the proportionality factor
+\begin{equation}
+  \alpha = \frac{ E - E_0 }{ E_1 - E_0 }
+  \label{def-alpha-cum}
+\end{equation}
+and interpolate to obtain
+\begin{equation}
+  \pihat(\Ehat' \mid E) = (1 - \alpha)\pihat(\Ehat' \mid E_0) +
+   \alpha \pihat(\Ehat' \mid E_1)
+ \label{unitbaseInterpCum}
+\end{equation}
+for $0 \le \Ehat' < 1$ and $\ell < L$ and for $0 \le \Ehat' \le 1$ and $\ell = L$.
+For $\ell = 1$,~2, $\ldots\,$,~$L$
+interpolate the end points of the intervals $\calB_\ell(E_k)$ to
+obtain
+\begin{equation}
+ \begin{split}
+  S_{\ell,\alpha}' &= (1 - \alpha)S_{\ell,0}' + \alpha S_{\ell,1}', \\
+  T_{\ell,\alpha}' &= (1 - \alpha)T_{\ell,0}' + \alpha T_{\ell,1}'.
+ \end{split}
+  \label{energy-range}
+\end{equation}
+At incident energy~$E$ 
+the range of outgoing energies~$E'$ as taken as
+\begin{equation}
+ \begin{split}
+   \calB_\ell(E) &= \{E' : S_{\ell,\alpha}' \le E' < T_{\ell,\alpha}' \}
+     \quad \text{for $\ell = 1$,~2, $\ldots\,$,~$L-1$,} \\
+   \calB_L(E) &= \{E' : S_{L,\alpha}' \le E' \le T_{L,\alpha}' \}.
+ \end{split}
+  \label{def-B-ell-alpha}
+\end{equation}
+Finally, the interpolated probability
+density $\pi( E' \mid E )$ is obtained by inversion of the mapping
+Eq.~\eqref{unit-base-scale}, giving
+\begin{equation}
+  \pi(E' \mid E) = \frac{\pihat(\Ehat' \mid E)}{  T_{\ell,\alpha}' -  S_{\ell,\alpha}'}
+ \label{map-inv}
+\end{equation}
+for $E'$ in $\calB_\ell(E)$.
+Set $\pi(E' \mid E) = 0$ for all outgoing energies~$E'$ which 
+are not in any of the sets $\calB_\ell(E)$ for 
+$\ell = 1$,~2, $\ldots\,$,~$L$.
+\end{enumerate}
 
-Interpolation by cumulative points is accomplished by doing
-a sequence of unit-base interpolations between $\pi( E' \mid E_0)$
-on the interval~$\calB_0(\ell)$ and $\pi( E' \mid E_1)$ on~$\calB_1(\ell)$
-for $\ell = 1,$ 2, $\ldots\,$, $L$.
+For tables of angular probability densities~$\pi( \mu \mid E)$, direct interpolation
+is often used for interpolating with respect to incident energy~$E$,
+because the direction cosines usually range over $-1 \le \mu \le 1$.
+For angular distributions with strong local features, interpolation by cumulative points 
+may be preferable.
 
-A more detailed discussion of interpolation of probability data by
-the method of cumulative points may be found in the note~\cite{interpolation}.
 
-Because interpolation by cumulative points depends on the
-detailed behavior of the probability densities, the method may also be useful
-for interpolation of angular probability densities~$\pi( \mu \mid E)$.
+\subsubsection{Practical considerations: intervals of zero length} 
+\label{Sec:cum-points-trivial}
+Experience with interpolation
+by cumulative points as described above shows that it must be
+modified to deal with the inaccuracy of
+computer arithmetic.  In particular, it may happen that 
+for $k=0$ or~1 and for some $\ell = \widehat \ell$
+the values of $S'_{ \ell,k}$ and~$T'_{ \ell,k}$
+as obtained from Eq.~(\ref{T-cum-prob-inv}) are computed to be equal.
+The mapping Eq.~(\ref{unit-base-map-cum}) to unit base is then undefined.
+
+This phenomenon may be understood in terms of the computer's
+machine epsilon, which is the smallest number $\epsilon_{\text{mach}}$
+such that $1 + \epsilon_{\text{mach}} > 1$ in the computer's arithmetic.
+In double precision arithmetic a common value is
+$$
+  \epsilon_{\text{mach}}  = 2^{-52} \approx 2.22 \times 10^{-16}.
+$$
+In particular, if the exact values of $S_{\widehat \ell,k}' $ and $T_{\widehat \ell,k}' $
+are such that $S_{\widehat \ell,k}' > 0$ and
+$$
+  T_{\widehat \ell,k}'  - S_{\widehat \ell,k}'  < \epsilon_{\text{mach}} S_{\widehat \ell,k}',
+$$
+then the computer will say that $S_{\widehat \ell,k}' = T_{\widehat \ell,k}'$.
+
+Consider first the case that the probability density $\pi(E' \mid E_k )$ is
+given as a histogram.  Then in exact arithmetic the cumulative points algorithm 
+ensures the existence of $S_{\widehat \ell,k}' $ and $T_{\widehat \ell,k}' $
+such that
+\begin{equation}
+  \Pi(S_{\widehat \ell,k}' \mid E_k ) = Y_{\widehat \ell-1}
+  \quad \text{and} \quad
+  \Pi(T_{\widehat \ell,k}' \mid E_k ) = Y_{\widehat \ell}.
+ \label{get-S-T}
+\end{equation}
+Furthermore, it is assured that $S_{\widehat \ell,k}'  < T_{\widehat \ell,k}' $
+and that
+$$
+  \pi(E' \mid E_k ) = \pi_{\widehat \ell,k}
+  \quad \text{for} \quad
+  S_{\widehat \ell,k}' \le E' < T_{\widehat \ell,k}',
+$$
+where $\pi_{\widehat \ell,k}$  is a positive constant.  Thus, if it happens
+that
+\begin{equation}
+  Y_{\widehat \ell} - Y_{\widehat \ell-1} <
+  \epsilon_{\text{mach}}  \pi_{\widehat \ell,k} S_{\widehat \ell,k}' ,
+ \label{bad-cum-prob}
+\end{equation}
+the computer will conclude that $S_{\widehat \ell,k}' = T_{\widehat \ell,k}'$.
+Because of the factor $\pi_{\widehat \ell,k}$ appearing on the right-hand
+side of Eq.~{\ref{bad-cum-prob}), this phenomenon is usually associated
+with narrow resonances in the data.  The size of $ \pi_{\widehat \ell,k}$ depends
+on the units used for energy, but the product $ \pi_{\widehat \ell,k} S_{\widehat \ell,k}' $
+is dimensionless, and it is typically large at a resonance.  For example, 
+for $S_{\widehat \ell,k}'  = 1\,\text{MeV}$ the value $ \pi_{\widehat \ell,k} 
+= 1.0 \times 10^8\,\text{MeV}^{-1}$ is reasonable, and Eq.~(\ref{bad-cum-prob})
+could easily be satisfied.
+
+The situation for a piecewise linear probability density $\pi(E' \mid E_k )$ is
+a little different.  For one thing, the value $ \pi_{\widehat \ell,k}$ in
+Eq.~(\ref{bad-cum-prob}) is replaced by the average
+$$
+  \frac{1}{2} \left(
+    \pi( S_{\widehat \ell,k}' \mid E_k ) +  \pi( T_{\widehat \ell,k}' \mid E_k ) 
+  \right).
+$$
+Another difference from the histogram case is that the determination of
+$S_{\widehat \ell,k}' $ and $T_{\widehat \ell,k}' $ in Eq.~(\ref{get-S-T}) 
+require the solution of quadratic equations, with additional inaccuracy
+introduced by the computer arithmetic.
+
+This raises the question of what to do when the solution of
+Eq.~(\ref{T-cum-prob-inv}) gives values of $S_{ \widehat \ell,k}'$ and 
+$T_{\widehat \ell,k}'$
+which are nearly equal for some $\widehat \ell$ and~$k$.
+The first requirement is a definition of equality for computer arithmetic.
+In the \gettransfer\ code $S'_{ \widehat \ell,k}$ and~$T'_{ \widehat \ell,k}$
+are considered to be essentially equal if
+\begin{equation}
+  \left| 
+    S'_{ \widehat \ell,k} - T'_{ \widehat \ell,k}
+  \right| <
+  \frac{ \delta_r} {2} \left(
+    S'_{ \widehat \ell,k} + T'_{ \widehat \ell,k}
+  \right),
+ \label{bad-unit-base}
+\end{equation}
+where $\delta_r$ is the parameter \texttt{tight\_tol}
+described in Section~\ref{Sec:floatingPoint}.  
+
+ The decision on what to do in \gettransfer\ about such near equality of
+$S'_{ \widehat \ell,k}$ and~$T'_{ \widehat \ell,k}$  is based on the size of
+$Y_{\widehat \ell} - Y_{\widehat \ell-1}$.  Let $\delta_c$
+be the parameter \texttt{cum\_prob\_skip} described in
+Section~\ref{Sec:cum-prob-skip}. 
+If Eq~(\ref{bad-unit-base})
+is satisfied and
+\begin{equation}
+  Y_{\widehat \ell} - Y_{\widehat \ell-1} < \delta_c,
+ \label{drop-B-ell}
+\end{equation}
+then the sets $\calB_{\widehat \ell}(E_k)$ with $k = 0$,~1
+in Eq.~(\ref{def-B-ell}) are omitted from the computation of the
+transfer matrix.  This omission introduces an error of at most one part
+in~$1/\delta_c$ in the transfer matrix.
+
+On the other hand, if Eq~(\ref{bad-unit-base})
+is satisfied and Eq~(\ref{drop-B-ell}) is violated for some
+$\widehat \ell$ and~$k$, then in \gettransfer\ the interval
+$\calB_{\widehat \ell}(E_k)$ is reduced to the point
+\begin{equation}
+   \calB_{\widehat \ell}(E_k) = \{E' : E' = \widetilde S_{\widehat \ell,k}' \} 
+  \label{def-B-ell-point}
+\end{equation}
+with
+\begin{equation}
+    \widetilde S_{\widehat \ell,k}' =
+     \frac{ 1} {2} \left(
+    S'_{ \widehat \ell,k} + T'_{ \widehat \ell,k}
+  \right),
+  \label{def-S-ell-point}
+\end{equation}
+and $\pi( E' \mid E_k )$ on $\calB_{\widehat \ell}(E_k)$ is taken
+to be a delta function
+\begin{equation}
+  \pi( E' \mid E_k ) = \left(
+    Y_{\widehat \ell} - Y_{\widehat \ell - 1}
+   \right)
+  \delta( E' - \widetilde S_{\widehat \ell,k}'  ).
+ \label{delta-data}
+\end{equation}
+Note that in exact arithmetic the intervals $\calB_{\ell}( E_k )$ defined
+in Eq.~(\ref{def-B-ell}) are disjoint.  For the construction here,
+however, there is no guarantee that the point $\calB_{\widehat \ell}(E_k)$
+obtained from Eqs.~(\ref{def-B-ell-point}) and~(\ref{def-S-ell-point})
+is not contained in $\calB_{\widehat \ell - 1}( E_k )$ or~$\calB_{\widehat \ell + 1}( E_k )$.
+
+If it happens that the delta function Eq.~(\ref{delta-data}) is used
+for both $k = 0$ and $k = 1$, then for incident energy~$E$ with
+$E_0 < E < E_1$, the set  $\calB_{\widehat \ell}(E)$ in
+Eq.~(\ref{def-B-ell-alpha}) is defined as the single point
+$$
+  \widetilde S_{\widehat \ell, \alpha}' = ( 1 - \alpha ) \widetilde S_{\widehat \ell, 0}' +
+  \alpha \widetilde S_{\widehat \ell,1}'
+$$
+with $\alpha$ given by Eq.~(\ref{def-alpha-cum}).  The
+probability density on $\calB_{\widehat \ell}(E)$ is taken to be
+the delta function
+$$
+   \pi( E' \mid E ) = \left(
+    Y_{\widehat \ell} - Y_{\widehat \ell - 1}
+   \right)
+  \delta( E' - \widetilde S_{\widehat \ell, \alpha}'  ).
+$$
+
+It remains to consider the case when Eq~(\ref{bad-unit-base})
+is satisfied and Eq~(\ref{drop-B-ell}) is false for only one value
+of~$k$, say $k = 0$.  In that case the set $ \calB_{\widehat \ell}(E_0)$
+reduces to a point as in Eqs.~(\ref{def-B-ell-point}) and~(\ref{def-S-ell-point}), and
+$\pi( E' \mid E_0 )$ on  $ \calB_{\widehat \ell}(E_0)$ is defined to be as
+in Eq.~(\ref{delta-data}) with $k = 0$.  For the mapping of this
+$\pi( E' \mid E_0 )$ on  $ \calB_{\widehat \ell}(E_0)$ to unit base,
+Eq.~(\ref{unit-base-scale}) is replaced by in \gettransfer\ by
+$$
+  \pihat(\Ehat' \mid E_0) = Y_{\widehat \ell} - Y_{\widehat \ell - 1}
+  \quad \text{for} \quad
+  0 \le \Ehat'  \le 1.
+$$
+At incident energy~$E$ with $E_0 < E < E_1$ the interpolation
+Eq.~(\ref{unitbaseInterpCum}) is performed using $\alpha$
+defined by Eq.~(\ref{def-B-ell-alpha}).  For inversion of the
+unit base map at incident energy~$E$, the range of outgoing
+energies Eq.~(\ref{energy-range}) is replaced by
+\begin{equation*}
+ \begin{split}
+  S_{\ell,\alpha}' &= (1 - \alpha) \widetilde S_{\widehat \ell, 0}'  + \alpha S_{\ell,1}', \\
+  T_{\ell,\alpha}' &= (1 - \alpha) \widetilde S_{\widehat \ell, 0}'  + \alpha T_{\ell,1}'.
+ \end{split}
+  %\label
+\end{equation*}
+The probability density $\pi( E' \mid E )$ for $S_{\ell,\alpha}' \le E' <
+T_{\ell,\alpha}'$ is then calculated using the scaling Eq.~(\ref{map-inv}).
+
 
 \section{Unscaled interpolation of Kalbach-Mann data}\label{Sec:Kalbach-r-interp}
 The above discussion pertains to the interpolation of tables of probability densities,
@@ -572,7 +827,7 @@ Eqs.~(\ref{unitbaseMap}) and~(\ref{unitbaseMap1}) replaced by
   \widehat r(\Ehat', E_1) &= r(E', E_1), \\
  \end{split}
 \end{equation*}
-for $0 \le \Ehat' \le 1$ with $\Ehat'$ as in Eq.~(\ref{unit-base-map})
+for $0 \le \Ehat' \le 1$ with $\Ehat'$ as in Eq.~(\ref{unit-base-map-cum})
 for $E = E_0$ and as in Eq.~(\ref{unit-base-map1})
 for $E = E_1$.  For linear-linear unscaled unit-base interpolation
 to incident energy $E$ with $E_0 < E < E_1$, interpolate the
@@ -590,11 +845,15 @@ for $\Emin' \le E' \le \Emax'$.
 
 When the energy probability density $\pi_E( E' \mid E )$ in Eq.~(\ref{Kalbach-prob})
 is interpolated using the method of cumulative points, the interpolated values of
-$r(E', E)$ in Eq.~(\ref{Kalbach-eta}) is obtained using the method of
-unscaled cumulative points defined as follows.  The method uses the outgoing energy
-ranges $\calB_0( \ell )$ given in Eq.~(\ref{def-B0-ell}) for $\pi_E( E' \mid E )$ at
-$E = E_0$ and the corresponding $\calB_1( \ell )$ at $E = E_1$, and it does unscaled
-unit-base interpolation of $r( E', E)$ between $\calB_0( \ell )$ and $\calB_1( \ell )$
-in sequence for $\ell = 1,$ 2, $\ldots\,$, $L$.
+$r(E', E)$ in Eq.~(\ref{Kalbach-eta}) are obtained using the method of
+unscaled cumulative points defined as follows.  Because the data for
+ $r( E' , E )$ and  $\pi_E( E' \mid E )$ are given at the same energy points
+ $E$ and~$E'$, it is natural to use for $r( E' , E_0 )$ and $r( E' , E_1 )$ the
+ intervals  $\calB_{ \ell}(E_k )$, k = 0,~1, constructed for $\pi_E( E' \mid E_k )$
+in Eq.~(\ref{def-B-ell}).  The \gettransfer\ code uses unscaled unit-base interpolation 
+between $r( E', E_0)$ on $\calB_{\ell}(E_0 )$ and  $r( E', E_0)$ on $\calB_{ \ell}(E_1 )$
+in sequence for $\ell = 1,$ 2, $\ldots\,$, $L$. This method is applicable
+even when a set $\calB_{ \ell}(E_k )$ reduces to a point as discussed in
+Section~\ref{Sec:cum-points-trivial}, as here is no problem of possible division by zero.
 
 

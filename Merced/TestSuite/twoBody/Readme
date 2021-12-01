@@ -9,11 +9,14 @@ are inaccurate at low incident energies.
 In the input file you must provide the Q value and the rest masses of 
 the incident particle, the target, and the emitted particle, and these
 must be in the same units as the energy bins.  You may also provide
-the rest mass of the residual, but this is not used.  You will get a
+the rest mass of the residual, but this is not used unless the residual
+is a photon.  You will get a
 warning message if the calculated rest mass of the residual differs
 too much from the one you provide.
 
-The computation is done with Newtonian mechanics if the input file
+Relativistic mechanics is used if the incident particle or one of the
+outgoing particles is a photon.  Otherwise,
+the computation is done with Newtonian mechanics if the input file
 contains the line
 kinetics: Newtonian
 To specify relativistic mechanics, include the line
@@ -34,11 +37,12 @@ in.elastic-C12.rel: elastic scattering using relativistic kinetics and adaptive 
 in.inelastic-Kr78: inelastic scattering using Newtonian kinetics and adaptive 
   quadrature.  The output file is out.inelastic-Kr78.
 
-in.inelastic-Kr78-Gauss6: inelastic scattering using Newtonian kinetics and 6-th 
-  order Gaussian quadrature. The output file is out.inelastic-Kr78-Gauss6.
-
 in.inelastic-Kr78.rel: inelastic scattering using relativistic kinetics and adaptive 
   quadrature.  The output file is out.inelastic-Kr78.
 
-in.capture: for capture of an incident neutron by a proton.  The data are for the
-  outgoing deuteron, with the photon as the residual.  The output file is out.capture.
+in.photon_out: data for the outgoing photon in the
+  H2 + H3 --> (He5 -> n + He4) + photon reaction.  The output file is
+  out.photon_out.
+
+in.photon_res: data for the outgoing deuteron in the
+  n + H1 --> H2 + gamma reaction.  The output file is out.photon_res.

@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.abstractClasses &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.abstractClasses</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.abstractClasses</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">times</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">suites</span> <span class="k">as</span> <span class="n">suitesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">styles</span> <span class="k">as</span> <span class="n">stylesModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="component"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component">[docs]</a><span class="k">class</span> <span class="nc">component</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">allowedClasses</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">allowedClasses</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">evaluated</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">(),</span> <span class="s1">&#39;styles&#39;</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                  <span class="c1"># A hack to deal with orphaned components that are not part of a full reactionSuite.</span>
+
+        <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getEvaluatedStyle</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">evaluated</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="component.keys"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">form</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="component.amendForPatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.amendForPatch">[docs]</a>    <span class="k">def</span> <span class="nf">amendForPatch</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">key</span> <span class="o">==</span> <span class="n">fromLabel</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">toLabel</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.cullStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">keeperLabel</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">styleList</span> <span class="p">:</span>                        <span class="c1"># Determine form to keep.</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="o">==</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">keeperLabel</span> <span class="o">=</span> <span class="n">label</span>
+                    <span class="k">break</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">keeperLabel</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>                   <span class="c1"># Remove all but keeping form.</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="o">!=</span> <span class="n">keeperLabel</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">label</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.getStylesOfClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.getStylesOfClass">[docs]</a>    <span class="k">def</span> <span class="nf">getStylesOfClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">styles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getStylesOfClass</span><span class="p">(</span> <span class="bp">cls</span> <span class="p">)</span>
+        <span class="n">formList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_form</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">styles</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">_form</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">:</span> <span class="n">formList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">_form</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">formList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.getStyleOfClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.getStyleOfClass">[docs]</a>    <span class="k">def</span> <span class="nf">getStyleOfClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getStyleOfClass</span><span class="p">(</span> <span class="bp">cls</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">]</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.processMC_cdf"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+
+        <span class="n">addToComponent</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;addToComponent&#39;</span><span class="p">,</span> <span class="kc">True</span> <span class="p">)</span>
+
+        <span class="n">_form</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">MonteCarlo_cdf</span> <span class="o">=</span> <span class="n">_form</span><span class="o">.</span><span class="n">processMC_cdf</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==== form = </span><span class="si">%s</span><span class="s1"> failed&#39;</span> <span class="o">%</span> <span class="n">_form</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">addToComponent</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">MonteCarlo_cdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">MonteCarlo_cdf</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.processMultiGroup"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">styleFilter</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="p">(</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">MonteCarlo_cdf</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">griddedCrossSection</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+        <span class="n">addToComponent</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;addToComponent&#39;</span><span class="p">,</span> <span class="kc">True</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="p">)</span> <span class="p">:</span> <span class="n">time</span> <span class="o">=</span> <span class="n">times</span><span class="o">.</span><span class="n">times</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="n">_form</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleFilter</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">_form</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="c1">#            if( verbosity ) : print(&#39;%sWARNING: no form found for component %s&#39; % ( indent, self.moniker ))</span>
+            <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span>
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">multiGroup</span> <span class="o">=</span> <span class="n">_form</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;form = </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">_form</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent2</span> <span class="o">+</span> <span class="s1">&#39;    &#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">current</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">))</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">addToComponent</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">multiGroup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">multiGroup</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">multiGroup</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">styleLabels</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">label</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.toLinear"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.toLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">(</span> <span class="p">),</span> <span class="s1">&#39;styles&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>            <span class="c1"># An orphaned component that is not part of a full reactionSuite.</span>
+            <span class="n">linear</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">linear</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">preProcessingHeadInChainWithLabel</span><span class="p">(</span> <span class="n">label</span> <span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">]</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">linear</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span>              <span class="c1"># This is not correct. Need toLinear for each class and use it.</span></div>
+
+<div class="viewcode-block" id="component.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calls the toPointwise_withLinearXYs method for the evaluated style and returns a &quot;lin-lin&quot; pointwise representation of it.</span>
+
+<span class="sd">        @:param lowerEps: lower epsilon for converting discontinuities to monotonic function</span>
+<span class="sd">        @:param upperEps: upper epsilon for converting discontinuities to monotonic function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span>
+        <span class="n">styleLabel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;styleLabel&#39;</span><span class="p">,</span> <span class="n">evaluated</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">styleLabel</span> <span class="o">!=</span> <span class="n">evaluated</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">:</span> <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">styleLabel</span><span class="p">]</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.check"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.component.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">formWarnings</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">formWarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;form &quot;</span><span class="si">%s</span><span class="s1">&quot;:&#39;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">formWarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div></div>
+
+<div class="viewcode-block" id="form"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.form">[docs]</a><span class="k">class</span> <span class="nc">form</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the base class which is used as a form base class for channelData, reactionData and productData form classes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+
+<div class="viewcode-block" id="form.getComponentsClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.form.getComponentsClass">[docs]</a>    <span class="k">def</span> <span class="nf">getComponentsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">]</span><span class="o">.</span><span class="n">component</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.toXML"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.form.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.abstractClasses</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

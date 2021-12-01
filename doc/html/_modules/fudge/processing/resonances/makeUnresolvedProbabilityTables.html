@@ -1,0 +1,771 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.processing.resonances.makeUnresolvedProbabilityTables &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.resonances.makeUnresolvedProbabilityTables</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.processing.resonances.makeUnresolvedProbabilityTables</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3</span>
+<span class="c1">#encoding: utf-8</span>
+
+<span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="kn">from</span> <span class="nn">fudge.reactionData</span> <span class="kn">import</span> <span class="n">crossSection</span> <span class="k">as</span> <span class="n">crossSectionModule</span>
+<span class="kn">from</span> <span class="nn">fudge.resonances</span> <span class="kn">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">commonResonancesModule</span><span class="p">,</span> <span class="n">resolved</span> <span class="k">as</span> <span class="n">resolvedModule</span>
+
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">table</span> <span class="k">as</span> <span class="n">tableModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">XYs</span> <span class="k">as</span> <span class="n">XYsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">multiD_XYs</span> <span class="k">as</span> <span class="n">multiD_XYsModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reconstructResonances</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Classes for generating probability tables P(crossSection | energy_in, T) from unresolved resonance parameters.</span>
+<span class="sd">Methodology: create multiple random sets of unresolved resonance parameters, reconstruct cross sections,</span>
+<span class="sd">optionally heat to one or more temperatures, and convert the results into probability tables.</span>
+<span class="sd">The unresolved region is divided into sub-regions, with one pdf generated for each sub-region.</span>
+
+<span class="sd">Usage example:</span>
+<span class="sd">tableGenerator = ProbabilityTableGenerator( reactionSuite, verbose=True )</span>
+<span class="sd">pdfs = tableGenerator.generatePDFs( resClass = reconstructResonances.SLBWcrossSection, nSamples = 10 )</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>   <span class="c1"># set True before debugging (disables multiprocessing)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">matplotlib</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>   <span class="c1"># avoid trouble with matplotlib and multiprocessing</span>
+
+<div class="viewcode-block" id="ProbabilityTableGenerator"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator">[docs]</a><span class="k">class</span> <span class="nc">ProbabilityTableGenerator</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">reactionSuite</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RRR</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">resonances</span><span class="o">.</span><span class="n">resolved</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">URR</span> <span class="o">=</span> <span class="n">reconstructResonances</span><span class="o">.</span><span class="n">URRcrossSection</span><span class="p">(</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">resonances</span><span class="o">.</span><span class="n">unresolved</span><span class="o">.</span><span class="n">evaluated</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="p">,</span> <span class="s1">&#39;averageWidths&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># do some pre-sorting for convenience</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">getWidthsAndSpacings</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+        <span class="c1"># obtain background cross sections (will be added to each realization). These include both</span>
+        <span class="c1"># the tabulated background and the contribution of resolved resonances in the URR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backgrounds</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">useForSelfShieldingOnly</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">reaction</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">resonanceReactions</span><span class="p">:</span>
+                <span class="n">xsc</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">reactionLink</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">evaluated</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xsc</span><span class="p">,</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">resonancesWithBackground</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">label</span>
+                <span class="k">for</span> <span class="n">simpleKey</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;elastic&#39;</span><span class="p">,</span> <span class="s1">&#39;capture&#39;</span><span class="p">,</span> <span class="s1">&#39;fission&#39;</span><span class="p">,</span> <span class="s1">&#39;total&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">reaction</span><span class="o">.</span><span class="n">reactionLink</span><span class="o">.</span><span class="n">link</span> <span class="ow">is</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">simpleKey</span><span class="p">):</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">simpleKey</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">backgrounds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">xsc</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">unresolvedRegion</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="c1"># disabling for now: looks like URR parameters stand on their own, no need to add tails from RRR</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        if self.reactionSuite.resonances.resolved is not None:</span>
+<span class="sd">            import copy</span>
+<span class="sd">            self.RRR = copy.copy(self.reactionSuite.resonances.resolved.evaluated)     # FIXME should be a deep copy instead</span>
+<span class="sd">            self.truncateResolvedRegion()   # drop resolved resonances in the unresolved region</span>
+
+<span class="sd">            # get contribution of resolved resonances in resolved and unresolved regions:</span>
+<span class="sd">            rrClass = reconstructResonances.getResonanceReconstructionClass(self.RRR)</span>
+<span class="sd">            rrCrossSection = rrClass(self.RRR)</span>
+<span class="sd">            egrid1 = rrCrossSection.generateEnergyGrid(highBound=self.lowerBound)   # extend up to bottom edge of URR</span>
+
+<span class="sd">            egrid2 = list(self.levelDensities.values())[0].domainGrid       # extends past original URR range due to &#39;addPoints&#39;</span>
+<span class="sd">            egrid = numpy.array(sorted(set(egrid1 + egrid2)))</span>
+<span class="sd">            xsecs = rrCrossSection.getCrossSection(egrid)</span>
+<span class="sd">            egrid, xsecs, message = rrCrossSection.refineInterpolation(egrid, xsecs)</span>
+<span class="sd">            for key in xsecs:</span>
+<span class="sd">                xsNow = crossSectionModule.XYs1d( axes=crossSectionModule.defaultAxes(&#39;eV&#39;), data=list(zip(egrid, xsecs[key])))</span>
+<span class="sd">                if key in self.backgrounds:</span>
+<span class="sd">                    self.backgrounds[key] += xsNow</span>
+<span class="sd">                else:</span>
+<span class="sd">                    self.backgrounds[key] = xsNow</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get mass ratio for heating cross sections:</span>
+        <span class="n">projectileMass</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span> <span class="p">]</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
+
+        <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span>
+        <span class="k">if</span> <span class="n">targetID</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span> <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">massRatio</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">projectileMass</span>
+
+<div class="viewcode-block" id="ProbabilityTableGenerator.truncateResolvedRegion"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.truncateResolvedRegion">[docs]</a>    <span class="k">def</span> <span class="nf">truncateResolvedRegion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all resolved resonances with energies above domainMax.</span>
+<span class="sd">        If domainMax is None, use self.lowerBound  (i.e. lower limit of the unresolved region).</span>
+<span class="sd">        Modifies the local copy of the resolved parameters (self.RRR)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">domainMax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RRR</span><span class="p">,</span> <span class="n">resolvedModule</span><span class="o">.</span><span class="n">BreitWigner</span><span class="p">):</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RRR</span><span class="o">.</span><span class="n">resonanceParameters</span><span class="o">.</span><span class="n">table</span>
+            <span class="n">energies</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">getColumn</span><span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">energies</span> <span class="ow">and</span> <span class="n">energies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">domainMax</span><span class="p">:</span>
+                <span class="n">energies</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RRR</span><span class="p">,</span> <span class="n">resolvedModule</span><span class="o">.</span><span class="n">RMatrix</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">spinGroup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">RRR</span><span class="o">.</span><span class="n">spinGroups</span><span class="p">:</span>
+                <span class="n">table</span> <span class="o">=</span> <span class="n">spinGroup</span><span class="o">.</span><span class="n">resonanceParameters</span><span class="o">.</span><span class="n">table</span>
+                <span class="n">energies</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">getColumn</span><span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">)</span>
+                <span class="k">while</span> <span class="n">energies</span> <span class="ow">and</span> <span class="n">energies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">domainMax</span><span class="p">:</span>
+                    <span class="n">energies</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="n">table</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProbabilityTableGenerator.getLastResolvedResonanceRegion"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.getLastResolvedResonanceRegion">[docs]</a>    <span class="k">def</span> <span class="nf">getLastResolvedResonanceRegion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the highest energy resolved resonance region. Most evaluations only contain one resolved region,</span>
+<span class="sd">        but a few (notably Pu239 in ENDF-VII.1) break the RRR into several regions.</span>
+
+<span class="sd">        :return: The highest resolved resonance region, or None if the evaluation contains no resolved region</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">RRR</span><span class="p">:</span>
+            <span class="c1"># For multiple regions, we need to do each region separately, then add them to the unified xs table &amp; egrid</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RRR</span><span class="p">,</span> <span class="n">commonResonancesModule</span><span class="o">.</span><span class="n">energyIntervals</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RRR</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Single region, everything goes on unified grid</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RRR</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ProbabilityTableGenerator.getLastResolvedResonanceEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.getLastResolvedResonanceEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">getLastResolvedResonanceEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the last resonance energy from the resolved region, that will start all the ladders in the URR</span>
+
+<span class="sd">        :param l: orbital angular momentum of the resonance to find</span>
+<span class="sd">        :param j: total angular momentum of the resonance to find</span>
+<span class="sd">        :return: either the energy of the last resonance with requested (l,j) or None if it can&#39;t be found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLastResolvedResonanceRegion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolved</span><span class="p">,</span> <span class="n">resolvedModule</span><span class="o">.</span><span class="n">BreitWigner</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getLastResolvedResonanceRegion</span><span class="p">()</span><span class="o">.</span><span class="n">resonanceParameters</span><span class="o">.</span><span class="n">table</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">resonances</span><span class="o">.</span><span class="n">resolved</span><span class="o">.</span><span class="n">domainMax</span><span class="p">:</span>
+                    <span class="c1"># ignore resonances added above the end of resolved region (only included for their tails)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">l</span> <span class="ow">and</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span> <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>   <span class="c1"># R-Matrix</span>
+            <span class="n">elastic</span><span class="p">,</span> <span class="o">=</span> <span class="p">[</span><span class="n">reac</span> <span class="k">for</span> <span class="n">reac</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">resonanceReactions</span> <span class="k">if</span> <span class="n">reac</span><span class="o">.</span><span class="n">reactionLink</span><span class="o">.</span><span class="n">link</span> <span class="ow">is</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="s1">&#39;elastic&#39;</span><span class="p">)]</span>
+            <span class="n">elasticLabel</span> <span class="o">=</span> <span class="n">elastic</span><span class="o">.</span><span class="n">label</span>
+
+            <span class="n">maxRes</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">spinGroup</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">spinGroups</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">spinGroup</span><span class="o">.</span><span class="n">spin</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+                    <span class="n">elasticChannels</span> <span class="o">=</span> <span class="p">[</span><span class="n">chan</span> <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">spinGroup</span><span class="o">.</span><span class="n">channels</span> <span class="k">if</span> <span class="n">chan</span><span class="o">.</span><span class="n">resonanceReaction</span> <span class="o">==</span> <span class="n">elasticLabel</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">l</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span> <span class="p">[</span><span class="n">chan</span><span class="o">.</span><span class="n">L</span> <span class="o">==</span> <span class="n">l</span> <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">elasticChannels</span><span class="p">]</span> <span class="p">):</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spinGroup</span><span class="o">.</span><span class="n">resonanceParameters</span><span class="o">.</span><span class="n">table</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">maxRes</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">maxRes</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span> <span class="n">spinGroup</span><span class="o">.</span><span class="n">resonanceParameters</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">getColumn</span><span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">maxRes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">maxRes</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ProbabilityTableGenerator.extrapolate_URR_parameters"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.extrapolate_URR_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">extrapolate_URR_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newDomainMin</span><span class="p">,</span> <span class="n">newDomainMax</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extrapolate widths, level densities and possibly scattering radius beyond either end</span>
+<span class="sd">        of the unresolved region, so we can draw realizations extending to higher/lower energy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">addPoints</span><span class="p">(</span> <span class="n">function1d</span><span class="p">,</span> <span class="n">newDomainMin</span><span class="p">,</span> <span class="n">newDomainMax</span> <span class="p">):</span>
+            <span class="n">xys1d</span> <span class="o">=</span> <span class="n">function1d</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">lowerEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+            <span class="n">span</span> <span class="o">=</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">-</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMin</span>
+
+            <span class="n">x1</span><span class="p">,</span><span class="n">y1</span> <span class="o">=</span> <span class="n">xys1d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">x2</span><span class="p">,</span><span class="n">y2</span> <span class="o">=</span> <span class="n">xys1d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">newX</span> <span class="o">=</span> <span class="n">newDomainMin</span>
+            <span class="n">newY</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">-</span> <span class="p">(</span><span class="n">x1</span><span class="o">-</span><span class="n">newX</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">)</span>
+            <span class="n">xys1d</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">newX</span><span class="p">,</span> <span class="n">newY</span><span class="p">)</span>
+
+            <span class="n">x1</span><span class="p">,</span><span class="n">y1</span> <span class="o">=</span> <span class="n">xys1d</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">x2</span><span class="p">,</span><span class="n">y2</span> <span class="o">=</span> <span class="n">xys1d</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">newX</span> <span class="o">=</span> <span class="n">newDomainMax</span>
+            <span class="n">newY</span> <span class="o">=</span> <span class="n">y2</span> <span class="o">+</span> <span class="p">(</span><span class="n">newX</span><span class="o">-</span><span class="n">x2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">)</span>
+            <span class="n">xys1d</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">newX</span><span class="p">,</span> <span class="n">newY</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">xys1d</span>
+
+        <span class="c1"># make local copies of widths, densities and scattering radius rather than modifying the evaluation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scatteringRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">scatteringRadius</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatteringRadius</span><span class="o">.</span><span class="n">isEnergyDependent</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scatteringRadius</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">addPoints</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatteringRadius</span><span class="o">.</span><span class="n">form</span><span class="p">,</span> <span class="n">newDomainMin</span><span class="p">,</span> <span class="n">newDomainMax</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">levelDensities</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">lj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">levelDensities</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">levelDensities</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span> <span class="o">=</span> <span class="n">addPoints</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">levelDensities</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">newDomainMin</span><span class="p">,</span> <span class="n">newDomainMax</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">addPoints</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                        <span class="n">newDomainMin</span><span class="p">,</span> <span class="n">newDomainMax</span> <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;elastic&#39;</span><span class="p">:</span>
+                    <span class="c1"># ENDF neutron widths aren&#39;t actually neutron widths.</span>
+                    <span class="c1"># Rather, they are what ENDF calls &quot;reduced widths&quot;.</span>
+                    <span class="c1"># We need to convert them back into widths</span>
+                    <span class="c1"># FIXME: do this conversion at ENDF translation step instead?</span>
+                    <span class="k">for</span> <span class="n">ip</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">key</span><span class="p">]):</span>
+                        <span class="n">rho</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">rho</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">f</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">penetrationFactor</span><span class="p">(</span><span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rho</span><span class="p">)</span> <span class="o">/</span> <span class="n">rho</span> <span class="c1"># See ENDF Eq. (D.95)</span>
+                        <span class="k">if</span> <span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># adjust widths since two channel spins are possible for this J,L</span>
+                            <span class="n">f</span> <span class="o">*=</span> <span class="mf">0.5</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">f</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span> <span class="o">=</span> <span class="n">newDomainMin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upperBound</span> <span class="o">=</span> <span class="n">newDomainMax</span></div>
+
+<div class="viewcode-block" id="ProbabilityTableGenerator.sampleRR"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.sampleRR">[docs]</a>    <span class="k">def</span> <span class="nf">sampleRR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lastResonanceEnergies</span><span class="p">,</span> <span class="n">lowerBound</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upperBound</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;goe&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a sample of a resolved resonance set using the average URR parameters</span>
+
+<span class="sd">        :param lastResonanceEnergies: the energy of the last resolved resonance for each l/j</span>
+<span class="sd">        :param lowerBound: optional. If supplied, resonances below lowerBound will be discarded</span>
+<span class="sd">        :param upperBound: optional. If supplied, resonances above upperBound will be discarded</span>
+<span class="sd">        :param style: method for generating resonance energies. Options include &#39;goe&#39;, &#39;wigner&#39;, &#39;picket fence&#39;, &#39;poisson&#39;, &#39;brody&#39;</span>
+<span class="sd">        :param seed: used to seed the random generator</span>
+<span class="sd">        :param verbose: turn on verbose output</span>
+<span class="sd">        :return: dictionary containing resonance parameters sorted by l/j</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">brownies.BNL.restools.resonance_generator</span> <span class="k">as</span> <span class="nn">rg</span>
+
+        <span class="n">fakeRRR</span><span class="o">=</span><span class="p">{}</span>
+
+        <span class="c1"># WARNING: be very careful that the columns defined in getFakeResonanceSet match</span>
+        <span class="c1">#          in both name and order with those defined below</span>
+        <span class="k">for</span> <span class="n">lj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">levelDensities</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+            <span class="c1"># First energy should be roughly D(E) above the last energy of the RRR</span>
+            <span class="c1"># We add fake energies drawn from a Wigner distribution until the starting energy is above the lowerBound</span>
+            <span class="n">E0</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">style</span> <span class="o">!=</span> <span class="s1">&#39;goe&#39;</span><span class="p">:</span>
+                <span class="n">E0</span> <span class="o">=</span> <span class="n">lastResonanceEnergies</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">E0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>      <span class="c1"># resolved region doesn&#39;t have any resonances for this L/J combination</span>
+                    <span class="n">E0</span> <span class="o">=</span> <span class="n">lowerBound</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rayleigh</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">levelDensities</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">lowerBound</span><span class="p">))</span>
+                <span class="k">while</span> <span class="n">E0</span> <span class="o">&lt;</span> <span class="n">lowerBound</span><span class="p">:</span>
+                    <span class="n">E0</span> <span class="o">+=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rayleigh</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">levelDensities</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">lowerBound</span><span class="p">))</span>
+
+            <span class="n">fakeRRR</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">=</span><span class="n">rg</span><span class="o">.</span><span class="n">getFakeResonanceSet</span><span class="p">(</span>
+                <span class="n">E0</span><span class="o">=</span><span class="n">E0</span><span class="p">,</span>
+                <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+                <span class="n">L</span><span class="o">=</span><span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">J</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">lj</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="n">levelDensity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">levelDensities</span><span class="p">[</span><span class="n">lj</span><span class="p">],</span>
+                <span class="n">aveWidthFuncs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">],</span>
+                <span class="n">widthKeys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">),</span> <span class="c1">#(&#39;elastic&#39;,&#39;capture&#39;,&#39;fission&#39;),</span>
+                <span class="n">DOFs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">DOFs</span><span class="p">[</span><span class="n">lj</span><span class="p">],</span>
+                <span class="n">domainMin</span><span class="o">=</span><span class="n">lowerBound</span><span class="p">,</span>
+                <span class="n">domainMax</span><span class="o">=</span><span class="n">upperBound</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">style</span> <span class="o">!=</span> <span class="s1">&#39;goe&#39;</span> <span class="ow">and</span> <span class="n">fakeRRR</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">E0</span><span class="p">:</span>
+                <span class="c1"># We hand in weird level densities that mess up the first energy point.</span>
+                <span class="c1"># We&#39;ll fix that now</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adjusting </span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2"> resonances by </span><span class="si">%f</span><span class="s2"> eV due to weird level densities&quot;</span> <span class="o">%</span>
+                                  <span class="p">(</span><span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lj</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">fakeRRR</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">E0</span><span class="p">))</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="n">fakeRRR</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">E0</span>
+                <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fakeRRR</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+                    <span class="n">fakeRRR</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-=</span><span class="n">offset</span>
+
+        <span class="k">return</span> <span class="n">fakeRRR</span></div>
+
+<div class="viewcode-block" id="ProbabilityTableGenerator.generatePDFs"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.generatePDFs">[docs]</a>    <span class="k">def</span> <span class="nf">generatePDFs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resClass</span><span class="p">,</span> <span class="n">nSamples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">temperatures</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;goe&#39;</span><span class="p">,</span> <span class="n">interpolateWidths</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">energyUnit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="n">temperatureUnit</span><span class="o">=</span><span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">plotSamples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">plotDir</span><span class="o">=</span><span class="s1">&#39;realizationPlots&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate multiple resonance parameter realizations, reconstruct cross sections, optionally heat to one or</span>
+<span class="sd">        more temperatures, and generate cross section PDFs at several incident energies.</span>
+<span class="sd">        The PDFs from each sample are summed together, and only normalized after all samples are completed.</span>
+
+<span class="sd">        :param resClass: The class instance to use for reconstructing realizations of the cross section set.</span>
+<span class="sd">        :param nSamples: number of realizations generated and averaged to create the PDFs</span>
+<span class="sd">        :param temperatures: list of temperatures for generating heated cross section PDFs.</span>
+<span class="sd">        :param style: style of resonance realization generation (see sampleRR method for style options)</span>
+<span class="sd">        :param interpolateWidths: interpolate the URR widths or not (just say &quot;True&quot;)</span>
+<span class="sd">        :param energyUnit: unit to use for energy grid in reconstructed cross sections</span>
+<span class="sd">        :param temperatureUnit: unit for the list of temperatures. Default = &#39;K&#39;</span>
+<span class="sd">        :param verbose: enable verbose output</span>
+<span class="sd">        :param plotSamples: number of cross section realizations to plot (helpful for debugging)</span>
+<span class="sd">        :return: dictionary with probability tables (stored as XYs2d) for each temperature / reaction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">plotSamples</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">plotDir</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">plotDir</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">temperatures</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">temperatures</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">temperaturesEnergy</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">temperatureUnit</span><span class="o">+</span><span class="s1">&#39;*k&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">)</span> <span class="k">for</span> <span class="n">T</span> <span class="ow">in</span> <span class="n">temperatures</span><span class="p">])</span>
+
+        <span class="c1"># Initialize the widths, DOFs and level spacings.</span>
+        <span class="c1"># Also setup the main egrid for cross section reconstruction.</span>
+        <span class="n">egrid</span><span class="p">,</span> <span class="n">interpolateWidths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">generateEnergyGrid</span><span class="p">(</span><span class="n">interpolateWidths</span><span class="o">=</span><span class="n">interpolateWidths</span><span class="p">)</span>
+        <span class="n">LD</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">levelDensities</span><span class="p">)</span>
+
+        <span class="c1"># Check that main grid spacing is compatible with parameter magnitude</span>
+        <span class="n">DeltaE</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">egrid</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">egrid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">egrid</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+        <span class="k">for</span> <span class="n">lj</span> <span class="ow">in</span> <span class="n">LD</span><span class="p">:</span>
+            <span class="n">warnCount</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">LD</span><span class="p">[</span><span class="n">lj</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="mf">10.0</span><span class="o">/</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">DeltaE</span><span class="p">:</span>
+                    <span class="n">warnCount</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Energy grid too fine, DeltaE=</span><span class="si">%s</span><span class="s2"> &lt; 10.0*D=</span><span class="si">%s</span><span class="s2"> at energy </span><span class="si">%s</span><span class="s2"> eV (L=</span><span class="si">%d</span><span class="s2">, J=</span><span class="si">%g</span><span class="s2">)&quot;</span><span class="o">%</span><span class="p">(</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="n">DeltaE</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="mf">10.0</span><span class="o">/</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lj</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">warnCount</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Energy grid too fine for </span><span class="si">%d</span><span class="s2"> patches (L=</span><span class="si">%d</span><span class="s2">, J=</span><span class="si">%g</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">warnCount</span><span class="p">,</span> <span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lj</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+            <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">warnCount</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">widths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">rxn</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">incidentEnergy</span> <span class="ow">in</span> <span class="n">widths</span><span class="o">.</span><span class="n">domainGrid</span><span class="p">:</span>
+                    <span class="n">widthAtEnergy</span> <span class="o">=</span> <span class="n">widths</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">incidentEnergy</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">widthAtEnergy</span> <span class="o">&gt;</span> <span class="n">DeltaE</span><span class="p">:</span>
+                        <span class="n">warnCount</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Energy grid too fine, DeltaE=</span><span class="si">%s</span><span class="s2"> &lt; 10.0*Gamma(</span><span class="si">%s</span><span class="s2">)=</span><span class="si">%s</span><span class="s2"> at energy </span><span class="si">%s</span><span class="s2"> eV&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                                <span class="nb">str</span><span class="p">(</span><span class="n">DeltaE</span><span class="p">),</span> <span class="n">rxn</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">widthAtEnergy</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">incidentEnergy</span><span class="p">)))</span>
+                <span class="k">if</span> <span class="n">warnCount</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: </span><span class="si">%s</span><span class="s2"> energy grid too fine for </span><span class="si">%d</span><span class="s2"> patches&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">warnCount</span><span class="p">))</span>
+
+        <span class="c1"># Average number of resonances around a given energy in egrid determines the size of the</span>
+        <span class="c1"># patch to use to enable &quot;ergodicity trick&quot; to accelerate convergence</span>
+        <span class="n">ljPatchE</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">lj</span> <span class="ow">in</span> <span class="n">LD</span><span class="p">:</span>
+            <span class="n">ljPatchE</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">warnCount</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">LD</span><span class="p">[</span><span class="n">lj</span><span class="p">]:</span>
+                <span class="c1"># Figure for decent job at getting width distributions correct in a given sample,</span>
+                <span class="c1"># need ~20 resonances in the patch</span>
+                <span class="n">patchSize</span><span class="o">=</span><span class="mf">20.0</span><span class="o">/</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">patchSize</span> <span class="o">&gt;</span> <span class="n">DeltaE</span><span class="p">:</span>
+                    <span class="n">warnCount</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Patch size needed to average resonances around grid point </span><span class="si">%s</span><span class="s2"> for L=</span><span class="si">%i</span><span class="s2">, J=</span><span class="si">%s</span><span class="s2"> &gt; grid spacing&quot;</span><span class="o">%</span><span class="p">(</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">lj</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
+                    <span class="n">ljPatchE</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">patchSize</span><span class="p">,</span> <span class="n">DeltaE</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ljPatchE</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patchSize</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">warnCount</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Patch size &gt; grid spacing at </span><span class="si">%d</span><span class="s2"> energies for L=</span><span class="si">%i</span><span class="s2">, J=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">warnCount</span><span class="p">,</span><span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">lj</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="c1"># Check all lj indexed patches have same number or energies in grid</span>
+        <span class="n">patchLengths</span><span class="o">=</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">ljPatchE</span><span class="p">[</span><span class="n">lj</span><span class="p">])</span> <span class="k">for</span> <span class="n">lj</span> <span class="ow">in</span> <span class="n">ljPatchE</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">patchLengths</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">patchLengths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">patchLengths</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One or more patch energy grids has the wrong number of values&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Take biggest patch at a given energy from all the lj&#39;s</span>
+        <span class="n">patchE</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,]</span> <span class="o">*</span> <span class="n">patchLengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">lj</span> <span class="ow">in</span> <span class="n">ljPatchE</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">patchLengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">patchE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">patchE</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ljPatchE</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">patchLimits</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">iE</span><span class="p">,</span> <span class="n">E</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">egrid</span><span class="p">):</span>
+            <span class="c1"># Make patch grid slightly larger than needed so that we can use the center region of width patchE</span>
+            <span class="c1"># and the tails of the resonances outside the patch can do their job</span>
+            <span class="n">Elo</span><span class="o">=</span><span class="n">E</span> <span class="o">-</span> <span class="n">patchE</span><span class="p">[</span><span class="n">iE</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span>
+            <span class="n">Ehi</span><span class="o">=</span><span class="n">E</span> <span class="o">+</span> <span class="n">patchE</span><span class="p">[</span><span class="n">iE</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span>
+            <span class="n">patchLimits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">Elo</span><span class="p">,</span> <span class="n">Ehi</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">patchLimits</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">extrapolate_URR_parameters</span><span class="p">(</span> <span class="mf">0.95</span> <span class="o">*</span> <span class="n">patchLimits</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mf">1.05</span> <span class="o">*</span> <span class="n">patchLimits</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+
+        <span class="c1"># Get highest-energy resolved resonance before start of realization for each L/J</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">truncateResolvedRegion</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span> <span class="p">)</span>
+        <span class="n">lastResonances</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">levelSpacings</span><span class="p">:</span>
+            <span class="n">lastResonances</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLastResolvedResonanceEnergy</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">j</span><span class="o">=</span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Loop through the samples to build the PDFs</span>
+        <span class="n">crossSectionSamples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">thePDFs</span><span class="o">=</span><span class="p">{</span><span class="n">T</span><span class="p">:{}</span> <span class="k">for</span> <span class="n">T</span> <span class="ow">in</span> <span class="n">temperatures</span><span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">to_XYs2ds</span><span class="p">(</span><span class="n">thePDFs</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="c1"># helper method, used after all samples collected to pack final results.</span>
+            <span class="c1"># May also be used to write intermediate results for debugging</span>
+            <span class="n">probabilityTableAxes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span><span class="n">rank</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">labelsUnits</span><span class="o">=</span><span class="p">{</span><span class="mi">2</span><span class="p">:(</span><span class="s1">&#39;energy_in&#39;</span><span class="p">,</span><span class="n">energyUnit</span><span class="p">),</span>
+                                                                        <span class="mi">1</span><span class="p">:(</span><span class="s1">&#39;crossSection&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">),</span>
+                                                                        <span class="mi">0</span><span class="p">:(</span><span class="s1">&#39;P(crossSection|energy_in)&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)})</span>
+            <span class="n">newPDFs</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">T</span> <span class="ow">in</span> <span class="n">thePDFs</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">thePDFs</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+                    <span class="n">probabilityTable</span> <span class="o">=</span> <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">probabilityTableAxes</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">Ein</span><span class="p">,</span><span class="n">PDF</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">egrid</span><span class="p">,</span><span class="n">thePDFs</span><span class="p">[</span><span class="n">T</span><span class="p">][</span><span class="n">rxn</span><span class="p">]):</span>
+                        <span class="n">PDF</span> <span class="o">=</span> <span class="n">PDF</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                        <span class="n">PDF</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">Ein</span>
+                        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+                            <span class="n">PDF</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">insitu</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">PDF</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="n">probabilityTableAxes</span>
+                        <span class="n">probabilityTable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PDF</span><span class="p">)</span>
+                    <span class="n">newPDFs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">T</span><span class="p">,{})[</span><span class="n">rxn</span><span class="p">]</span> <span class="o">=</span> <span class="n">probabilityTable</span>
+
+            <span class="k">return</span> <span class="n">newPDFs</span>
+
+
+        <span class="k">for</span> <span class="n">iSample</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nSamples</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sample </span><span class="si">%d</span><span class="s2"> of </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">iSample</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nSamples</span><span class="p">))</span>
+
+            <span class="c1"># Generate a realization of the resonances</span>
+            <span class="n">thisSample</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sampleRR</span><span class="p">(</span><span class="n">lastResonances</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span> <span class="n">lowerBound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+            <span class="c1"># convert sample into GNDS resolved resonance:</span>
+            <span class="c1"># FIXME currently only works for BreitWigner</span>
+            <span class="n">combinedData</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">table</span> <span class="ow">in</span> <span class="n">thisSample</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">columnHeaders</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span>
+                <span class="n">combinedData</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">table</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span>
+
+            <span class="c1"># sort by energy (probably not necessary):</span>
+            <span class="n">combinedData</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">res</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">combinedTable</span> <span class="o">=</span> <span class="n">tableModule</span><span class="o">.</span><span class="n">table</span><span class="p">(</span> <span class="n">columns</span><span class="o">=</span><span class="n">columnHeaders</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">combinedData</span> <span class="p">)</span>
+
+            <span class="c1"># FIXME following necessary since BreitWigner and URR use different naming conventions:</span>
+            <span class="n">renameColumns</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;elastic&#39;</span><span class="p">:</span> <span class="s1">&#39;neutronWidth&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;capture&#39;</span><span class="p">:</span> <span class="s1">&#39;captureWidth&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;fission&#39;</span><span class="p">:</span> <span class="s1">&#39;fissionWidth&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">combinedTable</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">renameColumns</span><span class="p">:</span>
+                    <span class="n">column</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">renameColumns</span><span class="p">[</span><span class="n">column</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+            <span class="n">resolvedRealization</span> <span class="o">=</span> <span class="n">resolvedModule</span><span class="o">.</span><span class="n">BreitWigner</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;realization&quot;</span><span class="p">,</span>
+                <span class="n">approximation</span><span class="o">=</span><span class="n">resolvedModule</span><span class="o">.</span><span class="n">BreitWigner</span><span class="o">.</span><span class="n">singleLevel</span><span class="p">,</span>
+                <span class="n">resonanceParameters</span><span class="o">=</span><span class="n">commonResonancesModule</span><span class="o">.</span><span class="n">resonanceParameters</span><span class="p">(</span> <span class="n">combinedTable</span> <span class="p">),</span>
+                <span class="n">scatteringRadius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scatteringRadius</span><span class="p">,</span>
+                <span class="n">PoPs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">PoPs</span><span class="p">)</span>
+
+            <span class="c1"># FIXME: next lines are required since the domain currently lives on &lt;resolved&gt; rather than the form</span>
+            <span class="n">resolvedContainer</span> <span class="o">=</span> <span class="n">resolvedModule</span><span class="o">.</span><span class="n">resolved</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">upperBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">URR</span><span class="o">.</span><span class="n">energyUnit</span><span class="p">)</span>
+            <span class="n">resolvedContainer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">resolvedRealization</span><span class="p">)</span>
+            <span class="n">resolvedContainer</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactionSuite</span><span class="p">)</span>
+
+            <span class="c1"># Setup the reconstruction class</span>
+            <span class="n">resonanceReconstructor</span> <span class="o">=</span> <span class="n">resClass</span><span class="p">(</span>
+                <span class="n">resolvedRealization</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+                <span class="n">enableAngDists</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># delay truncating negative cross sections until after adding the background contribution</span>
+            <span class="c1">#resonanceReconstructor.removeNegatives = False</span>
+
+            <span class="n">egridNow</span> <span class="o">=</span> <span class="n">resonanceReconstructor</span><span class="o">.</span><span class="n">generateEnergyGrid</span><span class="p">(</span><span class="n">stride</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="n">zeroK_xscs</span> <span class="o">=</span> <span class="n">resonanceReconstructor</span><span class="o">.</span><span class="n">getCrossSection</span><span class="p">(</span><span class="n">egridNow</span><span class="p">)</span>
+
+            <span class="c1"># convert to XYs1d</span>
+            <span class="n">zeroK_xscs</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span><span class="n">crossSectionModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span>
+                <span class="n">axes</span><span class="o">=</span><span class="n">crossSectionModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">),</span>
+                <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">egridNow</span><span class="p">,</span> <span class="n">zeroK_xscs</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
+                <span class="n">dataForm</span><span class="o">=</span><span class="s2">&quot;XsAndYs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">dullEdges</span><span class="p">(</span><span class="n">lowerEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">zeroK_xscs</span> <span class="p">}</span>
+
+            <span class="c1"># add background cross section if applicable</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">zeroK_xscs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backgrounds</span><span class="p">:</span>
+                    <span class="n">zeroK_xscs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backgrounds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">zeroK_xscs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeroK_xscs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rangeMin</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">iSample</span> <span class="o">&lt;</span> <span class="n">plotSamples</span><span class="p">:</span>
+                <span class="n">crossSectionSamples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zeroK_xscs</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">plotSamples</span> <span class="ow">and</span> <span class="n">iSample</span> <span class="o">==</span> <span class="n">plotSamples</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>    <span class="c1"># plot zero-K realizations</span>
+                <span class="n">figs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">reaction</span> <span class="ow">in</span> <span class="n">crossSectionSamples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">crossSectionSamples</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">reaction</span><span class="p">]</span><span class="o">.</span><span class="n">rangeMax</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">ridx</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">crossSectionSamples</span><span class="p">):</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="o">*</span><span class="n">sample</span><span class="p">[</span><span class="n">reaction</span><span class="p">]</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">ridx</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">reaction</span><span class="p">):</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">reaction</span><span class="p">)</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">()</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">(),</span>
+                                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;evaluation&quot;</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Incident energy (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">energyUnit</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Cross section (b)&#39;</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span><span class="p">,</span> <span class="mf">1.25</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">upperBound</span> <span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> 0K cross section realizations&quot;</span> <span class="o">%</span> <span class="n">reaction</span><span class="p">)</span>
+
+                    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plotDir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.png&quot;</span> <span class="o">%</span> <span class="n">reaction</span><span class="p">))</span>
+                    <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="n">figs</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+
+            <span class="c1"># next step: divide 0K cross sections into small regions, heat each region to desired temperature(s)</span>
+            <span class="c1"># convert result to pdf(crossSection) and add to &#39;running total&#39; pdf</span>
+
+            <span class="k">def</span> <span class="nf">heatAndMakePDFs</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">temperaturesEnergy</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">massRatio</span><span class="p">,</span> <span class="o">**</span><span class="n">plotOptions</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                Called for each cross section / incident energy range.</span>
+<span class="sd">                Heats to all desired temperatures and computes pdf(crossSection) at each temperature.</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="n">initialXsc</span> <span class="o">=</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span>
+                        <span class="n">axes</span><span class="o">=</span><span class="n">crossSectionModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">),</span>
+                        <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">),</span> <span class="n">dataForm</span><span class="o">=</span><span class="s2">&quot;XsAndYs&quot;</span><span class="p">)</span>
+
+                <span class="n">initialTemperature</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">figs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">nextTemp</span> <span class="ow">in</span> <span class="n">temperaturesEnergy</span><span class="p">:</span>
+                    <span class="n">heatedXsc</span> <span class="o">=</span> <span class="n">initialXsc</span><span class="o">.</span><span class="n">heat</span><span class="p">(</span><span class="n">initialTemperature</span><span class="p">,</span> <span class="n">nextTemp</span><span class="p">,</span> <span class="n">massRatio</span><span class="p">,</span> <span class="n">EMin</span><span class="o">=</span><span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">,</span> <span class="s1">&#39;eV&#39;</span><span class="p">),</span>
+                            <span class="n">lowerlimit</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">upperlimit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interpolationAccuracy</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">heatAllPoints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">doNotThin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">heatBelowThreshold</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">heatAllEDomain</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">setThresholdToZero</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                    <span class="n">pdfNow</span> <span class="o">=</span> <span class="n">heatedXsc</span><span class="o">.</span><span class="n">pdfOfY</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">domainMin</span><span class="o">=</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="o">=</span><span class="n">domainMax</span><span class="p">)</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pdfNow</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">())</span>
+
+                    <span class="k">if</span> <span class="n">plotOptions</span><span class="p">:</span>
+                        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+                        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="o">*</span><span class="n">heatedXsc</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">())</span>
+                        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Incident energy (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;energyUnit&#39;</span><span class="p">])</span>
+                        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Cross section (b)&quot;</span><span class="p">)</span>
+                        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="s1">&#39;elastic&#39;</span> <span class="ow">in</span> <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="s1">&#39;total&#39;</span> <span class="ow">in</span> <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]:</span>
+                            <span class="n">c1</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="o">*</span><span class="n">pdfNow</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;pdf&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">c1</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="o">*</span><span class="n">pdfNow</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;pdf&quot;</span><span class="p">)</span>
+                        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Cross section (b)&quot;</span><span class="p">)</span>
+                        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;PDF(crossSection)&quot;</span><span class="p">)</span>
+                        <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+                        <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;CDF(crossSection)&quot;</span><span class="p">)</span>
+                        <span class="n">cdfNow</span> <span class="o">=</span> <span class="n">pdfNow</span><span class="o">.</span><span class="n">indefiniteIntegral</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="s1">&#39;elastic&#39;</span> <span class="ow">in</span> <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="s1">&#39;total&#39;</span> <span class="ow">in</span> <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]:</span>
+                            <span class="n">c2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">cdfNow</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">(),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;cdf&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">c2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="o">*</span><span class="n">cdfNow</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">(),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;cdf&quot;</span><span class="p">)</span>
+                        <span class="n">curves</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">+</span> <span class="n">c2</span>
+                        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">curves</span><span class="p">,</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">get_label</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">curves</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+                        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%g</span><span class="s2"> </span><span class="si">%s</span><span class="s2">/k&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span> <span class="n">nextTemp</span><span class="p">,</span> <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;energyUnit&#39;</span><span class="p">]))</span>
+                        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+                        <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">0.93</span><span class="p">)</span>
+                        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%g</span><span class="s2">_</span><span class="si">%s</span><span class="s2">_per_k.png&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;savePrefix&#39;</span><span class="p">],</span> <span class="n">nextTemp</span><span class="p">,</span> <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;energyUnit&#39;</span><span class="p">]))</span>
+                        <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+                    <span class="c1"># heat incrementally rather than restarting at 0K each time:</span>
+                    <span class="n">initialTemperature</span> <span class="o">=</span> <span class="n">nextTemp</span>
+                    <span class="n">initialXsc</span> <span class="o">=</span> <span class="n">heatedXsc</span>
+
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="n">figs</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">results</span>
+
+            <span class="k">def</span> <span class="nf">unpackResults</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                heatAndMakePDFs returns a list containing a pdfOfY at each temperature.</span>
+<span class="sd">                Unpack those and add them to thePDFs</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="k">for</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+                    <span class="n">pdfNow</span> <span class="o">=</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">dataForm</span><span class="o">=</span><span class="s2">&quot;XsAndYs&quot;</span><span class="p">)</span>
+                    <span class="n">patches</span> <span class="o">=</span> <span class="n">thePDFs</span><span class="p">[</span><span class="n">temperature</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">patchLimits</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">patches</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>      <span class="c1"># 1st realization</span>
+                        <span class="n">patches</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdfNow</span>
+                    <span class="k">else</span><span class="p">:</span>                           <span class="c1"># subsequent realizations</span>
+                        <span class="n">patches</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">current</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">mutualify</span><span class="p">(</span><span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span>
+                                <span class="n">pdfNow</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                        <span class="n">patches</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">current</span>
+                        <span class="c1"># thin to prevent average pdfs from consuming too much memory</span>
+                        <span class="n">patches</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">thin</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">)</span>
+
+            <span class="n">reactionsToHeat</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">zeroK_xscs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;competitive&#39;</span><span class="p">,</span> <span class="s1">&#39;nonelastic&#39;</span><span class="p">):</span>
+                <span class="n">reactionsToHeat</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;fission&#39;</span> <span class="ow">in</span> <span class="n">zeroK_xscs</span> <span class="ow">and</span> <span class="n">zeroK_xscs</span><span class="p">[</span><span class="s1">&#39;fission&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rangeMax</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">reactionsToHeat</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="s1">&#39;fission&#39;</span><span class="p">)</span>
+
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">[(</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">Elo</span><span class="p">,</span> <span class="n">Ehi</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">Elo</span><span class="p">,</span> <span class="n">Ehi</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">patchLimits</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">reactionsToHeat</span><span class="p">]</span>
+            <span class="n">njobs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+
+            <span class="n">plotOptions</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">iSample</span> <span class="o">&lt;</span> <span class="n">plotSamples</span><span class="p">:</span>   <span class="c1"># plot realizations</span>
+                <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;energyUnit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energyUnit</span>
+
+            <span class="c1"># Add a buffer (factor of N * thermal velocity) before / after each cross section slice to account for heating edge effects.</span>
+            <span class="c1"># The buffer is included when heating but excluded when computing pdfOfY.</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>   <span class="c1"># multiprocessing disabled</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">Elo</span><span class="p">,</span> <span class="n">Ehi</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">plotOptions</span><span class="p">:</span>
+                        <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> patch </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+                        <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;savePrefix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plotDir</span><span class="p">,</span> <span class="s2">&quot;r</span><span class="si">%d</span><span class="s2">_patch</span><span class="si">%d</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">iSample</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">))</span>
+
+                    <span class="c1"># temperaturesEnergy[-1] is the average thermal energy (in energyUnit) of highest temperature.</span>
+                    <span class="n">paddingLow</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Elo</span> <span class="o">*</span> <span class="n">temperaturesEnergy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">massRatio</span><span class="p">)</span>
+                    <span class="n">paddingHigh</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Ehi</span> <span class="o">*</span> <span class="n">temperaturesEnergy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">massRatio</span><span class="p">)</span>
+
+                    <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">zeroK_xscs</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">domainSlice</span><span class="p">(</span><span class="n">Elo</span> <span class="o">-</span> <span class="n">paddingLow</span><span class="p">,</span> <span class="n">Ehi</span> <span class="o">+</span> <span class="n">paddingHigh</span><span class="p">)</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">()</span>
+                    <span class="n">results</span> <span class="o">=</span> <span class="n">heatAndMakePDFs</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">temperaturesEnergy</span><span class="p">,</span> <span class="n">Elo</span><span class="p">,</span> <span class="n">Ehi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">massRatio</span><span class="p">,</span> <span class="o">**</span><span class="n">plotOptions</span><span class="p">)</span>
+                    <span class="n">unpackResults</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Queue</span>
+                <span class="kn">import</span> <span class="nn">time</span>
+                <span class="kn">from</span> <span class="nn">fudge.defaults</span> <span class="kn">import</span> <span class="n">numTasks</span>
+                <span class="n">queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+
+                <span class="c1"># helper functions for running in parallel:</span>
+                <span class="k">def</span> <span class="nf">runAndEnqueue</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">temperaturesEnergy</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">massRatio</span><span class="p">,</span> <span class="n">plotOptions</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">results</span> <span class="o">=</span> <span class="n">heatAndMakePDFs</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">temperaturesEnergy</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">massRatio</span><span class="p">,</span> <span class="o">**</span><span class="n">plotOptions</span><span class="p">)</span>
+                        <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">results</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                        <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+
+                <span class="k">def</span> <span class="nf">startJob</span><span class="p">(</span><span class="n">job_index</span><span class="p">):</span>
+                    <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">Elo</span><span class="p">,</span> <span class="n">Ehi</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">job_index</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">plotOptions</span><span class="p">:</span>
+                        <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> patch </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+                        <span class="n">plotOptions</span><span class="p">[</span><span class="s1">&#39;savePrefix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plotDir</span><span class="p">,</span> <span class="s2">&quot;r</span><span class="si">%d</span><span class="s2">_patch</span><span class="si">%d</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">iSample</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">))</span>
+
+                    <span class="c1"># temperaturesEnergy[-1] is the average thermal energy (in energyUnit) of highest temperature.</span>
+                    <span class="n">paddingLow</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Elo</span> <span class="o">*</span> <span class="n">temperaturesEnergy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">massRatio</span><span class="p">)</span>
+                    <span class="n">paddingHigh</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Ehi</span> <span class="o">*</span> <span class="n">temperaturesEnergy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">massRatio</span><span class="p">)</span>
+
+                    <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">zeroK_xscs</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">domainSlice</span><span class="p">(</span><span class="n">Elo</span> <span class="o">-</span> <span class="n">paddingLow</span><span class="p">,</span> <span class="n">Ehi</span> <span class="o">+</span> <span class="n">paddingHigh</span><span class="p">)</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">()</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">runAndEnqueue</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">temperaturesEnergy</span><span class="p">,</span> <span class="n">Elo</span><span class="p">,</span> <span class="n">Ehi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">massRatio</span><span class="p">,</span> <span class="n">plotOptions</span><span class="p">))</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">p</span>
+
+                <span class="n">job_index</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">njobs</span><span class="p">,</span> <span class="n">numTasks</span><span class="p">)):</span>
+                    <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">startJob</span><span class="p">(</span><span class="n">job_index</span><span class="p">)</span> <span class="p">)</span>
+                    <span class="n">job_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">done</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span><span class="p">(</span><span class="n">done</span> <span class="o">&lt;</span> <span class="n">njobs</span><span class="p">):</span>
+                    <span class="k">while</span> <span class="n">queue</span><span class="o">.</span><span class="n">qsize</span><span class="p">():</span>
+                        <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error encountered in child process:&quot;</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="n">results</span>
+
+                        <span class="n">unpackResults</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+                    <span class="n">new_jobs</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                            <span class="n">new_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">done</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">exitcode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Job failed!&quot;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">job_index</span> <span class="o">&lt;</span> <span class="n">njobs</span><span class="p">:</span>
+                                <span class="n">new_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">startJob</span><span class="p">(</span><span class="n">job_index</span><span class="p">)</span> <span class="p">)</span>
+                                <span class="n">job_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+                    <span class="n">jobs</span> <span class="o">=</span> <span class="n">new_jobs</span>
+
+            <span class="k">if</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">iSample</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># save intermediate results for debugging</span>
+                <span class="n">outDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plotDir</span><span class="p">,</span> <span class="s2">&quot;intermediateResults&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outDir</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outDir</span><span class="p">)</span>
+
+                <span class="n">pdfsNow</span> <span class="o">=</span> <span class="n">to_XYs2ds</span><span class="p">(</span><span class="n">thePDFs</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">pdfsNow</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">reac</span> <span class="ow">in</span> <span class="n">pdfsNow</span><span class="p">[</span><span class="n">temp</span><span class="p">]:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outDir</span><span class="p">,</span> <span class="s2">&quot;iteration</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">K.xml&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">iSample</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">reac</span><span class="p">,</span> <span class="n">temp</span><span class="p">)),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+                            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdfsNow</span><span class="p">[</span><span class="n">temp</span><span class="p">][</span><span class="n">reac</span><span class="p">]</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">()))</span>
+
+
+        <span class="c1"># all realizations complete. Convert results for each reaction / temperature into XYs2d</span>
+        <span class="k">return</span> <span class="n">to_XYs2ds</span><span class="p">(</span><span class="n">thePDFs</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.processing.resonances.makeUnresolvedProbabilityTables</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

@@ -19,10 +19,14 @@ in.Kalbach-Fe57: Integrate using adaptive quadrature.  The output file
 in.Kalbach-Fe57.Gauss6: Integrate using 6th-order Gaussian quadrature.
   The output file is out.Kalbach-Fe57.Gauss6.
 
-in.Kalbach-Fe57.direct: This file specifies linear-linear direct interpolation
-  with respect to incident energy.  The output using adaptive quadrature
-  is out.Kalbach-Fe57.direct and with Monte Carlo quadrature it is
-  out.Kalbach-Fe57.direct.MC.
+in.Kalbach-Fe57.direct: This file specifies linear-linear truncated direct
+  interpolation with respect to incident energy.
+
+in.Kalbach-Fe57.directExtrapolate: This file specifies linear-linear
+  extrapolated direct interpolation with respect to incident energy.
+  The output using adaptive quadrature
+  is out.Kalbach-Fe57.directExtrapolate and with Monte Carlo quadrature it is
+  out.Kalbach-Fe57.directExtrapolate.MC.
 
 in.Kr78Kalbach: Most Kalbach data specify that interpolation with respect
   to outgoing energy be histogram.  This file uses linear-linear interpolation.

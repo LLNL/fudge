@@ -1,0 +1,51 @@
+% mapping to laboratory coordinates, 2-step, 2-body reactions
+\begin{center}
+
+\begin{tikzpicture}
+% the triangle, step 1
+  \draw[-{>[scale=2.5,
+          length=5,
+          width=3]},line width=0.4pt] (0, 0) -- (7.5, 3);
+  \draw[-{>[scale=2.5,
+          length=5,
+          width=3]},line width=0.4pt] (0, 0) -- (6, 0);
+\draw (6, 0) -- (9, 0);
+\draw ( 1.3, 0) arc (0: 27.1: 1.3);
+% step 2
+ \draw (7.5, 3) -- (10, 4);
+ \draw (9.3, 3) arc (0: 360: 1.8);
+   \draw[-{>[scale=2.5,
+          length=5,
+          width=3]},line width=0.4pt] (7.5, 3) -- (8.3, 4.25);
+   \draw[-{>[scale=2.5,
+          length=5,
+          width=3]},line width=0.4pt] (0, 0) -- (8.3, 4.25);
+  \draw (7.779, 2.868) -- (9.117, 2.209);
+  \draw (8.125, 4.688) -- (9.117, 2.209);
+  \draw (7.5, 3) -- (9.117, 2.209);
+  \draw (6.5, 5.5) -- (8.4, 0.75);
+ \draw (7.949, 2.78) arc (-26.1: 21.8: 0.5);
+  \draw ( 2.3, 0) arc (0: 21.8: 2.3);
+% labels
+  \node [below] at (3.5, -0.15) {$\Vtrans$};
+  \node [below] at (4, 1.4) {$\Valab'$};
+  \node [right] at (6.5, 0.9) {$\Sigma_0$};
+  \node [above] at (4, 2.2) {$\Vblab'$};
+  \node [right] at (7.9, 3.5) {$\Vbcm'$};
+  \node [right] at (8, 3){$\theta_2$};
+  \node [right] at (1.3, 0.3){$\Theta_0$};
+  \node [right] at (2.3, 0.4) {$\Theta_1$};
+  \node [below] at (9.9, 3.95) {$\xi$};
+  \node [left] at (6.5, 5.2) {$\eta$};
+  \node [above] at (8.125, 4.688) {$A$};
+  \node [below] at (9.3, 2.3) {$B$};
+  \node [below] at (7.35, 2.9) {$O'$};
+  \node [left] at (0, 0) {$O$};
+  \node [right] at (0.2, 5) {$\mubcm = \cos \theta_2$};
+  \node [right] at (0.2, 4.4) {$\mualab = \cos \Theta_1$};
+  \node [right] at (0.2, 3.8) {$\mulab = \cos \Theta_0$};
+%  \node [below] at (6, 0) {$C$};
+\end{tikzpicture}
+\caption{Step 2 for a 2-step 2-body reaction}
+\label{Fig:2-step-2-body-step2}
+\end{center} 

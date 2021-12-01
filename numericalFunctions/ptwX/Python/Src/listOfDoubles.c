@@ -1,65 +1,9 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 */
 
@@ -72,16 +16,17 @@
 
 #include <ptwX.h>
 
-#if( PY_VERSION_HEX < 0x02050000 )
-#define Py_ssize_t int64_t 
-#define lenfunc inquiry
-#define ssizeargfunc intargfunc
-#define ssizessizeargfunc intintargfunc
-#define ssizeobjargproc intobjargproc
-#define ssizessizeobjargproc intintobjargproc
+#if PY_MAJOR_VERSION < 3
+    #define PYUNICODE_FROMSTRING PyString_FromString
+    #define STATICFORWARD staticforward
+
+#else
+    #define PYUNICODE_FROMSTRING PyUnicode_FromString
+    #define STATICFORWARD static
+    #define Py_TPFLAGS_CHECKTYPES 0
 #endif
 
-staticforward PyTypeObject listOfDoubles_CPyType;
+STATICFORWARD PyTypeObject listOfDoubles_CPyType;
 
 typedef struct listOfDoubles_CPy_s {
     PyObject_HEAD
@@ -89,7 +34,7 @@ typedef struct listOfDoubles_CPy_s {
     ptwXPoints *ptwX;
 } listOfDoubles_CPy;
 
-#define is_listOfDoubles_CPyObject( v ) ((v)->ob_type == &listOfDoubles_CPyType)
+#define is_listOfDoubles_CPyObject( v ) ( Py_TYPE( v ) == &listOfDoubles_CPyType )
 
 static char listOfDoubles_C__doc__[] = 
     "The listOfDoubles_C class stores and manipulates a list of C double values.\n" \
@@ -150,7 +95,6 @@ static PyObject *listOfDoubles_C_SetPyErrorExceptionReturnNull( const char *s, .
 static int listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( const char *s, ... );
 static int listOfDoubles_C_checkStatus( listOfDoubles_CPy *self, char const *func );
 
-DL_EXPORT( void ) initlistOfDoubles_C( void );
 /*
 ******************** listOfDoubles_CNewInitialize ************************
 */
@@ -170,7 +114,7 @@ static listOfDoubles_CPy *listOfDoubles_CNewInitialize( void ) {
 static int listOfDoubles_C__init__( listOfDoubles_CPy *self, PyObject *args, PyObject *keywords ) {
 
     int initialSize = 100;
-    static char *kwlist[] = { "data", "initialSize" };
+    static char *kwlist[] = { "data", "initialSize", NULL };
     ptwXPoints *ptwX;
     PyObject *dataPy = NULL;
 
@@ -202,7 +146,7 @@ static void listOfDoubles_C_dealloc( PyObject *self ) {
     if( ptwX->ptwX != NULL ) {
         ptwX_free( ptwX->ptwX );
     }
-    self->ob_type->tp_free( self );
+    Py_TYPE( self )->tp_free( self );
 }
 /*
 ************************************************************
@@ -238,7 +182,7 @@ static PyObject *listOfDoubles_C__getitem__( listOfDoubles_CPy *self, Py_ssize_t
         listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_IndexError, smr );
         return( NULL );
     }
-    return( (PyObject *) Py_BuildValue( "d", *point ) );
+    return( Py_BuildValue( "d", *point ) );
 }
 /*
 ************************************************************
@@ -453,7 +397,11 @@ static PyObject *listOfDoubles_C__mul__( PyObject *self, PyObject *other ) {
     if( listOfDoubles_C_checkStatus( (listOfDoubles_CPy *) self2, "__mul__" ) != 0 ) return( NULL );
     smr = &(self2->smr);
 
+#if PY_MAJOR_VERSION < 3
     multiplier = PyInt_AsLong( other3 );
+#else
+    multiplier = PyLong_AsLong( other3 );
+#endif
     if( multiplier == -1 ) {
         if( PyErr_Occurred( ) != NULL ) return( NULL );
     }
@@ -482,7 +430,11 @@ static PyObject *listOfDoubles_C__imul__( PyObject *self, PyObject *other ) {
 
     if( listOfDoubles_C_checkStatus( self2, "__imul__" ) != 0 ) return( NULL );
 
+#if PY_MAJOR_VERSION < 3
     multiplier = PyInt_AsLong( other );
+#else
+    multiplier = PyLong_AsLong( other );
+#endif
     if( multiplier == -1 ) {
         if( PyErr_Occurred( ) != NULL ) return( NULL );
     }
@@ -538,6 +490,7 @@ static PyObject *listOfDoubles_C__neg__( PyObject *self ) {
 ************************************************************
 */
 static PyNumberMethods listOfDouble_CPy_number = {
+#if PY_MAJOR_VERSION < 3
     (binaryfunc) listOfDoubles_C__add__,    /* nb_add */
     0,                                      /* nb_subtract */
     (binaryfunc) listOfDoubles_C__mul__,    /* nb_multiply */
@@ -561,23 +514,49 @@ static PyNumberMethods listOfDouble_CPy_number = {
     0,                                      /* nb_float */
     0,                                      /* unaryfunc nb_oct */
     0,                                      /* unaryfunc nb_hex */
-    (binaryfunc) listOfDoubles_C__iadd__,   /* nb_inplace_add */            /* Added in release 2.0 */
+    (binaryfunc) listOfDoubles_C__iadd__,   /* nb_inplace_add */
     0,                                      /* nb_inplace_subtract */
     (binaryfunc) listOfDoubles_C__imul__,   /* nb_inplace_multiply */
     0,                                      /* nb_inplace_divide */
     (binaryfunc) 0,                         /* nb_inplace_remainder */
     (ternaryfunc) 0,                        /* nb_inplace_power */
-#if 0
-    binaryfunc nb_inplace_lshift
-    binaryfunc nb_inplace_rshift
-    binaryfunc nb_inplace_and
-    binaryfunc nb_inplace_xor
-    binaryfunc nb_inplace_or
-    binaryfunc nb_floor_divide         /* The following added in release 2.2, and require the Py_TPFLAGS_HAVE_CLASS flag */
-    binaryfunc nb_true_divide
-    binaryfunc nb_inplace_floor_divide
-    binaryfunc nb_inplace_true_divide
-    unaryfunc nb_index                 /* The following added in release 2.5 */
+
+#else
+    (binaryfunc) listOfDoubles_C__add__,    /* nb_add */
+    0,                                      /* nb_subtract */
+    (binaryfunc) listOfDoubles_C__mul__,    /* nb_multiply */
+    0,                                      /* nb_remainder */
+    0,                                      /* nb_divmod */
+    0,                                      /* nb_power */
+    (unaryfunc) listOfDoubles_C__neg__,     /* nb_negative */
+    0,                                      /* nb_positive */
+    (unaryfunc) listOfDoubles_C__abs__,     /* nb_absolute */
+    0,                                      /* nb_bool */
+    0,                                      /* nb_invert */
+    0,                                      /* nb_lshift */
+    0,                                      /* nb_rshift */
+    0,                                      /* nb_and */
+    0,                                      /* nb_xor */
+    0,                                      /* nb_or */
+    0,                                      /* nb_int */
+    0,                                      /* nb_reserved */
+    0,                                      /* nb_float */
+
+    (binaryfunc) listOfDoubles_C__iadd__,   /* nb_inplace_add */
+    0,                                      /* nb_inplace_subtract */
+    (binaryfunc) listOfDoubles_C__imul__,   /* nb_inplace_multiply */
+     0,                                     /* nb_inplace_remainder */
+     0,                                     /* nb_inplace_power */
+     0,                                     /* nb_inplace_lshift */
+     0,                                     /* nb_inplace_rshift */
+     0,                                     /* nb_inplace_and */
+     0,                                     /* nb_inplace_xor */
+     0,                                     /* nb_inplace_or */
+
+     0,                                     /* nb_floor_divide */
+     0,                                     /* nb_true_divide */
+     0,                                     /* nb_inplace_floor_divide */
+     0,                                     /* nb_inplace_true_divide */
 #endif
 };
 
@@ -586,7 +565,7 @@ static PyNumberMethods listOfDouble_CPy_number = {
 */
 static PyObject *listOfDoubles_C_allocatedSize( listOfDoubles_CPy *self ) {
 
-    return( (PyObject *) Py_BuildValue( "l", self->ptwX->allocatedSize ) );
+    return( Py_BuildValue( "l", self->ptwX->allocatedSize ) );
 }
 /*
 ************************************************************
@@ -952,7 +931,7 @@ static PyObject *listOfDoubles_C_toString2( listOfDoubles_CPy *self, int valuesP
         e++;
         *e = 0;
     }
-    str = PyString_FromString( s );
+    str = PYUNICODE_FROMSTRING( s );
     free( s );
     return( str );
 }
@@ -1081,11 +1060,18 @@ static PyObject *listOfDoubles_C_createFromString( listOfDoubles_CPy *self, PyOb
 
     ptwXPoints *ptwX;
     listOfDoubles_CPy *ptwXPy;
-    char *str, *endCharacter, sep = ' ';
+    char *str, *sepString = NULL, *endCharacter, sep = ' ';
     static char *kwlist[] = { "string", "sep", NULL };
     statusMessageReporting smr;
+    PyObject *x_Py;
 
-    if( !PyArg_ParseTupleAndKeywords( args, keywords, "s|c", kwlist, &str, &sep ) ) return( NULL );
+    if( !PyArg_ParseTupleAndKeywords( args, keywords, "s|s", kwlist, &str, &sepString ) ) return( NULL );
+
+    if( sepString != NULL ) {
+        long length = (long) strlen( sepString );
+        if( length != 1 ) return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "sep must be a single character, has %ld characters", length ) );
+        sep = sepString[0];
+    }
 
     smr_initialize( &smr, smr_status_Ok );
 
@@ -1099,7 +1085,10 @@ static PyObject *listOfDoubles_C_createFromString( listOfDoubles_CPy *self, PyOb
         return( NULL );
     }
     ptwXPy->ptwX = ptwX;
-    return( Py_BuildValue( "(O,s)", ptwXPy, endCharacter ) );
+    x_Py = Py_BuildValue( "Os", ptwXPy, endCharacter );
+    Py_DECREF( ptwXPy );
+
+    return( x_Py );
 }
 /*
 ************************************************************
@@ -1297,8 +1286,7 @@ static PyMethodDef listOfDoubles_CPyMethods[] = {
 ************************************************************
 */
 static PyTypeObject listOfDoubles_CPyType = {
-    PyObject_HEAD_INIT( NULL )
-    0,                                          /* ob_size        */
+    PyVarObject_HEAD_INIT( NULL, 0 )
     "listOfDoubles_C.listOfDoubles_C",          /* tp_name        */
     sizeof( listOfDoubles_CPy ),                /* tp_basicsize   */
     0,                                          /* tp_itemsize    */
@@ -1352,21 +1340,53 @@ static PyMethodDef listOfDoubles_CMiscPyMethods[] = {
         "   str           The string containing a list of floats to be converted.\n" },
     { NULL, NULL, 0, NULL }        /* Sentinel (i.e., the end of the list) */
 };
+
+static char const doc[] = "A module that contains the class listOfDoubles_C.";
 /*
 ************************************************************
 */
-DL_EXPORT( void ) initlistOfDoubles_C( void ) {
 
-    PyObject *m;
+#if PY_MAJOR_VERSION < 3
 
-    nfu_setup( );
+    PyMODINIT_FUNC initlistOfDoubles_C( void ) {
 
-    listOfDoubles_CPyType.tp_new = PyType_GenericNew;
-    if( PyType_Ready( &listOfDoubles_CPyType ) < 0 ) return;
+        PyObject *module;
 
-    if( ( m = Py_InitModule3( "listOfDoubles_C", listOfDoubles_CMiscPyMethods, "A module that contains the class listOfDoubles_C." ) ) == NULL ) return;
+        nfu_setup( );
 
-    Py_INCREF( &listOfDoubles_CPyType );
-    PyModule_AddObject( m, "listOfDoubles_C", (PyObject *) &listOfDoubles_CPyType );
+        listOfDoubles_CPyType.tp_new = PyType_GenericNew;
+        if( PyType_Ready( &listOfDoubles_CPyType ) < 0 ) return;
 
-}
+        if( ( module = Py_InitModule3( "listOfDoubles_C", listOfDoubles_CMiscPyMethods, doc ) ) == NULL ) return;
+
+        Py_INCREF( &listOfDoubles_CPyType );
+        PyModule_AddObject( module, "listOfDoubles_C", (PyObject *) &listOfDoubles_CPyType );
+    }
+
+#else
+
+    static struct PyModuleDef listOfDoubles_CModule = {
+        PyModuleDef_HEAD_INIT,
+        "listOfDoubles_C",      /* name of module */
+        doc,                    /* module documentation, may be NULL */
+        -1,                     /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+        listOfDoubles_CMiscPyMethods
+    };
+
+    PyMODINIT_FUNC PyInit_listOfDoubles_C( void ) {
+
+        PyObject *module;
+
+        nfu_setup( );
+
+        if( ( module = PyModule_Create( &listOfDoubles_CModule ) ) == NULL ) return( NULL );
+
+        listOfDoubles_CPyType.tp_new = PyType_GenericNew;
+        if( PyType_Ready( &listOfDoubles_CPyType ) < 0 ) return( NULL );
+        Py_INCREF( &listOfDoubles_CPyType );
+        PyModule_AddObject( module, "listOfDoubles_C", (PyObject *) &listOfDoubles_CPyType );
+
+        return( module );
+    }
+
+#endif

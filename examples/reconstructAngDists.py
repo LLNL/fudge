@@ -1,70 +1,15 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 import argparse, fudge
-import fudge.legacy.converting.endfFileToGNDS
-import fudge.gnds.covariances.covarianceSuite
+import fudge.covariances.covarianceSuite
 import fudge.processing.resonances.reconstructResonances
+
+import brownies.legacy.converting.endfFileToGNDS
 
 
 def parseArgs():
@@ -84,8 +29,8 @@ def smallBanner( x, wingsize=10 ):
 
 
 def getPlotTable( nativeData ):
-    '''Make a table that we can feed to a spreadsheet from an instance of fudge.gnds.productData.distributions.angular.LegendrePointwise'''
-    if not isinstance( nativeData, fudge.gnds.productData.distributions.angular.LegendrePointwise): raise TypeError("Must be of type fudge.gnds.productData.distributions.angular.LegendrePointwise")
+    '''Make a table that we can feed to a spreadsheet from an instance of fudge.productData.distributions.angular.LegendrePointwise'''
+    if not isinstance( nativeData, fudge.productData.distributions.angular.LegendrePointwise): raise TypeError("Must be of type fudge.productData.distributions.angular.LegendrePointwise")
     table = []
     for x in nativeData: 
         table.append([0.0]*(2+nativeData.maxLegendreOrder()))
@@ -100,33 +45,33 @@ if __name__ == "__main__":
 
     gndsMap = {}
 
-    print smallBanner( "Reading %s" % args.endf )
+    print( smallBanner("Reading %s" % args.endf) )
 
     # Is the file a GNDS file?
     if open(args.endf).readline().startswith( "<?xml" ):
-        RS = fudge.gnds.reactionSuite.readXML( args.endf)
-        try:    CS = fudge.gnds.covariances.covarianceSuite.readXML( args.endf.replace('.gnds.', '.gndsCov.'))
-        except: CS = fudge.gnds.covariances.covarianceSuite()
+        RS = fudge.reactionSuite.readXML( args.endf)
+        try:    CS = fudge.covariances.covarianceSuite.readXML( args.endf.replace('.gnds.', '.gndsCov.'))
+        except: CS = fudge.covariances.covarianceSuite()
         gndsMap[args.endf] = [ RS, CS ]
 
     # Maybe its an ENDF file?
     elif open(args.endf).readline().endswith(' 0  0    0\n'): 
-        results = fudge.legacy.converting.endfFileToGNDS.endfFileToGNDS( args.endf, toStdOut = False, skipBadData = True )
+        results = brownies.legacy.converting.endfFileToGNDS.endfFileToGNDS(args.endf, toStdOut = False, skipBadData = True)
         if type( results ) == dict:    gndsMap[args.endf] = [ results['reactionSuite'], results['covarianceSuite'] ]
         elif type( results ) == tuple: gndsMap[args.endf] = [ results[0], results[1] ]
         else: 
             raise TypeError( "endfFileToGNDS.endfFileToGNDS() returned a "+str(type(results))+", I don't know what to do with it" )
 
     # Failed!
-    else: print "WARNING: Unknown file type, not reading %s"% args.endf
+    else: print( "WARNING: Unknown file type, not reading %s"% args.endf )
                                 
     # Reconstruct the angular distributions
     # The thing returned as the value in the angDists map should be a valid 
     # component that we can just attach to the product (possibly after matching onto an existing table)
     if args.strategy == 'dryrun': exit()
-    print smallBanner( "Reconstructing resonance cross sections" )
+    print( smallBanner( "Reconstructing resonance cross sections" ) )
     gndsMap[args.endf][0].reconstructResonances()
-    print smallBanner( "Reconstructing resonance angular distributions" )
+    print( smallBanner( "Reconstructing resonance angular distributions" ) )
     newAngDists = fudge.processing.resonances.reconstructResonances.reconstructAngularDistributions( gndsMap[args.endf][0] )
     
     
@@ -136,28 +81,28 @@ if __name__ == "__main__":
     product = gndsMap[args.endf][0].getReaction( 'elastic' ).outputChannel.getProductWithName( 'n' )
     if args.strategy == 'replace': product.addDistributionComponent( angDists['elastic'] )
     elif args.strategy =='merge':  
-        print smallBanner( "Merging angular distributions" )
+        print( smallBanner( "Merging angular distributions" ) )
         originalNativeData = product.getDistributionComponentByToken( product.getDistributionNativeData(  ) ).getNativeData()
         newNativeData = newAngDists['elastic'].getNativeData()
         Emax = newNativeData.domainMax()
         if str( originalNativeData ).endswith( 'LegendrePointwise' ):
             for x in originalNativeData:
                 if x.value > Emax: newNativeData.append(x)
-#            print 'DEBUG: new',len(newNativeData)
+#            print('DEBUG: new',len(newNativeData) )
             product.addDistributionComponent( newAngDists['elastic'] )
-#            print 'DEBUG: old',len(originalNativeData)
-#            print 'DEBUG: should  be new',len(product.getDistributionComponentByToken( product.getDistributionNativeData(  ) ).getNativeData())
+#            print('DEBUG: old',len(originalNativeData) )
+#            print('DEBUG: should  be new',len(product.getDistributionComponentByToken( product.getDistributionNativeData(  ) ).getNativeData()) )
         else: raise ValueError( "Don't know how to merge LegendrePointwise from reconstructed resonances with angular distribution of type %s"%str( nativeData ).split('/')[-1])
     else: pass    
 
     # Check evaluation
     if args.check:
-        print smallBanner( "Checking final evaluation" )
-        print gndsMap[args.endf][0].check()
+        print( smallBanner( "Checking final evaluation" ) )
+        print( gndsMap[args.endf][0].check() )
 
     # Save the results
     if args.outFile is not None:
-        print smallBanner( "Saving results as a "+args.format+" in file %s"%args.outFile )
+        print( smallBanner( "Saving results as a "+args.format+" in file %s"%args.outFile ) )
         if args.format == 'table': 
             open( args.outFile, mode='w' ).write( 
                 '\n'.join( 

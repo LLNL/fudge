@@ -2,6 +2,7 @@ xndfgenTransferMatrix: version 1.0
 Process: Evaporation spectrum
 Comment: Ar38(n,2n)Ar37; data for outgoing n
 outputLegendreOrder: 0
+do adaptive quadrature: false
 Quadrature method: Gauss6
 Projectile Frame: lab
 

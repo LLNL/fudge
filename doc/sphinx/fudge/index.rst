@@ -2,7 +2,7 @@ fudge Package
 =============
 
 .. warning:: 
-    THE `fudge`, `__doc__`, `fudgeDefaults`, AND `fudgeParameters` MODULES CORRESPOND TO LEGACY FUDGE 
+    THE `fudge`, `__doc__`, AND `fudgeParameters` MODULES CORRESPOND TO LEGACY FUDGE 
 
 :mod:`fudge` Package
 --------------------
@@ -20,35 +20,11 @@ fudge Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`fudgeDefaults` Module
----------------------------
-
-.. automodule:: fudge.fudgeDefaults
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`fudgeParameters` Module
------------------------------
-
-.. automodule:: fudge.fudgeParameters
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
 .. toctree::
 
-    Core library <fudge.core>
-    GNDS hierarchy <fudge.gnds>
-    Legacy data support <fudge.legacy>
-    Particle properties <fudge.particles>
+    GNDS hierarchy <fudge>
     Processing support <fudge.processing>
-    Structure data<fudge.structure>
-    Visualization <fudge.vis>
-    Physical quantities with uncertainty framework <pqu>
     C extensions for low-level numerics <numericalFunctions>
-    Cross section heating module <crossSectionAdjustForHeatedTarget>
-

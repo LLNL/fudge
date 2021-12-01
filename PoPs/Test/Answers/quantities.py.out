@@ -3,7 +3,7 @@
 
 <mass>
   <double label="atomic" value="2.12" unit="amu"/>
-  <double label="nuclear" value="2.0" unit="amu"/></mass>
+  <double label="nuclear" value="2." unit="amu"/></mass>
 
 ============== CHARGE ==============
 <integer label="nucleus" value="3" unit="e"/>
@@ -12,15 +12,15 @@
   <integer label="nucleus" value="3" unit="e"/></charge>
 
 ============== HALFLIFE ==============
-<double label="nucleus" value="3140000.0" unit="d"/>
+<double label="nucleus" value="3.14e6" unit="d"/>
 
 <halflife>
-  <double label="nucleus" value="3140000.0" unit="d"/></halflife>
+  <double label="nucleus" value="3.14e6" unit="d"/></halflife>
 
 3.14e6 d
 3.14e6 d
 2.71296e11 s
-2.71296e+11
+2.71296e11
 
 <halflife>
   <string label="nucleus" value="stable" unit="s"/></halflife>

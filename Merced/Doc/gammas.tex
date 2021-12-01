@@ -108,21 +108,27 @@ the region of integration is bounded by these two curves and
 lies within the $\calE_g$ energy bin.  This region is shaded gray in
 Figure~\ref{Fig:coherent}.
 
-\subsection{A programming detail}
-Because of the $\sqrt{1 - \mulab}$ singularity in Eq.~(\ref{def-x-MeV}),
-the default method for evaluating integrals with respect to $\mulab$ in 
-this section is adaptive quadrature based on first-order Gaussian quadrature
-for
-\begin{equation}
-  \int_a^b d\mulab \, F(\mulab) \sqrt{ 1 - \mulab}.
- \label{Gauss-quad-half}
-\end{equation}
-This method is used for integration over $\mulab$ in 
-Eqs.~(\ref{total-sigma-whole-atom}) and~(\ref{Ien-whole-atom-intE}).
+\subsection{A programming detail}\label{Sec:coherent-quad}
+The $\sqrt{1 - \mulab}$ singularity in Eq.~(\ref{def-x-MeV})
+is handled as follows.  There is a parameter~$\delta_s$ 
+such that if an integral Eqs.~(\ref{total-sigma-whole-atom}) 
+or~(\ref{Ien-whole-atom-intE}) involves integration with
+respect to $\mulab$ over an interval $a \le \mulab \le b$
+with $a \le 1 - \delta_s$, then first-order Gaussian
+quadrature with weight  $\sqrt{1 - \mulab}$ is used.  Similarly,
+if $a < 1 - \delta_s < b$ in such an integral, then standard
+Gaussian quadrature is used for  $a \le \mulab \le 1 - \delta_s$
+and $\sqrt{1 - \mulab}$ weighted Gaussian quadrature for
+$1 - \delta_s \le \mulab \le b$.  The parameter~$ \delta_s$
+may be set using the command given in Section~\ref{Sec:sqrt-quad}.
+These quadratures may or may not be adaptive, as controlled by
+the command given in Section~\ref{Sec:QuadratureMethods}.
 
-The default method for integration over incident energy $E$ in
-Eq.~(\ref{Ien-whole-atom-intE}) is second-order adaptive Gaussian
-quadrature.
+The quadrature methods used for $\mulab$ in
+Eqs.~(\ref{total-sigma-whole-atom}) 
+and~(\ref{Ien-whole-atom-intE})
+also apply to the computation of
+the cross section in Eq.~(\ref{total-sigma-whole-atom}).
 
 \subsection{The input file for coherent scattering}
 For coherent scattering, the reaction identifier in Section~\ref{data-model} 
@@ -130,15 +136,6 @@ is\\
   \Input{Process: coherent scattering}{}\\
 and the data are always in the laboratory frame\\
   \Input{Product Frame: lab}{}
-
-The quadrature methods with respect to $\mulab$ and $E$
-in Eq.~(\ref{Ien-whole-atom-intE}) may be set independently
-using the commands of Section~\ref{Sec:QuadratureMethods}.
-The defaults are\\
-    \Input{mu quadrature method:}{square root}\\
-    \Input{Ein quadrature method:}{adaptive}\\
-The quadrature method specified for $\mulab$ also applies to the computation of
-the cross section in Eq.~(\ref{total-sigma-whole-atom}).
 
 In \xendl\ the values of $x$ in Eq.~(\ref{def-x}) are given in units of
 $\text{\AA}^{-1}$, and the \gettransfer\ code converts $x$ to energy using
@@ -207,7 +204,7 @@ is as follows.\\
    \Input{ \indent  }{$\cdots$}\\
    \Input{ \indent1.000000000000e+07  3.311053000000e-07}{}
 
-\section{Compton scattering}
+\section{Compton scattering}\label{Sec:Compton-scattering}
 This reaction is also called incoherent scattering, and it is
 the scattering of a photon by an individual bound electron.
 See the reference~\cite{ENDFB}.
@@ -290,10 +287,11 @@ After integrating over $\Elab'$, it is found that
          \frac{P_\ell ( \mulab ) \sigma_I(\mulab \mid E)}{1 + \kappa(1 - \mulab)}.
   \label{Ien-Compton-intE}
 \end{equation}
-As in coherent scattering, the default quadrature method for integration
-with respect to $\mulab$ in Eqs.~(\ref{Compton-sigma}) and~(\ref{Ien-Compton-intE})
-is first-order 
-Gaussian quadrature for the weighted integral Eq.~(\ref{Gauss-quad-half}).
+For the integrals 
+with respect to $\mulab$ in Eqs.~(\ref{Compton-sigma}),
+(\ref{Compton-sigma}) and~(\ref{Ien-Compton-intE}),
+the singularities $\sqrt{1 - \mulab}$ are handled in the same way as
+described in Section~\ref{Sec:coherent-quad} for coherent scattering.
 
 \begin{figure}
 \input{fig11-2}
@@ -327,15 +325,6 @@ Compton scattering is\\
   \Input{Process: Compton scattering}{}\\
 and the data is always in the laboratory frame\\
   \Input{Product Frame: lab}{}
-
-This default quadrature methods with respect to $\mulab$ 
-and $E$ in Eq.~(\ref{Ien-Compton-intE}) are\\
-    \Input{mu quadrature method:}{square root}\\
-    \Input{Ein quadrature method:}{adaptive}\\
-The quadrature method specified for $\mulab$ also applies to the computation of
-the cross section in Eq.~(\ref{Compton-sigma}).  It is possible
-to override these choices as explained in
-Section~\ref{Sec:QuadratureMethods}.
 
 As in coherent scattering, the values of $x$ used for Compton
 scattering in \xendl\ are in units of $\text{\AA}^{-1}$, so these are

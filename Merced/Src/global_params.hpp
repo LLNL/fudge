@@ -23,15 +23,15 @@
 #include <list>
 #include <vector>
 
-using namespace std;
-
+namespace Glb
+{
 // ----------------------- class ss_link -------------------
 //! Links for the list of input parameters
 class ss_link
 {
 private:
-  string x;  // the variable name
-  string y;  // the value of the variable
+  std::string x;  // the variable name
+  std::string y;  // the value of the variable
 
 public:
   // is this set in the command line?
@@ -46,27 +46,27 @@ public:
   { }
 
   //!Common name used to access the X value of this list.
-  inline string name( )
+  inline std::string name( )
   {
     return x;
   }
 
   //!Common name used to access the Y value of this list.
-  inline string value( )
+  inline std::string value( )
   {
     return y;
   }
 
   //!Sets the X value of this list.
   //! \param xx the label portion of this entry
-  inline void set_name( const string &xx )
+  inline void set_name( const std::string &xx )
   {
     x = xx;
   }
 
   //!Sets the Y value of this list.
   //! \param yy the value portion of this entry
-  inline void set_value( const string &yy )
+  inline void set_value( const std::string &yy )
   {
     y = yy;
   }
@@ -76,15 +76,15 @@ public:
 };
 
 // ----------------------- class ss_list -------------------
-//! List of ss_links.
-class ss_list : public list< ss_link >
+//! List of Glb::ss_links.
+class ss_list : public std::list< Glb::ss_link >
 {
 public:
   //! Function to get the link at "x".
   //! Returns "false" if the entry is not found.
   //! \param x the desired label
   //! \param link the link with this label, if any
-  bool at(string x, ss_list::iterator& link);
+  bool at(std::string x, ss_list::iterator& link);
 
   void print( );
 
@@ -97,7 +97,7 @@ class GlobalParameterClass
 public:
 
   //!The output file when we write to only one file
-  fstream output_file;
+  std::fstream output_file;
 
   //!Default constructor - initializes Parameter list and values
   GlobalParameterClass();
@@ -109,17 +109,17 @@ public:
   //! Returns "false" if the entry is not found.
   //! \param x the desired label
   //! \param link the link with this label, if any
-  bool find(string x, ss_list::iterator& link);
+  bool find(std::string x, Glb::ss_list::iterator& link);
 
   //!The function used to input information into the Parameter list.
   //! \param gp the label for this entry
   //! \param gp_num the numerical value for this entry
-  void set( string gp, double gp_num);
+  void set( std::string gp, double gp_num);
 
   //!The function used to input information into the Parameter list.
   //! \param gp the label for this entry
   //! \param gp_val the string value for this entry
-  void set( string gp, string gp_val);
+  void set( std::string gp, std::string gp_val);
 
   //! Function to print a table of parameters and values used in the translation.
   void print();
@@ -134,11 +134,11 @@ public:
 
   //!Delivers the stored value of the requested parameter.
   //! \param ParamName the desired label
-  double Value( string ParamName );   
+  double Value( std::string ParamName );   
 
   //!Delivers the string representation of the requested parameter.
   //! \param ParamName the desired label
-  string Flag( string ParamName );
+  std::string Flag( std::string ParamName );
 
   //! Gets the datafield precision for output
   int get_field_width( );
@@ -149,16 +149,18 @@ public:
 private:
 
   //! Local string buffer
-  vector< string > spar;
+  std::vector< std::string > spar;
 
   //!Parameters stored in name indexed link list
-  ss_list Parameters;
+  Glb::ss_list Parameters;
 
   //! Sets the set_in_command flag
   //! \param ParamName the desired label
-  void set_command( string ParamName );
+  void set_command( std::string ParamName );
 };
 
-extern GlobalParameterClass Global;
+} // end of namespace Glb
+
+extern Glb::GlobalParameterClass Global;
 
 #endif

@@ -1,84 +1,131 @@
 \subsection{Core}
-This section decribes all the routines in the file "ptwXY\_core.c".
+This section decribes all the functions in the file ``ptwXY\_core.c''.
 
 \subsubsection{ptwXY\_new} \label{ptwXYnewSec}
-This routine allocates memory for a new \highlight{ptwXYPoints} object and initializes it by calling \highlight{ptwXY\-\_setup}.
-\setargumentNameLengths{secondarySize}
-\CallingC{ptwXYPoints *ptwXY\_new(}{ptwXY\_interpolation interpolation,
+This function allocates memory for a new \highlight{ptwXYPoints} object and initializes it by calling \highlight{ptwXY\-\_initialize}.
+\setargumentNameLengths{interpolationString}
+\CallingC{ptwXYPoints *ptwXY\_new(}{statusMessageReporting *smr,
+    \addArgument{ptwXY\_interpolation interpolation,}
+    \addArgument{char const *interpolationString,}
     \addArgument{double biSectionMax,}
     \addArgument{double accuracy,}
     \addArgument{int64\_t primarySize,}
     \addArgument{int64\_t secondarySize,}
-    \addArgument{fnu\_status *status ),}
     \addArgument{int userFlag );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{interpolation}{The type of interpolation to use.}
+    \argumentBox{interpolationString}{The string representation of interpolation.}
     \argumentBox{biSectionMax}{The maximum disection allowed.}
     \argumentBox{accuracy}{The interpolation accuracy of the data.}
     \argumentBox{primarySize}{Initial size of the primary cache.}
     \argumentBox{secondarySize}{Initial size of the secondary cache.} 
-    \argumentBox{status}{On return, the status value.}
-    \argumentBox{userFlag}{An user defined integer value not used by any ptwXY function.}
+    \argumentBox{userFlag}{A user defined integer value not used by any ptwXY function.}
     \vskip 0.05 in \noindent
-If this routine fails, NULL is returned.
+The value of \highlight{interpolation} and \highlight{interpolationString} must agree; otherwise, an error will be reported.
+For all but \highlight{ptwXY\_interpolationOther} these must match the string returned by the function \highlight{ptwXY\_interpolationToString}.
+For \highlight{ptwXY\_interpolationOther}, the string can be anything that is not one of the standard interpolation string.
 
-\subsubsection{ptwXY\_setup}
-This routine initializes a \highlight{ptwXYPoints} object and must be called for a \highlight{ptwXYPoints} object
-before that object can be used by any other routine in this package.
-\setargumentNameLengths{secondarySize}
-\CallingC{fnu\_status ptwXY\_setup(}{ptwXYPoints *ptwXY,
+If this function fails, NULL is returned.
+
+\subsubsection{ptwXY\_new2}
+This function calls \highlight{ptwXY\_new} with the biSectionMax = 12, accuracy = 1e-3, userFlag = 0 and with interpolationString set to the
+proper string. This function should not be used for the interpolation value of \highlight{ptwXY\_interpolationOther}.
+\CallingC{ptwXYPoints *ptwXY\_new(}{statusMessageReporting *smr,
     \addArgument{ptwXY\_interpolation interpolation,}
+    \addArgument{int64\_t primarySize,}
+    \addArgument{int64\_t secondarySize );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{interpolation}{The type of interpolation to use.}
+    \argumentBox{primarySize}{Initial size of the primary cache.}
+    \argumentBox{secondarySize}{Initial size of the secondary cache.} 
+    \vskip 0.05 in \noindent
+
+\subsubsection{ptwXY\_initialize}
+This function initializes a \highlight{ptwXYPoints} object and must be called for a \highlight{ptwXYPoints} object
+before that object can be used by any other function in this package.
+\setargumentNameLengths{interpolationString}
+\CallingC{fnu\_status ptwXY\_initialize(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{ptwXY\_interpolation interpolation,}
+    \addArgument{char const *interpolationString,}
     \addArgument{double biSectionMax,}
     \addArgument{double accuracy,}
     \addArgument{int64\_t primarySize,}
-    \addArgument{int64\_t secondarySize );},
+    \addArgument{int64\_t secondarySize,}
     \addArgument{int userFlag );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to a \highlight{ptwXYPoints} object to initialize.}
     \argumentBox{interpolation}{The type of interpolation to use.}
+    \argumentBox{interpolationString}{The string representation of interpolation.}
     \argumentBox{biSectionMax}{The maximum disection allowed.}
     \argumentBox{accuracy}{The interpolation accuracy of the data.}
     \argumentBox{primarySize}{Initial size of the primary cache.}
     \argumentBox{secondarySize}{Initial size of the secondary cache.} 
     \argumentBox{userFlag}{An user defined integer value not used by any ptwXY function.}
     \vskip 0.05 in \noindent
-The primary and secondary caches are allocated with routines \highlight{ptwXY\_reallocatePoints} and 
+The primary and secondary caches are allocated with functions \highlight{ptwXY\_reallocatePoints} and 
 \highlight{ptwXY\_reallocateOverflowPoints} respectively.
 
 \subsubsection{ptwXY\_create}
-This routines combines \highlight{ptwXY\_new} and \highlight{ptwXY\_setXYData}.
-\CallingC{ptwXYPoints *ptwXY\_create(}{ptwXY\_interpolation interpolation, 
+This functions combines \highlight{ptwXY\_new} and \highlight{ptwXY\_setXYData}.
+\CallingC{ptwXYPoints *ptwXY\_create(}{statusMessageReporting *smr,
+    \addArgument{ptwXY\_interpolation interpolation,}
+    \addArgument{char const *interpolationString,}
     \addArgument{double biSectionMax,}
     \addArgument{double accuracy,}
     \addArgument{int64\_t primarySize,}
     \addArgument{int64\_t secondarySize,}
     \addArgument{int64\_t length,}
-    \addArgument{double *xy ),}
-    \addArgument{fnu\_status *status,}
+    \addArgument{double *xy,}
     \addArgument{int userFlag );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{interpolation}{The type of interpolation to use.}
+    \argumentBox{interpolationString}{The string representation of interpolation.}
     \argumentBox{biSectionMax}{The maximum disection allowed.}
     \argumentBox{accuracy}{The interpolation accuracy of the data.}
     \argumentBox{primarySize}{Initial size of the primary cache.}
     \argumentBox{secondarySize}{Initial size of the secondary cache.} 
     \argumentBox{length}{The number of points in xy.}
     \argumentBox{xy}{The new points given as $x_0, y_0, x_1, y_1, \; \ldots, \; x_n, y_n$ where n = length - 1.}
-    \argumentBox{status}{On return, the status value.}
     \argumentBox{userFlag}{An user defined integer value not used by any ptwXY function.}
     \vskip 0.05 in \noindent
-If this routine fails, NULL is returned.
+If this function fails, NULL is returned.
+
+\subsubsection{ptwXY\_create2}
+This function calls \highlight{ptwXY\_create} with the biSectionMax = 12, accuracy = 1e-3, userFlag = 0 and with interpolationString set to the
+proper string. This function should not be used for the interpolation value of \highlight{ptwXY\_interpolationOther}.
+\setargumentNameLengths{interpolation}
+\CallingC{ptwXYPoints *ptwXY\_new(}{statusMessageReporting *smr,
+    \addArgument{ptwXY\_interpolation interpolation,}
+    \addArgument{int64\_t primarySize,}
+    \addArgument{int64\_t secondarySize,}
+    \addArgument{int64\_t length,}
+    \addArgument{double *xy );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{interpolation}{The type of interpolation to use.}
+    \argumentBox{primarySize}{Initial size of the primary cache.}
+    \argumentBox{secondarySize}{Initial size of the secondary cache.} 
+    \argumentBox{length}{The number of points in xy.}
+    \argumentBox{xy}{The new points given as $x_0, y_0, x_1, y_1, \; \ldots, \; x_n, y_n$ where n = length - 1.}
+    \vskip 0.05 in \noindent
 
 \subsubsection{ptwXY\_createFrom\_Xs\_Ys}
-This routines is like \highlight{ptwXY\_create} except the x and y data are given in separate arrays.
-\CallingC{ptwXYPoints *ptwXY\_createFrom\_Xs\_Ys(}{ptwXY\_interpolation interpolation, 
+This functions is like \highlight{ptwXY\_create} except the x and y data are given in separate arrays.
+\setargumentNameLengths{interpolationString}
+\CallingC{ptwXYPoints *ptwXY\_createFrom\_Xs\_Ys(}{statusMessageReporting *smr,
+    \addArgument{ptwXY\_interpolation interpolation,}
+    \addArgument{char const *interpolationString,}
     \addArgument{double biSectionMax,}
     \addArgument{double accuracy,}
     \addArgument{int64\_t primarySize,}
     \addArgument{int64\_t secondarySize,}
     \addArgument{int64\_t length,}
-    \addArgument{double *Xs ),}
-    \addArgument{double *Ys ),}
-    \addArgument{fnu\_status *status,}
+    \addArgument{double *Xs,}
+    \addArgument{double *Ys,}
     \addArgument{int userFlag );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{interpolation}{The type of interpolation to use.}
+    \argumentBox{interpolationString}{The string representation of interpolation.}
     \argumentBox{biSectionMax}{The maximum disection allowed.}
     \argumentBox{accuracy}{The interpolation accuracy of the data.}
     \argumentBox{primarySize}{Initial size of the primary cache.}
@@ -86,122 +133,195 @@ This routines is like \highlight{ptwXY\_create} except the x and y data are give
     \argumentBox{length}{The number of points in xy.}
     \argumentBox{Xs}{The new x points given as $x_0, x_1, \; \ldots, \; x_n$ where n = length - 1.}
     \argumentBox{Ys}{The new y points given as $y_0, y_1, \; \ldots, \; y_n$ where n = length - 1.}
-    \argumentBox{status}{On return, the status value.}
     \argumentBox{userFlag}{An user defined integer value not used by any ptwXY function.}
     \vskip 0.05 in \noindent
-If this routine fails, NULL is returned.
+If this function fails, NULL is returned.
+
+\subsubsection{ptwXY\_createFrom\_Xs\_Ys2}
+This function calls \highlight{ptwXY\_createFrom\_Xs\_Ys} with the biSectionMax = 12, accuracy = 1e-3, userFlag = 0 and with interpolationString set to the
+proper string. This function should not be used for the interpolation value of \highlight{ptwXY\_interpolationOther}.
+\setargumentNameLengths{interpolation}
+\CallingC{ptwXYPoints *ptwXY\_Xs\_Ys2(}{statusMessageReporting *smr,
+    \addArgument{ptwXY\_interpolation interpolation,}
+    \addArgument{int64\_t primarySize,}
+    \addArgument{int64\_t secondarySize,}
+    \addArgument{int64\_t length,}
+    \addArgument{double *Xs,}
+    \addArgument{double *Ys );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{interpolation}{The type of interpolation to use.}
+    \argumentBox{primarySize}{Initial size of the primary cache.}
+    \argumentBox{secondarySize}{Initial size of the secondary cache.} 
+    \argumentBox{length}{The number of points in xy.}
+    \argumentBox{Xs}{The new x points given as $x_0, x_1, \; \ldots, \; x_n$ where n = length - 1.}
+    \argumentBox{Ys}{The new y points given as $y_0, y_1, \; \ldots, \; y_n$ where n = length - 1.}
+    \vskip 0.05 in \noindent
+
 
 \subsubsection{ptwXY\_copy}
-This routine clears the points in \highlight{dest} and then copies the points from \highlight{src} into \highlight{dest}.
+This function clears the points in \highlight{dest} and then copies the points from \highlight{src} into \highlight{dest}.
+It also copies all other data like the interplation flag.  The \highlight{src} object is not modified.
+\setargumentNameLengths{dest}
+\CallingC{fnu\_status ptwXY\_copy(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *dest,}
+    \addArgument{ptwXYPoints *src );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{dest}{A pointer to the destination \highlight{ptwXYPoints} object.}
+    \argumentBox{src}{A pointer to the source \highlight{ptwXYPoints} object.}
+
+\subsubsection{ptwXY\_copyPointsOnly}
+This function clears the points in \highlight{dest} and then copies the points from \highlight{src} into \highlight{dest}.
+Unlike \highlight{ptwXY\_copy}, this function does not copy any of the other data (e.g., the interpolation flag).
 The \highlight{src} object is not modified.
 \setargumentNameLengths{dest}
-\CallingC{fnu\_status ptwXY\_copy(}{ptwXYPoints *dest,
-    \addArgument{ptwXYPoints *src );}
-    }
+\CallingC{fnu\_status ptwXY\_copyPointsOnly(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *dest,}
+    \addArgument{ptwXYPoints *src );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{dest}{A pointer to the destination \highlight{ptwXYPoints} object.}
     \argumentBox{src}{A pointer to the source \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_clone}
-This routine creates a new \highlight{ptwXYPoints} object and sets its points to the points in its first argument.
-\CallingC{ptwXYPoints *ptwXY\_clone(}{ptwXYPoints *ptwXY, 
-    \addArgument{fnu\_status *status );}}
+This function creates a new \highlight{ptwXYPoints} object and sets its points to the points in its first argument.
+This function calls \highlight{ptwXY\_simpleCoalescePoints}. Also see \highlight{ptwXY\_clone2}.
+\setargumentNameLengths{status}
+\CallingC{ptwXYPoints *ptwXY\_clone(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{status}{On return, the status value.}
+    \vskip 0.05 in \noindent
+If an error occurs, NULL is returned.
+
+\subsubsection{ptwXY\_clone2}
+This function is like \highlight{ptwXY\_clone} but does not call \highlight{ptwXY\_simpleCoalescePoints}.
+\setargumentNameLengths{status}
+\CallingC{ptwXYPoints *ptwXY\_clone2(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \vskip 0.05 in \noindent
+If an error occurs, NULL is returned.
+
+\subsubsection{ptwXY\_cloneToInterpolation}
+This function calls \highlight{ptwXY\_clone} and set the interpolation of the returned \highlight{ptwXYPoints} instance to
+\highlight{interpolation} without adding any points.
+\setargumentNameLengths{interpolation}
+\CallingC{ptwXYPoints *ptwXY\_cloneToInterpolation(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{ptwXY\_interpolation interpolation );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{interpolation}{The interpolation of the return \highlight{ptwXYPoints} instance.}
     \vskip 0.05 in \noindent
 If an error occurs, NULL is returned.
 
 \subsubsection{ptwXY\_slice}
-This routine creates a new \highlight{ptwXYPoints} object and sets its points to the points from index \highlight{index1} inclusive 
+This function creates a new \highlight{ptwXYPoints} object and sets its points to the points from index \highlight{index1} inclusive 
 to \highlight{index2} exclusive of \highlight{ptwXY}.
 \setargumentNameLengths{secondarySize}
-\CallingC{ptwXYPoints *ptwXY\_slice(}{ptwXYPoints *ptwXY, 
+\CallingC{ptwXYPoints *ptwXY\_slice(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t index1,}
     \addArgument{int64\_t index2,}
-    \addArgument{int64\_t secondarySize,}
-    \addArgument{fnu\_status *status );}}
+    \addArgument{int64\_t secondarySize}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{index1}{The lower index.}
     \argumentBox{index2}{The upper index.}
     \argumentBox{secondarySize}{Initial size of the secondary cahce.}
-    \argumentBox{status}{On return, the status value.}
     \vskip 0.05 in \noindent
 If an error occurs, NULL is returned.
 
-\subsubsection{ptwXY\_xSlice}
-This routine creates a new \highlight{ptwXYPoints} object and sets its points to the points from the points between the domain
-\highlight{xMin} and \highlight{xMax} of \highlight{ptwXY}. If \highlight{fill} is true, points at xMin and xMax are added if
-not in the inputted \highlight{ptwXY}.
+\subsubsection{ptwXY\_domainSlice}
+This function creates a new \highlight{ptwXYPoints} object and sets its points to the points from the points between the domain
+\highlight{domainMin} and \highlight{domainMax} of \highlight{ptwXY}. If \highlight{fill} is true, points at \highlight{domainMin} and 
+\highlight{domainMax} are added if not in the inputted \highlight{ptwXY}.
 \setargumentNameLengths{secondarySize}
-\CallingC{ptwXYPoints *ptwXY\_xSlice(}{ptwXYPoints *ptwXY, 
-    \addArgument{double xMin,}
-    \addArgument{double xMax,}
+\CallingC{ptwXYPoints *ptwXY\_domainSlice(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double domainMin,}
+    \addArgument{double doaminMax,}
     \addArgument{int64\_t secondarySize,}
-    \addArgument{int fill,}
-    \addArgument{fnu\_status *status );}}
+    \addArgument{int fill}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{xMax}{The lower domain value.}
-    \argumentBox{xMax}{The upper domain value.}
+    \argumentBox{domainMin}{The lower domain value.}
+    \argumentBox{domainMax}{The upper domain value.}
     \argumentBox{secondarySize}{Initial size of the secondary cahce.}
-    \argumentBox{fill}{Initial size of the secondary cahce.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{fill}{If not 0, points at domainMin and domainMax are added if needed.}
     \vskip 0.05 in \noindent
 If an error occurs, NULL is returned.
 
-\subsubsection{ptwXY\_xMinSlice}
-This routine creates a new \highlight{ptwXYPoints} object and sets its points to the points from the points between the domain
-\highlight{xMin} to the end of \highlight{ptwXY}. If \highlight{fill} is true, point at xMin is added if
+\subsubsection{ptwXY\_domainMinSlice}
+This function creates a new \highlight{ptwXYPoints} object and sets its points to the points from the points between the domain
+\highlight{domainMin} to the end of \highlight{ptwXY}. If \highlight{fill} is true, point at \highlight{domainMin} is added if
 not in the inputted \highlight{ptwXY}.
 \setargumentNameLengths{secondarySize}
-\CallingC{ptwXYPoints *ptwXY\_xMinSlice(}{ptwXYPoints *ptwXY, 
-    \addArgument{double xMin,}
+\CallingC{ptwXYPoints *ptwXY\_domainMinSlice(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double domainMin,}
     \addArgument{int64\_t secondarySize,}
-    \addArgument{int fill,}
-    \addArgument{fnu\_status *status );}}
+    \addArgument{int fill );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{xMin}{The lower domain value.}
+    \argumentBox{domainMin}{The lower domain value.}
     \argumentBox{secondarySize}{Initial size of the secondary cahce.}
-    \argumentBox{fill}{Initial size of the secondary cahce.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{fill}{If not 0, a point at domainMin is added if needed.}
     \vskip 0.05 in \noindent
 If an error occurs, NULL is returned.
 
-\subsubsection{ptwXY\_xMaxSlice}
-This routine creates a new \highlight{ptwXYPoints} object and sets its points to the points from the points between the domain of
-the beginning of \highlight{ptwXY} to xMax. If \highlight{fill} is true, point at xMax is added if
+\subsubsection{ptwXY\_domainMaxSlice}
+This function creates a new \highlight{ptwXYPoints} object and sets its points to the points from the points between the domain of
+the beginning of \highlight{ptwXY} to \highlight{domainMax}. If \highlight{fill} is true, point at \highlight{domainMax} is added if
 not in the inputted \highlight{ptwXY}.
 \setargumentNameLengths{secondarySize}
-\CallingC{ptwXYPoints *ptwXY\_xMaxSlice(}{ptwXYPoints *ptwXY, 
-    \addArgument{double xMax,}
+\CallingC{ptwXYPoints *ptwXY\_domainMaxSlice(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double domainMax,}
     \addArgument{int64\_t secondarySize,}
-    \addArgument{int fill,}
-    \addArgument{fnu\_status *status );}}
+    \addArgument{int fill );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
-    \argumentBox{xMax}{The upper domain value.}
+    \argumentBox{domainMax}{The upper domain value.}
     \argumentBox{secondarySize}{Initial size of the secondary cahce.}
-    \argumentBox{fill}{Initial size of the secondary cahce.}
-    \argumentBox{status}{On return, the status value.}
+    \argumentBox{fill}{If not 0, a point at domainMax is added if needed.}
     \vskip 0.05 in \noindent
 If an error occurs, NULL is returned.
+
+\subsubsection{ptwXY\_getInterpolation}
+This function returns the value of \highlight{ptwXY}'s interpolation member.
+\CallingC{ptwXY\_interpolation ptwXY\_getInterpolation(}{ptwXYPoints *ptwXY );}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+
+\subsubsection{ptwXY\_getInterpolationString}
+This function returns a pointer to \highlight{ptwXY}'s interpolationString member.
+\CallingC{char const *ptwXY\_getInterpolationString(}{ptwXYPoints *ptwXY );}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+
+\subsubsection{ptwXY\_getStatus}
+This function returns the value of \highlight{ptwXY}'s status member.
+\CallingC{nfu\_status ptwXY\_getStatus(}{ptwXYPoints *ptwXY );}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_getUserFlag}
-This routine returns the value of \highlight{ptwXY}'s userFlag member.
+This function returns the value of \highlight{ptwXY}'s userFlag member.
 \CallingC{int ptwXY\_getUserFlag(}{ptwXYPoints *ptwXY );}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_setUserFlag}
-This routine sets the value of the \highlight{ptwXY}'s userFlag member to userFlag.
+This function sets the value of the \highlight{ptwXY}'s userFlag member to userFlag.
 \CallingC{void ptwXY\_setUserFlag(}{ptwXYPoints *ptwXY,
     \addArgument{int userFlag);}}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{userFlag}{The value to set ptwXY's userFlag to.}
 
 \subsubsection{ptwXY\_getAccuracy}
-This routine returns the value of \highlight{ptwXY}'s accuracy member.
+This function returns the value of \highlight{ptwXY}'s accuracy member.
 \CallingC{double ptwXY\_getAccuracy(}{ptwXYPoints *ptwXY );}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_setAccuracy}
-This routine sets the value of the \highlight{ptwXY}'s accuracy member to accuracy.
+This function sets the value of the \highlight{ptwXY}'s accuracy member to accuracy.
 \CallingC{double ptwXY\_setAccuracy(}{ptwXYPoints *ptwXY,
     \addArgument{double accuracy );}}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
@@ -210,12 +330,12 @@ Becuase the range of accuracy is limited, the actual value set may be different 
 argument accuracy. The actual value set in ptwXY is returned.
 
 \subsubsection{ptwXY\_getBiSectionMax}
-This routine returns the value of \highlight{ptwXY}'s biSectionMax member.
+This function returns the value of \highlight{ptwXY}'s biSectionMax member.
 \CallingC{double ptwXY\_getBiSectionMax(}{ptwXYPoints *ptwXY );}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_setBiSectionMax}
-This routine sets the value of the \highlight{ptwXY}'s biSectionMax member to biSectionMax.
+This function sets the value of the \highlight{ptwXY}'s biSectionMax member to biSectionMax.
 \CallingC{double ptwXY\_setBiSectionMax(}{ptwXYPoints *ptwXY,
     \addArgument{double biSectionMax );}}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
@@ -224,23 +344,27 @@ Becuase the range of biSectionMax is limited, the actual value set may be differ
 argument biSectionMax. The actual value set in ptwXY is returned.
 
 \subsubsection{ptwXY\_reallocatePoints}
-This routine changes the size of the primary cache.
+This function changes the size of the primary cache.
 \setargumentNameLengths{forceSmallerResize}
-\CallingC{fnu\_status ptwXY\_reallocatePoints(}{ptwXYPoints *ptwXY,
+\CallingC{fnu\_status ptwXY\_reallocatePoints(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t size,}
     \addArgument{int forceSmallerResize );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{size}{The desired size of the primary cache.}
-    \argumentBox{forceSmallerResize}{If true (i.e. non-zero) and size is smaller than the current size, the primary cache
+    \argumentBox{forceSmallerResize}{If true (i.e., non-zero) and size is smaller than the current size, the primary cache
         is resized. Otherwise, the primary cache is only reduced if the inputted size is significantly smaller than the current size.}
     \vskip 0.05 in \noindent
 The actual memory allocated is the maximum of {\tt size}, the current length of the primary cache and \highlight{ptwXY\_minimumSize}.
 
 \subsubsection{ptwXY\_reallocateOverflowPoints}
-This routine changes the size of the secondary cache.
+This function changes the size of the secondary cache.
 \setargumentNameLengths{ptwXY}
-\CallingC{fnu\_status ptwXY\_reallocateOverflowPoints(}{ptwXYPoints *ptwXY,
+\CallingC{fnu\_status ptwXY\_reallocateOverflowPoints(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t size );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{size}{The desired size of the secondary cache.}
     \vskip 0.05 in \noindent
@@ -248,13 +372,15 @@ The actual memory allocated is the maximum of {\tt size} and \highlight{ptwXY\_m
 \highlight{ptwXY\_coalescePoints} is called if the current length of the secondary cache is greater than the inputted size.
 
 \subsubsection{ptwXY\_coalescePoints}
-This routine adds the points from the secondary cache to the primary cache and then removes the points from the secondary cache. If the
+This function adds the points from the secondary cache to the primary cache and then removes the points from the secondary cache. If the
 argument \highlight{newPoint} is not-NULL it is also added to the primary cache.
 \setargumentNameLengths{forceSmallerResize}
-\CallingC{fnu\_status ptwXY\_coalescePoints(}{ptwXYPoints *ptwXY,
+\CallingC{fnu\_status ptwXY\_coalescePoints(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t size,}
     \addArgument{ptwXYPointsPoint *newPoint,}
     \addArgument{int forceSmallerResize );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{size}{The desired size of the primary cache.}
     \argumentBox{newPoint}{If not NULL, an additional point to add.}
@@ -264,66 +390,84 @@ argument \highlight{newPoint} is not-NULL it is also added to the primary cache.
 The actual memory allocated is the maximum of {\tt size}, the new length of the \highlight{ptwXY} object and \highlight{ptwXY\_minimumSize}.
 
 \subsubsection{ptwXY\_simpleCoalescePoints}
-This routine is a simple wrapper for \highlight{ptwXY\_coalescePoints} when only coalescing of the existing points is needed.
-\CallingC{fnu\_status ptwXY\_simpleCoalescePoints(}{ptwXYPoints *ptwXY );}
+This function is a simple wrapper for \highlight{ptwXY\_coalescePoints} when only coalescing of the existing points is needed.
+\CallingC{fnu\_status ptwXY\_simpleCoalescePoints(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_clear}
-This routine removes all points from a \highlight{ptwXYPoints} object but does not free any allocated memory. Upon return, the
+This function removes all points from a \highlight{ptwXYPoints} object but does not free any allocated memory. Upon return, the
 length of the \highlight{ptwXYPoints} object is zero.
 \setargumentNameLengths{ptwXY}
-\CallingC{fnu\_status ptwXY\_clear(}{ptwXYPoints *ptwXY );}
+\CallingC{fnu\_status ptwXY\_clear(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_release}
-This routine frees all the internal memory allocated for a \highlight{ptwXYPoints} object.
+This function frees all the internal memory allocated for a \highlight{ptwXYPoints} object.
 \setargumentNameLengths{ptwXY}
-\CallingC{fnu\_status ptwXY\_release(}{ptwXYPoints *ptwXY );}
+\CallingC{fnu\_status ptwXY\_release(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_free}
-This routine calls \highlight{ptwXY\_release} and then calls free on \highlight{ptwXY}. 
-\CallingC{fnu\_status ptwXY\_free(}{ptwXYPoints *ptwXY );}
+This function calls \highlight{ptwXY\_release} and then calls free on \highlight{ptwXY}. 
+\CallingC{ptwXYPoints *ptwXY\_free(}{ptwXYPoints *ptwXY );}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \vskip 0.05 in \noindent
-Any \highlight{ptwXYPoints} object allocated using \highlight{ptwXY\_new} should be freed calling \highlight{ptwXY\_free}.
-Once this routine is called, the \highlight{ptwXYPoints} object should never be used.
+Any \highlight{ptwXYPoints} object allocated using \highlight{ptwXY\_new} will be freed calling \highlight{ptwXY\_free}.
+Once this function is called, the \highlight{ptwXYPoints} object should never be used.
+The return value is always NULL.
 
 \subsubsection{ptwXY\_length}
-This routine returns the length (i.e., number of points in the primary and secondary caches) for a \highlight{ptwXY} object.
-\CallingC{int64\_t ptwXY\_length(}{ptwXYPoints *ptwXY );}
+This function returns the length (i.e., number of points in the primary and secondary caches) for a \highlight{ptwXY} object.
+\CallingC{int64\_t ptwXY\_length(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_getNonOverflowLength}
-This routine returns the length of the primary caches (note, this is not its size).
-\CallingC{int64\_t ptwXY\_getNonOverflowLength(}{ptwXYPoints *ptwXY );}
+This function returns the length of the primary caches (note, this is not its size).
+\CallingC{int64\_t ptwXY\_getNonOverflowLength(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_setXYData}
-This routine replaces the current points in a \highlight{ptwXY} object with a new set of points.
-\CallingC{fnu\_status ptwXY\_setXYData(}{ptwXYPoints *ptwXY,
+This function replaces the current points in a \highlight{ptwXY} object with a new set of points.
+\setargumentNameLengths{length}
+\CallingC{fnu\_status ptwXY\_setXYData(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t length,}
     \addArgument{double *xy );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{length}{The number of points in xy.}
     \argumentBox{xy}{The new points given as $x_0, y_0, x_1, y_1, \; \ldots, \; x_n, y_n$ where n = length - 1.}
 
 \subsubsection{ptwXY\_setXYDataFromXsAndYs}
-This routines is like \highlight{ptwXY\_setXYData} except the x and y data are given in separate arrays.
-\CallingC{fnu\_status ptwXY\_setXYDataFromXsAndYs(}{ptwXYPoints *ptwXY,
+This functions is like \highlight{ptwXY\_setXYData} except the x and y data are given in separate arrays.
+\CallingC{fnu\_status ptwXY\_setXYDataFromXsAndYs(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t length,}
     \addArgument{double *Xs,}
     \addArgument{double *Ys );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{length}{The number of points in xy.}
     \argumentBox{Xs}{The new x points given as $x_0, x_1, \; \ldots, \; x_n$ where n = length - 1.}
     \argumentBox{Ys}{The new y points given as $y_0, y_1, \; \ldots, \; y_n$ where n = length - 1.}
 
 \subsubsection{ptwXY\_deletePoints}
-This routine removes all the points from index \highlight{i1} inclusive to index \highlight{i2} exclusive. Indexing is 0 based.
-\CallingC{fnu\_status ptwXY\_deletePoints(}{ptwXYPoints *ptwXY,
+This function removes all the points from index \highlight{i1} inclusive to index \highlight{i2} exclusive. Indexing is 0 based.
+\CallingC{fnu\_status ptwXY\_deletePoints(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t i1,}
     \addArgument{int64\_t i2 );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{i1}{The lower index.}
     \argumentBox{i2}{The upper index.}
@@ -334,53 +478,106 @@ The indices i1 and i2 must satisfy the relationship ( 0 $\le$ i1 $\le$ i2 $\le n
 \highlight{ptwXY} object; otherwise, no modification is done to the \highlight{ptwXY} object
 and the error \highlight{nfu\_badIndex} is returned.
 
+\subsubsection{ptwXY\_getLowerIndexBoundingX}
+This function sets the index such that the xs[index] $<=$ x $<$ xs[index] where xs is the list of x-values for \highlight{ptwXY}. 
+If x is outside the domain of xs, index is set to -1. If x is the upper domain, it is length - 1 (i.e., for the last two points, the condition
+is xs[index] $<=$ x $<=$ xs[index]).
+\CallingC{fnu\_status ptwXY\_getLowerIndexBoundingX(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double x,}
+    \addArgument{int64\_t *index );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{x}{The domain value.}
+    \argumentBox{index}{The set index.}
+    \vskip 0.05 in \noindent
+
 \subsubsection{ptwXY\_getPointAtIndex}
-This routine checks that the index argument is valid, and if it is, this routine returns the result 
+This function checks that the index argument is valid, and if it is, this function returns the result 
 of \highlight{ptwXY\_getPointAtIndex\_Unsafely}. Otherwise, NULL is returned.
-\CallingC{ptwXYPoint *ptwXY\_getPointAtIndex(}{ptwXYPoints *ptwXY,
+\CallingC{ptwXYPoint *ptwXY\_getPointAtIndex(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t index );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{index}{The index of the point to return.}
 
 \subsubsection{ptwXY\_getPointAtIndex\_Unsafely}
-This routine returns the point at index. This routine does not check if index is valid and 
-thus is not intended for general use. Instead, see \highlight{ptwXY\_getPointAtIndex} for a general use version of this routine.
+This function returns the point at index. This function does not check if index is valid and 
+thus is not intended for general use. Instead, see \highlight{ptwXY\_getPointAtIndex} for a general use version of this function.
 \CallingCLimited{ptwXYPoint *ptwXY\_getPointAtIndex\_Unsafely(}{ptwXYPoints *ptwXY,
     \addArgument{int64\_t index );}}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{index}{The index of the point to return.}
 
 \subsubsection{ptwXY\_getXYPairAtIndex}
-This routine calls \highlight{ptwXY\_getPointAtIndex} and if the index is valid it returns the point's x and y values via the
+This function calls \highlight{ptwXY\_getPointAtIndex} and if the index is valid it returns the point's x and y values via the
 arguments *x and *y. Otherwise, *x and *y are unaltered and an error signal is returned.
-\CallingC{ptwXYPoint *ptwXY\_getPairAtIndex(}{ptwXYPoints *ptwXY,
+\CallingC{nfu\_status ptwXY\_getPairAtIndex(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t index,}
     \addArgument{double *x,}
     \addArgument{double *y );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{index}{The index of the point to return.}
     \argumentBox{*x}{The point's x value is returned in this argument.}
     \argumentBox{*y}{The point's y value is returned in this argument.}
 
 \subsubsection{ptwXY\_getPointsAroundX}
-This routine sets the \highlight{lessThanEqualXPoint} and \highlight{greaterThanXPoint} members of the 
-\highlight{ptwXY} object to the two points that bound a point $x$.
-\CallingCLimited{ptwXY\_lessEqualGreaterX ptwXY\_getPointsAroundX(}{ptwXYPoints *ptwXY,
-    \addArgument{double x );}}
+This function sets the \highlight{lessThanEqualXPoint} and \highlight{greaterThanXPoint} arguments
+to the two points that bound the point $x$.
+\setargumentNameLengths{lessThanEqualXPoint}
+\CallingCLimited{ptwXY\_lessEqualGreaterX ptwXY\_getPointsAroundX(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double x ),}
+    \addArgument{ptwXYOverflowPoint *lessThanEqualXPoint,}
+    \addArgument{ptwXYOverflowPoint *greaterThanXPoint );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{x}{The $x$ value.}
+    \argumentBox{lessThanEqualXPoint}{The lower bounding point.}
+    \argumentBox{greaterThanXPoint}{The upper bounding point.}
     \vskip 0.05 in \noindent
 If the \highlight{ptwXY} object is empty then the return value is \highlight{ptwXY\_less\-Equal\-GreaterX\_\-empty}.
-If $x$ is less than xMin, then \highlight{ptwXY\_less\-Equal\-GreaterX\_\-less\-Than} is return.
-If $x$ is greater than xMax, then \highlight{ptwXY\_less\-Equal\-GreaterX\_\-greater\-Than} is return. If $x$ corresponds to a
+If $x$ is less than domainMin, then \highlight{ptwXY\_less\-Equal\-GreaterX\_\-less\-Than} is return.
+If $x$ is greater than doaminMax, then \highlight{ptwXY\_less\-Equal\-GreaterX\_\-greater\-Than} is return. If $x$ corresponds to a
 point in the \highlight{ptwXY} object then \highlight{ptwXY\_\-less\-Equal\-GreaterX\_\-equal} is returned. Otherwise, 
 \highlight{ptwXY\_\-less\-Equal\-GreaterX\_\-between} is returned.
 
+\subsubsection{ptwXY\_getPointsAroundX\_closeIsEqual}
+This function is like \highlight{ptwXY\_getPointsAroundX} except that when \highlight{eps} is greater than 0., 
+it will set \highlight{closeIsEqual} to a non-zero value if a point is with relative \highlight{eps} of \highlight{x}.
+\highlight{*closePoint} is set to the which of \highlight{lessThanEqualXPoint} or \highlight{greaterThanXPoint}
+is closer.  If \highlight{x} is below \highlight{*closePoint}, then closeIsEqual is set to -1. If it is above then closeIsEqual is set to 1.
+Otherwise, closeIsEqual is set to 0.
+\setargumentNameLengths{lessThanEqualXPoint}
+\CallingCLimited{ptwXY\_lessEqualGreaterX ptwXY\_getPointsAroundX\_closeIsEqual(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double x ),}
+    \addArgument{ptwXYOverflowPoint *lessThanEqualXPoint,}
+    \addArgument{ptwXYOverflowPoint *greaterThanXPoint ),}
+    \addArgument{double eps,}
+    \addArgument{int *closeIsEqual,}
+    \addArgument{ptwXYPoint **closePoint );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{x}{The $x$ value.}
+    \argumentBox{lessThanEqualXPoint}{The lower bounding point.}
+    \argumentBox{greaterThanXPoint}{The upper bounding point.}
+    \argumentBox{eps}{}
+    \argumentBox{closeIsEqual}{}
+    \argumentBox{closePoint}{}
+    \vskip 0.05 in \noindent
+
 \subsubsection{ptwXY\_getValueAtX}
-This routine gets the $y$ value at $x$, interpolating if necessary.
-\CallingC{fnu\_status ptwXY\_getValueAtX(}{ptwXYPoints *ptwXY,
+This function gets the $y$ value at $x$, interpolating if necessary.
+\setargumentNameLengths{ptwXY}
+\CallingC{fnu\_status ptwXY\_getValueAtX(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{double x,}
     \addArgument{double *y );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{x}{The $x$ value.}
     \argumentBox{y}{Upon return, contains the $y$ value.}
@@ -389,22 +586,99 @@ If the x value is outside the domain of the \highlight{ptwXY} object, $y$ is set
 is \highlight{nfu\_X\-Outside\-Domain}.
 
 \subsubsection{ptwXY\_setValueAtX}
-This routine sets the point at $x$ to $y$, if $x$ does not corresponds to a
+This function sets the point at $x$ to $y$, if $x$ does not corresponds to a
 point in the \highlight{ptwXY} object then a new point is added.
-\CallingC{fnu\_status ptwXY\_setValueAtX(}{ptwXYPoints *ptwXY,
+\CallingC{fnu\_status ptwXY\_setValueAtX(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{double x,}
     \addArgument{double y );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{x}{The $x$ value.}
     \argumentBox{y}{The $y$ value.}
     \vskip 0.05 in \noindent
 
+\subsubsection{ptwXY\_setValueAtX\_overrideIfClose}
+\highlight{FIXME}
+
+This function 
+\CallingC{fnu\_status ptwXY\_setValueAtX\_overrideIfClose(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double x,}
+    \addArgument{double y,}
+    \addArgument{double eps,}
+    \addArgument{int override );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{x}{The $x$ value.}
+    \argumentBox{y}{The $y$ value.}
+    \argumentBox{eps}{}
+    \argumentBox{override}{}
+    \vskip 0.05 in \noindent
+
+\subsubsection{ptwXY\_mergeFromXsAndYs}
+This function calls \highlight{ptwXY\_mergeFrom} to add the points give by \highlight{xs} and \highlight{ys} into \highlight{ptwXY}.
+\setargumentNameLengths{length}
+\CallingC{fnu\_status ptwXY\_mergeFromXsAndYs(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{int64\_t length}
+    \addArgument{double *xs,}
+    \addArgument{double *ys );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{length}{The number of values in xs.}
+    \argumentBox{xs}{The $x$-values to merge.}
+    \argumentBox{ys}{The $y$-values to merge.}
+    \vskip 0.05 in \noindent
+
+\subsubsection{ptwXY\_mergeFromXYs}
+This function calls \highlight{ptwXY\_mergeFrom} to add the points give by \highlight{xs} and \highlight{ys} into \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_mergeFromXYs(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{int64\_t length}
+    \addArgument{double *xys );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{length}{The number of values in xs.}
+    \argumentBox{xs}{The (x,y) pairs to merge.}
+    \vskip 0.05 in \noindent
+
+\subsubsection{ptwXY\_mergeFrom}
+This function merges the points gives by \highlight{xs} and \highlight{ys} into \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_mergeFrom(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{int incY}
+    \addArgument{int64\_t length}
+    \addArgument{double *xs,}
+    \addArgument{double *ys );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{incY}{Not used.}
+    \argumentBox{length}{The number of values in xs.}
+    \argumentBox{xs}{The $x$-values to merge.}
+    \argumentBox{ys}{The $y$-values to merge.}
+    \vskip 0.05 in \noindent
+
+\subsubsection{ptwXY\_appendXY}
+This function appends the point \highlight{(x,y)} to the end of \highlight{ptwXY}. Note, \highlight{x} must be greater than domainMax.
+\CallingC{fnu\_status ptwXY\_appendXY(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double x,}
+    \addArgument{double y );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{x}{The $x$-value to append.}
+    \argumentBox{y}{The $y$-value to append.}
+    \vskip 0.05 in \noindent
+
 \subsubsection{ptwXY\_setXYPairAtIndex}
-This routine sets the $x$ and $y$ values at index.
-\CallingC{fnu\_status ptwXY\_setXYPairAtIndex(}{ptwXYPoints *ptwXY,
+This function sets the $x$ and $y$ values at index.
+\CallingC{fnu\_status ptwXY\_setXYPairAtIndex(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{int64\_t index}
     \addArgument{double x,}
     \addArgument{double y );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{index}{The index of the point to set.}
     \argumentBox{x}{The $x$ value.}
@@ -414,13 +688,15 @@ If index is invalid, \highlight{nfu\_badIndex} is returned. If the $x$ value is 
 or $x \ge x_{\rm index+1}$) then \highlight{nfu\_badIndexForX} is return.
 
 \subsubsection{ptwXY\_getSlopeAtX}
-This routine calculates the slope at the point $x$ assuming linear-linear interpolation. That is, for $x_i < x < x_{i+1}$,
+This function calculates the slope at the point $x$ assuming linear-linear interpolation. That is, for $x_i < x < x_{i+1}$,
 the slope is $( y_{i+1} - y_i ) / ( x_{i+1} - x_i )$. If $x = x_j$ is the point in \highlight{ptwXY} at
 index $j$ then for side = `+', $i = j$ is used in the above slope equation. Else, if side = `-', $i = j-1$ is used in the above slope equation.
-\CallingC{fnu\_status ptwXY\_getSlopeAtX(}{ptwXYPoints *ptwXY,
+\CallingC{fnu\_status ptwXY\_getSlopeAtX(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
     \addArgument{double x,}
     \addArgument{const char side,}
     \addArgument{double *slope );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{index}{The index of the point to set.}
     \argumentBox{x}{The $x$ value.}
@@ -428,56 +704,91 @@ index $j$ then for side = `+', $i = j$ is used in the above slope equation. Else
     \vskip 0.05 in \noindent
 If side is neither '-' or '+', the error \highlight{nfu\_badInput} is returned.
 
-\subsubsection{ptwXY\_getXMinAndFrom --- Not for general use}
-This routine returns the xMin value and indicates whether the minimum value resides in the primary 
+\subsubsection{ptwXY\_domainMinAndFrom --- Not for general use}
+This function returns the domainMin value and indicates whether the minimum value resides in the primary 
 or secondary cache.
 \setargumentNameLengths{dataFrom}
-\CallingCLimited{double ptwXY\_getXMinAndFrom(}{ptwXYPoints *ptwXY,
-    \addArgument{ptwXY\_dataFrom *dataFrom );}}
+\CallingCLimited{nfu\_status ptwXY\_domainMinAndFrom(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{ptwXY\_dataFrom *dataFrom,}
+    \addArgument{double *domainMin );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{dataFrom}{The output of this argument indicates which cache the minimum value resides in.}
+    \argumentBox{domainMin}{The value of the domain min.}
     \vskip 0.05 in \noindent
-The return value from this routine is xMin. If there are no data in the \highlight{ptwXYPoints} object, then \highlight{dataFrom} is set
+The return value from this function is domainMin. If there are no data in the \highlight{ptwXYPoints} object, then \highlight{dataFrom} is set
 to \highlight{ptwXY\_dataFrom\_Unknown}. Otherwise, it is set to \highlight{ptwXY\_data\-From\_Points} or \highlight{ptwXY\_dataFrom\_Overflow} if the 
 minimum value is in the primary or secondary cache respectively.
 
-\subsubsection{ptwXY\_getXMin}
-This routine returns the xMin value returned by \highlight{ptwXY\_getXMinAndFrom}. The calling routine should check that the
+\subsubsection{ptwXY\_domainMin}
+This function returns the domainMin value returned by \highlight{ptwXY\_domainMinAndFrom}. The calling function should check that the
 \highlight{ptwXYPoints} object contains at least one point (i.e., that the length is greater than 0). If the length is 0, the return value is
 undefined.
-\CallingC{double ptwXY\_getXMin(}{ptwXYPoints *ptwXY );}
+\CallingC{nfu\_status ptwXY\_domainMin(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double *domainMin );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{domainMin}{The value of the domain min.}
 
-\subsubsection{ptwXY\_getXMaxAndFrom --- Not for general use}
-This routine returns the xMax value and indicates whether the maximum value resides in the primary or secondary cache.
-\CallingCLimited{double ptwXY\_getXMaxAndFrom(}{ptwXYPoints *ptwXY,
-    \addArgument{ptwXY\_dataFrom *dataFrom );}}
+\subsubsection{ptwXY\_domainMaxAndFrom --- Not for general use}
+This function returns the domainMax value and indicates whether the maximum value resides in the primary or secondary cache.
+\CallingCLimited{nfu\_status ptwXY\_doaminMaxAndFrom(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{ptwXY\_dataFrom *dataFrom,}
+    \addArgument{double *domainMax );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{dataFrom}{The output of this argument indicates which cache the maximum value resides in.}
+    \argumentBox{domainMax}{The value of the domain max.}
     \vskip 0.05 in \noindent
-The return value from this routine is xMax. If there are no data in the \highlight{ptwXYPoints} object, then \highlight{dataFrom} is set
+The return value from this function is domainMax. If there are no data in the \highlight{ptwXYPoints} object, then \highlight{dataFrom} is set
 to \highlight{ptwXY\_dataFrom\_Unknown}. Otherwise, it is set to \highlight{ptwXY\_data\-From\_Points} or \highlight{ptwXY\_dataFrom\_Overflow} if the 
 maximum value is in the primary or secondary cache respectively.
 
-\subsubsection{ptwXY\_getXMax}
-This routine returns the xMax value returned by \highlight{ptwXY\_getXMinAndFrom}. The calling routine should check that the
+\subsubsection{ptwXY\_domainMax}
+This function returns the doaminMax value returned by \highlight{ptwXY\_domainMinAndFrom}. The calling function should check that the
 \highlight{ptwXYPoints} object contains at least one point (i.e., that the length is greater than 0). If the length is 0, the return value is
 undefined.
-\CallingC{double ptwXY\_getXMax(}{ptwXYPoints *ptwXY );}
+\CallingC{nfu\_status ptwXY\_domainMax(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double *domainMax );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{domainMax}{The value of the domain max.}
 
-\subsubsection{ptwXY\_getYMin}
-This routine returns the minimum y value in \highlight{ptwXY}.
-\CallingC{double ptwXY\_getYMin(}{ptwXYPoints *ptwXY );}
+\subsubsection{ptwXY\_range}
+This function returns the minimum and maximum y values in \highlight{ptwXY}.
+\CallingC{nfu\_status  ptwXY\_getYMin(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double *rangeMin,}
+    \addArgument{double *rangeMax );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{rangeMin}{The value of the range min.}
+    \argumentBox{rangeMax}{The value of the range max.}
 
-\subsubsection{ptwXY\_getYMax}
-This routine returns the maximum y value in \highlight{ptwXY}.
-\CallingC{double ptwXY\_getYMax(}{ptwXYPoints *ptwXY );}
+\subsubsection{ptwXY\_rangeMin}
+This function returns the minimum y value in \highlight{ptwXY}.
+\CallingC{nfu\_status  ptwXY\_getYMin(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double *rangeMin );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{rangeMin}{The value of the range min.}
+
+\subsubsection{ptwXY\_rangeMax}
+This function returns the maximum y value in \highlight{ptwXY}.
+\CallingC{nfu\_status ptwXY\_getYMax(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY,}
+    \addArgument{double *rangeMax );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{rangeMax}{The value of the range max.}
 
 \subsubsection{ptwXY\_initialOverflowPoint --- Not for general use}
-This routine initializes a point in the secondary cache.
+This function initializes a point in the secondary cache.
 \CallingCLimited{void ptwXY\_initialOverflowPoint(\hskip -1. in}{
     \addArgument{ptwXYOverflowPoint *overflowPoint,}
     \addArgument{ptwXYOverflowPoint *prior,}
@@ -485,3 +796,16 @@ This routine initializes a point in the secondary cache.
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
     \argumentBox{prior}{The prior point in the linked list.}
     \argumentBox{next}{The next point in the linked list.}
+
+\subsubsection{ptwXY\_interpolationToString}
+This function returns the string representation of \highlight{interpolation}.
+\setargumentNameLengths{interpolation}
+\CallingC{char const *ptwXY\_interpolationToString(}{ptwXY\_interpolation interpolation );}
+    \argumentBox{interpolation}{The interpolation values.}
+
+\subsubsection{ptwXY\_stringToInterpolation}
+This function returns the \highlight{ptwXY\_interpolation} value for \highlight{interpolationString}.
+\setargumentNameLengths{interpolationString}
+\CallingC{ptwXY\_interpolation *ptwXY\_stringToInterpolation(\hskip -1. in}{
+    \addArgument{char const *interpolationString );}}
+    \argumentBox{interpolationString}{The interpolation string.}

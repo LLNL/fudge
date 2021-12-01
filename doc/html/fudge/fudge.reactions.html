@@ -1,0 +1,535 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.reactions package &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="numericalFunctions Package" href="numericalFunctions.html" />
+    <link rel="prev" title="fudge.reactionData.test package" href="fudge.reactionData.test.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="numericalFunctions.html" title="numericalFunctions Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudge.reactionData.test.html" title="fudge.reactionData.test package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.html" accesskey="U">fudge package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.reactions package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fudge-reactions-package">
+<h1>fudge.reactions package<a class="headerlink" href="#fudge-reactions-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-fudge.reactions.base">
+<span id="fudge-reactions-base-module"></span><h2>fudge.reactions.base module<a class="headerlink" href="#module-fudge.reactions.base" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="fudge.reactions.base.FissionGenre">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.base.</code><code class="sig-name descname">FissionGenre</code><a class="reference internal" href="../_modules/fudge/reactions/base.html#FissionGenre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.FissionGenre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="fudge.reactions.base.FissionGenre.allowed">
+<code class="sig-name descname">allowed</code><em class="property"> = (None, 'total', 'firstChance', 'secondChance', 'thirdChance', 'fourthChance')</em><a class="headerlink" href="#fudge.reactions.base.FissionGenre.allowed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.reactions.base.FissionGenre.firstChance">
+<code class="sig-name descname">firstChance</code><em class="property"> = 'firstChance'</em><a class="headerlink" href="#fudge.reactions.base.FissionGenre.firstChance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.reactions.base.FissionGenre.fourthChance">
+<code class="sig-name descname">fourthChance</code><em class="property"> = 'fourthChance'</em><a class="headerlink" href="#fudge.reactions.base.FissionGenre.fourthChance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.reactions.base.FissionGenre.secondChance">
+<code class="sig-name descname">secondChance</code><em class="property"> = 'secondChance'</em><a class="headerlink" href="#fudge.reactions.base.FissionGenre.secondChance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.reactions.base.FissionGenre.thirdChance">
+<code class="sig-name descname">thirdChance</code><em class="property"> = 'thirdChance'</em><a class="headerlink" href="#fudge.reactions.base.FissionGenre.thirdChance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.reactions.base.FissionGenre.total">
+<code class="sig-name descname">total</code><em class="property"> = 'total'</em><a class="headerlink" href="#fudge.reactions.base.FissionGenre.total" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.reactions.base.base_reaction">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.base.</code><code class="sig-name descname">base_reaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genre</span></em>, <em class="sig-param"><span class="n">ENDF_MT</span></em>, <em class="sig-param"><span class="n">fissionGenre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">documentation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>Base class for all types of reaction.</p>
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.addDocumentation">
+<code class="sig-name descname">addDocumentation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">documentation</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.addDocumentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.addDocumentation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.amendForPatch">
+<code class="sig-name descname">amendForPatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fromLabel</span></em>, <em class="sig-param"><span class="n">toLabel</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.amendForPatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.amendForPatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.reactions.base.base_reaction.ancestryMembers">
+<code class="sig-name descname">ancestryMembers</code><em class="property"> = ('crossSection', 'doubleDifferentialCrossSection', 'outputChannel')</em><a class="headerlink" href="#fudge.reactions.base.base_reaction.ancestryMembers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.calculateAverageProductData">
+<code class="sig-name descname">calculateAverageProductData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.calculateAverageProductData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.calculateAverageProductData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate average product data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – The style to use.</p></li>
+<li><p><strong>indent</strong> – string; The amount to indent and verbose output.</p></li>
+<li><p><strong>kwargs</strong> – string; All other parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is usually not called directly. Use reactionSuite.check() instead.</p>
+<dl class="simple">
+<dt>Checks cross section and outputChannel (and differential cross sections if available). Checks include:</dt><dd><p>do Z/A balance? do Q-value and thresholds agree?
+Does cross section domain agree with each product distribution/multiplicity domain?
+Does energy balance?</p>
+</dd>
+</dl>
+<p>&#64;:param info: dict
+&#64;:return list of warnings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See documentation for reactionSuite.convertUnits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.crossSection">
+<em class="property">property </em><code class="sig-name descname">crossSection</code><a class="headerlink" href="#fudge.reactions.base.base_reaction.crossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.cullStyles">
+<code class="sig-name descname">cullStyles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">styleList</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.cullStyles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.cullStyles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.diff">
+<code class="sig-name descname">diff</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em>, <em class="sig-param"><span class="n">diffResults</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.diff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.domainMax">
+<em class="property">property </em><code class="sig-name descname">domainMax</code><a class="headerlink" href="#fudge.reactions.base.base_reaction.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.domainMin">
+<em class="property">property </em><code class="sig-name descname">domainMin</code><a class="headerlink" href="#fudge.reactions.base.base_reaction.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.reactions.base.base_reaction.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.domainUnitConversionFactor">
+<code class="sig-name descname">domainUnitConversionFactor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitTo</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.domainUnitConversionFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.domainUnitConversionFactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.doubleDifferentialCrossSection">
+<em class="property">property </em><code class="sig-name descname">doubleDifferentialCrossSection</code><a class="headerlink" href="#fudge.reactions.base.base_reaction.doubleDifferentialCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.findLinks">
+<code class="sig-name descname">findLinks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">links</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.findLinks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.findLinks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.fissionGenre">
+<em class="property">property </em><code class="sig-name descname">fissionGenre</code><a class="headerlink" href="#fudge.reactions.base.base_reaction.fissionGenre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.getDocumentation">
+<code class="sig-name descname">getDocumentation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.getDocumentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.getDocumentation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.getQ">
+<code class="sig-name descname">getQ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span></em>, <em class="sig-param"><span class="n">final</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.getQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.getQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Q-value for this reaction. Converted to float if possible, otherwise a string value is returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.getReactionSuite">
+<code class="sig-name descname">getReactionSuite</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.getReactionSuite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.getReactionSuite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.heatCrossSection">
+<code class="sig-name descname">heatCrossSection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">temperature</span></em>, <em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">lowerlimit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">upperlimit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">interpolationAccuracy</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">heatAllPoints</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">doNotThin</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">heatBelowThreshold</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">heatAllEDomain</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">setThresholdToZero</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.heatCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.heatCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.isBasicReaction">
+<code class="sig-name descname">isBasicReaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.isBasicReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.isBasicReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.isCompleteReaction">
+<code class="sig-name descname">isCompleteReaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.isCompleteReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.isCompleteReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.isFission">
+<code class="sig-name descname">isFission</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.isFission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.isFission" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.isThermalNeutronScatteringLaw">
+<code class="sig-name descname">isThermalNeutronScatteringLaw</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.isThermalNeutronScatteringLaw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.isThermalNeutronScatteringLaw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.reactions.base.base_reaction.label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the reaction’s label.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.outputChannel">
+<em class="property">property </em><code class="sig-name descname">outputChannel</code><a class="headerlink" href="#fudge.reactions.base.base_reaction.outputChannel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.parseNode">
+<code class="sig-name descname">parseNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.parseNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate a &lt;reaction&gt; element from xml into a reaction class instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.partialProductionIntegral">
+<code class="sig-name descname">partialProductionIntegral</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reaction_suite</span></em>, <em class="sig-param"><span class="n">productID</span></em>, <em class="sig-param"><span class="n">energyIn</span></em>, <em class="sig-param"><span class="n">energyOut</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">muOut</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">phiOut</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">frame</span><span class="o">=</span><span class="default_value">'lab'</span></em>, <em class="sig-param"><span class="n">LegendreOrder</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.partialProductionIntegral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.partialProductionIntegral" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.processGriddedCrossSections">
+<code class="sig-name descname">processGriddedCrossSections</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">incrementalIndent</span><span class="o">=</span><span class="default_value">'  '</span></em>, <em class="sig-param"><span class="n">isPhotoAtomic</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.processGriddedCrossSections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.processGriddedCrossSections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.processMC_cdf">
+<code class="sig-name descname">processMC_cdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">incrementalIndent</span><span class="o">=</span><span class="default_value">'  '</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.processMC_cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.processMC_cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.removeStyles">
+<code class="sig-name descname">removeStyles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">styleLabels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.removeStyles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.removeStyles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.thresholdQAs">
+<code class="sig-name descname">thresholdQAs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span></em>, <em class="sig-param"><span class="n">final</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.thresholdQAs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.thresholdQAs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.toString">
+<code class="sig-name descname">toString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.toString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.toXML">
+<code class="sig-name descname">toXML</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.toXML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.base.base_reaction.updateLabel">
+<code class="sig-name descname">updateLabel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#base_reaction.updateLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.base_reaction.updateLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the reaction’s label from outputChannel products.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="fudge.reactions.base.isGNDSReaction">
+<code class="sig-prename descclassname">fudge.reactions.base.</code><code class="sig-name descname">isGNDSReaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">o</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#isGNDSReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.base.isGNDSReaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if o is an instance of base_reaction or of a subclass thereof.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.reactions.fissionComponent">
+<span id="fudge-reactions-fissioncomponent-module"></span><h2>fudge.reactions.fissionComponent module<a class="headerlink" href="#module-fudge.reactions.fissionComponent" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the fissionComponent class</p>
+<dl class="py class">
+<dt id="fudge.reactions.fissionComponent.fissionComponent">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.fissionComponent.</code><code class="sig-name descname">fissionComponent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genre</span></em>, <em class="sig-param"><span class="n">ENDF_MT</span></em>, <em class="sig-param"><span class="n">fissionGenre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">documentation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/fissionComponent.html#fissionComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.fissionComponent.fissionComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.base.base_reaction" title="fudge.reactions.base.base_reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.reactions.base.base_reaction</span></code></a></p>
+<p>Special case of reaction, for storing 1st, 2nd, 3rd, etc fission chances when we also have total.</p>
+<dl class="py attribute">
+<dt id="fudge.reactions.fissionComponent.fissionComponent.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'fissionComponent'</em><a class="headerlink" href="#fudge.reactions.fissionComponent.fissionComponent.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.reactions.incompleteReaction">
+<span id="fudge-reactions-incompletereaction-module"></span><h2>fudge.reactions.incompleteReaction  module<a class="headerlink" href="#module-fudge.reactions.incompleteReaction" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the incompleteReaction class, for storing partially evaluated reactions
+that do not have enough information to be used for transport but may still contain useful info.</p>
+<p>Originally designed to store sub-actinide fission and standards cross-sections</p>
+<dl class="py class">
+<dt id="fudge.reactions.incompleteReaction.incompleteReaction">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.incompleteReaction.</code><code class="sig-name descname">incompleteReaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genre</span></em>, <em class="sig-param"><span class="n">ENDF_MT</span></em>, <em class="sig-param"><span class="n">fissionGenre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">documentation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/incompleteReaction.html#incompleteReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.incompleteReaction.incompleteReaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.base.base_reaction" title="fudge.reactions.base.base_reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.reactions.base.base_reaction</span></code></a></p>
+<p>Similar to the base &lt;reaction&gt; class, except it generally does not contain
+a complete description of products, and cannot be used for transport. It must contain a crossSection
+and outputChannel, but the list of products may be empty.</p>
+<dl class="py attribute">
+<dt id="fudge.reactions.incompleteReaction.incompleteReaction.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'reaction'</em><a class="headerlink" href="#fudge.reactions.incompleteReaction.incompleteReaction.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.reactions.orphanProduct">
+<span id="fudge-reactions-orphanproduct-module"></span><h2>fudge.reactions.orphanProduct module<a class="headerlink" href="#module-fudge.reactions.orphanProduct" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the orphanProduct class, for storing orphanProduct reaction data.</p>
+<dl class="py class">
+<dt id="fudge.reactions.orphanProduct.orphanProduct">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.orphanProduct.</code><code class="sig-name descname">orphanProduct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genre</span></em>, <em class="sig-param"><span class="n">ENDF_MT</span></em>, <em class="sig-param"><span class="n">fissionGenre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">documentation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/orphanProduct.html#orphanProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.orphanProduct.orphanProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.base.base_reaction" title="fudge.reactions.base.base_reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.reactions.base.base_reaction</span></code></a></p>
+<p>An orphanProduct reaction is another special case of the &lt;reaction&gt; class, used to store product information
+for a product not in the exclusive reactions. Currently only used for photons (i.e., gammas) from ENDL’s C=55 or the ENDF
+equivalent.</p>
+<dl class="py attribute">
+<dt id="fudge.reactions.orphanProduct.orphanProduct.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'orphanProduct'</em><a class="headerlink" href="#fudge.reactions.orphanProduct.orphanProduct.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.reactions.production">
+<span id="fudge-reactions-production-module"></span><h2>fudge.reactions.production module<a class="headerlink" href="#module-fudge.reactions.production" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the production class, for storing production cross section of radioactive products.</p>
+<dl class="py class">
+<dt id="fudge.reactions.production.production">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.production.</code><code class="sig-name descname">production</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genre</span></em>, <em class="sig-param"><span class="n">ENDF_MT</span></em>, <em class="sig-param"><span class="n">fissionGenre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">documentation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/production.html#production"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.production.production" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.base.base_reaction" title="fudge.reactions.base.base_reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.reactions.base.base_reaction</span></code></a></p>
+<p>Production reactions are another special case of the &lt;reaction&gt; class, used to store the cross section for
+producing specific radioactive products. Requires a cross section and product id, but no distributions.
+As with the summedReaction, ‘outputChannel’ should be a channels.simpleOutputChannel instance.</p>
+<dl class="py attribute">
+<dt id="fudge.reactions.production.production.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'production'</em><a class="headerlink" href="#fudge.reactions.production.production.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.reactions.reaction">
+<span id="fudge-reactions-reaction-module"></span><h2>fudge.reactions.reaction module<a class="headerlink" href="#module-fudge.reactions.reaction" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the reaction class.</p>
+<dl class="py class">
+<dt id="fudge.reactions.reaction.reaction">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.reactions.reaction.</code><code class="sig-name descname">reaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genre</span></em>, <em class="sig-param"><span class="n">ENDF_MT</span></em>, <em class="sig-param"><span class="n">fissionGenre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">documentation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#reaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.reaction.reaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.base.base_reaction" title="fudge.reactions.base.base_reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.reactions.base.base_reaction</span></code></a></p>
+<p>This is the class for a normal gnds reaction.</p>
+<dl class="py attribute">
+<dt id="fudge.reactions.reaction.reaction.ancestryMembers">
+<code class="sig-name descname">ancestryMembers</code><em class="property"> = ('crossSection', 'doubleDifferentialCrossSection', 'outputChannel', 'availableEnergy', 'availableMomentum')</em><a class="headerlink" href="#fudge.reactions.reaction.reaction.ancestryMembers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.reaction.reaction.getThreshold">
+<code class="sig-name descname">getThreshold</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#reaction.getThreshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.reaction.reaction.getThreshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.reaction.reaction.isBasicReaction">
+<code class="sig-name descname">isBasicReaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#reaction.isBasicReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.reaction.reaction.isBasicReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.reaction.reaction.isCompleteReaction">
+<code class="sig-name descname">isCompleteReaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#reaction.isCompleteReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.reaction.reaction.isCompleteReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.reactions.reaction.reaction.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'reaction'</em><a class="headerlink" href="#fudge.reactions.reaction.reaction.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.reaction.reaction.processCoulombPlusNuclearMuCutoff">
+<code class="sig-name descname">processCoulombPlusNuclearMuCutoff</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">excludeRutherfordScattering</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#reaction.processCoulombPlusNuclearMuCutoff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.reaction.reaction.processCoulombPlusNuclearMuCutoff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.reaction.reaction.processThermalNeutronScatteringLaw">
+<code class="sig-name descname">processThermalNeutronScatteringLaw</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#reaction.processThermalNeutronScatteringLaw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.reaction.reaction.processThermalNeutronScatteringLaw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.reaction.reaction.reactionProducts">
+<code class="sig-name descname">reactionProducts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#reaction.reactionProducts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.reaction.reaction.reactionProducts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.reactions.reaction.reaction.thermalNeutronScatteringLawTemperatures">
+<code class="sig-name descname">thermalNeutronScatteringLawTemperatures</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">temperatures</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#reaction.thermalNeutronScatteringLawTemperatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.reactions.reaction.reaction.thermalNeutronScatteringLawTemperatures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.reactions">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.reactions" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">fudge.reactions package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions.base">fudge.reactions.base module</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions.fissionComponent">fudge.reactions.fissionComponent module</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions.incompleteReaction">fudge.reactions.incompleteReaction  module</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions.orphanProduct">fudge.reactions.orphanProduct module</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions.production">fudge.reactions.production module</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions.reaction">fudge.reactions.reaction module</a></li>
+<li><a class="reference internal" href="#module-fudge.reactions">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudge.reactionData.test.html"
+                        title="previous chapter">fudge.reactionData.test package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="numericalFunctions.html"
+                        title="next chapter">numericalFunctions Package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/fudge/fudge.reactions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="numericalFunctions.html" title="numericalFunctions Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudge.reactionData.test.html" title="fudge.reactionData.test package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.reactions package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

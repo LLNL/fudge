@@ -16,8 +16,10 @@
 #define COEF_VECTOR
 
 #include "max_output_order.hpp"
-#include "Legendre_data.hpp"
+#include "Legendre_base.hpp"
 
+namespace Coef
+{
 //! Do we conserve particle number, energy, or both?
 enum Conserve{ NUMBER, ENERGY, BOTH, NOT_SET };
 
@@ -29,10 +31,10 @@ private:
 
 public:
   //! Coefficients for conservation of number of particles
-  double weight_1[ max_output_order+1 ];
+  double weight_1[ Order::max_output_order+1 ];
 
   //! Coefficients for conservation of energy
-  double weight_E[ max_output_order+1 ];
+  double weight_E[ Order::max_output_order+1 ];
 
   //! actual Legendre order
   int order;
@@ -57,48 +59,46 @@ public:
   //! Sets the entries to zero
   void set_zero( );
 
-  //! Ensure that our rough estimate is nonzero
-  //! param Norm_1 the max norm of weight_1, set to length if initially 0
-  //! param Norm_E the max norm of weight_E, set to length if initially 0
-  //! param length default value for norms initially 0
-  void test_zero( double *Norm_1, double *Norm_E, double length );
-
   //! Makes a copy
-  //! param to_copy the values to copy
+  //! \param to_copy the values to copy
   void copy( const coef_vector &to_copy );
 
   //! Makes a copy
-  //! param to_copy the values to copy
+  //! \param to_copy the values to copy
   coef_vector& operator=( const coef_vector& to_copy );
 
   //! Does vector addition
-  //! param to_add the values to add
+  //! \param to_add the values to add
   coef_vector& operator+=( const coef_vector& to_add );
 
   //! Adds a scalar to the terms of order L_order
-  //! param to_add the values to add (one order)
-  //! param L_order the Legendre order to add to
+  //! \param to_add the values to add (one order)
+  //! \param L_order the Legendre order to add to
   coef_vector& plus( const coef_vector& to_add, int L_order );
 
   //! Scales the vector
-  //! param factor the scale factor
+  //! \param factor the scale factor
   coef_vector& operator*=( double factor );
 
   //! Scales the weight_E terms
-  //! param factor the scale factor for weight_E
+  //! \param factor the scale factor for weight_E
   void scale_E( double factor );
 
   //! Weights the vector 
-  //! param 
-  coef_vector& operator*=( Legendre_base &factor );
+  //! \param factor, the weight
+  coef_vector& operator*=( LgBase::Legendre_base &factor );
+
+  //! Makes sure that no entry is zero
+  void test_zero( );
 
   //! Calculates the max norms of weight_1 and weight_E
-  //! Replaces the entries by their absolute values
-  //! param Norm_1 the max norm of weight_1
-  //! param Norm_E the max norm of weight_E
+  //! \param Norm_1 the max norm of weight_1
+  //! \param Norm_E the max norm of weight_E
   void max_norm( double *Norm_1, double *Norm_E );
 
   void print( );
 };
+
+} // end of namespace Coef
 
 #endif

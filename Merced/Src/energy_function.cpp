@@ -13,20 +13,25 @@
 //! All data is in laboratory coordinates.
 
 #include "energy_function.hpp"
+#include "adapt_quad.hpp"
 #include "messaging.hpp"
 #include "global_params.hpp"
-#include "math_util.hpp"
 
-// ************* class E_function_param *****************
-// ---------------- E_function_param::set_Ein_default --------------------
+// ************* class Efunc::E_function_param *****************
+// ---------------- Efunc::E_function_param::set_Ein_default --------------------
 // Interpolate the parameters
-void E_function_param::set_Ein_default( double E_in )
+bool Efunc::E_function_param::set_Ein_default( double E_in )
 {
-  Theta = this_Theta->linlin_interp( E_in, *next_Theta );
-  multiplicity = this_mult->linlin_interp( E_in, *next_mult );
-  if( ( Theta <= 0.0 ) || ( multiplicity < 0.0 ) )
+  bool Theta_OK;
+  Theta = this_Theta->linlin_interp( E_in, *next_Theta, &Theta_OK );
+
+  bool mult_OK;
+  multiplicity = this_mult->linlin_interp( E_in, *next_mult, &mult_OK );
+  if( ( !Theta_OK ) || ( !mult_OK ) )
   {
-    FatalError( "E_function_param::set_Ein_default", "got a negative parameter" );
+    Msg::DebugInfo( "Efunc::E_function_param::set_Ein_default",
+		     "got a negative parameter" );
+    return false;
   }
   // the range of integration
   E_max = E_in - U;
@@ -37,59 +42,57 @@ void E_function_param::set_Ein_default( double E_in )
   E_1 = ( use_Eout_max ) ? Eout_max : E_max;
   set_scales( );
   norm = get_norm( );
-  Eout_0 = Eout_min;
-  Eout_1 = E_1;
+
+  return true;
 }
 
-// ************* class U_Ein_hit_list *****************
-// ----------- U_Ein_hit_list::find_bottom_hits --------------
+// ************* class Efunc::U_Ein_hit_list *****************
+// ----------- Efunc::U_Ein_hit_list::find_bottom_hits --------------
 // Finds the intersection with the bottom of a box
-void U_Ein_hit_list::find_bottom_hits( double E_out,
-  vector< Ein_Eta_Hit > *Ein_hits )
+void Efunc::U_Ein_hit_list::find_bottom_hits( double E_out,
+  std::vector< Box::Ein_Eta_Hit > *Ein_hits )
 {
   // for new entries
-  Ein_Eta_Hit Ein_eta_hit;
+  Box::Ein_Eta_Hit Ein_eta_hit;
   double Ein = E_out + get_U( );
 
   if( Ein > 0.0 )
   {
     // append this entry
     Ein_eta_hit.E_in = Ein;
-    Ein_eta_hit.hit_edge = BOTTOM_IN;
+    Ein_eta_hit.hit_edge = Box::BOTTOM_IN;
     Ein_hits->push_back( Ein_eta_hit );
   }
 }
-// ----------- U_Ein_hit_list::find_top_hits --------------
+// ----------- Efunc::U_Ein_hit_list::find_top_hits --------------
 // Finds the intersection with the top of a box
-void U_Ein_hit_list::find_top_hits( double E_out,
-  vector< Ein_Eta_Hit > *Ein_hits )
+void Efunc::U_Ein_hit_list::find_top_hits( double E_out,
+  std::vector< Box::Ein_Eta_Hit > *Ein_hits )
 {
   // for new entries
-  Ein_Eta_Hit Ein_eta_hit;
+  Box::Ein_Eta_Hit Ein_eta_hit;
   double Ein = E_out + get_U( );
 
   if( Ein > 0.0 )
   {
     // append this entry
     Ein_eta_hit.E_in = Ein;
-    Ein_eta_hit.hit_edge = TOP_OUT;
+    Ein_eta_hit.hit_edge = Box::TOP_OUT;
     Ein_hits->push_back( Ein_eta_hit );
   }
 }
 
 
-// ************* class energy_function *****************
-// ---------------- energy_function::setup_data_default --------------------
+// ************* class Efunc::energy_function *****************
+// ---------------- Efunc::energy_function::setup_data_default --------------------
 // Initializes the quadrature parameters
-void energy_function::setup_data_default( const Energy_groups& Eout_groups,
-  E_function_param *Ein_param )
+void Efunc::energy_function::setup_data_default( const Egp::Energy_groups& Eout_groups,
+  Efunc::E_function_param *Ein_param )
 {
-  static double skip_tol = Global.Value( "abs_tol" );
+  static double skip_tol = Global.Value( "tight_tol" );
 
   Ein_param->U = U;
-  Energy_groups::const_iterator Eout_ptr = Eout_groups.end();
-  --Eout_ptr;
-  Ein_param->top_E_out = *Eout_ptr;
+  Ein_param->top_E_out = Eout_groups.get_top_E( );
   Ein_param->this_Theta = begin( );
   Ein_param->next_Theta = Ein_param->this_Theta;
   ++Ein_param->next_Theta;
@@ -109,13 +112,15 @@ void energy_function::setup_data_default( const Energy_groups& Eout_groups,
     bool data_bad = Ein_param->update_pointers( first_E );
     if( data_bad )
     {
-      FatalError( "energy_function::setup_data_default", "energies inconsistent" );
+      Msg::FatalError( "Efunc::energy_function::setup_data_default",
+		       "energies inconsistent" );
     }
   }
 }
-// ---------------- energy_function::set_Ein_range_default --------------------
+// ---------------- Efunc::energy_function::set_Ein_range_default --------------------
 // Sets the range of incident energies for this intergration
-void energy_function::set_Ein_range_default( int Ein_bin, E_function_param *Ein_param )
+void Efunc::energy_function::set_Ein_range_default( int Ein_bin,
+			     Efunc::E_function_param *Ein_param )
 {
   Ein_param->set_Ein_range( );
   double this_E = Ein_param->this_Theta->x;
@@ -125,15 +130,17 @@ void energy_function::set_Ein_range_default( int Ein_bin, E_function_param *Ein_
 
   if( Ein_param->data_E_1 < Ein_param->data_E_0 )
   {
-    FatalError( "energy_function::set_Ein_range_default", "check the Theta incident energies" );
+    Msg::FatalError( "Efunc::energy_function::set_Ein_range_default",
+		     "check the Theta incident energies" );
   }
 }
-// ---------------- energy_function::next_ladder_default --------------------
+// ---------------- Efunc::energy_function::next_ladder_default --------------------
 // Default go to the next (incident energy, Theta).  Returns "true" when finished.
-bool energy_function::next_ladder_default( double E_in, E_function_param *Ein_param )
+bool Efunc::energy_function::next_ladder_default( double E_in,
+				      Efunc::E_function_param *Ein_param )
 {
   bool done = Ein_param->update_bin_pointers( E_in );
-  static double etol = Global.Value( "E_tol" );
+  static double etol = Global.Value( "tight_tol" );
   double E_tol = E_in * etol;
   //    double E_tol = 0.0;
   if( !done )
@@ -154,20 +161,21 @@ bool energy_function::next_ladder_default( double E_in, E_function_param *Ein_pa
   }
   return done;
 }
-// ----------- energy_function::Eout_ladder --------------
+// ----------- Efunc::energy_function::Eout_ladder --------------
 // This routine uses the angular distributions this_eta_dist and the
 // next to calculate the contribution to the E_out boxes of the
 // transfer matrix between incident energies Ein_param->data_E_0 and
 // Ein_param->data_E_1.
-void energy_function::Eout_ladder( T_matrix& transfer, E_function_param *Ein_param )
+void Efunc::energy_function::Eout_ladder( Trf::T_matrix& transfer,
+					  Efunc::E_function_param *Ein_param )
 {
   bool geom_OK;  // for checking the consistency of the geometry
-  U_Ein_hit_list test_hits;
+  Efunc::U_Ein_hit_list test_hits;
   // loop through the outgoing energies (column of transfer)
   for( int Eout_count = 0; Eout_count < transfer.num_Eout_bins;
     ++Eout_count )
   {
-    vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( )
+    std::vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( )
       + Eout_count;
     // how does the line Eout = Ein - U meet this E-E' box?
     double U = Ein_param->U;
@@ -179,7 +187,8 @@ void energy_function::Eout_ladder( T_matrix& transfer, E_function_param *Ein_par
       test_hits.hit_box( U, Eout_ptr,
                          Ein_param->data_E_0, Ein_param->data_E_1 );
       test_hits.print( );
-      FatalError( "energy_function::Eout_ladder", "Check the coding" );
+      Msg::FatalError( "Efunc::energy_function::Eout_ladder",
+		       "Check the coding" );
     }
     if( ( Eout_count > 0 ) && ( Ein_param->upper_hits.is_below( ) ) )
     {
@@ -190,21 +199,19 @@ void energy_function::Eout_ladder( T_matrix& transfer, E_function_param *Ein_par
     one_Ebox( transfer, Eout_count, Ein_param );
   }
 }
-// ----------- energy_function::one_Ebox --------------
+// ----------- Efunc::energy_function::one_Ebox --------------
 // Does the integration for one E-E' box
-void energy_function::one_Ebox( T_matrix& transfer, int Eout_count,
-   E_function_param *Ein_param )
+void Efunc::energy_function::one_Ebox( Trf::T_matrix& transfer, int Eout_count,
+   Efunc::E_function_param *Ein_param )
 {
-  static double from_quad_tol = Global.Value( "abs_quad_tol" )/100;
-  static double from_abs_tol = 1000*Global.Value( "abs_tol" );
-  double skip_tol = ( from_quad_tol > from_abs_tol ) ? from_quad_tol : from_abs_tol;
+  static double skip_tol = Global.Value( "tight_tol" );
   // the E' energy range
   Ein_param->Eout_min = transfer.out_groups[ Eout_count ];
   Ein_param->Eout_max = transfer.out_groups[ Eout_count + 1 ];
 
   // integrate depending on how the line Eout = Ein - U meets the box
-  U_Ein_hit_list::iterator high_hit_ptr = Ein_param->upper_hits.begin( );
-  U_Ein_hit_list::iterator next_high_ptr = high_hit_ptr;
+  Efunc::U_Ein_hit_list::iterator high_hit_ptr = Ein_param->upper_hits.begin( );
+  Efunc::U_Ein_hit_list::iterator next_high_ptr = high_hit_ptr;
   ++next_high_ptr;
   for( ; next_high_ptr != Ein_param->upper_hits.end( );
          high_hit_ptr = next_high_ptr, ++next_high_ptr )
@@ -212,13 +219,13 @@ void energy_function::one_Ebox( T_matrix& transfer, int Eout_count,
     // always integrate from Eout_min
     Ein_param->use_Eout_min = true;
     // where is the line Eout = Ein - U?
-    if( high_hit_ptr->hit_edge == BELOW )
+    if( high_hit_ptr->hit_edge == Box::BELOW )
     {
       // do nothing---we are below the E-E' box
       continue;
     }
-    else if( ( high_hit_ptr->hit_edge == BOTTOM_IN ) ||
-             ( high_hit_ptr->hit_edge == INSIDE ) )
+    else if( ( high_hit_ptr->hit_edge == Box::BOTTOM_IN ) ||
+             ( high_hit_ptr->hit_edge == Box::INSIDE ) )
     {
       // the line Eout = Ein - U is inside the E-E' box
       Ein_param->use_Eout_max = false;
@@ -233,30 +240,25 @@ void energy_function::one_Ebox( T_matrix& transfer, int Eout_count,
     Ein_param->Ein_1 = next_high_ptr->E_in;
     if( Ein_param->Ein_1 - Ein_param->Ein_0 <= Ein_param->Ein_1 * skip_tol )
     {
-      Warning( "energy_function::one_Ebox", "skipping a very short interval");
+      Msg::Warning( "Efunc::energy_function::one_Ebox",
+		    "skipping a very short interval");
       continue;  // skip this interval
     }
-    if( transfer.interpolate_Eout_integrals )
-    {
-      interp_update_T( transfer, Eout_count, Ein_param );
-    }
-    else
-    {
-      update_T( transfer, Eout_count, Ein_param );
-    }
+
+    update_T( transfer, Eout_count, Ein_param );
   }
 }
-// ----------- energy_function::update_T --------------
+// ----------- Efunc::energy_function::update_T --------------
 // Adds to an element of transfer the integral between over the E-E' box
-void energy_function::update_T( T_matrix &transfer, int Eout_count,
-   E_function_param *Ein_param )
+void Efunc::energy_function::update_T( Trf::T_matrix &transfer, int Eout_count,
+   Efunc::E_function_param *Ein_param )
 {
   // a vector to store the integrals
-  coef_vector value( transfer.order, transfer.conserve );
+  Coef::coef_vector value( transfer.order, transfer.conserve );
   value.set_zero( );
 
   // parameters for the integration
-  QuadParamBase *params = static_cast< QuadParamBase* >( Ein_param );
+  Qparam::QuadParamBase *params = static_cast< Qparam::QuadParamBase* >( Ein_param );
 
   // loop over the cross section data
   Ein_param->this_sigma = Ein_param->first_ladder_sigma;
@@ -279,13 +281,14 @@ void energy_function::update_T( T_matrix &transfer, int Eout_count,
       Ein_param->next_sigma->x;
     double tol = Ein_param->set_tol( left_E, right_E );
 
-    quad_F::integrate( Energy_function_F::Ein_F, transfer.Ein_quad_method, left_E,
+    quad_F::integrate( Energy_function_F::Ein_F, transfer.Ein_quad_rule, left_E,
 		       right_E, params, tol, &value );
 
     if( value.weight_1[ 0 ] < 0.0 )
     {
-      Warning( "energy_function::update_T", pastenum( "negative integral ", left_E ) +
-	       pastenum(" ", right_E ) );
+      Msg::Warning( "Efunc::energy_function::update_T",
+		    Msg::pastenum( "negative integral ", left_E ) +
+	       Msg::pastenum(" ", right_E ) );
       value.set_zero( );  // throw out these values
     }
 
@@ -296,117 +299,27 @@ void energy_function::update_T( T_matrix &transfer, int Eout_count,
     ++Ein_param->quad_count;
   }
 }
-// ----------- energy_function::interp_update_T --------------
-// Adds to an element of transfer the interpolated integral over the E-E' box
-void energy_function::interp_update_T( T_matrix &transfer, int Eout_count,
-  E_function_param *Ein_param )
-{
-  static double etol = Global.Value( "E_tol" );
-  // A list of integrals over E_out for interpolation over one energy bin
-  Eout_integrals Eout_ints;
-  Eout_ints.Eout_int_params = Ein_param;
-
-  // initial integration over E_out
-  Eout_ints.setup_Eout_ints( transfer.order, transfer.conserve,
-    Ein_param->Ein_0, Ein_param->Ein_1 );
-  Ein_param->this_Eout_int = Eout_ints.begin( );
-  Ein_param->next_Eout_int = Ein_param->this_Eout_int;
-  ++Ein_param->next_Eout_int;
-  Ein_param->Eout_int_end = Eout_ints.end( );
-
-  // a vector to store the integrals
-  coef_vector value( transfer.order, transfer.conserve );
-
-  // parameters for the integration
-  QuadParamBase *params = static_cast< QuadParamBase* >( Ein_param );
-
-  // loop over the cross section data
-  Ein_param->this_sigma = Ein_param->first_ladder_sigma;
-  Ein_param->next_sigma = Ein_param->this_sigma;
-  ++Ein_param->next_sigma;
-  // Ein_param->Ein_0 may be past Ein_param->next_sigma
-  while( ( Ein_param->this_sigma != Ein_param->last_ladder_sigma ) &&
-         ( Ein_param->next_sigma->x < Ein_param->Ein_0 ) )
-  {
-    Ein_param->this_sigma = Ein_param->next_sigma;
-    ++Ein_param->next_sigma;
-  }
-  for( ; ( Ein_param->this_sigma != Ein_param->last_ladder_sigma ) &&
-         ( Ein_param->this_sigma->x < Ein_param->Ein_1 ); )
-  {
-    double left_E = ( Ein_param->this_sigma->x < Ein_param->Ein_0 ) ?
-      Ein_param->Ein_0 : Ein_param->this_sigma->x;
-    double right_E = ( Ein_param->next_sigma->x > Ein_param->Ein_1 ) ?
-      Ein_param->Ein_1 : Ein_param->next_sigma->x;
-    if( left_E < Ein_param->this_Eout_int->E_in )
-    {
-      left_E = Ein_param->this_Eout_int->E_in;
-    }
-    if( right_E > Ein_param->next_Eout_int->E_in )
-    {
-      right_E = Ein_param->next_Eout_int->E_in;
-    }
-    // evaluate the integral exactly by 4th-order Gaussian quadrature
-    double tol = 0.0;  // not used here
-    quad_F::integrate( Energy_function_F::interp_Ein_F, GAUSS4, left_E,
-		       right_E, params, tol, &value );
-
-    // add this integral
-    transfer( Ein_param->Ein_count, Eout_count ) += value;
-    // increment the function counts
-    Ein_param->Ein_F_count += Ein_param->func_count;
-    ++Ein_param->quad_count;
-
-    // the next subinterval
-    double E_tol = right_E * etol;
-    if( right_E > Ein_param->next_Eout_int->E_in - E_tol )
-    {
-      Ein_param->this_Eout_int = Ein_param->next_Eout_int;
-      ++Ein_param->next_Eout_int;
-      if( Ein_param->next_Eout_int == Ein_param->Eout_int_end )
-      {
-	break;
-      }
-    }
-    if( right_E > Ein_param->next_sigma->x - E_tol )
-    {
-      Ein_param->this_sigma = Ein_param->next_sigma;
-      ++Ein_param->next_sigma;
-    }
-  }
-}
 
 // ************** Probability density model ******************************
 // ----------- Energy_function_F::Ein_F --------------
 //! Integral function for the model
-void Energy_function_F::Ein_F( double E_in, QuadParamBase *Ein_param,
-   coef_vector *value )
+bool Energy_function_F::Ein_F( double E_in, Qparam::QuadParamBase *Ein_param,
+   Coef::coef_vector *value )
 {
-  // the parameters are really E_function_param *
-  E_function_param *e_params = static_cast<E_function_param *>( Ein_param );
+  // the parameters are really Efunc::E_function_param *
+  Efunc::E_function_param *e_params = static_cast<Efunc::E_function_param *>( Ein_param );
   e_params->func_count += 1;
-  e_params->set_Ein( E_in );  // interpolate the data
+  bool Ein_OK = e_params->set_Ein( E_in );  // interpolate the data
 
-  e_params->get_integrals( e_params->Eout_min, e_params->E_1, *value );
+  bool integral_OK = e_params->get_integrals( e_params->Eout_min, e_params->E_1, *value );
 
+  if( !Ein_OK || !integral_OK )
+  {
+    return false;
+  }
   // weight it by flux * cross section * multiplicity * model_weight
   e_params->set_weight( E_in );
   *value *= e_params->current_weight;
-}
 
-// ----------- Energy_function_F::interp_Ein_F --------------
-//! Interpolated integral function for the model
-void Energy_function_F::interp_Ein_F( double E_in, QuadParamBase *Ein_param,
-  coef_vector *value )
-{
-  // the parameters are really E_function_param *
-  E_function_param *e_params = static_cast<E_function_param *>( Ein_param );
-  e_params->func_count += 1;
-  e_params->set_Ein( E_in );  // interpolate the data
-  e_params->this_Eout_int->Interpolate( E_in,
-    *(e_params->next_Eout_int), value );
-
-  // weight it by flux * cross section * multiplicity * model_weight
-  e_params->set_weight( E_in );
-  *value *= e_params->current_weight;
+  return true;
 }

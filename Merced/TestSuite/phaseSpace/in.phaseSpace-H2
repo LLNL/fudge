@@ -2,7 +2,6 @@ xndfgenTransferMatrix: version 1.0
 Process: phase space spectrum
 Comment: H2(n,2n)H1; data for outgoing n
 outputLegendreOrder: 3
-Quadrature method: adaptive
 Conserve: both
 Projectile Frame: lab
 

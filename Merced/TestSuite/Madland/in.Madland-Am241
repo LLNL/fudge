@@ -3,7 +3,6 @@ Process: Madland-Nix spectrum
 Comment: Am241(n,fission)?; data for outgoing n_1
 outputLegendreOrder: 0
 Conserve: number
-Quadrature method: adaptive
 Projectile Frame: lab
 
 # All energies in this file are given in MeV.

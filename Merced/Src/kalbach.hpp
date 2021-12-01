@@ -18,17 +18,19 @@
 #include "Ecm_Elab_geom.hpp"
 #include "transfer.hpp"
 
-class kalbach_Ein_param;  // forward declaration
+namespace Kbach
+{
+  class kalbach_Ein_param;  // forward declaration
 
 //! Class for parameters for the 2-d quadrature over cm cosine and Eout_cm
 // ---------------- class kalbach_Ecm_param ------------------
-class kalbach_Ecm_param : public Ecm_Elab_Ecm_param
+class kalbach_Ecm_param : public Egeom::Ecm_Elab_Ecm_param
 {
 public:
   // the data entries for this incident energy
-  kalbach_data Ein_data;  // the current Kalbach data
-  Kalbach_a *kalbach_a;
-  Quadrature_Method mu_quad_method;  // quadrature method for outgoing cosine
+  Kdata::kalbach_data Ein_data;  // the current Kalbach data
+  Kdata::Kalbach_a *kalbach_a;
+  Qmeth::Quadrature_Rule mu_quad_rule;  // quadrature rule for outgoing cosine
   long int mu_F_count;  // number of calls to Kalbach_F::mu_F
 
   inline kalbach_Ecm_param( ): mu_F_count ( 0 ) {}
@@ -41,15 +43,15 @@ public:
   //! \param Eoutmin minimum outgoing energy in the lab frame
   //! \param Eoutmax maximum outgoing energy in the lab frame
   //! \param kalbach_A data for the Kalbach a parameter
-  void setup( double E_in, const kalbach_data &Ein0_data,
-              const kalbach_data &Ein1_data,
-              double Eoutmin, double Eoutmax, Kalbach_a *kalbach_A );
+  void setup( double E_in, const Kdata::kalbach_data &Ein0_data,
+              const Kdata::kalbach_data &Ein1_data,
+              double Eoutmin, double Eoutmax, Kdata::Kalbach_a *kalbach_A );
 
 };
 
 //! Class for parameters for the 1-d quadrature over cm cosine
 // ---------------- class kalbach_mu_param ------------------
-class kalbach_mu_param : public Ecm_Elab_mu_param
+class kalbach_mu_param : public Egeom::Ecm_Elab_mu_param
 {
 public:
   double r;
@@ -64,20 +66,20 @@ public:
   //! \param E_in energy of the incident particle
   //! \param Eoutcm center-of-mass energy of the outgoing particle
   //! \param Ecm_param the computed paramters for quadrature over outgoing energy
-  void setup( double Ein, double Eoutcm, const kalbach_Ecm_param& Ecm_param );
+  void setup( double Ein, double Eoutcm, const Kbach::kalbach_Ecm_param& Ecm_param );
 };
 
 //! class for Kalbach data at one incident energy
 // ---------------- class Kalbach_one_Ein ------------------
-class Kalbach_one_Ein : public dd_vector
+class Kalbach_one_Ein : public Ddvec::dd_vector
 {
 private:
 
 public:
   //! the values of (E_out, r)
-  dd_vector Eout_r;
+  Ddvec::dd_vector Eout_r;
 
-  unit_base_map unit_base;  // unit_base for this incident energy
+  Ddvec::unit_base_map unit_base;  // unit_base for this incident energy
 
   Kalbach_one_Ein( ) {}
   ~Kalbach_one_Ein( ){}
@@ -85,12 +87,12 @@ public:
   //! Reads the Kalbach energy probability density for one incident energy
   //! \param infile input file
   //! \param num_Eout number of outgoing energies for this data
-  void read_probability( data_parser &input_file, int num_Eout );
+  void read_probability( Dpar::data_parser &input_file, int num_Eout );
 
   //! Reads the Kalbach r parameters for one incident energy
   //! \param infile input file
   //! \param num_Eout number of outgoing energies for this data
-  void read_r( data_parser &input_file, int num_Eout );
+  void read_r( Dpar::data_parser &input_file, int num_Eout );
 
    // Truncates histogram data at the maximum energy
   //! \param EMax the maximum incident energy for the transfer matrix
@@ -99,10 +101,10 @@ public:
 
 //! class for Kalbach data
 // ---------------- class Kalbach ------------------
-class Kalbach : public list< Kalbach_one_Ein >
+class Kalbach : public std::list< Kbach::Kalbach_one_Ein >
 {
 private:
-  map_cm_lab map;
+  Maps::map_cm_lab map;
 
   //! The smallest incident energy for cross section, multiplicity,
   //! model weight, flux weight, and energy groups
@@ -121,19 +123,22 @@ private:
   //! \param weight- the weighting to apply to the transfer matrix entries
   //! \param e_flux_ the initial approximation to apply to the particle flux
   //! \param Ein_groups the boundaries of the incident energy groups
-  bool get_Ein_range( const dd_vector& sigma_, const dd_vector& mult_,
-		      const dd_vector& weight_,
-		      const Flux_List& e_flux_, const Energy_groups& Ein_groups );
+  bool get_Ein_range( const Ddvec::dd_vector& sigma_, const Ddvec::dd_vector& mult_,
+		      const Ddvec::dd_vector& weight_,
+		      const Lgdata::Flux_List& e_flux_,
+		      const Egp::Energy_groups& Ein_groups );
 
   //! Adds to the transfer matrix for a pair of incident energies.
   //! \param transfer the entries in the transfer matrix get updated
   //! \param Ein_param the quadrature parameters
-  void cm_Eout_ladder( T_matrix& transfer, kalbach_Ein_param *Ein_param );
+  void cm_Eout_ladder( Trf::T_matrix& transfer
+		       , Kbach::kalbach_Ein_param *Ein_param );
 
   //! Loops over the E_out bins for a given cm_Eout bin
   //! \param transfer: the entries in the transfer matrix get updated
   //! \param Ein_param the quadrature parameters
-  void lab_Eout_ladder( T_matrix& transfer, kalbach_Ein_param &Ein_param );
+  void lab_Eout_ladder( Trf::T_matrix& transfer,
+			Kbach::kalbach_Ein_param &Ein_param );
 
   //! Initializes the quadrature parameters
   //! \param sigma the cross section data
@@ -141,45 +146,47 @@ private:
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param e_flux the initial approximation to apply to the particle flux
   //! \param Ein_groups the boundaries of the incident energy groups
-  void setup_param( const dd_vector& sigma, const dd_vector& mult,
-    const dd_vector& weight, const Flux_List& e_flux,
-    const Energy_groups& Ein_groups );
+  void setup_param( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& mult,
+    const Ddvec::dd_vector& weight, const Lgdata::Flux_List& e_flux,
+    const Egp::Energy_groups& Ein_groups );
 
   //! Initializes the quadrature parameters
   //! \param Ein_param the quadrature parameters
-  void setup_data( kalbach_Ein_param *Ein_param );
+  void setup_data( Kbach::kalbach_Ein_param *Ein_param );
 
   //! Sets the range of incident energies for this intergration
   //! \param Ein_bin the incident energy bin
   //! \param Ein_param the quadrature parameters
-  void set_Ein_range( int Ein_bin, kalbach_Ein_param &Ein_param );
+  void set_Ein_range( int Ein_bin, Kbach::kalbach_Ein_param &Ein_param );
 
   //! Does the integration for one E-E' box between 2 eta = const hyperbolas
   //! \param transfer: the entries in the transfer matrix get updated
   //! \param Eout_count identifies the matrix entry to update
   //! \param Ein_param the quadrature parameters
-  void one_Ebox( T_matrix& transfer, int Eout_count, kalbach_Ein_param &Ein_param );
+  void one_Ebox( Trf::T_matrix& transfer, int Eout_count,
+		 Kbach::kalbach_Ein_param &Ein_param );
 
   //! Go to the next pair of incident energies.  Returns "true" when finished.
   //! \param  E_in the next incident energy
   //! \param Ein_param the quadrature parameters
-  bool next_ladder( double E_in, kalbach_Ein_param *Ein_param );
+  bool next_ladder( double E_in, Kbach::kalbach_Ein_param *Ein_param );
 
   //! Adds to an element of transfer the integral between the intersections of 2 Eout_cm = const arcs with the Eout_lab box
   //! \param transfer: the entries in the transfer matrix get updated
   //! \param Eout_count identifies the matrix entry to update
   //! \param Ein_param the quadrature parameters
-  void update_T( T_matrix &transfer, int Eout_count, kalbach_Ein_param &Ein_param );
+  void update_T( Trf::T_matrix &transfer, int Eout_count,
+		 Kbach::kalbach_Ein_param &Ein_param );
 
   //! Starts one staircase of the Eout_cm histogram
   void start_Eout_cm( );
 
 public:
-  Kalbach_a kalbach_a;
-  two_d_interp Ein_interp;
-  Interp_Type Eout_interp;
-  two_d_interp Ein_r_interp;
-  Interp_Type r_interp;
+  Kdata::Kalbach_a kalbach_a;
+  Terp::two_d_interp Ein_interp;
+  Terp::Interp_Type Eout_interp;
+  Terp::two_d_interp Ein_r_interp;
+  Terp::Interp_Type r_interp;
 
   Kalbach( );
   ~Kalbach( ) {}
@@ -187,30 +194,30 @@ public:
   //! Reads the Kalbach energy probability density
   //! \param infile input file
   //! \param num_Ein number of incident energies for this reaction
-  void read_probability( data_parser &input_file, int num_Ein );
+  void read_probability( Dpar::data_parser &input_file, int num_Ein );
 
   //! Reads the Kalbach r parameters
   //! \param infile input file
   //! \param num_Ein number of incident energies for this reaction
-  void read_r( data_parser &input_file, int num_Ein );
+  void read_r( Dpar::data_parser &input_file, int num_Ein );
 
   //! Calculates the transfer matrix for this particle
   //! \param sigma the cross section data
   //! \param multiple the outgoing particle multiplicity data
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param transfer the transfer matrix
-  void get_T( const dd_vector& sigma, const dd_vector& multiple, 
-	      const dd_vector& weight, T_matrix& transfer );
+  void get_T( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& multiple, 
+	      const Ddvec::dd_vector& weight, Trf::T_matrix& transfer );
 };
 
 //! Class for parameters for the 3-d quadrature over Ein, cm cosine, and Eout_cm
 // ---------------- class kalbach_Ein_param ------------------
-class kalbach_Ein_param : public Ecm_Elab_Ein_param
+class kalbach_Ein_param : public Egeom::Ecm_Elab_Ein_param
 {
 private:
   //! Extrapolated data used with linlin interpolation of incident energy
-  Kalbach_one_Ein low_linlin;  // (Eout, probability) at lower incident energy
-  Kalbach_one_Ein high_linlin;  // (Eout, probability) at higher incident energy
+  Kbach::Kalbach_one_Ein low_linlin;  // (Eout, probability) at lower incident energy
+  Kbach::Kalbach_one_Ein high_linlin;  // (Eout, probability) at higher incident energy
 
   //! Interpolates (Eout_cm, probability) data to the lower common Eout_cm value
   //! \param lower_Eout the lower end of the Eout_cm range
@@ -228,36 +235,36 @@ private:
 
 public:
   // parameters for integration over center-of-mass energy
-  kalbach_Ecm_param Ecm_params;
+  Kbach::kalbach_Ecm_param Ecm_params;
 
   // (Eout_cm, probability) data interpolated to common Eout_cm values
-  kalbach_data Ein0_data;  // Kalbach data for lower incident energy
-  kalbach_data Ein1_data;  // Kalbach data for higher incident energy
+  Kdata::kalbach_data Ein0_data;  // Kalbach data for lower incident energy
+  Kdata::kalbach_data Ein1_data;  // Kalbach data for higher incident energy
 
-  Kalbach_a *kalbach_a;
-  Quadrature_Method Eout_quad_method;  // quadrature method for outgoing energy
-  Quadrature_Method mu_quad_method;  // quadrature method for outgoing cosine
+  Kdata::Kalbach_a *kalbach_a;
+  Qmeth::Quadrature_Rule Eout_quad_rule;  // quadrature rule for outgoing energy
+  Qmeth::Quadrature_Rule mu_quad_rule;  // quadrature rule for outgoing cosine
 
   // where we are in the list
-  Kalbach::iterator this_Ein;
-  Kalbach::iterator next_Ein;
+  Kbach::Kalbach::iterator this_Ein;
+  Kbach::Kalbach::iterator next_Ein;
 
   // pointers to the data entries
-  Kalbach_one_Ein::const_iterator left_ptr;  //(lower Eoutcm, probability), low Ein
-  Kalbach_one_Ein::const_iterator next_left_ptr; //(higher Eoutcm, probability), low Ein
-  Kalbach_one_Ein::const_iterator last_left_ptr; // end of (Eoutcm, probability),low Ein
-  dd_vector::const_iterator left_r_ptr; //(lower Eoutcm, r), low Ein
-  dd_vector::const_iterator next_left_r_ptr; //(higher Eoutcm, r), low Ein
-  dd_vector::const_iterator last_left_r_ptr; //end of (Eoutcm, r), low Ein
-  Kalbach_one_Ein::const_iterator right_ptr;  //(lower Eoutcm, probability), high Ein
-  Kalbach_one_Ein::const_iterator next_right_ptr; //(higher Eoutcm, probability), high Ein
-  Kalbach_one_Ein::const_iterator last_right_ptr; //end of (Eoutcm, probability), high Ein
-  dd_vector::const_iterator right_r_ptr; //(lower Eoutcm, r), high Ein
-  dd_vector::const_iterator next_right_r_ptr; //(higher Eoutcm, r), high Ein
-  dd_vector::const_iterator last_right_r_ptr; //end of (Eoutcm, r), high Ein
+  Kbach::Kalbach_one_Ein::const_iterator left_ptr;  //(lower Eoutcm, probability), low Ein
+  Kbach::Kalbach_one_Ein::const_iterator next_left_ptr; //(higher Eoutcm, probability), low Ein
+  Kbach::Kalbach_one_Ein::const_iterator last_left_ptr; // end of (Eoutcm, probability),low Ein
+  Ddvec::dd_vector::const_iterator left_r_ptr; //(lower Eoutcm, r), low Ein
+  Ddvec::dd_vector::const_iterator next_left_r_ptr; //(higher Eoutcm, r), low Ein
+  Ddvec::dd_vector::const_iterator last_left_r_ptr; //end of (Eoutcm, r), low Ein
+  Kbach::Kalbach_one_Ein::const_iterator right_ptr;  //(lower Eoutcm, probability), high Ein
+  Kbach::Kalbach_one_Ein::const_iterator next_right_ptr; //(higher Eoutcm, probability), high Ein
+  Kbach::Kalbach_one_Ein::const_iterator last_right_ptr; //end of (Eoutcm, probability), high Ein
+  Ddvec::dd_vector::const_iterator right_r_ptr; //(lower Eoutcm, r), high Ein
+  Ddvec::dd_vector::const_iterator next_right_r_ptr; //(higher Eoutcm, r), high Ein
+  Ddvec::dd_vector::const_iterator last_right_r_ptr; //end of (Eoutcm, r), high Ein
 
-  Vcm_Vlab_hit_list upper_hits;
-  Vcm_Vlab_hit_list lower_hits;
+  Vhit::Vcm_Vlab_hit_list upper_hits;
+  Vhit::Vcm_Vlab_hit_list lower_hits;
 
   long int quad_count;  // number of 3-d quadratures
   long int Ein_F_count;  // number of calls to Kalbach_F::Ein_F
@@ -280,30 +287,37 @@ public:
   //! Returns true when finished
   bool next_Eoutcm( );
 };
+} // end of namespace Kbach
 
 // ************* functions to integrate ******************
 namespace Kalbach_F
 {
   // ---------------- Kalbach_F::mu_F ------------------
   //! Function for the 1-d quadrature over cm cosine
+  //! Returns true if the interpolation is OK.
   //! \param mu the center-of-mass direction cosine of the outgoing particle
   //! \param mu_quad_param the function parameters
   //! \param value the value of the integrand, a set of Legendre coefficients
-  void mu_F( double mu, QuadParamBase *mu_quad_param, coef_vector *value );
+  bool mu_F( double mu, Qparam::QuadParamBase *mu_quad_param,
+	     Coef::coef_vector *value );
 
   // ---------------- Kalbach_F::Ecm_F ------------------
   //! Function for the 2-d quadrature over cm cosine and outgoing energy
+  //! Function for the 1-d quadrature over cm cosine
   //! \param Eout_cm the center-of-mass energy of the outgoing particle
   //! \param Ecm_quad_param the function parameters
   //! \param value the value of the integrand, a set of Legendre coefficients
-  void Ecm_F( double Eout_cm, QuadParamBase *Ecm_quad_param, coef_vector *value );
+  bool Ecm_F( double Eout_cm, Qparam::QuadParamBase *Ecm_quad_param,
+	      Coef::coef_vector *value );
 
   // ---------------- Kalbach_F::Ein_F ------------------
   //! Function for the 3-d quadrature over incident energy, cm cosine, and outgoing energy
+  //! Function for the 1-d quadrature over cm cosine
   //! \param E_in the energy of the incident particle
   //! \param quad_param the function parameters
   //! \param value the value of the integrand, a set of Legendre coefficients
-  void Ein_F( double E_in, QuadParamBase *quad_param, coef_vector *value );
+  bool Ein_F( double E_in, Qparam::QuadParamBase *quad_param,
+	      Coef::coef_vector *value );
 }
 
 #endif

@@ -3,6 +3,8 @@ Process: phase space spectrum
 Comment: H2(n,2n)H1; data for outgoing n
 outputLegendreOrder: 3
 Conserve: both
+do adaptive quadrature: false
+sqrt_wt_cutoff: 0.0  #  disables the weighted Gaussian quadrature
 Quadrature method: Gauss6
 Projectile Frame: lab
 

@@ -1,0 +1,1630 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.covariances package &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fudge.processing package" href="fudge.processing.html" />
+    <link rel="prev" title="fudge.channelData package" href="fudge.channelData.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.processing.html" title="fudge.processing package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudge.channelData.html" title="fudge.channelData package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.html" accesskey="U">fudge package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.covariances package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fudge-covariances-package">
+<h1>fudge.covariances package<a class="headerlink" href="#fudge-covariances-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-fudge.covariances.base">
+<span id="fudge-covariances-base-module"></span><h2>fudge.covariances.base module<a class="headerlink" href="#module-fudge.covariances.base" title="Permalink to this headline">¶</a></h2>
+<p>Abstract base class for ‘standard’ covariance matrices (not including parameter covariances).
+All covariance classes need a label, ability to get row/column bounds, ability to convert to simple
+numeric matrix, etc.</p>
+<dl class="py class">
+<dt id="fudge.covariances.base.covariance">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.base.</code><code class="sig-name descname">covariance</code><a class="reference internal" href="../_modules/fudge/covariances/base.html#covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.base.covariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="fudge.covariances.base.covariance.columnBounds">
+<em class="property">abstract </em><code class="sig-name descname">columnBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/base.html#covariance.columnBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.base.covariance.columnBounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.base.covariance.domainUnit">
+<em class="property">abstract property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.covariances.base.covariance.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.base.covariance.getUncertaintyVector">
+<em class="property">abstract </em><code class="sig-name descname">getUncertaintyVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/base.html#covariance.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.base.covariance.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.base.covariance.isSymmetric">
+<em class="property">abstract property </em><code class="sig-name descname">isSymmetric</code><a class="headerlink" href="#fudge.covariances.base.covariance.isSymmetric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.base.covariance.label">
+<em class="property">abstract property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.covariances.base.covariance.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.base.covariance.rowBounds">
+<em class="property">abstract </em><code class="sig-name descname">rowBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/base.html#covariance.rowBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.base.covariance.rowBounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.base.covariance.toCovarianceMatrix">
+<em class="property">abstract </em><code class="sig-name descname">toCovarianceMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">domain</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/base.html#covariance.toCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.base.covariance.toCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances.covarianceSuite">
+<span id="fudge-covariances-covariancesuite-module"></span><h2>fudge.covariances.covarianceSuite module<a class="headerlink" href="#module-fudge.covariances.covarianceSuite" title="Permalink to this headline">¶</a></h2>
+<p>Module with containers for covariances in several different forms</p>
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSuite.covarianceSections">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSuite.</code><code class="sig-name descname">covarianceSections</code><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.suites.suite" title="fudge.suites.suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.suites.suite</span></code></a></p>
+<p>Most covariances are stored in ‘sections’, each representing either the internal covariance
+for a single quantity (i.e. cross section) or the cross-term between two quantities</p>
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSuite.covarianceSections.legacyMemberNameMapping">
+<code class="sig-name descname">legacyMemberNameMapping</code><em class="property"> = {'section': 'covarianceSection'}</em><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSections.legacyMemberNameMapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSuite.covarianceSections.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'covarianceSections'</em><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSections.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSuite.</code><code class="sig-name descname">covarianceSuite</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">projectile</span></em>, <em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">evaluation</span></em>, <em class="sig-param"><span class="n">formatVersion</span><span class="o">=</span><span class="default_value">'1.10'</span></em>, <em class="sig-param"><span class="n">sourcePath</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>All covariances for a target/projectile combination are stored in a <a class="reference internal" href="#fudge.covariances.covarianceSuite.covarianceSuite" title="fudge.covariances.covarianceSuite.covarianceSuite"><code class="xref py py-class docutils literal notranslate"><span class="pre">covarianceSuite</span></code></a> in gnds.
+The <a class="reference internal" href="#fudge.covariances.covarianceSuite.covarianceSuite" title="fudge.covariances.covarianceSuite.covarianceSuite"><code class="xref py py-class docutils literal notranslate"><span class="pre">covarianceSuite</span></code></a> is stored in a separate file from the reactionSuite.</p>
+<p>Within the <a class="reference internal" href="#fudge.covariances.covarianceSuite.covarianceSuite" title="fudge.covariances.covarianceSuite.covarianceSuite"><code class="xref py py-class docutils literal notranslate"><span class="pre">covarianceSuite</span></code></a>, data is sorted into <code class="xref py py-class docutils literal notranslate"><span class="pre">sections</span></code> (see the section module), each
+of which contains one section of the full covariance matrix.</p>
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check all covariance sections, returning a list of warnings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>checkUncLimits</strong> (<em>bool</em>) – Should we check the uncertainty limits? (default: True)</p></li>
+<li><p><strong>minRelUnc</strong> (<em>float</em>) – Minimum allowable relative uncertainty (default: 0.0)</p></li>
+<li><p><strong>maxRelUnc</strong> (<em>float</em>) – Maximum allowable relative uncertainty (default: 10.0)</p></li>
+<li><p><strong>theData</strong> – A reference to the data for this covariance.  This is useful for converting between relative and absolute covariance (default: None)</p></li>
+<li><p><strong>negativeEigenTolerance</strong> (<em>float</em>) – Ignore negative eigenvalues smaller than this (default: -1e-6)</p></li>
+<li><p><strong>eigenvalueRatioTolerance</strong> (<em>float</em>) – Warn if smallest eigenvalue &lt; this value * biggest (default: 1e-8)</p></li>
+<li><p><strong>eigenvalueAbsoluteTolerance</strong> (<em>float</em>) – Warn if smallest eigenvalue &lt; this value (default: 1e-14)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="fudge.html#fudge.warning.context" title="fudge.warning.context">warning.context</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.childNodeOrder">
+<code class="sig-name descname">childNodeOrder</code><em class="property"> = {'1.10': ('externalFiles', 'styles', 'covarianceSections', 'parameterCovariances'), '2.0.LLNL_4': ('externalFiles', 'styles', 'covarianceSections', 'parameterCovariances')}</em><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.childNodeOrder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { ‘eV’ : ‘MeV’, ‘b’ : ‘mb’ }).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.covarianceSections">
+<em class="property">property </em><code class="sig-name descname">covarianceSections</code><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.covarianceSections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.externalFiles">
+<em class="property">property </em><code class="sig-name descname">externalFiles</code><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.externalFiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.fix">
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply basic fixes to a covariance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>removeNegativeEVs</strong> (<em>bool</em>) – Should we remove eigenspaces corresponding to negative eigenvalues? (Default: True)</p></li>
+<li><p><strong>removeSmallEVs</strong> (<em>bool</em>) – Should we remove eigenspaces corresponding to small eigenvalues? (Default: False)</p></li>
+<li><p><strong>fixUncLimits</strong> (<em>bool</em>) – Should we fix the uncertainties to lie within bounds imposed by minRelUnc and maxRelUnc? (Default: False)</p></li>
+<li><p><strong>minRelUnc</strong> (<em>float</em><em> or </em><em>None</em>) – Minimum allowable uncertainty for this covariance</p></li>
+<li><p><strong>maxRelUnc</strong> (<em>float</em><em> or </em><em>None</em>) – Maximum allowable uncertainty for this covariance</p></li>
+<li><p><strong>theData</strong> (<em>instance</em><em> or </em><em>None</em>) – Reference to the data that accompanies this covariance so that we may convert between absolute and relative covariance as needed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'covarianceSuite'</em><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.parameterCovariances">
+<em class="property">property </em><code class="sig-name descname">parameterCovariances</code><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.parameterCovariances" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.parseXMLNode">
+<em class="property">static </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.projectile">
+<code class="sig-name descname">projectile</code><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.projectile" title="Permalink to this definition">¶</a></dt>
+<dd><p>The projectile</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.removeExtraZeros">
+<code class="sig-name descname">removeExtraZeros</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.removeExtraZeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.removeExtraZeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks all covariance matrices for rows/columns of all zero, removes them if found.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.saveToFile">
+<code class="sig-name descname">saveToFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fileName</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.saveToFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.saveToFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.saveToOpenedFile">
+<code class="sig-name descname">saveToOpenedFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fOut</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.saveToOpenedFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.saveToOpenedFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.sourcePath">
+<em class="property">property </em><code class="sig-name descname">sourcePath</code><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.sourcePath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sourcePath member which is the path to the covarianceSuite file for self if self is from a file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.styles">
+<em class="property">property </em><code class="sig-name descname">styles</code><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.styles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.target">
+<code class="sig-name descname">target</code><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.target" title="Permalink to this definition">¶</a></dt>
+<dd><p>The target</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.toXML">
+<code class="sig-name descname">toXML</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an GNDS/XML string representation of self.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSuite.covarianceSuite.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#covarianceSuite.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.covarianceSuite.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of GNDS/XML strings representing self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSuite.parameterCovariances">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSuite.</code><code class="sig-name descname">parameterCovariances</code><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#parameterCovariances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.parameterCovariances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.suites.suite" title="fudge.suites.suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.suites.suite</span></code></a></p>
+<p>Resolved and unresolved resonance parameters are stored inside the parameterCovariances</p>
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSuite.parameterCovariances.legacyMemberNameMapping">
+<code class="sig-name descname">legacyMemberNameMapping</code><em class="property"> = {'section': 'averageParameterCovariance'}</em><a class="headerlink" href="#fudge.covariances.covarianceSuite.parameterCovariances.legacyMemberNameMapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSuite.parameterCovariances.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'parameterCovariances'</em><a class="headerlink" href="#fudge.covariances.covarianceSuite.parameterCovariances.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="fudge.covariances.covarianceSuite.readXML">
+<code class="sig-prename descclassname">fudge.covariances.covarianceSuite.</code><code class="sig-name descname">readXML</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gndsCovariancesFile</span></em>, <em class="sig-param"><span class="n">reactionSuite</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">warningNoReactionSuite</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#readXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.readXML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances.distributions">
+<span id="fudge-covariances-distributions-module"></span><h2>fudge.covariances.distributions module<a class="headerlink" href="#module-fudge.covariances.distributions" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="fudge.covariances.distributions.LegendreLValue">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.distributions.</code><code class="sig-name descname">LegendreLValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L1</span></em>, <em class="sig-param"><span class="n">L2</span></em>, <em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreLValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.suites.suite" title="fudge.suites.suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.suites.suite</span></code></a></p>
+<p>Represents one subsection of the Legendre coefficient covariance matrix:
+covariance between coefficients for two Legendre orders at various energies</p>
+<dl class="py attribute">
+<dt id="fudge.covariances.distributions.LegendreLValue.L1">
+<code class="sig-name descname">L1</code><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.L1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.distributions.LegendreLValue.L2">
+<code class="sig-name descname">L2</code><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.L2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreLValue.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreLValue.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreLValue.fix">
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreLValue.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.distributions.LegendreLValue.frame">
+<code class="sig-name descname">frame</code><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.distributions.LegendreLValue.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'LegendreLValue'</em><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreLValue.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreLValue.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreLValue.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreLValue.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.distributions.</code><code class="sig-name descname">LegendreOrderCovarianceForm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lvalues</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>Stores covariance between energy-dependent Legendre coefficients for a reaction.
+This class contains one or more LegendreLValue sections, each section containing the matrix
+between a pair of L-values</p>
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.addLegendreOrder">
+<code class="sig-name descname">addLegendreOrder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">LValue</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm.addLegendreOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.addLegendreOrder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.fix">
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.lvalues">
+<code class="sig-name descname">lvalues</code><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.lvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>the l values of course</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'LegendreOrderCovariance'</em><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.distributions.LegendreOrderCovarianceForm.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances.mixed">
+<span id="fudge-covariances-mixed-module"></span><h2>fudge.covariances.mixed module<a class="headerlink" href="#module-fudge.covariances.mixed" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="fudge.covariances.mixed.mixedForm">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.mixed.</code><code class="sig-name descname">mixedForm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">components</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.ancestry.ancestry</span></code>, <a class="reference internal" href="#fudge.covariances.base.covariance" title="fudge.covariances.base.covariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.covariances.base.covariance</span></code></a></p>
+<p>Covariance for a single quantity, stored as several separate matrices that must be summed together.
+In general, the energy bounds for these matrices can overlap (unlike regions1d cross section data).</p>
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.addComponent">
+<code class="sig-name descname">addComponent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">covariance</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.addComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.addComponent" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>covariance</strong> – an instance of covariance (or inherited class)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.columnBounds">
+<code class="sig-name descname">columnBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.columnBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.columnBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the column.  If unit is specified, return the bounds in that unit.
+Otherwise, take unit from the first sub-matrix.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.mixed.mixedForm.components">
+<code class="sig-name descname">components</code><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.components" title="Permalink to this definition">¶</a></dt>
+<dd><p>a Python list containing instances of <code class="docutils literal notranslate"><span class="pre">mixedForm</span></code>, <code class="docutils literal notranslate"><span class="pre">summedCovariance</span></code>, and <code class="docutils literal notranslate"><span class="pre">covarianceMatrix</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.fix">
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.getCorrelationMatrix">
+<code class="sig-name descname">getCorrelationMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.getCorrelationMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.getCorrelationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.getMatchingComponent">
+<code class="sig-name descname">getMatchingComponent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowBounds</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">columnBounds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.getMatchingComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.getMatchingComponent" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowBounds</strong> – </p></li>
+<li><p><strong>columnBounds</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.getUncertaintyVector">
+<code class="sig-name descname">getUncertaintyVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines all subsections into single uncertainty vector, converting to relative if requested.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an XYs1d instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.group">
+<code class="sig-name descname">group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupBoundaries</span><span class="o">=</span><span class="default_value">None, None</span></em>, <em class="sig-param"><span class="n">groupUnit</span><span class="o">=</span><span class="default_value">None, None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.makeSafeBounds">
+<code class="sig-name descname">makeSafeBounds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.makeSafeBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.makeSafeBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go through all the components and make sure the bounds don’t overlap.  If they do, it is likely a bug.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.mixed.mixedForm.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'mixed'</em><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate &lt;mixed&gt; element from xml.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalelabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlog</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ylog</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.rowBounds">
+<code class="sig-name descname">rowBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.rowBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.rowBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the row. If unit is specified, return the bounds in that unit.
+Otherwise, take unit from first sub-matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.toAbsolute">
+<code class="sig-name descname">toAbsolute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.toAbsolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.toAbsolute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and columnData
+to convert self into an absolute covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</p></li>
+<li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “column direction”</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the column axis is set to ‘mirrorOtherAxis’, only rowData is needed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a copy of self, but rescaled and with the type set to absoluteToken</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.toCovarianceMatrix">
+<code class="sig-name descname">toCovarianceMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">'composed'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.toCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.toCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum all parts together to build a single matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.toRelative">
+<code class="sig-name descname">toRelative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.toRelative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.toRelative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and columnData
+to convert self into a relative covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</p></li>
+<li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “column direction”</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the column axis is a link to row axis, only rowData is needed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a copy of self, but rescaled and with the type set to relativeToken</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.mixed.mixedForm.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#mixedForm.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.mixedForm.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances.modelParameters">
+<span id="fudge-covariances-modelparameters-module"></span><h2>fudge.covariances.modelParameters module<a class="headerlink" href="#module-fudge.covariances.modelParameters" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="fudge.covariances.modelParameters.averageParameterCovariance">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.modelParameters.</code><code class="sig-name descname">averageParameterCovariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">columnData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#averageParameterCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.averageParameterCovariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.covariances.covarianceSection.covarianceSection" title="fudge.covariances.covarianceSection.covarianceSection"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.covariances.covarianceSection.covarianceSection</span></code></a></p>
+<p>For storing unresolved resonance parameter covariances. Very similar to covariances for cross section, nubar, etc.:
+they require an energy grid + matrix.</p>
+<p>Each average parameter (e.g. elastic width, capture width, etc.) has its own averageParameterCovariance section.</p>
+<dl class="py attribute">
+<dt id="fudge.covariances.modelParameters.averageParameterCovariance.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'averageParameterCovariance'</em><a class="headerlink" href="#fudge.covariances.modelParameters.averageParameterCovariance.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.modelParameters.parameterCovariance">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.modelParameters.</code><code class="sig-name descname">parameterCovariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">columnData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.suites.suite" title="fudge.suites.suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.suites.suite</span></code></a></p>
+<p>For storing unresolved resonance parameter covariances. Very similar to covariances for cross section, nubar, etc.:
+they require an energy grid + matrix.</p>
+<p>Each average parameter (e.g. elastic width, capture width, etc.) has its own averageParameterCovariance section.</p>
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovariance.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovariance.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovariance.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>check each section</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovariance.crossTerm">
+<em class="property">property </em><code class="sig-name descname">crossTerm</code><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovariance.crossTerm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovariance.evaluated">
+<em class="property">property </em><code class="sig-name descname">evaluated</code><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovariance.evaluated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method to grab evaluated style
+FIXME method should be inherited, but abstractClasses.component defines methods that don’t make sense for covariances</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.modelParameters.parameterCovariance.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'parameterCovariance'</em><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovariance.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovariance.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovariance.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovariance.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate &lt;section&gt; element from xml.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovariance.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovariance.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovariance.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.modelParameters.parameterCovarianceMatrix">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.modelParameters.</code><code class="sig-name descname">parameterCovarianceMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">matrix</span></em>, <em class="sig-param"><span class="n">parameters_</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">'relativeCovariance'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.form" title="fudge.abstractClasses.form"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.form</span></code></a></p>
+<p>Store covariances (or correlations, depending on ‘type’) between model parameters</p>
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovarianceMatrix.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovarianceMatrix.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovarianceMatrix.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovarianceMatrix.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovarianceMatrix.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovarianceMatrix.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovarianceMatrix.fix">
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovarianceMatrix.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovarianceMatrix.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>assemble some useful info, to be handed down to children’s fix() functions</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.modelParameters.parameterCovarianceMatrix.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'parameterCovarianceMatrix'</em><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovarianceMatrix.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovarianceMatrix.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovarianceMatrix.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovarianceMatrix.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterCovarianceMatrix.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterCovarianceMatrix.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterCovarianceMatrix.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.modelParameters.parameterLink">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.modelParameters.</code><code class="sig-name descname">parameterLink</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">link</span></em>, <em class="sig-param"><span class="n">nParameters</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">matrixStartIndex</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">parameterStartIndex</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">parameterStride</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.link.link</span></code></p>
+<p>Establishes a link between one or more rows of a parameterCovariance and corresponding parameter(s).
+Supports linking to specific parameters inside a table or list.</p>
+<p>For example, if we have a 2x4 table:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">A</span> <span class="n">B</span> <span class="n">C</span> <span class="n">D</span><span class="o">|</span>
+<span class="o">|</span><span class="n">E</span> <span class="n">F</span> <span class="n">G</span> <span class="n">H</span><span class="o">|</span>
+</pre></div>
+</div>
+<p>and wish to give a 4x4 covariance matrix for elements in the 2nd and 4th column of the table, we can create
+a parameterLink pointing to the table, with
+‘matrixStartIndex=0’,  ‘nParameters=4’,  ‘parameterStartIndex=1’,  ‘parameterStride=2’.</p>
+<p>The corresponding covariance matrix rows would then correspond to ‘B, D, F, H’.</p>
+<dl class="py attribute">
+<dt id="fudge.covariances.modelParameters.parameterLink.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'parameterLink'</em><a class="headerlink" href="#fudge.covariances.modelParameters.parameterLink.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameterLink.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameterLink.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameterLink.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.modelParameters.parameters">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.modelParameters.</code><code class="sig-name descname">parameters</code><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.suites.suite" title="fudge.suites.suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.suites.suite</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.covariances.modelParameters.parameters.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'parameters'</em><a class="headerlink" href="#fudge.covariances.modelParameters.parameters.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.modelParameters.parameters.nParameters">
+<em class="property">property </em><code class="sig-name descname">nParameters</code><a class="headerlink" href="#fudge.covariances.modelParameters.parameters.nParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances.covarianceSection">
+<span id="fudge-covariances-covariancesection-module"></span><h2>fudge.covariances.covarianceSection module<a class="headerlink" href="#module-fudge.covariances.covarianceSection" title="Permalink to this headline">¶</a></h2>
+<p>A covarianceSuite is organized into sections, where each section contains either
+- a covariance matrix for a single reaction quantity (cross section, multiplicity, etc), or
+- a covariance matrix between two different quantities (off-diagonal block)</p>
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSection.Slice">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSection.</code><code class="sig-name descname">Slice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dimension</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">domainUnit</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">domainMin</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">domainMax</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">domainValue</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#Slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>Used inside covariances for multi-dimensional functions.
+Each Slice fixes a value or range along one dimension of the multi-dimensional function.</p>
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.Slice.dimension">
+<em class="property">property </em><code class="sig-name descname">dimension</code><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.dimension" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.Slice.domainMax">
+<em class="property">property </em><code class="sig-name descname">domainMax</code><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.Slice.domainMin">
+<em class="property">property </em><code class="sig-name descname">domainMin</code><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.Slice.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.Slice.domainValue">
+<em class="property">property </em><code class="sig-name descname">domainValue</code><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.domainValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.Slice.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSection.Slice.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'slice'</em><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.Slice.parseXMLNode">
+<em class="property">static </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#Slice.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.Slice.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#Slice.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSection.columnData">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSection.</code><code class="sig-name descname">columnData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ENDF_MFMT</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dimension</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#columnData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.columnData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.covariances.covarianceSection.dataLink" title="fudge.covariances.covarianceSection.dataLink"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.covariances.covarianceSection.dataLink</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSection.columnData.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'columnData'</em><a class="headerlink" href="#fudge.covariances.covarianceSection.columnData.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSection.covarianceSection">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSection.</code><code class="sig-name descname">covarianceSection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">columnData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#covarianceSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.suites.suite" title="fudge.suites.suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.suites.suite</span></code></a></p>
+<p>A covarianceSuite contains sections, where each section represents either a self-covariance for one quantity,
+or a cross-covariance between two quantities</p>
+<p>More generally, the covarianceSuite can be thought of as a single covariance matrix with all covariance data
+for a target/projectile. It is broken into sections, where each section holds a chunk of the full matrix.</p>
+<p>Within each section, covariance data can take multiple forms: <code class="xref py py-class docutils literal notranslate"><span class="pre">covarianceMatrix</span></code> is the most common,
+but ‘summed’, ‘mixed’ are also possible.</p>
+<p>section inherits from ‘suite’, and can contain anything inheriting from the base covariance class.</p>
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.covarianceSection.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#covarianceSection.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>check each section</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.covarianceSection.crossTerm">
+<em class="property">property </em><code class="sig-name descname">crossTerm</code><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection.crossTerm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.covarianceSection.evaluated">
+<em class="property">property </em><code class="sig-name descname">evaluated</code><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection.evaluated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method to grab evaluated style
+FIXME method should be inherited, but abstractClasses.component defines methods that don’t make sense for covariances</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.covarianceSection.fix">
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#covarianceSection.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>assemble some useful info, to be handed down to children’s check() functions</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSection.covarianceSection.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'covarianceSection'</em><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSection.covarianceSection.monikerByFormat">
+<code class="sig-name descname">monikerByFormat</code><em class="property"> = {'1.10': 'section'}</em><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection.monikerByFormat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.covarianceSection.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#covarianceSection.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate &lt;section&gt; element from xml.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.covarianceSection.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#covarianceSection.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.covarianceSection.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSection.dataLink">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSection.</code><code class="sig-name descname">dataLink</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ENDF_MFMT</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dimension</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#dataLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.dataLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.link.link</span></code></p>
+<p>Base class for rowData and columnData. Both are links but with some additional attributes.</p>
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.dataLink.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">linkElement</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#dataLink.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.dataLink.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the xml-represented link back to python. The resulting link points to None,
+and must be resolved by the calling function.
+Link attributes can be converted to desired type by passing a ‘typeConversion’ dictionary in linkData</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceSection.dataLink.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#dataLink.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.dataLink.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSection.rowData">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSection.</code><code class="sig-name descname">rowData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ENDF_MFMT</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dimension</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#rowData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.rowData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.covariances.covarianceSection.dataLink" title="fudge.covariances.covarianceSection.dataLink"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.covariances.covarianceSection.dataLink</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSection.rowData.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'rowData'</em><a class="headerlink" href="#fudge.covariances.covarianceSection.rowData.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.covarianceSection.slices">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceSection.</code><code class="sig-name descname">slices</code><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#slices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.slices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.suites.suite" title="fudge.suites.suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.suites.suite</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceSection.slices.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'slices'</em><a class="headerlink" href="#fudge.covariances.covarianceSection.slices.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances.shortRangeSelfScalingVariance">
+<span id="fudge-covariances-shortrangeselfscalingvariance-module"></span><h2>fudge.covariances.shortRangeSelfScalingVariance module<a class="headerlink" href="#module-fudge.covariances.shortRangeSelfScalingVariance" title="Permalink to this headline">¶</a></h2>
+<p>Some evaluations use short-range self-scaling variance components  (ENDF LB=8 or 9)
+to represent part or all of the uncertainty.
+When processing these sections to generate a multi-group covariance library,
+the size of the variance depends either directly or inversely on the size of the processed group.
+These sections only produce a diagonal, no cross-correlations.</p>
+<dl class="py class">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.shortRangeSelfScalingVariance.</code><code class="sig-name descname">shortRangeSelfScalingVariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">'absolute'</span></em>, <em class="sig-param"><span class="n">dependenceOnProcessedGroupWidth</span><span class="o">=</span><span class="default_value">'inverse'</span></em>, <em class="sig-param"><span class="n">matrix</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.ancestry.ancestry</span></code>, <a class="reference internal" href="#fudge.covariances.base.covariance" title="fudge.covariances.base.covariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.covariances.base.covariance</span></code></a></p>
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that matrix is diagonal and all elements &gt;= 0</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.columnBounds">
+<code class="sig-name descname">columnBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.columnBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.columnBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the column.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use deepcopy, but don’t copy self.ancestor
+:return: copy of self</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.dependenceOnProcessedGroupWidth">
+<em class="property">property </em><code class="sig-name descname">dependenceOnProcessedGroupWidth</code><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.dependenceOnProcessedGroupWidth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.getUncertaintyVector">
+<code class="sig-name descname">getUncertaintyVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.gridded2d">
+<em class="property">property </em><code class="sig-name descname">gridded2d</code><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.gridded2d" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.isSymmetric">
+<em class="property">property </em><code class="sig-name descname">isSymmetric</code><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.isSymmetric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.matrix">
+<em class="property">property </em><code class="sig-name descname">matrix</code><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'shortRangeSelfScalingVariance'</em><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.parseXMLNode">
+<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.rowBounds">
+<code class="sig-name descname">rowBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.rowBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.rowBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the row.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.toCovarianceMatrix">
+<code class="sig-name descname">toCovarianceMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">domain</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.toCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.toCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#shortRangeSelfScalingVariance.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.type">
+<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.shortRangeSelfScalingVariance.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances.covarianceMatrix">
+<span id="fudge-covariances-covariancematrix-module"></span><h2>fudge.covariances.covarianceMatrix module<a class="headerlink" href="#module-fudge.covariances.covarianceMatrix" title="Permalink to this headline">¶</a></h2>
+<p>Base classes for covariances: matrix, axes.</p>
+<dl class="py class">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.covarianceMatrix.</code><code class="sig-name descname">covarianceMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">'absolute'</span></em>, <em class="sig-param"><span class="n">matrix</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">productFrame</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.ancestry.ancestry</span></code>, <a class="reference internal" href="#fudge.covariances.base.covariance" title="fudge.covariances.base.covariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.covariances.base.covariance</span></code></a></p>
+<p>Simplest form of covariance. covarianceMatrix contains a label, a covariance ‘type’ which might be ‘absolute’,
+‘relative’ or ‘correlation’, and an optional ‘productFrame’ (for covariances on outgoing distributions).
+Matrix data is stored in an <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.gridded.gridded2d</span></code> class. May be diagonal, symmetric, sparse, etc</p>
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if uncertainty in the bounds passed into the checker.  
+Requires specification of the data (“theData”) if the covariance is not relative.
+I was not creative when I coded this, so it will fail when theData.getValue( x )
+doesn’t exist or is a function of more than one value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.columnBounds">
+<code class="sig-name descname">columnBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.columnBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.columnBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the column.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.convertAxesToUnits">
+<code class="sig-name descname">convertAxesToUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">units</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.convertAxesToUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.convertAxesToUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts all the axes’ units.
+The parameter <code class="docutils literal notranslate"><span class="pre">units</span></code> should be a list of units with the same length as self.axes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use deepcopy, but don’t copy self.ancestor
+:return: copy of self</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.domainSlice">
+<code class="sig-name descname">domainSlice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowDomainBounds</span></em>, <em class="sig-param"><span class="n">columnDomainBounds</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.domainSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.domainSlice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return copy with a revised domain for rows and columns.
+If requested domain extends beyond limits of self, add rows/columns of zeros to the new matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowDomainBounds</strong> – tuple (domainMin, domainMax)</p></li>
+<li><p><strong>columnDomainBounds</strong> – tuple (domainMin, domainMax). If not supplied, columnDomainBounds = rowDomainBounds</p></li>
+<li><p><strong>label</strong> – string to label the result</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>covarianceMatrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.fix">
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fix uncertainty using the bounds passed into the fixer.
+Requires specification of the data (“theData”) if the covariance is not relative.
+I was not creative when I coded this, so it will fail when theData.getValue( x )
+doesn’t exist or is a function of more than one value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.getCorrelationMatrix">
+<code class="sig-name descname">getCorrelationMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.getCorrelationMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.getCorrelationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the correlation matrix generated from self’s covariance matrix.  This is
+essentially a copy of self, but renormalized by the uncertainty:</p>
+<blockquote>
+<div><p>correlation[i,j] = covariance[i,j]/sqrt(covariance[i,i])/sqrt(covariance[j,j])</p>
+</div></blockquote>
+<p>We reuse the covariance matrix class so that we can do plotting, etc.  If you have
+a correlation matrix, you can safely recover it provided you have the uncertainty
+vector.</p>
+<p>Currently only works for a square covariance matrix and not a off-diagonal part of
+another covariance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.getUncertaintyVector">
+<code class="sig-name descname">getUncertaintyVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an XYs1d object containing uncertainty for this matrix.
+Convert relative/absolute if requested (if so, must also pass central values as theData)</p>
+<p>Examples:</p>
+<blockquote>
+<div><ul>
+<li><p>if the covariance matrix is relative and we want relative uncertainty vector, just do:</p>
+<blockquote>
+<div><p>&gt; matrix.getUncertaintyVector()</p>
+</div></blockquote>
+</li>
+<li><p>if we want the absolute matrix instead:</p>
+<blockquote>
+<div><p>&gt; matrix.getUncertaintyVector( theData=&lt;XYs1d instance&gt;, relative=False )</p>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.getValue">
+<code class="sig-name descname">getValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.getValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.group">
+<code class="sig-name descname">group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupBoundaries</span><span class="o">=</span><span class="default_value">None, None</span></em>, <em class="sig-param"><span class="n">groupUnit</span><span class="o">=</span><span class="default_value">None, None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Group the matrix in self</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>groupBoundaries</strong> – a 2 element list containing the group boundaries for the rows
+and columns (respectively) of the covariance to be regrouped
+rows go in the first element, columns in the second</p></li>
+<li><p><strong>groupUnit</strong> – a 2 element list containing the units in which group boundaries are
+specified for the rows and columns (respectively) of the covariance
+to be regrouped</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the regrouped matrix (an xData.array.full as the array in a gridded2d.matrix)</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We still need to do flux weighting</p>
+</div>
+<p class="rubric">Regrouping Theory</p>
+<p>Given a function <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/>, we write the grouped data using fudge’s <code class="docutils literal notranslate"><span class="pre">flat</span></code> interpolation
+scheme.  We note that we could write this scheme as an expansion over basis functions:</p>
+<div class="math">
+<p><img src="../_images/math/b9c842b81e65f5ed28f370dbd753cdadcaa5a399.png" alt="f(E) = \sum_{i=0}^{N+1} w_i(E) * f_i"/></p>
+</div><p>where the weight functions <img class="math" src="../_images/math/2072ff8039492d073ea4a823cbe5e798bc910aa4.png" alt="w_i(E)"/> are</p>
+<div class="math">
+<p><img src="../_images/math/a38a6541f2fb7d54eaf0466bb516b649cba1951b.png" alt="w_i(E) = 1  \;\text{for}\; E_i &lt;= E &lt;= E_{i+1}; \;\; 0 \;\textrm{otherwise}"/></p>
+</div><p>These weights are an orthogonal (but not orthonormal) basis, with</p>
+<div class="math">
+<p><img src="../_images/math/b13ce8fc9d6912c4659ecd010a7e66aa741320b6.png" alt="(E_{i+1}-E_i) \delta_{ij} = \int dE w_i(E) * w_j(E)"/></p>
+</div><p>So, to transform from basis <img class="math" src="../_images/math/2072ff8039492d073ea4a823cbe5e798bc910aa4.png" alt="w_i(E)"/> to <img class="math" src="../_images/math/db34ba2b27729ef39c3c1f1aebbf6b4d0f18a61c.png" alt="v_i(E)"/> (which has group boundaries
+<img class="math" src="../_images/math/1e19278a2004fb1dd9c4bcd8f9dd4dda4824eab2.png" alt="[ E'_0, ... ]"/>), do:</p>
+<div class="math">
+<p><img src="../_images/math/631ecf4ba45c2803a80a245aeb917d90a59d536d.png" alt="f'_j = \sum_i m_{ji} f_i"/></p>
+</div><p>where <img class="math" src="../_images/math/d7c1ed9292aeb727c15fce3872180062382667ec.png" alt="f'"/> is the regrouped function coefficients and <img class="math" src="../_images/math/a4a4a425ca015581e5850127c31f57cfdb68caa2.png" alt="m_{ji}"/> is the matrix</p>
+<div class="math">
+<p><img src="../_images/math/1d47af0176b54dc8b01339813e01163f1360a243.png" alt="m_{ij} = (E'_{i+1}-E'_i)^{-1} \int dE v_i(E) w_j(E)"/></p>
+</div><p class="rubric">Applying regrouping theory to covariance matrices</p>
+<p>When we are given a covariance matrix <img class="math" src="../_images/math/ac603da68375c4adcc212186c7d89be471b4b8b2.png" alt="c_{ij}"/> in ENDF, it is meant to be interpreted
+as a grouped covariance in both the direction of the matrix rows and the matrix
+columns.  Therefore, we must regroup in both the row direction and the column
+direction.  The ENDF format gives both the group boundaries for the rows and columns.
+In other words, ENDF gives us the following rule for evaluating the continuous row-
+column covariance:</p>
+<div class="math">
+<p><img src="../_images/math/52ef6a92faf01a00c7032f9cd71a4b9c74a63235.png" alt="c( E1, E2 ) = \sum_{ij} w_i(E1) w_j(E2) c_{ij}"/></p>
+</div><p>Computing <img class="math" src="../_images/math/1987e3721eb0b08cc9212a15e58b6e7b5443afa8.png" alt="m_{ij}"/> as before,</p>
+<div class="math">
+<p><img src="../_images/math/73640fafae24ebf2a3f103c8cd720a67408c7525.png" alt="cc_{ij} = \sum_{i',j'} m_{ii'} c_{i'j'} m_{j'j}"/></p>
+</div><p>It is straightforward to generalize to the case where the row and column bases are
+different.</p>
+<p>In the routine below, we abuse <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.XYs1d</span></code> to specify the functions
+<img class="math" src="../_images/math/2072ff8039492d073ea4a823cbe5e798bc910aa4.png" alt="w_i(E)"/> and use the <code class="xref py py-func docutils literal notranslate"><span class="pre">XYs1d.groupOneFunction()</span></code> method to perform the integrals to get
+the regrouping matrix.  We do this separately for the rows and the columns.
+The matrix multiplication that converts a covariance from one pair of bases (group
+structures) to another is accomplished using numpy.</p>
+<p class="rubric">An explanation of fudge’s ‘flat’ interpolation</p>
+<p>Suppose we have a function <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> specified using fudge’s <cite>‘flat’</cite> interpolation.
+Then we have <img class="math" src="../_images/math/3bfb3a64189a14b2704f4610827762d5e3145114.png" alt="N"/> entries <img class="math" src="../_images/math/5e9f15626aff4406b928d61f37f8a857f7acddd0.png" alt="[f_0, f_1, ..., f_{N-1}]"/> and a set of group
+boundaries <img class="math" src="../_images/math/04e094603df9343f34a7250021d19932cf4174fd.png" alt="[E_0, E_1, ..., E_N]"/> and the following rule for interpolation:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Below <img class="math" src="../_images/math/b093524cca7c5e201eff20c8daedae7e61432d1d.png" alt="E_0"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/1eb0514994edf71549d3baf4fbfa79d643bca95e.png" alt="0.0"/></p></li>
+<li><p>From <img class="math" src="../_images/math/3290943726ee46f8b00db6f7d2c59323b1485873.png" alt="E_0 \rightarrow E_1"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/4219fbe33be36f254f9093809318b9fb7b889a9a.png" alt="f_0"/></p></li>
+<li><p>From <img class="math" src="../_images/math/c7556cb98a58c7c492be015c98c138a24701dfe4.png" alt="E_1 \rightarrow E_2"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/0464a071da3203b9d565701f510a766ae52f3016.png" alt="f_1"/></p></li>
+<li><p>…</p></li>
+<li><p>From <img class="math" src="../_images/math/02c8061a6034148f11d578582755e3eae9e49cf1.png" alt="E_{i} \rightarrow E_{i+1}"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/a960eb612c236288975208781dc321395934f356.png" alt="f_i"/></p></li>
+<li><p>…</p></li>
+<li><p>From <img class="math" src="../_images/math/3b2dabe94293cca9493ab85332dc73648f41e4e4.png" alt="E_{N-1} \rightarrow E_N"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/5f11c6205eb3f1cd4279a0e87b0e6d26e8eaeb25.png" alt="f_{N-1}"/></p></li>
+<li><p>Above <img class="math" src="../_images/math/c774764e8e120dcedf98ae0e553ce56653836a3a.png" alt="E_N"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/1eb0514994edf71549d3baf4fbfa79d643bca95e.png" alt="0.0"/></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.isSymmetric">
+<code class="sig-name descname">isSymmetric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.isSymmetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.isSymmetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple test to determine if an underlying matrix is symmetric
+:return: boolean</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.matrix">
+<code class="sig-name descname">matrix</code><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>a <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.gridded.gridded2d</span></code> instance containing the matrix</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'covarianceMatrix'</em><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.parseXMLNode">
+<em class="property">static </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate &lt;covarianceMatrix&gt; element from xml into python class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalelabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlog</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ylog</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.plot" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – </p></li>
+<li><p><strong>scalelabel</strong> – </p></li>
+<li><p><strong>xlim</strong> – </p></li>
+<li><p><strong>ylim</strong> – </p></li>
+<li><p><strong>xlog</strong> – </p></li>
+<li><p><strong>ylog</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.productFrame">
+<em class="property">property </em><code class="sig-name descname">productFrame</code><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.productFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.removeExtraZeros">
+<code class="sig-name descname">removeExtraZeros</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.removeExtraZeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.removeExtraZeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all extra zeros from the underlying matrix
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.rowBounds">
+<code class="sig-name descname">rowBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.rowBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.rowBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the row.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.toAbsolute">
+<code class="sig-name descname">toAbsolute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.toAbsolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.toAbsolute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and colData
+to convert self into an absolute covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”
+if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</p></li>
+<li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “col direction”
+if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a copy of self, but rescaled and with the type set to absoluteToken</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.toCovarianceMatrix">
+<code class="sig-name descname">toCovarianceMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.toCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.toCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return copy of self (for consistency with toCovarianceMatrix behavior in summed.py / mixed.py)
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.toRelative">
+<code class="sig-name descname">toRelative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.toRelative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.toRelative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
+to convert self into a relative covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”
+if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</p></li>
+<li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “col direction”
+if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the column axis is a link, only rowData is needed.
+If neither rowData nor colData are specified, you’d better hope that the covariance is already
+relative because this will throw an error.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a copy of self, but rescaled and with the type set to relativeToken</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#covarianceMatrix.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.covarianceMatrix.covarianceMatrix.type">
+<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#fudge.covariances.covarianceMatrix.covarianceMatrix.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances.summed">
+<span id="fudge-covariances-summed-module"></span><h2>fudge.covariances.summed module<a class="headerlink" href="#module-fudge.covariances.summed" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="fudge.covariances.summed.summand">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.summed.</code><code class="sig-name descname">summand</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ENDF_MFMT</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">coefficient</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.link.link</span></code></p>
+<p>Stores one summand in the summed covariance. Consists of a link, an ENDF MF/MT and a coefficient</p>
+<dl class="py attribute">
+<dt id="fudge.covariances.summed.summand.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'summand'</em><a class="headerlink" href="#fudge.covariances.summed.summand.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summand.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summand.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summand.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.covariances.summed.summedCovariance">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.covariances.summed.</code><code class="sig-name descname">summedCovariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">domainMin</span></em>, <em class="sig-param"><span class="n">domainMax</span></em>, <em class="sig-param"><span class="n">domainUnit</span><span class="o">=</span><span class="default_value">'eV'</span></em>, <em class="sig-param"><span class="n">summands</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.ancestry.ancestry</span></code>, <a class="reference internal" href="#fudge.covariances.base.covariance" title="fudge.covariances.base.covariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.covariances.base.covariance</span></code></a></p>
+<p>Covariance matrix stored as sum/difference of matrices from other reactions,
+valid over a specified domain.
+Note: summed matrices may sum over other summed matrices, which opens up the possibility of
+a recursively-defined covariance. Recursion is avoided so long as the domains don’t overlap.</p>
+<p>Each summand has a coefficient ‘c’ that scales the associated covariance when summing together:</p>
+<blockquote>
+<div><p>$$sum_{0}^{N} c * Cov * c.T$$</p>
+</div></blockquote>
+<p>In current data libraries the coefficients are always +/-1.</p>
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.columnBounds">
+<code class="sig-name descname">columnBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.columnBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.columnBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the column.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.domainMax">
+<em class="property">property </em><code class="sig-name descname">domainMax</code><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.domainMin">
+<em class="property">property </em><code class="sig-name descname">domainMin</code><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.fix">
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.getReferredCovariance">
+<code class="sig-name descname">getReferredCovariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pointer</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.getReferredCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.getReferredCovariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>FIXME what’s this for? It’s not used anywhere in FUDGE… should it be removed?</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pointer</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.getUncertaintyVector">
+<code class="sig-name descname">getUncertaintyVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine all subsections into single uncertainty vector, converting to relative if requested.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an XYs1d instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.group">
+<code class="sig-name descname">group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupBoundaries</span><span class="o">=</span><span class="default_value">None, None</span></em>, <em class="sig-param"><span class="n">groupUnit</span><span class="o">=</span><span class="default_value">None, None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.covariances.summed.summedCovariance.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'sum'</em><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.parseXMLNode">
+<em class="property">static </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalelabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlog</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ylog</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.rowBounds">
+<code class="sig-name descname">rowBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.rowBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.rowBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the row.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.toAbsolute">
+<code class="sig-name descname">toAbsolute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.toAbsolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.toAbsolute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and columnData
+to convert self into an absolute covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</p></li>
+<li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “column direction”</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the column axis is set to ‘mirrorOtherAxis’, only rowData is needed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a copy of self, but rescaled and with the type set to absoluteToken</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.toCorrelationMatrix">
+<code class="sig-name descname">toCorrelationMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.toCorrelationMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.toCorrelationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.toCovarianceMatrix">
+<code class="sig-name descname">toCovarianceMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">'composed'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.toCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.toCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum the parts to construct the covariance matrix on the domain of self.
+Note: each part must be converted to absolute before summing, since the sum is over different reactions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>label</strong> – label attached to the new covarianceMatrix</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>covarianceMatrix instance, on the union grid of all summands over the domain of self.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.toRelative">
+<code class="sig-name descname">toRelative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colData</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.toRelative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.toRelative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and columnData
+to convert self into a relative covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</p></li>
+<li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “column direction”</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the column axis is a link to row axis, only rowData is needed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a copy of self, but rescaled and with the type set to relativeToken</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.covariances.summed.summedCovariance.toXMLList">
+<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#summedCovariance.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.summedCovariance.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.covariances">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.covariances" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">fudge.covariances package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.base">fudge.covariances.base module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.covarianceSuite">fudge.covariances.covarianceSuite module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.distributions">fudge.covariances.distributions module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.mixed">fudge.covariances.mixed module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.modelParameters">fudge.covariances.modelParameters module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.covarianceSection">fudge.covariances.covarianceSection module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.shortRangeSelfScalingVariance">fudge.covariances.shortRangeSelfScalingVariance module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.covarianceMatrix">fudge.covariances.covarianceMatrix module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances.summed">fudge.covariances.summed module</a></li>
+<li><a class="reference internal" href="#module-fudge.covariances">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudge.channelData.html"
+                        title="previous chapter">fudge.channelData package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fudge.processing.html"
+                        title="next chapter">fudge.processing package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/fudge/fudge.covariances.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.processing.html" title="fudge.processing package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudge.channelData.html" title="fudge.channelData package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.covariances package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

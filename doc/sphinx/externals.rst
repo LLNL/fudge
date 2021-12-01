@@ -1,15 +1,15 @@
 External Packages used in Fudge
 ===============================
 
-Fudge depends on some stand-alone packages that are also maintained by the LLNL Computational Nuclear Physics group.
-These 'external' packages are included with Fudge but have their own source tree and documentation::
+Fudge depends on some stand-alone packages that are also maintained by the LLNL Nuclear Data and Theory group.
+These 'external' packages are distributed with Fudge but have their own source tree and documentation.
 
 pqu
 ---
 Also known as physicalQuantitiesWithUncertainties, this is a Python package for managing values with units and
-(optional) uncertainties. For more information, see the package documentation here_.
+(optional) uncertainties. For more information, see the `pqu package documentation`_.
 
-.. _here: ../../pqu/doc/html/index.html
+.. _pqu package documentation: ../../pqu/doc/html/index.html
 
 numericalFunctions
 ------------------
@@ -30,6 +30,9 @@ PoPs
 ----
 Properties of Particles (such as mass, spin and parity, charge and halflife) are collected together in a
 particle database. The PoPs Python package is meant for reading and writing these particle databases.
+See `PoPs documentation`_ for more information.
+
+.. _PoPs documentation: ../../PoPs/Doc/html/index.html
 
 Merced
 ------

@@ -1,26 +1,28 @@
 { % localize the newcommands
-\newcommand{\mzerot}{m_{t,0}}
-\newcommand{\mzeroi}{m_{i,0}}
-\newcommand{\Ezerot}{m_t}
-\newcommand{\Ezeroi}{m_i}
-\newcommand{\EzeroR}{m_R}
-\newcommand{\Ezeroe}{m_e}
 \newcommand{\Tlabin}{T_{i,\textrm{lab}}}
 \newcommand{\plabin}{p_{i,\textrm{lab}}}
+\newcommand{\plaba}{p_{\textrm{lab},1}}
+\newcommand{\plabb}{p_{\textrm{lab},2}}
+\newcommand{\plabc}{p_{\textrm{lab},3}}
 \newcommand{\Tlabe}{T_{e,\textrm{lab}}}
 \newcommand{\plabe}{p_{e,\textrm{lab}}}
-\newcommand{\plabea}{p_{e1,\textrm{lab}}}
-\newcommand{\plabeb}{p_{e2,\textrm{lab}}}
-\newcommand{\plabec}{p_{e3,\textrm{lab}}}
+\newcommand{\plabea}{p_{e,\textrm{lab},1}}
+\newcommand{\plabeb}{p_{e,\textrm{lab},2}}
+\newcommand{\plabec}{p_{e,\textrm{lab},3}}
 \newcommand{\Tcmi}{T_{i,\textrm{cm}}}
 \newcommand{\Tcmt}{T_{t,\textrm{cm}}}
 \newcommand{\Tcme}{T_{e,\textrm{cm}}}
-\newcommand{\TcmR}{T_{R,\textrm{cm}}}
+\newcommand{\Tcmr}{T_{r,\textrm{cm}}}
 \newcommand{\pcmi}{p_{i,\textrm{cm}}}
+\newcommand{\pcma}{p_{\textrm{cm},1}}
+\newcommand{\pcmb}{p_{\textrm{cm},2}}
+\newcommand{\pcmc}{p_{\textrm{cm},3}}
 \newcommand{\pcme}{p_{e,\textrm{cm}}}
-\newcommand{\pcmea}{p_{e1,\textrm{cm}}}
-\newcommand{\pcmeb}{p_{e2,\textrm{cm}}}
-\newcommand{\pcmec}{p_{e3,\textrm{cm}}}
+\newcommand{\pcmea}{p_{e,\textrm{cm},1}}
+\newcommand{\pcmeb}{p_{e,\textrm{cm},2}}
+\newcommand{\pcmec}{p_{e,\textrm{cm},3}}
+\newcommand{\pcmta}{p_{t,\textrm{cm},1}}
+\newcommand{\pcmia}{p_{i,\textrm{cm},1}}
 %\newcommand{\mucm}{\mu_{\textrm{cm}}}
 %\newcommand{\mulab}{\mu_{\textrm{lab}}}
 
@@ -82,23 +84,24 @@ Consider the application of Eq.~(\ref{spacetime}) to the system
 consisting of a moving incident particle and a target 
 at rest in
 the laboratory frame.  Suppose that the incident
-particle has rest mass $\Ezeroi$ and kinetic
-energy $\Tlabin$, and let $\Ezerot$ be the rest mass of the
-target.  Then it follows from Eq.~(\ref{one-p})
+particle has rest mass $\myi$ and kinetic
+energy $\Tlabin$, and let $\mtarg$ be the rest mass of the
+target.  Then, for a target at rest it follows from Eq.~(\ref{one-p})
 that the initial laboratory-frame momentum is given by
 \begin{equation}
-  \plabin^2  = 2\Ezeroi \Tlabin + \Tlabin^2.
+  \plabin^2  = 2\myi \Tlabin + \Tlabin^2.
  \label{p-lab-in}
 \end{equation}
-Consequently, for the system of consisting of the two particles
+Consequently, for the system of consisting of a particle
+incident on a stationary target
 in the laboratory frame, the energy-momentum invariant is
 $$
-  S = (\Ezerot + \Ezeroi + \Tlabin)^2 -
-      ( 2\Ezeroi \Tlabin + \Tlabin^2 ),
+  S = (\mtarg + \myi + \Tlabin)^2 -
+      ( 2\myi \Tlabin + \Tlabin^2 ),
 $$
 This expression simplifies to
 \begin{equation}
-  S = (\Ezeroi + \Ezerot )^2 + 2\Ezerot \Tlabin.
+  S = (\myi + \mtarg )^2 + 2\mtarg \Tlabin.
   \label{S-lab}
 \end{equation}
 
@@ -110,7 +113,7 @@ Similarly, let the target have center-of-mass kinetic energy $\Tcmt$,
 and its momentum is~$-\pcmi$.  The energy-momentum invariant
 for the system is therefore
 \begin{equation}
-  S = (\Ezeroi + \Tcmi + \Ezerot + \Tcmt)^2,
+  S = (\myi + \Tcmi + \mtarg + \Tcmt)^2,
  \label{spacetime-cm}
 \end{equation}
 the square of the total energy of the system in the center-of-mass frame.
@@ -118,14 +121,14 @@ By using Eq.~(\ref{spacetime-1}) on each of the particles, it
 is possible to rewrite this as
 $$
   S = \left(
-    \sqrt{\Ezeroi^2 + \pcmi^2 } +
-       \sqrt{\Ezerot^2 + \pcmi^2 }
+    \sqrt{\myi^2 + \pcmi^2 } +
+       \sqrt{\mtarg^2 + \pcmi^2 }
    \right)^2.
 $$
 Upon solving this equation for $\pcmi^2$, it is found that
 \begin{equation}
-  \pcmi^2 = \frac{ \left[S - (\Ezeroi^2 + \Ezerot^2)\right]^2 -
-                 4 \Ezeroi^2 \Ezerot^2 }
+  \pcmi^2 = \frac{ \left[S - (\myi^2 + \mtarg^2)\right]^2 -
+                 4 \myi^2 \mtarg^2 }
                 {4 S }.
   \label{p-cm}
 \end{equation}
@@ -133,87 +136,98 @@ An expression for $\pcmi^2$ in terms of the
 laboratory incident kinetic energy $\Tlabin$ is obtained by substituting
 in Eq.~(\ref{p-cm}) the value of $S$ given by Eq.~(\ref{S-lab}),
 \begin{equation}
-  \pcmi^2 = \frac{\Ezerot^2( 2 \Ezeroi \Tlabin + \Tlabin^2)}
-              {(\Ezerot + \Ezeroi )^2 + 2\Ezerot \Tlabin}.
+  \pcmi^2 = \frac{\mtarg^2( 2 \myi \Tlabin + \Tlabin^2)}
+              {(\mtarg + \myi )^2 + 2\mtarg \Tlabin}.
   \label{p-cm-1}
 \end{equation}
 It follows from Eq.~(\ref{one-p}) that this equation may also
 be written as
 $$
-  \pcmi^2 = \frac{\Ezerot^2 \plabin^2 }
-                {(\Ezerot + \Ezeroi )^2 + 2\Ezerot \Tlabin}.
+  \pcmi^2 = \frac{\mtarg^2 \plabin^2 }
+                {(\mtarg + \myi )^2 + 2\mtarg \Tlabin}.
 $$
 
 \section{Mapping between frames}
 Consider a coordinate system in which the momentum
 $\plabin$ of the incident particle is in the direction of
-the first spatial axis.  The boost from
+the first spatial axis.  The boost of the energy-momentum
+vector from
 the laboratory to the center-of-mass frame then takes the
 form
-$$
-  (E_{\text{cm}}, p_{\text{cm}})^T = R (E_{\text{lab}}, p_{\text{lab}})^T
-$$
-with the matrix
 \begin{equation}
-   R =
+  \begin{bmatrix}
+    E_{\text{cm}} \\
+    \pcma \\
+    \pcmb \\
+    \pcmc
+  \end{bmatrix}
+   =
     \begin{bmatrix}
      \cosh \chi & -\sinh \chi & 0 & 0 \\
      -\sinh \chi & \cosh \chi & 0 & 0 \\
      0  & 0 & 1 & 0 \\
      0  & 0 & 0 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    E_{\text{lab}} \\
+    \plaba \\
+    \plabb \\
+    \plabc
   \end{bmatrix}.
   \label{R-3}
 \end{equation}
 
-Upon applying the rotation Eq.~(\ref{R-3}) to the target,
+Upon applying the second component of the boost Eq.~(\ref{R-3}) to the 
+target,
 it is found that
 $$
-     \begin{bmatrix}
-        \Ezerot + \Tcmt \\
-        -|\pcmi| \\
-        0 \\
-        0
-     \end{bmatrix}
-      = R
-\begin{bmatrix}
-        \Ezerot \\
-           0  \\
-           0 \\
-           0
-     \end{bmatrix}.
+  \pcmta = - \mtarg  \sinh \chi.
 $$
-It follows that
+With the notation that $ | p | $
+is the length of the vector~$p$, 
+it follows that
+$$
+   \pcmta =  -\pcmia = - | \pcmi |,
+$$
+so that
 \begin{equation}
-   \sinh \chi = \frac{|\pcmi|}{\Ezerot}.
+   \sinh \chi = \frac{|\pcmi|}{\mtarg}.
  \label{lab-to-cm}
 \end{equation}
 By using Eq.~(\ref{p-cm-1}), one may conclude that
 \begin{equation}
-  \sinh \chi = \frac{\sqrt{ 2 \Ezeroi \Tlabin + \Tlabin^2}}
-    {\sqrt{( \Ezerot + \Ezeroi )^2 + 2 \Ezerot \Tlabin }}.
+  \sinh \chi = \frac{\sqrt{ 2 \myi \Tlabin + \Tlabin^2}}
+    {\sqrt{( \mtarg + \myi )^2 + 2 \mtarg \Tlabin }}.
   \label{lab-to-cm-2}
 \end{equation}
 Note that except for incident gammas, $\Tlabin$ is much smaller
-than the rest mass $\Ezeroi$, so that $\chi$ is a
+than the rest mass $\myi$, so that $\chi$ is a
 small, positive number.
 
 In the next section of this appendix, for 2-body problems
 the center-of-mass energy and momentum of the
 emitted particle and residual are determined.  In order to boost these 4-vectors
-to the laboratory frame, one may use the inverse of the matrix $R$ in
+to the laboratory frame, one may use the inverse of the matrix in
 Eq.~(\ref{R-3}), so that
 \begin{equation}
-  (E_{\text{lab}}, p_{\text{lab}})^T = R^{-1}(E_{\text{cm}}, p_{\text{cm}})^T
- \label{3d-map}
-\end{equation}
-with
-\begin{equation}
-   R^{-1} =
+  \begin{bmatrix}
+    E_{\text{lab}} \\
+    \plaba \\
+    \plabb \\
+    \plabc
+  \end{bmatrix}
+   =
     \begin{bmatrix}
      \cosh \chi & \sinh \chi & 0 & 0 \\
      \sinh \chi & \cosh \chi & 0 & 0 \\
      0  & 0 & 1 & 0 \\
      0  & 0 & 0 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    E_{\text{cm}} \\
+    \pcma \\
+    \pcmb \\
+    \pcmc
   \end{bmatrix}.
   \label{R-3-inv}
 \end{equation}
@@ -232,40 +246,40 @@ $$
 and Eq.~(\ref{lab-to-cm-2}) becomes
 $$
   \sinh \chi = \frac{ \Tlabin}
-    {\sqrt{ \Ezerot^2 + 2 \Ezerot \Tlabin }}.
+    {\sqrt{ \mtarg^2 + 2 \mtarg \Tlabin }}.
 $$
 It follows that
 $$
-  \cosh \chi = \frac{ \Ezerot + \Tlabin}
-    {\sqrt{ \Ezerot^2 + 2 \Ezerot \Tlabin }}.
+  \cosh \chi = \frac{ \mtarg + \Tlabin}
+    {\sqrt{ \mtarg^2 + 2 \mtarg \Tlabin }}.
 $$
 
 
 
 \section{Outgoing particles}
-Denote by $\Ezeroe$ the rest mass of the
+Denote by $\myo$ the rest mass of the
 emitted particle and
 $\Tcme$ its kinetic energy in the center-of-mass frame.
 The convention in \xendl\ is that the energy~$Q$ of the reaction
-is specified by the data, and the rest mass  $\EzeroR$ of the residual
+is specified by the data, and the rest mass  $\mres$ of the residual
 is calculated from
 \begin{equation}
-  \EzeroR = \Ezerot + ( \Ezeroi - \Ezeroe ) - Q.
+  \mres = \mtarg + ( \myi - \myo ) - Q.
  \label{Q-2body}
 \end{equation}
-Let $\TcmR$ be the kinetic energy of the residual in the center-of-mass frame.
+Let $\Tcmr$ be the kinetic energy of the residual in the center-of-mass frame.
 In terms of these variables, the energy-momentum invariant
 for the system is the square of the total energy
 $$
-    S = (\Ezeroe + \Tcme + \EzeroR + \TcmR)^2,
+    S = (\myo + \Tcme + \mres + \Tcmr)^2,
 $$
 with the same value of $S$ as in Eq.~(\ref{spacetime-cm}).
 The argument leading to Eq.~(\ref{p-cm}) shows that the
 momentum~$\pcme$ of the emitted particle in the center-of-mass frame
 has magnitude given by
 \begin{equation}
-  \pcme^2 = \frac{ \left[S - (\EzeroR^2 + \Ezeroe^2)\right]^2 -
-                 4 \EzeroR^2 \Ezeroe^2 }
+  \pcme^2 = \frac{ \left[S - (\mres^2 + \myo^2)\right]^2 -
+                 4 \mres^2 \myo^2 }
                 {4 S }.
   \label{p-cm-e}
 \end{equation}
@@ -277,8 +291,8 @@ in order to mitigate this problem as much as possible.
 As a first step, Eq.~(\ref{p-cm-e}) is rewritten in the
 form
 \begin{equation}
-  4 S \pcme^2 = \left[S - (\EzeroR + \Ezeroe)^2\right]
-              \left[S - (\EzeroR - \Ezeroe)^2\right].
+  4 S \pcme^2 = \left[S - (\mres + \myo)^2\right]
+              \left[S - (\mres - \myo)^2\right].
  \label{p-cm-e-1}
 \end{equation}
 In this expression, the subtraction of nearly equal
@@ -290,25 +304,25 @@ simplifications.
 By using the expression for~$S$ in Eq.~(\ref{S-lab}), one
 obtains the relation
 $$
-  S - (\EzeroR + \Ezeroe)^2 =
-  (\Ezerot + \Ezeroi)^2 - (\EzeroR + \Ezeroe)^2  + 2\Ezerot \Tlabin.
+  S - (\mres + \myo)^2 =
+  (\mtarg + \myi)^2 - (\mres + \myo)^2  + 2\mtarg \Tlabin.
 $$
 In terms of the energy $Q$ of the discrete 2-body reaction
 and the parameter
 \begin{equation}
-  M_T = \Ezerot + \EzeroR + \Ezeroi + \Ezeroe,
+  M_T = \mtarg + \mres + \myi + \myo,
  \label{def-M}
 \end{equation}
 it follows that
 $$
-    S - (\EzeroR + \Ezeroe)^2 =
-     M_T Q + 2\Ezerot \Tlabin.
+    S - (\mres + \myo)^2 =
+     M_T Q + 2\mtarg \Tlabin.
 $$
 Consequently, it is seen that Eq.~(\ref{p-cm-e}) may be
 replaced by
 \begin{equation}
-  \pcme^2 = \frac{ (M_T Q +  2\Ezerot \Tlabin )
-                 ( M_T Q +  2\Ezerot \Tlabin + 4\EzeroR \Ezeroe)}
+  \pcme^2 = \frac{ (M_T Q +  2\mtarg \Tlabin )
+                 ( M_T Q +  2\mtarg \Tlabin + 4\mres \myo)}
                 {4 S }.
   \label{p-cm-e-OK}
 \end{equation}
@@ -318,7 +332,7 @@ It is clear from Eq.~(\ref{p-cm-e-OK}) that for endothermic
 reactions ($Q < 0$), the threshold occurs when the incident
 particle has kinetic energy
 $$
-  \Tlabin = \frac{-M_T Q}{2\Ezerot}.
+  \Tlabin = \frac{-M_T Q}{2\mtarg}.
 $$
 
 In Eq.~(\ref{p-cm-e-OK}) there is subtraction of nearly equal
@@ -332,7 +346,7 @@ Eq.~(\ref{good-T}) to determine the kinetic energy of the
 emitted particle in the center-of-mass frame as
 \begin{equation}
   \Tcme = \frac{\pcme^2 }
-          {\Ezeroe + \sqrt{ \Ezeroe^2 + \pcme^2 }}.
+          {\myo + \sqrt{ \myo^2 + \pcme^2 }}.
  \label{T-cm-e}
 \end{equation}
 
@@ -341,8 +355,8 @@ It is often desired to determine the kinetic energy~$\Tlabe$
 and momentum~$\plabe$ of the emitted particle in the laboratory frame
 for given direction cosine~$\mucm$ in the center-of-mass frame.
 It is possible to use the boost 
-Eq.~(\ref{3d-map}) to determine $\plabe$ as follows.  Recall that
-the form of Eq.~(\ref{3d-map}) is determined by the requirement that
+Eq.~(\ref{R-3-inv}) to determine $\plabe$ as follows.  Recall that
+the form of Eq.~(\ref{R-3-inv}) is determined by the requirement that
 the first axis of the coordinate system was chosen parallel to~$\plabin$.
 Consequently, one has
 $$
@@ -358,11 +372,11 @@ then
 $$
   \pcmeb =  |\pcme| \sqrt{ 1 - \mucm^2}.
 $$
-The momentum components of the boost Eq.~(\ref{3d-map}) then
+The momentum components of the boost Eq.~(\ref{R-3-inv}) then
 take the form
 \begin{equation*}
 \begin{split}
-  \plabea &= (\Ezeroe + \Tcme)\sinh \chi +  \mucm |\pcme| \cosh \chi, \\
+  \plabea &= (\myo + \Tcme)\sinh \chi +  \mucm |\pcme| \cosh \chi, \\
   \plabeb &= |\pcme| \sqrt{ 1 - \mucm^2}, \\
   \plabec & = 0.\\
 \end{split}
@@ -381,15 +395,15 @@ The kinetic energy $\Tlabe$ is calculated from $|\plabe|$
 by using Eq.~(\ref{good-T}).
 
 \subsection{Photon emission}
-When the emitted particle is a photon, because $\Ezeroe = 0$,
+When the emitted particle is a photon, because $\myo = 0$,
 Eqs.~(\ref{p-cm-e-OK}) and (\ref{T-cm-e}) take the simpler form
 $$
   E_{e, \textrm{cm}} = \Tcme = |\pcme| =
-   \frac{ M_T Q +  2\Ezerot \Tlabin }
+   \frac{ M_T Q +  2\mtarg \Tlabin }
                 {2 \sqrt{S} }.
 $$
 For given direction cosine~$\mucm$ in the center-of-mass frame,
-the energy component of the boost Eq.~(\ref{3d-map}) gives the
+the energy component of the boost Eq.~(\ref{R-3-inv}) gives the
 Doppler shift
 $$
    E_{e, \textrm{lab}} = E_{e, \textrm{cm}}
@@ -406,5 +420,478 @@ $$
   \mulab = \frac{\sinh \chi + \mucm \cosh \chi}
                 {\cosh \chi + \mucm \sinh \chi}.
 $$
+
+\newcommand{\mayo}{m_{1,e}}
+\newcommand{\mares}{m_{1,r}}
+\newcommand{\mbyo}{m_{2,e}}
+\newcommand{\mbres}{m_{2,r}}
+
+\newcommand{\muacm}{\mu_{\text{1,cm}}}
+\newcommand{\mubcm}{\mu_{\text{2,cm}}}
+\newcommand{\mualab}{\mu_{\text{1,lab}}}
+\newcommand{\mublab}{\mu_{\text{2,lab}}}
+
+\newcommand{\Vacm}{\textbf{V}_{\text{1,cm}}}
+\newcommand{\Valab}{\textbf{V}_{\text{1,lab}}}
+
+\newcommand{\Talabe}{T_{1,e,\textrm{lab}}}
+\newcommand{\Tacme}{T_{1,e,\textrm{cm}}}
+\newcommand{\Tacmr}{T_{1,r,\textrm{cm}}}
+\newcommand{\pacmi}{p_{1,i,\textrm{cm}}}
+\newcommand{\pacme}{p_{1,e,\textrm{cm}}}
+\newcommand{\pacmea}{p_{1,e,\textrm{cm},1}}
+\newcommand{\pacmeb}{p_{1,e,\textrm{cm},2}}
+\newcommand{\pacmec}{p_{1,e,\textrm{cm},3}}
+\newcommand{\plabi}{p_{i,\textrm{lab}}}
+\newcommand{\palabe}{p_{1,e,\textrm{lab}}}
+\newcommand{\palabea}{p_{1,e,\textrm{lab},1}}
+\newcommand{\palabeb}{p_{1,e,\textrm{lab},2}}
+\newcommand{\palabec}{p_{1,e,\textrm{lab},3}}
+
+\newcommand{\Tblabe}{T_{2,e,\textrm{lab}}}
+\newcommand{\Tbcme}{T_{2,e,\textrm{cm}}}
+\newcommand{\Tbcmr}{T_{2,r,\textrm{cm}}}
+\newcommand{\pbcmi}{p_{2,i,\textrm{cm}}}
+\newcommand{\pbcme}{p_{2,e,\textrm{cm}}}
+\newcommand{\pbcmea}{p_{2,e,\textrm{cm},1}}
+\newcommand{\pbcmeb}{p_{2,e,\textrm{cm},2}}
+\newcommand{\pbcmec}{p_{2,e,\textrm{cm},3}}
+\newcommand{\pbThetae}{p_{2,e,{\Theta_1}}}
+\newcommand{\pbThetaea}{p_{2,e,{\Theta_1},1}}
+\newcommand{\pbThetaeb}{p_{2,e,{\Theta_1},2}}
+\newcommand{\pbThetaec}{p_{2,e,{\Theta_1},3}}
+\newcommand{\pblabe}{p_{2,e,\textrm{lab}}}
+\newcommand{\pblabea}{p_{2,e,\textrm{lab},1}}
+\newcommand{\pblabeb}{p_{2,e,\textrm{lab},2}}
+\newcommand{\pblabec}{p_{2,e,\textrm{lab},3}}
+
+\section{Two-step 2-body reactions}
+\label{Sec:2-step-2-body-rel}
+This section presents a relativistic treatment of the 2-step
+discrete 2-body reaction discussed in Section~\ref{Sec:2-step-2-body}.
+The first step of the reaction is inelastic scattering, with an
+excited outgoing particle.  This excited particle then splits into a final outgoing particle
+and a residual.  The notation used for this reaction is as in
+Section~\ref{Sec:2-step-2-body} so that for the first step, $\mayo$ is the rest mass of
+the excited outgoing particle, $\mares$ is the residual, and $Q_1$ is
+the $Q$-value.  For the second step of the reaction, $\mbyo$ denotes the rest mass of
+the final outgoing particle, $\mbres$ is the residual, and $Q_2$ is
+the $Q$-value.
+
+For the first step of the reaction, the energy-momentum invariant $S_1$
+is as in Eq.~(\ref{spacetime-cm}),
+\begin{equation}
+  S_1 = (\myi + \Tcmi + \mtarg + \Tcmt)^2.
+ \label{spacetime-cm-step1}
+\end{equation}
+As mentioned in Eq.~(\ref{2-step-mayo}), the rest mass of
+the excited outgoing particle from the first step is given by
+$$
+  \mayo = \myi + \mtarg - \mares - Q_1.
+$$
+
+For the excited particle emitted in the first step of the
+reaction, the boost Eq.~(\ref{R-3-inv}) from the center-of-mass frame to the
+laboratory frame takes the form
+\begin{equation}
+  \begin{bmatrix}
+    \mayo + \Talabe \\
+    \palabea \\
+    \palabeb \\
+    \palabec
+  \end{bmatrix}
+   =
+    \begin{bmatrix}
+     \cosh \chi_1 & \sinh \chi_1 & 0 & 0 \\
+     \sinh \chi_1 & \cosh \chi_1 & 0 & 0 \\
+     0  & 0 & 1 & 0 \\
+     0  & 0 & 0 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mayo + \Tacme \\
+    \pacmea \\
+    \pacmeb \\
+    \pacmec
+  \end{bmatrix}.
+  \label{R-3-inv-step1}
+\end{equation}
+As in Eq.~(\ref{lab-to-cm-2}),
+the parameter~$\chi_1$ for this boost
+is is given by
+\begin{equation}
+  \sinh \chi_1 = \frac{\sqrt{ 2 \myi \Tlabin + \Tlabin^2}}
+    {\sqrt{( \mtarg + \myi )^2 + 2 \mtarg \Tlabin }}.
+  \label{lab-to-cm-2-step1}
+\end{equation}
+
+For step~1 of the reaction, the total mass of the particles
+in Eq.~(\ref{def-M}) is given by
+\begin{equation}
+  M_{1,T} = \mtarg + \mares + \myi + \mayo,
+ \label{def-M-step1}
+\end{equation}
+and for the momentum of the excited outgoing particle in
+the frame of the center of mass of the initial collision the
+relation Eq.~(\ref{p-cm-e-OK}) takes the form
+\begin{equation}
+  |\pacme|^2 = \frac{ (M_{1,T} Q_1 +  2\mtarg \Tlabin )
+                 ( M_{1,T} Q_1 +  2\mtarg \Tlabin + 4\mayo \mares)}
+                {4 S_1 }.
+  \label{p-cm-e-OK-step1}
+\end{equation}
+Then by Eq.~(\ref{T-cm-e}), the kinetic energy of the excited
+particle emitted in the first step is
+\begin{equation}
+  \Tacme = \frac{|\pacme|^2 }
+          {\mayo + \sqrt{ \mayo^2 + |\pacme|^2 }}.
+ \label{T-cm-e-step1}
+\end{equation}
+
+The remaining items to be determined on the right-hand
+side of Eq.~(\ref{R-3-inv-step1}) are the components of
+the momentum~$\pacme$.
+Let $\theta_1$ denote the angle between $\pacme$ and the
+center-of-mass momentum~$\pacmi$ of the incident particle.
+The coordinate system may be
+chosen so that $\pacmec = 0$ and so that~$\theta_1$
+satisfies the condition
+$$
+  0 \le \theta_1 \le \pi.
+$$
+Then with $\muacm = \cos \theta_1$, the components 
+of~$\pacme$ are
+\begin{equation*}
+\begin{split}
+  \pacmea &= | \pacme | \, \muacm, \\
+  \pacmeb &=     |   \pacme | \sqrt{ 1 - \muacm^2 }, \\
+  \pacmec &=     0.
+\end{split}
+%\label{pcme-abc}
+\end{equation*}
+
+Now that all of the variables on the  right-hand
+side of Eq.~(\ref{R-3-inv-step1}) are identified, those on
+the left-hand side are determined as well.  In particular,
+the magnitude of the momentum~$\palabe$ in the laboratory
+frame of the excited
+outgoing particle from step~1 of the reaction is given by
+\begin{equation}
+  | \palabe | = \sqrt{ \palabea^2 + \palabeb^2 + \palabec^2 }\,.
+ \label{plab-rel-step1}
+\end{equation}
+The direction cosine~$\mualab$ for step~1 of the reaction is
+defined as
+\begin{equation}
+  \mualab = 
+  \begin{cases}
+     \palabea / | \palabe | &
+       \text{for $| \palabe | \ne 0$,} \\
+     1 & \text{otherwise.}
+   \end{cases}
+ \label{mu-lab-step1}
+\end{equation}
+Consequently, for $| \palabe | \ne 0$ the angle between
+$\palabe$ and the laboratory-frame momentum~$\plabi$
+of the incident particle is
+\begin{equation}
+   \Theta_1 = \cos^{-1} \mualab.
+ \label{def-Theta1}
+\end{equation}
+
+For the breakup of the excited particle emitted
+by step~1, the initial analysis takes place in the 
+frame in which this particle is stationary.  In this frame
+the energy-momentum invariant is
+$$
+  S_2 = \mayo^2.
+$$
+The total mass for the breakup is
+$$
+  M_{2,T} = \mayo + \mbres + \mbyo.
+$$
+For step~2 of the reaction, Eq.~(\ref{p-cm-e-OK}) for the
+magnitude of the momentum takes the form
+\begin{equation}
+  |\pbcme|^2 = \frac{ M_{2,T} Q_2 
+                 ( M_{2,T} Q_2 + 4\mbyo \mbres)}
+                {4 S_2 }.
+  \label{p-cm-e-OK-step2}
+\end{equation}
+In this frame, the
+kinetic energy of the final emitted particle is
+\begin{equation}
+  \Tbcme = \frac{|\pbcme|^2 }
+          {\mbyo + \sqrt{ \mbyo^2 + |\pbcme|^2 }}.
+  \label{T-cm-e-OK-step2}
+\end{equation}
+
+For the relativistic treatment of this 2-step reaction,
+the elements $\Inum_{g,h,\ell}$ of the transfer matrix are calculated
+as in the Newtonian case Eq.~(\ref{2-step-muEint}), namely by
+\begin{equation}
+    \Inum_{g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) w(E) \widetilde \phi_\ell(E)
+    \int_{\muacm} d\muacm  \, g(\muacm \mid E)
+    \int_{\Sigma_{1,h}} d\sigma_1 \, P_\ell( \mulab ).
+  \label{2-step-muEint-2step}
+\end{equation}
+One difference from the Newtonian case is that, here
+the isotropic emission in the breakup step is reflected
+in the uniform distribution of the momentum
+$$
+   \pbcme =
+  \begin{bmatrix}
+    \pbcmea \\
+    \pbcmeb \\
+    \pbcmec
+  \end{bmatrix}
+$$
+over the hemisphere~$\Sigma_1$ given by the relation
+\begin{equation}
+  \pbcmec =
+  \sqrt{ |  \pbcme |^2 -  \pbcmea^2 -  \pbcmeb^2 }
+  \label{2-step-def-Sigma0}
+\end{equation}
+for
+$$
+  \pbcmea^2 +  \pbcmeb^2 \le |  \pbcme |^2.
+$$
+The differential $ d\sigma_1$ in Eq.~(\ref{2-step-muEint-2step})
+is the differential surface area
+on the hemisphere~$\Sigma_1$ normalized so that
+$$
+  \int_{\Sigma_1} d\sigma_1 = 1.
+$$
+
+Another difference in Eq.~(\ref{2-step-muEint-2step}) from the 
+Newtonian case is the need to construct a boost of the
+energy-momentum vector
+\begin{equation}
+  \begin{bmatrix}
+    \mbyo + \Tbcme \\
+    \pbcmea \\
+    \pbcmeb \\
+    \pbcmec
+  \end{bmatrix}
+  \label{2-step-final-Ep-cm}
+\end{equation}
+to the laboratory frame of the initial collision
+\begin{equation}
+  \begin{bmatrix}
+    \mbyo + \Tblabe \\
+    \pblabea \\
+    \pblabeb \\
+    \pblabec
+  \end{bmatrix}.
+  \label{2-step-final-Ep-lab}
+\end{equation}
+This boost will be constructed in such a way that the $\pblabea$
+momentum axis in Eq.~(\ref{2-step-final-Ep-lab}) is parallel to
+the momentum $\plabin$ of the initial incident particle.
+In the integral in Eq.~(\ref{2-step-muEint-2step}), $\Sigma_{1,h}$
+denotes the portion of $\Sigma_1$ on which the kinetic energy
+$\Tbcme$ of the final emitted particle in the laboratory frame
+is in the outgoing energy bin~$\calE_h'$.  
+
+The direction cosine~$\mulab$
+in Eq.~(\ref{2-step-muEint-2step}) is taken to be
+\begin{equation}
+  \mulab =
+  \begin{cases}
+    \pblabea / | \pblabe | &
+       \text {if $ | \pblabe | > 0$,} \\
+     1 & \text{otherwise.}
+  \end{cases}
+  \label{2-step-final-mu-lab}
+\end{equation}
+
+The boost of the energy-momentum vector for the final
+emitted particle from the frame of Eq~(\ref{2-step-final-Ep-cm})
+to the laboratory frame of Eq.~(\ref{2-step-final-Ep-lab})
+will be constructed as an initial boost followed by a rotation
+of the momentum subspace.
+
+For the excited particle emitted in step~1, the boost
+\begin{equation}
+  \begin{bmatrix}
+    \mayo + \Talabe \\
+    |\palabe|  \\
+    0 \\
+    0
+  \end{bmatrix}
+   =
+    \begin{bmatrix}
+     \cosh \chi_2 & \sinh \chi_2 & 0 & 0 \\
+     \sinh \chi_2 & \cosh \chi_2 & 0 & 0 \\
+     0  & 0 & 1 & 0 \\
+     0  & 0 & 0 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mayo \\
+    0 \\
+    0 \\
+    0
+  \end{bmatrix}
+  \label{boost-chi2}
+\end{equation}
+maps the energy and momentum from the center-of-mass
+frame of the breakup reaction to a laboratory frame.
+The value of~$\chi_2$ in the boost Eq.~(\ref{boost-chi2}) 
+is determined by
+$$
+  \sinh \chi_2 = \frac{  |\palabe| }{ \mayo}
+$$
+with~$|\palabe|$ given by Eq.~(\ref{plab-rel-step1}).
+
+An application of the boost Eq.~(\ref{boost-chi2}) to the
+energy-momentum vector for the
+particle emitted in step~2 of the reaction gives the result
+\begin{equation}
+  \begin{bmatrix}
+    \mbyo + \Tblabe \\
+    \pbThetaea \\
+    \pbThetaeb \\
+    \pbThetaec
+  \end{bmatrix}
+   =
+    \begin{bmatrix}
+     \cosh \chi_2 & \sinh \chi_2 & 0 & 0 \\
+     \sinh \chi_2 & \cosh \chi_2 & 0 & 0 \\
+     0  & 0 & 1 & 0 \\
+     0  & 0 & 0 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mbyo + \Tbcme \\
+    \pbcmea \\
+    \pbcmeb \\
+    \pbcmec
+  \end{bmatrix}.
+  \label{R-3-inv-step2}
+\end{equation}
+
+The mapping Eq.~(\ref{R-3-inv-step2}) takes the
+center-of-mass energy-$\pbcmea$ plane onto the laboratory
+energy-$\pbThetaea$ plane.  The construction Eq.~(\ref{boost-chi2})
+ensures that this plane contains the vector~$\palabe$.  Both
+$\palabe$ and the momentum~$\plabin$ of the initial incident particle
+lie in the original laboratory momentum subspace, but Eqs.~(\ref{mu-lab-step1})
+and~(\ref{def-Theta1}) show that these vectors are separated by
+the angle~$\Theta_1$.  It is therefore desirable to rotate the
+$$
+  \pbThetae =
+   \begin{bmatrix}
+     \pbThetaea \\
+    \pbThetaeb \\
+    \pbThetaec
+   \end{bmatrix}
+$$
+momentum subspace by the mapping
+\begin{equation}
+  \begin{bmatrix}
+    \mbyo + \Tblabe \\
+    \pblabea \\
+    \pblabeb \\
+    \pblabec
+  \end{bmatrix}
+   =
+    \begin{bmatrix}
+     1 & 0 & 0 & 0 \\
+     0 & \cos \Theta_1 & -\sin \Theta_1 & 0 \\
+     0  & \sin \Theta_1 & \cos \Theta_1 & 0 \\
+     0  & 0 & 0 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mbyo + \Tblabe \\
+    \pbThetaea \\
+    \pbThetaeb \\
+    \pbThetaec
+   \end{bmatrix}.
+  \label{R-3-inv-rotate}
+\end{equation}
+Recall that $\Theta_1$ is set equal to~$0$ if $|\palabe | = 0$, so that 
+Eq.~(\ref{R-3-inv-rotate}) is also valid in
+this case.  For step~2 of the reaction, the mapping of the
+energy-momentum vector from the center-of-mass frame
+to the initial laboratory frame is accomplished by the boost
+Eq.~(\ref{R-3-inv-step2}) followed by the rotation Eq.~(\ref{R-3-inv-rotate}).
+
+One should not compute the kinetic energy~$\Tblabe$ by subtracting
+the rest mass~$\mbyo$ from the total energy in the laboratory frame.
+It is better to first calculate the square of the length of the momentum
+$$
+  |\pblabe|^2 = \pblabea^2 + \pblabeb^2 + \pblabec^2
+$$
+and to use
+\begin{equation*}
+  \Tblabe = \frac{|\pblabe|^2 }
+          {\mbyo + \sqrt{ \mbyo^2 + |\pblabe|^2 }}.
+  %\label{T-lab-e-OK-step2}
+\end{equation*}
+
+It remains to describe the details of the computation of
+the integral
+$$
+    \int_{\Sigma_{1,h}} d\sigma_1 \, P_\ell( \mulab ),
+$$
+which appears in Eq.~(\ref{2-step-muEint-2step}).
+This is an integral over a subset of the hemisphere
+Eq.~(\ref{2-step-def-Sigma0}) of the center-of-mass
+momentum subspace for the breakup step of the reaction.
+In the Newtonian analysis of this reaction in Section~\ref{Sec:2-step-2-body},
+a uniform measure~$d\sigma_0$ was derived for the
+hemisphere~$\Sigma_0$ of Eq.~(\ref{2-step-def-zeta}) in
+terms of the variables $\mubcm$ and~$w$ of Eqs.~(\ref{2-step-def-xi})
+and~(\ref{2-step-def-eta}).  The analogous uniform measure~$d\sigma_1$
+on the hemisphere~$\Sigma_1$ of Eq.~(\ref{2-step-def-Sigma0})
+is given by the relations
+\begin{alignat}{2}
+  \pbcmea &= |\pbcme| \, \mubcm
+    \quad &\text{for $-1 \le \mubcm \le 1$,} 
+      \label{2-step-def-xi-rel} \\
+  \pbcmeb &= |\pbcme| \sqrt{ 1 - \mubcm^2 } \, \sin w     
+    \quad &\text{for $-\pi/2 \le w \le \pi/2$}.
+   \label{2-step-def-eta-rel}
+\end{alignat}
+With this notation, the expression
+$$
+  d\sigma_1 = \frac{ d \mubcm \, dw}{2 \pi}
+$$
+gives a uniform measure on~$\Sigma_1$.
+
+\begin{figure}
+\input{figA-1}
+\end{figure}
+
+It is clear from the mappings Eqs.~(\ref{R-3-inv-step2}) and~(\ref{R-3-inv-rotate})
+that for fixed values of the kinetic energy~$\Tlabin$ of the incident
+particle and for fixed direction cosines $\muacm$ and~$\mubcm$,
+the kinetic energy~$\Tblabe$ of the final emitted particle in the initial
+laboratory frame is independent of the value of~$\pbcmeb$.
+That is, $\Tblabe$ is constant for $\pbcmea$ and~$\pbcmeb$ on
+the segment from $A$ to~$B$ in the $(\pbcmea, \pbcmeb)$-plane
+in Figure~\ref{Fig:2-step-2-body-step2-rel}.
+Note also that for fixed $\Tlabin$ and~$\muacm$, the relations
+Eqs.~(\ref{R-3-inv-step2}) and~(\ref{2-step-def-xi-rel}) imply that
+$\Tblabe$ is an increasing function of~$\mubcm$.  It follows
+that if $\Tblabe$ lies in an energy bin~$\calE_h'$ for given
+$\Tlabin$ and~$\muacm$, then it does so for $\mubcm$ on
+an interval $[a_h, b_h]$ with
+$$
+  -1 \le a_h \le \mubcm \le b_h \le 1.
+$$
+This situation is of interest only if $a_h < b_h$.  In conclusion,
+it has been shown that the integral over~$\Sigma_{1,h}$ in
+Eq.~(\ref{2-step-muEint-2step}) may be written as
+\begin{equation*}
+   \int_{\Sigma_{1,h}} d\sigma_1 \, P_\ell( \mulab ) =
+   \frac{1}{2 \pi }
+   \int_{ a_h}^{b_h} d\mubcm \int_{- \pi/2}
+                           ^{\pi/2} dw \,
+          P_\ell( \mulab ) .
+% \label{2-step-int-sigma-rel}
+\end{equation*}
+
+
+
 
 } % end of this appendix

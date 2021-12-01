@@ -16,11 +16,13 @@
 
 #include "evaporation.hpp"
 
+namespace Max
+{
 class Maxwell_param;  // forward reference
 
 //! Class for the maxwell model
 // ---------------- class maxwell ------------------
-class maxwell : public evaporation
+class maxwell : public Evap::evaporation
 {
 private:
 
@@ -35,7 +37,7 @@ public:
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param transfer the computed transfer matrix
   void get_T( const dd_vector& sigma, const dd_vector& multiple,
-    const dd_vector& weight, T_matrix& transfer );
+    const dd_vector& weight, Trf::T_matrix& transfer );
 };
 
 //! Class for parameters for the Maxwell model
@@ -57,19 +59,11 @@ public:
 
   // *** Implement the virtual functions ***
   //! Gets the integrals over outgoing energy
+  //! returns true if the interpolation is OK
   //! \param Eout_0 lower limit of the integral over outgoing energy
   //! \param Eout_1 upper limit of the integral over outgoing energy
   //! \param value the computed integral
-  void get_integrals( double Eout_0, double Eout_1, coef_vector &value );
-
-  //! Gets the integrals over outgoing energy and returns the noise in the calculation
-  //! \param Eout_0 lower limit of the integral over outgoing energy
-  //! \param Eout_1 upper limit of the integral over outgoing energy
-  //! \param value the computed integral
-  inline double tol_get_integrals( double Eout_0, double Eout_1, coef_vector &value )
-  {
-    return Evap_param::tol_get_integrals( Eout_0, Eout_1, value );
-  }
+  bool get_integrals( double Eout_0, double Eout_1, Coef::coef_vector &value );
 
   //! Integrate from 0 to E_max to get the norm
   double get_norm( );
@@ -87,15 +81,19 @@ public:
   // *** End of the virtual functions ***
 };
 
+} // end of namespace Max
+
 // **************** Function to integrate *********************
 namespace Maxwell_F
 {
   // --------------------  Eout_F ------------------
   // Function for the 1-d quadrature over outgoing energy
+  //! returns true if the interpolation is OK
   //! \param E_out energy of outgoing particle
   //! \param E_out_param parameters for this function
   //! \param value the computed contribution to the transfer matrix
-  void Eout_F( double E_out, QuadParamBase *E_out_param, coef_vector *value );
+  bool Eout_F( double E_out, Qparam::QuadParamBase *E_out_param,
+	       Coef::coef_vector *value );
 }
 
 #endif

@@ -12,6 +12,13 @@ fudge.processing.deterministic.transferMatrices module
     :undoc-members:
     :show-inheritance:
 
+fudge.processing.deterministic.multiGroupUpScatter module
+---------------------------------------------------------
+
+.. automodule:: fudge.processing.deterministic.multiGroupUpScatter
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Module contents
 ---------------

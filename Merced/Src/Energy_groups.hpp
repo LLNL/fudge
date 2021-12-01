@@ -18,11 +18,12 @@
 
 #include "data_parser.hpp"
 
-using namespace std;
+namespace Egp
+{
 
 //! Class for the energy group boundaries
 //-----------class Energy_groups ----------
-class Energy_groups : public vector< double >
+class Energy_groups : public std::vector< double >
 {
 public:
   inline Energy_groups( ) {}
@@ -31,7 +32,7 @@ public:
   //! Reads the energy group boundaries
   //! \param infile input file
   //! \param num_bd number of energy group boundaries
-  void read_bd( data_parser &input_file, int num_bd );
+  void read_bd( Dpar::data_parser &input_file, int num_bd );
 
   //! Returns the index of the left-hand end of the energy bin containing this_E
   //! \param this_E the given energy
@@ -40,6 +41,10 @@ public:
   //! Returns the index of the right-hand end of the energy bin containing this_E
   //! \param this_E the given energy
   int last_bin_ID( double this_E ) const;
+
+  //! Returns the largest energy in the list
+  double get_top_E( ) const;
 };
 
+} // end of namespace Egp
 #endif

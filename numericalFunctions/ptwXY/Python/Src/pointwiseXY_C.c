@@ -1,65 +1,9 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 */
 
@@ -80,13 +24,20 @@
 #include <ptwXY.h>
 #include <pointwiseXY_C.h>
 
-#if( PY_VERSION_HEX < 0x02050000 )
-#define Py_ssize_t int64_t 
-#define lenfunc inquiry
-#define ssizeargfunc intargfunc
-#define ssizessizeargfunc intintargfunc
-#define ssizeobjargproc intobjargproc
-#define ssizessizeobjargproc intintobjargproc
+#if PY_MAJOR_VERSION < 3
+    #define PYUNICODE_CHECK PyString_Check
+    #define PYUNICODE_ASSTRING PyString_AsString
+    #define PYUNICODE_FROMSTRING PyString_FromString
+
+    #define STATICFORWARD staticforward
+
+#else
+    #define PYUNICODE_CHECK PyUnicode_Check
+    #define PYUNICODE_ASSTRING PyUnicode_AsUTF8
+    #define PYUNICODE_FROMSTRING PyUnicode_FromString
+
+    #define STATICFORWARD static
+    #define Py_TPFLAGS_CHECKTYPES 0
 #endif
 
 #define pyObject_Unsupported 0
@@ -102,7 +53,7 @@ typedef ptwXYPoints *(*ptwXY_ptwXY_ptwXY_func)( statusMessageReporting *smr, ptw
 
 static double _defaultAccuracy = 1e-3;
 
-staticforward PyTypeObject pointwiseXY_CPyType;
+STATICFORWARD PyTypeObject pointwiseXY_CPyType;
 
 typedef struct pointwiseXY_CPy_s {
     PyObject_HEAD
@@ -112,7 +63,7 @@ typedef struct pointwiseXY_CPy_s {
     int safeDivide;
 } pointwiseXY_CPy;
 
-#define is_pointwiseXY_CPyObject( v ) ((v)->ob_type == &pointwiseXY_CPyType)
+#define is_pointwiseXY_CPyObject( v ) ( Py_TYPE( v ) == &pointwiseXY_CPyType )
 
 typedef struct GnG_parameters_s {
     PyObject *func;
@@ -159,6 +110,7 @@ static PyObject *pointwiseXY_C__repr__( pointwiseXY_CPy *self );
 static Py_ssize_t pointwiseXY_C__len__( pointwiseXY_CPy *self );
 static PyObject *pointwiseXY_C__getitem__( pointwiseXY_CPy *self, Py_ssize_t index );
 static PyObject *pointwiseXY_C__getslice__( pointwiseXY_CPy *self, Py_ssize_t index1_, Py_ssize_t index2_ );
+static PyObject *pointwiseXY_C_getslice( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords );
 static int pointwiseXY_C__setitem__( pointwiseXY_CPy *self, Py_ssize_t index, PyObject *value );
 static int pointwiseXY_C__setslice__( pointwiseXY_CPy *self, Py_ssize_t index1_, Py_ssize_t index2_, PyObject *value );
 static PyObject *pointwiseXY_C__add__( PyObject *self, PyObject *other );
@@ -291,7 +243,7 @@ static int pointwiseXY_C_Get_pointwiseXY_CAsSelf( PyObject *self, PyObject *othe
     pointwiseXY_CPy **self3, pointwiseXY_CPy **other3 );
 static int pointwiseXY_C_addedItemToPythonList( PyObject *list, PyObject *item );
 static int isOkayAndHasData( pointwiseXY_CPy *self );
-static int pointwiseXY_C_checkInterpolationString( char *interpolationStr, ptwXY_interpolation *interpolation, int allowOther );
+static int pointwiseXY_C_checkInterpolationString( char const *interpolationStr, ptwXY_interpolation *interpolation, int allowOther );
 static PyObject *pointwiseXY_C_GetNone( void );
 static void pointwiseXY_C_SetPyErrorExceptionFromSMR( PyObject *type, statusMessageReporting *smr );
 static PyObject *pointwiseXY_C_SetPyErrorExceptionReturnNull( const char *s, ... );
@@ -299,7 +251,6 @@ static int pointwiseXY_C_SetPyErrorExceptionReturnMinusOne( const char *s, ... )
 static int pointwiseXY_C_checkStatus( pointwiseXY_CPy *self );
 static int pointwiseXY_C_checkStatus2( pointwiseXY_CPy *self, char const *name );
 
-DL_EXPORT( void ) initpointwiseXY_C( void );
 /*
 ******************** pointwiseXY_CNewInitialize ************************
 */
@@ -327,7 +278,8 @@ static int pointwiseXY_C__init__( pointwiseXY_CPy *self, PyObject *args, PyObjec
         "safeDivide", "userFlag", NULL };
     ptwXYPoints *ptwXY = NULL;
     PyObject *dataPy = NULL, *dataFormPy = NULL, *xsPy = NULL, *ysPy = NULL, *theEnd = NULL, *iterator;
-    char *interpolationStr = NULL, *dataForm, dataFormXYs[] = "xys", dataFormXsAndYs[] = "xsandys", dataFormList[] = "list", dataFormToLower[12], *c;
+    char *interpolationStr = NULL, dataFormXYs[] = "xys", dataFormXsAndYs[] = "xsandys", dataFormList[] = "list", dataFormToLower[12], *c;
+    char const *dataForm;
     ptwXY_interpolation interpolation = ptwXY_interpolationLinLin;
 
     self->ptwXY = NULL;
@@ -339,8 +291,8 @@ static int pointwiseXY_C__init__( pointwiseXY_CPy *self, PyObject *args, PyObjec
     if( dataFormPy == NULL ) {
         dataForm = dataFormXYs; }
     else {
-        if( !PyString_Check( dataFormPy ) ) return( pointwiseXY_C_SetPyErrorExceptionReturnMinusOne( "dataForm must be a string" ) );
-        dataForm = PyString_AsString( dataFormPy );
+        if( !PYUNICODE_CHECK( dataFormPy ) ) return( pointwiseXY_C_SetPyErrorExceptionReturnMinusOne( "dataForm must be a string" ) );
+        dataForm = PYUNICODE_ASSTRING( dataFormPy );
         if( strlen( dataForm ) > strlen( dataFormXsAndYs ) )
             return( pointwiseXY_C_SetPyErrorExceptionReturnMinusOne( "invalid dataForm = '%s'", dataForm ) );
         strcpy( dataFormToLower, dataForm );
@@ -412,10 +364,13 @@ static void pointwiseXY_C_dealloc( PyObject *self ) {
 
     pointwiseXY_CPy *ptwXY = (pointwiseXY_CPy *) self;
 
+    smr_release( &(ptwXY->smr) );
+
     if( ptwXY->ptwXY != NULL ) {
         ptwXY_free( ptwXY->ptwXY );
     }
-    self->ob_type->tp_free( self );
+
+    Py_TYPE( self )->tp_free( self );
 }
 /*
 ************************************************************
@@ -436,9 +391,9 @@ static Py_ssize_t pointwiseXY_C__len__( pointwiseXY_CPy *self ) {
 /*
 ************************************************************
 */
-static PyObject *pointwiseXY_C__getitem__( pointwiseXY_CPy *self, Py_ssize_t index_ ) {
+static PyObject *pointwiseXY_C__getitem__( pointwiseXY_CPy *self, Py_ssize_t _index ) {
 
-    int64_t index = (int64_t) index_;
+    int64_t index = (int64_t) _index;
     ptwXYPoint *point;
     statusMessageReporting *smr = &(self->smr);
 
@@ -451,7 +406,7 @@ static PyObject *pointwiseXY_C__getitem__( pointwiseXY_CPy *self, Py_ssize_t ind
         }
         return( NULL );
     }
-    return( (PyObject *) Py_BuildValue( "[d,d]", point->x, point->y ) );
+    return( Py_BuildValue( "[dd]", point->x, point->y ) );
 }
 /*
 ************************************************************
@@ -478,9 +433,9 @@ static void pointwiseXY_C_getSliceIndices( int64_t length, int64_t *index1, int6
 /*
 ************************************************************
 */
-static PyObject *pointwiseXY_C__getslice__( pointwiseXY_CPy *self, Py_ssize_t index1_, Py_ssize_t index2_ ) {
+static PyObject *pointwiseXY_C__getslice__( pointwiseXY_CPy *self, Py_ssize_t _index1, Py_ssize_t _index2 ) {
 
-    int64_t index1 = (int64_t) index1_, index2 = (int64_t) index2_, overflowSize = self->ptwXY->overflowAllocatedSize;
+    int64_t index1 = (int64_t) _index1, index2 = (int64_t) _index2, overflowSize = self->ptwXY->overflowAllocatedSize;
     pointwiseXY_CPy *newPy;
     ptwXYPoints *n;
     statusMessageReporting *smr = &(self->smr);
@@ -501,12 +456,23 @@ static PyObject *pointwiseXY_C__getslice__( pointwiseXY_CPy *self, Py_ssize_t in
 /*
 ************************************************************
 */
-static int pointwiseXY_C__setitem__( pointwiseXY_CPy *self, Py_ssize_t index_, PyObject *value ) {
+static PyObject *pointwiseXY_C_getslice( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords ) {
+
+    long lower = 0, upper = (long) self->ptwXY->length;
+    static char *kwlist[] = { "lower", "upper", NULL };
+
+    if( !PyArg_ParseTupleAndKeywords( args, keywords, "|ll", kwlist, &lower, &upper ) ) return( NULL );
+    return( pointwiseXY_C__getslice__( self, lower, upper ) );
+}
 /*
-*   This routine can be called either when "self[index_] = number" or "del self[index_]".
+************************************************************
+*/
+static int pointwiseXY_C__setitem__( pointwiseXY_CPy *self, Py_ssize_t _index, PyObject *value ) {
+/*
+*   This routine can be called either when "self[_index] = number" or "del self[_index]".
 */
     int status = 0;
-    int64_t index = (int64_t) index_;
+    int64_t index = (int64_t) _index;
     ptwXYPoint *point;
     pointwiseXY_CPy *other = (pointwiseXY_CPy *) value;
     double x, y;
@@ -519,10 +485,10 @@ static int pointwiseXY_C__setitem__( pointwiseXY_CPy *self, Py_ssize_t index_, P
         return( -1 );
     }
     if( value == NULL ) {
-        if( ptwXY_deletePoints( smr, self->ptwXY, index, index + 1 ) != nfu_Okay )
+        if( ptwXY_deletePoints( smr, self->ptwXY, index, index + 1 ) != nfu_Okay ) {
             pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
             status = -1;
-        }
+        } }
     else {
         switch( pyObject_NumberOrPtwXY( value ) ) {
         case pyObject_Unsupported :
@@ -630,17 +596,89 @@ Err:
 ************************************************************
 */
 static PySequenceMethods pointwiseXY_CPy_sequence = {
-    (lenfunc) pointwiseXY_C__len__,               /* sq_length */
-    0,                                          /* sq_concat */
-    0,                                          /* sq_repeat */
-    (ssizeargfunc) pointwiseXY_C__getitem__,        /* sq_item */
-    (ssizessizeargfunc) pointwiseXY_C__getslice__,    /* sq_slice */
-    (ssizeobjargproc) pointwiseXY_C__setitem__,     /* sq_ass_item */
-    (ssizessizeobjargproc) pointwiseXY_C__setslice__, /* sq_ass_slice */
-    0,                                          /* sq_contains */
-    0,                                          /* sq_inplace_concat */
-    0                                           /* sq_inplace_repeat */
+    (lenfunc) pointwiseXY_C__len__,                     /* sq_length */
+    0,                                                  /* sq_concat */
+    0,                                                  /* sq_repeat */
+    (ssizeargfunc) pointwiseXY_C__getitem__,            /* sq_item */
+#if PY_MAJOR_VERSION < 3
+    (ssizessizeargfunc) pointwiseXY_C__getslice__,      /* sq_slice */
+    (ssizeobjargproc) pointwiseXY_C__setitem__,         /* sq_ass_item */
+    (ssizessizeobjargproc) pointwiseXY_C__setslice__,   /* sq_ass_slice */
+#else
+    0,                                                  /* sq_slice */
+    (ssizeobjargproc) pointwiseXY_C__setitem__,         /* sq_ass_item */
+    0,                                                  /* sq_ass_slice */
+#endif
+    0,                                                  /* sq_contains */
+    0,                                                  /* sq_inplace_concat */
+    0                                                   /* sq_inplace_repeat */
 };
+#if PY_MAJOR_VERSION < 3
+    #define pointwiseXY_CPy_mappingPointer 0
+#else
+/*
+************************************************************
+*/
+static PyObject *pointwiseXY_C_subscript( pointwiseXY_CPy *self, PyObject *item ) {
+
+    if( PyIndex_Check( item ) ) {
+        Py_ssize_t index;
+
+        index = PyNumber_AsSsize_t( item, PyExc_IndexError );
+        if( ( index == -1 ) && PyErr_Occurred( ) ) return( NULL );
+        if( index < 0 ) index += pointwiseXY_C__len__( self );
+        return( pointwiseXY_C__getitem__( self, index ) ); }
+    else if ( PySlice_Check( item ) ) {
+        Py_ssize_t start, stop, step, slicelength;
+
+        if( PySlice_Unpack( item, &start, &stop, &step ) < 0 ) return( NULL );
+        slicelength = PySlice_AdjustIndices( pointwiseXY_C__len__( self ), &start, &stop, step );
+        if( slicelength <= 0 ) stop = start;
+        if( step == 1 ) return( pointwiseXY_C__getslice__( self, start, stop ) );
+
+        PyErr_Format( PyExc_ValueError, "step can only be 1" );
+        return( NULL );
+    }
+    PyErr_Format( PyExc_TypeError, "indices must be integers or slices, not %.200s", item->ob_type->tp_name );
+    return( NULL );
+}
+/*
+************************************************************
+*/
+static int pointwiseXY_ass_subscript( pointwiseXY_CPy *self, PyObject *item, PyObject *value ) {
+
+    if( PyIndex_Check( item ) ) {
+        Py_ssize_t index;
+
+        index = PyNumber_AsSsize_t( item, PyExc_IndexError );
+        if( ( index == -1 ) && PyErr_Occurred( ) ) return( -1 );
+        if( index < 0 ) index += pointwiseXY_C__len__( self );
+        return( pointwiseXY_C__setitem__( self, index, value ) ); }
+    else if ( PySlice_Check( item ) ) {
+        Py_ssize_t start, stop, step, slicelength;
+
+        if( PySlice_Unpack( item, &start, &stop, &step ) < 0 ) return( -1 );
+        slicelength = PySlice_AdjustIndices( pointwiseXY_C__len__( self ), &start, &stop, step );
+        if( slicelength <= 0 ) stop = start;
+        if( step == 1 ) return( pointwiseXY_C__setslice__( self, start, stop, value ) );
+
+        PyErr_Format( PyExc_ValueError, "step can only be 1" );
+        return( -1 );
+    }
+    PyErr_Format( PyExc_TypeError, "indices must be integers or slices, not %.200s", item->ob_type->tp_name );
+    return( -1 );
+}
+/*
+************************************************************
+*/
+static PyMappingMethods pointwiseXY_CPy_mapping = {
+    (lenfunc) pointwiseXY_C__len__,
+    (binaryfunc) pointwiseXY_C_subscript,
+    (objobjargproc) pointwiseXY_ass_subscript
+};
+
+#define pointwiseXY_CPy_mappingPointer (&pointwiseXY_CPy_mapping)
+#endif
 /*
 ************************************************************
 */
@@ -845,7 +883,7 @@ static PyObject *pointwiseXY_C__div__( PyObject *self, PyObject *other ) {
         }
         break;
     case pyObject_ptwXY :
-        if( s3->safeDivide || s3->safeDivide ) {
+        if( s3->safeDivide || o3->safeDivide ) {
             n = pointwiseXY_C_add_sub_mul_div_pointwiseXY_C( s3, o3, pointwiseXY_C_div_pointwiseXY_C_Py_withSafeDivide ); }
         else {
             n = pointwiseXY_C_add_sub_mul_div_pointwiseXY_C( s3, o3, pointwiseXY_C_div_pointwiseXY_C_Py_withoutSafeDivide );
@@ -871,7 +909,7 @@ static PyObject *pointwiseXY_C__idiv__( PyObject *self, PyObject *other ) {
         self = pointwiseXY_C_add_sub_mul_div_number_insitu( s3, other, ptwXY_div_doubleFrom );
         break;
     case pyObject_ptwXY :
-        if( s3->safeDivide || s3->safeDivide ) {
+        if( s3->safeDivide || o3->safeDivide ) {
             self = pointwiseXY_C_add_sub_mul_div_pointwiseXY_C_insitu( s3, o3, pointwiseXY_C_div_pointwiseXY_C_Py_withSafeDivide ); }
         else {
             self = pointwiseXY_C_add_sub_mul_div_pointwiseXY_C_insitu( s3, o3, pointwiseXY_C_div_pointwiseXY_C_Py_withoutSafeDivide );
@@ -966,6 +1004,7 @@ static PyObject *pointwiseXY_C_add_sub_mul_div_number_insitu( pointwiseXY_CPy *s
     pointwiseXY_C_PyNumberToFloat( other, &number );       /* Assume calling routine has checked that other is a number. */
     if( ( n1 = ptwXY_clone( smr, self->ptwXY ) ) == NULL ) goto Err;
     if( func( smr, n1, number ) != nfu_Okay ) goto Err;
+    ptwXY_free( self->ptwXY );
     self->ptwXY = n1;
     return( (PyObject *) self );
 
@@ -1083,6 +1122,7 @@ static PyObject *pointwiseXY_C__abs__( PyObject *self ) {
 ************************************************************
 */
 static PyNumberMethods pointwiseXY_CPy_number = {
+#if PY_MAJOR_VERSION < 3
     (binaryfunc) pointwiseXY_C__add__,      /* nb_add */
     (binaryfunc) pointwiseXY_C__sub__,      /* nb_subtract */
     (binaryfunc) pointwiseXY_C__mul__,      /* nb_multiply */
@@ -1106,23 +1146,49 @@ static PyNumberMethods pointwiseXY_CPy_number = {
     0,                                      /* nb_float */
     0,                                      /* unaryfunc nb_oct */
     0,                                      /* unaryfunc nb_hex */
-    (binaryfunc) pointwiseXY_C__iadd__,     /* nb_inplace_add */            /* Added in release 2.0 */
+    (binaryfunc) pointwiseXY_C__iadd__,     /* nb_inplace_add */
     (binaryfunc) pointwiseXY_C__isub__,     /* nb_inplace_subtract */
     (binaryfunc) pointwiseXY_C__imul__,     /* nb_inplace_multiply */
     (binaryfunc) pointwiseXY_C__idiv__,     /* nb_inplace_divide */
     (binaryfunc) 0,                         /* nb_inplace_remainder */
     (ternaryfunc) 0,                        /* nb_inplace_power */
-#if 0
-    binaryfunc nb_inplace_lshift
-    binaryfunc nb_inplace_rshift
-    binaryfunc nb_inplace_and
-    binaryfunc nb_inplace_xor
-    binaryfunc nb_inplace_or
-    binaryfunc nb_floor_divide         /* The following added in release 2.2, and require the Py_TPFLAGS_HAVE_CLASS flag */
-    binaryfunc nb_true_divide
-    binaryfunc nb_inplace_floor_divide
-    binaryfunc nb_inplace_true_divide
-    unaryfunc nb_index                 /* The following added in release 2.5 */
+
+#else
+    (binaryfunc) pointwiseXY_C__add__,      /* nb_add */
+    (binaryfunc) pointwiseXY_C__sub__,      /* nb_subtract */
+    (binaryfunc) pointwiseXY_C__mul__,      /* nb_multiply */
+    (binaryfunc) pointwiseXY_C__mod__,      /* nb_remainder */
+    0,                                      /* nb_divmod */
+    (ternaryfunc) pointwiseXY_C__pow__,     /* nb_power */
+    (unaryfunc) pointwiseXY_C__neg__,       /* nb_negative */
+    0,                                      /* nb_positive */
+    (unaryfunc) pointwiseXY_C__abs__,       /* nb_absolute */
+    0,                                      /* nb_bool */
+    0,                                      /* nb_invert */
+    0,                                      /* nb_lshift */
+    0,                                      /* nb_rshift */
+    0,                                      /* nb_and */
+    0,                                      /* nb_xor */
+    0,                                      /* nb_or */
+    0,                                      /* nb_int */
+    0,                                      /* nb_reserved */
+    0,                                      /* nb_float */
+
+    (binaryfunc) pointwiseXY_C__iadd__,     /* nb_inplace_add */
+    (binaryfunc) pointwiseXY_C__isub__,     /* nb_inplace_subtract */
+    (binaryfunc) pointwiseXY_C__imul__,     /* nb_inplace_multiply */
+     0,                                     /* nb_inplace_remainder */
+     0,                                     /* nb_inplace_power */
+     0,                                     /* nb_inplace_lshift */
+     0,                                     /* nb_inplace_rshift */
+     0,                                     /* nb_inplace_and */
+     0,                                     /* nb_inplace_xor */
+     0,                                     /* nb_inplace_or */
+
+     0,                                     /* nb_floor_divide */
+     (binaryfunc) pointwiseXY_C__div__,     /* nb_true_divide */
+     0,                                     /* nb_inplace_floor_divide */
+     (binaryfunc) pointwiseXY_C__idiv__,    /* nb_inplace_true_divide */
 #endif
 };
 
@@ -1151,7 +1217,7 @@ static PyObject *pointwiseXY_C_pop( pointwiseXY_CPy *self, PyObject *args, PyObj
         pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
         return( NULL );
     }
-    return( Py_BuildValue( "(d,d)", point.x, point.y ) );
+    return( Py_BuildValue( "[dd]", point.x, point.y ) );
 }
 /*
 ************************************************************
@@ -1160,7 +1226,7 @@ static PyObject *pointwiseXY_C_allocatedSize( pointwiseXY_CPy *self ) {
 
     if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
 
-    return( (PyObject *) Py_BuildValue( "l", self->ptwXY->allocatedSize ) );
+    return( Py_BuildValue( "l", self->ptwXY->allocatedSize ) );
 }
 /*
 ************************************************************
@@ -1223,7 +1289,7 @@ static nfu_status pointwiseXY_C_applyFunction2( statusMessageReporting *smr, ptw
     PyObject **f_args = (PyObject **) argList, *result;
     nfu_status status_nf = nfu_Okay;
 
-    result = PyEval_CallFunction( (PyObject *) f_args[0], "(d,O)", ptwXY->x, f_args[1] );
+    result = PyObject_CallFunction( (PyObject *) f_args[0], "(d,O)", ptwXY->x, f_args[1] );
     if( result == NULL ) return( nfu_badInput );
     if( pointwiseXY_C_PyNumberToFloat( result, &(ptwXY->y) ) != 0 ) {
         smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badInput, "could not convert returned value to float" );
@@ -1256,7 +1322,7 @@ static PyObject *pointwiseXY_C_changeInterpolationIfNeeded( pointwiseXY_CPy *sel
 
     int status, length = 0, i1;
     double accuracy = self->ptwXY->accuracy, lowerEps = 0., upperEps = 0.;
-    char *interpolationStr;
+    char const *interpolationStr;
     static char *kwlist[] = { "interpolation", "accuracy", "lowerEps", "upperEps", NULL };
     PyObject *allowedInterpolations, *iterator, *interpolationItem = NULL;
     ptwXY_interpolation interpolation = ptwXY_interpolationLinLin, firstInterpolation = ptwXY_interpolationLinLin;
@@ -1269,7 +1335,7 @@ static PyObject *pointwiseXY_C_changeInterpolationIfNeeded( pointwiseXY_CPy *sel
     if( ( iterator = PyObject_GetIter( allowedInterpolations ) ) == NULL ) return( NULL );
     for( interpolationItem = PyIter_Next( iterator ), i1 = 0; interpolationItem != NULL; 
             interpolationItem = PyIter_Next( iterator ), ++i1 ) {
-        if( ( interpolationStr = PyString_AsString( interpolationItem ) ) == NULL ) {
+        if( ( interpolationStr = PYUNICODE_ASSTRING( interpolationItem ) ) == NULL ) {
             Py_DECREF( interpolationItem );
             Py_DECREF( iterator );
             smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, 
@@ -1481,7 +1547,7 @@ static PyObject *pointwiseXY_C_copyDataToXYs( pointwiseXY_CPy *self, PyObject *a
         return( NULL );
     }
     for( i1 = 0; i1 < self->ptwXY->length; i1++ ) {
-        ni = Py_BuildValue( "[d,d]", xScale * xs[i1], yScale * ys[i1] );
+        ni = Py_BuildValue( "[dd]", xScale * xs[i1], yScale * ys[i1] );
         if( pointwiseXY_C_addedItemToPythonList( l, ni ) != 0 ) {
             free( xs );
             free( ys );
@@ -1498,7 +1564,7 @@ static PyObject *pointwiseXY_C_copyDataToXYs( pointwiseXY_CPy *self, PyObject *a
 static PyObject *pointwiseXY_C_copyDataToXsAndYs( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords ) {
 
     int64_t i;
-    PyObject *lx = PyList_New( 0 ), *ly, *item;
+    PyObject *lx, *ly, *item;
     double xScale = 1.0, yScale = 1.0;
     static char *kwlist[] = { "xScale", "yScale", NULL };
     statusMessageReporting *smr = &(self->smr);
@@ -1507,12 +1573,12 @@ static PyObject *pointwiseXY_C_copyDataToXsAndYs( pointwiseXY_CPy *self, PyObjec
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "|dd", kwlist, &xScale, &yScale ) ) return( NULL );
 
-    if( lx == NULL ) return( NULL );
     if( ptwXY_coalescePoints( smr, self->ptwXY, 0, NULL, 0 ) != nfu_Okay ) {
         pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
         return( NULL );
     }
 
+    if( ( lx = PyList_New( 0 ) ) == NULL ) return( NULL );
     if( ( ly = PyList_New( 0 ) ) == NULL ) {
         Py_DECREF( lx );
         return( NULL );
@@ -1530,7 +1596,12 @@ static PyObject *pointwiseXY_C_copyDataToXsAndYs( pointwiseXY_CPy *self, PyObjec
             return( NULL );
         }
     }
-    return( Py_BuildValue( "[O,O]", lx, ly ) );
+
+    item = Py_BuildValue( "OO", lx, ly );
+    Py_DECREF( lx );
+    Py_DECREF( ly );
+
+    return( item );
 }
 /*
 ************************************************************
@@ -1631,6 +1702,19 @@ static PyObject *pointwiseXY_C_getInterpolation( pointwiseXY_CPy *self ) {
     if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
 
     return( Py_BuildValue( "s", ptwXY_getInterpolationString( self->ptwXY ) ) );
+}
+/*
+************************************************************
+*/
+static PyObject *pointwiseXY_C_setInterpolation( pointwiseXY_CPy *self, PyObject *args ) {
+
+    char *interpolationString;
+
+    if( !PyArg_ParseTuple( args, "s", &interpolationString ) ) return( NULL );
+
+    if( ptwXY_setInterpolationString( self->ptwXY, interpolationString ) == nfu_Okay ) return( pointwiseXY_C_GetNone( ) );
+
+    return( pointwiseXY_C_SetPyErrorExceptionReturnNull( "Other interpolation not support for setInterpolation: interpolation = '%s'", interpolationString ) );
 }
 /*
 ************************************************************
@@ -1794,7 +1878,7 @@ BRB FIXME , check if smr is needed.
     GnG_parameters *parameters = (GnG_parameters *) argList;
     PyObject *result;
 
-    result = PyEval_CallFunction( parameters->func, "(d,O)", x, parameters->argList );
+    result = PyObject_CallFunction( parameters->func, "(d,O)", x, parameters->argList );
     if( result == NULL ) return( nfu_badInput );
 
     if( PyFloat_Check( result ) ) {
@@ -1968,7 +2052,7 @@ static PyObject *pointwiseXY_C_groupFunctionsCommon( pointwiseXY_CPy *f1, PyObje
     pointwiseXY_CPy *f2 = (pointwiseXY_CPy *) of2, *f3 = (pointwiseXY_CPy *) of3;
     PyObject *newPy = NULL;
     ptwXY_group_normType norm = ptwXY_group_normType_none;
-    char *normChars;
+    char const *normChars;
     int status;
     statusMessageReporting *smr = &(f1->smr);
 
@@ -1987,8 +2071,8 @@ static PyObject *pointwiseXY_C_groupFunctionsCommon( pointwiseXY_CPy *f1, PyObje
 BRB FIXME, need to check status of normPy
 */
     if( ( normPy != NULL ) && ( normPy != Py_None ) ) {
-        if( PyString_Check( normPy ) ) {
-            if( ( normChars = PyString_AsString( normPy ) ) == NULL ) {
+        if( PYUNICODE_CHECK( normPy ) ) {
+            if( ( normChars = PYUNICODE_ASSTRING( normPy ) ) == NULL ) {
                 return( pointwiseXY_C_SetPyErrorExceptionReturnNull( "invalid string norm" ) ); }
             else {
                 if( strcmp( "dx", normChars ) != 0 ) return( pointwiseXY_C_SetPyErrorExceptionReturnNull( "invalid string norm identifier, must be 'dx'" ) );
@@ -2090,9 +2174,11 @@ static PyObject *pointwiseXY_C_mutualify( pointwiseXY_CPy *self, PyObject *args,
 
     if( ( n1Py = pointwiseXY_CNewInitialize( self->infill, self->safeDivide ) ) == NULL ) goto Err;
     if( ( n2Py = pointwiseXY_CNewInitialize( other2->infill, other2->safeDivide ) ) == NULL ) goto Err;
-    if( ( lPy = Py_BuildValue( "(O,O)", n1Py, n2Py ) ) == NULL ) goto Err;
+    if( ( lPy = Py_BuildValue( "OO", n1Py, n2Py ) ) == NULL ) goto Err;
     n1Py->ptwXY = n1;
     n2Py->ptwXY = n2;
+    Py_DECREF( n1Py );          /* This is needed as the tuple in Py_BuildValue is adding a reference counts, making the count for the object 2 and not 1. */
+    Py_DECREF( n2Py );
 
     return( lPy );
 
@@ -2112,7 +2198,7 @@ static PyObject *pointwiseXY_C_overflowAllocatedSize( pointwiseXY_CPy *self ) {
 
     if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
 
-    return( (PyObject *) Py_BuildValue( "l", self->ptwXY->overflowAllocatedSize ) );
+    return( Py_BuildValue( "l", self->ptwXY->overflowAllocatedSize ) );
 }
 /*
 ************************************************************
@@ -2121,7 +2207,7 @@ static PyObject *pointwiseXY_C_overflowLength( pointwiseXY_CPy *self ) {
 
     if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
 
-    return( (PyObject *) Py_BuildValue( "l", self->ptwXY->overflowLength ) );
+    return( Py_BuildValue( "l", self->ptwXY->overflowLength ) );
 }
 /*
 ************************************************************
@@ -2132,26 +2218,26 @@ static PyObject *pointwiseXY_C_plot( pointwiseXY_CPy *self, PyObject *args ) {
 
     if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
 
-    if( ( moduleName = PyString_FromString( "Gnuplot" ) ) == NULL ) return( NULL );
+    if( ( moduleName = PYUNICODE_FROMSTRING( "Gnuplot" ) ) == NULL ) return( NULL );
     GnuplotModule = PyImport_Import( moduleName );
     Py_DECREF( moduleName );
     if( GnuplotModule == NULL ) return( NULL );
 
     if( ( Gnuplot = PyObject_GetAttrString( GnuplotModule, "Gnuplot" ) ) == NULL ) goto err;
-    if( ( g = PyEval_CallFunction( Gnuplot, "()" ) ) == NULL ) goto err;
-    if( PyEval_CallFunction( g, "(s)", "set style data linespoints" ) == NULL ) goto err;
+    if( ( g = PyObject_CallFunction( Gnuplot, "()" ) ) == NULL ) goto err;
+    if( PyObject_CallFunction( g, "(s)", "set style data linespoints" ) == NULL ) goto err;
 
     if( ( Data = PyObject_GetAttrString( GnuplotModule, "Data" ) ) == NULL ) goto err;
 
     if( ptwXY_length( NULL, self->ptwXY ) > 0 ) {
-        if( ( data = PyEval_CallFunction( Data, "(O)", self ) ) == NULL ) goto err; }
+        if( ( data = PyObject_CallFunction( Data, "(O)", self ) ) == NULL ) goto err; }
     else {
-        if( ( data = PyEval_CallFunction( Data, "([[d,d]])", -.9999, -.9999 ) ) == NULL ) goto err;
-        PyEval_CallFunction( g, "(s)", "set xrange [-1:1]" );
-        PyEval_CallFunction( g, "(s)", "set yrange [-1:1]" );
-        PyEval_CallFunction( g, "(s)", "set label 'Instance has no data' center at 0,0" );
+        if( ( data = PyObject_CallFunction( Data, "([[d,d]])", -.9999, -.9999 ) ) == NULL ) goto err;
+        PyObject_CallFunction( g, "(s)", "set xrange [-1:1]" );
+        PyObject_CallFunction( g, "(s)", "set yrange [-1:1]" );
+        PyObject_CallFunction( g, "(s)", "set label 'Instance has no data' center at 0,0" );
     }
-    if( PyEval_CallMethod( g, "plot", "(O)", data ) == NULL ) goto err;
+    if( PyObject_CallMethod( g, "plot", "(O)", data ) == NULL ) goto err;
 
     status = g;
     goto theEnd;
@@ -2247,7 +2333,7 @@ static int pointwiseXY_C_setDataFromPtwXY( ptwXYPoints *ptwXY, pointwiseXY_CPy *
 
     statusMessageReporting *smr = &(otherPy->smr);
 
-    if( ptwXY_copyDataOnly( smr, ptwXY, otherPy->ptwXY ) != nfu_Okay ) {
+    if( ptwXY_copyPointsOnly( smr, ptwXY, otherPy->ptwXY ) != nfu_Okay ) {
         pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
         return( -1 );
     }
@@ -2610,7 +2696,7 @@ static PyObject *pointwiseXY_C_toString2( pointwiseXY_CPy *self, int pairsPerLin
         e++;
         *e = 0;
     }
-    str = PyString_FromString( s );
+    str = PYUNICODE_FROMSTRING( s );
     free( s );
     return( str );
 }
@@ -2791,7 +2877,7 @@ static PyObject *pointwiseXY_C_domain( pointwiseXY_CPy *self ) {
     if( isOkayAndHasData( self ) == -1 ) return( NULL );
     if( pointwiseXY_C_domainMinMax( self, &domainMin, &domainMax ) == -1 ) return( NULL );
 
-    return( Py_BuildValue( "(d,d)", domainMin, domainMax ) );
+    return( Py_BuildValue( "[dd]", domainMin, domainMax ) );
 }
 /*
 ************************************************************
@@ -2855,7 +2941,7 @@ static PyObject *pointwiseXY_C_range( pointwiseXY_CPy *self ) {
     if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
 
     if( pointwiseXY_C_rangeMinMax( self, &rangeMin, &rangeMax ) == -1 ) return( NULL );
-    return( Py_BuildValue( "(d,d)", rangeMin, rangeMax ) );
+    return( Py_BuildValue( "[dd]", rangeMin, rangeMax ) );
 }
 /*
 ************************************************************
@@ -2950,7 +3036,10 @@ static PyObject *pointwiseXY_C_ysMappedToXs( pointwiseXY_CPy *self, PyObject *ar
     nPy = pointwiseXY_C_ptwXPoints_to_PyFloatList( ptwX );
     ptwX_free( ptwX );
 
-    return( Py_BuildValue( "(l,O)", (long) offset, nPy ) );
+    Xs_Py = Py_BuildValue( "lO", (long) offset, nPy );
+    Py_DECREF( nPy );
+
+    return( Xs_Py );
 }
 /*
 ************************************************************
@@ -3034,7 +3123,7 @@ static nfu_status pointwiseXY_C_createFromFunction2( statusMessageReporting *smr
     PyObject **f_args = (PyObject **) argList, *result;
     nfu_status status_nf = nfu_Okay;
 
-    result = PyEval_CallFunction( (PyObject *) f_args[0], "(d,O)", x, f_args[1] );
+    result = PyObject_CallFunction( (PyObject *) f_args[0], "(d,O)", x, f_args[1] );
     if( result == NULL ) {
         f_args[2] = f_args[0];
         return( nfu_badInput );
@@ -3044,6 +3133,7 @@ static nfu_status pointwiseXY_C_createFromFunction2( statusMessageReporting *smr
         status_nf = nfu_badInput;
         f_args[2] = f_args[0];
     }
+
     Py_DECREF( result );
     return( status_nf );
 }
@@ -3060,6 +3150,7 @@ static PyObject *pointwiseXY_C_createFromString( pointwiseXY_CPy *self, PyObject
     ptwXY_interpolation interpolation = ptwXY_interpolationLinLin;
     static char *kwlist[] = { "str", "accuracy", "biSectionMax", "interpolation", "infill", "safeDivide", "sep", NULL };
     statusMessageReporting smr;
+    PyObject *xys_Py;
 
     smr_initialize( &smr, smr_status_Ok );
 
@@ -3067,14 +3158,18 @@ static PyObject *pointwiseXY_C_createFromString( pointwiseXY_CPy *self, PyObject
         &str, &accuracy, &biSectionMax, &interpolationStr, &infill, &safeDivide, &sep ) ) return( NULL );
     if( pointwiseXY_C_checkInterpolationString( interpolationStr, &interpolation, 1 ) != 0 ) return( NULL );
 
-    if( ( ptwXY = ptwXY_fromString( &smr, str, sep, interpolation, interpolationStr, biSectionMax, accuracy, &endCharacter ) ) == NULL ) {
+    if( ( ptwXY = ptwXY_fromString( &smr, str, sep, interpolation, interpolationStr, biSectionMax, accuracy, &endCharacter, 1 ) ) == NULL ) {
         pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, &smr );
         goto err;
     }
 
     if( ( ptwXYPy = pointwiseXY_CNewInitialize( infill, safeDivide ) ) == NULL ) goto err;
     ptwXYPy->ptwXY = ptwXY;
-    return( Py_BuildValue( "(O,s)", ptwXYPy, endCharacter ) );
+
+    xys_Py = Py_BuildValue( "Os", ptwXYPy, endCharacter );
+    Py_DECREF( ptwXYPy );
+
+    return( xys_Py );
 
 err:
     if( ptwXY != NULL ) ptwXY_free( ptwXY );
@@ -3420,8 +3515,10 @@ static int pointwiseXY_C_PyNumberToFloat( PyObject *n, double *d ) {
 
     if( PyFloat_Check( n ) ) {
         *d = PyFloat_AsDouble( n ); }
+#if PY_MAJOR_VERSION < 3
     else if( PyInt_Check( n ) ) {
         *d = (double) PyInt_AsLong( n ); }
+#endif
     else if( PyLong_Check( n ) ) {
         *d = (double) PyLong_AsLongLong( n ); }
     else {
@@ -3434,10 +3531,12 @@ static int pointwiseXY_C_PyNumberToFloat( PyObject *n, double *d ) {
 */
 static int pyObject_NumberOrPtwXY(  PyObject *other ) {
 
-    if( PyInt_Check( other ) ) {
+    if( PyLong_Check( other ) ) {
         return( pyObject_Number ); }
-    else if( PyLong_Check( other ) ) {
+#if PY_MAJOR_VERSION < 3
+    else if( PyInt_Check( other ) ) {
         return( pyObject_Number ); }
+#endif
     else if( PyFloat_Check( other ) ) {
         return( pyObject_Number ); }
     else if( PyList_Check( other ) ) {
@@ -3503,7 +3602,7 @@ static int isOkayAndHasData( pointwiseXY_CPy *self ) {
 /*
 ************************************************************
 */
-static int pointwiseXY_C_checkInterpolationString( char *interpolationStr, ptwXY_interpolation *interpolation, int allowOther ) {
+static int pointwiseXY_C_checkInterpolationString( char const *interpolationStr, ptwXY_interpolation *interpolation, int allowOther ) {
 
     if( interpolationStr == NULL ) interpolationStr = "lin-lin";
     if( strcmp( interpolationStr, "lin-lin" ) == 0 ) {
@@ -3677,6 +3776,7 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
     { "getBiSectionMax", (PyCFunction) pointwiseXY_C_getBiSectionMax, METH_NOARGS, "Returns self's biSectionMax value." },
     { "getInfill", (PyCFunction) pointwiseXY_C_getInfill, METH_NOARGS, "Returns self's infill flag." },
     { "getInterpolation", (PyCFunction) pointwiseXY_C_getInterpolation, METH_NOARGS, "Returns self's interpolation as a string." },
+    { "setInterpolation", (PyCFunction) pointwiseXY_C_setInterpolation, METH_VARARGS, "Set self's interpolation. Other interpolation not supported." },
     { "getNFStatus", (PyCFunction) pointwiseXY_C_getNFStatus, METH_NOARGS, "Returns self's numerical functions status flag (an integer)." },
     { "lowerIndexBoundingX", (PyCFunction) pointwiseXY_C_lowerIndexBoundingX, METH_VARARGS,
         "Returns the lower index in self that bounds the x-value. -1 is returned if x is outside domain.\n" \
@@ -3686,6 +3786,13 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
         "Returns True if self's interpolation is 'lin-lin', otherwise returns False." },
     { "isInterpolationOther", (PyCFunction) pointwiseXY_C_isInterpolationOther, METH_NOARGS,
         "Returns True if self's interpolation is 'other', otherwise returns False." },
+    { "getslice", (PyCFunction) pointwiseXY_C_getslice, METH_VARARGS | METH_KEYWORDS,
+        "getslice( lowerIndex, upperIndex )\n\n" \
+        "Returns the slice of self from lowerIndex to upperIndex with a step of 1.\n" \
+        "\nArguments are: ([o] implies optional argument)\n" \
+        "   lowerIndex [o]      Value of the lower index. Default is 0.\n" \
+        "   upperIndex [o]      Value of the upper index. Default is length of pointwiseXY_C.\n" \
+        "\nExample: Return a pointwise representation of 'x * sin( x**2 )' in the domain [1, 10]." },
     { "getSecondaryCacheSize", (PyCFunction) pointwiseXY_C_getSecondaryCacheSize, METH_NOARGS, "Returns the size of self's secondary cache." },
     { "getSafeDivide", (PyCFunction) pointwiseXY_C_getSafeDivide, METH_NOARGS, "Returns self's safeDivide flag." },
     { "evaluate", (PyCFunction) pointwiseXY_C_evaluate, METH_VARARGS, "Gets the y value at x." },
@@ -3809,8 +3916,8 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
     { "thicken", (PyCFunction) pointwiseXY_C_thicken, METH_VARARGS | METH_KEYWORDS, 
         "Returns a new instance with denser points than self filled in using self's interpolation. The number of points added are determined by the following arguments\n" \
             "sectionSubdivideMax    maximum number of points to insert between consecutive points (default 1),\n" \
-            "dDomainMax                  minimum dx step (default 0),\n" \
-            "fDomainMax                  minimum fractional step (default 1)." },
+            "dDomainMax             minimum dx step (default 0),\n" \
+            "fDomainMax             minimum fractional step (default 1)." },
     { "thin", (PyCFunction) pointwiseXY_C_thin, METH_VARARGS, 
         "Returns a new instance of self thinned to accuracy (i.e., points are removed if possible).\n" \
         "\nArguments are:\n" \
@@ -3862,8 +3969,7 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
 ************************************************************
 */
 static PyTypeObject pointwiseXY_CPyType = {
-    PyObject_HEAD_INIT( NULL )
-    0,                                      /* ob_size        */
+    PyVarObject_HEAD_INIT( NULL, 0 )
     "pointwiseXY_C.pointwiseXY_C",          /* tp_name        */
     sizeof( pointwiseXY_CPy ),              /* tp_basicsize   */
     0,                                      /* tp_itemsize    */
@@ -3876,7 +3982,7 @@ static PyTypeObject pointwiseXY_CPyType = {
     (reprfunc) pointwiseXY_C__repr__,       /* tp_repr        */
     &pointwiseXY_CPy_number,                /* tp_as_number   */
     &pointwiseXY_CPy_sequence,              /* tp_as_sequence */
-    0,                                      /* tp_as_mapping  */
+    pointwiseXY_CPy_mappingPointer,         /* tp_as_mapping  */
     0,                                      /* tp_hash        */
     0,                                      /* tp_call        */
     0,                                      /* tp_str         */
@@ -4038,32 +4144,64 @@ static PyObject *pointwiseXY_C_factory_create( ptwXYPoints *ptwXY, int infill, i
 /*
 ************************************************************
 */
-DL_EXPORT( void ) initpointwiseXY_C( void ) {
 
-    PyObject *m;
-    static void *Py_pointwiseXY_C_API[Py_pointwiseXY_C_API_numberOfPointers];
-    PyObject *c_api_object;
+static char const doc[] = "A module that contains the class pointwiseXY_C.";
 
-    pointwiseXY_CPyType.tp_new = PyType_GenericNew;
-    if( PyType_Ready( &pointwiseXY_CPyType ) < 0 ) return;
+#if PY_MAJOR_VERSION < 3
 
-    if( ( m = Py_InitModule3( "pointwiseXY_C", pointwiseXY_CMiscPyMethods, "A module that contains the class pointwiseXY_C." ) ) == NULL ) return;
+    PyMODINIT_FUNC initpointwiseXY_C( void ) {
 
-    Py_INCREF( &pointwiseXY_CPyType );
-    PyModule_AddObject( m, "pointwiseXY_C", (PyObject *) &pointwiseXY_CPyType );
+        PyObject *module;
+        static void *Py_pointwiseXY_C_API[Py_pointwiseXY_C_API_numberOfPointers];
+        PyObject *c_api_object;
 
-    Py_pointwiseXY_C_API[Py_pointwiseXY_C_get_ptwXYPoints_NUM] = (void *) pointwiseXY_C_factory_get_ptwXYPoints;
-    Py_pointwiseXY_C_API[Py_pointwiseXY_C_NUM] = (void *) pointwiseXY_C_factory_create;
+        pointwiseXY_CPyType.tp_new = PyType_GenericNew;
+        if( PyType_Ready( &pointwiseXY_CPyType ) < 0 ) return;
 
-/*
-Cannot get the PyCapsule_Import (i.e. python 2.7) way to work but the PyImport_ImportModuleEx with 2.6 and 2.7 so use it for now.
-#if( PY_VERSION_HEX < 0x02070000 )
-*/
-#if 1
-    c_api_object = PyCObject_FromVoidPtr( (void *) Py_pointwiseXY_C_API, NULL) ;
+        if( ( module = Py_InitModule3( "pointwiseXY_C", pointwiseXY_CMiscPyMethods, doc ) ) == NULL ) return;
+
+        Py_INCREF( &pointwiseXY_CPyType );
+        PyModule_AddObject( module, "pointwiseXY_C", (PyObject *) &pointwiseXY_CPyType );
+
+        Py_pointwiseXY_C_API[Py_pointwiseXY_C_get_ptwXYPoints_NUM] = (void *) pointwiseXY_C_factory_get_ptwXYPoints;
+        Py_pointwiseXY_C_API[Py_pointwiseXY_C_NUM] = (void *) pointwiseXY_C_factory_create;
+
+/* Cannot get the PyCapsule_Import to work for python 2.7.  */
+        c_api_object = PyCObject_FromVoidPtr( (void *) Py_pointwiseXY_C_API, NULL );
+
+        if( c_api_object != NULL ) PyModule_AddObject( module, "_C_API", c_api_object );
+    }
+
 #else
-    c_api_object = PyCapsule_New( (void *) Py_pointwiseXY_C_API, "pointwiseXY_C._C_API", NULL );
-#endif
 
-    if( c_api_object != NULL ) PyModule_AddObject( m, "_C_API", c_api_object );
-}
+    static struct PyModuleDef pointwiseXY_CModule = {
+        PyModuleDef_HEAD_INIT,
+        "pointwiseXY_C",            /* name of module */
+        doc,                        /* module documentation, may be NULL */
+        -1,                         /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+        pointwiseXY_CMiscPyMethods
+    };
+
+    PyMODINIT_FUNC PyInit_pointwiseXY_C( void ) {
+
+        PyObject *module;
+        static void *Py_pointwiseXY_C_API[Py_pointwiseXY_C_API_numberOfPointers];
+        PyObject *c_api_object;
+
+        if( ( module = PyModule_Create( &pointwiseXY_CModule ) ) == NULL ) return( NULL );
+
+        pointwiseXY_CPyType.tp_new = PyType_GenericNew;
+        if( PyType_Ready( &pointwiseXY_CPyType ) < 0 ) return( NULL );
+        Py_INCREF( &pointwiseXY_CPyType );
+        PyModule_AddObject( module, "pointwiseXY_C", (PyObject *) &pointwiseXY_CPyType );
+
+        Py_pointwiseXY_C_API[Py_pointwiseXY_C_get_ptwXYPoints_NUM] = (void *) pointwiseXY_C_factory_get_ptwXYPoints;
+        Py_pointwiseXY_C_API[Py_pointwiseXY_C_NUM] = (void *) pointwiseXY_C_factory_create;
+
+        c_api_object = PyCapsule_New( (void *) Py_pointwiseXY_C_API, "numericalFunctions.pointwiseXY_C._C_API", NULL );
+        if( c_api_object != NULL ) PyModule_AddObject( module, "_C_API", c_api_object );
+
+        return( module );
+    }
+
+#endif

@@ -1,64 +1,8 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 """
@@ -66,11 +10,18 @@ This module contains routines for plotting multiple data sets on the same plot.
 """
 
 import os, types
-from fudge.core import fudgemisc
-from fudge.core.utilities import fudgeFileMisc, subprocessing
+import sys
+from brownies.legacy.endl import fudgemisc
+from fudge.core.utilities import fudgeFileMisc
+from LUPY import subprocessing
 from fudge import __path__
-import plotbase
 
+if( sys.version_info[0] == 2 ) :
+    import plotbase
+else :
+    from . import plotbase
+
+python = sys.executable
 
 def multiPlot( datasets, xylog = 0, xMin = None, xMax = None, yMin = None, yMax = None, xLabel = "Energy (MeV)",
         yLabel = "Cross section (barn)", title = None, lineWidth = 1, fontSize = None ) :
@@ -106,7 +57,7 @@ Also see the routine qmultiPlot.
             try :
                 xys = dataset.copyDataToXYs( )
             except :
-                print "Warning in multiPlot: cannot plot object named %s" % dataset.__class__.__name__
+                print("Warning in multiPlot: cannot plot object named %s" % dataset.__class__.__name__)
                 continue
             f = fudgeFileMisc.fudgeTempFile( )
             for x, y in xys : f.write( "%.10e %14.8e\n" % ( x, y ) )
@@ -119,7 +70,7 @@ Also see the routine qmultiPlot.
 
     o = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
     p = fudgemisc.findPythonFile( os.sep.join( __path__ + [ "vis", "gnuplot", "fudge2dMultiPlot.py" ] ) )
-    s = [ 'python', p, 'xylog', str( xylog ) ] + o + [ 'files' ] + fs
+    s = [ python, p, 'xylog', str( xylog ) ] + o + [ 'files' ] + fs
     subprocessing.spawn( s )
 
 def qmultiPlot( dataList, xylog = 0, xMin = None, xMax = None, yMin = None, yMax = None, xLabel = "Energy (MeV)", 
@@ -179,9 +130,9 @@ See the routine multiPlot for additional information."""
                         if( F.levels != [] ) and ( F.levels.columns( ) == 2 ) :
                             for i in F.levels : qmultiPlotAddPlot( i, g, t, withLineWidth )
                 else :
-                    print "Warning in qmultiPlot: cannot plot object named %s" % dateset.__class__.__name__
+                    print("Warning in qmultiPlot: cannot plot object named %s" % dateset.__class__.__name__)
         else :
-            print 'Warning in qmultiPlot: cannot plot object of type "%s"' % type( dateset )
+            print('Warning in qmultiPlot: cannot plot object of type "%s"' % type( dateset ))
     if( title is None ) : title = "Untitled"
     g( 'set title "' + title + '"' )
     g( 'set style data linespoints' )
@@ -205,8 +156,8 @@ See the routine multiPlot for additional information."""
             s = 'set yrange [ %e to %e ]' % ( yMin, yMax )
         g( s )
     if( fontSize is not None ) : g( 'set terminal x11 font "times,%d"' % fontSize )
-    g( "set xlabel %s" % `xLabel` )
-    g( "set ylabel %s" % `yLabel` )
+    g( "set xlabel %s" % repr(xLabel) )
+    g( "set ylabel %s" % repr(yLabel) )
     g.replot( )
     return g
 
@@ -256,5 +207,5 @@ def multiPlot3d( dataList, xyzlog = 0, xMin = None, xMax = None, yMin = None, yM
         f.close( )
     o = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, zMin, zMax, zLabel )
     p = fudgemisc.findPythonFile( os.sep.join( __path__ + [ "vis", "gnuplot", "fudge3dMultiPlot.py" ] ) )
-    s = [ 'python', p, 'xyzlog', str( xyzlog ) ] + o + [ 'files' ] + fs
+    s = [ python, p, 'xyzlog', str( xyzlog ) ] + o + [ 'files' ] + fs
     subprocessing.spawn( s )

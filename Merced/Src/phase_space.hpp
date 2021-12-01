@@ -17,16 +17,18 @@
 #include "Ecm_Elab_geom.hpp"
 #include "transfer.hpp"
 
+namespace Phase
+{
 class phase_space_Ein_param;  // forward reference
 
 //! Class for parameters for the 2-d quadrature over cm cosine and Eout_cm
 // ---------------- class phase_space_Ecm_param ------------------
-class phase_space_Ecm_param : public Ecm_Elab_Ecm_param
+class phase_space_Ecm_param : public Egeom::Ecm_Elab_Ecm_param
 {
 public:
   // the mapping and phase-spcace parameters
-  phase_space_map *PSmap;
-  Quadrature_Method  mu_quad_method;  // quadrature method for outgoing cosine
+  Maps::phase_space_map *PSmap;
+  Qmeth::Quadrature_Rule  mu_quad_rule;  // quadrature rule for outgoing cosine
   long int mu_F_count;  // number of calls to phase_space_F::mu_F
 
   inline phase_space_Ecm_param( ): mu_F_count( 0 ) {}
@@ -46,11 +48,11 @@ public:
 };
 
 //! class for Phase_Space data
-// ---------------- class Phase_Space ------------------
+// ---------------- class phase_space ------------------
 class phase_space
 {
 private:
-  phase_space_map PSmap;
+  Maps::phase_space_map PSmap;
 
   int first_Ein;  // index of the left-hand end of the first significant energy bin
   int last_Ein;  // index of the right-hand end of the last significant energy bin
@@ -68,26 +70,29 @@ private:
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param e_flux approximate flux used to weight the transfer matrix
   //! \param Ein_groups the boundaries of the incident energy groups
-  bool get_Ein_range( const dd_vector& sigma, const dd_vector& multiple,
-    const dd_vector& weight,
-    const Flux_List& e_flux, const Energy_groups& Ein_groups );
+  bool get_Ein_range( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& multiple,
+    const Ddvec::dd_vector& weight,
+    const Lgdata::Flux_List& e_flux, const Egp::Energy_groups& Ein_groups );
 
   //! Loops over the E_out bins for a given cm_Eout bin
   //! \param transfer the computed transfer matrix
   //! \param Ein_param the quadrature parameters for intration over incident energy
-  void Eout_ladder( T_matrix& transfer, phase_space_Ein_param *Ein_param );
+  void Eout_ladder( Trf::T_matrix& transfer,
+		    Phase::phase_space_Ein_param *Ein_param );
 
   //! Does the integration for one E-E' box between 2 eta = const hyperbolas
   //! \param transfer the computed transfer matrix
   //! \param Eout_count identifies the matrix row to update
   //! \param Ein_param the quadrature parameters for intration over incident energy
-  void one_Ebox( T_matrix& transfer, int Eout_count, phase_space_Ein_param *Ein_param );
+  void one_Ebox( Trf::T_matrix& transfer, int Eout_count,
+		 Phase::phase_space_Ein_param *Ein_param );
 
   //! Adds to an element of transfer the integral between the intersections of 2 Eout_cm = const arcs with the Eout_lab box
   //! \param transfer the computed transfer matrix
   //! \param Eout_count identifies the matrix row to update
   //! \param Ein_param the quadrature parameters for intration over incident energy
-  void update_T( T_matrix &transfer, int Eout_count, phase_space_Ein_param *Ein_param );
+  void update_T( Trf::T_matrix &transfer, int Eout_count,
+		 Phase::phase_space_Ein_param *Ein_param );
 
 public:
   double mProj;
@@ -95,6 +100,7 @@ public:
   double mEject;
   double totalMass;
   double Q_value;
+  double threshold;
   int numParticles;
 
   phase_space( ): mProj( -1.0 ), mTarg( -1.0 ), mEject( -1.0 ), 
@@ -106,30 +112,30 @@ public:
   //! \param multiple the outgoing particle multiplicity data
   //! \param weight the weighting to apply to the transfer matrix entries
   //! \param transfer the transfer matrix
-  void get_T( const dd_vector& sigma, const dd_vector& multiple,
-	      const dd_vector& weight, T_matrix& transfer );
+  void get_T( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& multiple,
+	      const Ddvec::dd_vector& weight, Trf::T_matrix& transfer );
 
   //! Stores the masses
   //! \param particle_info the masses of the particles involved in the reaction
-  void copy_masses( const particleInfo &particle_info );
+  void copy_masses( const Maps::particleInfo &particle_info );
 
 };
 
 //! Class for parameters for the 3-d quadrature over Ein, cm cosine, and Eout_cm
 // ---------------- class phase_space_Ein_param ------------------
-class phase_space_Ein_param : public Ecm_Elab_Ein_param
+class phase_space_Ein_param : public Egeom::Ecm_Elab_Ein_param
 {
 public:
-  Vcm_Vlab_hit_list upper_hits;
-  Vcm_Vlab_hit_list lower_hits;
+  Vhit::Vcm_Vlab_hit_list upper_hits;
+  Vhit::Vcm_Vlab_hit_list lower_hits;
 
   // parameters for integration over center-of-mass energy
-  phase_space_Ecm_param Ecm_params;
+  Phase::phase_space_Ecm_param Ecm_params;
 
   // the mapping and phase-spcace parameters
-  phase_space_map *map;
-  Quadrature_Method Eout_quad_method;  // quadrature method for outgoing energy
-  Quadrature_Method mu_quad_method;  // quadrature method for outgoing cosine
+  Maps::phase_space_map *map;
+  Qmeth::Quadrature_Rule Eout_quad_rule;  // quadrature rule for outgoing energy
+  Qmeth::Quadrature_Rule mu_quad_rule;  // quadrature rule for outgoing cosine
 
   long int quad_count;  // number of 3-d quadratures
   long int Ein_F_count;  // number of calls to phase_space_F::Ein_F
@@ -143,37 +149,54 @@ public:
 
   //! Copies the data for mapping to the lab frame
   //! \param PSmap data for mapping to the lab frame
-  void setup_map( phase_space_map *PSmap );
+  void setup_map( Maps::phase_space_map *PSmap );
 
   // Sets up the parameters for integration over center-of-mass outgoing energy
   //! \param E_in energy of the incident particle
   void  set_Ecm_param( double E_in );
 
 };
+} // end of namespace Phase
 
 // ************* functions to integrate ******************
 namespace phase_space_F
 {
   // ---------------- phase_space_F::mu_F ------------------
   //! Function for the 1-d quadrature over cm cosine
+  //! Returns true if the interpolation is OK.
   //! \param mu the center-of-mass direction cosine of the outgoing particle
   //! \param mu_quad_param the function parameters
   //! \param value the value of the integrand, a set of Legendre coefficients
-  void mu_F( double mu, QuadParamBase *mu_quad_param, coef_vector *value );
+  bool mu_F( double mu, Qparam::QuadParamBase *mu_quad_param,
+	     Coef::coef_vector *value );
 
   // ---------------- phase_space_F::Ecm_F ------------------
   //! Function for the 2-d quadrature over cm cosine and outgoing energy
+  //! Returns true if the interpolation is OK.
   //! \param Eout_cm the center-of-mass energy of the outgoing particle
   //! \param Ecm_quad_param the function parameters
   //! \param value the value of the integrand, a set of Legendre coefficients
-  void Ecm_F( double Eout_cm, QuadParamBase *Ecm_quad_param, coef_vector *value );
+  bool Ecm_F( double Eout_cm, Qparam::QuadParamBase *Ecm_quad_param,
+	      Coef::coef_vector *value );
+
+  // ---------------- phase_space_F::Ecm_F_flip ------------------
+  //! Function for the 2-d quadrature over cm cosine and outgoing energy with
+  //! singularity sqrt( flip_Eout_cm )
+  //! Returns true if the interpolation is OK.
+  //! \param flip_Eout_cm the center-of-mass energy of the outgoing particle
+  //! \param Ecm_quad_param the function parameters
+  //! \param value the value of the integrand, a set of Legendre coefficients
+  bool Ecm_F_flip( double flip_Eout_cm, Qparam::QuadParamBase *Ecm_quad_param,
+		   Coef::coef_vector *value );
 
   // ---------------- phase_space_F::Ein_F ------------------
   //! Function for the 3-d quadrature over incident energy, cm cosine, and outgoing energy
+  //! Returns true if the interpolation is OK.
   //! \param E_in the energy of the incident particle
   //! \param quad_param the function parameters
   //! \param value the value of the integrand, a set of Legendre coefficients
-  void Ein_F( double E_in, QuadParamBase *quad_param, coef_vector *value );
+  bool Ein_F( double E_in, Qparam::QuadParamBase *quad_param,
+	      Coef::coef_vector *value );
 }
 
 #endif

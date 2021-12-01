@@ -89,11 +89,14 @@ Interpolation: lin-lin
 Product Frame: lab
 
 # Start data
-Legendre coefficients: n = 2
+Legendre coefficients: n = 3
 Interpolation: lin-lin
  Ein: 8871800.0:  n = 2
 1.0
 0.0
+ Ein: 1.15e+07: n = 2
+1.0
+0.1
  Ein: 20000000.0:  n = 2
 1.0
 0.0

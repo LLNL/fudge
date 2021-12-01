@@ -15,14 +15,12 @@
 #include "messaging.hpp"
 #include "global_params.hpp"  // for input parameters
 // #include "version.hpp"
-// #include "logger.hpp"
 #include "reaction.hpp"
 #include "data_parser.hpp"
 
-using namespace std;
 
 // Handle the input parameters
-GlobalParameterClass Global;
+Glb::GlobalParameterClass Global;
 
 // At the end, we write out the evaluation documentation, version info and
 // any processing errors.  This holds that data.
@@ -36,18 +34,19 @@ int main(int argc, char* argv[])
   // Set the number of threads for parallel processing
   Global.set_num_threads( );
 
-  ofstream output_file;
+  std::ofstream output_file;
 
-  string input_file_name = Global.Flag( "input" );
-  data_parser input_file( input_file_name );
-  string output_file_name = Global.Flag( "output" );
+  std::string input_file_name = Global.Flag( "input" );
+  Dpar::data_parser input_file( input_file_name );
+  std::string output_file_name = Global.Flag( "output" );
   output_file.open( output_file_name.c_str( ) );
   if( !output_file )
   {
-    FatalError( "main", "Unable to open output file: " + output_file_name );
+    Msg::FatalError( "main",
+		     "Unable to open output file: " + output_file_name );
   }
 
-  reaction react_data;
+  React::reaction react_data;
   react_data.process_data( input_file, &output_file );
 
   //  messageLog.write();

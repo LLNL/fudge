@@ -1,15 +1,15 @@
 ============
 2.300098(4) MeV
 value = 2.300098000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
-uncertainty = value = 4.000000000000001e-06, significantDigits = 1, order = -6, isPercent = False
+uncertainty = value = 4.000000000000000e-06, significantDigits = 1, order = -6, isPercent = False
 
 2.300098(4) MeV
 value = 2.300098000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
-uncertainty = value = 4.000000000000001e-06, significantDigits = 1, order = -6, isPercent = False
+uncertainty = value = 4.000000000000000e-06, significantDigits = 1, order = -6, isPercent = False
 
 2.300098 +/- 4.e-6 MeV
 value = 2.300098000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
-uncertainty = value = 4.000000000000001e-06, significantDigits = 1, order = -6, isPercent = False
+uncertainty = value = 4.000000000000000e-06, significantDigits = 1, order = -6, isPercent = False
 ============
 2.300000 +/- 4.e-6 MeV
 value = 2.300000000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"

@@ -1,0 +1,584 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.sums &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.sums</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.sums</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the &#39;sum&#39;, &#39;summand&#39; and &#39;Summands&#39; classes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">formatVersion</span> <span class="k">as</span> <span class="n">formatVersionModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span> <span class="k">as</span> <span class="n">warningModule</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">suites</span> <span class="k">as</span> <span class="n">suitesModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.reactionData</span> <span class="kn">import</span> <span class="n">crossSection</span> <span class="k">as</span> <span class="n">crossSectionModule</span>
+<span class="kn">from</span> <span class="nn">fudge.channelData</span> <span class="kn">import</span> <span class="n">Q</span> <span class="k">as</span> <span class="n">QModule</span>
+<span class="kn">from</span> <span class="nn">fudge.productData</span> <span class="kn">import</span> <span class="n">multiplicity</span> <span class="k">as</span> <span class="n">multiplicityModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="sums"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.sums">[docs]</a><span class="k">class</span> <span class="nc">sums</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains all summed quantities. Currently supports summed cross sections and multiplicities,</span>
+<span class="sd">    could extend to other types of sums later.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;sums&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;crossSectionSums&#39;</span><span class="p">,</span> <span class="s1">&#39;multiplicitySums&#39;</span> <span class="p">)</span>
+    <span class="n">legacyMemberNameMapping</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;crossSections&#39;</span><span class="p">:</span> <span class="s1">&#39;crossSectionSums&#39;</span><span class="p">,</span> <span class="s1">&#39;multiplicities&#39;</span><span class="p">:</span> <span class="s1">&#39;multiplicitySums&#39;</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSectionSums</span> <span class="o">=</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">crossSectionSums</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSectionSums</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicitySums</span> <span class="o">=</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">multiplicitySums</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicitySums</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">crossSectionSums</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSectionSums</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">multiplicitySums</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicitySums</span>
+
+<div class="viewcode-block" id="sums.convertUnits"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.sums.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span>
+            <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">child</span> <span class="p">)</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="sums.cullStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.sums.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSectionSums</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicitySums</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="sums.findLinks"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.sums.findLinks">[docs]</a>    <span class="k">def</span> <span class="nf">findLinks</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">links</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span> <span class="n">item</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="sums.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.sums.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSectionSums</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicitySums</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="sums.toXMLList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.sums.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span><span class="p">]):</span> <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span><span class="s1">&#39;  &#39;</span><span class="p">)</span>
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">child</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span><span class="p">:</span> <span class="n">xml</span> <span class="o">+=</span> <span class="n">val</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">xml</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="sums.parseXMLNode"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.sums.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span><span class="p">:</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span> <span class="ow">and</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">legacyMemberNameMapping</span><span class="p">:</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">legacyMemberNameMapping</span><span class="p">[</span><span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">])</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: unexpected child &#39;</span><span class="si">%s</span><span class="s2">&#39; in sums&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="crossSectionSum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum">[docs]</a><span class="k">class</span> <span class="nc">crossSectionSum</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores a summed quantity (cross section, multiplicity, etc.) along with the list of what&#39;s being summed over</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;crossSectionSum&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;summands&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;crossSection&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">ENDF_MT</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a &#39;sum&#39; instance</span>
+<span class="sd">        :param label: unique string identifying this sum</span>
+<span class="sd">        :param ENDF_MT: for converting back to ENDF</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">ENDF_MT</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="o">=</span> <span class="n">Summands</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span> <span class="o">=</span> <span class="n">QModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span> <span class="o">=</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">summands</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">crossSection</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Q</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="crossSectionSum.convertUnits"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.findLinks"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.findLinks">[docs]</a>    <span class="k">def</span> <span class="nf">findLinks</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">links</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span> <span class="n">item</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.heatCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.heatCrossSection">[docs]</a>    <span class="k">def</span> <span class="nf">heatCrossSection</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">lowerlimit</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">upperlimit</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">interpolationAccuracy</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">heatAllPoints</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">doNotThin</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">heatBelowThreshold</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">heatAllEDomain</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">setThresholdToZero</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">heat</span><span class="p">(</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">lowerlimit</span><span class="p">,</span> <span class="n">upperlimit</span><span class="p">,</span> <span class="n">interpolationAccuracy</span><span class="p">,</span> <span class="n">heatAllPoints</span><span class="p">,</span> <span class="n">doNotThin</span><span class="p">,</span>
+                <span class="n">heatBelowThreshold</span><span class="p">,</span> <span class="n">heatAllEDomain</span><span class="p">,</span> <span class="n">setThresholdToZero</span> <span class="o">=</span> <span class="n">setThresholdToZero</span><span class="p">,</span> <span class="n">addToSuite</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.cullStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.processGriddedCrossSections"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.processGriddedCrossSections">[docs]</a>    <span class="k">def</span> <span class="nf">processGriddedCrossSections</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">processGriddedCrossSections</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">incrementalIndent</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.processMultiGroup"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.sumSummands"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.sumSummands">[docs]</a>    <span class="k">def</span> <span class="nf">sumSummands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the sum by looping over summands. If a style is specified, use that style if available.</span>
+<span class="sd">        Otherwise sum the evaluated style.</span>
+<span class="sd">        :param style: optional string identifying what style of data to sum (&#39;eval&#39;, &#39;recon&#39;, etc.)</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">getPointwiseLinearForm</span><span class="p">(</span> <span class="n">component</span> <span class="p">):</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">component</span><span class="p">:</span> <span class="k">return</span> <span class="n">component</span><span class="p">[</span> <span class="n">label</span> <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">component</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">lowerEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+
+        <span class="n">sums</span> <span class="o">=</span> <span class="n">getPointwiseLinearForm</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">link</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">pointwise</span> <span class="o">=</span> <span class="n">getPointwiseLinearForm</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">link</span> <span class="p">)</span>
+            <span class="n">sums</span><span class="p">,</span> <span class="n">current</span> <span class="o">=</span> <span class="n">sums</span><span class="o">.</span><span class="n">mutualify</span><span class="p">(</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pointwise</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span>
+            <span class="n">sums</span> <span class="o">+=</span> <span class="n">current</span>
+        <span class="k">return</span> <span class="n">sums</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.scaleSummandsToMatchSum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.scaleSummandsToMatchSum">[docs]</a>    <span class="k">def</span> <span class="nf">scaleSummandsToMatchSum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        rescale the cross sections in the summands list so that their sum matches the cross section in self</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="p">:</span>
+            <span class="n">correctXsec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="p">[</span> <span class="n">label</span> <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">correctXsec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">lowerEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+        <span class="n">summedXsec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sumSummands</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">correctXsec</span><span class="o">.</span><span class="n">domain</span><span class="p">()</span> <span class="o">!=</span> <span class="n">summedXsec</span><span class="o">.</span><span class="n">domain</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">summedCrossSectionDomainMismatch</span><span class="p">(</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span>
+        <span class="n">scaleFactor</span><span class="o">=</span><span class="n">correctXsec</span><span class="o">/</span><span class="n">summedXsec</span>
+
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">label</span>
+            <span class="n">cutHere</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainMin</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cutHere</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">cutHere</span><span class="p">,</span><span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">getThreshold</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainUnit</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span> <span class="c1"># if getting threshold fails, cut at the domainMin</span>
+                <span class="k">pass</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">evaluated</span><span class="p">,</span><span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">evaluated</span><span class="o">*</span><span class="n">scaleFactor</span><span class="p">)</span><span class="o">.</span><span class="n">domainSlice</span><span class="p">(</span><span class="n">domainMin</span><span class="o">=</span><span class="n">cutHere</span><span class="p">)</span>
+            <span class="n">answer</span><span class="o">.</span><span class="n">label</span><span class="o">=</span><span class="n">label</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="crossSectionSum.scaleSumToMatchSummands"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.scaleSumToMatchSummands">[docs]</a>    <span class="k">def</span> <span class="nf">scaleSumToMatchSummands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sum the summands cross section list, then set the sum to the cross section in self.</span>
+<span class="sd">        If a style is specified, the sum will be stored under that style. Otherwise it replaces the</span>
+<span class="sd">        evaluated style.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resummed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sumSummands</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">resummed</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">resummed</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">label</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">resummed</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.check"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+
+        <span class="c1"># does self.__crossSection equal the sum over summand reaction cross sections?</span>
+        <span class="n">sums</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sumSummands</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;reconstructedStyleName&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;reconstructedStyleName&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="p">:</span>
+            <span class="n">quotedXsec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="p">[</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;reconstructedStyleName&#39;</span><span class="p">]</span> <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">quotedXsec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">lowerEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sums</span><span class="o">.</span><span class="n">domain</span><span class="p">()</span> <span class="o">!=</span> <span class="n">quotedXsec</span><span class="o">.</span><span class="n">domain</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">summedCrossSectionDomainMismatch</span><span class="p">(</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">quotedXsec</span> <span class="o">-</span> <span class="n">sums</span>
+            <span class="n">diff</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">setSafeDivide</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">relativeDiff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">diff</span> <span class="p">)</span> <span class="o">/</span> <span class="n">quotedXsec</span>
+            <span class="k">try</span><span class="p">:</span>    <span class="c1"># FIXME instead of try/catch, should really compare relativeDiff.rangeMax with &#39;inf&#39;</span>
+                <span class="k">if</span> <span class="n">relativeDiff</span><span class="o">.</span><span class="n">rangeMax</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionMaxDiff&#39;</span><span class="p">]:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">summedCrossSectionMismatch</span><span class="p">(</span> <span class="n">relativeDiff</span><span class="o">.</span><span class="n">rangeMax</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">summedCrossSectionZeroDivision</span><span class="p">(</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.getLabel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.getLabel">[docs]</a>    <span class="k">def</span> <span class="nf">getLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.toXMLList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot; ENDF_MT=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="crossSectionSum.parseXMLNode"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.crossSectionSum.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@label=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">))</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span> <span class="n">Summands</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">QModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Unexpected element &quot;</span><span class="si">%s</span><span class="s1">&quot; encountered&#39;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">sums</span> <span class="o">=</span> <span class="n">crossSectionSum</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">),</span> <span class="nb">int</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;ENDF_MT&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">sums</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">Summands</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">sums</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">sums</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">QModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">sums</span></div></div>
+
+<div class="viewcode-block" id="multiplicitySum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum">[docs]</a><span class="k">class</span> <span class="nc">multiplicitySum</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores a summed multiplicity along with the list of what&#39;s being summed over</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;multiplicitySum&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;summands&#39;</span><span class="p">,</span> <span class="s1">&#39;multiplicity&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">ENDF_MT</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a &#39;sum&#39; instance</span>
+<span class="sd">        :param name: descriptive string</span>
+<span class="sd">        :param label: unique string identifying this sum</span>
+<span class="sd">        :param ENDF_MT: for converting back to ENDF</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">ENDF_MT</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="o">=</span> <span class="n">Summands</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span> <span class="o">=</span> <span class="n">multiplicityModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">summands</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">multiplicity</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="multiplicitySum.convertUnits"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="multiplicitySum.findLinks"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum.findLinks">[docs]</a>    <span class="k">def</span> <span class="nf">findLinks</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">links</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span> <span class="n">item</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="multiplicitySum.check"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">isConstant</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">negativeMultiplicity</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConstant</span><span class="p">(),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>   <span class="c1"># energy-dependent mult.</span>
+            <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="s1">&#39;rangeMin&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">form</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">negativeMultiplicity</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">rangeMin</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">form</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="c1"># does multiplicity equal the sum over its summand multiplicities?</span>
+        <span class="n">sums</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">lowerEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">sums</span><span class="p">,</span> <span class="n">current</span> <span class="o">=</span> <span class="n">sums</span><span class="o">.</span><span class="n">mutualify</span><span class="p">(</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">lowerEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">),</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span>
+            <span class="n">sums</span> <span class="o">+=</span> <span class="n">current</span>
+        <span class="n">quotedXsec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">lowerEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sums</span><span class="o">.</span><span class="n">domain</span><span class="p">()</span> <span class="o">!=</span> <span class="n">quotedXsec</span><span class="o">.</span><span class="n">domain</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">summedMultiplicityDomainMismatch</span><span class="p">(</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">quotedXsec</span> <span class="o">-</span> <span class="n">sums</span>
+            <span class="n">diff</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">setSafeDivide</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">relativeDiff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">diff</span> <span class="p">)</span> <span class="o">/</span> <span class="n">quotedXsec</span>
+            <span class="k">try</span><span class="p">:</span>    <span class="c1"># FIXME instead of try/catch, should really compare relativeDiff.rangeMax with &#39;inf&#39;</span>
+                <span class="k">if</span> <span class="n">relativeDiff</span><span class="o">.</span><span class="n">rangeMax</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;multiplicityMaxDiff&#39;</span><span class="p">]:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">summedMultiplicityMismatch</span><span class="p">(</span> <span class="n">relativeDiff</span><span class="o">.</span><span class="n">rangeMax</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">summedMultiplicityZeroDivision</span><span class="p">(</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="multiplicitySum.getLabel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum.getLabel">[docs]</a>    <span class="k">def</span> <span class="nf">getLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span></div>
+
+<div class="viewcode-block" id="multiplicitySum.cullStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="multiplicitySum.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="multiplicitySum.toXMLList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">attrStr</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot; ENDF_MT=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span><span class="p">,</span> <span class="n">attrStr</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="multiplicitySum.parseXMLNode"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.multiplicitySum.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@label=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">))</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;ENDF_MT&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">MT</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;Unsupported attribute &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span> <span class="p">)</span>
+
+        <span class="n">summands</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span> <span class="n">Summands</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">multiplicityModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Unexpected element &quot;</span><span class="si">%s</span><span class="s1">&quot; encountered&#39;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">sums</span> <span class="o">=</span> <span class="n">multiplicitySum</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">MT</span> <span class="p">)</span>
+        <span class="n">sums</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">Summands</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">sums</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">multiplicityModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">sums</span></div></div>
+
+<div class="viewcode-block" id="Summands"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands">[docs]</a><span class="k">class</span> <span class="nc">Summands</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;summands&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Summands.append"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+
+<span class="c1">#        if( not( isinstance( iter, ( add, subtract ) ) ) ) : raise TypeError( &#39;Invalid item to add: type = %s.&#39; % type( item ) )</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Summands.findLinks"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands.findLinks">[docs]</a>    <span class="k">def</span> <span class="nf">findLinks</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">links</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link2</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">item</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">path</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Summands.index"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the index of item in self.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">index</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Summands.pop"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Removes and return item at index. Default is the last item.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Summands.toXMLList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">xmlList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">summand</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span> <span class="p">:</span>
+            <span class="n">xmlList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;  </span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="n">summand</span><span class="o">.</span><span class="n">toXML</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">xmlList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xmlList</span></div>
+
+<div class="viewcode-block" id="Summands.parseXMLNode"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">add</span><span class="o">.</span><span class="n">moniker</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">add</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">subtract</span><span class="o">.</span><span class="n">moniker</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">subtract</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="add"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.add">[docs]</a><span class="k">class</span> <span class="nc">add</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Link representing one of the quantities that is added to the sum.&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;add&#39;</span></div>
+
+<div class="viewcode-block" id="subtract"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.subtract">[docs]</a><span class="k">class</span> <span class="nc">subtract</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Link representing one of the quantities that is subtracted from the sum.&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;subtract&#39;</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.sums</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

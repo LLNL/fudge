@@ -6,7 +6,6 @@ Target's ZA: 6012
 Product's ZA: 1001
 # all masses in MeV
 Compound's mass: 1.117792457959e+04
-Quadrature method: adaptive
 outputLegendreOrder: 3
 Product's mass:  9.382687642145e+02
 Target's mass:  1.117792457959e+04

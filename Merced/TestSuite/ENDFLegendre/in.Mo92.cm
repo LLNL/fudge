@@ -4,7 +4,6 @@ Comment: n + Mo92 --> n + Mo92_c outgoing data for n
 Projectile's mass:  9.395656534709e+08
 Target's mass:  8.561068551701e+10
 Product's mass:  9.395656534709e+08
-Quadrature method: adaptive
 outputLegendreOrder: 5
 Projectile Frame: lab
 

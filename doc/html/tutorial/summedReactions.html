@@ -1,33 +1,25 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>4.5. Summed Reactions &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4.5. Summed Reactions &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="4.6. Covariances" href="covariances.html" />
     <link rel="prev" title="4.4. Fission" href="fission.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,9 +35,10 @@
         <li class="right" >
           <a href="fission.html" title="4.4. Fission"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U"><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.5. </span>Summed Reactions</a></li> 
       </ul>
     </div>  
 
@@ -55,7 +48,7 @@
           <div class="body" role="main">
             
   <div class="section" id="summed-reactions">
-<h1>4.5. Summed Reactions<a class="headerlink" href="#summed-reactions" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">4.5. </span>Summed Reactions<a class="headerlink" href="#summed-reactions" title="Permalink to this headline">¶</a></h1>
 <p>Evaluators sometimes need to specify redundant information in an evaluation. For example, the total reaction cross section is a sum of each discrete reaction in the evaluation and could in principle be derived from those discrete reactions.
 In practice, however, the total cross section is easier to measure and usually better known than any of its constituents.
 It is therefore usually listed seperately in a GNDS file, as a <em>summedReaction</em>. Distributions should not be listed for summed reactions.</p>
@@ -63,6 +56,7 @@ It is therefore usually listed seperately in a GNDS file, as a <em>summedReactio
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -73,10 +67,10 @@ It is therefore usually listed seperately in a GNDS file, as a <em>summedReactio
             </a></p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="fission.html"
-                        title="previous chapter">4.4. Fission</a></p>
+                        title="previous chapter"><span class="section-number">4.4. </span>Fission</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="covariances.html"
-                        title="next chapter">4.6. Covariances</a></p>
+                        title="next chapter"><span class="section-number">4.6. </span>Covariances</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -85,15 +79,15 @@ It is therefore usually listed seperately in a GNDS file, as a <em>summedReactio
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -113,14 +107,15 @@ It is therefore usually listed seperately in a GNDS file, as a <em>summedReactio
         <li class="right" >
           <a href="fission.html" title="4.4. Fission"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" >4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" ><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.5. </span>Summed Reactions</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

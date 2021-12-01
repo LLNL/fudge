@@ -3,7 +3,6 @@ Process: ENDF Double differential EMuEpP data
 Comment: Be9(n,2n He4)He4; data for outgoing n
 outputLegendreOrder: 3
 Conserve: both
-Quadrature method: adaptive
 Projectile Frame: lab
 
 # All energies in this file are given in MeV.

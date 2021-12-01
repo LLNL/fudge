@@ -1,68 +1,16 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from __future__ import print_function
+import sys
 import abc
+
+from xml.etree import cElementTree
+
+from . import formatVersion as formatVersionModule
 
 __metaclass__ = type
 
@@ -80,9 +28,12 @@ class ancestry :
 
     This class defines three members:
 
-        moniker     Name of the class.
-        ancestor    Instance which self is a child of.
-        attribute   Additional qualifier for xlink string.
+        moniker                     Name of the class.
+        ancestor                    Instance which self is a child of.
+        attribute                   Additional qualifier for xlink string.
+        keyName                     The name of the key for instance if it goes in a suite.
+        ancestryMembers             Tuple of names of members added by sub-classes.
+        legacyMemberNameMapping     A map whose keys are legacy member names and whose associated values are the current memeber names.
 
     For an instance, the xlink is '/the/list/of/ancestors/self' if attribute is None or
     '/the/list/of/ancestors/self[@attribute="value"]' if attribute is not None. For example,
@@ -93,19 +44,23 @@ class ancestry :
     xlink for the C class is '/nameA/nameB/nameC[@greeting="Hi"]'.
     """
 
-    __metaclass__ = abc.ABCMeta
     ancestryMembers = tuple( )
+    legacyMemberNameMapping = {}
+    keyName = None
+    formatVersion = formatVersionModule.default
+    monikerByFormat = {}
 
     def __init__( self ) :
 
         self.__ancestor = None
-        self.attribute = None
+        self.__attribute = None
 
     def __str__( self ) :
 
         return( self.toXLink( ) )
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def moniker( self ) :
 
         pass
@@ -115,6 +70,28 @@ class ancestry :
         """Returns self's ancestor."""
 
         return( self.__ancestor )
+
+    @property
+    def attribute( self ) :
+
+        return( self.__attribute )
+
+    @property
+    def keyValue( self ) :
+        """Returns self's keyValue."""
+
+        if( self.keyName is None ) :
+            if( hasattr( self, 'label' ) ) : return( self.label )           # For legacy, this is deprecated.
+            return( None )
+        return( getattr( self, self.keyName ) )
+
+    @property
+    def rootAncestor( self ) :
+        """Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None."""
+
+        ancestor = self
+        while( ancestor.__ancestor is not None ) : ancestor = ancestor.__ancestor
+        return( ancestor )
 
     def checkAncestry( self, verbose = 0, level = 0 ) :
 
@@ -148,6 +125,15 @@ class ancestry :
             else :
                 print('WARNING from checkAncestry: %s does not have member "%s"' % (self.toXLink(), member))
 
+    def copy( self ):
+        """
+        Use deepcopy, but don't copy self.ancestor
+        :return: copy of self
+        """
+        import copy
+        memodict = {id(self.ancestor):None} # TODO: add 'unresolvedLinks' to memodict
+        return copy.deepcopy(self, memo=memodict)
+
     def findAttributeInAncestry( self, attributeName ) :
 
         if( hasattr( self, attributeName ) ) : return( getattr( self, attributeName ) )
@@ -169,6 +155,8 @@ class ancestry :
         an entity is found, its moniker value must be entityName. If no entity is found, raise AttributeError.
         """
 
+        if entityName in self.legacyMemberNameMapping: entityName = self.legacyMemberNameMapping[entityName]
+
         if( entityName in ( '.', self.moniker ) ) :
             return self
         elif( entityName == '..' ) :
@@ -188,12 +176,28 @@ class ancestry :
             raise AttributeError( "Can't find entity %s in %s" % (entityName,self) )
         return entity
 
-    def getRootAncestor( self ) :
-        """Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None."""
+    def findInstancesOfClassInChildren( self, cls, level = 9999 ) :
+        """
+        Finds all instances of class *cls* in self's children, grand-children, etc.
+        """
 
-        ancestor = self
-        while( ancestor.__ancestor is not None ) : ancestor = ancestor.__ancestor
-        return( ancestor )
+        foundInstances = []
+        level -= 1
+        if( level < 0 ) : return( foundInstances )
+        for ancestryMember in self.ancestryMembers :
+            if( ancestryMember == '' ) : continue
+            if( ancestryMember[0] == '[' ) : ancestryMember = ancestryMember[1:]
+            instance = getattr( self, ancestryMember )
+            if( instance is None ) : continue
+            if( isinstance( instance, cls ) ) : foundInstances.append( instance )
+            foundInstances += instance.findInstancesOfClassInChildren( cls, level = level )
+
+        return( foundInstances )
+
+    def getRootAncestor( self ) :
+        """This function is deprecated. See and use rootAncestor instead."""
+
+        return( self.rootAncestor )
 
     def isChild( self, child ) :
 
@@ -208,9 +212,9 @@ class ancestry :
         """Sets self's ancestor to ancestor."""
 
         self.__ancestor = ancestor 
-        self.attribute = attribute
+        self.__attribute = attribute
 
-    def toRelativeXLink( self, other = None ) :
+    def toRelativeXLink( self, other = None, formatVersion = None ) :
         """
         Returns a string that is a relative xlink to another element (using XML xpath syntax).
         Both elements must reside in the same hierarchy.  For a description of xpath, see 
@@ -223,8 +227,8 @@ class ancestry :
         else :
             if( self.getRootAncestor( ) is not other.getRootAncestor( ) ) : 
                 raise Exception( 'Root ancestors not the same ("%s" != "%s")' % ( self.toXLink( ), other.toXLink( ) ) )
-            thisPath = self.toXLink( ).split( '/' )
-            othersPath = other.toXLink( ).split( '/' )
+            thisPath = self.toXLink( formatVersion = formatVersion ).split( '/' )
+            othersPath = other.toXLink( formatVersion = formatVersion ).split( '/' )
             for i1, tag in enumerate( thisPath ) :
                 if( i1 >= len( othersPath ) ) : break
                 if( tag != othersPath[i1] ) : break
@@ -233,7 +237,11 @@ class ancestry :
             relativePath += '/'.join( othersPath[i1:] )
             return( relativePath )
 
-    def toXLink( self, attributeName = None, attributeValue = None ) :
+    @abc.abstractmethod
+    def toXMLList( self, **kwargs ) :
+        pass
+
+    def toXLink( self, attributeName = None, attributeValue = None, formatVersion = None ) :
         """
         Returns a string that is an xlink to self (using XML xpath syntax).  The resulting 
         xlink starts at the root element. For a description of xpath, see 
@@ -241,16 +249,21 @@ class ancestry :
         """
 
         s1, attribute = '', ''
-        if( self.__ancestor is not None ) : s1 = self.__ancestor.toXLink( )
-        if( ( attributeName is None ) and ( self.attribute is not None ) ) : 
-            attributeName, attributeValue = self.attribute, getattr( self, self.attribute )
+        if( self.__ancestor is not None ) : s1 = self.__ancestor.toXLink( formatVersion = formatVersion )
+        if( ( attributeName is None ) and ( self.__attribute is not None ) ) : 
+            attributeName, attributeValue = self.__attribute, getattr( self, self.__attribute )
         if( attributeName is not None ) :
             if( attributeValue is None ) : raise Exception( 'attributeValue is None while attributeName is not' )
             attribute = "[@%s='%s']" % ( attributeName, attributeValue )
         elif( attributeValue is not None ) :
             raise Exception( 'attribute name is None but value is not: value = %s' % attributeValue )
+        moniker = self.monikerByFormat.get(formatVersion, self.moniker)
 
-        return( s1 + '/%s%s' % ( self.moniker, attribute ) )
+        return( s1 + '/%s%s' % ( moniker, attribute ) )
+
+    @abc.abstractmethod
+    def parseXMLNode( self, element, xPath, linkData ) :
+        pass
 
     def followXPath( self, xPath ):
         """
@@ -259,11 +272,14 @@ class ancestry :
 
         Uses ancestry.findEntity to find each element
         """
+
         def follow2( xPathList, node ):
-            # recursive helper function: descend the path to find the correct element
+            """For internal use. Recursive helper function: descend the path to find the correct element."""
+
             if len(xPathList)==0: return node
 
             xPathNext = xPathList[0]
+
             try:
                 if "[@" in xPathNext:
                     r1,r2 = xPathNext.split("[@",1)
@@ -273,11 +289,12 @@ class ancestry :
                 else:
                     nodeNext = node.findEntity( xPathNext )
             except:
-                raise XPathNotFound()
+                raise XPathNotFound( )
             return follow2(xPathList[1:], nodeNext)
 
         # FIXME refactor to use xml.etree.ElementPath.xpath_tokenizer?
         xPathList = xPath.split('/')
+
         while not xPathList[0]: # trim empty sections from the beginning
             xPathList = xPathList[1:]
         if '{' in xPath:        # careful, qualifiers may contain '/'
@@ -290,8 +307,86 @@ class ancestry :
             xPathList = xpl2
         try:
             return follow2( xPathList, self )
-        except XPathNotFound:
+        except XPathNotFound :
             raise XPathNotFound( "Cannot locate path '%s'" % xPath )
+
+class Ancestry2( ancestry ) :
+
+    def toXML( self, indent = '', **kwargs ) :
+
+        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
+
+    def parseAncestryMembers( self, node, xPath, linkData, **kwargs ) :
+
+        for child in node :
+            for memberName in self.ancestryMembers :
+                if( memberName == '' ) : continue
+                if( memberName[:1] == '[' ) : memberName = memberName[1:]
+                member = getattr( self, memberName )
+                if( child.tag == member.moniker ) :
+                    member.parseNode( child, xPath, linkData, **kwargs )
+                    break
+
+    def parseNode( self, node, xPath, linkData, **kwargs ) :
+
+        xPath.append( node.tag )
+
+        self.parseAncestryMembers( node, xPath, linkData, **kwargs )
+
+        xPath.pop( )
+
+    @classmethod
+    def parseXMLString( cls, string, **kwargs ) :
+        """
+        Parses a XML string using class cls.
+        """
+
+        from LUPY import xmlNode as xmlNodeMode        # Wrapper around the xml parser.
+
+        types = ( str, )
+        if( not( isinstance( string, types ) ) ) : raise TypeError( 'Invalid string.' )
+
+        node = cElementTree.fromstring( string )
+        node = xmlNodeMode.xmlNode( node, xmlNodeMode.xmlNode.etree )
+
+        return( cls.parseNodeUsingClass( node, [], {}, **kwargs ) )
+
+    @classmethod
+    def readXMLFile( cls, fileName, **kwargs ) :
+        """
+        Reads and parses an XML file using class cls.
+        """
+
+        from LUPY import xmlNode as xmlNodeMode        # Wrapper around the xml parser.
+
+        if( not( isinstance( fileName, str ) ) ) : raise TypeError( 'Invalid file name.' )
+
+        node = cElementTree.parse( fileName ).getroot( )
+        node = xmlNodeMode.xmlNode( node, xmlNodeMode.xmlNode.etree )
+
+        return( cls.parseNodeUsingClass( node, [], {}, **kwargs ) )
+
+    @classmethod
+    def parseNodeUsingClass( cls, node, xPath, linkData, **kwargs ) :
+        """
+        """
+
+        xPath.append( node.tag )
+        instance = cls.parseConstructBareNodeInstance( node, xPath, linkData, **kwargs )
+        xPath.pop( )
+
+        instance.parseNode( node, xPath, linkData, **kwargs )
+
+        return( instance )
+
+    @staticmethod
+    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+        """
+        For internal use.  This class should only be called from parseNodeUsingClass.  This class method must be overriden by 
+        sub-class. The overrided method should only parse the parts of node needed to construct cls and then return the instance.
+        """
+
+        raise Exception( 'This static method of "%s" must be overloaded by sub-class and is not for moniker "%s".' % ( Ancestry2, node.tag ) )
 
 class XPathNotFound( Exception ):
 

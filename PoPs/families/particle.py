@@ -1,68 +1,12 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 """
-This module contains the parity classes.
+This module defines the abstract base class for all types of particle appearing in PoPs.
 """
 
 import abc
@@ -89,6 +33,11 @@ class alias( miscModule.classWithIDKey ) :
         miscModule.classWithIDKey.__init__( self, id )
 
         self.__particle = particle
+
+    @property
+    def particle( self ) :
+
+        return( self.__particle )
 
     @property
     def pid( self ) :
@@ -130,6 +79,14 @@ class alias( miscModule.classWithIDKey ) :
 
         return( self.__particle.halflife )
 
+    def getMass( self, unit ) :
+
+        return( self.__particle.getMass( unit ) )
+
+    def isAlias( self ) :
+
+        return( True )
+
 class particle( miscModule.classWithIDKey ) :
     """
     This is the abstract base class for all particles.
@@ -138,6 +95,9 @@ class particle( miscModule.classWithIDKey ) :
     __metaclass__ = abc.ABCMeta
 
     def __init__( self, id ) :
+        """
+        :param id: The particle id. Every particle in a PoPs database must have a unique id.
+        """
 
         miscModule.classWithIDKey.__init__( self, id )
 
@@ -153,47 +113,81 @@ class particle( miscModule.classWithIDKey ) :
         self.__decayData = decayDataModule.decayData( )
         self.__decayData.setAncestor( self )
 
+    def __eq__( self, other ) :
+
+        return( self.id == other.id )
+
+    @property
+    @abc.abstractmethod
+    def familyOrder( self ) :
+
+        pass
+
     @property
     def isAnti( self ) :
+        """
+        :return: whether this is an anti-particle
+        """
 
         return( self.__anti )
 
     @property
     def family( self ) :
+        """
+        :return: family name of the particle
+        """
 
         return( self.moniker )
 
     @property
     def mass( self ) :
+        """
+        :return: particle mass
+        """
 
         return( self.__mass )
 
     @property
     def spin( self ) :
+        """
+        :return: particle spin
+        """
 
         return( self.__spin )
 
     @property
     def parity( self ) :
+        """
+        :return: particle parity
+        """
 
         return( self.__parity )
 
     @property
     def charge( self ) :
+        """
+        :return: particle charge
+        """
 
         return( self.__charge )
 
     @property
     def halflife( self ) :
+        """
+        :return: particle halflife
+        """
 
         return( self.__halflife )
 
     @property
     def decayData( self ) :
+        """
+        :return: particle decay information
+        """
 
         return( self.__decayData )
 
-    def addSuite( self, module ) :
+    def addSuite( self, module ) :      # FIXME rename this __addSuite? Not intended for public use
 
         suite = module.suite( )
         suite.setAncestor( self )
@@ -216,6 +210,16 @@ class particle( miscModule.classWithIDKey ) :
         return warnings
 
     def buildFromRawData( self, mass = None, spin = None, parity = None, charge = None, halflife = None, label = 'default' ) :
+        """
+        Helper method for quickly adding properties to a particle
+
+        :param mass:  tuple(float value, string unit)
+        :param spin:  tuple(int or fraction value, string unit)
+        :param parity: tuple(int value, string unit)
+        :param charge: tuple(int value, string unit)
+        :param halflife: tuple(float or string value, string unit)
+        :param label: style label (string) to apply to each quantity
+        """
 
         def getUnit( unit ) :
 
@@ -237,6 +241,7 @@ class particle( miscModule.classWithIDKey ) :
             self.halflife.add( _halflife )
 
     def convertUnits( self, unitMap ) :
+        """ See convertUnits documentation in PoPs.database """
 
         self.__mass.convertUnits( unitMap )
         self.__spin.convertUnits( unitMap )
@@ -246,6 +251,9 @@ class particle( miscModule.classWithIDKey ) :
         self.__decayData.convertUnits( unitMap )
 
     def copy( self ) :
+        """
+        :return: deep copy of self
+        """
 
         _particle = self.__class__( self.id )
         self.__copyStandardQuantities( _particle )
@@ -262,7 +270,18 @@ class particle( miscModule.classWithIDKey ) :
         for item in self.__halflife : other.halflife.add( item.copy( ) )
         self.__decayData.copyItems( other.decayData )
 
+    def familyOrderLessThan( self, other ) :
+
+        if( not( isinstance( other, particle ) ) ) : raise TypeError( 'Other must be a particle: %s.' % other.__class__ )
+        if( self.familyOrder < other.familyOrder ) : return( True )
+        return( False )
+
     def replicate( self, other ) :
+        """
+        Copy data from other into self
+
+        :param other: another particle instance
+        """
 
         self.__mass.replicate( other.mass )
         self.__spin.replicate( other.spin )
@@ -272,6 +291,12 @@ class particle( miscModule.classWithIDKey ) :
         self.__decayData = other.decayData.copy( )
 
     def getMass( self, unit ) :
+        """
+        Evaluate the particle mass in the desired unit.
+
+        :param unit: desired unit (string)
+        :return: mass (float)
+        """
 
         return( self.mass[0].float( unit ) )
 
@@ -282,6 +307,10 @@ class particle( miscModule.classWithIDKey ) :
     def extraXMLElements( self, indent = '', **kwargs ) :
 
         return( [] )
+
+    def isAlias( self ) :
+
+        return( False )
 
     def sortCompare( self, other ) :
         """This should be defined in each sub-class."""
@@ -342,9 +371,9 @@ class particle( miscModule.classWithIDKey ) :
 
         xPath.append( '%s[@id="%s"]' % ( element.tag, element.get( 'id' ) ) )
 
-        kwargs = element.attrib.copy( )
+        kwargs = {v[0]:v[1] for v in element.items()}
         del kwargs['id']
-        self = cls( element.attrib['id'], **kwargs )
+        self = cls( element.get('id'), **kwargs )
         xPath.pop()
 
         self.parseXMLNode( element, xPath, linkData )

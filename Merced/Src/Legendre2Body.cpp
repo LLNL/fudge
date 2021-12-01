@@ -17,43 +17,46 @@
 #endif
 
 #include "Legendre2Body.hpp"
+#include "adapt_quad.hpp"
 #include "global_params.hpp"
 #include "messaging.hpp"
 
-using namespace std;
-
-// ************* Legendre_param *************
-// ---------------- Legendre_param::interpolate ------------------
+// ************* Lg2b::Legendre_param *************
+// ---------------- Lg2b::Legendre_param::interpolate ------------------
 // Interpolates between two incident energies
-void Legendre_param::interpolate( double Ein,
-   Legendre_angle_dist::const_iterator prev_coefs,
-   Legendre_angle_dist::const_iterator next_coefs )
+bool Lg2b::Legendre_param::interpolate( double Ein,
+   Lg2b::Legendre_angle_dist::const_iterator prev_coefs,
+   Lg2b::Legendre_angle_dist::const_iterator next_coefs )
 {
-  if( Ein_interp == LINLIN )
+  bool interp_OK;
+  if( Ein_interp == Terp::LINLIN )
   {
-    coefs.linlin_interp( Ein, *prev_coefs, *next_coefs );
+    interp_OK = coefs.linlin_interp( Ein, *prev_coefs, *next_coefs );
   }
   else
   {
-    coefs.linlog_interp( Ein, *prev_coefs, *next_coefs );
+    interp_OK = coefs.linlog_interp( Ein, *prev_coefs, *next_coefs );
   }
+  return interp_OK;
 }
 
-// ************* Legendre_angle_dist *************
-// ---------------- Legendre_angle_dist::setup_map ------------------
-void Legendre_angle_dist::setup_map( )
+// ************* Lg2b::Legendre_angle_dist *************
+// ---------------- Lg2b::Legendre_angle_dist::setup_map ------------------
+void Lg2b::Legendre_angle_dist::setup_map( double top_E_in )
 // set up the map from center-of-mass to laboratory coordinates
 {
+  static double etol = Global.Value( "looser_tol" );
+
   // function parameter
   void *params;
-  relativistic_mass.setup_masses( &particle_info, &Q );
+  relMass.setup_masses( &particle_info, &Q );
 
   // We must do it relativistically if either outgoing particle is a photon
-  if( relativistic_mass.photon_in_out( ) )
+  if( relMass.rest_masses->photon_in_out( ) )
   {
     if( !use_relativistic )
     {
-      Warning( "Legendre_angle_dist::setup_map",
+      Msg::Warning( "Lg2b::Legendre_angle_dist::setup_map",
 	       "relativistic kinetics used because a particle is a photon" );
     }
     use_relativistic = true;
@@ -61,17 +64,23 @@ void Legendre_angle_dist::setup_map( )
 
   if( use_relativistic )
   {
-    relativistic_mass.get_threshold( );
-    threshold = relativistic_mass.threshold;
+    relMass.get_threshold( );
+    threshold = relMass.threshold;
 
     // parameters for the relativistic_F functions
-    relativistic_param relativistic_map;
-    relativistic_map.masses = &relativistic_mass;
+    Rel::relativistic_param relParam;
+    relParam.relMap.relMasses = &relMass;
     // we need to set the direction cosine
-    relativistic_map.mu_cm = 0.0;
-    params = static_cast< void * >( &relativistic_map );
+    relParam.mu_cm = 0.0;
+    // lower bound
+    params = static_cast< void * >( &relParam );
     threshold_out = relativistic_F::T_out_lab( threshold, params );
-    flip = relativistic_map.find_lowest_bottom( );
+    Ddvec::dd_entry pair_0( threshold, threshold_out );
+
+    // upper bound
+    double top_out = relativistic_F::T_out_lab( top_E_in, params );
+    Ddvec::dd_entry pair_1( top_E_in, top_out );
+    flip = relParam.find_bottom( -1.0, pair_0, pair_1, etol );
   }
   else
   {
@@ -80,22 +89,22 @@ void Legendre_angle_dist::setup_map( )
     threshold = map.threshold;
 
     // parameters for the Newtonian_F functions
-    Newton_map_param Newton_param;
+    Maps::Newton_map_param Newton_param;
     Newton_param.masses = &map;
     params = static_cast< void * >( &Newton_param );
     threshold_out = Newtonian_F::T_out_lab( threshold, params );
     flip = Newton_param.find_lowest_bottom( );
   }
 }
-// ---------------- Legendre_angle_dist::setup_param_map ------------------
-void Legendre_angle_dist::setup_param_map( Legendre2d_param *Ein_param )
+// ---------------- Lg2b::Legendre_angle_dist::setup_param_map ------------------
+void Lg2b::Legendre_angle_dist::setup_param_map( Lg2b::Legendre2d_param *Ein_param )
 // set up the Ein_param->map from center-of-mass to laboratory coordinates
 {
   if( use_relativistic )
   {
-    Ein_param->relativistic_map.masses = &relativistic_mass;
-    Ein_param->lower_hits.relativistic_map.masses = &relativistic_mass;
-    Ein_param->upper_hits.relativistic_map.masses = &relativistic_mass;
+    Ein_param->relMap.relMasses = &relMass;
+    Ein_param->lower_hits.relParam.relMap.relMasses = &relMass;
+    Ein_param->upper_hits.relParam.relMap.relMasses = &relMass;
   }
   else
   {
@@ -104,13 +113,13 @@ void Legendre_angle_dist::setup_param_map( Legendre2d_param *Ein_param )
     Ein_param->upper_hits.Newton_map.masses = &map;
   }
 }
-// ----------- Legendre_angle_dist::set_threshold --------------
+// ----------- Lg2b::Legendre_angle_dist::set_threshold --------------
 // Uses the mass difference to set the threshold
-void Legendre_angle_dist::set_threshold( )
+void Lg2b::Legendre_angle_dist::set_threshold( )
 {
   if( use_relativistic )
   {
-    threshold = relativistic_mass.threshold;
+    threshold = relMass.threshold;
   }
   else
   {
@@ -118,17 +127,17 @@ void Legendre_angle_dist::set_threshold( )
   }
 
   // adjust the data if necessary
-  Legendre_angle_dist::iterator data_ptr = begin( );
+  Lg2b::Legendre_angle_dist::iterator data_ptr = begin( );
   double first_Ein = data_ptr->get_E_in( );
   if( first_Ein < threshold )
   {
     data_ptr->set_E_in( threshold );
   }
 }
-// ----------- Legendre_angle_dist::initialize_param --------------
+// ----------- Lg2b::Legendre_angle_dist::initialize_param --------------
 // Initializes the quadrature parameters
-void Legendre_angle_dist::initialize_param( Quadrature_Method mu_quad_method, 
-  Legendre2d_param *Ein_param )
+void Lg2b::Legendre_angle_dist::initialize_param( Qmeth::Quadrature_Rule mu_quad_rule, 
+  Lg2b::Legendre2d_param *Ein_param )
 {
   Ein_param->use_relativistic = use_relativistic;
   Ein_param->lower_hits.use_relativistic = use_relativistic;
@@ -140,21 +149,21 @@ void Legendre_angle_dist::initialize_param( Quadrature_Method mu_quad_method,
   Ein_param->lower_hits.flip.x = flip.x;  // for mu_cm = -1
   Ein_param->lower_hits.flip.y = flip.y;
   Ein_param->Ein_interp = Ein_interp;
-  Ein_param->mu_quad_method = mu_quad_method;
+  Ein_param->mu_quad_rule = mu_quad_rule;
 }
-// ----------- Legendre_angle_dist::read_data --------------
-void Legendre_angle_dist::read_data( data_parser &input_file, int num_Ein )
+// ----------- Lg2b::Legendre_angle_dist::read_data --------------
+void Lg2b::Legendre_angle_dist::read_data( Dpar::data_parser &input_file, int num_Ein )
 {
   Ein_interp = interp_flag_F::read_1d_interpolation( input_file );
 
-  Legendre_coefs new_angle_dist;  // angular distribution for one E_in
-  Legendre_angle_dist::iterator new_angle_ptr;
+  Lgdata::Legendre_coefs new_angle_dist;  // angular distribution for one E_in
+  Lg2b::Legendre_angle_dist::iterator new_angle_ptr;
 
   // read the data
   for( int Ein_count = 0; Ein_count < num_Ein; ++Ein_count )
   {
     // insert a new angular distribution
-    new_angle_ptr = insert( end( ), Legendre_coefs( ) );
+    new_angle_ptr = insert( end( ), Lgdata::Legendre_coefs( ) );
     // get the incident energy and the data pairs
     new_angle_ptr->set_E_in( input_file.get_next_double( ) );
     int Order = input_file.get_next_int( ) - 1;
@@ -167,12 +176,18 @@ void Legendre_angle_dist::read_data( data_parser &input_file, int num_Ein )
   new_angle_ptr->truncate_zeros( );
   //  print( );
 }
-// ----------- Legendre_angle_dist::get_T --------------
+// ----------- Lg2b::Legendre_angle_dist::get_T --------------
 // Calculates the transfer matrix for this particle.
 // sigma is the cross section.
-void Legendre_angle_dist::get_T( const dd_vector& sigma, const dd_vector& weight,
-  T_matrix& transfer )
+void Lg2b::Legendre_angle_dist::get_T( const Ddvec::dd_vector& sigma,
+				       const Ddvec::dd_vector& weight,
+  Trf::T_matrix& transfer )
 {
+  if( particle_info.photon_in_out( ) )
+  {
+    // This needs relativistic kinematics.
+    Global.set( "kinetics", "relativistic" );
+  }
   // set the flag for relativistic mechanics
   if( Global.Flag( "kinetics" ) == "newtonian" )
   {
@@ -183,18 +198,14 @@ void Legendre_angle_dist::get_T( const dd_vector& sigma, const dd_vector& weight
     use_relativistic = true;
   }
 
-  if( ( Ein_interp != LINLIN ) && ( Ein_interp != LINLOG ) )
+  if( ( Ein_interp != Terp::LINLIN ) && ( Ein_interp != Terp::LINLOG ) )
   {
-    FatalError( "Legendre_angle_dist::get_T",
+    Msg::FatalError( "Lg2b::Legendre_angle_dist::get_T",
       "Incident energy interpolation not implemented" );
-  }
-  if( particle_info.mProd == 0.0 )
-  {
-    FatalError( "Legendre_angle_dist::get_T", "gamma emission not implemented" );
   }
 
   // the multiplicity is one
-  dd_vector multiple;
+  Ddvec::dd_vector multiple;
   multiple.make_flat( sigma, 1.0 );
   bool done = get_Ein_range( sigma, multiple, weight, transfer.e_flux,
     transfer.in_groups );
@@ -204,25 +215,21 @@ void Legendre_angle_dist::get_T( const dd_vector& sigma, const dd_vector& weight
   }
 
   // for center-of-mass data
-  setup_map( );
+  double top_E_in =  transfer.in_groups.get_top_E( );
+  setup_map( top_E_in );
   // use the threshold computed from the kinetics
-  set_threshold( ); 
+  set_threshold( );
+  transfer.threshold = threshold;
   // the computed threshold may be above 20 MeV
-   dd_vector::const_iterator last_sigma = sigma.end( );
+   Ddvec::dd_vector::const_iterator last_sigma = sigma.end( );
   --last_sigma;
   if( last_sigma->x < threshold )
   {
-    Info( "Legendre_angle_dist::get_T", "computed threshold outside the data range" );
+    Msg::Info( "Lg2b::Legendre_angle_dist::get_T",
+	       "computed threshold outside the data range" );
     transfer.zero_transfer( );
   }
-
-  if( ( transfer.Ein_quad_method != ADAPTIVE2 ) &&
-      ( transfer.Ein_quad_method != ADAPTIVE4 ) )
-  {
-    Warning( "Legendre_angle_dist::get_T",
-	     "Gaussian quadrature is not advised for this data" );
-  }
-
+  
   int num_negative = 0; // number of negative sums of Legendre series
   long int quad_count = 0;  // number of 2-d quadratures
   long int Ein_F_count= 0;  // number of calls to Legendre2Body_F::E_quad_F
@@ -235,8 +242,8 @@ void Legendre_angle_dist::get_T( const dd_vector& sigma, const dd_vector& weight
   reduction( +: mu_F_count ) reduction( +: num_negative )
   for( int Ein_bin = first_Ein; Ein_bin < last_Ein; ++Ein_bin )
   {
-    Legendre2d_param Ein_param;
-    initialize_param( transfer.mu_quad_method, &Ein_param );
+    Lg2b::Legendre2d_param Ein_param;
+    initialize_param( transfer.mu_quad_rule, &Ein_param );
     setup_param_map( &Ein_param );
 
     // set up the data range for this bin
@@ -262,33 +269,35 @@ void Legendre_angle_dist::get_T( const dd_vector& sigma, const dd_vector& weight
   }
   if( num_negative > 0 )
   {
-    Info( "Legendre_angle_dist::get_T", pastenum( "got ", num_negative ) +
+    Msg::Info( "Lg2b::Legendre_angle_dist::get_T",
+	       Msg::pastenum( "got ", num_negative ) +
 	  " negative Legendre sums." );
   }  // end of parallel loop
 
   // print the counts of function evaluations
-  cout << "2d quadratures: " << quad_count << endl;
-  cout << "Legendre2Body_F::E_quad_F calls: " << Ein_F_count << endl;
-  cout << "Legendre2Body_F::mu_cm_quad_F calls: " << mu_F_count << endl;
-  cout << "average Legendre2Body_F::E_quad_F calls: " << 1.0*Ein_F_count/quad_count << endl;
-  cout << "average Legendre2Body_F::mu_cm_quad_F calls: " << 1.0*mu_F_count/Ein_F_count << endl;
+  std::cout << "2d quadratures: " << quad_count << std::endl;
+  std::cout << "Legendre2Body_F::E_quad_F calls: " << Ein_F_count << std::endl;
+  std::cout << "Legendre2Body_F::mu_cm_quad_F calls: " << mu_F_count << std::endl;
+  std::cout << "average Legendre2Body_F::E_quad_F calls: " << 1.0*Ein_F_count/quad_count << std::endl;
+  std::cout << "average Legendre2Body_F::mu_cm_quad_F calls: " << 1.0*mu_F_count/Ein_F_count << std::endl;
 }
-// ----------- Legendre_angle_dist::get_Ein_range --------------
+// ----------- Lg2b::Legendre_angle_dist::get_Ein_range --------------
 //  Gets the range of nontrivial incident energy bins; computes first_Ein and last_Ein
 // returns true if the threshold is too high for the energy bins
-bool Legendre_angle_dist::get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
-    const dd_vector& weight,
-    const Flux_List& e_flux, const Energy_groups& Ein_groups )
+bool Lg2b::Legendre_angle_dist::get_Ein_range( const Ddvec::dd_vector& sigma,
+					       const Ddvec::dd_vector& mult,
+    const Ddvec::dd_vector& weight,
+    const Lgdata::Flux_List& e_flux, const Egp::Energy_groups& Ein_groups )
 {
   double E_last;
 
-  two_body_Ein_param initial_param;
+  Adist::two_body_Ein_param initial_param;
   bool done = initial_param.get_Ein_range( sigma, mult, weight, e_flux,
                                          Ein_groups, &E_first, &E_last );
   if( done ) return true;
 
   // check the range of incident energies for the probability data
-  Legendre_angle_dist::const_iterator Ein_data_ptr = begin( );
+  Lg2b::Legendre_angle_dist::const_iterator Ein_data_ptr = begin( );
   double E_data = Ein_data_ptr->get_E_in( );
   if( E_data > E_first )
   {
@@ -307,11 +316,11 @@ bool Legendre_angle_dist::get_Ein_range( const dd_vector& sigma, const dd_vector
 
   return false;
 }
-// ----------- Legendre_angle_dist::setup_data --------------
+// ----------- Lg2b::Legendre_angle_dist::setup_data --------------
 // Initializes the quadrature parameters
-void Legendre_angle_dist::setup_data( Legendre2d_param *Ein_param )
+void Lg2b::Legendre_angle_dist::setup_data( Lg2b::Legendre2d_param *Ein_param )
 {
-  static double skip_tol = Global.Value( "abs_tol" );
+  static double skip_tol = Global.Value( "tight_tol" );
 
   Ein_param->left_data = begin( );
   Ein_param->right_data = Ein_param->left_data;
@@ -332,15 +341,15 @@ void Legendre_angle_dist::setup_data( Legendre2d_param *Ein_param )
     bool data_bad = Ein_param->update_pointers( first_E );
     if( data_bad )
     {
-      FatalError( "Legendre_angle_dist::setup_data", "energies inconsistent" );
+      Msg::FatalError( "Lg2b::Legendre_angle_dist::setup_data", "energies inconsistent" );
     }
   }
 }
-// ----------- Legendre_angle_dist::next_ladder --------------
-bool Legendre_angle_dist::next_ladder( double E_in, Legendre2d_param *Ein_param )
+// ----------- Lg2b::Legendre_angle_dist::next_ladder --------------
+bool Lg2b::Legendre_angle_dist::next_ladder( double E_in, Lg2b::Legendre2d_param *Ein_param )
 {
   bool done = Ein_param->update_bin_pointers( E_in );
-  static double etol = Global.Value( "E_tol" );
+  static double etol = Global.Value( "tight_tol" );
   if( !done )
   {
     double E_tol = E_in * etol;
@@ -361,9 +370,9 @@ bool Legendre_angle_dist::next_ladder( double E_in, Legendre2d_param *Ein_param 
   return done;
 }
 
-// ----------- Legendre_angle_dist::set_Ein_range --------------
+// ----------- Lg2b::Legendre_angle_dist::set_Ein_range --------------
 // Sets the range of incident energies for this intergration
-void Legendre_angle_dist::set_Ein_range( Legendre2d_param *Ein_param )
+void Lg2b::Legendre_angle_dist::set_Ein_range( Lg2b::Legendre2d_param *Ein_param )
 {
   Ein_param->set_Ein_range( );
   double this_E = Ein_param->left_data->get_E_in( );
@@ -376,17 +385,19 @@ void Legendre_angle_dist::set_Ein_range( Legendre2d_param *Ein_param )
   {
     Ein_param->data_E_0 = threshold;
     Ein_param->data_E_1 = threshold;
-    // Warning( "Legendre_angle_dist::set_Ein_range", "ignoring 2 data below threshold" );
+    // Msg::Warning( "Lg2b::Legendre_angle_dist::set_Ein_range",
+    //   "ignoring 2 data below threshold" );
   }
   else if( Ein_param->data_E_0 < threshold )
   {
     Ein_param->data_E_0 = threshold;
-    // Warning( "Legendre_angle_dist::set_Ein_range", "ignoring data below threshold" );
+    // Msg::Warning( "Lg2b::Legendre_angle_dist::set_Ein_range",
+    //   "ignoring data below threshold" );
   }
 
   if( Ein_param->data_E_1 < Ein_param->data_E_0 )
   {
-    FatalError( "Legendre_angle_dist::set_Ein_range", "check the incident energies" );
+    Msg::FatalError( "Lg2b::Legendre_angle_dist::set_Ein_range", "check the incident energies" );
   }
   Ein_param->set_sigma_range( );
 
@@ -397,15 +408,19 @@ void Legendre_angle_dist::set_Ein_range( Legendre2d_param *Ein_param )
   double right_data_Ein = Ein_param->right_data->get_E_in( );
   Ein_param->upper_hits.right_Ein_Eout.x = right_data_Ein;
   Ein_param->lower_hits.right_Ein_Eout.x = right_data_Ein;
+  
   void *params;  // for the function parameters
+  Rel::relativistic_param relParam;
+  relParam.relMap.relMasses = &relMass;
+
   if( use_relativistic )
   {
-    Ein_param->relativistic_map.mu_cm = 1.0;
-    params = static_cast< void * >( &Ein_param->relativistic_map );
+    relParam.mu_cm = 1.0;
+    params = static_cast< void * >( &relParam );
     Ein_param->upper_hits.left_Ein_Eout.y = relativistic_F::T_out_lab( left_data_Ein, params );
     Ein_param->upper_hits.right_Ein_Eout.y = relativistic_F::T_out_lab( right_data_Ein, params );
     // for mu_cm = -1
-    Ein_param->relativistic_map.mu_cm = -1.0;
+    relParam.mu_cm = -1.0;
     Ein_param->lower_hits.left_Ein_Eout.y = relativistic_F::T_out_lab( left_data_Ein, params );
     Ein_param->lower_hits.right_Ein_Eout.y = relativistic_F::T_out_lab( right_data_Ein, params );
    }
@@ -421,24 +436,24 @@ void Legendre_angle_dist::set_Ein_range( Legendre2d_param *Ein_param )
     Ein_param->lower_hits.right_Ein_Eout.y = Newtonian_F::T_out_lab( right_data_Ein, params );
   }
 }
-// ----------- Legendre_angle_dist::Eout_ladder --------------
+// ----------- Lg2b::Legendre_angle_dist::Eout_ladder --------------
 // This routine uses the this angular Legendre expansion and the
 // next to calculate the contribution to the E_out boxes of the
 // transfer matrix between incident energies Ein_param->data_E_0 and
 // Ein_param->data_E_1.
-void Legendre_angle_dist::Eout_ladder( T_matrix& transfer,
-   Legendre2d_param *Ein_param )
+void Lg2b::Legendre_angle_dist::Eout_ladder( Trf::T_matrix& transfer,
+   Lg2b::Legendre2d_param *Ein_param )
 {
   bool geom_OK;  // for checking the consistency of the geometry
-  angle_hit_list test_hits;
+  Adist::angle_hit_list test_hits;
   test_hits.Newton_map.masses = &map;
-  test_hits.relativistic_map.masses = &relativistic_mass;
+  test_hits.relParam.relMap.relMasses = &relMass;
 
   // loop through the outgoing energies (column of transfer)
   for( int Eout_count = 0; Eout_count < transfer.num_Eout_bins;
     ++Eout_count )
   {
-    vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( )
+    std::vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( )
       + Eout_count;
     // how does the mu = -1 hyperbola meet this E-E' box?
     geom_OK = Ein_param->lower_hits.hit_box( -1.0, Eout_ptr,
@@ -449,7 +464,7 @@ void Legendre_angle_dist::Eout_ladder( T_matrix& transfer,
       test_hits.hit_box( -1.0, Eout_ptr,
         Ein_param->data_E_0, Ein_param->data_E_1 );
       test_hits.print( );
-      FatalError( "Legendre_angle_dist::Eout_ladder", "Check the coding, 1" );
+      Msg::FatalError( "Lg2b::Legendre_angle_dist::Eout_ladder", "Check the coding, 1" );
     }
     if( ( Eout_count < transfer.num_Eout_bins - 1 ) &&
         ( Ein_param->lower_hits.is_above( ) ) )
@@ -466,7 +481,7 @@ void Legendre_angle_dist::Eout_ladder( T_matrix& transfer,
       test_hits.hit_box( 1.0, Eout_ptr,
                          Ein_param->data_E_0, Ein_param->data_E_1 );
       test_hits.print( );
-      FatalError( "Legendre_angle_dist::Eout_ladder", "Check the coding, 2" );
+      Msg::FatalError( "Lg2b::Legendre_angle_dist::Eout_ladder", "Check the coding, 2" );
     }
     if( ( Eout_count > 0 ) && ( Ein_param->upper_hits.is_below( ) ) )
     {
@@ -477,10 +492,10 @@ void Legendre_angle_dist::Eout_ladder( T_matrix& transfer,
     one_Ebox( transfer, Eout_count,Ein_param  );
   }
 }
-// ----------- Legendre_angle_dist::one_Ebox --------------
+// ----------- Lg2b::Legendre_angle_dist::one_Ebox --------------
 // Integrate over one E-E' box
-void Legendre_angle_dist::one_Ebox( T_matrix& transfer, int Eout_count,
-   Legendre2d_param *Ein_param )
+void Lg2b::Legendre_angle_dist::one_Ebox( Trf::T_matrix& transfer, int Eout_count,
+   Lg2b::Legendre2d_param *Ein_param )
 {
   // the E' energy range
   Ein_param->Eout_min = transfer.out_groups[ Eout_count ];
@@ -490,32 +505,32 @@ void Legendre_angle_dist::one_Ebox( T_matrix& transfer, int Eout_count,
   Ein_param->lower_hits.common_hits( Ein_param->upper_hits );
 
   // integrate depending on how the hyperbolas mu_cm = const meet the box
-  angle_hit_list::iterator low_hit_ptr = Ein_param->lower_hits.begin( );
-  angle_hit_list::iterator next_low_ptr = low_hit_ptr;
+  Adist::angle_hit_list::iterator low_hit_ptr = Ein_param->lower_hits.begin( );
+  Adist::angle_hit_list::iterator next_low_ptr = low_hit_ptr;
   ++next_low_ptr;
-  angle_hit_list::iterator high_hit_ptr = Ein_param->upper_hits.begin( );
-  angle_hit_list::iterator next_high_ptr = high_hit_ptr;
+  Adist::angle_hit_list::iterator high_hit_ptr = Ein_param->upper_hits.begin( );
+  Adist::angle_hit_list::iterator next_high_ptr = high_hit_ptr;
   ++next_high_ptr;
   for( ; ( next_low_ptr != Ein_param->lower_hits.end( ) ) &&
          ( next_high_ptr != Ein_param->upper_hits.end( ) );
        low_hit_ptr = next_low_ptr, ++next_low_ptr,
          high_hit_ptr = next_high_ptr, ++next_high_ptr )
   {
-    if( ( low_hit_ptr->hit_edge == ABOVE ) ||
-        ( low_hit_ptr->hit_edge == TOP_OUT ) )
+    if( ( low_hit_ptr->hit_edge == Box::ABOVE ) ||
+        ( low_hit_ptr->hit_edge == Box::TOP_OUT ) )
     {
       // do nothing---we are above the E-E' box
       continue;
     }
-    else if( ( low_hit_ptr->hit_edge == TOP_IN ) ||
-             ( low_hit_ptr->hit_edge == BOTTOM_IN ) ||
-             ( low_hit_ptr->hit_edge == INSIDE ) )
+    else if( ( low_hit_ptr->hit_edge == Box::TOP_IN ) ||
+             ( low_hit_ptr->hit_edge == Box::BOTTOM_IN ) ||
+             ( low_hit_ptr->hit_edge == Box::INSIDE ) )
     {
       // the lower mu_cm = const hyperbola is inside the E-E' box
       Ein_param->use_Eout_min = false;
       // where is the upper hyperbola?
-      if( ( high_hit_ptr->hit_edge == ABOVE ) ||
-          ( high_hit_ptr->hit_edge == TOP_OUT ) )
+      if( ( high_hit_ptr->hit_edge == Box::ABOVE ) ||
+          ( high_hit_ptr->hit_edge == Box::TOP_OUT ) )
       {
         // integrate up to the top of the E-E' bin
         Ein_param->use_Eout_max = true;
@@ -532,15 +547,15 @@ void Legendre_angle_dist::one_Ebox( T_matrix& transfer, int Eout_count,
       // integrate from Eout_min
       Ein_param->use_Eout_min = true;
       // where is the upper mu_cm = const hyperbola?
-      if( ( high_hit_ptr->hit_edge == BOTTOM_OUT ) ||
-          ( high_hit_ptr->hit_edge == BELOW ) )
+      if( ( high_hit_ptr->hit_edge == Box::BOTTOM_OUT ) ||
+          ( high_hit_ptr->hit_edge == Box::BELOW ) )
       {
         // do nothing---we are below the E-E' box
         continue;
       }
-      else if( ( high_hit_ptr->hit_edge == TOP_IN ) ||
-               ( high_hit_ptr->hit_edge == BOTTOM_IN ) ||
-               ( high_hit_ptr->hit_edge == INSIDE ) )
+      else if( ( high_hit_ptr->hit_edge == Box::TOP_IN ) ||
+               ( high_hit_ptr->hit_edge == Box::BOTTOM_IN ) ||
+               ( high_hit_ptr->hit_edge == Box::INSIDE ) )
       {
         // the upper mu_cm = const hyperbola is inside the E-E' box
         Ein_param->use_Eout_max = false;
@@ -557,17 +572,17 @@ void Legendre_angle_dist::one_Ebox( T_matrix& transfer, int Eout_count,
     update_T( transfer, Eout_count, Ein_param );
   }
 }
-// ----------- Legendre_angle_dist::update_T --------------
-void Legendre_angle_dist::update_T( T_matrix &transfer, int Eout_count,
-   Legendre2d_param *Ein_param )
+// ----------- Lg2b::Legendre_angle_dist::update_T --------------
+void Lg2b::Legendre_angle_dist::update_T( Trf::T_matrix &transfer, int Eout_count,
+   Lg2b::Legendre2d_param *Ein_param )
 {
   static double tol = Global.Value( "quad_tol" );
   // a vector to store the integrals
-  coef_vector value( transfer.order, transfer.conserve );
+  Coef::coef_vector value( transfer.order, transfer.conserve );
   value.set_zero( );
 
   // parameters for the integration
-  QuadParamBase *params = static_cast< QuadParamBase* >( Ein_param );
+  Qparam::QuadParamBase *params = static_cast< Qparam::QuadParamBase* >( Ein_param );
 
   // loop over the cross section data
   Ein_param->this_sigma = Ein_param->first_ladder_sigma;
@@ -589,7 +604,7 @@ void Legendre_angle_dist::update_T( T_matrix &transfer, int Eout_count,
     double right_E = ( Ein_param->next_sigma->x > Ein_param->Ein_1 ) ?
       Ein_param->Ein_1 : Ein_param->next_sigma->x;
     // evaluate the integral
-    quad_F::integrate( Legendre2Body_F::E_quad_F, transfer.Ein_quad_method,
+    quad_F::integrate( Legendre2Body_F::E_quad_F, transfer.Ein_quad_rule,
        left_E, right_E, params, tol, &value );
 
     // Add this integral
@@ -603,23 +618,26 @@ void Legendre_angle_dist::update_T( T_matrix &transfer, int Eout_count,
 // **************** functions to integrate **********
 // Function for the 1-d quadrature
 // ---------------- Legendre2Body_F::mu_cm_quad_F ------------------
-void Legendre2Body_F::mu_cm_quad_F( double mu_cm,
-   QuadParamBase *mu_cm_quad_param, coef_vector *value )
+bool Legendre2Body_F::mu_cm_quad_F( double mu_cm,
+   Qparam::QuadParamBase *mu_cm_quad_param, Coef::coef_vector *value )
 {
   // the parameters are really Legendre_param
-  Legendre_param *params = static_cast<Legendre_param*>( mu_cm_quad_param );
+  Lg2b::Legendre_param *params = static_cast<Lg2b::Legendre_param*>( mu_cm_quad_param );
   params->func_count += 1;
   //  if( params->func_count % 100 == 0 )
   //  {
-  //    Info( "mu_cm_quad_F", pastenum( "got ", params->func_count ) + " evaluations");
+  //    Msg::Info( "mu_cm_quad_F",
+  //      Msg::pastenum( "got ", params->func_count ) + " evaluations");
   //  }
   // get Eout_lab and mu_lab
   double Eout_lab;
   double mu_lab;
   double E_in = params->coefs.get_E_in( );
+
+  // we may want to check that these routines worked OK
   if( params->use_relativistic )
   {
-    params->relativistic_map->get_E_mu_lab( mu_cm, &Eout_lab, &mu_lab );
+    params->relMap.get_E_mu_lab( mu_cm, &Eout_lab, &mu_lab );
   }
   else
   {
@@ -639,30 +657,33 @@ void Legendre2Body_F::mu_cm_quad_F( double mu_cm,
     ++(params->num_negative);
     if( ( !params->flag_set ) && ( params->num_negative == 1 ) )
     {
-      string Ein_value = pastenum( "Negative Legendre sum for E_in:", E_in );
-      string mu_value = pastenum( " and mu_cm:", mu_cm );
-      Info( "Legendre_mu_cm_quad_F", Ein_value + mu_value );
+      std::string Ein_value = Msg::pastenum( "Negative Legendre sum for E_in:", E_in );
+      std::string mu_value = Msg::pastenum( " and mu_cm:", mu_cm );
+      Msg::Info( "Legendre_mu_cm_quad_F", Ein_value + mu_value );
     }
   
   }
 
   // do the energy weighting if necessary
-  if( ( value->conserve == ENERGY ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::ENERGY ) || ( value->conserve == Coef::BOTH ) )
   {
     value->scale_E( Eout_lab );
   }
+
+  // there should be 
+  return true;
 }
 // ---------------- Legendre2Body_F::E_quad_F ------------------
-void Legendre2Body_F::E_quad_F( double E_in, QuadParamBase *e_quad_param,
-   coef_vector *value )
+bool Legendre2Body_F::E_quad_F( double E_in, Qparam::QuadParamBase *e_quad_param,
+   Coef::coef_vector *value )
 // Function for the 2-d quadrature
 {
-  // the parameters are really Legendre2d_param *
-  Legendre2d_param *e_params = static_cast<Legendre2d_param *>( e_quad_param );
+  // the parameters are really Lg2b::Legendre2d_param *
+  Lg2b::Legendre2d_param *e_params = static_cast<Lg2b::Legendre2d_param *>( e_quad_param );
   e_params->func_count += 1;
   //  if( e_params->func_count % 100 == 0 )
   //  {
-  //    Info( "Legendre2Body_F::E_quad_F", pastenum( "got ",
+  //    Msg::Info( "Legendre2Body_F::E_quad_F", Msg::pastenum( "got ",
   //      e_params->func_count ) + " evaluations");
   //  }
 
@@ -670,30 +691,34 @@ void Legendre2Body_F::E_quad_F( double E_in, QuadParamBase *e_quad_param,
   // *value comes in as 0.  
 
   // parameters for the integration over mu_cm
-  Legendre_param mu_cm_params;
+  Lg2b::Legendre_param mu_cm_params;
   mu_cm_params.flag_set = ( e_params->num_negative > 0 );
   mu_cm_params.coefs.set_E_in( E_in );
   mu_cm_params.Newton_map = &e_params->Newton_map;
-  mu_cm_params.relativistic_map = &e_params->relativistic_map;
+  mu_cm_params.relMap.relMasses = e_params->relMap.relMasses;
   mu_cm_params.use_relativistic = e_params->use_relativistic;
   mu_cm_params.Ein_interp = e_params->Ein_interp;
   // interpolate the (mu_cm, probability) with respect to incident energy
   int max_order = ( e_params->left_data->order > e_params->right_data->order ) ?
     e_params->left_data->order : e_params->right_data->order;
   mu_cm_params.coefs.initialize( max_order );
-  mu_cm_params.interpolate( E_in, e_params->left_data, e_params->right_data );
-
+  bool is_OK = mu_cm_params.interpolate( E_in, e_params->left_data, e_params->right_data );
+  if( !is_OK )
+  {
+    return false;
+  }
+  
   // the range of integration
   double mu_cm_0;
   double mu_cm_1;
   if( e_params->use_relativistic )
   {
-    mu_cm_params.relativistic_map->set_boost( E_in );
+    mu_cm_params.relMap.set_boost( E_in );
 
     mu_cm_0 = ( e_params->use_Eout_min ) ?
-      mu_cm_params.relativistic_map->get_mu_cm( e_params->Eout_min ) : -1.0;
+      mu_cm_params.relMap.get_mu_cm( e_params->Eout_min ) : -1.0;
     mu_cm_1 = ( e_params->use_Eout_max ) ?
-    mu_cm_params.relativistic_map->get_mu_cm( e_params->Eout_max ) : 1.0;
+    mu_cm_params.relMap.get_mu_cm( e_params->Eout_max ) : 1.0;
   }
   else
   {
@@ -704,10 +729,11 @@ void Legendre2Body_F::E_quad_F( double E_in, QuadParamBase *e_quad_param,
   }
 
   // evaluate the integral over mu_cm
-  QuadParamBase *params = static_cast< QuadParamBase* >( &mu_cm_params );
+  Qparam::QuadParamBase *params =
+    static_cast< Qparam::QuadParamBase* >( &mu_cm_params );
   static double tol = Global.Value( "quad_tol" );
 
-  quad_F::integrate( Legendre2Body_F::mu_cm_quad_F, e_params->mu_quad_method,
+  is_OK = quad_F::integrate( Legendre2Body_F::mu_cm_quad_F, e_params->mu_quad_rule,
          mu_cm_0, mu_cm_1, params, tol, value );
 
   e_params->num_negative += mu_cm_params.num_negative;
@@ -715,7 +741,9 @@ void Legendre2Body_F::E_quad_F( double E_in, QuadParamBase *e_quad_param,
   // weight it by flux * cross section
   e_params->set_weight( E_in );
   *value *= e_params->current_weight;
-  //  cout << "E_in: " << E_in << " mu_cm_0: " << mu_cm_0 << " mu_cm_1: " <<
-  //    mu_cm_1 << endl;
+  //  std::cout << "E_in: " << E_in << " mu_cm_0: " << mu_cm_0 << " mu_cm_1: " <<
+  //    mu_cm_1 << std::endl;
   //  value->print( );
+
+  return is_OK;
 }

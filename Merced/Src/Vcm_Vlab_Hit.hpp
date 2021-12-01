@@ -18,6 +18,8 @@
 #include "param_base.hpp"
 #include "mappings.hpp"
 
+namespace Vhit
+{
 //! How does a curve E_cm = const intersect an Eout_lab-mu_lab quadrature box?
 // ---------------- Hit_Corner -----------------------------
 enum Hit_Corner{ V_INSIDE,        // lies inside the box
@@ -28,6 +30,7 @@ enum Hit_Corner{ V_INSIDE,        // lies inside the box
                  V_BELOW,         // lies below the box
                  V_ABOVE};        // lies above the box
 
+  
 //! Class for an intersection of E_cm = const with an Eout_lab-mu_lab quadrature box
 // ---------------- class Vcm_quadBox_Hit ------------------
 class Vcm_quadBox_Hit
@@ -59,21 +62,25 @@ public:
   //! Prints a hit
   void print( ) const;
 };
+}    // end of this part of namespace Vhit
 
 namespace Vcm_quadBox_Hit_F
 {
   // ---------------- Vcm_quadBox_Hit comparison function ------------------
   //! Order Vcm_quadBox_Hit by its V_cm member
-  //! \param first the first Vcm_quadBox_Hit to compare
-  //! \param second the  second Vcm_quadBox_Hit to compare
-  bool lessthan_F( Vcm_quadBox_Hit first, Vcm_quadBox_Hit second );
+  //! \param first the first Vhit::Vcm_quadBox_Hit to compare
+  //! \param second the  second Vhit::Vcm_quadBox_Hit to compare
+  bool lessthan_F( Vhit::Vcm_quadBox_Hit first, Vhit::Vcm_quadBox_Hit second );
 }
 
+namespace Vhit // more
+{
+  
 //! Class for the list of intersections of an E_cm = const. surface with an E_out silo.
 //! In this list the "bottom" of the box is *Eout_ptr = const. and the top is *(++Eout_ptr) = const.
 //! The "left side" is mu_lab = -1 and the "right side" is mu_lab = 1.
 // ---------------- class Vcm_Vlab_hit_list ------------------
-class Vcm_Vlab_hit_list : public hit_list_base
+class Vcm_Vlab_hit_list : public Box::hit_list_base
 {
 private:
   //! The desired outgoing energy in the laboratory frame 
@@ -108,28 +115,28 @@ private:
   //! Finds the intersections with the bottom of a box
   //! \param E_out_lab bottom boundary of the outgoing energy bin
   //! \param Ein_hits computed incident energies which give intersections
-  void find_bottom_hits( double E_out_lab, vector< Ein_Eta_Hit > *Ein_hits );
+  void find_bottom_hits( double E_out_lab, std::vector< Box::Ein_Eta_Hit > *Ein_hits );
 
   //! Finds the intersections with the top of a box
   //! \param E_out_lab top boundary of the outgoing energy bin
   //! \param Ein_hits computed incident energies which give intersections
-  void find_top_hits( double E_out_lab, vector< Ein_Eta_Hit > *Ein_hits );
+  void find_top_hits( double E_out_lab, std::vector< Box::Ein_Eta_Hit > *Ein_hits );
 
   //! Where do we hit the left-hand side of the box?
   //! \param dummy not used
   //! \param Eout_ptr bottom boundary of the outgoing energy bin
-  void test_left( double dummy, vector< double >::const_iterator Eout_ptr );
+  void test_left( double dummy, std::vector< double >::const_iterator Eout_ptr );
 
   //! Where do we hit the right-hand side of the box?
   //! \param dummy not used
   //! \param Eout_ptr bottom boundary of the outgoing energy bin
-  void test_right( double dummy, vector< double >::const_iterator Eout_ptr );
+  void test_right( double dummy, std::vector< double >::const_iterator Eout_ptr );
 
   //! No top or bottom intersections, so are we above, below, or through the middle?
   //! \param Eout_ptr bottom boundary of the outgoing energy bin
   //! \param dummy_left not used
   //! \param dummy_right not used
-  void test_sides( vector< double >::const_iterator Eout_ptr,
+  void test_sides( std::vector< double >::const_iterator Eout_ptr,
     double dummy_left, double dummy_right );
 
   //! Checks for inconsistencies caused by peculiarities of real arithmetic.
@@ -139,8 +146,8 @@ private:
 
 public:
   //! parameters used by the hit_G function and its derivative
-  Ecm_intersect G0_data;  // at the lower incident energy
-  Ecm_intersect G1_data;  // at the higher incident energy
+  Maps::Ecm_intersect G0_data;  // at the lower incident energy
+  Maps::Ecm_intersect G1_data;  // at the higher incident energy
 
   inline Vcm_Vlab_hit_list( ) {}
   inline ~Vcm_Vlab_hit_list( ) {}
@@ -149,5 +156,7 @@ public:
   //! param E_out_lab desired outgoing energy
   void set_G_data( double E_out_lab );
 };
+
+}  // end of namespace Vhit
 
 #endif

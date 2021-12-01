@@ -19,20 +19,21 @@
 #endif
 
 #include "standard_Legendre.hpp"
+#include "adapt_quad.hpp"
 #include "messaging.hpp"
 #include "global_params.hpp"
 
-// ************* class standard_Legendre_vector *****************
-// ----------- standard_Legendre_vector::read_coef --------------
+// ************* class StdLg::standard_Legendre_vector *****************
+// ----------- StdLg::standard_Legendre_vector::read_coef --------------
 // Reads the Legendre coefficients of the energy probability density
-void standard_Legendre_vector::read_coef( data_parser& infile, int num_Eout, int max_order )
+void StdLg::standard_Legendre_vector::read_coef( Dpar::data_parser& infile, int num_Eout, int max_order )
 {
-  standard_Legendre_vector::iterator new_Eout_ptr;
+  StdLg::standard_Legendre_vector::iterator new_Eout_ptr;
   // read the data
   for( int Eout_count = 0; Eout_count < num_Eout; ++Eout_count )
   {
     // make a new set of Legendre coefficients
-    new_Eout_ptr = insert( end( ), Legendre_coefs( ) );
+    new_Eout_ptr = insert( end( ), Lgdata::Legendre_coefs( ) );
     new_Eout_ptr->initialize( max_order );
     new_Eout_ptr->set_E_out( infile.get_next_double( ) );  // energy of outgoing particle
     int file_order = infile.get_next_int( ) - 1;  // Legendre order of input data
@@ -48,25 +49,25 @@ void standard_Legendre_vector::read_coef( data_parser& infile, int num_Eout, int
       infile.get_next_double( );
     }
   }
-  // ensure proper normalization
-  renorm( );
+  // ensure proper normalization, data not truncated
+  renorm( false );
 
-  if( Ein_interp.qualifier == UNITBASE )
+  if( Ein_interp.qualifier == Terp::UNITBASE )
   {
     to_unit_base( );
   }
-  else if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+  else if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
   {
     form_cum_prob( );
   }
 }
-// ----------- standard_Legendre_vector::append_data --------------
+// ----------- StdLg::standard_Legendre_vector::append_data --------------
 // Appends a copy of the data to the list
-void standard_Legendre_vector::append_data( double E_out, const Legendre_coefs &to_copy )
+void StdLg::standard_Legendre_vector::append_data( double E_out, const Lgdata::Legendre_coefs &to_copy )
 {
   // make a new set of Legendre coefficients
-  standard_Legendre_vector::iterator new_Eout_ptr;
-  new_Eout_ptr = insert( end( ), Legendre_coefs( ) );
+  StdLg::standard_Legendre_vector::iterator new_Eout_ptr;
+  new_Eout_ptr = insert( end( ), Lgdata::Legendre_coefs( ) );
   new_Eout_ptr->initialize( to_copy.order );
   new_Eout_ptr->set_E_out( E_out );
   for( int L_count = 0; L_count <= to_copy.order; ++L_count )
@@ -74,30 +75,130 @@ void standard_Legendre_vector::append_data( double E_out, const Legendre_coefs &
     (*new_Eout_ptr)[ L_count ] = to_copy.value( L_count );
   }
 }
-// ----------- standard_Legendre_vector::extrapolate_copy --------------
+// ----------- StdLg::standard_Legendre_vector::copy --------------
+// Copies a vector
+void StdLg::standard_Legendre_vector::copy( const StdLg::standard_Legendre_vector& vector_from )
+{
+  set_E_in( vector_from.get_E_in( ) );
+  Ein_interp = vector_from.Ein_interp;
+  Eout_interp = vector_from.Eout_interp;
+
+  for( StdLg::standard_Legendre_vector::const_iterator entry = vector_from.begin( );
+       entry != vector_from.end( ); ++entry )
+  {
+    append_data( entry->get_E_out( ), *entry );
+  }
+}
+// ----------- StdLg::standard_Legendre_vector::truncate_copy --------------
+// Copies a vector with truncation
+bool StdLg::standard_Legendre_vector::truncate_copy(
+     const StdLg::standard_Legendre_vector& vector_from,
+     double min_E, double max_E )
+{
+  if( min_E >= max_E )
+  {
+    return false;
+  }
+  
+  set_E_in( vector_from.get_E_in( ) );
+  Ein_interp = vector_from.Ein_interp;
+  Eout_interp = vector_from.Eout_interp;
+
+  static double abs_tol = Global.Value( "tight_tol" );
+  StdLg::standard_Legendre_vector::const_iterator prev_entry = vector_from.begin( );
+  StdLg::standard_Legendre_vector::const_iterator next_entry = prev_entry;
+  ++next_entry;
+
+  Lgdata::Legendre_coefs new_entry;  // for creating entries
+  int prev_order = prev_entry->order;
+  int next_order = next_entry->order;
+  int use_order = ( prev_order > next_order ) ?
+    prev_order : next_order;
+  new_entry.initialize( use_order );
+
+  // find the start
+  while( next_entry->get_E_out( ) < ( 1.0 + abs_tol ) * min_E )
+  {
+    prev_entry = next_entry;
+    ++next_entry;
+  }
+  if( Eout_interp == Terp::HISTOGRAM )
+  {
+    append_data( min_E, *prev_entry );
+  }
+  else  // LTerp::INLIN
+  {
+    if( prev_entry->get_E_out( ) < ( 1.0 - abs_tol ) * min_E )
+    {
+      new_entry.linlin_interp( min_E, *prev_entry, *next_entry );
+      append_data( min_E, new_entry );
+    }
+    else
+    {
+      append_data( min_E, *prev_entry );
+    }
+  }
+
+  // do the middle ones
+  while( next_entry->get_E_out( ) < ( 1.0 - abs_tol ) * max_E )
+  {
+    append_data( next_entry->get_E_out( ), *next_entry );
+    prev_entry = next_entry;
+    ++next_entry;
+  }
+
+  // do the last one
+  if( Eout_interp == Terp::HISTOGRAM )
+  {
+    append_data( max_E, *prev_entry );
+  }
+  else  // Terp::LINLIN
+  {
+    if( prev_entry->get_E_out( ) < ( 1.0 - abs_tol ) * max_E )
+    {
+      prev_order = prev_entry->order;
+      next_order = next_entry->order;
+      use_order = ( prev_order > next_order ) ?
+          prev_order : next_order;
+      new_entry.initialize( use_order );
+      new_entry.linlin_interp( max_E, *prev_entry, *next_entry );
+      append_data( max_E, new_entry );
+    }
+    else
+    {
+      append_data( max_E, *prev_entry );
+    }
+  }
+
+  // renorm truncated data
+  bool norm_OK = renorm( true );
+
+  return norm_OK;
+}
+// ----------- StdLg::standard_Legendre_vector::extrapolate_copy --------------
 // Copies a vector with extrapolation
-void standard_Legendre_vector::extrapolate_copy(
-     const standard_Legendre_vector& vector_from,
+void StdLg::standard_Legendre_vector::extrapolate_copy(
+     const StdLg::standard_Legendre_vector& vector_from,
      double min_E, double max_E )
 {
   set_E_in( vector_from.get_E_in( ) );
   Ein_interp = vector_from.Ein_interp;
   Eout_interp = vector_from.Eout_interp;
 
-  Legendre_coefs null_entry;  // for creating entries, initially all zero
+  Lgdata::Legendre_coefs null_entry;  // for creating entries, initially all zero
   null_entry.initialize( 0 );
 
-  static double e_tol = Global.Value( "E_tol" );
-  standard_Legendre_vector::const_iterator this_entry = vector_from.begin( );
+  static double abs_tol = Global.Value( "tight_tol" );
+  StdLg::standard_Legendre_vector::const_iterator this_entry = vector_from.begin( );
 
   double E_value = this_entry->get_E_out( );
-  if( min_E < ( 1.0 - e_tol )*E_value )
+  if( min_E < ( 1.0 - abs_tol )*E_value )
   {
     // extrapolate a zero head of the list
     append_data( min_E, null_entry );
     if( this_entry->value( 0 ) != 0.0 )
     {
-      append_data( ( 1.0 - e_tol )*E_value, null_entry );
+      append_data( ( 1.0 - abs_tol )*E_value, null_entry );
     }
     append_data( E_value, *this_entry );
   }
@@ -113,15 +214,15 @@ void standard_Legendre_vector::extrapolate_copy(
   {
     append_data( this_entry->get_E_out( ), *this_entry );
   }
-  standard_Legendre_vector::iterator Lptr = end( );
+  StdLg::standard_Legendre_vector::iterator Lptr = end( );
   --Lptr;
   E_value = Lptr->get_E_out( );
-  if( max_E > ( 1.0 + e_tol )*E_value )
+  if( max_E > ( 1.0 + abs_tol )*E_value )
   {
     // extrapolate a zero tail
     if( Lptr->value( 0 ) != 0.0 )
     {
-      append_data( ( 1.0 + e_tol )*E_value, null_entry );
+      append_data( ( 1.0 + abs_tol )*E_value, null_entry );
     }
     append_data( max_E, null_entry );
   }
@@ -130,22 +231,22 @@ void standard_Legendre_vector::extrapolate_copy(
     Lptr->set_E_out( max_E );
   }
 }
-// ----------- standard_Legendre_vector::form_cum_prob --------------
+// ----------- StdLg::standard_Legendre_vector::form_cum_prob --------------
 // Forms the list of cumulative probabilities
-void standard_Legendre_vector::form_cum_prob( )
+void StdLg::standard_Legendre_vector::form_cum_prob( )
 {
   // copy the data
   cum_prob.Eout_interp = Eout_interp;
-  for( standard_Legendre_vector::const_iterator Eout_ptr = begin( );
+  for( StdLg::standard_Legendre_vector::const_iterator Eout_ptr = begin( );
        Eout_ptr != end( ); ++Eout_ptr )
   {
-    cumulative_prob_list::iterator cum_prob_ptr = cum_prob.insert(
-      cum_prob.end( ), cumulative_prob_entry( ) );
+    Cum::cumulative_prob_list::iterator cum_prob_ptr = cum_prob.insert(
+      cum_prob.end( ), Cum::cumulative_prob_entry( ) );
     cum_prob_ptr->E_out = Eout_ptr->get_E_out( );
     cum_prob_ptr->Prob = Eout_ptr->value( 0 );
   }
   // now form the slopes and cumulative probabilities
-  if( Eout_interp == HISTOGRAM )
+  if( Eout_interp == Terp::HISTOGRAM )
   {
     cum_prob.get_cum_prob_flat( );
   }
@@ -155,10 +256,10 @@ void standard_Legendre_vector::form_cum_prob( )
   }
 }
 
-// *************** class standard_Legendre_param *************************
-// ------------------ standard_Legendre_param::initialize ----------------
+// *************** class StdLg::standard_Legendre_param *************************
+// ------------------ StdLg::standard_Legendre_param::initialize ----------------
 // Allocates space
-void standard_Legendre_param::initialize( int Order )
+void StdLg::standard_Legendre_param::initialize( int Order )
 {
   mid_lower_Eout.initialize( Order );
   mid_upper_Eout.initialize( Order );
@@ -169,9 +270,9 @@ void standard_Legendre_param::initialize( int Order )
   Ein1_data.prev_data.initialize( Order );
   Ein1_data.next_data.initialize( Order );
 }
-// ------------------ standard_Legendre_param::reset_start ----------------
+// ------------------ StdLg::standard_Legendre_param::reset_start ----------------
 // Initializes the data pointers for one incident energy range
-void standard_Legendre_param::reset_start( )
+void StdLg::standard_Legendre_param::reset_start( )
 {
   Ein0_data.set_E_in( this_Ein->get_E_in( ) );
   Ein1_data.set_E_in( next_Ein->get_E_in( ) );
@@ -179,27 +280,27 @@ void standard_Legendre_param::reset_start( )
   right_Ein = next_Ein->get_E_in( );
 
   // initialize the pointers
-  if( Ein_interp.qualifier == DIRECT )
+  if( Ein_interp.qualifier == Terp::DIRECT )
   {
-    if( Ein_interp.flag == LINLIN )
+    if( Ein_interp.flag == Terp::LINLIN )
     {
       setup_Ein_linlin( );
     }
-    else if( Ein_interp.flag == HISTOGRAM )
+    else if( Ein_interp.flag == Terp::HISTOGRAM )
     {
       setup_Ein_flat( );
     }
   }
-  else if( Ein_interp.qualifier == UNITBASE )
+  else if( Ein_interp.qualifier == Terp::UNITBASE )
   {
     setup_Ein_ubase( );
   }
-  else if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+  else if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
   {
     setup_Ein_cum_prob( );
   }
 
-  if( Ein_interp.qualifier != CUMULATIVE_POINTS )
+  if( Ein_interp.qualifier != Terp::CUMULATIVE_POINTS )
   {
     // for the range of Eout values
     double lower_Eout;
@@ -211,7 +312,8 @@ void standard_Legendre_param::reset_start( )
         next_left_ptr->get_E_out( ) : next_right_ptr->get_E_out( );
     if( higher_Eout <= lower_Eout )
     {
-      FatalError( "standard_Legendre_param::reset_start", "Check the Eout values." );
+      Msg::FatalError( "StdLg::standard_Legendre_param::reset_start",
+		       "Check the Eout values." );
     }
 
     // Interpolate to the common Eout values
@@ -220,7 +322,7 @@ void standard_Legendre_param::reset_start( )
   }
 
   // physical outgoing energy ranges
-  if( Ein_interp.qualifier == DIRECT )
+  if( Ein_interp.qualifier == Terp::DIRECT )
   {
     Eout_0_range.x = Ein0_data.prev_data.get_E_out( );
     Eout_0_range.y = Ein0_data.next_data.get_E_out( );
@@ -230,14 +332,16 @@ void standard_Legendre_param::reset_start( )
   else
   {
     Eout_0_range.x = Ein0_data.ubase_map.Eout_min;
+    // Don't test for good interpolation
     Eout_0_range.y = Ein0_data.ubase_map.un_unit_base( Ein0_data.next_data.get_E_out( ) );
     Eout_1_range.x = Ein1_data.ubase_map.Eout_min;
+    // Don't test for good interpolation
     Eout_1_range.y = Ein1_data.ubase_map.un_unit_base( Ein1_data.next_data.get_E_out( ) );
   }
 }
-// ---------------- standard_Legendre_param::setup_Ein_ubase ------------------
+// ---------------- StdLg::standard_Legendre_param::setup_Ein_ubase ------------------
 // Sets up the data for unit-base interpolation in incident energy
-void standard_Legendre_param::setup_Ein_ubase( )
+void StdLg::standard_Legendre_param::setup_Ein_ubase( )
 {
   // lower incident energy
   left_ptr = this_Ein->begin( );
@@ -255,9 +359,9 @@ void standard_Legendre_param::setup_Ein_ubase( )
   Ein0_data.ubase_map.copy( this_Ein->ubase_map );
   Ein1_data.ubase_map.copy( next_Ein->ubase_map );
 }
-// ---------------- standard_Legendre_param::setup_Ein_cum_prob ------------------
+// ---------------- StdLg::standard_Legendre_param::setup_Ein_cum_prob ------------------
 // Sets up the data for cumulative points interpolation in incident energy
-void standard_Legendre_param::setup_Ein_cum_prob( )
+void StdLg::standard_Legendre_param::setup_Ein_cum_prob( )
 {
   // lower incident energy
   left_ptr = this_Ein->begin( );
@@ -305,12 +409,28 @@ void standard_Legendre_param::setup_Ein_cum_prob( )
   // set up Ein0_data and Ein1_data
   setup_low_A( );
   setup_high_A( higher_A );
-  Ein0_data.to_unit_base( );
-  Ein1_data.to_unit_base( );
+
+  if( Ein0_data.prev_data.get_E_out( ) < Ein0_data.next_data.get_E_out( ) )
+  {
+    Ein0_data.to_unit_base( );
+  }
+  else
+  {
+    Ein0_data.short_to_unit_base( higher_A );
+  }
+
+  if( Ein1_data.prev_data.get_E_out( ) < Ein1_data.next_data.get_E_out( ) )
+  {
+    Ein1_data.to_unit_base( );
+  }
+  else
+  {
+    Ein1_data.short_to_unit_base( higher_A );
+  }
 }
-// ---------------- standard_Legendre_param::setup_Ein_linlin ------------------
+// ---------------- StdLg::standard_Legendre_param::setup_Ein_linlin ------------------
 // Sets up the data for direct linlin interpolation in incident energy
-void standard_Legendre_param::setup_Ein_linlin( )
+void StdLg::standard_Legendre_param::setup_Ein_linlin( )
 {
   // remove previous data
   if( !low_linlin.empty( ) )
@@ -319,22 +439,68 @@ void standard_Legendre_param::setup_Ein_linlin( )
     high_linlin.erase( high_linlin.begin( ), high_linlin.end( ) );
   }
 
+  // trancate or extrapolate data?
+  static int truncate = Global.Value( "truncate_direct" );
+  bool use_truncate = ( truncate > 0 );
+
   // get the outgoing energy range
   left_ptr = this_Ein->begin( );
   right_ptr = next_Ein->begin( );
-  double Eout_min = ( left_ptr->get_E_out( ) < right_ptr->get_E_out( ) ) ?
-    left_ptr->get_E_out( ) : right_ptr->get_E_out( );
+
+  double Eout_min;
+  double left_Eout = left_ptr->get_E_out( );
+  double right_Eout = right_ptr->get_E_out( );
+  if( use_truncate )
+  {
+    Eout_min = ( left_Eout > right_Eout ) ? left_Eout : right_Eout;
+  }
+  else
+  {
+    Eout_min = ( left_Eout < right_Eout ) ? left_Eout : right_Eout;
+  }
 
   left_ptr = this_Ein->end( );
   --left_ptr;
   right_ptr = next_Ein->end( );
   --right_ptr;
-  double Eout_max = ( left_ptr->get_E_out( ) > right_ptr->get_E_out( ) ) ?
-    left_ptr->get_E_out( ) : right_ptr->get_E_out( );
+  double Eout_max;
+  left_Eout = left_ptr->get_E_out( );
+  right_Eout = right_ptr->get_E_out( );
+  if( use_truncate )
+  {
+    Eout_max = ( left_Eout < right_Eout ) ? left_Eout : right_Eout;
+  }
+  else
+  {
+    Eout_max = ( left_Eout > right_Eout ) ? left_Eout : right_Eout;
+  }
 
-  // extrapolate as zero
-  low_linlin.extrapolate_copy( *this_Ein, Eout_min, Eout_max );
-  high_linlin.extrapolate_copy( *next_Ein, Eout_min, Eout_max );
+  // make copies, truncated or extrapolated
+  if( use_truncate )
+  {
+    bool low_OK = low_linlin.truncate_copy( *this_Ein, Eout_min, Eout_max );
+    bool high_OK = high_linlin.truncate_copy( *next_Ein, Eout_min, Eout_max );
+    if( !low_OK || !high_OK )
+    {
+      Msg::Warning( "StdLg::standard_Legendre_param::setup_Ein_linlin",
+	       "truncation gave norm 0, using histogram" );
+      // we got norm zero; use histogram in incident energy
+      if( !low_linlin.empty( ) )
+      {
+        low_linlin.erase( low_linlin.begin( ), low_linlin.end( ) );
+        high_linlin.erase( high_linlin.begin( ), high_linlin.end( ) );
+      }
+
+      low_linlin.copy( *this_Ein );
+      high_linlin.copy( *this_Ein );
+      high_linlin.set_E_in( next_Ein->get_E_in( ) );
+    }
+  }
+  else
+  {
+    low_linlin.extrapolate_copy( *this_Ein, Eout_min, Eout_max );
+    high_linlin.extrapolate_copy( *next_Ein, Eout_min, Eout_max );
+  }
 
   // set pointers at lower incident energy
   left_ptr = low_linlin.begin( );
@@ -348,9 +514,9 @@ void standard_Legendre_param::setup_Ein_linlin( )
   ++next_right_ptr;
   last_right_ptr = high_linlin.end( );
 }
-// ---------------- standard_Legendre_param::setup_Ein_flat ------------------
+// ---------------- StdLg::standard_Legendre_param::setup_Ein_flat ------------------
 // Sets up the data for histogram interpolation in incident energy
-void standard_Legendre_param::setup_Ein_flat( )
+void StdLg::standard_Legendre_param::setup_Ein_flat( )
 {
   // lower incident energy
   left_ptr = this_Ein->begin( );
@@ -362,17 +528,18 @@ void standard_Legendre_param::setup_Ein_flat( )
   next_right_ptr = next_left_ptr;
   last_right_ptr = this_Ein->end( );
 }
-// ------------------ standard_Legendre_param::get_next_Eout ----------------
+// ------------------ StdLg::standard_Legendre_param::get_next_Eout ----------------
 // Increments the data pointers for one incident energy range
-bool standard_Legendre_param::get_next_Eout( )
+bool StdLg::standard_Legendre_param::get_next_Eout( )
 {
   // ignore intervals with probability less than skip_tol
-  static double skip_tol = Global.Value( "abs_tol" );
+  static double skip_tol = Global.Value( "tight_tol" );
 
   bool done = false;
-  if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+  if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
   {
     // undo the unit-base map before copying data
+    // Don't test for good interpolation
     Ein0_data.un_unit_base( );
     Ein1_data.un_unit_base( );
   }
@@ -392,7 +559,7 @@ bool standard_Legendre_param::get_next_Eout( )
     {
       return true;
     }
-    if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+    if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
     {
       left_cum_prob = next_left_cum_prob;
       ++next_left_cum_prob;
@@ -427,7 +594,7 @@ bool standard_Legendre_param::get_next_Eout( )
     {
       return true;
     }
-    if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+    if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
     {
       right_cum_prob = next_right_cum_prob;
       ++next_right_cum_prob;
@@ -454,14 +621,33 @@ bool standard_Legendre_param::get_next_Eout( )
     }
   }
 
-  if( Ein_interp.qualifier == CUMULATIVE_POINTS )
+  if( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS )
   {
     // Interpolate to the common higher cumulative probability
+    double lower_A = ( left_cum_prob->cum_prob > right_cum_prob->cum_prob )?
+      left_cum_prob->cum_prob : right_cum_prob->cum_prob;
     double higher_A = ( next_left_cum_prob->cum_prob < next_right_cum_prob->cum_prob )?
         next_left_cum_prob->cum_prob : next_right_cum_prob->cum_prob;
     setup_high_A( higher_A );
-    Ein0_data.to_unit_base( );
-    Ein1_data.to_unit_base( );
+    double dA = higher_A - lower_A;
+
+    if( Ein0_data.prev_data.get_E_out( ) < Ein0_data.next_data.get_E_out( ) )
+    {
+      Ein0_data.to_unit_base( );
+    }
+    else
+    {
+      Ein0_data.short_to_unit_base( dA );
+    }
+    
+    if( Ein1_data.prev_data.get_E_out( ) < Ein1_data.next_data.get_E_out( ) )
+    {
+      Ein1_data.to_unit_base( );
+    }
+    else
+    {
+      Ein1_data.short_to_unit_base( dA );
+    }
   }
   else
   {
@@ -475,35 +661,36 @@ bool standard_Legendre_param::get_next_Eout( )
   // Reset the physical E_out ranges
   Eout_0_range.x = Eout_0_range.y;
   Eout_1_range.x = Eout_1_range.y;
-  if( ( Ein_interp.qualifier == UNITBASE ) ||
-      ( Ein_interp.qualifier == CUMULATIVE_POINTS ) )
+  if( ( Ein_interp.qualifier == Terp::UNITBASE ) ||
+      ( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS ) )
   {
+    // Don't test for good interpolation
     Eout_0_range.y = Ein0_data.ubase_map.un_unit_base( Ein0_data.next_data.get_E_out( ) );
     Eout_1_range.y = Ein1_data.ubase_map.un_unit_base( Ein1_data.next_data.get_E_out( ) );
     // We may have skipped an interval with zero probability
     Eout_0_range.x = Ein0_data.ubase_map.un_unit_base( Ein0_data.prev_data.get_E_out( ) );
     Eout_1_range.x = Ein1_data.ubase_map.un_unit_base( Ein1_data.prev_data.get_E_out( ) );
   }
-  else if( Ein_interp.flag == LINLIN )
+  else if( Ein_interp.flag == Terp::LINLIN )
   {
     Eout_0_range.y = Ein0_data.next_data.get_E_out( );
     Eout_1_range.y = Ein1_data.next_data.get_E_out( );
   }
-  else // Ein_interp == HISTOGRAM
+  else // Ein_interp == Terp::HISTOGRAM
   {
     Eout_0_range.y = Ein0_data.next_data.get_E_out( );
     Eout_1_range.y = Eout_0_range.y;
   }
   return done;
 }
-// ---------------- standard_Legendre_param::common_low_Eout ------------------
+// ---------------- StdLg::standard_Legendre_param::common_low_Eout ------------------
 // Interpolates (Eout, probability) data to the lower common Eout value
-void standard_Legendre_param::common_low_Eout( double lower_Eout )
+void StdLg::standard_Legendre_param::common_low_Eout( double lower_Eout )
 {
   Ein0_data.prev_data.set_E_out( lower_Eout );
   Ein1_data.prev_data.set_E_out( lower_Eout );
 
-  if( ( left_ptr->get_E_out( ) == lower_Eout ) || ( Ein0_data.Eout_interp == HISTOGRAM ) )
+  if( ( left_ptr->get_E_out( ) == lower_Eout ) || ( Ein0_data.Eout_interp == Terp::HISTOGRAM ) )
   {
     Ein0_data.prev_data.copy_coef( *left_ptr );
   }
@@ -512,7 +699,7 @@ void standard_Legendre_param::common_low_Eout( double lower_Eout )
     Ein0_data.prev_data.linlin_interp( lower_Eout, *left_ptr, *next_left_ptr );
   }
 
-  if( ( right_ptr->get_E_out( ) == lower_Eout ) || ( Ein1_data.Eout_interp == HISTOGRAM ) )
+  if( ( right_ptr->get_E_out( ) == lower_Eout ) || ( Ein1_data.Eout_interp == Terp::HISTOGRAM ) )
   {
     Ein1_data.prev_data.copy_coef( *right_ptr );
   }
@@ -521,20 +708,20 @@ void standard_Legendre_param::common_low_Eout( double lower_Eout )
     Ein1_data.prev_data.linlin_interp( lower_Eout, *right_ptr, *next_right_ptr );
   }
 }
-// ---------------- standard_Legendre_param::common_high_Eout ------------------
+// ---------------- StdLg::standard_Legendre_param::common_high_Eout ------------------
 // Interpolates (Eout, probability) data to the higher common Eout value
-void standard_Legendre_param::common_high_Eout( double higher_Eout )
+void StdLg::standard_Legendre_param::common_high_Eout( double higher_Eout )
 {
   Ein0_data.next_data.set_E_out( higher_Eout );
   Ein1_data.next_data.set_E_out( higher_Eout );
 
-  static double abs_tol = Global.Value( "abs_tol" );
+  static double abs_tol = Global.Value( "tight_tol" );
 
   if( next_left_ptr->get_E_out( ) < higher_Eout * ( 1 + abs_tol ) )
   {
     Ein0_data.next_data.copy_coef( *next_left_ptr );
   }
-  else if( Ein0_data.Eout_interp == HISTOGRAM )
+  else if( Ein0_data.Eout_interp == Terp::HISTOGRAM )
   {
     Ein0_data.next_data.copy_coef( *left_ptr );
   }
@@ -547,7 +734,7 @@ void standard_Legendre_param::common_high_Eout( double higher_Eout )
   {
     Ein1_data.next_data.copy_coef( *next_right_ptr );
   }
-  else if( Ein1_data.Eout_interp == HISTOGRAM )
+  else if( Ein1_data.Eout_interp == Terp::HISTOGRAM )
   {
     Ein1_data.next_data.copy_coef( *right_ptr );
   }
@@ -556,9 +743,9 @@ void standard_Legendre_param::common_high_Eout( double higher_Eout )
     Ein1_data.next_data.linlin_interp( higher_Eout, *right_ptr, *next_right_ptr );
   }
 }
-// ---------------- standard_Legendre_param::setup_low_A ------------------
+// ---------------- StdLg::standard_Legendre_param::setup_low_A ------------------
 // Sets (Eout, probability) data to the lower zero cumulative probability
-void standard_Legendre_param::setup_low_A( )
+void StdLg::standard_Legendre_param::setup_low_A( )
 {
   Ein0_data.prev_data.set_E_out( left_ptr->get_E_out( ) );
   Ein1_data.prev_data.set_E_out( right_ptr->get_E_out( ) );
@@ -566,9 +753,9 @@ void standard_Legendre_param::setup_low_A( )
   Ein0_data.prev_data.copy_coef( *left_ptr );
   Ein1_data.prev_data.copy_coef( *right_ptr );
 }
-// ---------------- standard_Legendre_param::setup_high_A ------------------
+// ---------------- StdLg::standard_Legendre_param::setup_high_A ------------------
 // Interpolates (Eout, probability) data to the higher common cumulative probability
-void standard_Legendre_param::setup_high_A( double higher_A )
+void StdLg::standard_Legendre_param::setup_high_A( double higher_A )
 {
   double higher_Eout;
 
@@ -581,7 +768,7 @@ void standard_Legendre_param::setup_high_A( double higher_A )
   {
     higher_Eout = left_cum_prob->get_cum_inv( higher_A );
     Ein0_data.next_data.set_E_out( higher_Eout );
-    if( Ein0_data.Eout_interp == HISTOGRAM )
+    if( Ein0_data.Eout_interp == Terp::HISTOGRAM )
     {
       Ein0_data.next_data.copy_coef( *left_ptr );
     }
@@ -600,7 +787,7 @@ void standard_Legendre_param::setup_high_A( double higher_A )
   {
     higher_Eout = right_cum_prob->get_cum_inv( higher_A );
     Ein1_data.next_data.set_E_out( higher_Eout );
-    if( Ein1_data.Eout_interp == HISTOGRAM )
+    if( Ein1_data.Eout_interp == Terp::HISTOGRAM )
     {
       Ein1_data.next_data.copy_coef( *right_ptr );
     }
@@ -610,15 +797,18 @@ void standard_Legendre_param::setup_high_A( double higher_A )
     }
   }
 }
-// ------------------ standard_Legendre_param::unitbase_interpolate ----------------
+// ------------------ StdLg::standard_Legendre_param::unitbase_interpolate ----------------
 // Does unit-base interpolation between two incident energies
-void standard_Legendre_param::unitbase_interpolate( double Ein )
+bool StdLg::standard_Legendre_param::unitbase_interpolate( double Ein )
 {
+  bool is_OK = true;
+  
   double dEin = right_Ein - left_Ein;
   if( dEin <= 0.0 )
   {
-    FatalError( "standard_Legendre_param::unitbase_interpolate",
+    Msg::DebugInfo( "StdLg::standard_Legendre_param::unitbase_interpolate",
 		"Incident energies out of order" );
+    return false;
   }
   // lin-lin interpolate the physical energy range
   double alpha = ( Ein - left_Ein )/dEin;
@@ -628,22 +818,26 @@ void standard_Legendre_param::unitbase_interpolate( double Ein )
   mid_ubase_map.interpolate( alpha, Ein0_data.ubase_map, Ein1_data.ubase_map );
 
   // interpolate data at the lower and upper unit-base outgoing energies
-  if(  Ein_interp.flag == LINLOG )
+  if(  Ein_interp.flag == Terp::LINLOG )
   {
     alpha = log( Ein / left_Ein )/log( right_Ein / left_Ein );
   }
-  mid_lower_Eout.unitbase_interp( Ein, alpha, Ein0_data.prev_data,
+  is_OK = mid_lower_Eout.unitbase_interp( Ein, alpha, Ein0_data.prev_data,
      Ein1_data.prev_data );
-  mid_upper_Eout.unitbase_interp( Ein, alpha, Ein0_data.next_data,
+  if( !is_OK ) return false;
+  is_OK = mid_upper_Eout.unitbase_interp( Ein, alpha, Ein0_data.next_data,
      Ein1_data.next_data );
+  if( !is_OK ) return false;
+  
   double Eout_min_ubase;
   double Eout_max_ubase;
-  if( Eout_interp == HISTOGRAM )
+  if( Eout_interp == Terp::HISTOGRAM )
   {
     // save the unit-base outgoing energies that are to be used
     if( use_Eout_min )
     {
-      Eout_min_ubase = mid_ubase_map.to_unit_base( Eout_min );
+      Eout_min_ubase = mid_ubase_map.to_unit_base( Eout_min, &is_OK );
+      if( !is_OK ) return false;
       use_prev_Eout.set_E_out( Eout_min_ubase );
     }
     else
@@ -653,7 +847,8 @@ void standard_Legendre_param::unitbase_interpolate( double Ein )
     use_prev_Eout.copy_coef( mid_lower_Eout );
     if( use_Eout_max )
     {
-      Eout_max_ubase = mid_ubase_map.to_unit_base( Eout_max );
+      Eout_max_ubase = mid_ubase_map.to_unit_base( Eout_max, &is_OK );
+      if( !is_OK ) return false;
       use_next_Eout.set_E_out( Eout_max_ubase );
     }
     else
@@ -667,7 +862,8 @@ void standard_Legendre_param::unitbase_interpolate( double Ein )
     // interpolate data to the unit-base outgoing energies that are to be used
     if( use_Eout_min )
     {
-      Eout_min_ubase = mid_ubase_map.to_unit_base( Eout_min );
+      Eout_min_ubase = mid_ubase_map.to_unit_base( Eout_min, &is_OK );
+      if( !is_OK ) return false;
       use_prev_Eout.linlin_interp( Eout_min_ubase, mid_lower_Eout, mid_upper_Eout );
     }
     else
@@ -677,7 +873,8 @@ void standard_Legendre_param::unitbase_interpolate( double Ein )
     }
     if( use_Eout_max )
     {
-      Eout_max_ubase = mid_ubase_map.to_unit_base( Eout_max );
+      Eout_max_ubase = mid_ubase_map.to_unit_base( Eout_max, &is_OK );
+      if( !is_OK ) return false;
       use_next_Eout.linlin_interp( Eout_max_ubase, mid_lower_Eout, mid_upper_Eout );
     }
     else
@@ -686,15 +883,17 @@ void standard_Legendre_param::unitbase_interpolate( double Ein )
       use_next_Eout.copy_coef( mid_upper_Eout );
     }
   }
+
+  return is_OK;
 }
-// ------------------ standard_Legendre_param::direct_linlin_interpolate -----------
+// ------------------ StdLg::standard_Legendre_param::direct_linlin_interpolate -----------
 // Does direct lin-lin interpolation between two incident energies
-void standard_Legendre_param::direct_linlin_interpolate( double Ein )
+void StdLg::standard_Legendre_param::direct_linlin_interpolate( double Ein )
 {
   double dEin = right_Ein - left_Ein;
   if( dEin <= 0.0 )
   {
-    FatalError( "standard_Legendre_param::linlin_interpolate",
+    Msg::FatalError( "StdLg::standard_Legendre_param::linlin_interpolate",
 		"Incident energies out of order" );
   }
   double alpha = ( Ein - left_Ein )/dEin;
@@ -706,7 +905,7 @@ void standard_Legendre_param::direct_linlin_interpolate( double Ein )
 
   double Eout_min_linlin;
   double Eout_max_linlin;
-  if( Eout_interp == HISTOGRAM )
+  if( Eout_interp == Terp::HISTOGRAM )
   {
     // save the outgoing energies that are to be used
     if( use_Eout_min )
@@ -758,9 +957,9 @@ void standard_Legendre_param::direct_linlin_interpolate( double Ein )
   Eout_range.x = ( 1.0 - alpha )*Eout_0_range.x + alpha*Eout_1_range.x;
   Eout_range.y = ( 1.0 - alpha )*Eout_0_range.y + alpha*Eout_1_range.y;
 }
-// ------------------ standard_Legendre_param::flat_interpolate ----------------
+// ------------------ StdLg::standard_Legendre_param::flat_interpolate ----------------
 // Does histogram interpolation between two incident energies
-void standard_Legendre_param::flat_interpolate( )
+void StdLg::standard_Legendre_param::flat_interpolate( )
 {
   // copy the data at the lower incident energy
   mid_lower_Eout.set_E_out( Ein0_data.prev_data.get_E_out( ) );
@@ -770,7 +969,7 @@ void standard_Legendre_param::flat_interpolate( )
 
   double Eout_min_flat;
   double Eout_max_flat;
-  if( Eout_interp == HISTOGRAM )
+  if( Eout_interp == Terp::HISTOGRAM )
   {
     // save the outgoing energies that are to be used
     if( use_Eout_min )
@@ -823,29 +1022,29 @@ void standard_Legendre_param::flat_interpolate( )
   Eout_range.y = Eout_0_range.y;
 }
 
-// ************* class standard_Legendre *****************
-// ----------- standard_Legendre::standard_Legendre ------------------
+// ************* class StdLg::standard_Legendre *****************
+// ----------- StdLg::standard_Legendre::standard_Legendre ------------------
 // constructor
-standard_Legendre::standard_Legendre( )
+StdLg::standard_Legendre::standard_Legendre( )
 {
-  Ein_interp.flag = NOTSET;  // LINLIN or HISTOGRAM
-  Eout_interp = NOTSET;   // LINLIN or HISTOGRAM
+  Ein_interp.flag = Terp::NOTSET;  // Terp::LINLIN or Terp::HISTOGRAM
+  Eout_interp = Terp::NOTSET;   // Terp::LINLIN or Terp::HISTOGRAM
 }
-// ----------- standard_Legendre::~standard_Legendre ------------------
+// ----------- StdLg::standard_Legendre::~standard_Legendre ------------------
 // destructor
-standard_Legendre::~standard_Legendre( )
+StdLg::standard_Legendre::~standard_Legendre( )
 {
 }
-// ----------- standard_Legendre::read_data ------------------
+// ----------- StdLg::standard_Legendre::read_data ------------------
 // Reads the Legendre data
-void standard_Legendre::read_data( data_parser& infile, int num_Ein )
+void StdLg::standard_Legendre::read_data( Dpar::data_parser& infile, int num_Ein )
 {
   order = Global.Value( "outputLegendreOrder" );
-  standard_Legendre::iterator new_Ein_ptr;
+  StdLg::standard_Legendre::iterator new_Ein_ptr;
   for( int Ein_count = 0; Ein_count < num_Ein; ++Ein_count )
   {
-    // make a new standard_Legendre_vector
-    new_Ein_ptr = insert( end( ), standard_Legendre_vector( ) );
+    // make a new StdLg::standard_Legendre_vector
+    new_Ein_ptr = insert( end( ), StdLg::standard_Legendre_vector( ) );
     new_Ein_ptr->set_E_in( infile.get_next_double( ) );  // energy of incident particle
     new_Ein_ptr->Ein_interp = Ein_interp;
     new_Ein_ptr->Eout_interp = Eout_interp;
@@ -853,22 +1052,22 @@ void standard_Legendre::read_data( data_parser& infile, int num_Ein )
     new_Ein_ptr->read_coef( infile, num_Eout, order );
   }
 }
-// -----------  standard_Legendre::get_Ein_range --------------
+// -----------  StdLg::standard_Legendre::get_Ein_range --------------
 //  Gets the range of nontrivial incident energy bins; computes first_Ein and last_Ein
 // returns true if the threshold is too high for the energy bins
-bool standard_Legendre::get_Ein_range( const dd_vector& sigma_, const dd_vector& mult_,
-    const dd_vector& weight_,
-    const Flux_List& e_flux_, const Energy_groups& Ein_groups )
+bool StdLg::standard_Legendre::get_Ein_range( const Ddvec::dd_vector& sigma_, const Ddvec::dd_vector& mult_,
+    const Ddvec::dd_vector& weight_,
+    const Lgdata::Flux_List& e_flux_, const Egp::Energy_groups& Ein_groups )
 {
   double E_last;
 
-  standard_Legendre_param initial_param;
+  StdLg::standard_Legendre_param initial_param;
   bool done = initial_param.get_Ein_range( sigma_, mult_, weight_, e_flux_,
                                          Ein_groups, &E_first, &E_last );
   if( done ) return true;
 
   // check the range of incident energies for the probability data
-  standard_Legendre::const_iterator this_ptr = begin( );
+  StdLg::standard_Legendre::const_iterator this_ptr = begin( );
   double E_data = this_ptr->get_E_in( );
   if( E_data > E_first )
   {
@@ -887,33 +1086,35 @@ bool standard_Legendre::get_Ein_range( const dd_vector& sigma_, const dd_vector&
 
   return false;
 }
-// ----------- standard_Legendre::get_T ------------------
+// ----------- StdLg::standard_Legendre::get_T ------------------
 // Computes the transfer matrix
-void standard_Legendre::get_T( const dd_vector& sigma, const dd_vector& multiple, 
-  const dd_vector& weight, T_matrix& transfer )
+void StdLg::standard_Legendre::get_T( const Ddvec::dd_vector& sigma, const Ddvec::dd_vector& multiple, 
+  const Ddvec::dd_vector& weight, Trf::T_matrix& transfer )
 {
-  bool interp_OK = ( ( Ein_interp.qualifier == UNITBASE ) &&
-		     ( ( Ein_interp.flag == LINLIN ) ||
-		       ( Ein_interp.flag == LINLOG ) ) ) ||
-    ( ( Ein_interp.qualifier == CUMULATIVE_POINTS ) &&
-      ( ( Ein_interp.flag == LINLIN ) ||
-        ( Ein_interp.flag == HISTOGRAM ) ) ) ||
-    ( ( Ein_interp.qualifier == DIRECT ) &&
-      ( ( Ein_interp.flag == LINLIN ) ||
-        ( Ein_interp.flag == HISTOGRAM ) ) );
+  bool interp_OK = ( ( Ein_interp.qualifier == Terp::UNITBASE ) &&
+		     ( ( Ein_interp.flag == Terp::LINLIN ) ||
+		       ( Ein_interp.flag == Terp::LINLOG ) ) ) ||
+    ( ( Ein_interp.qualifier == Terp::CUMULATIVE_POINTS ) &&
+      ( ( Ein_interp.flag == Terp::LINLIN ) ||
+        ( Ein_interp.flag == Terp::HISTOGRAM ) ) ) ||
+    ( ( Ein_interp.qualifier == Terp::DIRECT ) &&
+      ( ( Ein_interp.flag == Terp::LINLIN ) ||
+        ( Ein_interp.flag == Terp::HISTOGRAM ) ) );
 
   if( !interp_OK )
   {
-    FatalError( "standard_Legendre::get_T", "Incident interpolation type not implemented" );
+    Msg::FatalError( "StdLg::standard_Legendre::get_T",
+		     "Incident interpolation type not implemented" );
   }
-  interp_OK = ( Eout_interp == LINLIN ) || ( Eout_interp == HISTOGRAM );
+  interp_OK = ( Eout_interp == Terp::LINLIN ) || ( Eout_interp == Terp::HISTOGRAM );
   if( !interp_OK )
   {
-    FatalError( "standard_Legendre::get_T", "Outgoing interpolation type not implemented" );
+    Msg::FatalError( "StdLg::standard_Legendre::get_T",
+		     "Outgoing interpolation type not implemented" );
   }
-  if( Ein_interp.qualifier == DIRECT )
+  if( Ein_interp.qualifier == Terp::DIRECT )
   {
-    Warning( "standard_Legend::get_T",
+    Msg::Warning( "standard_Legend::get_T",
       "direct interpolation may violate energy conservation" );
   }
 
@@ -924,6 +1125,7 @@ void standard_Legendre::get_T( const dd_vector& sigma, const dd_vector& multiple
   {
     transfer.zero_transfer( );
   }
+  transfer.threshold = sigma.begin( )->x;
 
   long int quad_count = 0;  // number of 3-d quadratures
   long int Ein_F_count= 0;  // number of calls to standard_Legendre_F::Ein_F
@@ -934,7 +1136,7 @@ void standard_Legendre::get_T( const dd_vector& sigma, const dd_vector& multiple
   reduction( +: quad_count ) reduction( +: Ein_F_count )
   for( int Ein_bin = first_Ein; Ein_bin < last_Ein; ++Ein_bin )
   {
-    standard_Legendre_param Ein_param;
+    StdLg::standard_Legendre_param Ein_param;
     Ein_param.Ein_interp = Ein_interp;
     Ein_param.Eout_interp = Eout_interp;
     Ein_param.initialize( transfer.order );
@@ -961,15 +1163,15 @@ void standard_Legendre::get_T( const dd_vector& sigma, const dd_vector& multiple
   } // end of parallel loop
 
   // print the counts of function evaluations
-  cout << "2d quadratures: " << quad_count << endl;
-  cout << "standard_Legendre_F::Ein_F calls: " << Ein_F_count << endl;
-  cout << "average standard_Legendre_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << endl;
+  std::cout << "2d quadratures: " << quad_count << std::endl;
+  std::cout << "standard_Legendre_F::Ein_F calls: " << Ein_F_count << std::endl;
+  std::cout << "average standard_Legendre_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << std::endl;
 }
-// ----------- standard_Legendre::setup_data --------------
+// ----------- StdLg::standard_Legendre::setup_data --------------
 // Initializes the quadrature parameters
-void standard_Legendre::setup_data( standard_Legendre_param *Ein_param )
+void StdLg::standard_Legendre::setup_data( StdLg::standard_Legendre_param *Ein_param )
 {
-  static double skip_tol = Global.Value( "abs_tol" );
+  static double skip_tol = Global.Value( "tight_tol" );
 
   Ein_param->Ein0_data.Ein_interp = Ein_interp;
   Ein_param->Ein0_data.Eout_interp = Eout_interp;
@@ -995,13 +1197,14 @@ void standard_Legendre::setup_data( standard_Legendre_param *Ein_param )
     bool data_bad = Ein_param->update_pointers( first_E );
     if( data_bad )
     {
-      FatalError( "standard_Legendre::setup_data", "energies inconsistent" );
+      Msg::FatalError( "StdLg::standard_Legendre::setup_data",
+		       "energies inconsistent" );
     }
   }
 }
-// -----------  standard_Legendre::set_Ein_range ------------------
+// -----------  StdLg::standard_Legendre::set_Ein_range ------------------
 // Sets the range of incident energies for this intergration
-void standard_Legendre::set_Ein_range( int Ein_bin, standard_Legendre_param &Ein_param )
+void StdLg::standard_Legendre::set_Ein_range( int Ein_bin, StdLg::standard_Legendre_param &Ein_param )
 {
   Ein_param.set_Ein_range( );
   double this_E = Ein_param.this_Ein->get_E_in( );
@@ -1011,14 +1214,15 @@ void standard_Legendre::set_Ein_range( int Ein_bin, standard_Legendre_param &Ein
 
   if( Ein_param.data_E_1 < Ein_param.data_E_0 )
   {
-    FatalError( "standard_Legendre::set_Ein_range", "check the incident energies" );
+    Msg::FatalError( "StdLg::standard_Legendre::set_Ein_range",
+		     "check the incident energies" );
   }
   Ein_param.set_sigma_range( );
 }
-// ----------- standard_Legendre::E_data_ladder --------------
+// ----------- StdLg::standard_Legendre::E_data_ladder --------------
 // Loops through the energy data
- void standard_Legendre::E_data_ladder( T_matrix& transfer,
-    standard_Legendre_param *Ein_param )
+ void StdLg::standard_Legendre::E_data_ladder( Trf::T_matrix& transfer,
+    StdLg::standard_Legendre_param *Ein_param )
 {
   Ein_param->reset_start( );
   // loop through the energy data
@@ -1039,16 +1243,16 @@ void standard_Legendre::set_Ein_range( int Ein_bin, standard_Legendre_param &Ein
     if( done ) break;
   }
 }
-// ----------- standard_Legendre::Eout_ladder --------------
+// ----------- StdLg::standard_Legendre::Eout_ladder --------------
 // Loops through the outgoing energy bins
-void standard_Legendre::Eout_ladder( T_matrix& transfer,
-   standard_Legendre_param *Ein_param )
+void StdLg::standard_Legendre::Eout_ladder( Trf::T_matrix& transfer,
+   StdLg::standard_Legendre_param *Ein_param )
 {
   double dummy = 0.0;
   for( int Eout_count = 0; Eout_count < transfer.num_Eout_bins;
     ++Eout_count )
   {
-    vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( )
+    std::vector< double >::const_iterator Eout_ptr = transfer.out_groups.begin( )
       + Eout_count;
     // how does the lowest interpolation line meet this E-E' box?
     Ein_param->lower_hits.hit_box( dummy, Eout_ptr,
@@ -1071,10 +1275,10 @@ void standard_Legendre::Eout_ladder( T_matrix& transfer,
     one_Ebox( transfer, Eout_count, Ein_param );
   }
 }
-// ----------- standard_Legendre::one_Ebox --------------
+// ----------- StdLg::standard_Legendre::one_Ebox --------------
 // Integrate over one E-E' box
-void standard_Legendre::one_Ebox( T_matrix& transfer, int Eout_count,
-   standard_Legendre_param *Ein_param )
+void StdLg::standard_Legendre::one_Ebox( Trf::T_matrix& transfer, int Eout_count,
+   StdLg::standard_Legendre_param *Ein_param )
 {
   // the E' energy range
   Ein_param->Eout_min = transfer.out_groups[ Eout_count ];
@@ -1084,32 +1288,32 @@ void standard_Legendre::one_Ebox( T_matrix& transfer, int Eout_count,
   Ein_param->lower_hits.common_hits( Ein_param->upper_hits );
 
   // integrate depending on how the hyperbolas eta = const meet the box
-  energy_hit_list::iterator low_hit_ptr = Ein_param->lower_hits.begin( );
-  energy_hit_list::iterator next_low_ptr = low_hit_ptr;
+  Box::energy_hit_list::iterator low_hit_ptr = Ein_param->lower_hits.begin( );
+  Box::energy_hit_list::iterator next_low_ptr = low_hit_ptr;
   ++next_low_ptr;
-  energy_hit_list::iterator high_hit_ptr = Ein_param->upper_hits.begin( );
-  energy_hit_list::iterator next_high_ptr = high_hit_ptr;
+  Box::energy_hit_list::iterator high_hit_ptr = Ein_param->upper_hits.begin( );
+  Box::energy_hit_list::iterator next_high_ptr = high_hit_ptr;
   ++next_high_ptr;
   for( ; ( next_low_ptr != Ein_param->lower_hits.end( ) ) &&
          ( next_high_ptr != Ein_param->upper_hits.end( ) );
        low_hit_ptr = next_low_ptr, ++next_low_ptr,
          high_hit_ptr = next_high_ptr, ++next_high_ptr )
   {
-    if( ( low_hit_ptr->hit_edge == ABOVE ) ||
-        ( low_hit_ptr->hit_edge == TOP_OUT ) )
+    if( ( low_hit_ptr->hit_edge == Box::ABOVE ) ||
+        ( low_hit_ptr->hit_edge == Box::TOP_OUT ) )
     {
       // do nothing---we are above the E-E' box
       continue;
     }
-    else if( ( low_hit_ptr->hit_edge == TOP_IN ) ||
-             ( low_hit_ptr->hit_edge == BOTTOM_IN ) ||
-             ( low_hit_ptr->hit_edge == INSIDE ) )
+    else if( ( low_hit_ptr->hit_edge == Box::TOP_IN ) ||
+             ( low_hit_ptr->hit_edge == Box::BOTTOM_IN ) ||
+             ( low_hit_ptr->hit_edge == Box::INSIDE ) )
     {
       // the lower eta = const hyperbola is inside the E-E' box
       Ein_param->use_Eout_min = false;
       // where is the upper hyperbola?
-      if( ( high_hit_ptr->hit_edge == ABOVE ) ||
-          ( high_hit_ptr->hit_edge == TOP_OUT ) )
+      if( ( high_hit_ptr->hit_edge == Box::ABOVE ) ||
+          ( high_hit_ptr->hit_edge == Box::TOP_OUT ) )
       {
         // integrate up to the top of the E-E' bin
         Ein_param->use_Eout_max = true;
@@ -1126,15 +1330,15 @@ void standard_Legendre::one_Ebox( T_matrix& transfer, int Eout_count,
       // integrate from Eout_min
       Ein_param->use_Eout_min = true;
       // where is the upper eta = const hyperbola?
-      if( ( high_hit_ptr->hit_edge == BOTTOM_OUT ) ||
-          ( high_hit_ptr->hit_edge == BELOW ) )
+      if( ( high_hit_ptr->hit_edge == Box::BOTTOM_OUT ) ||
+          ( high_hit_ptr->hit_edge == Box::BELOW ) )
       {
         // do nothing---we are below the E-E' box
         continue;
       }
-      else if( ( high_hit_ptr->hit_edge == TOP_IN ) ||
-               ( high_hit_ptr->hit_edge == BOTTOM_IN ) ||
-               ( high_hit_ptr->hit_edge == INSIDE ) )
+      else if( ( high_hit_ptr->hit_edge == Box::TOP_IN ) ||
+               ( high_hit_ptr->hit_edge == Box::BOTTOM_IN ) ||
+               ( high_hit_ptr->hit_edge == Box::INSIDE ) )
       {
         // the upper eta = const hyperbola is inside the E-E' box
         Ein_param->use_Eout_max = false;
@@ -1151,13 +1355,13 @@ void standard_Legendre::one_Ebox( T_matrix& transfer, int Eout_count,
     update_T( transfer, Eout_count, Ein_param );
   }
 }
-// ----------- standard_Legendre::next_ladder --------------
-bool standard_Legendre::next_ladder( double E_in, standard_Legendre_param *Ein_param )
+// ----------- StdLg::standard_Legendre::next_ladder --------------
+bool StdLg::standard_Legendre::next_ladder( double E_in, StdLg::standard_Legendre_param *Ein_param )
 {
   bool done = Ein_param->update_bin_pointers( E_in );
   if( !done )
   {
-    static double etol = Global.Value( "E_tol" );
+    static double etol = Global.Value( "tight_tol" );
     double E_tol = E_in * etol;
     //    double E_tol = 0.0;
     if( E_in + E_tol >= Ein_param->next_Ein->get_E_in( ) )
@@ -1177,21 +1381,20 @@ bool standard_Legendre::next_ladder( double E_in, standard_Legendre_param *Ein_p
 
   return done;
 }
-// ----------- standard_Legendre::update_T --------------
+// ----------- StdLg::standard_Legendre::update_T --------------
 // Increments the transfer matrix
-void standard_Legendre::update_T( T_matrix &transfer, int Eout_count,
-   standard_Legendre_param *Ein_param )
+void StdLg::standard_Legendre::update_T( Trf::T_matrix &transfer, int Eout_count,
+   StdLg::standard_Legendre_param *Ein_param )
 {
   static double tol = Global.Value( "quad_tol" );
   // differences of nearly-equal numbers can cause problems; when to skip an interval
-  static double from_quad_tol = Global.Value( "abs_quad_tol" )/100;
-  static double from_abs_tol = 1000*Global.Value( "abs_tol" );
-  double skip_tol = ( from_quad_tol > from_abs_tol ) ? from_quad_tol : from_abs_tol;
+  static double skip_tol = Global.Value( "tight_tol" );
+  
   // a vector to store the integrals, one Legendre order
-  coef_vector value( transfer.order, transfer.conserve );
+  Coef::coef_vector value( transfer.order, transfer.conserve );
   value.set_zero( );
   // parameters for the integration
-  QuadParamBase *params = static_cast< QuadParamBase* >( Ein_param );
+  Qparam::QuadParamBase *params = static_cast< Qparam::QuadParamBase* >( Ein_param );
 
   double Ein_0 = Ein_param->Ein_0;
   double Ein_1 = Ein_param->Ein_1;
@@ -1224,7 +1427,7 @@ void standard_Legendre::update_T( T_matrix &transfer, int Eout_count,
     }
     else
     {
-      quad_F::integrate( standard_Legendre_F::Ein_F, transfer.Ein_quad_method,
+      quad_F::integrate( standard_Legendre_F::Ein_F, transfer.Ein_quad_rule,
                          Ein_param->Ein_0,
 			 Ein_param->Ein_1, params, tol, &value );
       // add this integral
@@ -1235,10 +1438,10 @@ void standard_Legendre::update_T( T_matrix &transfer, int Eout_count,
     }
   }
 }
-// ----------- standard_Legendre::print --------------
-void standard_Legendre::print( )
+// ----------- StdLg::standard_Legendre::print --------------
+void StdLg::standard_Legendre::print( )
 {
-  for( standard_Legendre::iterator energy_ptr = begin( );
+  for( StdLg::standard_Legendre::iterator energy_ptr = begin( );
        energy_ptr != end( ); ++energy_ptr )
   {
     energy_ptr->print( );
@@ -1247,20 +1450,24 @@ void standard_Legendre::print( )
 
 // *************** standard_Legendre_F::Ein_F **********************************
 // Gets the energy probability density at given incident and outgpoing energies
-void standard_Legendre_F::Ein_F( double E_in, QuadParamBase *Ein_param,
-   coef_vector *value )
+bool standard_Legendre_F::Ein_F( double E_in, Qparam::QuadParamBase *Ein_param,
+   Coef::coef_vector *value )
 {
-  // the parameters are really standard_Legendre_param *
-  standard_Legendre_param *e_params = static_cast<standard_Legendre_param *>( Ein_param );
+  bool is_OK = true;
+  
+  // the parameters are really StdLg::standard_Legendre_param *
+  StdLg::standard_Legendre_param *e_params =
+    static_cast<StdLg::standard_Legendre_param *>( Ein_param );
   e_params->func_count += 1;
   double scale = 1;  // jacobian for the unit-base map
-  if( ( e_params->Ein_interp.qualifier == UNITBASE ) ||
-      ( e_params->Ein_interp.qualifier == CUMULATIVE_POINTS ) )
+  if( ( e_params->Ein_interp.qualifier == Terp::UNITBASE ) ||
+      ( e_params->Ein_interp.qualifier == Terp::CUMULATIVE_POINTS ) )
   {
-    e_params->unitbase_interpolate( E_in );
+    is_OK = e_params->unitbase_interpolate( E_in );
+    if( !is_OK ) return false;
     scale = e_params->mid_ubase_map.Eout_max - e_params->mid_ubase_map.Eout_min;
   }
-  else if( e_params->Ein_interp.flag == HISTOGRAM )
+  else if( e_params->Ein_interp.flag == Terp::HISTOGRAM )
   {
     e_params->flat_interpolate( );
   }
@@ -1274,43 +1481,43 @@ void standard_Legendre_F::Ein_F( double E_in, QuadParamBase *Ein_param,
   double d_Eout = Eout_high - Eout_low;  // unit-base outgoing energy difference
 
   // omit really small intervals
-  static double etol = Global.Value( "E_tol" );
-  if( abs( d_Eout ) < etol*Eout_high )
+  static double etol = Global.Value( "tight_tol" );
+  if( std::abs( d_Eout ) < etol*Eout_high )
   {
     value->set_zero( );  // return zero
-    return;
+    return false;
   }
   // test for bad input
   if( ( d_Eout < 0.0 ) || ( scale <= 0.0 ) )
   {
-    Warning( "standard_Legendre_F::Ein_F", "energies out of order" );
-    if( ( value->conserve == NUMBER ) || ( value->conserve == BOTH ) )
+    Msg::DebugInfo( "standard_Legendre_F::Ein_F", "energies out of order" );
+    if( ( value->conserve == Coef::NUMBER ) || ( value->conserve == Coef::BOTH ) )
     {
       for( int L_count = 0; L_count <= use_order; ++L_count )
       {
         value->weight_1[ L_count ] = 0.0;
       }
     }
-    if( ( value->conserve == ENERGY ) || ( value->conserve == BOTH ) )
+    if( ( value->conserve == Coef::ENERGY ) || ( value->conserve == Coef::BOTH ) )
     {
       for( int L_count = 0; L_count <= use_order; ++L_count )
       {
         value->weight_E[ L_count ] = 0.0;
       }
     }
-    return;
+    return false;
   }
   // input OK
-  if( ( value->conserve == NUMBER ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::NUMBER ) || ( value->conserve == Coef::BOTH ) )
   {
-    if( e_params->Eout_interp == HISTOGRAM )
+    if( e_params->Eout_interp == Terp::HISTOGRAM )
     {
       for( int L_count = 0; L_count <= use_order; ++L_count )
       {
         value->weight_1[ L_count ] = d_Eout*e_params->mid_lower_Eout.data[ L_count ];
       }
     }
-    else  // LINLIN
+    else  // Terp::LINLIN
     {
       for( int L_count = 0; L_count <= use_order; ++L_count )
       {
@@ -1320,15 +1527,20 @@ void standard_Legendre_F::Ein_F( double E_in, QuadParamBase *Ein_param,
       }
     }
   }
-  if( ( value->conserve == ENERGY ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::ENERGY ) || ( value->conserve == Coef::BOTH ) )
   {
     double av_Eout = 0.5*( Eout_high + Eout_low );  // (unit-base)
-    if( ( e_params->Ein_interp.qualifier == UNITBASE ) ||
-	( e_params->Ein_interp.qualifier == CUMULATIVE_POINTS ) )
+    if( ( e_params->Ein_interp.qualifier == Terp::UNITBASE ) ||
+	( e_params->Ein_interp.qualifier == Terp::CUMULATIVE_POINTS ) )
     {
       av_Eout = e_params->mid_ubase_map.un_unit_base( av_Eout );  // physical
+      if( !is_OK )
+      {
+	Msg::DebugInfo( "standard_Legendre_F::Ein_F", "bad interpolation" );
+	return false;
+      }
     }
-    if( e_params->Eout_interp == HISTOGRAM )
+    if( e_params->Eout_interp == Terp::HISTOGRAM )
     {
       double integral = d_Eout*av_Eout;
       for( int L_count = 0; L_count <= use_order; ++L_count )
@@ -1336,7 +1548,7 @@ void standard_Legendre_F::Ein_F( double E_in, QuadParamBase *Ein_param,
         value->weight_E[ L_count ] = integral*e_params->mid_lower_Eout.data[ L_count ];
       }
     }
-    else  // LINLIN
+    else  // Terp::LINLIN
     {
       for( int L_count = 0; L_count <= use_order; ++L_count )
       {
@@ -1352,4 +1564,6 @@ void standard_Legendre_F::Ein_F( double E_in, QuadParamBase *Ein_param,
   // weight it by flux * cross section * multiplicity * model weight
   e_params->set_weight( E_in );
   *value *= e_params->current_weight;
+
+  return true;
 }

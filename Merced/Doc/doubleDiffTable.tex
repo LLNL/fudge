@@ -1,14 +1,25 @@
 \chapter{Joint energy-angle probability density tables}
 \label{Sec:joint-table}
 It is also possible to give energy-angle probability densities
-as tables in \xendl.  These probability tables must be in the 
-laboratory coordinate system.
-The \ENDL~\cite{Omega} and \ENDF~\cite{ENDFB} forms of these
-tables differ slightly, and \gettransfer\ supports both formats.
-The \ENDF\ format is described first.
+as tables in \xendl.  Traditionally, the data for these tables 
+had to be in the laboratory coordinate system, but \xendl\ also
+permits center-of-mass data.  For such data in the laboratory frame,
+the \ENDL~\cite{Omega} and \ENDF\ 
+\texttt{MF = 6, LAW = 7}~\cite{ENDFB} forms 
+differ slightly, and \gettransfer\ supports both formats.
 
-One format for tables
-of values of $\pi(\Elab', \mulab \mid E)$ is as arrays
+The \ENDF\ manual~\cite{ENDFB} includes the format 
+\texttt{MF = 6, LAW = 1}, which
+may be used for energy-angle probability density tables in either
+the laboratory or center-of-mass frames, but the
+\ENDFdata~\cite{ENDFdata} library contains no data of this form.
+The \xendl\ tables of energy-angle probability density in the
+center-of-mass frame are normalized differently from the
+\ENDF\  \texttt{MF = 6, LAW = 1} tables, and \gettransfer\ supports only the
+\xendl\ version.
+
+The \ENDF\ \texttt{MF = 6, LAW = 7} format for tables
+of values of $\pi(\Elab', \mulab \mid E)$ in the laboratory frame is as arrays
 \begin{equation}
   \{ E, \{ \mulab, \{ \Elab', \pi(\Elab', \mulab \mid E) \} \} \}.
  \label{ENDF-E-mu-table}
@@ -28,16 +39,50 @@ The \ENDL\ energy-angle probability density data tables
 are given in the form of the product
 \begin{equation}
   \pi(\Elab', \mulab \mid E) =
-  \pi_\mu(\mulab \mid E)\pi_E(\Elab' \mid E, \mulab),
+  \pi_\mu(\mulab \mid E)\pi_{E'}(\Elab' \mid E, \mulab),
    \label{correlated}
 \end{equation}
-in which $\pi_E(\Elab' \mid E, \mulab)$ is normalized so that
+in which $\pi_{E'}(\Elab' \mid E, \mulab)$ is normalized so that
 $$
-  \int_0^\infty d\Elab' \, \pi_E(\Elab' \mid E, \mulab) = 1
+  \int_0^\infty d\Elab' \, \pi_{E'}(\Elab' \mid E, \mulab) = 1
 $$
 for each of the tabulated values of $E$ and~$\mulab$.
 
-In the \gettransfer\ code energy-angle probability density
+The \xendl\ format for joint energy-angle probability tables in the
+center-or-mass frame is of the form
+\begin{equation}
+  \{ E, \{ \Ecm', \{ \mucm, \pi(\Ecm', \mucm \mid E) \} \} \}.
+ \label{ENDF-E-mu-cm-table}
+\end{equation}
+For each incident energy~$E$, the data in Eq.~(\ref{ENDF-E-mu-cm-table})
+are normalized so that
+$$
+  \int_0^\infty d\Ecm' \, \int_{-1}^1 d\mucm \, \pi(\Ecm', \mucm \mid E) = 1.
+$$
+
+For the sake of completeness, a description of the
+\ENDF\  \texttt{MF = 6, LAW = 1} format energy-angle probability density
+data is given here.  In this case, $\pi(\Ecm', \mucm \mid E)$
+is represented as a product
+$$
+  \pi(\Ecm', \mucm \mid E) = \pi_{E'}(\Ecm' \mid E)
+   \pi_\mu(\mucm \mid E, \Ecm', ).
+$$
+The values of $\pi_{E'}(\Ecm' \mid E)$ are given separately.
+The order for the data $\pi_\mu( \mucm \mid E, \Ecm')$ is as
+in Eq.~(\ref{ENDF-E-mu-cm-table}), and the normalization is
+such that
+$$
+  \int_{-1}^1 d\mucm \, \pi_\mu(\mucm \mid E, \Ecm') = 1
+$$
+for each value of $E$ and $\Ecm'$.
+
+\section{Processing of energy-angle probability density tables}
+\label{Sec:joint-table-process}
+The processing of joint energy-angle probability density tabulated
+data by the \gettransfer\ code depends on the format of the data.
+The treatment of data given in  the laboratory frame is discussed first.
+In \gettransfer, energy-angle probability density
 tables in the format of Eq.~(\ref{ENDF-E-mu-table}) are converted to
 the format of Eq.~(\ref{correlated}) via the formulas
 $$
@@ -48,13 +93,9 @@ $$
   \pi_E(\Elab' \mid E, \mulab) = \frac
     {\pi(\Elab', \mulab \mid E)} {\pi_\mu(\mulab \mid E)}.
 $$
-The rest of the discussion of energy-angle probability density
-tables is therefore in terms of the form of the data in Eq.~(\ref{correlated}).
-Tbus, the discussion is in terms of the angular probability density $\pi_\mu(\mulab \mid E)$
-and the outgoing energy conditional probability density $\pi_E(\Elab' \mid E, \mulab)$.
 
 With the correlated energy-angle probability density
-(\ref{correlated}) the number-preserving integral (\ref{Inum}) is
+Eq.~(\ref{correlated}), the number-preserving integral Eq.~(\ref{Inum}) is
 \begin{multline}
    \Inum_{gh,\ell} =
         \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
@@ -62,7 +103,7 @@ With the correlated energy-angle probability density
        \, \int_{\mulab} d\mulab \,  P_\ell( \mulab ) \pi_\mu(\mulab \mid E)\pi_E(\Elab' \mid E, \mulab),
   \label{Inum-corr}
 \end{multline}
-and the energy-preserving integral (\ref{Ien}) becomes
+and the energy-preserving integral Eq.~(\ref{Ien}) becomes
 \begin{multline}
   \Ien_{gh,\ell} =
      \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
@@ -71,17 +112,29 @@ and the energy-preserving integral (\ref{Ien}) becomes
   \label{Ien-corr}
 \end{multline}
 
-The method used by \gettransfer\ to evaluate the integrals (\ref{Inum-corr})
-and (\ref{Ien-corr}) is to first compute the Legendre coefficients
+The method used by \gettransfer\ to evaluate the integrals Eqs.~(\ref{Inum-corr})
+and~(\ref{Ien-corr}) is to first compute the Legendre coefficients
 \begin{equation}
   \pi_\ell(\Elab' \mid E) =
   \int_{-1}^1 d\mulab  \,  P_\ell ( \mulab ) \pi_\mu(\mulab \mid E)\pi_E(\Elab' \mid E, \mulab).
   \label{get-I4}
 \end{equation}
-The coding for the integration of (\ref{InumI4})
+In the evaluation of this integral, the functions~$\pi_\mu(\mulab \mid E)$
+and~$\pi_E(\Elab' \mid E, \mulab)$ are interpolated separately with respect to~$\mulab$
+before being multiplied.
+The coding for the integration of Eqs.~(\ref{InumI4})
 and~(\ref{IenI4}) is then applied to obtain the transfer matrix.
 
-\section{Input of $\pi(\Elab', \mulab \mid E)$ the form of a table, Eq.~(\ref{ENDF-E-mu-table})}
+The treatment of center-of-mass energy-angle probability tables
+of the form Eq.~(\ref{ENDF-E-mu-cm-table}) is as described in
+Section~\ref{Ch:Legendre-cm}.
+
+\section{Input of tables of energy-angle probability densities}
+The form of the input files for energy-angle probability tables
+depends on whether the data is as in Eqs.~(\ref{ENDF-E-mu-table}),
+(\ref{correlated}), or~(\ref{ENDF-E-mu-cm-table}).
+
+\subsection{Input of $\pi(\Elab', \mulab \mid E)$ in the form of Eq.~(\ref{ENDF-E-mu-table})}
 For tables of the energy-angle probability density $\pi(\Elab', \mulab \mid E)$
 in the format Eq.~(\ref{ENDF-E-mu-table}), the identification line in
 Section~\ref{model-info} is\\
@@ -143,7 +196,7 @@ An example of such data with energy in MeV is\\
 \Input{ \indent  7.370900e-01  2.255450e-02}{}\\
  \Input{ \indent }{ etc.}
 
-\section{Input of $\pi(\Elab', \mulab \mid E)$ as a product, Eq.~(\ref{correlated})}
+\subsection{Input of $\pi(\Elab', \mulab \mid E)$ as a product, Eq.~(\ref{correlated})}
 For tables of the energy-angle probability density $\pi(\Elab', \mulab \mid E)$
 given as the product in Eq.~(\ref{correlated}), the identification line in
 Section~\ref{model-info} is\\
@@ -235,4 +288,67 @@ An example of this type of data with energy in MeV is given by\\
   \Input{ \indent 1.32751551e+01  1.88436981e-03}{}\\
   \Input{ \indent 1.38015128e+01  1.90038969e-03}{}
  
- 
+ \subsection{Input of $\pi(\Ecm', \mucm \mid E)$ in the form of Eq.~(\ref{ENDF-E-mu-cm-table})}
+For tables of the energy-angle probability density $\pi(\Ecm', \mucm \mid E)$
+in the format Eq.~(\ref{ENDF-E-mu-cm-table}), the identification line in
+Section~\ref{model-info} is\\
+      \Input{Process: pointwise energy-angle data}{}\\
+These data are always in the center-of-mass frame,\\
+  \Input{Product Frame: centerOfMass}{}
+
+The first lines in the data for Section~\ref{model-info} give the number~$K$
+of incident energies along with the interpolation rules.  Currently,
+\gettransfer\ handles only linear-linear unit-base interpolation with
+respect to incident energy~$E$, linear-linear direct interpolation
+with respect to outgoing energy~$\Ecm'$, and linear-linear interpolation
+for the direction cosine~$\mucm$.  The input format is therefore of the form\\
+  \Input{EEpMuPData:}{$n = K$}\\
+  \Input{Incident energy interpolation: lin-lin unitbase}{}\\
+  \Input{Outgoing energy interpolation: lin-lin direct}{}\\
+  \Input{Outgoing cosine interpolation: lin-lin}{}\\
+
+For each incident energy~$E$ there is a data section of the form\\
+    \Input{ Ein:}{$E$: \quad \texttt{n = $N$}}\\
+indicating that data are given for $N$ values of $\Ecm'$.  The block of
+data corresponding to a value of $\Ecm'$ is of the form\\
+    \Input{ Ep:}{$\Ecm'$: \quad \texttt{n = $J$}}\\
+followed by $J$ pairs of values of direction cosine $\mucm$ and
+probability density~$\pi(\Ecm', \mucm \mid E)$ .
+
+An example of such data with energy in MeV is\\
+  \Input{EEpMuPData: n = 15}{}\\
+  \Input{Incident energy interpolation: lin-lin unitbase}{}\\
+  \Input{Outgoing energy interpolation: lin-lin direct}{}\\
+  \Input{Outgoing cosine interpolation: lin-lin}{}\\
+ \Input{\# Start sub data}{}\\
+  \Input{E:  1.002700000000e+01: n = 44}{}\\
+  \Input{\# Start sub data}{}\\
+  \Input{ Ep: 0.000000000000e+00 : n = 21}{}\\
+   \Input{ \indent -1.000000000000e+00  1.078178702711e-01}{}\\
+   \Input{ \indent -9.000000000000e-01  1.071148616947e-01}{}\\
+  \Input{  \indent -8.000000000000e-01  1.064935902862e-01}{}\\
+   \Input{ \indent -7.000000000000e-01  1.059535819660e-01}{}\\
+  \Input{  \indent -6.000000000000e-01  1.054944246648e-01}{}\\
+   \Input{ \indent -5.000000000000e-01  1.051157680091e-01}{}\\
+   \Input{ \indent }{ $\cdots$}\\
+  \Input{\# Start sub data}{}\\
+  \Input{ Ep: 6.870524931290e-03 : n = 21}{}\\
+  \Input{  \indent -1.000000000000e+00  1.078230802439e-01}{}\\
+  \Input{  \indent -9.000000000000e-01  1.071184528032e-01}{}\\
+   \Input{ \indent -8.000000000000e-01  1.064957460252e-01}{}\\
+   \Input{ \indent -7.000000000000e-01  1.059544836844e-01}{}\\
+  \Input{  \indent -6.000000000000e-01  1.054942518410e-01}{}\\
+   \Input{ \indent }{ $\cdots$}\\
+  \Input{\# Start sub data}{}\\
+  \Input{ Ep: 4.122315000000e-01 : n = 21}{}\\
+  \Input{  \indent -1.000000000000e+00  0.000000000000e+00}{}\\
+  \Input{  \indent -9.000000000000e-01  0.000000000000e+00}{}\\
+  \Input{  \indent -8.000000000000e-01  0.000000000000e+00}{}\\
+  \Input{ $\cdots$}{}\\
+  \Input{\# Start sub data}{}\\
+ \Input{E =  1.100000000000e+01: n = 62}{}\\
+  \Input{\# Start sub data}{}\\
+  \Input{ Ep: 0.000000000000e+00 : n = 21}{}\\
+  \Input{ \indent }{ $\cdots$}\
+
+

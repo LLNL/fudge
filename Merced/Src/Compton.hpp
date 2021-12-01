@@ -20,8 +20,9 @@
 #include "param_base.hpp"
 #include "x_vector.hpp"
 
-using namespace std;
-
+namespace Comp
+{
+  
 class Compton_Ein_param;  // foreward declaration
 
 //! Class for intersections of a data curve with an integration box
@@ -47,7 +48,7 @@ public:
 
   //! Finds (Ein, mu) where this Eout curve hits the curve x = constant.
   //! \param x ( E_in/(c*h) )*\sqrt{ ( 1 - \mu )/2} 
-  dd_entry hit_x( double x ) const;
+  Ddvec::dd_entry hit_x( double x ) const;
 
   //! Finds mu where this Eout curve hits the line Ein = constant.
   //! \param E_in energy of incident gamma
@@ -77,7 +78,7 @@ public:
 
 //! Class for all corners of the top or bottom of a quadrature box
 // ---------------- class corner_list ------------------
-class corner_list : public list< Boundary_corner >
+class corner_list : public std::list< Boundary_corner >
 {
 private:
 
@@ -139,7 +140,7 @@ public:
 
   //! constructs upper_Eout_hits and lower_Eout_hits
   //! \param Eout_ptr the lower bound of the outgoing energy bin
-  void setup_Eout( vector< double >::const_iterator Eout_ptr );
+  void setup_Eout( std::vector< double >::const_iterator Eout_ptr );
 
   //! Identifies the top and bottom of the quadrature region
   //! \param x_0 lower value of ( E_in/(c*h) )*\sqrt{ ( 1 - \mu )/2} 
@@ -150,7 +151,7 @@ public:
 //! Class for parameters for the 1-d quadrature of the Compton scattering factor over mu
 //! class for (x_0, SF_0) and (x_1, SF_1) scattering factors
 // ---------------- class Compton_mu_param ------------------
-class Compton_mu_param : public dd_pair, public param_base
+class Compton_mu_param : public Ddvec::dd_pair, public Pbase::param_base
 {
 public:
   double E_in;
@@ -161,18 +162,18 @@ public:
 
 //! Class for Compton scattering data
 //--------------- class Compton ----------------
-class Compton : public x_vector
+class Compton : public Xvec::x_vector
 {
 private:
   //! Adds the result of one integration
   //! \param transfer: the entries in the transfer matrix get updated
   //! \param Ein_param data for quadrature over incident energy   
-  void update_T( T_matrix &transfer, Compton_Ein_param *Ein_param );
+  void update_T( Trf::T_matrix &transfer, Compton_Ein_param *Ein_param );
 
   //! Calculates the cross section
-  //! \param mu_quad_method the method for integration over direction cosine
+  //! \param mu_quad_rule the method for integration over direction cosine
   //! \param sigma the computed cross section data
-  void get_xsec( Quadrature_Method mu_quad_method, dd_vector& sigma );
+  void get_xsec( Qmeth::Quadrature_Rule mu_quad_rule, dd_vector& sigma );
 
 public:
   //! scattering factor in the file
@@ -185,12 +186,12 @@ public:
   // Calculates the cross section and transfer matrix
   //! \param transfer: the entries in the transfer matrix get updated
   //! \param xsec the cross section data
-  void get_T( T_matrix& transfer, dd_vector& xsec );
+  void get_T( Trf::T_matrix& transfer, dd_vector& xsec );
 
   // Climbs up the incident energy bins
   //! \param transfer: the entries in the transfer matrix get updated
   //! \param Ein_param data for quadrature over incident energy   
-  void Ein_ladder( T_matrix& transfer, Compton_Ein_param *Ein_param );
+  void Ein_ladder( Trf::T_matrix& transfer, Compton_Ein_param *Ein_param );
 
   //! Sets the range of incident energies for this intergration
   //! \param Ein_param data for quadrature over incident energy   
@@ -199,13 +200,13 @@ public:
   //! Integrates over one x-E box; loop over the (E_in, mu) Compton region
   //! \param transfer: the entries in the transfer matrix get updated
   //! \param Ein_param data for quadrature over incident energy   
-  void one_Ebox( T_matrix& transfer, Compton_Ein_param *Ein_param );
+  void one_Ebox( Trf::T_matrix& transfer, Compton_Ein_param *Ein_param );
 
 };
 
 //! Class for parameters for the 2-d quadrature of the Compton scattering factor
 // ---------------- class Compton_Ein_param ------------------
-class Compton_Ein_param : public param_base
+class Compton_Ein_param : public Pbase::param_base
 {
 public:
   Compton_region quad_box;
@@ -221,39 +222,63 @@ public:
   corner_list::const_iterator top_ptr; // where we are along the top
   corner_list::const_iterator next_top_ptr; // where we are along the top
 
-  x_vector::const_iterator x_ptr;  // where we are in the x-scattering function data
-  x_vector::const_iterator next_x;
+  Xvec::x_vector::const_iterator x_ptr;  // where we are in the x-scattering function data
+  Xvec::x_vector::const_iterator next_x;
 
   Eout_curve *Eout_ptr;  // where we are in the outgoing energies
   Eout_curve *next_Eout;
 
-  Quadrature_Method mu_quad_method;  // quadrature method for cosine integral
+  Qmeth::Quadrature_Rule mu_quad_rule;  // quadrature rule for cosine integral
 
   Compton_Ein_param( ): quad_count( 0 ), Ein_F_count( 0 ), mu_F_count( 0 ) {}
   ~Compton_Ein_param( ) {}
 };
 
+} // end of namespace Comp
+
 // ----------------- functions to integrate --------------------
 namespace Compton_F
 {
   //! Function for computing the cross section
+  //! Returns false if there are problems
   //! \param mu the center-of-mass direction cosine of the outgoing particle
   //! \param FF_param the function parameters
   //! \param value the value of the integrand
-  void sigma_F( double mu, QuadParamBase *FF_param, coef_vector *value );
+  bool sigma_F( double mu, Qparam::QuadParamBase *FF_param,
+		Coef::coef_vector *value );
+
+  //! Function for computing the cross section with singularity sqrt( flip_mu )
+  //! Returns false if there are problems
+  //! \param flip_mu = 1 - mu
+  //! \param FF_param the function parameters
+  //! \param value the value of the integrand
+  bool flip_sigma_F( double flip_mu, Qparam::QuadParamBase *FF_param,
+		     Coef::coef_vector *value );
 
   //! Function for the 1-d quadrature over mu
+  //! Returns false if there are problems
   //! \param mu the center-of-mass direction cosine of the outgoing particle
   //! \param SF_quad_param the function parameters
   //! \param value the value of the integrand, a set of Legendre coefficients
-  void mu_F( double mu, QuadParamBase *SF_param, coef_vector *value );
+  bool mu_F( double mu, Qparam::QuadParamBase *SF_param,
+	     Coef::coef_vector *value );
+
+  //! Function for the 1-d quadrature over mu with singularity sqrt( flip_mu )
+  //! Returns false if there are problems
+  //! \param flip_mu = 1 - mu
+  //! \param SF_quad_param the function parameters
+  //! \param value the value of the integrand, a set of Legendre coefficients
+  bool flip_mu_F( double flip_mu, Qparam::QuadParamBase *SF_param,
+		  Coef::coef_vector *value );
 
   //! \param Ecm_quad_param the function parameters
+  //! Returns false if there are problems
   //! Function for the 2-d quadrature over E_in
   //! \param E_in the energy of the incident particle
   //! \param compton_mu_param the function parameters
   //! \param value the value of the integrand, a set of Legendre coefficients
-  void Ein_F( double E_in, QuadParamBase *compton_param, coef_vector *value );
+  bool Ein_F( double E_in, Qparam::QuadParamBase *compton_param,
+	      Coef::coef_vector *value );
 }
 
 #endif

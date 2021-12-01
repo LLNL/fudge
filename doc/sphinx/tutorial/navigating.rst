@@ -7,78 +7,26 @@ How to find data within a ``reactionSuite``
 The Fudge reactionSuite and covarianceSuite classes are meant to reflect the GNDS data hierarchy.
 Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,
 
-    >>> from fudge.gnds import reactionSuite
+    >>> from fudge import reactionSuite
     >>> RS = reactionSuite.readXML("path_to_GNDS_file.xml")
     >>> elastic = RS.getReaction("elastic")
     >>> elastic
-    <fudge.gnds.reactions.reaction.reaction object at 0x1020dc590>
+    <fudge.reactions.reaction.reaction object at 0x1020dc590>
     >>> elastic.crossSection
-    <fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0>
+    <fudge.reactionData.crossSection.component object at 0x10220dcd0>
     >>> elastic.outputChannel.Q
-    <fudge.gnds.channelData.Q.component object at 0x10212a0d0>
+    <fudge.channelData.Q.component object at 0x10212a0d0>
     >>> elastic.outputChannel.products
-    <fudge.gnds.product.products object at 0x102608e10>
+    <fudge.product.products object at 0x102608e10>
     >>> elastic.outputChannel.products[0].multiplicity
-    <fudge.gnds.productData.multiplicity.component object at 0x102610310>
+    <fudge.productData.multiplicity.component object at 0x102610310>
     >>> elastic.outputChannel.products[0].distribution
-    <fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0>
+    <fudge.productData.distributions.distribution.component object at 0x1026103d0>
 
 The 'getReaction' method of reactionSuite provides a simple way to search for a desired reaction.
 In addition to strings like "elastic", "fission" or "n + Fe56_e3" (to search for a reaction that emits a neutron
 plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.
 
-Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
-can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
-instead they are instances of Fudge classes like
-Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,
-
-    >>> from fudge.gnds import reactionSuite
-    >>> RS = reactionSuite.readXML("path_to_GNDS_file.xml")
-    >>> elastic = RS.getReaction("elastic")
-    >>> elastic
-    <fudge.gnds.reactions.reaction.reaction object at 0x1020dc590>
-    >>> elastic.crossSection
-    <fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0>
-    >>> elastic.outputChannel.Q
-    <fudge.gnds.channelData.Q.component object at 0x10212a0d0>
-    >>> elastic.outputChannel.products
-    <fudge.gnds.product.products object at 0x102608e10>
-    >>> elastic.outputChannel.products[0].multiplicity
-    <fudge.gnds.productData.multiplicity.component object at 0x102610310>
-    >>> elastic.outputChannel.products[0].distribution
-    <fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0>
-
-The 'getReaction' method of reactionSuite provides a simple way to search for a desired reaction.
-In addition to strings like "elastic", "fission" or "n + Fe56_e3" (to search for a reaction that emits a neutron
-plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.
-
-Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
-can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
-instead they are instances of Fudge classes like
-Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,
-
-    >>> from fudge.gnds import reactionSuite
-    >>> RS = reactionSuite.readXML("path_to_GNDS_file.xml")
-    >>> elastic = RS.getReaction("elastic")
-    >>> elastic
-    <fudge.gnds.reactions.reaction.reaction object at 0x1020dc590>
-    >>> elastic.crossSection
-    <fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0>
-    >>> elastic.outputChannel.Q
-    <fudge.gnds.channelData.Q.component object at 0x10212a0d0>
-    >>> elastic.outputChannel.products
-    <fudge.gnds.product.products object at 0x102608e10>
-    >>> elastic.outputChannel.products[0].multiplicity
-    <fudge.gnds.productData.multiplicity.component object at 0x102610310>
-    >>> elastic.outputChannel.products[0].distribution
-    <fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0>
-
-The 'getReaction' method of reactionSuite provides a simple way to search for a desired reaction.
-In addition to strings like "elastic", "fission" or "n + Fe56_e3" (to search for a reaction that emits a neutron
-plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.
-
-Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
-can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
 instead they are instances of Fudge classes like ``crossSection.component``, ``Q.component``, ``distribution.component``,
 etc.  This reflects the basic design of GNDS: each physical quantity can potentially contain more than one form of data
 including the original 'evaluated' data as well as other types that may be processed by heating, grouping, etc.

@@ -1,12 +1,16 @@
 \subsection{Unitary operators}
-This section decribes all the routines in the file "ptwXY\_unitaryOperators.c".
+This section decribes all the functions in the file ``ptwXY\_unitaryOperators.c''.
 
 \subsubsection{ptwXY\_abs}
-This routine applies the math absolute operation to every y-value in \highlight{ptwXY}.
-\CallingC{fnu\_status ptwXY\_abs(}{ptwXYPoints *ptwXY );}
+This function applies the math absolute operation to every y-value in \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_abs(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
 
 \subsubsection{ptwXY\_neg}
-This routine applies the math negate operation to every y-value in \highlight{ptwXY}.
-\CallingC{fnu\_status ptwXY\_neg(}{ptwXYPoints *ptwXY );}
+This function applies the math negate operation to every y-value in \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_neg(}{statusMessageReporting *smr,
+    \addArgument{ptwXYPoints *ptwXY );}}
+    \argumentBox{smr}{The \highlight{statusMessageReporting} instance to record errors.}
     \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}

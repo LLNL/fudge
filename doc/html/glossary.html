@@ -1,32 +1,24 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Glossary &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="History of Fudge and GNDS" href="history.html" /> 
-  </head>
-  <body>
+    <link rel="prev" title="Thanks" href="thanks.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -37,9 +29,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="history.html" title="History of Fudge and GNDS"
+          <a href="thanks.html" title="Thanks"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Glossary</a></li> 
       </ul>
     </div>  
 
@@ -50,13 +43,41 @@
             
   <div class="section" id="glossary">
 <span id="id1"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
-<dl class="glossary docutils">
-<dt id="term-evaluation">evaluation</dt>
-<dd>A complete set of parameters (e.g. the cross sections) defined at all energies, even when no experimentally measured data are available. It is the task of the evaluator to assess the most probable value of a parameter at any energy, resolving issues of discrepant measurement, assigning values (by an educated guess or based on model calculations) where no data are available and providing data in computer-readable format.</dd>
+<dl class="glossary simple">
+<dt id="term-component">component</dt><dd><p>A GNDS ‘reaction’ object contains several types of physical data, including the crossSection, the outputChannel
+with a corresponding Q-value and list of products, and for each product a multiplicity and distribution.
+Each of these data types is a ‘component’ which contains one or more data ‘form’ (see below). Each form
+in the component should have a label corresponding to a ‘style’ defined in the reactionSuite styles section.</p>
+</dd>
+<dt id="term-evaluation">evaluation</dt><dd><p>A complete set of parameters (e.g. the cross sections) defined at all energies, even when no experimentally measured data are available.
+It is the task of the evaluator to assess the most probable value of a parameter at any energy, resolving issues of discrepant measurement,
+assigning values (by an educated guess or based on model calculations) where no data are available and providing data in computer-readable format.</p>
+</dd>
+<dt id="term-form">form</dt><dd><p>A form is one representation of a type of data. Forms are collected inside of a component. For example, the crossSection component
+may contain an evaluated form (which might be ‘resonancesWithBackground’) along with several processed forms including
+‘XYs1d’ (after resonance reconstruction and/or Doppler broadening) and ‘gridded1d’ (after grouping).
+Each form should have a label corresponding to a ‘style’ defined in the reactionSuite styles section.</p>
+</dd>
+<dt id="term-PoPs">PoPs</dt><dd><p>Properties of Particles (PoPs) is a database for storing particle information such as mass, spin, halflife, etc.
+A PoPs database may be stored inside of a reactionSuite or may be stored as a separate stand-alone file.</p>
+</dd>
+<dt id="term-protare">protare</dt><dd><p>Contraction for ‘PROjectile + TARget + Evaluation’. Also known as a reactionSuite, a protare contains all possible reactions involving this projectile/target combination.</p>
+</dd>
+<dt id="term-reactionSuite">reactionSuite</dt><dd><p>Contains all possible reactions involving a projectile/target combination. May contain additional information such as summed reactions. Also sometimes called a Protare</p>
+</dd>
+<dt id="term-style">style</dt><dd><p>Defines a type of data stored inside a GNDS file. The most common style is ‘evaluated’ (corresponding to data added by an evaluator).
+Other styles include ‘crossSectionReconstructed’, ‘heated’, ‘griddedCrossSection’, etc. Each style defines some details about the data + how
+they were derived, and each style has a unique label used to associate that style with data elsewhere in the file.
+Also see the definitions of ‘component’ and ‘form’.</p>
+</dd>
+<dt id="term-suite">suite</dt><dd><p>A suite in GNDS contains a collection of similar objects. For example, the ‘reactions’ suite contains a list of ‘reaction’ instances
+while a ‘nuclides’ suite (in the PoPs particle database) contains a list of ‘nuclide’ objects.</p>
+</dd>
 </dl>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -66,8 +87,8 @@
               <img class="logo" src="_static/gnd.png" alt="Logo"/>
             </a></p>
   <h4>Previous topic</h4>
-  <p class="topless"><a href="history.html"
-                        title="previous chapter">History of Fudge and GNDS</a></p>
+  <p class="topless"><a href="thanks.html"
+                        title="previous chapter">Thanks</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -76,15 +97,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -99,14 +120,15 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="history.html" title="History of Fudge and GNDS"
+          <a href="thanks.html" title="Thanks"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Glossary</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

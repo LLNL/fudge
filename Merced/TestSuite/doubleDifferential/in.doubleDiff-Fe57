@@ -3,7 +3,6 @@ Process: Double differential EMuEpP data transfer matrix
 Comment: Fe57(n,2n)Fe56; data for outgoing n
 outputLegendreOrder: 3
 Conserve: both
-Quadrature method: Adaptive
 Projectile Frame: lab
 
 # The energies in this file are all in MeV.

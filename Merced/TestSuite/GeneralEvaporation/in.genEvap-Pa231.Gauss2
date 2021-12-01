@@ -2,6 +2,7 @@ xndfgenTransferMatrix: version 1.0
 Process: general evaporation
 Comment: Pa231(n,fission)?; data for outgoing delayed n_1
 outputLegendreOrder: 0
+do adaptive quadrature: false
 Quadrature method: Gauss2
 Projectile Frame: lab
 

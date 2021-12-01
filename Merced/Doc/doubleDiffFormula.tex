@@ -522,27 +522,32 @@ by the particles, subject to the constraints of conservation
 of energy and momentum.  The model uses Newtonian mechanics.
 
 In the \ENDF\ manual~\cite{ENDFB}
-there are two scenarios for this model: (1) inelastic collision
+there are two scenarios for this model: (1) a discrete 2-body reaction
 followed by break-up of the excited residual, and (2) break-up
 induced by the collision.  In the first case, the $n$-body phase space
 model treats only the particles emitted in the break-up of the excited
 residual, not the one from the initial collision.  The total kinetic energy $\Estar$
 of the outgoing particles treated by the model therefore depends on
-the scenario.
+the scenario.  For both scenarios, the number~$n$ of outgoing particles
+ought to be greater than~2, because the breakup into 2 particles may
+be treated as a discrete 2-body reaction.
 
-In the case of break-up following an
-inelastic collision, the analysis is in the frame in which the residual from
-the inelastic collision is stationary.  The total kinetic energy of the 
+In the case of break-up following a discrete 2-body
+reaction, the analysis is in the frame in which the residual from
+the initial collision is stationary.  The total kinetic energy of the 
 outgoing particles involved is then
 $$
   \Estar = Q_{\textrm{res}},
 $$
 where $Q_{\textrm{res}}$ is
-the energy of the break-up of the excited residual.  In this case, the reference
-frame for the model is that in which the residual nucleus is stationary
-after the initial inelastic collision.  The \gettransfer\ 
-code currently does not implement this scenario, because this is
-a 2-step reaction.
+the energy of the break-up of the excited residual.  The \gettransfer\ 
+code currently does not implement this scenario, because no data
+in the \ENDFdata\ library~\cite{ENDFdata} currently use it.
+The \ENDFdata\ library does contain one reaction for which the data are marked
+as an $n$-body reaction following a knock-on collision.  But since the subsequent
+breakup is into only 2 particles, the \gettransfer\ code treats the reaction
+as a sequence of two discrete 2-body reactions as discussed in
+Section~\ref{Sec:2-step-2-body}.
 
 For the break-up of a compound nucleus following the collision of a projectile
 with a stationary target in the laboratory frame, the total kinetic energy $\Estar$
@@ -583,13 +588,13 @@ is given by
   \picm(\Ecm' \mid E ) = C_n 
      \sqrt{\Ecm'}\,
      (\Emax - \Ecm')^{(3n - 8)/2}.
-  \label{probability}
+  \label{n-body-probability}
 \end{equation}
 Note that this probability density is isotropic in the center-of-mass frame.
-Furthermore, the relation Eq.~(\ref{probability}) was derived using Newtonian
+Furthermore, the relation Eq.~(\ref{n-body-probability}) was derived using Newtonian
 mechanics.
 
-The normalization constant $C_n$ in Eq.~(\ref{probability}) is best
+The normalization constant $C_n$ in Eq.~(\ref{n-body-probability}) is best
 represented in terms of the beta function
 \begin{equation}
   B(\alpha, \beta) =
@@ -628,6 +633,29 @@ That is, for the $n$-body phase space
 the annular ring Eq.~(\ref{KalbachEcm}) in Figure~8.1 is replaced by the
 interior of the semicircle Eq.~(\ref{nBodyEcm}).
 
+\subsection{Quadrature for the $n$-body phase space model}
+\label{Sec:n-body-quadrature}
+It is clear from Eq.~(\ref{n-body-probability})
+that in the integrals in Eqs.~(\ref{Inum}) and~(\ref{Ien}) the
+integrands with respect to outgoing energy~$\Ecm'$ have a
+$\sqrt{\Ecm'}$ singularity.  The \gettransfer\ code has a parameter~$\delta_s$
+such that if integration of Eqs.~(\ref{Inum}) or~(\ref{Ien}) with respect
+to~$\Ecm'$ is over an interval $a \le \Ecm' \le b$ with $b \le \delta_s  \Emax$,
+then first-order Gaussian integration with weight~$\sqrt{\Ecm' }$ is used.
+Furthermore, if $a < \delta_s  \Emax < b \le (1 - \delta_s ) \Emax$ for such an integral, then
+$\sqrt{\Ecm' }$ weighted Gaussian integration is used on
+the subinterval $a \le \Ecm'  \le \delta_s  \Emax$ and standard
+Gaussian integration on $\delta_s  \Emax \le \Ecm'  \le b$.
+See Section~\ref{Sec:sqrt-quad} for instructions on setting the
+value of~$\delta_s$.  See Section~\ref{Sec:QuadratureMethods}
+for control over whether or not adaptive Gaussian quadrature is used.
+
+When this model is used with $n = 3$, the singularity 
+$\sqrt{\Emax - \Ecm'}$ is handled in a similar fashion.  In this case,
+first-order Gaussian quadrature with weight $\sqrt{\Emax - \Ecm'}$
+is used for integrals with respect to $\Ecm'$ which overlap with
+the interval $(1 - \delta_s ) \Emax < \Ecm' \le \Emax$.
+
 \subsection{Input file for the $n$-body phase space model}
 The data identifier in Section~\ref{data-model} for the
 $n$-body phase space model is\\
@@ -656,7 +684,7 @@ by the $n$-body phase space model.  This information is input using\\
 The units used for these masses must be the
 same as is used for the other particles.
 
-Finally, the probability density in Eq.~(\ref{probability}) requires the number
+Finally, the probability density in Eq.~(\ref{n-body-probability}) requires the number
 of particles $n$ in the model, and this is given by\\
  \Input{Number of particles:}{$n$}
  

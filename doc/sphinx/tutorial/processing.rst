@@ -1,5 +1,5 @@
 Processing GNDS files
-====================
+=====================
 
 The ``processProtare`` script (in fudge/bin/processProtare.py) is the main driver for processing
 nuclear data evaluations. This script can be used to reconstruct resonances (if necessary),

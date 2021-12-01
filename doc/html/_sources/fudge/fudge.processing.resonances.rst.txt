@@ -1,13 +1,6 @@
 fudge.processing.resonances package
 ===================================
 
-Subpackages
------------
-
-.. toctree::
-
-    fudge.processing.resonances.test
-
 Submodules
 ----------
 
@@ -31,6 +24,14 @@ fudge.processing.resonances.reconstructResonances module
 --------------------------------------------------------
 
 .. automodule:: fudge.processing.resonances.reconstructResonances
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+fudge.processing.resonances.makeUnresolvedProbabilityTables module
+------------------------------------------------------------------
+
+.. automodule:: fudge.processing.resonances.makeUnresolvedProbabilityTables
     :members:
     :undoc-members:
     :show-inheritance:

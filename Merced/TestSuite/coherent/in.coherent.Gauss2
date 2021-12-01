@@ -2,7 +2,9 @@ xndfgenTransferMatrix: version 1.0
 Process: coherent scattering
 Comment: gamma + Al_natural --> gamma[scattering:'coherent'] + Al_natural outgoing data for gamma
 outputLegendreOrder: 3
+do adaptive quadrature: false
 Quadrature method: Gauss2
+sqrt_wt_cutoff: 0.0  # disables the use of weighted Gaussian quadrature
 
 inverseWaveLengthToEnergyFactor: 1.2398424421518084e-10
 ThompsonScattering: 0.6652448
@@ -1299,11 +1301,11 @@ Interpolation: lin-lin
 realAnomalousFactor: n = 2
 Interpolation: lin-lin
  0.0  0.0
- 21.0 0.0
+ 1.0E+20 0.0
 
 
 # Start data
 imaginaryAnomalousFactor: n = 2
 Interpolation: lin-lin
  0.0  0.0
- 21.0 0.0
+ 1.0E+20 0.0

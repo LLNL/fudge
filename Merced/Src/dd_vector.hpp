@@ -23,8 +23,8 @@
 
 #include "data_parser.hpp"
 
-using namespace std;  // needed to access vectors
-
+namespace Terp
+{
 //! Specifies the interpolation rule
 // ------------------------ Interp_Type ---------------
 enum Interp_Type{ NOTSET, LINLIN, HISTOGRAM, LINLOG, LOGLIN, LOGLOG };
@@ -48,6 +48,7 @@ public:
   //! \param to_copy: the data to copy
   two_d_interp& operator=( const two_d_interp &to_copy );
 };
+} // end of namespace Terp
 
 // ***************** namespace interp_flag_F *************************
 //! Routines to read interpolation flags
@@ -58,41 +59,53 @@ namespace interp_flag_F
   //! Returns  HISTOGRAM, LINLIN, etc.
   //! \param interp_ID: "flat", "lin-lin", etc.
   //! \param input_file: to handle fatal errors
-  Interp_Type read_flag( const string& interp_ID, data_parser &input_file );
+  Terp::Interp_Type read_flag( const std::string& interp_ID, Dpar::data_parser &input_file );
 
   // ------------------------ read_qualifier ---------------
   //! Interprets the interpolation qualifier
   //! Returns  DIRECT, UNITBASE, etc.
   //! \param interp_ID: "direct", "unitbase", etc.
   //! \param input_file: to handle fatal errors
-  Interp_qualifier read_qualifier( const string& qualifier_ID,
-    data_parser &input_file );
+  Terp::Interp_qualifier read_qualifier( const std::string& qualifier_ID,
+    Dpar::data_parser &input_file );
 
   // ------------------------ read_1d_interpolation ---------------
   //! Interprets the interpolation rule and outputs it
   //! \param input_file the input file with data P( Eout | Ein )
-  Interp_Type read_1d_interpolation( data_parser &input_file );
+  Terp::Interp_Type read_1d_interpolation( Dpar::data_parser &input_file );
 
   // ------------------------ read_2d_interpolation ---------------
   //! Interprets the interpolation rules for 2d data
   //! \param input_file the input file with data P( Eout | Ein )
   //! \param energy_in_interp interpolation rules with respect to Ein
   //! \param data_out_qualifier interpolation qualifier with respect to Ein: unitbase
-  void read_2d_interpolation( data_parser &input_file, 
-    two_d_interp *energy_in_interp, Interp_Type *data_out_interp );
+  void read_2d_interpolation( Dpar::data_parser &input_file, 
+    Terp::two_d_interp *energy_in_interp, Terp::Interp_Type *data_out_interp );
 
-  // ------------------------ read_3d_interpolation ---------------
+  // ------------------------ read_3d_interpolation_ENDL ---------------
   //! Interprets the interpolation rules for ENDL 3d data
   //! \param input_file the input file with data P( Eout | Ein, cosine )
   //! \param energy_in_interp interpolation with respect to Ein
   //! \param cosine_interp interpolation with respect to cosine
   //! \param energy_out_interp interpolation with respect to Eout
-  void read_3d_interpolation( data_parser &input_file,
-    two_d_interp *energy_in_interp, two_d_interp *cosine_interp,
-    Interp_Type *energy_out_interp );
+  void read_3d_interpolation_ENDL( Dpar::data_parser &input_file,
+    Terp::two_d_interp *energy_in_interp, Terp::two_d_interp *cosine_interp,
+    Terp::Interp_Type *energy_out_interp );
+
+  // ------------------------ read_3d_interpolation_GND ---------------
+  //! Interprets the interpolation rules for GND 3d data
+  //! \param input_file the input file with data P( Eout | Ein, cosine )
+  //! \param energy_in_interp interpolation with respect to Ein
+  //! \param cosine_interp interpolation with respect to cosine
+  //! \param energy_out_interp interpolation with respect to Eout
+  void read_3d_interpolation_GND( Dpar::data_parser &input_file,
+    Terp::two_d_interp *energy_in_interp, Terp::two_d_interp *cosine_interp,
+    Terp::Interp_Type *energy_out_interp );
 }
 // ****************** end of namespace interp_flag_F *****************
 
+namespace Ddvec
+{
 // ------------------------ class Ein_entry ---------------
 //! A class for one 
 class Ein_entry
@@ -110,7 +123,7 @@ public:
 
 // ------------------------ class Ein_vector ---------------
 //! A class used to hold the structure of a dd_vector
-class Ein_vector : public vector< Ein_entry >
+class Ein_vector : public std::vector< Ein_entry >
 {
 public:
   bool start_zero;  // is the first y-value zero?
@@ -143,7 +156,7 @@ public:
 
 // ------------------------ class Ein_vectors ---------------
 //! A class used to manage interpolation of two dd_vectors to a common set of energies
-class Ein_vectors : public vector< Ein_entries >
+class Ein_vectors : public std::vector< Ein_entries >
 {
 public:
   Ein_vectors::iterator start_jump[ 2 ];  // keep track of an initial jump
@@ -223,29 +236,33 @@ public:
   //! Does linear-linear interpolation
   //! param E intermediate energy
   //! param next_entry next ( E, y ) pair
-  double linlin_interp( double E, const dd_entry& next_entry ) const;
+  //! \param interp_OK, true if the interpolation is OK
+  double linlin_interp( double E, const dd_entry& next_entry, bool *interp_OK ) const;
 
   //! Does linear-log interpolation
   //! param E intermediate energy
   //! param next_entry next ( E, y ) pair
-  double linlog_interp( double E, const dd_entry& next_entry ) const;
+  //! \param interp_OK, true if the interpolation is OK
+  double linlog_interp( double E, const dd_entry& next_entry, bool *interp_OK ) const;
 
   //! A first step in bilinear interpolation
+  //! Returns true if the interpolation is OK
   //! param E intermediate incident energy
   //! param left_data_Ein lower incident energy, Ein_left
   //! param left_data pair ( Eout, P( Eout | Ein_left ) )
   //! param right_data_Ein lower incident energy, Ein_right
   //! param right_data pair ( Eout, P( Eout | Ein_right ) )
-  void linlin_interp( double E, double left_data_Ein, const dd_entry& left_data,
+  bool linlin_interp( double E, double left_data_Ein, const dd_entry& left_data,
     double right_data_Ein, const dd_entry& right_data );
 
   //! A first step in bilinear-log interpolation
+  //! Returns true if the interpolation is OK
   //! param E intermediate incident energy
   //! param left_data_Ein lower incident energy, Ein_left
   //! param left_data pair ( Eout, P( Eout | Ein_left ) )
   //! param right_data_Ein lower incident energy, Ein_right
   //! param right_data pair ( Eout, P( Eout | Ein_right ) )
-  void linlog_interp( double E, double left_data_Ein, const dd_entry& left_data,
+  bool linlog_interp( double E, double left_data_Ein, const dd_entry& left_data,
     double right_data_Ein, const dd_entry& right_data );
 
   // for debugging
@@ -254,17 +271,17 @@ public:
 
 // ------------------------ class dd_pair ---------------
 //!The dd_pair class is used in interpolation between 2 data points.
-class dd_pair : public pair< dd_entry, dd_entry >
+class dd_pair : public std::pair< dd_entry, dd_entry >
 {
 private:
   double tag;
 
 public:
   //! How to interpolate between the two entries
-  Interp_Type Eout_interp;
+  Terp::Interp_Type Eout_interp;
 
   //!Default inline constructor is blank.
-  inline dd_pair( ): Eout_interp( LINLIN ) {}
+  inline dd_pair( ): Eout_interp( Terp::LINLIN ) {}
 
   //!Inline default desctructor is blank.
   inline ~dd_pair() {}
@@ -276,15 +293,17 @@ public:
 
   //! Do linear interpolation between first and second
   //! \param eta interpolate y for first.x <= eta <= second.x
-  double value( double eta );
+  //! \param interp_OK, true if the interpolation is OK
+  double value( double eta, bool *interp_OK );
 
   //! Solves for x given y
   //! \param Eout for linear interpolation find x such that y = Eout
-  double inverse( double Eout );
+  //! \param interp_OK, true if the interpolation is OK
+  double inverse( double Eout, bool *interp_OK );
 
   //! Solves for x given y
   //! \param Eout for linear interpolation find x such that y = Eout
-  //! \param flag flag = 0 for no solution, flag = 2 for many
+  //! \param flag flag = -1: failure, flag = 0: no solution, flag = 2: many
   double find_Ein( double Eout, int *flag );
 
   //! The usual tag is the incident energy.
@@ -300,26 +319,42 @@ public:
     tag = E_in;
   }
 
+  //! The tag may be direction cosine
+  inline double get_mu() const
+  {
+    return tag;
+  }
+
+  //! Sets the tag
+  //! \param E_in the tag value when it is direction cosine
+  inline void set_mu( double mu )
+  {
+    tag = mu;
+  }
+
   //! Does linear-linear interpolation with respect to the tag
+  //! Returns true if the interpolation is OK
   //! \param E_in the intermediate incident energy
   //! \param lower_data data at lower incident energy
   //! \param higher_data data at higher incident energy
-  void linlin_interp( double E_in, const dd_pair &lower_data,
+  bool linlin_interp( double E_in, const dd_pair &lower_data,
 		      const dd_pair &higher_data );
 
   //! Does linear-log interpolation with respect to the tag
+  //! Returns true if the interpolation is OK
   //! \param E_in the intermediate incident energy
   //! \param lower_data data at lower incident energy
   //! \param higher_data data at higher incident energy
-  void linlog_interp( double E_in, const dd_pair &lower_data,
+  bool linlog_interp( double E_in, const dd_pair &lower_data,
 		      const dd_pair &higher_data );
 
   //! Sets up the data for outgoing energies Eout_min and Eout_max
+  //! Returns true if the interpolation is OK
   //! \param prev_data data at a lower outgoing energy
   //! \param next_data data at a higher outgoing energy
   //! \param Eout_min the desired lower outgoing energy
   //! \param Eout_max the desired higher outgoing energy
-  void set_data( const dd_entry &prev_data, const dd_entry &next_data,
+  bool set_data( const dd_entry &prev_data, const dd_entry &next_data,
 		 double Eout_min, double Eout_max );
 };
 
@@ -335,23 +370,34 @@ public:
   inline ~unit_base_map( ) { }
 
   //! Undoes the unit-base map---finds E' for given eta
+  //! For this version the code does a fatal exit for bad eta.
   //! \param eta unit-base energy, 0 <= eta <= 1
   double un_unit_base( double eta ) const;
 
+  //! Undoes the unit-base map---finds E' for given eta
+  //! \param eta unit-base energy, 0 <= eta <= 1
+  //! \param interp_OK, true if the interpolation is OK
+  double un_unit_base( double eta, bool *interp_OK ) const;
+
   //! Finds eta for given physical E'
   //! \param physical_E the physical energy
-  double to_unit_base( double physical_E );
+  //! \param interp_OK, true if the interpolation is OK
+  double to_unit_base( double physical_E, bool *interp_OK );
 
   //! Makes a copy
   //! \param to_copy the data to copy
   void copy( const unit_base_map &to_copy );
 
   //! Interpolates the energy range
+  //! Returns true if the interpolation is OK
   //! \param alpha interpolation parameter 0 <= alpha <= 1
-  //! \param prev the outgoing energy range sor the lower incident energy
-  //! \param next the outgoing energy range sor the higher incident energy
-  void interpolate( double alpha, const unit_base_map &prev,
+  //! \param prev the outgoing energy range for the lower incident energy
+  //! \param next the outgoing energy range for the higher incident energy
+  bool interpolate( double alpha, const unit_base_map &prev,
     const unit_base_map &next );
+
+  //! Tests for a trivial interval
+  bool too_short( );
 };
 
 // ----------------------- class cum_points_pair -------------------
@@ -363,9 +409,16 @@ public:
 
   cum_points_pair( ) {}
   ~cum_points_pair( ) {}
+  
+  //! Tests for a trivial interval
+  bool too_short( );
 
   //! Maps the pair to unit base
   void to_unit_base( );
+  
+  //! Maps the pair to unit base, used for intervals of length zero
+  //! \param dA, the probability for this interval
+  void short_to_unit_base( double dA );
 
   //! Undoes the mapping to unit base
   void un_unit_base( );
@@ -373,17 +426,17 @@ public:
 
 // ----------------------- class dd_vector -------------------
 //! Vector of dd_entrys.
-class dd_vector : public vector< dd_entry >
+class dd_vector : public std::vector< dd_entry >
 {
 private:
   //! A label for the vector.
   double tag;
 
 public:
-  Interp_Type interp_type;
+  Terp::Interp_Type interp_type;
 
   //! Default constructor
-  dd_vector( ): tag( 0.0 ), interp_type( NOTSET )
+  dd_vector( ): tag( 0.0 ), interp_type( Terp::NOTSET )
   {}
 
   //! Copy constructor
@@ -422,12 +475,12 @@ public:
   //! Reads the data from a file
   //! \param input_file the input file to read
   //! \param num_sigma the number of pairs ( x, y ) to read
-  void read_data( data_parser &input_file, int num_sigma );
+  void read_data( Dpar::data_parser &input_file, int num_sigma );
 
   //! Reads the data and interpolation type from a file
   //! \param input_file the input file to read
   //! \param num_sigma the number of pairs ( x, y ) to read
-  void read_data_interp( data_parser &input_file, int num_sigma );
+  void read_data_interp( Dpar::data_parser &input_file, int num_sigma );
 
   //! Appends an ( E_out, Prob ) entry to the vector
   //! \param E_out the x-value of the pair ( x, y ) to append to the vector
@@ -442,7 +495,7 @@ public:
   //! Makes a constant vector
   //! \param E_groups use the energy range of this vector as the x-values for (x, y)
   //! \param val the y-value for the pairs (x, y)
-  void make_flat( const vector< double >& E_groups, double val );
+  void make_flat( const std::vector< double >& E_groups, double val );
 
   //! Copies a vector
   //! \param vector_from the vector to copy
@@ -454,12 +507,21 @@ public:
   //! \param max_x if necessary, extrapolate as zero to this highest energy
   void extrapolate_copy( const dd_vector& vector_from, double min_x, double max_x );
 
+  //! Copies a vector with truncation
+  //! Returns false if truncation gave a vector with zero norm
+  //! \param vector,_from the vector to copy
+  //! \param min_x, if necessary, chop to this lowest energy
+  //! \param max_x, if necessary, chop to this highest energy
+  //! \param do_renorm, renormalize if true
+  bool truncate_copy( const dd_vector& vector_from, double min_x, double max_x,
+		      bool do_renorm );
+
   //! Prepends x=0 using histogram extrapolation if necessary
   //! \param to_copy, the data to copy
   //! \param E_insert, make sure that the result has an entry at this energy
   void prepend( const dd_vector& to_copy, double E_insert );
 
-   //! Adds one vector to another
+  //! Adds one vector to another
   //! \param vector_2 add the y's of this (x, y) vector
   dd_vector& operator+=( dd_vector& vector_2 );
 
@@ -475,6 +537,7 @@ public:
   void print( ) const;
 
   //! Parses this dd_vector
+  
   //! \param E_in_list computed vector of (x-value, multiplicity) of the (x, y) pairs
   void parse_vector( Ein_vector *E_in_list ) const;
 
@@ -488,10 +551,11 @@ public:
   double get_norm( );
 
   //! For probability-density tables set the norm to 1
-  void renorm( );
+  //! Returns false if we get zero norm from truncated direct interpolation
+  // \param truncated, true for data from truncated direct interpolation
+  bool renorm( bool truncated );
 
-  //! Maps a vector to [0, 1] and saves the map; we don't always want to normalize
-  //! \param Renorm whether or not to renorm to 1
+  //! Maps a vector to [0, 1] and saves the map
   //! \param ubase_map save the original energy range
   void mapto_01( unit_base_map *ubase_map );
 
@@ -531,10 +595,21 @@ public:
 
   //! Checks whether an angular probability density is isotropic
   bool isotropic( ) const;
+
+  //! Finds the interval containing the desired X-value
+  //! \param X, the desired X-value
+  //! \param prev_ptr, last link such that prev_ptr->x <= X
+  //! \param next_ptr, first link such that next_ptr->x > X
+  void locate_x( double X, dd_vector::const_iterator *prev_ptr,
+		 dd_vector::const_iterator *next_ptr ) const;
 };
+
+} // end of namespace Ddvec
 
 namespace dd_vector_F
 {
+  // This routine is no longer used.
+  
   // -------------------- fill_in_vectors ---------------
   //! This routine computes vector_1_fill and vector_2_fill with common x-values.
   //! \param vector_1 first vector of (x, y) values
@@ -542,8 +617,8 @@ namespace dd_vector_F
   //! \param vector_1_fill first vector of (x, y) values, filled to common x-values
   //! \param vector_2_fill second vector of (x, y) values, filled to common x-values
   //! \param re_norm Do we renormalize?
-  void fill_in_vectors( const dd_vector& vector_1, const dd_vector& vector_2,
-    dd_vector *vector_1_fill, dd_vector *vector_2_fill, bool re_norm );
+  void fill_in_vectors( const Ddvec::dd_vector& vector_1, const Ddvec::dd_vector& vector_2,
+    Ddvec::dd_vector *vector_1_fill, Ddvec::dd_vector *vector_2_fill, bool re_norm );
 }
 
 #endif

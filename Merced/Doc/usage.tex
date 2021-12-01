@@ -23,7 +23,7 @@ energies be given in MeV.
 \section{Output file}
 The default name of the output file is \texttt{utfil}.  
 It may only be changed on the command line,  and the option to do so is\\
-  \Input{-output}{OutputFile}\\
+  \Input{-output}{OutputFile}
 
 \section{Form of the input file}
 The first line of the input file must be\\
@@ -41,9 +41,9 @@ Comments may be included in the input file in either if two forms.\\
    \Input{Comment: n1 + C12 --> n1 + C12 outgoing data for n1}{}
  
 \subsection{Parallel computing}
-The \gettransfer\ code may be compiled to run in parallel if
-\textsf{OpenMP} is available on your computer.  In fact, the
-\textsf{Makefile} uses \textsf{OpenMP} as a default.  To obtain 
+In its default mode the \textsf{Makefile} for the \gettransfer\ code
+tests whether \textsf{OpenMP} is available on the computer.  If so,
+then \textsf{OpenMP} is used to manage parallel computation.  To obtain 
 serial code, compile using the command\\
    \Input{make VERSION=SERIAL}{}
 
@@ -290,8 +290,8 @@ All of them may also be input as command line options.
 \subsection{Legendre order of the output}\label{Sec:LegendreOrder}
 The Legendre order of the matrices Eqs.~(\ref{Inum}) and~(\ref{Ien})
 computed by \gettransfer\ is set by the command\\
-  \Input{outputLegendreOrder: n = $L$}{}\\
-The default is $L = 3$.
+  \Input{outputLegendreOrder: n = $\Lmax$}{}\\
+The default is $\Lmax = 3$.
 
 \subsection{Numerical precision of the output}
 The number of significant figures for the output data is set by\\
@@ -322,74 +322,171 @@ The default is \texttt{false}.
 To scale the integrals Eq.~(\ref{Inum}) so as to enforce the identity
 Eq.~(\ref{rowSum}), use the option\\
   \Input{scale\_rows: true}{}\\
-In this case, the integrals Eq.~(\ref{Ien}) are also scaled.  The default
-is \texttt{true}, scale the integrals.
+In this case, the integrals Eq.~(\ref{Ien}) are also scaled.  Except for
+coherent scattering and Compton scattering, the default
+is \texttt{true}, scale the integrals.  The reason one may not want to do
+this scaling for coherent or Compton scattering, is that for these reactions
+the assumption that cross section data may be interpolated linear-linear
+used in deriving Eq.~(\ref{rowSum}) is likely to be violated.
 
 \section{Optional inputs, quadrature methods}\label{Sec:QuadratureMethods}
 For the integrals Eqs.~(\ref{Inum}) and~(\ref{Ien}) and their equivalents
-in the center-of-mass frame, the quadrature methods may be set
-by commands of the form\\
-  \Input{\textrm{Variable} quadrature method:}{Method}\\
-The `Variable' in this line is any of the following.\\
-  \Input{Ein}{for integrals with respect to incident energy~$E$,}\\
-  \Input{Eout}{for integrals with respect to outgoing energy~$\Elab'$ or~$\Ecm'$,}\\
-  \Input{mu}{for integrals with respect to direction cosine~$\mulab$ of ~$\mucm$.}\\
-  \Input{-}{Omission of this parameter gives the same quadrature method for all integrals.}\\
-The options for the `Method' in the command to set the quadrature method
-are\\
-  \Input{adaptive}{for adaptive 2nd-order Gaussian quadrature,}\\
-  \Input{square root}{for adaptive 1st-order Gaussian quadrature with weight $\sqrt{1 - \mu}$,}\\
-  \Input{Gauss2}{for non-adaptive 2nd-order Gaussian quadrature,}\\
-  \Input{Gauss4}{for non-adaptive 4th-order Gaussian quadrature,}\\
-  \Input{Gauss6}{for non-adaptive 6th-order Gaussian quadrature.}\\
-The default for most data models is\\
-  \Input{quadrature method: adaptive}{}\\
-to use adaptive 2nd-order Gaussian  quadrature for all integrals.
-The exceptions are\\
-  \Input{mu quadrature method: square root}{}\\
-for the integrals over direction cosine $\mulab$ with data for
-coherent scattering and Compton scattering.  The non-adaptive options
-are primarily used in debugging.
+in the center-of-mass frame, the user may override the default quadrature methods
+by commands in the input file (but not on the command line).  The command\\
+  \Input{do adaptive quadrature: false}{}\\
+disables the adaptive quadrature.  This is useful in debugging.
+
+With or without adaptive quadrature, the following methods may
+be specified for the integrals in Eqs.~(\ref{Inum}) and~(\ref{Ien}),\\
+  \Input{Gauss1}{for the midpoint rule,}\\
+  \Input{Gauss2}{for 2nd-order Gaussian quadrature,}\\
+  \Input{Gauss3}{for 3rd-order Gaussian quadrature,}\\
+  \Input{Gauss4}{for 4th-order Gaussian quadrature,}\\
+  \Input{Gauss6}{for 6th-order Gaussian quadrature,}\\
+With \texttt{Method} one of these parameters use\\
+  \Input{Ein quadrature method: Method}{for integrals with respect to incident energy,}\\
+  \Input{Eout quadrature method: Method}{for integrals with respect to outgoing energy,}\\
+  \Input{mu quadrature method: Method}{for integrals with respect to direction cosine.}\\
+  \Input{quadrature method: Method}{to use the same quadrature method for all integrals.}
+
+Thus, the command\\
+  \Input{mu quadrature method: Gauss4}{}\\
+specifies that Gaussian quadrature of order~4 be used for integrals with
+respect to the direction cosine~$\mu$.  The code will use adaptive quadrature,
+unless the line\\
+  \Input{do adaptive quadrature: false}{}\\
+is also included in the input file.  But note that adaptive Gaussian quadrature 
+of order~6 is not implemented.
 
 \section{Optional inputs, numerical tolerances}
 The user may reset the tolerances for convergence of the adaptive quadrature
-and for determination of the equality of two floating-point numbers.
+and for determination of the equality of two floating-point numbers.  There is
+also a tolerance for whether the code will issue a warning when a table of
+probability densities gives a total probability different from~1.
 
-\subsection{Convergence of adaptive quadrature}
-The adaptive quadrature routine produces an estimate $\calI$ of
-the integral, along with an estimate $e_\calI$ of the error.  The process of
-successive subdivision stops when
+\subsection{Convergence of adaptive quadrature}\label{Sec:adaptive-quadrature}
+In the \gettransfer\ code, all Legendre
+orders  $\ell = 0,$ 1, \ldots,~$\Lmax$ are handled concurrently.
+In order to compute approximate integrals $\calI_\ell$ for $\ell = 0,$ 1, \ldots,~$\Lmax$
+involved in Eqs.~(\ref{Inum}) and~(\ref{Ien}),
+the code first calculates rough approximations~$\calR_\ell$.  Because
 $$
-  | e_\calI | < \epsilon_a + \epsilon_r | \calI |.
+  |P_\ell ( \mu ) | \le P_0( \mu ) = 1
 $$
-The absolute quadrature tolerance is set by the command\\
-  \Input{abs\_quad\_tol:}{$\epsilon_a$}\\
-The default is $\epsilon_a = \texttt{1.0e-8}$.  To set the relative
-quadrature tolerance, use\\
-  \Input{quad\_tol:}{$\epsilon_r$}\\
-The default is $\epsilon_r = \texttt{1.0e-4}$. 
+for $-1 \le \mu \le 1$ and  $\ell = 1,$ 2, \ldots,~$\Lmax$ and because all other
+factors appearing in Eqs.~(\ref{Inum}) and~(\ref{Ien}) are nonnegative, it is guaranteed
+that
+$$
+  | \calI_\ell | \le \calI_0
+  \quad \text{for $\ell = 1,$ 2, \ldots,~$\Lmax$.}
+$$
+
+Legendre coefficients $\calI_\ell$ which are extremely small relative
+to~$\calI_0$ in absolute value need not be calculated with high precision.
+Consequently, there is a parameter\\
+  \Input{quad\_tol\_floor:}{$ \delta_f$}\\
+ such that
+whenever a Legendre coefficient $\calR_\ell$ satisfies the condition
+$$
+  | \calR_\ell| < \delta_f \calR_0
+$$
+for $\ell = 1,$ 2, \ldots,~$\Lmax$, it is replaced by $\delta_f \calR_0$.
+The default value is $\delta_f = \texttt{1.0e-12}$.
+
+At each step of the adaptive quadrature, Romberg extrapolation is used to 
+to produce estimates~$\epsilon_\ell$ of the current errors in
+the Legendre coefficients~$\calI_\ell$, $\ell = 0,$ 1, \ldots,~$\Lmax$,
+being computed.  Subdivision of intervals stops when
+$$
+  | \epsilon_\ell | \le \delta_q \Delta^\ell | \calR_\ell |
+$$
+for all $\ell = 0,$ 1, \ldots,~$\Lmax$.  The parameters~$\delta_q$
+and~$ \Delta$ are set by the commands\\
+  \Input{quad\_tol:}{$\delta_q$}\\
+  \Input{quad\_weight\_increase:}{$\Delta$}\\
+The default values are $\delta_q = \texttt{0.0001}$
+and~$\Delta = \texttt{2.5}$.  The reason for imposing looser tolerances
+on the high-order Legendre coefficients is that they are usually
+smaller and less significant that the low-order coefficients.
 
 There is also a limit on the total number of intervals used in
 adaptive quadrature\\
   \Input{max\_divisions: n = $n$}{}\\
 If this limit is exceeded, the adaptive quadrature routine returns
 the current estimate and prints a warning that this result may be
-inaccurate.
+inaccurate.  The default value is~\texttt{1000}.
+
+\subsection{Other quadrature parameters}\label{Sec:sqrt-quad}
+The \gettransfer\ code has parameters to control the treatment of
+square-root singularities and to determine the size of
+intervals which are so small that integrals over them may be set to zero.
+
+As explained in Section~\ref{Sec:coherent-quad},
+there is a parameter~$\delta_s$ to control when to use weighted Gaussian
+quadrature to account for the $\sqrt{ 1 - \mulab }$ singularity in
+integrals for coherent scattering.  This
+parameter is specified using the command\\
+  \Input{sqrt\_wt\_cutoff}{$\delta_s$}\\
+The default value is $\delta_s = 0.1$.  
+
+This parameter is also used to control the use of weighted
+Gaussian quadrature in integrals involved in Compton scattering
+in Section~\ref{Sec:Compton-scattering} and in the $n$-body phase space model
+in Section~\ref{Sec:n-body-quadrature}.
+
+Because computer arithmetic may produce weird results when
+interpolating data between two nearly equal energies or
+direction cosines, there is a parameter~$\delta_0$ such that
+the current estimate for an integral is accepted
+whenever it is over an interval $[a, b]$ with
+$$
+  b - a < \frac{\delta_0}{2} \left(
+    |a| + |b| 
+  \right).
+$$
+This parameter is set using the command\\
+  \Input{short\_interval:}{$\delta_0$}\\
+The default value is $\delta_0 = \texttt{1.0e-12}$.
+
+ \label{Sec:cum-prob-skip}
+As discussed
+in Section~\ref{Sec:cum-points-trivial}, when interpolation
+by cumulative points is used,
+the \gettransfer\ code omits intervals of small probability.
+This operation is controlled by setting
+  \Input{cum\_prob\_skip:}{$\delta_c$},\\
+and the default value is $\delta_c = \texttt{1.0e-12}$.
+
+
 
 \subsection{Near equality of floating-point numbers}
-In comparisons of floating-point numbers $x_1$ and~$x_2$, the code treats 
-them as essentially equal if
-$$
-  | x_1 - x_2 | \le \delta_a + \delta_r \min( | x_1 |, | x_2 | ).
-$$
-Here, the absolute tolerance $\delta_a$ is set by\\
-  \Input{abs\_tol:}{$\delta_a$}\\
-The default value is $\delta_a = \texttt{2.0e-14}$ and is appropriate
-when energies are measured in MeV.  It should be scaled accordingly,
-when other energy units are used.  The relative tolerance
-$\delta_r$ is set using\\
-  \Input{E\_tol:}{$\delta_r$}\\
-The default value is $\delta_r = \texttt{1.0e-9}$.
+\label{Sec:floatingPoint}
+The code has two parameters for testing near equality of floating-point numbers.
+Energies or direction cosines $x_1$ and~$x_2$ are treated
+as essentially equal if
+\begin{equation}
+  | x_1 - x_2 | \le \delta_r \min( | x_1 |, | x_2 | ).
+ \label{equalTol}
+\end{equation}
+The tolerance $\delta_r$ in Eq.~\eqref{equalTol}  used in scanning the
+data is set by\\
+  \Input{tight\_tol:}{$\delta_r$}\\
+with default value $\delta_r = \texttt{2.0e-14}$.
+A looser relative tolerance is used in the determination of regions
+of integration and in tests of consistency of particle masses and $Q$
+values for discrete 2-body reactions.  For these applications
+$\delta_r$ in Eq.~\eqref{equalTol} is set using\\
+  \Input{looser\_tol:}{$\delta_r$}\\
+with default value is $\delta_r = \texttt{1.0e-10}$.
+
+\subsection{Warning that a probability density table
+gives total probability different from~1}
+For tables of probability density, the \gettransfer\ code scales the
+data to ensure that the total probability is~1.  The code issues a
+warning if the total probability differs from~1 by more than
+\texttt{norm\_tol}.  The default\\
+  \Input{norm\_tol:}{2.0e-5}
+
 
 \section{Physical constants}
 The coding for coherent photon scattering and Compton scattering
@@ -430,16 +527,17 @@ The effect of this option is:
 $$
   \texttt{message\_level} =
     \begin{cases}
-       0& \text{print all messages},\\
-       1& \text{print only warnings and errors},\\
-       2& \text{print only severe errors; these cause exits anyway}.
+       0& \text{print only fatal errors},\\
+       1& \text{print all messages, plus debugging information},\\
+       2& \text{print warnings, information, and fatal errors},\\
+       3& \text{print only warnings and fatal errors.}
     \end{cases}
 $$
-The default value is 0, print all messages.
+The default value is 2, print all messages except debugging information.
 
-It is also possible to turn off all messages with the command\\
-  \Input{skip\_logging:}{\texttt{true}}\\
-The default value is \texttt{false}.
+%It is also possible to turn off all messages with the command\\
+ % \Input{skip\_logging:}{\texttt{true}}\\
+%The default value is \texttt{false}.
 
 \section{Model-dependent information}\label{model-info}
 The remainder of the input file consists of data required by the model. 

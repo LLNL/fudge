@@ -1,5 +1,5 @@
 Checking ENDF or GNDS files
-==========================
+===========================
 
 Let's face it.  ENDF evaluations often have mistakes and bugs.  Fortunately `fudge` comes 
 armed with a large number of pre-made checks.  Running them is as simple as running the 
@@ -16,12 +16,12 @@ Using the ``myEval`` and ``myCov`` instances from the previous tutorial, we find
     >>> myEval.check()
     n + H1
     H2 + photon
-    <fudge.gnds.warning.context object at 0x101cb6190>
+    <fudge.warning.context object at 0x101cb6190>
     
 Hmm... This doesn't look so helpful.  This is because ``fudge`` understand the hierarchy 
 and categorizes the errors and warnings accordingly.  Try this:
 
-    >>> print myEval.check()
+    >>> print( myEval.check() )
     ReactionSuite: n + H1
     WARNING: Wick's limit too low by 3.975% at 1000000.0
     WARNING: Wick's limit too low by 11.792% at 1200000.0
@@ -80,7 +80,7 @@ and categorizes the errors and warnings accordingly.  Try this:
 Much more useful.  In fact, you can loop over the warnings to look for specific ones:
 
     >>> for w in myEval.check():
-    ...     if 'Q-value' in str( w ): print w
+    ...     if 'Q-value' in str( w ): print( w )
     ...
     reaction label 1: H2 + gamma
         WARNING: Calculated and tabulated Q-values disagree: 2735357.48694634 eV vs 2224631 eV!
@@ -125,18 +125,18 @@ This is what I came up with (download it :download:`here <checkendf.py>`):
     results = endfFileToGNDS( args.inFile, toStdOut=True, skipBadData=True )
     myEval = results['reactionSuite']
     myCov = results['covarianceSuite']
-    print '\n\n'
+    print( '\n\n' )
     
     # Check the evaluation
-    print "Checking evaluation for "+args.inFile
-    print "------------------------------------------------"
-    print myEval.check()
+    print( "Checking evaluation for "+args.inFile )
+    print( "------------------------------------------------" )
+    print( myEval.check() )
     
-    print '\n'
+    print( '\n' )
     
     # Check the covariance
-    print "Checking covariances for "+args.inFile
-    print "------------------------------------------------"
-    print myCov.check()
+    print( "Checking covariances for "+args.inFile )
+    print( "------------------------------------------------" )
+    print( myCov.check() )
 
 Try it out!

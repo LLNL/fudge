@@ -1,33 +1,25 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Installation &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Reporting Bugs" href="reporting-bugs.html" />
     <link rel="prev" title="Downloading" href="downloading.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +35,8 @@
         <li class="right" >
           <a href="downloading.html" title="Downloading"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Installation</a></li> 
       </ul>
     </div>  
 
@@ -54,91 +47,97 @@
             
   <div class="section" id="installation">
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>Fudge is designed to be simple to install and use. For basic use the package only requires
-Python (versions 2.6-2.7, not version 3.0 and higher).  Python 2.7 is likely already present
-on all unix-based systems (if in doubt, try entering “python” on the command-line),
-and is available for all platforms at <a class="reference external" href="http://www.python.org/getit/">http://www.python.org/getit/</a>.</p>
-<div class="section" id="to-install-the-package">
-<h2>To install the package:<a class="headerlink" href="#to-install-the-package" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><p class="first">Obtain the current version (available online at <a class="reference external" href="https://ndclx4.bnl.gov/gf/project/gnd/">https://ndclx4.bnl.gov/gf/project/gnd/</a> or <a class="reference external" href="ftp://gdo-nuclear.ucllnl.org/">ftp://gdo-nuclear.ucllnl.org/</a>),
-and place it on your system.</p>
-</li>
-<li><p class="first">To unzip the package, type</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$tar -xvf fudge-4.2.3.tar.gz
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p class="first">The unzipped directory is named ‘fudge-4.2.3’. Navigate into the new directory, and type</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$make
-</pre></div>
-</div>
-</div></blockquote>
-<p>and (following step is only required for generating multi-group processed libraries):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$make merced
-</pre></div>
-</div>
-</li>
-<li><p class="first">You are now set to use Fudge! For advanced use, see the optional components below.</p>
-</li>
+<p>The basic use of the FUDGE package requires the following:</p>
+<ul class="simple">
+<li><p>Git distributed version control system</p></li>
+<li><p>Python (versions 3.6 or higher) general-purpose programming language (with the numpy package included)</p></li>
+<li><p>C compiler for the translation of the compute-intensive modules.</p></li>
+</ul>
+<p>While there are numerous options available for the installation of FUDGE, only the following are currently supported:</p>
+<ul class="simple">
+<li><p>Installation via <cite>pip install</cite> in a virtual environment or normal computing environmet that has the necessary installation privileges. This requires the following steps:</p></li>
+</ul>
+<ol class="lowerroman simple">
+<li><p>Ensure that NumPy (version 1.15 or higher) and wheels are installed in your Python environment</p></li>
+<li><p>Run the command</p></li>
 </ol>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">ssh</span><span class="p">:</span><span class="o">//</span><span class="n">git</span><span class="nd">@czgitlab</span><span class="o">.</span><span class="n">llnl</span><span class="o">.</span><span class="n">gov</span><span class="p">:</span><span class="mi">7999</span><span class="o">/</span><span class="n">nuclear</span><span class="o">/</span><span class="n">fudge</span><span class="o">/</span><span class="n">fudge</span><span class="o">.</span><span class="n">git</span><span class="nd">@fudge4</span><span class="o">.</span><span class="mi">3</span><span class="o">-</span><span class="n">rc5</span>
+</pre></div>
 </div>
+</div></blockquote>
+<ul class="simple">
+<li><p>Installation via Makefiles which is our typical development mode for active FUDGE code maintenance and improvements. The following steps are recommended:</p></li>
+</ul>
+<ol class="lowerroman simple">
+<li><p>Ensure that NumPy (version 1.15 or higher) is installed</p></li>
+<li><p>Use the following command to clone FUDGE to the current folder:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="n">submodules</span> <span class="n">ssh</span><span class="p">:</span><span class="o">//</span><span class="n">git</span><span class="nd">@czgitlab</span><span class="o">.</span><span class="n">llnl</span><span class="o">.</span><span class="n">gov</span><span class="p">:</span><span class="mi">7999</span><span class="o">/</span><span class="n">nuclear</span><span class="o">/</span><span class="n">fudge</span><span class="o">/</span><span class="n">fudge</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="lowerroman simple" start="3">
+<li><p>Build FUDGE with the following command:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">fudge</span><span class="p">;</span> <span class="n">make</span> <span class="o">-</span><span class="n">s</span>
+</pre></div>
+</div>
+</div></blockquote>
 <div class="section" id="optional-extra-python-packages">
 <h2>[Optional] Extra python packages<a class="headerlink" href="#optional-extra-python-packages" title="Permalink to this headline">¶</a></h2>
-<p>For more advanced use, Fudge depends on these additional, optional packages:</p>
+<p>For more advanced use, Fudge depends on these additional packages:</p>
 <ul class="simple">
-<li>gnuplot and Gnuplot.py (for plotting, <a class="reference external" href="http://gnuplot-py.sourceforge.net">http://gnuplot-py.sourceforge.net</a>)</li>
-<li>matplotlib (alternate style of plotting, <a class="reference external" href="http://matplotlib.sourceforge.net">http://matplotlib.sourceforge.net</a>)</li>
-<li>numpy (for some advanced features including checking and manipulating covariance matrices, <a class="reference external" href="http://numpy.scipy.org">http://numpy.scipy.org</a>)</li>
+<li><p>The matplotlib for general plotting. Previous versions of FUDGE used gnuplot but this is being phased out in favor of matplotlib.</p></li>
+<li><p>PyQt5 and Qt v5 for interactive plotting. The underlying plotting is still done with matplotlib with the Qt toolkit and bindings providing the graphical
+user interface to interact and modify some of the common matplotlib plot options.</p></li>
 </ul>
 </div>
 <div class="section" id="optional-setting-environment-variables">
 <h2>[Optional] Setting Environment Variables<a class="headerlink" href="#optional-setting-environment-variables" title="Permalink to this headline">¶</a></h2>
-<p>For general use of the fudge package, some changes should be made to your
-computer’s environment. The following lines make the required change.
-Note that &lt;path_to_fudge&gt; indicates the path to
-the directory containing the Fudge README.txt file:</p>
+<p>For general use of the fudge package, some changes should be made to your computer’s environment. The following lines make the required change.
+Note that &lt;path_to_fudge&gt; indicates the path to root FUDGE folder:</p>
 <ul>
-<li><p class="first">On unix with bash, ksh, etc, put this line in the .bashrc or equivalent:</p>
+<li><p>On unix with bash, ksh, etc, put this line in the .bashrc or equivalent:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$export PYTHONPATH=$PYTHONPATH:&lt;path_to_fudge&gt;
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PYTHONPATH=$PYTHONPATH:&lt;path_to_fudge&gt;
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p class="first">On csh, tcsh or similar, do:</p>
+<li><p>On csh, tcsh or similar, do:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$setenv PYTHONPATH $PYTHONPATH:&lt;path_to_fudge&gt;
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>setenv PYTHONPATH $PYTHONPATH:&lt;path_to_fudge&gt;
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p class="first">On Windows, the environment variable should be added to the registry
-(see for example <a class="reference external" href="http://www.support.tabs3.com/main/R10463.htm">http://www.support.tabs3.com/main/R10463.htm</a>)</p>
-</li>
+<li><p>On Windows, the environment variable should be added to the registry (see for example <a class="reference external" href="http://www.support.tabs3.com/main/R10463.htm">http://www.support.tabs3.com/main/R10463.htm</a>)</p></li>
 </ul>
 </div>
-<div class="section" id="more-information-on-building-extensions">
-<h2>More information on building Extensions<a class="headerlink" href="#more-information-on-building-extensions" title="Permalink to this headline">¶</a></h2>
-<p>Fudge is primarily written in python, which is easily portable across many different
-systems. Some advanced features of fudge (computationally intensive tasks) are however
-implemented in C/C++ or fortran, and must be compiled before use. To build these extensions,
-use the Makefile included in the main Fudge directory:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ make
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<p>Users on OS X may have trouble compiling Merced (the C++ code responsible for generating transfer matrices
+for deterministic transport). Merced uses OpenMP threading, which is currently not supported by the default
+clang compiler on OS X.
+This problem is associated with an error message like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">error</span><span class="p">:</span> <span class="n">unsupported</span> <span class="n">option</span> <span class="s1">&#39;-fopenmp&#39;</span>
 </pre></div>
 </div>
-<p>An additional package called Merced must also be compiled before using Fudge to generate transfer matrices
-for deterministic transport.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ make merced
+<p>You may safely ignore this error message unless you wish to use the deterministic processing capabilities in Fudge.
+If you encounter this error and do need to use Merced, you will need to install a compiler with OpenMP support,
+then specify which compiler to use when building Merced.</p>
+<p>For example, the g++-mp-4.9 compiler (available from Macports) supports openmp</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">port</span> <span class="n">install</span> <span class="n">gcc</span><span class="o">-</span><span class="mi">9</span>
+<span class="c1"># then</span>
+<span class="n">make</span> <span class="n">merced</span> <span class="n">CXX</span><span class="o">=</span><span class="n">g</span><span class="o">++-</span><span class="n">mp</span><span class="o">-</span><span class="mf">4.9</span>
 </pre></div>
 </div>
-<p>Merced uses OpenMP threading. Some users may run into a ‘missing omp.h’ error when compiling Merced (in particular
-on OS X where the default C++ compiler does not support OpenMP). If so, we recommend installing the g++-mp-4.9
-compiler instead (available via MacPorts) and compiling with that:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ make merced CXX=g++-mp-4.9
+<p>Windows users may also have trouble with installing Merced. The solution here appears to be to install
+VisualStudio, and specify the ‘CL’ compiler while building Merced:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">merced</span> <span class="n">CXX</span><span class="o">=</span><span class="n">CL</span>
 </pre></div>
 </div>
 <p>If you encounter other trouble with installing, building extensions or setting environment
@@ -147,6 +146,7 @@ variables, please let us know (email: <a class="reference external" href="mailto
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -155,13 +155,12 @@ variables, please let us know (email: <a class="reference external" href="mailto
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#to-install-the-package">To install the package:</a></li>
 <li><a class="reference internal" href="#optional-extra-python-packages">[Optional] Extra python packages</a></li>
 <li><a class="reference internal" href="#optional-setting-environment-variables">[Optional] Setting Environment Variables</a></li>
-<li><a class="reference internal" href="#more-information-on-building-extensions">More information on building Extensions</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -180,15 +179,15 @@ variables, please let us know (email: <a class="reference external" href="mailto
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -208,12 +207,13 @@ variables, please let us know (email: <a class="reference external" href="mailto
         <li class="right" >
           <a href="downloading.html" title="Downloading"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Installation</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

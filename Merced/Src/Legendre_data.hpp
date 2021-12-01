@@ -19,76 +19,21 @@
 #include <list>
 #include <vector>
 
+#include "Legendre_base.hpp"
 #include "dd_vector.hpp"
+#include "quad_param.hpp"
+#include "coef_vector.hpp"
 #include "data_parser.hpp"
 
-using namespace std;
-
-// --------------- class Legendre_base -------------------------
-//! Class to hold Legendre coefficients j=0, 1, ..., order
-class Legendre_base
+namespace Lgdata
 {
-private:
-double Energy;
 
-public:
-//! Legendre coefficients
-double *data;
-
-//! the Legendre order
-int order;
-
-//! Constructor
-inline Legendre_base( ): Energy(-1.0), order(-1) {}
-
-//! Destructor
-inline ~Legendre_base( ) { clean_data( ); }
-
-//! "Energy" could be for the incident or the outgoing particle
-inline double get_E_out( ) const { return Energy; }
-inline double get_E_in( ) const { return Energy; }
-
-//! Sets the energy for the Legendre data
-//! \param Eout the energy for the Legendre data
-inline void set_E_out( double Eout ) { Energy = Eout; }
-//! \param Ein the energy for the Legendre data
-inline void set_E_in( double Ein ) { Energy = Ein; }
-
-void clean_data( );
-
-//! Sets the incident energy and allocates space
-//! \param order the Legendre order for the data
-void initialize( int order );
-
-//! Access routine for N-th coefficient
-//! \param N number of the current Legendre coefficient
-double &operator[ ]( int N );
-
-//! Access routine for N-th coefficient; does not change the data
-//! \param N number of the current Legendre coefficient
-double value( int N ) const;
-
-//! Ignore zero high-order Legendre coefficients
-void truncate_zeros( );
-
-//! Scales the vector
-//! \param factor multiply all coefficients by this number
-Legendre_base& operator*=( double factor );
-
-//! Sums the Legenre series
-//! \param mu sum the series at this mu value
-double sum_Legendre( double mu );
-
-// For debugging
-void print( ) const;
-};
-
-// --------------- class Legendre_coefs -------------------------
+  // --------------- class Legendre_coefs -------------------------
 //! Class to hold Legendre coefficients of flux j=0, 1, ..., order
-class Legendre_coefs : public Legendre_base
+  class Legendre_coefs : public LgBase::Legendre_base
 {
 private:
-//! Interpolates the flux with weight alpha
+//! Returns true if the interpolation is OK
 //! \param alpha the weight for next_flux
 //! \param prev_flux Legendre coefficients at a lower energy
 //! \param next_flux Legendre coefficients at a higher energy
@@ -131,44 +76,69 @@ void only_copy_coef( const Legendre_coefs& to_copy );
 void set_max_order( int left_order, int right_order );
 
 //! Interpolates the flux at energy E_in
+//! Returns true if the interpolation is OK
 //! \param E_in intermediate energy
 //! \param prev_flux Legendre coefficients at a lower energy
 //! \param next_flux Legendre coefficients at a higher energy
-void linlin_interp( double E_in, const Legendre_coefs& prev_flux,
+bool linlin_interp( double E_in, const Legendre_coefs& prev_flux,
 const Legendre_coefs& next_flux );
 
 //! Interpolates Legendre-coefficient data at energy E_in
 //! It is required that left_flux and right_flux be at the same outgoing energy
+//! Returns true if the interpolation is OK
 //! \param E_in intermediate incident energy
 //! \param left_Ein lower incident energy
 //! \param left_flux Legendre coefficients at incident energy left_Ein
 //! \param right_Ein higher incident energy
 //! \param right_flux Legendre coefficients at incident energy right_Ein
-void Ein_linlin_interp( double E_in, double left_Ein, 
+bool Ein_linlin_interp( double E_in, double left_Ein, 
 const Legendre_coefs& left_flux, double right_Ein,
 const Legendre_coefs& right_flux );
 
 //! Interpolates unit-base Legendre-coefficient data
 //! It is required that left_flux and right_flux be at the same outgoing energy
+//! Returns true if the interpolation is OK
 //! \param E_in intermediate incident energy
 //! \param alpha the proportionality factor
 //! \param left_flux Legendre coefficients at incident energy left_Ein
 //! \param right_flux Legendre coefficients at incident energy right_Ein
-void unitbase_interp( double E_in, double alpha, 
+bool unitbase_interp( double E_in, double alpha, 
 const Legendre_coefs& left_flux,
 const Legendre_coefs& right_flux );
 
 //! Interpolates the flux linearly with respect to the logarithm of the energy
+//! Returns true if the interpolation is OK
 //! \param E_in intermediate energy
 //! \param left_flux Legendre coefficients at a lower energy
 //! \param right_flux Legendre coefficients at a higher energy
-void linlog_interp( double E_in, 
+bool linlog_interp( double E_in, 
 const Legendre_coefs& left_flux,
 const Legendre_coefs& right_flux );
 
+    //! Addition operator
+    //! \param to_add the Legendre moments to add
+    Legendre_coefs& operator+=( const Coef::coef_vector &to_add );
+
 };
 
-// --------------- class Legendre_data_range -------------------------
+  //! Class for parameters for the quadrature over mu
+  // ---------------- class Lgdata::mu_param ------------------
+  class mu_param: public Qparam::QuadParamBase
+  {
+  public:
+    Ddvec::dd_vector::const_iterator left_data;
+    Ddvec::dd_vector::const_iterator right_data;
+
+    inline mu_param() {}
+    inline ~mu_param() {}
+
+    //! Evaluate by linear-linear interpolation
+    //! \param mu an intermediate direction cosine
+    //! \param is_OK, true if the intertpolation is OK
+    double value( double mu, bool *is_OK );
+  };
+
+// ------------ class Lgdata::Legendre_data_range ------------------
 //! Class to hold Legendre coefficient data for a range on outgoing energies
 class Legendre_data_range
 {
@@ -178,10 +148,10 @@ double E_in; // the incident energy
 public:
 Legendre_coefs prev_data;  // Legendre data for lower outgoing energy
 Legendre_coefs next_data;  // Legendre data for upper outgoing energy
-unit_base_map ubase_map;  // unit-base map for this data
+Ddvec::unit_base_map ubase_map;  // unit-base map for this data
 
-two_d_interp Ein_interp;
-Interp_Type Eout_interp;
+Terp::two_d_interp Ein_interp;
+Terp::Interp_Type Eout_interp;
 
 inline Legendre_data_range( ) {}
 inline ~Legendre_data_range( ) {}
@@ -203,7 +173,7 @@ return E_in;
 //! \param Ein the energy of the incident particle
 //! \param ubasemap the unit-base-map for this data
 //! \param Eoutinterp rule for interpolation is outgoing energy
-void new_Ein( double Ein, const unit_base_map &ubasemap, Interp_Type Eoutinterp );
+void new_Ein( double Ein, const Ddvec::unit_base_map &ubasemap, Terp::Interp_Type Eoutinterp );
 
 //! Sets up prev_data and next_data for a given range of outgoing energies
 //! \param prevdata Legendre coefficients at a lower energy
@@ -214,40 +184,44 @@ void set_data( const Legendre_coefs &prevdata, const Legendre_coefs &nextdata,
 double Eout_min, double Eout_max );
 
 //! Does unit-base interpolation between incident energies
+//! Returns true if the interpolation is OK
 //! It is required that left_data and right_data be at the same outgoing energy
 //! \param E_in an intermediate incident energy
 //! \param left_data Legendre coefficients at a lower incident energy
 //! \param right_data Legendre coefficients at a higher incident energy
-void ubase_interpolate( double E_in,
+bool ubase_interpolate( double E_in,
 const Legendre_data_range &left_data, const Legendre_data_range &right_data );
 
 //! Maps from physical variables to unit-base
-void to_unit_base( );
+bool to_unit_base( );
+
+//! Used by cumulative points interpolation for intervals of length zero
+//! \param dA, the cumulative probability for this interval
+void short_to_unit_base( double dA );
 
 //! Maps from unit-base to physical variables
-void un_unit_base( );
+//! Returns true if the interpolation is OK
+bool un_unit_base( );
 
-//! Returns the Legendre coefficients for this outgoing energy
-//! \param E_out energy of the outgoing particle
-Legendre_coefs Eout_interpolate( double E_out );
+
 };
 
 // --------------- class Legendre_list_base -------------------------
 //! Class to hold an array Legendre coefficient data
-class Legendre_list_base : public list< Legendre_coefs >
+class Legendre_list_base : public std::list< Legendre_coefs >
 {
 private:
-//! The energy of the incident particle
-double E_in;
+  //! The energy of the incident particle
+  double E_in;
 
-//! Finds the total probability
-double get_norm( ) const;
+  //! Finds the total probability
+  double get_norm( ) const;
 
 public:
-int order;
-unit_base_map ubase_map;
-two_d_interp Ein_interp; // interpolation rule for incident energy
-  Interp_Type Eout_interp; // interpolation rule for outgoing energy
+  int order;
+  Ddvec::unit_base_map ubase_map;
+  Terp::two_d_interp Ein_interp; // interpolation rule for incident energy
+  Terp::Interp_Type Eout_interp; // interpolation rule for outgoing energy
 
   //! Constructor
   inline Legendre_list_base( ): order( -1 ) {}
@@ -263,7 +237,9 @@ two_d_interp Ein_interp; // interpolation rule for incident energy
   inline void set_E_in( double Ein ) { E_in = Ein; }
 
   //! Normalizes the total probability
-  void renorm( );
+  //! Returns true if the norm is positive
+  //! \param truncated, true if this is data for interpolation with truncation
+  bool renorm( bool truncated );
 
   //! Maps the data to unit base
   void to_unit_base( );
@@ -275,14 +251,14 @@ two_d_interp Ein_interp; // interpolation rule for incident energy
 
 // --------------- class Flux_List -------------------------
 //! Class to hold Legendre coefficients of flux j=0, 1, ..., order
-class Flux_List : public list< Legendre_coefs >
+class Flux_List : public std::list< Legendre_coefs >
 {
 private:
 
 public:
   int order;
 
-  Interp_Type interp;
+  Terp::Interp_Type interp;
 
   //! Constructor
   inline Flux_List( ): order( -1 ) {}
@@ -293,7 +269,7 @@ public:
   //! Constructs the list from the python data
   //! \param infile the input file
   //! \param num_Ein the number of incident energies
-  void read_flux( data_parser &infile, int num_Ein );
+  void read_flux( Dpar::data_parser &infile, int num_Ein );
 
   //! Evaluates the flux at energy E_in with search starting at ptr
   //! \param E_in incident energy requested
@@ -303,7 +279,7 @@ public:
 
 // --------------- class weight_vector -------------------------
 //! Class to hold Legendre flux weights for one energy bin
-class weight_vector : public Legendre_base
+  class weight_vector : public LgBase::Legendre_base
 {
 private:
 
@@ -329,7 +305,7 @@ public:
 };
 // --------------- class weight_list -------------------------
 //! Class to hold all of the Legendre flux weights
-class weight_list : public list<  weight_vector >
+class weight_list : public std::list<  weight_vector >
 {
 private:
 
@@ -343,5 +319,27 @@ public:
   { }
 
 };
+
+} // End of namespace Lgdata
+
+namespace to_Legendre_F
+{
+  // ************* functions to integrate ***************
+  // ---------------- mu_F ------------------
+  //! Function for the quadrature over mu
+  //! \param mu the direction cosine
+  //! \param param the function parameters
+  //! \param value the value of the integrand, a set of Legendre coefficients
+  bool mu_F( double mu_in, Qparam::QuadParamBase *param, Coef::coef_vector *value );
+
+  // ------------------ to_Legendre_F::from_table --------------
+  //! Evaluates the Legendre moments
+  //! Returns the number of function evaluations used in the quadrature
+  //! \param mu_table pairs ( direction cosine, probability density )
+  //! \param coefs, the corresponding Legendre coefficients
+  int from_table( const Ddvec::dd_vector& mu_table,
+		  Lgdata::Legendre_coefs *coefs );
+
+}  // end of namespace to_Legendre_F
 
 #endif

@@ -1,64 +1,8 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 __metaclass__ = type
@@ -71,31 +15,25 @@ from xData import ancestry as ancestryModule
 
 class suite( ancestryModule.ancestry ) :
     """
-    Abstract base class for holding a list of objects that can be indexed by an integer or a string. 
-    For integer indexing, the indexing is by order in which an object was put into the array or, 
-    if a sortedSuite instance, by its sort order in the suite.
-    For string indexing, this class acts like the python dict class. This class
-    is like the python OrderedDict class. However, this class does not inherit the OrderedDict class
-    as it does act differently. For example, only objects in the list of allowedClasses can be
-    added to an suite instance. The allowedClasses is an argument to the constructor.
+    Abstract base class for holding a list of objects that can be indexed by an integer or a string.
+    For integer indexing, the indexing is by order in which an object was put into the array or,
+    if a sortedSuite instance, by the index assigned when the object was added to the suite.
+    For string indexing, this class acts like the python dictionary.
 
-    The constructor for this class has 3 (not counting self) arguments. They are::
+    The suite also has a tuple of 'allowedClasses' controlling what type(s) of objects it can contain.
+    The allowedClasses must be passed in as an argument to the constructor.
 
-        + ------------------+-------------------------------------------------------+
-        | allowedClasses    | A list of classes. Only objects matching one of the   |
-        |                   | classes can be add.                                   |
-        + ------------------+-------------------------------------------------------+
-        | replace           | If False, the add method will only allow an object to |
-        |                   | be insert if no object in the list has the same key.  |
-        |                   | If True and an object of the same key exists the      |
-        |                   | added object replaces the old object at the same      |
-        |                   | position in the list. Default is True.                |
-        + ------------------+-------------------------------------------------------+
     """
 
     __metaclass__ = abc.ABCMeta
 
     def __init__( self, allowedClasses, replace = True ) :
+        """
+        :param allowedClasses: tuple of classes. Only instances of these classes can be added to the suite.
+        :param replace: boolean (default=True). If False, the add method can only add objects with keys
+            not already present in the suite. If True, the original object will be replaced by the new object
+            having the same key.
+        """
 
         ancestryModule.ancestry.__init__( self )
 
@@ -136,6 +74,7 @@ class suite( ancestryModule.ancestry ) :
 
     @property
     def allowedClasses( self ) :
+        """Return the tuple of classes that are allowed in this suite"""
 
         return( self.__allowedClasses )     # No fear, user cannot alter as __allowedClasses is a tuple.
 
@@ -145,6 +84,13 @@ class suite( ancestryModule.ancestry ) :
         return( self.__replace )
 
     def add( self, item ) :
+        """
+        Attempt to add item to self.
+        Raises TypeError if item is not an instance of any class in self.allowedClasses
+        Raises KeyError if self.replace == False and the item shares a key with another item already in the suite.
+
+        :param item: instance to add to self
+        """
 
         classAllowed = False
         for cls in self.__allowedClasses :
@@ -161,6 +107,7 @@ class suite( ancestryModule.ancestry ) :
     def addIndex( self, item ) :
         """
         Returns the index at which item will be added to self.
+        Raises KeyError if self.replace == False and the item shares a key with another item already in the suite.
         """
 
         index = len( self )
@@ -171,6 +118,7 @@ class suite( ancestryModule.ancestry ) :
         return( index, False )
 
     def check( self, info ):
+        """See documentation in database.check"""
 
         from . import warning as warningModule
         warnings = []
@@ -181,10 +129,12 @@ class suite( ancestryModule.ancestry ) :
         return warnings
 
     def convertUnits( self, unitMap ) :
+        """See documentation in database.convertUnits"""
 
         for item in self.__items : item.convertUnits( unitMap )
 
     def remove( self, key ) :
+        """Remove object with specified key from the suite"""
 
         for i1, item in enumerate( self.__items ) :
             if( item.key == key ) :
@@ -193,6 +143,10 @@ class suite( ancestryModule.ancestry ) :
         return( False )
 
     def replicate( self, other ) :
+        """
+        Add copies of all items in other to self.
+        :param other: suite or other iterable
+        """
 
         for item in other : self.add( item.copy( ) )
 
@@ -268,7 +222,7 @@ class suite( ancestryModule.ancestry ) :
     @classmethod
     def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
 
-        return( cls( element.attrib ).parseXMLNode( element, xPath, linkData ) )
+        return( cls().parseXMLNode( element, xPath, linkData ) )
 
     @classmethod
     def parseXMLStringAsClass( cls, string ) :
@@ -276,12 +230,17 @@ class suite( ancestryModule.ancestry ) :
         from xml.etree import cElementTree
 
         element = cElementTree.fromstring( string )
-        kwargs = element.attrib.copy( )
+        kwargs = {v[0]:v[1] for v in element.items()}
         return( cls( **kwargs ).parseXMLNode( element, [], [] ) )
 
 class sortedSuite( suite ) :
 
     def addIndex( self, item ) :
+        """
+        Find the location to insert item into a sorted suite.
+        :param item: instance to add. Must define a 'sortCompare' method (used to determine insertion point).
+        :return: tuple(insertion index (int), whether to replace existing item at that index (boolean))
+        """
 
         for i1, _item in enumerate( self ) :
             cmp = item.sortCompare( _item )

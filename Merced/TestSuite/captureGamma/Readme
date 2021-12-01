@@ -1,7 +1,0 @@
-The data in this subdirectory is for gammas from neutron capture reactions,
-treated as a discrete 2-body reaction.  The data is in the center-of-mass
-frame, and the boost is relativistic.
-
-The input files are:
-
-in.H1: capture to form deuterium.  The output file is out.H1.

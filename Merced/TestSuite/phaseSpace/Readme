@@ -9,12 +9,7 @@ in.phaseSpace-H2: With default adaptive quadrature the output is
   quadrature using MC_transfer the output is out.phaseSpace-H2.MC with
   nummontecarlo set to 100000.
 
-phaseSpace-H2.Gauss6: This file specifies 6th-order Gaussian quadrature.
+in.phaseSpace-H2.Gauss6: This file specifies 6th-order Gaussian quadrature.
   The output file is out.phaseSpace-H2.Gauss6.
   The worst discrepancy is in the lowest relevant bin, and it is 0.1%. 
 
-phaseSpace-H2.tight: This file sets the relative error in the
-  adaptive quadrature quad_tol = 1.0e-6 and the absolute error to
-  abs_quad_tol = 1.0e-10.  The output is out.phaseSpace-H2.tight.
-  In this case the row sums agree with the
-  integral of the cross section to 1 in 10^5,

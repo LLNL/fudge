@@ -15,8 +15,11 @@
 #ifndef MAX_LEGENDRE
 #define MAX_LEGENDRE
 
-//! Sets the maximum Legendre order of the output transfer matrix
-//! The code runs a lot faster if this is hard-wired.
-static const int max_output_order = 15;
+namespace Order
+{
+  //! Sets the maximum Legendre order of the output transfer matrix
+  //! The code runs a lot faster if this is hard-wired.
+  static const int max_output_order = 15;
+}
 
 #endif

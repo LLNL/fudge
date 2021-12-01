@@ -17,24 +17,27 @@
 #endif
 
 #include "Maxwell.hpp"
+#include "adapt_quad.hpp"
 #include "global_params.hpp"
 #include "messaging.hpp"
-#include "math_util.hpp"
 
 #include "protos.h"
 
-// ****************** class Maxwell_param **********************
-// ---------------- Maxwell_param::get_integrals --------------------
+// ****************** class Max::Maxwell_param **********************
+// ---------------- Max::Maxwell_param::get_integrals --------------------
 // Gets the integrals over outgoing energy
-void Maxwell_param::get_integrals( double Eout_0, double Eout_1, coef_vector &value )
+bool Max::Maxwell_param::get_integrals( double Eout_0, double Eout_1,
+					Coef::coef_vector &value )
 {
+  bool is_OK = true;
+  
   if( Eout_0 == 0.0 )
   {
-    if( ( value.conserve == NUMBER ) || ( value.conserve == BOTH ) )
+    if( ( value.conserve == Coef::NUMBER ) || ( value.conserve == Coef::BOTH ) )
     {
       value.weight_1[ 0 ] = integral_prob( Eout_1 );
     }
-    if( ( value.conserve == ENERGY ) || ( value.conserve == BOTH ) )
+    if( ( value.conserve == Coef::ENERGY ) || ( value.conserve == Coef::BOTH ) )
     {
       value.weight_E[ 0 ] = integral_Eprob( Eout_1 );
     }
@@ -42,60 +45,65 @@ void Maxwell_param::get_integrals( double Eout_0, double Eout_1, coef_vector &va
   else
   {
     static double tol = Global.Value( "quad_tol" );
-    evap_params_1d params_1d;
+    Evap::evap_params_1d params_1d;
     params_1d.Theta = Theta;
-    QuadParamBase *void_params_1d = static_cast< QuadParamBase* >( &params_1d );
+    Qparam::QuadParamBase *void_params_1d =
+      static_cast< Qparam::QuadParamBase* >( &params_1d );
 
-    quad_F::integrate( Maxwell_F::Eout_F, Eout_quad_method, Eout_0, Eout_1,
+    is_OK = quad_F::integrate( Maxwell_F::Eout_F, Eout_quad_rule, Eout_0, Eout_1,
 		       void_params_1d, tol, &value );
     Eout_F_count += params_1d.func_count;
   }
   value *= 1.0/norm;
+
+  return is_OK;
 }
-// ---------------- Maxwell_param::set_scales --------------------
+// ---------------- Max::Maxwell_param::set_scales --------------------
 //! Sets the scale factors for the integrals of probability and energy*probability
-void Maxwell_param::set_scales( )
+void Max::Maxwell_param::set_scales( )
 {
   // the scale factors used with the incomplete gamma functions
   prob_integral_scale = tgamma( 1.5 )*Theta*sqrt( Theta );
   Eprob_integral_scale = 1.5*prob_integral_scale*Theta;  // includes Gamma( 2.5 )
 }
-// ---------------- Maxwell_param::get_norm --------------------
+// ---------------- Max::Maxwell_param::get_norm --------------------
 // Integrate from 0 to E_max to get the norm
-double Maxwell_param::get_norm( )
+double Max::Maxwell_param::get_norm( )
 {
   return integral_prob( E_max );
 }
-// ---------------- Maxwell_param::integral_prob --------------------
+// ---------------- Max::Maxwell_param::integral_prob --------------------
 // Integral of the probability density from 0 to E_1
-double Maxwell_param::integral_prob( double E_1 )
+double Max::Maxwell_param::integral_prob( double E_1 )
 {
   // This is Theta times the integral of y^{1/2}*exp( -y ) with y = E_out/Theta
   double y_1 = E_1/Theta;
-  return prob_integral_scale*igam( 1.5, y_1 );
+  return prob_integral_scale*Proto::igam( 1.5, y_1 );
 }
-// ---------------- Maxwell_param::integral_Eprob --------------------
+// ---------------- Max::Maxwell_param::integral_Eprob --------------------
 // Integral of energy times the probability density from 0 to E_1
-double Maxwell_param::integral_Eprob( double E_1 )
+double Max::Maxwell_param::integral_Eprob( double E_1 )
 {
   // This is Theta times the integral of y^{3/2}*exp( -y ) with y = E_out/Theta
   double y_1 = E_1/Theta;
-  return Eprob_integral_scale*igam( 2.5, y_1 );
+  return Eprob_integral_scale*Proto::igam( 2.5, y_1 );
 }
 
-// ****************** class maxwell **********************
-// ----------- maxwell::get_T --------------
+// ****************** class Max::maxwell **********************
+// ----------- Max::maxwell::get_T --------------
 // Calculates the transfer matrix for this particle.
 // sigma is the cross section.
-void maxwell::get_T( const dd_vector& sigma, const dd_vector& multiple,
-  const dd_vector& weight, T_matrix& transfer )
+void Max::maxwell::get_T( const dd_vector& sigma, const dd_vector& multiple,
+  const dd_vector& weight, Trf::T_matrix& transfer )
 {
-  if( interp_type != LINLIN )
+  if( interp_type != Terp::LINLIN )
   {
-    FatalError( "evaporation::get_T", "interp_type for Theta not implemented" );
+    Msg::FatalError( "Max::maxwell::get_T",
+		     "interp_type for Theta not implemented" );
   }
   transfer.getBinCrossSection( sigma );
-
+  threshold =sigma.begin( )->x;
+  
   // synchronize the starting energies
   bool done = get_Ein_range( sigma, multiple, weight, transfer.e_flux,
     transfer.in_groups );
@@ -114,7 +122,7 @@ void maxwell::get_T( const dd_vector& sigma, const dd_vector& multiple,
 #else
   num_processors = 1;
 #endif
-  cout << "number of processors: " << num_processors << endl;
+  std::cout << "number of processors: " << num_processors << std::endl;
 
   // do the integrals incident bin by incident bin
 #pragma omp parallel for schedule( dynamic, 1 ) default( none )	\
@@ -123,8 +131,8 @@ void maxwell::get_T( const dd_vector& sigma, const dd_vector& multiple,
   // now do the integrals incident bin by incident bin
   for( int Ein_bin = first_Ein; Ein_bin < last_Ein; ++Ein_bin )
   {
-    Maxwell_param Ein_param;
-    Ein_param.Eout_quad_method = transfer.Eout_quad_method;
+    Max::Maxwell_param Ein_param;
+    Ein_param.Eout_quad_rule = transfer.Eout_quad_rule;
     // set up the data range for this bin
     Ein_param.setup_bin( Ein_bin, sigma, multiple, weight, transfer.e_flux,
                          transfer.in_groups );
@@ -146,28 +154,31 @@ void maxwell::get_T( const dd_vector& sigma, const dd_vector& multiple,
     Eout_F_count += Ein_param.Eout_F_count;
   }
   // print the counts of function evaluations
-  cout << "2d quadratures: " << quad_count << endl;
-  cout << "Energy_function_F::Ein_F calls: " << Ein_F_count << endl;
-  cout << "evaporation_F::Eout_F calls: " << Eout_F_count << endl;
-  cout << "average Energy_function_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << endl;
-  cout << "average evaporation_F::Eout_F calls: " << 1.0*Eout_F_count/Ein_F_count << endl;
+  std::cout << "2d quadratures: " << quad_count << std::endl;
+  std::cout << "Energy_function_F::Ein_F calls: " << Ein_F_count << std::endl;
+  std::cout << "evaporation_F::Eout_F calls: " << Eout_F_count << std::endl;
+  std::cout << "average Energy_function_F::Ein_F calls: " << 1.0*Ein_F_count/quad_count << std::endl;
+  std::cout << "average evaporation_F::Eout_F calls: " << 1.0*Eout_F_count/Ein_F_count << std::endl;
 }
 
 // **************** Function to integrate *********************
 // --------------------  Maxwell_F::Eout_F ------------------
 // Function for the 1-d quadrature over outgoing energy
-void Maxwell_F::Eout_F( double E_out, QuadParamBase *E_out_param, coef_vector *value )
+bool Maxwell_F::Eout_F( double E_out, Qparam::QuadParamBase *E_out_param,
+			Coef::coef_vector *value )
 {   
-  // the parameters are really evap_params_1d
-  evap_params_1d *Eout_params = static_cast< evap_params_1d* >( E_out_param );
+  // the parameters are really Evap::evap_params_1d
+  Evap::evap_params_1d *Eout_params = static_cast< Evap::evap_params_1d* >( E_out_param );
   Eout_params->func_count += 1;
   double Prob = sqrt( E_out )*exp( - E_out/Eout_params->Theta );
-  if( ( value->conserve == NUMBER ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::NUMBER ) || ( value->conserve == Coef::BOTH ) )
   {
     value->weight_1[ 0 ] = Prob;
   }
-  if( ( value->conserve == ENERGY ) || ( value->conserve == BOTH ) )
+  if( ( value->conserve == Coef::ENERGY ) || ( value->conserve == Coef::BOTH ) )
   {
     value->weight_E[ 0 ] = E_out*Prob;
   }
+
+  return true;
 }

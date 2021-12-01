@@ -2,6 +2,7 @@ xndfgenTransferMatrix: version 1.0
 Process: Kalbach spectrum
 Comment: Fe57(n,2n)Fe56; data for outgoing n
 outputLegendreOrder: 3
+do adaptive quadrature: false
 Quadrature method: Gauss6
 Conserve: both
 Projectile Frame: lab

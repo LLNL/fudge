@@ -1,33 +1,25 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>External Packages used in Fudge &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Packages used in Fudge &#8212; Fudge and GNDS 5.0.0 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '4.2.3 beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Generalized Interaction Data Interface (GIDI)" href="gidi.html" />
+    <link rel="next" title="Generalized Nuclear Data (GNDS)" href="gnds.html" />
     <link rel="prev" title="numericalFunctions Package" href="fudge/numericalFunctions.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,12 +30,13 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gidi.html" title="Generalized Interaction Data Interface (GIDI)"
+          <a href="gnds.html" title="Generalized Nuclear Data (GNDS)"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="fudge/numericalFunctions.html" title="numericalFunctions Package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">External Packages used in Fudge</a></li> 
       </ul>
     </div>  
 
@@ -54,17 +47,17 @@
             
   <div class="section" id="external-packages-used-in-fudge">
 <h1>External Packages used in Fudge<a class="headerlink" href="#external-packages-used-in-fudge" title="Permalink to this headline">¶</a></h1>
-<p>Fudge depends on some stand-alone packages that are also maintained by the LLNL Computational Nuclear Physics group.
-These ‘external’ packages are included with Fudge but have their own source tree and documentation:</p>
+<p>Fudge depends on some stand-alone packages that are also maintained by the LLNL Nuclear Data and Theory group.
+These ‘external’ packages are distributed with Fudge but have their own source tree and documentation.</p>
 <div class="section" id="pqu">
 <h2>pqu<a class="headerlink" href="#pqu" title="Permalink to this headline">¶</a></h2>
 <p>Also known as physicalQuantitiesWithUncertainties, this is a Python package for managing values with units and
-(optional) uncertainties. For more information, see the package documentation <a class="reference external" href="../../pqu/doc/html/index.html">here</a>.</p>
+(optional) uncertainties. For more information, see the <a class="reference external" href="../../pqu/doc/html/index.html">pqu package documentation</a>.</p>
 </div>
 <div class="section" id="numericalfunctions">
 <h2>numericalFunctions<a class="headerlink" href="#numericalfunctions" title="Permalink to this headline">¶</a></h2>
-<p>A package written primarily in C that handles many of the low-level data containers used by <code class="docutils literal"><span class="pre">Fudge</span></code> and GNDS.
-Documentation is available <code class="xref download docutils literal"><span class="pre">here</span></code></p>
+<p>A package written primarily in C that handles many of the low-level data containers used by <code class="docutils literal notranslate"><span class="pre">Fudge</span></code> and GNDS.
+Documentation is available <code class="xref download docutils literal notranslate"><span class="pre">here</span></code></p>
 </div>
 <div class="section" id="xdata">
 <h2>xData<a class="headerlink" href="#xdata" title="Permalink to this headline">¶</a></h2>
@@ -74,17 +67,18 @@ Some of the classes in xData use numericalFunctions internally for better perfor
 <div class="section" id="crosssectionadjustforheatedtarget">
 <h2>crossSectionAdjustForHeatedTarget<a class="headerlink" href="#crosssectionadjustforheatedtarget" title="Permalink to this headline">¶</a></h2>
 <p>A package written in C for the numerically-intensive task of Doppler broadening cross sections.
-Documentation is available <code class="xref download docutils literal"><span class="pre">here</span></code></p>
+Documentation is available <code class="xref download docutils literal notranslate"><span class="pre">here</span></code></p>
 </div>
 <div class="section" id="pops">
 <h2>PoPs<a class="headerlink" href="#pops" title="Permalink to this headline">¶</a></h2>
 <p>Properties of Particles (such as mass, spin and parity, charge and halflife) are collected together in a
-particle database. The PoPs Python package is meant for reading and writing these particle databases.</p>
+particle database. The PoPs Python package is meant for reading and writing these particle databases.
+See <a class="reference external" href="../../PoPs/Doc/html/index.html">PoPs documentation</a> for more information.</p>
 </div>
 <div class="section" id="merced">
 <h2>Merced<a class="headerlink" href="#merced" title="Permalink to this headline">¶</a></h2>
 <p>A package written in C++ for computing transfer matrices for deterministic transport.
-Documentation is available <a class="reference download internal" href="_downloads/merced.pdf" download=""><code class="xref download docutils literal"><span class="pre">here</span></code></a></p>
+Documentation is available <a class="reference download internal" download="" href="_downloads/b1e7299487c69239391310c7ff8b9a0c/merced.pdf"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a></p>
 </div>
 <div class="section" id="statusmessagereporting">
 <h2>statusMessageReporting<a class="headerlink" href="#statusmessagereporting" title="Permalink to this headline">¶</a></h2>
@@ -94,6 +88,7 @@ by other externals such as numericalFunctions and crossSectionAdjustForHeatedTar
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -102,7 +97,7 @@ by other externals such as numericalFunctions and crossSectionAdjustForHeatedTar
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">External Packages used in Fudge</a><ul>
 <li><a class="reference internal" href="#pqu">pqu</a></li>
@@ -120,8 +115,8 @@ by other externals such as numericalFunctions and crossSectionAdjustForHeatedTar
   <p class="topless"><a href="fudge/numericalFunctions.html"
                         title="previous chapter">numericalFunctions Package</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="gidi.html"
-                        title="next chapter">Generalized Interaction Data Interface (GIDI)</a></p>
+  <p class="topless"><a href="gnds.html"
+                        title="next chapter">Generalized Nuclear Data (GNDS)</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -130,15 +125,15 @@ by other externals such as numericalFunctions and crossSectionAdjustForHeatedTar
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -153,17 +148,18 @@ by other externals such as numericalFunctions and crossSectionAdjustForHeatedTar
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gidi.html" title="Generalized Interaction Data Interface (GIDI)"
+          <a href="gnds.html" title="Generalized Nuclear Data (GNDS)"
              >next</a> |</li>
         <li class="right" >
           <a href="fudge/numericalFunctions.html" title="numericalFunctions Package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">External Packages used in Fudge</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

@@ -16,68 +16,76 @@
 #include <sstream>
 #include "global_params.hpp"
 #include "messaging.hpp"
-// #include "logger.hpp"
 
-using namespace std;
 
 //! Always write out a Fatal Error message, then exit badly
-void FatalError(string routine, string error){
-    string msg = routine+": "+error;
-    cerr << "merced Fatal Error "<<msg<<endl;
+void Msg::FatalError(std::string routine, std::string error){
+    std::string msg = routine+": "+error;
+    std::cerr << "merced Fatal Error "<<msg<<std::endl;
     //  messageLog.logMessage(msg, 4);
     //  messageLog.write();
     exit(-1);
 };
 
 //! Always write out a Severe Error message, then attempt to throw an exception
-void SevereError(string routine, string error){
-    string msg = "merced "+routine+": "+error;
+void Msg::SevereError(std::string routine, std::string error){
+    std::string msg = "merced "+routine+": "+error;
     //  messageLog.logMessage(msg, 3);
-    //    throw(string("Severe Error "+msg));
-    cerr << "Severe Error "+msg << endl;
+    //    throw(std::string("Severe Error "+msg));
+    std::cerr << "Severe Error "+msg << std::endl;
     exit( -2 );
 };
 
 //! Only show a warning if required
-void Warning(string routine, string warning){
-  static bool messagelevel_warn = Global.Value( "message_level" ) <= 1;
+void Msg::Warning(std::string routine, std::string warning){
+  static bool messagelevel_warn = Global.Value( "message_level" ) >= 2;
     if ( messagelevel_warn) {
-        string msg = "merced "+routine+": "+warning;
-        cerr << "Warning "<<msg<<endl;
+        std::string msg = "merced "+routine+": "+warning;
+        std::cerr << "Msg::Warning "<<msg<<std::endl;
         //  messageLog.logMessage(msg, 2);
     }
 };
 
 //! Only show information if required
-void Info(string routine, string info){
-  static bool messagelevel_info = Global.Value( "message_level" ) <= 0;
+void Msg::Info(std::string routine, std::string info){
+  static bool messagelevel_info = Global.Value( "message_level" ) >= 3;
     if (messagelevel_info) {
-        string msg = "merced "+routine+": "+info;
-        cout << "Info "<<msg<<endl;
-        //messageLog.logMessage(msg, 0); // never log Info statements
+        std::string msg = "merced "+routine+": "+info;
+        std::cout << "Msg::Info "<<msg<<std::endl;
+        //messageLog.logMessage(msg, 0); // never log Msg::Info statements
     }
 };
 
 //! Only show information if required
-void Unimplemented(string routine, string info){
-  static bool messagelevel_info = Global.Value( "message_level" ) <= 0;
+void Msg::DebugInfo(std::string routine, std::string info){
+  static bool messagelevel_info = Global.Value( "message_level" ) == 1;
     if (messagelevel_info) {
-        string msg = "merced "+routine+": "+info;
-        cout << "Unimplemented "<<msg<<endl;
+        std::string msg = "merced "+routine+": "+info;
+        std::cout << "Msg::DebugInfo "<<msg<<std::endl;
+        //messageLog.logMessage(msg, 5);
+    }
+};
+
+//! Only show information if required
+void Msg::Unimplemented(std::string routine, std::string info){
+  static bool messagelevel_info = Global.Value( "message_level" ) >= 1;
+    if (messagelevel_info) {
+        std::string msg = "merced "+routine+": "+info;
+        std::cout << "Msg::Unimplemented "<<msg<<std::endl;
         //  messageLog.logMessage(msg, 1);
     }
 };
 
-//! gizmo to paste doubles on the backs of strings
-string pastenum(string front, double back){
-    ostringstream tmp; 
+//! gizmo to paste doubles on the backs of std::strings
+std::string Msg::pastenum(std::string front, double back){
+  std::ostringstream tmp; 
     tmp << front << back; 
     return tmp.str();
 };
 
-//! gizmo to paste ints on the backs of strings
-string pastenum(string front, int back){
-    ostringstream tmp; 
+//! gizmo to paste ints on the backs of std::strings
+std::string Msg::pastenum(std::string front, int back){
+  std::ostringstream tmp; 
     tmp << front << back; 
     return tmp.str();
 };

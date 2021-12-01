@@ -75,7 +75,7 @@ static std::string ermsg[7] = {
 };
 
 
-int mtherr( const std::string &name, int code )
+int Proto::mtherr( const std::string &name, int code )
 {
 
 /* Display string passed by calling program,

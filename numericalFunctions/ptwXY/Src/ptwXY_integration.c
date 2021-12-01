@@ -1,65 +1,9 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 */
 
@@ -701,6 +645,7 @@ ptwXPoints *ptwXY_groupTwoFunctions( statusMessageReporting *smr, ptwXYPoints *p
         ptwXPoints *groupBoundaries, ptwXY_group_normType normType, ptwXPoints *ptwX_norm ) {
 
     int64_t i, igs, ngs;
+    nfu_status status = nfu_Okay;
     double x1, fy1, gy1, x2, fy2, gy2, fy2p, gy2p, xg1, xg2, sum;
     ptwXYPoints *f = NULL, *ff, *g = NULL, *gg = NULL;
     ptwXPoints *groupedData = NULL;
@@ -756,7 +701,10 @@ ptwXPoints *ptwXY_groupTwoFunctions( statusMessageReporting *smr, ptwXYPoints *p
         return( groupedData );
     }
 
-    if( ptwXY_tweakDomainsToMutualify( smr, ff, gg, 4, 0 ) != nfu_Okay ) goto Err;
+    if( ( status = ptwXY_tweakDomainsToMutualify( smr, ff, gg, 4, 0 ) ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, status, "ptwXY_tweakDomainsToMutualify failed: most likely functions cannot be mutualified by tweaking." );
+        goto Err;
+    }
     if( ( f = ptwXY_union( smr, ff, gg, ptwXY_union_fill ) ) == NULL ) goto Err;
     if( ( g = ptwXY_union( smr, gg, f,  ptwXY_union_fill ) ) == NULL ) goto Err;
 
@@ -805,7 +753,7 @@ Err:
     smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     if( ff != NULL ) ptwXY_free( ff );
     if( gg != NULL ) ptwXY_free( gg );
-    if( f != NULL ) ptwXY_free( ff );
+    if( f != NULL ) ptwXY_free( f );
     if( g != NULL ) ptwXY_free( g );
     if( groupedData != NULL ) ptwX_free( groupedData );
     return( NULL );
@@ -817,6 +765,7 @@ ptwXPoints *ptwXY_groupThreeFunctions( statusMessageReporting *smr, ptwXYPoints 
         ptwXYPoints *ptwXY3, ptwXPoints *groupBoundaries, ptwXY_group_normType normType, ptwXPoints *ptwX_norm ) {
 
     int64_t i, igs, ngs;
+    nfu_status status = nfu_Okay;
     double x1, fy1, gy1, hy1, x2, fy2, gy2, hy2, fy2p, gy2p, hy2p, xg1, xg2, sum;
     ptwXYPoints *f = NULL, *ff, *fff = NULL, *g = NULL, *gg = NULL, *h = NULL, *hh = NULL;
     ptwXPoints *groupedData = NULL;
@@ -880,9 +829,9 @@ ptwXPoints *ptwXY_groupThreeFunctions( statusMessageReporting *smr, ptwXYPoints 
         return( groupedData );
     }
 
-    if( ptwXY_tweakDomainsToMutualify( smr, ff, gg, 4, 0 ) != nfu_Okay ) goto Err;
-    if( ptwXY_tweakDomainsToMutualify( smr, ff, hh, 4, 0 ) != nfu_Okay ) goto Err;
-    if( ptwXY_tweakDomainsToMutualify( smr, gg, hh, 4, 0 ) != nfu_Okay ) goto Err;
+    if( ( status = ptwXY_tweakDomainsToMutualify( smr, ff, gg, 4, 0 ) ) != nfu_Okay ) goto Err2;
+    if( ( status = ptwXY_tweakDomainsToMutualify( smr, ff, hh, 4, 0 ) ) != nfu_Okay ) goto Err2;
+    if( ( status = ptwXY_tweakDomainsToMutualify( smr, gg, hh, 4, 0 ) ) != nfu_Okay ) goto Err2;
     if( ( fff = ptwXY_union( smr,  ff,  gg, ptwXY_union_fill ) ) == NULL ) goto Err;
     if( (   h = ptwXY_union( smr,  hh, fff, ptwXY_union_fill ) ) == NULL ) goto Err;
     if( (   f = ptwXY_union( smr, fff,   h, ptwXY_union_fill ) ) == NULL ) goto Err;
@@ -946,6 +895,10 @@ Err:
     if( h != NULL ) ptwXY_free( h );
     if( groupedData != NULL ) ptwX_free( groupedData );
     return( NULL );
+
+Err2:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, status, "ptwXY_tweakDomainsToMutualify failed: most likely functions cannot be mutualified by tweaking." );
+    goto Err;
 }
 /*
 ************************************************************
@@ -962,6 +915,8 @@ ptwXPoints *ptwXY_runningIntegral( statusMessageReporting *smr, ptwXYPoints *ptw
     }
 
     if( ( runningIntegral = ptwX_new( smr, ptwXY->length ) ) == NULL ) goto Err;
+
+    if( ptwXY->length == 0 ) return( runningIntegral );
 
     if( ptwX_setPointAtIndex( smr, runningIntegral, 0, 0. ) != nfu_Okay ) goto Err;
     for( i = 1; i < ptwXY->length; i++ ) {

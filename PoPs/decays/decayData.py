@@ -1,71 +1,41 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Nuclear Data and Theory group
-#         (email: mattoon1@llnl.gov)
-# LLNL-CODE-683960.
-# All rights reserved.
+# Copyright 2021, Lawrence Livermore National Security, LLC.
+# See the top-level COPYRIGHT file for details.
 # 
-# This file is part of the FUDGE package (For Updating Data and 
-#         Generating Evaluations)
-# 
-# When citing FUDGE, please use the following reference:
-#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
-# 
-# 
-#     Please also read this link - Our Notice and Modified BSD License
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the disclaimer below.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the disclaimer (as noted below) in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific
-#       prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
-# Additional BSD Notice
-# 
-# 1. This notice is required to be provided under our contract with the U.S.
-# Department of Energy (DOE). This work was produced at Lawrence Livermore
-# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-# 
-# 2. Neither the United States Government nor Lawrence Livermore National Security,
-# LLC nor any of their employees, makes any warranty, express or implied, or assumes
-# any liability or responsibility for the accuracy, completeness, or usefulness of any
-# information, apparatus, product, or process disclosed, or represents that its use
-# would not infringe privately-owned rights.
-# 
-# 3. Also, reference herein to any specific commercial products, process, or services
-# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-# or imply its endorsement, recommendation, or favoring by the United States Government
-# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the United States Government or
-# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-# product endorsement purposes.
-# 
+# SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 """
-This module contains the particle decay classes.
+This module defines classes for storing particle decay information.
+Decay data are organized as follows::
+
+   - particle
+      - decayData
+         - averageEnergies
+         - decayModes
+            - decayMode
+               - probability
+               - Q
+               - spectra
+               - decayPath
+                  - decay
+
+All decay info is stored inside the <decayData> section.
+
+<averageEnergies> stores a summary of average outgoing energy for various types of decay radiation,
+summed over all possible decay modes.
+
+<decayModes> contains a list of <decayMode>, each with a corresponding probability.
+A <decayMode> may also contain a <Q>  (i.e. the decay Q-value), a <spectra> (describing the outgoing energy spectrum
+for each types of decay product), and a <decayPath> (listing each step of the decay along with outgoing products).
+
+Ideally the outgoing spectra would be associated with specific decay products under the <decayPath>, but
+often the spectra are summed over multiple products.  For example, in B-nn decay (beta-delayed 2-neutron emission),
+the spectra of the 2 outgoing neutrons cannot be resolved, so the evaluation usually stores only the summed spectrum
+for the two neutrons.
 """
 
-import abc
+import abc  # FIXME remove unused import?
 
 from xData import ancestry as ancestryModule
 
@@ -85,10 +55,20 @@ decayModesParticle = ""
 decayModeTypes = [decayModesIT, decayModesSF, decayModesParticle]
 
 class decay( miscModule.classWithIndexKey ) :
+    """
+    Describes one step in a multi-step decay. For example, in beta-delayed 2-n emission
+    the first <decay> is for the beta-decay, and the 2nd and 3rd <decay> elements describe the two neutrons
+    being emitted sequentially.
+    """
 
     moniker = 'decay'
 
     def __init__( self, index, type, complete = True ) :
+        """
+        :param index: int, identifies the position of this decay within the decayPath. 0 = first, 1 = second, etc.
+        :param type: string identifying a decay type, such as "isomeric transition"
+        :param complete: boolean, whether all outgoing products are listed
+        """
 
         miscModule.classWithIndexKey.__init__( self, index )
 
@@ -118,6 +98,7 @@ class decay( miscModule.classWithIndexKey ) :
         return( self.__type )
 
     def convertUnits( self, unitMap ) :
+        """See documentation in PoPs.database.convertUnits"""
 
         self.__products.convertUnits( unitMap )
 
@@ -159,14 +140,17 @@ class decay( miscModule.classWithIndexKey ) :
         xPath.append( element.tag )
 
         complete = True
-        if element.attrib.get('complete') == 'false': complete = False
-        self = cls( element.attrib['index'], element.attrib.get( 'type', '' ), complete )
+        if element.get('complete') == 'false': complete = False
+        self = cls( element.get('index'), element.get( 'type', '' ), complete )
         xPath.pop( )
         self.parseXMLNode( element, xPath, linkData )
 
         return( self )
 
 class decayPath( suiteModule.suite ) :
+    """
+    Stores all <decay> steps involved in a decayMode
+    """
 
     moniker = 'decayPath'
 
@@ -185,10 +169,19 @@ class decayPath( suiteModule.suite ) :
         return( self )
 
 class decayMode( miscModule.classWithLabelKey ) :
+    """
+    Describes one way a particle can decay. The description includes the probability, Q-value, outgoing products
+    and spectra. For electro-magnetic decays, may also include a set of internal conversion coefficients
+    and/or photon emission probabilities.
+    """
 
     moniker = 'decayMode'
 
     def __init__( self, label, mode ) :
+        """
+        :param label: string, must be unique within this <decayModes> section
+        :param mode: string, describes the decay mode. Examples: "beta+ or e.c.", "beta-,n", "alpha", etc.
+        """
 
         miscModule.classWithLabelKey.__init__( self, label )
 
@@ -249,6 +242,7 @@ class decayMode( miscModule.classWithLabelKey ) :
         return( self.__spectra )
 
     def convertUnits( self, unitMap ) :
+        """See convertUnits documentation in PoPs.database"""
 
         self.__probability.convertUnits( unitMap )
         self.__Q.convertUnits( unitMap )
@@ -256,6 +250,9 @@ class decayMode( miscModule.classWithLabelKey ) :
         self.__spectra.convertUnits( unitMap )
 
     def copy( self ) :
+        """
+        :return: deep copy of self
+        """
 
         other = self.__class__( self.label, self.mode )
         for item in self.__probability : other.probability.add( item.copy( ) )
@@ -311,13 +308,16 @@ class decayMode( miscModule.classWithLabelKey ) :
 
         xPath.append( element.tag )
 
-        self = cls( element.attrib['label'], element.attrib['mode'] )
+        self = cls( element.get('label'), element.get('mode') )
         self.parseXMLNode( element, xPath, linkData )
 
         xPath.pop( )
         return( self )
 
 class decayModes( suiteModule.suite ) :
+    """
+    Contains a list of decayMode instances
+    """
 
     moniker = 'decayModes'
 
@@ -336,6 +336,10 @@ class decayModes( suiteModule.suite ) :
         return( self )
 
 class decayData( ancestryModule.ancestry ) :
+    """
+    Contains all decay information for a particle, including average energies for decay products
+    and a list of decay modes.
+    """
 
     moniker = 'decayData'
 
@@ -360,17 +364,25 @@ class decayData( ancestryModule.ancestry ) :
         return( self.__averageEnergies )
 
     def convertUnits( self, unitMap ) :
+        """See convertUnits documentation in PoPs.database"""
 
         self.__decayModes.convertUnits( unitMap )
         self.__averageEnergies.convertUnits( unitMap )
 
     def copy( self ) :
+        """
+        :return: deep copy of self
+        """
 
         _decayData = decayData( )
         self.copyItems( _decayData )
         return( _decayData )
 
     def copyItems( self, other ) :
+        """
+        Copy all items in self to other
+        :param other: decayData instance where contents of self will be copied
+        """
 
         for item in self.__decayModes : other.decayModes.add( item.copy( ) )
         for item in self.__averageEnergies : other.averageEnergies.add( item.copy( ) )

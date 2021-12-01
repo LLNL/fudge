@@ -6,8 +6,6 @@ inverseWaveLengthToEnergyFactor: 1.2398424421518084e-10
 Electron mass: 0.511000
 ThompsonScattering: 0.6652448
 
-ein quadrature method: adaptive
-mu quadrature method: square root
 Projectile Frame: lab
 
 # The scale_rows option assumes that the cross section is piecewise linear; it isn't.

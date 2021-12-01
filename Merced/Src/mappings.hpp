@@ -15,8 +15,10 @@
 #ifndef DEF_MAPPINGS
 #define DEF_MAPPINGS
 
-#include "dd_vector.hpp"  // for dd_entry
+#include "dd_vector.hpp"  // for Ddvec::dd_entry
 
+namespace Maps
+{
 // ----------- class particleInfo -----------------
 //! mass information needed for discrete 2-body reactions
 class particleInfo
@@ -35,7 +37,10 @@ public:
 
   //! Make a copy
   //! \param to_copy partidcle masses to copy
-  void copy( const particleInfo &to_copy );
+  void copy( const Maps::particleInfo &to_copy );
+
+  //! Returns true if any particle is a photon
+  bool photon_in_out( );
 };
 
 // ----------- class map_cm_lab -----------------
@@ -115,14 +120,9 @@ public:
 
 // ----------- class two_body_map -----------------
 //! Class for cm-lab mappings for discrete 2-body reactions, Newtonian
-class two_body_map : public map_cm_lab
+class two_body_map : public Maps::map_cm_lab
 {
 private:
-  //! For exothermic reactions: parameters Newt_gamma and used in
-  //! min_Eout to find the incident energy for minimal outgoing lab energy.
-  double Newt_gamma;   // 2.0 * mEject * beta_eject
-  double mass_sum;     // mTarg + mProj
-  double mass_product;  //  2.0 * mProj * mEject * mEject
 
 public:
   double threshold;
@@ -141,7 +141,7 @@ public:
   //! Sets up the map from center-of-mass to laboratory coordinates
   //! \param particle_info the particle masses
   //! \param Q the energy of the reaction
-  void set_map( particleInfo &particle_info, double Q );
+  void set_map( Maps::particleInfo &particle_info, double Q );
 
   //! Calculates the threshold energy
   void get_threshold( );
@@ -163,43 +163,136 @@ public:
   //! \param mu_lab computed lab-frame direction cosine of ejected particle
   void two_body_get_E_mu_lab( double E_in, double mu_cm, double *Eout_lab, double *mu_lab );
 
-  //! For endothermic reactions, returns the incident energy for zero outgoing lab energy
+  //! Returns the incident energy for zero outgoing lab energy when this exists
   double zero_Eout( );
 
-  //! For exothermic reactions, returns the incident energy for minimal outgoing lab energy
+  //! For endothermic reactions, reReturns the incident energy for minimal outgoing lab energy when this minimum is positive
   double min_Eout( );
 };
 
 // ----------- class Newton_map_param -----------------
-//! Class for the Newtonian_F functions
+//! Class for 2-body map as parameter for the Newtonian_F functions
 class Newton_map_param
 {
 public:
-  two_body_map *masses;  // the mass ratios
+  Maps::two_body_map *masses;  // the mass ratios
   double mu_cm;       // the centger-of-mass direction cosine
 
   Newton_map_param( ) {}
   ~Newton_map_param( ) {}
 
   //! For mu < 0 find the incident energy which minimizes Eout.
-  dd_entry find_bottom( double mu );
+  Ddvec::dd_entry find_bottom( double mu );
 
   //! Find the incident energy which minimizes Eout for mu = -1
-  dd_entry find_lowest_bottom(  );
+  Ddvec::dd_entry find_lowest_bottom(  );
 
-  //! Finds the incident energies for given E_lab and mu_cm.
+  //! Finds the incident energy for given E_lab and mu_cm.
   //! Returns the number of solutions.
   //! \param E_lab lab-frame energy of ejected particle
   //! \param mu_cm center-of-mass direction cosine of ejected particle
   //! \param pair_0 ( Ein, Eout ) at lower incident energy
   //! \param pair_1 ( Ein, Eout ) at higher incident energy
-  double find_hit( double E_lab, double mu_cm, const dd_entry &pair_0,
-		   const dd_entry &pair_1 );
+  double find_hit( double E_lab, double mu_cm, const Ddvec::dd_entry &pair_0,
+		   const Ddvec::dd_entry &pair_1 );
+};
+
+// ----------- class two_step_map -----------------
+//! Class for cm-lab mappings for discrete 2-step reactions, Newtonian
+class two_step_map : public Maps::two_body_map
+{
+private:
+
+public:
+  //! data for the second step of the reaction
+  Maps::two_body_map step_2_map;
+  
+   //! the energy of the product in the frame of the second step
+  double E_cm2_prod;
+
+  //! Default constructor
+  two_step_map( ) {}
+
+  //! Default destructor
+  ~two_step_map() {}
+
+  //! Sets up the map from center-of-mass to laboratory coordinates
+  //! \param step1_particles the particle masses for step 1
+  //! \param Q the energy of the first step
+  void set_map( Maps::particleInfo &step1_particles, double Q,
+		Maps::particleInfo &step2_particles );
+
+  //! Gets the laboratory energy of the outgoing particle for 2-step reactions
+  //! \param E_in, energy of incident particle
+  //! \param mucm1, center-of-mass direction cosine of ejected particle
+  //! \param mucm2, the direction cosine for the second step
+  double two_step_get_E_lab( double E_in, double mucm1, double mucm2 );
+
+  //! Returns the direction cosine of outgoing particle for 2-step reactions
+  //! \param E_in energy of incident particle
+  //! \param mucm1 center-of-mass direction cosine for first step
+  //! \param mucm2, the direction cosine for the second step
+  //! \param Etrans2, contribution from the ejected particle from step 1
+  //! \param Eout_2, lab-frame energy of ejected particle from step 2
+  //! \param w, the longitude for the second step, $-\pi/2 \le w \le \pi/2$.
+  double two_step_get_mu_lab( double E_in, double mucm1, double mucm2,
+			      double Etrans2, double Eout_2, double w );
+
+  //! Returns the translational energy for step 2 from the outgoing energy for step 1
+  //! \param Eout_lab1, the outgoing energy for step 1
+  double two_body_get_Etrans2( double Eout_lab1 ) const
+  { return step_2_map.gamma*Eout_lab1; }
+
+  //! Returns the direction cosine for the first step for given incident energy and desired outgoing energy
+  //! \param E_in, the incident energy
+  //! \param mucm2, direction cosine for step 2 (+/- 1)
+  //! \param Eout_lab, the desired outgoing energy, lab frame
+  double get_mucm1( double E_in, int mucm2, double Eout_lab );
+
+  //! Returns the direction cosine for the second step for given translational energy and desired outgoing energy
+  //! \param Etrans2, the energy due to motion of the center of mass for step 2
+  //! \param Eout_lab, the desired outgoing energy, lab frame
+  double get_mucm2( double Etrans2, double Eout_lab );
+
+};
+
+// ----------- class two_step_map_param -----------------
+//! Class for cm-lab mappings for discrete 2-step reactions as a function parameter, Newtonian
+class two_step_map_param
+{
+private:
+
+public:
+  //! data for the mapping
+  Maps::two_step_map *map;
+  
+  //! the incident energy
+  double E_in;
+
+  //! the direction cosines for the 2 steps
+  double mucm_1;
+  double mucm_2;
+
+  //! Default constructor
+  two_step_map_param( ) {}
+
+  //! Default destructor
+  ~two_step_map_param() {}
+
+  //! Finds the incident energy for given E_lab.
+  //! \param E_lab lab-frame energy of ejected particle
+  //! \param pair_0 ( Ein, Eout ) at lower incident energy
+  //! \param pair_1 ( Ein, Eout ) at higher incident energy
+  double find_hit( double E_lab, const Ddvec::dd_entry &pair_0,
+		   const Ddvec::dd_entry &pair_1 );
+  
+  //! Find the incident energy which minimizes Eout for mucm_1 = mucm_2 = -1
+  Ddvec::dd_entry find_lowest_bottom(  );
 };
 
 // ----------- class Ecm_intersect -----------------
 //! Class for data used in the intersection of an E_cm = const. surface with an E_out cylinder
-class Ecm_intersect : public map_cm_lab
+class Ecm_intersect : public Maps::map_cm_lab
 {
 private:
 
@@ -219,7 +312,7 @@ public:
 
   //! Gets the translational energy from initial collision
   inline double get_Etrans( ) const
-  { return map_cm_lab::get_Etrans( E_in ); }
+  { return Maps::map_cm_lab::get_Etrans( E_in ); }
 
   //! Sets the energies
   //! \param Ein energy of the incident particle
@@ -234,21 +327,21 @@ public:
   //! \param Ein energy of the incident particle
   //! \param low_data intgersection information at a lower incident energy
   //! \param high_data intgersection information at a higher incident energy
-  void interpolate_Ein( double Ein, double E_lab, const Ecm_intersect &low_data,
-			const Ecm_intersect &high_data );
+  void interpolate_Ein( double Ein, double E_lab, const Maps::Ecm_intersect &low_data,
+			const Maps::Ecm_intersect &high_data );
 };
 
 // ----------- class phase_space_map -----------------
 //! Class for data used in the intersection of an E_cm = const. surface with an E_out cylinder
-class phase_space_map : public Ecm_intersect
+class phase_space_map : public Maps::Ecm_intersect
 {
 private:
   double out_mass_ratio;
   double exponent;  // the phase-space exoponent, (3*n/2) - 4
   double normalize;  // the phase-space normalization constant
-  int num_particles;
 
 public:
+  int num_particles;
 
   //! Default constructor
   phase_space_map( ) {}
@@ -275,6 +368,7 @@ public:
   //! \param Ecm_max maximal center-of-mass energy of ejected particle
   double get_prob( double E_cm, double Ecm_max );
 };
+} // end of namespace Maps
 
 // ************* functions *************
 namespace Newtonian_F
@@ -284,6 +378,13 @@ namespace Newtonian_F
   //! \param T_in_lab kinetic energy of the incident particle in the lab frame
   //! \param params the data for the Newtonian boost
   double T_out_lab( double T_in_lab, void *params );
+
+  // ------------------ two_step_T_out_lab -----------------------
+  //! For a 2-step reaction, returns the kinetic energy of the emitted particle in the lab frame
+  //! \param T_in_lab kinetic energy of the incident particle in the lab frame
+  //! \param params the data for the Newtonian boost
+  double two_step_T_out_lab( double T_in_lab, void *params );
+  
 }
 
 #endif
