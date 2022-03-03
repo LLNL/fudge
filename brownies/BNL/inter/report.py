@@ -1100,9 +1100,8 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
             else:
                 kT = PQU.PQU(30., 'keV')
             if EThreshold / 10 < kT.getValueAs('eV'):
-                x = computeMACS(r.crossSection, T=kT, useCovariance=useCovariance)
-                updateColumnsAndRow(columnHeaders, row, icol, "MACS(%s)" % str(kT), x.getValueAs('mb'),
-                                    'mb')  # preferred unit for MACS is mb
+                x = computeMACS(r.crossSection, T=kT, useCovariance=useCovariance).inUnitsOf('mb')  # pref. unit is mb
+                updateColumnsAndRow(columnHeaders, row, icol, "MACS(%s)" % str(kT), x, 'mb')
             else:
                 row.append(blank())
 
