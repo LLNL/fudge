@@ -255,7 +255,7 @@ def getEvaluationReport(rs, title=None, saveDoc=False, **otherArgs):
     :param saveDoc:
     :return:
     """
-    endfDoc = rs.documentation.endfCompatible.body.split('\n')
+    endfDoc = rs.styles.getEvaluatedStyle().documentation.endfCompatible.body.split('\n')
     globalMetadata = Report(title=title)
     globalMetadata['Authors'] = endfDoc[0][33:].strip()
     globalMetadata['Lab'] = endfDoc[0][11:22].strip()
@@ -271,9 +271,9 @@ def getEvaluationReport(rs, title=None, saveDoc=False, **otherArgs):
     if hasattr(rs, 'attributes'):
         globalMetadata['Attributes'] = rs.attributes
     if saveDoc:
-        globalMetadata['ENDF documentation'] = rs.documentation.toXMLList()
+        globalMetadata['ENDF documentation'] = rs.styles.getEvaluatedStyle().documentation.toXMLList()
     globalMetadata['Projectile frame'] = rs.projectileFrame
-    globalMetadata['Temperature'] = rs.styles['eval'].temperature
+    globalMetadata['Temperature'] = rs.styles.getEvaluatedStyle().temperature
     globalMetadata['GNDS version'] = rs.formatVersion
     return globalMetadata
 
