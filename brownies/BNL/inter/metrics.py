@@ -44,12 +44,21 @@ def getProjectileAndTargetMasses(_xs):
     return m1, m2
 
 
-def convolve(funcA, funcB, domainMax=None, useCovariance=False, covariance=None, normalize=True):
-    if funcA.domainMax != funcB.domainMax:
-        raise ValueError
+def convolve(funcA, funcB, useCovariance=False, covariance=None, normalize=True):
+    if funcA.domainUnit != funcB.domainUnit:
+       raise ValueError("Units differ")
 
-    if domainMax is None:
-        domainMax = PQU.PQU(min(funcA.domainMax, funcB.domainMax), funcA.domainUnit)
+    if funcA.domainMin != funcB.domainMin:
+        if funcA.domainMin < funcB.domainMin:
+            raise ValueError( 'funcA has a domainMin lower than funcB, I cannot extrapolate')
+        funcB.domainSlice(domainMin=funcA.domainMin)
+
+    if funcA.domainMax != funcB.domainMax:
+        if funcA.domainMax < funcB.domainMax:
+            funcB.domainSlice(domainMax=funcA.domainMax)
+        else:
+            funcB.setValue(1.000001*funcB.domainMax, 0.0)
+            funcB.setValue(funcA.domainMax, 0.0)
 
     return funcA.integrateTwoFunctionsWithUncertainty(funcB,
                                                       useCovariance=useCovariance,
