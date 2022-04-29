@@ -12,14 +12,14 @@ from setuptools.command.build_ext import build_ext
 from setuptools import setup, Extension
 import subprocess
 
-#minimumNumpy = 1.15
+minimumNumpy = 1.15
 cwd = 'file://localhost%s/' % os.getcwd()
-#try:
-#    import numpy
-#    assert float('.'.join(numpy.__version__.split('.')[:2])) >= minimumNumpy, numpyErrorMessage
+try:
+    import numpy
+    assert float('.'.join(numpy.__version__.split('.')[:2])) >= minimumNumpy, numpyErrorMessage
 
-#except (ImportError, ModuleNotFoundError):
-#    sys.exit('Install numpy>=%s before installing FUDGE' % minimumNumpy)
+except (ImportError, ModuleNotFoundError):
+    sys.exit('Install numpy>=%s before installing FUDGE' % minimumNumpy)
 
 
 class CustomInstall(install):

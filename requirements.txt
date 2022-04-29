@@ -1,3 +1,0 @@
-scipy
-matplotlib
-numpy>=1.15
