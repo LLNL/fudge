@@ -29,6 +29,7 @@ def CF252SPECTRUMAVEFUNCTION(E, *fpars): return math.exp(-0.789 * E / 1e6) * mat
 
 CF252SPECTRUMAVE = function_to_XYs(CF252SPECTRUMAVEFUNCTION, [])
 
+
 def getProjectileAndTargetMasses(_xs):
     targetID = _xs.getRootAncestor().target
     if targetID in _xs.getRootAncestor().PoPs.aliases:
@@ -43,10 +44,31 @@ def getProjectileAndTargetMasses(_xs):
     return m1, m2
 
 
+def convolve(funcA, funcB, useCovariance=False, covariance=None, normalize=True):
+    if funcA.domainUnit != funcB.domainUnit:
+       raise ValueError("Units differ")
+
+    if funcA.domainMin != funcB.domainMin:
+        if funcA.domainMin < funcB.domainMin:
+            raise ValueError( 'funcA has a domainMin lower than funcB, I cannot extrapolate')
+        funcB.domainSlice(domainMin=funcA.domainMin)
+
+    if funcA.domainMax != funcB.domainMax:
+        if funcA.domainMax < funcB.domainMax:
+            funcB.domainSlice(domainMax=funcA.domainMax)
+        else:
+            funcB.setValue(1.000001*funcB.domainMax, 0.0)
+            funcB.setValue(funcA.domainMax, 0.0)
+
+    return funcA.integrateTwoFunctionsWithUncertainty(funcB,
+                                                      useCovariance=useCovariance,
+                                                      covariance=covariance,
+                                                      normalize=normalize)
+
+
 # -------------------------------------------------------------------------------
 # Main functions
 # -------------------------------------------------------------------------------
-
 def computeRI(xs, Ecut=None, domainMax=None, useCovariance=True, covariance=None):
     """
     Compute the resonance integral (RI):
@@ -75,8 +97,10 @@ def computeRI(xs, Ecut=None, domainMax=None, useCovariance=True, covariance=None
         domainMax = PQU.PQU(min(xs.domainMax, DEFAULTONEOVEREXYs.domainMax), xs.domainUnit)
 
     if Ecut is None:
-        return xs.integrateTwoFunctionsWithUncertainty(DEFAULTONEOVEREXYs, domainMax=domainMax,
-                                                       useCovariance=useCovariance, covariance=covariance,
+        return xs.integrateTwoFunctionsWithUncertainty(DEFAULTONEOVEREXYs,
+                                                       domainMax=domainMax,
+                                                       useCovariance=useCovariance,
+                                                       covariance=covariance,
                                                        normalize=False)
 
     Ecut = PQU.PQU(Ecut).getValueAs(xs.domainUnit)
@@ -90,8 +114,11 @@ def computeRI(xs, Ecut=None, domainMax=None, useCovariance=True, covariance=None
 
     Egrid = [1e-5, 0.99999 * Ecut] + list(equal_lethargy_bins(5000, domainMin=Ecut))
     oneOverE = function_to_XYs(oneOverEFunc, [], Egrid=Egrid)
-    return xs.integrateTwoFunctionsWithUncertainty(oneOverE, domainMax=domainMax, useCovariance=useCovariance,
-                                                   covariance=covariance, normalize=False)
+    return xs.integrateTwoFunctionsWithUncertainty(oneOverE,
+                                                   domainMax=domainMax,
+                                                   useCovariance=useCovariance,
+                                                   covariance=covariance,
+                                                   normalize=False)
 
 
 def computeMACS(xs, T, a=None, useCovariance=True, covariance=None, normalize=False):
@@ -146,8 +173,8 @@ def computeMACS(xs, T, a=None, useCovariance=True, covariance=None, normalize=Fa
         return norm * E * math.exp(-a_over_kT * E)
 
     maxwellian = function_to_XYs(maxwellianFunc, [])
-    return xs.integrateTwoFunctionsWithUncertainty(maxwellian, useCovariance=useCovariance, covariance=covariance,
-                                                   normalize=normalize)
+
+    return convolve(xs, maxwellian, useCovariance=useCovariance, covariance=covariance, normalize=normalize)
 
 
 def computeCf252SpectrumAveAnalytic(xs, useCovariance=True, covariance=None):
@@ -178,8 +205,8 @@ def computeCf252SpectrumAveAnalytic(xs, useCovariance=True, covariance=None):
 
     """
     check_is_cross_section(xs)
-    return xs.integrateTwoFunctionsWithUncertainty(CF252SPECTRUMAVE, useCovariance=useCovariance, covariance=covariance,
-                                                   normalize=True)
+
+    return convolve(xs, CF252SPECTRUMAVE, useCovariance=useCovariance, covariance=covariance, normalize=True)
 
 
 def computeAverageOverWindow(xs, windowCenter, windowWidth, useCovariance=True, covariance=None):
@@ -221,7 +248,10 @@ def computeValueAtAPoint(xs, point, useCovariance=True, covariance=None):
     :rtype: PQU
     """
     check_is_cross_section(xs)
-    return xs.evaluateWithUncertainty(PQU.PQU(point), useCovariance=useCovariance, covariance=covariance)
+
+    return xs.evaluateWithUncertainty(PQU.PQU(point),
+                                      useCovariance=useCovariance,
+                                      covariance=covariance)
 
 
 def computeRoomTempCS(xs, T=None, useCovariance=True, covariance=None):
@@ -244,6 +274,7 @@ def computeRoomTempCS(xs, T=None, useCovariance=True, covariance=None):
     :rtype: PQU
     """
     check_is_cross_section(xs)
+
     if T is None:
         ERT = convert_units_to_energy(ROOMTEMPERATURE)
     else:
@@ -272,6 +303,7 @@ def computeWestcottFactor(xs, a=None, T=None, useCovariance=True, covariance=Non
     :rtype: PQU
     """
     check_is_cross_section(xs)
+
     if T is None:
         ERT = convert_units_to_energy(ROOMTEMPERATURE)
     else:
@@ -313,8 +345,9 @@ def computeAstrophysicalReactionRate(xs, T, useCovariance=True, covariance=None)
     mu = PQU.PQU(m1 * m2 / (m1 + m2), 'amu')
 
     vT = (2.0 * kT / mu).sqrt()
-    return (AVAGADROSNUMBER * computeMACS(xs, kT, useCovariance=useCovariance, covariance=covariance) * vT).inUnitsOf(
-        "cm**3/mol/s")
+    return (AVAGADROSNUMBER * computeMACS(xs, kT,
+                                          useCovariance=useCovariance,
+                                          covariance=covariance) * vT).inUnitsOf("cm**3/mol/s")
 
 
 def computeALPHA(capxs, fisxs, E=convert_units_to_energy(ROOMTEMPERATURE), useCovariance=True):
@@ -467,8 +500,7 @@ def computeCf252SpectrumAve(xs, useCovariance=True, covariance=None):
         energies.append(float(sline[2]) * 1e6)
         fluxes.append(float(sline[3]) / (float(sline[2]) - float(sline[1])) / 1e6)
     spectrum = grouped_values_to_XYs(energies, fluxes, domainUnit='eV', rangeUnit='1/eV')
-    return xs.integrateTwoFunctionsWithUncertainty(spectrum, useCovariance=useCovariance, covariance=covariance,
-                                                   normalize=True)
+    return convolve(xs, spectrum, useCovariance=useCovariance, covariance=covariance, normalize=True)
 
 
 def computeGodivaSpectrumAve(xs, useCovariance=True, covariance=None):
@@ -486,8 +518,7 @@ def computeGodivaSpectrumAve(xs, useCovariance=True, covariance=None):
     check_is_cross_section(xs)
     #    spectrum=get_KENO_flux(os.sep.join([INTERDIR,'spectra','HMF001.001']))
     spectrum = get_spectrum("Godiva")
-    return xs.integrateTwoFunctionsWithUncertainty(spectrum, useCovariance=useCovariance, covariance=covariance,
-                                                   normalize=True)
+    return convolve(xs, spectrum, useCovariance=useCovariance, covariance=covariance, normalize=True)
 
 
 def computeJezebelSpectrumAve(xs, useCovariance=True, covariance=None):
@@ -505,8 +536,7 @@ def computeJezebelSpectrumAve(xs, useCovariance=True, covariance=None):
     check_is_cross_section(xs)
     #    spectrum=get_KENO_flux(os.sep.join([INTERDIR,'spectra','PMF001.001']))
     spectrum = get_spectrum("Jezebel")
-    return xs.integrateTwoFunctionsWithUncertainty(spectrum, useCovariance=useCovariance, covariance=covariance,
-                                                   normalize=True)
+    return convolve(xs, spectrum, useCovariance=useCovariance, covariance=covariance, normalize=True)
 
 
 def computeBigTenSpectrumAve(xs, useCovariance=True, covariance=None):
@@ -524,17 +554,15 @@ def computeBigTenSpectrumAve(xs, useCovariance=True, covariance=None):
     check_is_cross_section(xs)
     #    spectrum=get_KENO_flux(os.sep.join([INTERDIR,'spectra','IMF007.001']))
     spectrum = get_spectrum("BigTen")
-    return xs.integrateTwoFunctionsWithUncertainty(spectrum, useCovariance=useCovariance, covariance=covariance,
-                                                   normalize=True)
+    return convolve(xs, spectrum, useCovariance=useCovariance, covariance=covariance, normalize=True)
 
 
-def computeLookupSpectrumAve(xs, key, verbose=True, useCovariance=True, covariance=None):
+def computeLookupSpectrumAve(xs, key, useCovariance=True, covariance=None):
     """
     Compute pectrum average of one of the spectra stored in the spectra module
 
     :param xs: cross section to average
     :param key: the lookup key of the spectra
-    :param verbose: verbose flag
     :param useCovariance: a flag
     :param covariance: a reference to the covariance of xs, if it cannot be determined otherwise
     :return:
@@ -543,8 +571,7 @@ def computeLookupSpectrumAve(xs, key, verbose=True, useCovariance=True, covarian
     spectrum = get_spectrum(key)
     if not isinstance(spectrum, XYs.XYs1d):
         raise TypeError("Not instance of XYs.XYs1d")
-    return xs.integrateTwoFunctionsWithUncertainty(spectrum, useCovariance=useCovariance, covariance=covariance,
-                                                   normalize=True)
+    return convolve(xs, spectrum, useCovariance=useCovariance, covariance=covariance, normalize=True)
 
 
 def computeUserDefinedSpectrumAve(xs, path, key, useCovariance=True, covariance=None):
@@ -562,5 +589,4 @@ def computeUserDefinedSpectrumAve(xs, path, key, useCovariance=True, covariance=
     spectrum = get_user_defined_flux(path, key)
     if not isinstance(spectrum, XYs.XYs1d):
         raise TypeError("Not instance of XYs.XYs1d")
-    return xs.integrateTwoFunctionsWithUncertainty(spectrum, useCovariance=useCovariance, covariance=covariance,
-                                                   normalize=True)
+    return convolve(xs, spectrum, useCovariance=useCovariance, covariance=covariance, normalize=True)

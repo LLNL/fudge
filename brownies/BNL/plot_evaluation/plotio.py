@@ -72,7 +72,8 @@ def readEvaluation(filename, targ=None, proj=None, verbose=True, skipBadData=Tru
 
         # Is the file a GNDS file?
         if firstline.startswith("<?xml") or firstline.startswith("<reactionSuite "):
-            import fudge
+            import fudge.reactionSuite
+            import fudge.covariances
             RS = fudge.reactionSuite.readXML(filename)
             try:
                 CS = fudge.covariances.covarianceSuite.readXML(filename.replace('.gnds.', '.gndsCov.'))
