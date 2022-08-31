@@ -52,7 +52,7 @@
 <dd class="field-odd"><p>5.0</p>
 </dd>
 <dt class="field-even">Date</dt>
-<dd class="field-even"><p>Nov 29, 2021</p>
+<dd class="field-even"><p>Aug 31, 2022</p>
 </dd>
 </dl>
 <p>The Generalized Nuclear Database Structure (GNDS) has been accepted by the international
@@ -80,17 +80,25 @@ and the Python extensions numpy and matplotlib.  I will also assume that you hav
 of the Python scripting language and that you are involved in nuclear data enterprise in
 some fashion (so I don’t have to define things like “evaluation”).</p>
 <p>Let’s begin with the most important thing.  Make sure fudge is in your PYTHONPATH!
-You can do this a few different ways:</p>
+You can do this a few different ways, depending on what shell you use.</p>
 <blockquote>
-<div><ul>
-<li><p>Using the bash shell, at the command line do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export PYTHONPATH=&quot;/full/path/to/directory/containing/fudge&quot;
-</pre></div>
-</div>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>For bash (or ksh, zsh)::</dt><dd><p>$ export PYTHONPATH=”/full/path/to/directory/containing/fudge”  # only changes the current terminal session
+or add that line to .bashrc (or similar)</p>
+</dd>
+</dl>
 </li>
-<li><p>Add this export directive to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> file.</p></li>
+<li><dl class="simple">
+<dt>For csh (or tcsh)::</dt><dd><p>$ setenv PYTHONPATH “/full/path/to/directory/containing/fudge”
+or add that line to .cshrc or .tcshrc</p>
+</dd>
+</dl>
+</li>
 <li><p>Alternatively, you can amend the <code class="docutils literal notranslate"><span class="pre">sys.path</span></code> variable to point to the directory
-containing the <code class="docutils literal notranslate"><span class="pre">fudge</span></code> python module <em>inside</em> any python script you write.</p></li>
+containing the <code class="docutils literal notranslate"><span class="pre">fudge</span></code> python module <em>inside</em> any python script you write.::
+$ import sys
+$ sys.path.append(“/full/path/to/directory/containing/fudge”)</p></li>
 </ul>
 </div></blockquote>
 <p>With that settled, you can start with the section on translating between ENDF and GNDS.</p>

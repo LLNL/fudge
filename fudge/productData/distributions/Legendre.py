@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,7 +12,7 @@ This is a temporary module, to be removed once testing is done and all coefficie
 
 import math
 
-from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 from xData import axes as axesModule
 from xData import multiD_XYs as multiD_XYsModule
 from xData import series1d as series1dModule
@@ -21,32 +21,31 @@ from fudge.core.utilities import brb
 
 from fudge.processing import group as groupModule
 
-from .. import energyDeposition as energyDepositionModule
-from fudge.productData import momentumDeposition as momentumDepositionModule
+from .. import averageProductEnergy as averageProductEnergyModule
+from fudge.productData import averageProductMomentum as averageProductMomentumModule
 
 from . import base as baseModule
 from . import miscellaneous as miscellaneousModule
 from . import energyAngular as energyAngularModule
 
-__metaclass__ = type
 
 def defaultAxes( energyUnit ) :
 
-    axes = axesModule.axes( rank = 4 )
-    axes[3] = axesModule.axis( 'l',          3, '' )
-    axes[2] = axesModule.axis( 'energy_in',  2, energyUnit )
-    axes[1] = axesModule.axis( 'energy_out', 1, energyUnit )
-    axes[0] = axesModule.axis( 'c_l',        0, '1/' + energyUnit )
+    axes = axesModule.Axes(4)
+    axes[3] = axesModule.Axis( 'l',          3, '' )
+    axes[2] = axesModule.Axis( 'energy_in',  2, energyUnit )
+    axes[1] = axesModule.Axis( 'energy_out', 1, energyUnit )
+    axes[0] = axesModule.Axis( 'c_l',        0, '1/' + energyUnit )
     return( axes )
 
-class subform( baseModule.subform ) :
+class Subform( baseModule.Subform ) :
     """Abstract base class for LLNLLegendre forms."""
 
     def __init__( self ) :
 
-        baseModule.subform.__init__( self )
+        baseModule.Subform.__init__( self )
 
-class LLNLPointwise( subform ) :
+class LLNLPointwise( Subform ) :
     """
     This is for ENDL I = 4 data with l > 0.
     This is a temporary class, to be removed once testing is done and all coefficients in endl99, H2(n,2n)p data are filled in.
@@ -56,7 +55,7 @@ class LLNLPointwise( subform ) :
 
     def __init__( self, axes ) :
 
-        subform.__init__( self )
+        Subform.__init__( self )
         self.data = []
         self.axes = axes
         self.label = None
@@ -103,22 +102,20 @@ class LLNLPointwise( subform ) :
 
                 Legendre_l0p = multiD_XYsModule.XYs2d( )
                 for energy in Es :
-                    Legendre_l0p.append( Legendre_l0.interpolateAtValue( energy, unitBase = True, 
-                            extrapolation = standardsModule.flatExtrapolationToken ) )
+                    Legendre_l0p.append(Legendre_l0.interpolateAtValue(energy, unitBase=True, extrapolation=xDataEnumsModule.Extrapolation.flat))
                 Legendre_l0 = Legendre_l0p
 
                 if( Legendre_l1 is not None ) :
                     Legendre_l1p = multiD_XYsModule.XYs2d( )
                     for energy in Es :
-                        Legendre_l1p.append( Legendre_l1.interpolateAtValue( energy, unitBase = True,
-                                extrapolation = standardsModule.flatExtrapolationToken ) )
+                        Legendre_l1p.append(Legendre_l1.interpolateAtValue(energy, unitBase=True, extrapolation=xDataEnumsModule.Extrapolation.flat))
                     Legendre_l1 = Legendre_l1p
 
         calculateDepositionEnergyFromEpP = miscellaneousModule.calculateDepositionEnergyFromEpP
         depEnergy = [ [ EpP.outerDomainValue, multiplicity.evaluate( EpP.outerDomainValue ) * calculateDepositionEnergyFromEpP( EpP.outerDomainValue, EpP ) ] for EpP in Legendre_l0 ]
         if( depEnergy[0][0] > EMin ) : depEnergy.insert( 0, [ EMin, 0. ] ) # Special case for bad data
-        axes = energyDepositionModule.defaultAxes( energyUnit )
-        energyDep = energyDepositionModule.XYs1d( data = depEnergy, axes = axes, label = style.label )
+        axes = averageProductEnergyModule.defaultAxes( energyUnit )
+        energyDep = averageProductEnergyModule.XYs1d( data = depEnergy, axes = axes, label = style.label )
 
         if( Legendre_l1 is not None ) :
             depMomentum = []
@@ -130,9 +127,9 @@ class LLNLPointwise( subform ) :
                     depMomentum.append( [ EpP.outerDomainValue, const * multiplicity.evaluate( EpP.outerDomainValue ) * EpP.integrateWithWeight_sqrt_x( ) ] )
         else :
             depMomentum = [ [ Legendre_l0[0].outerDomainValue, 0. ], [ Legendre_l0[-1].outerDomainValue, 0. ] ]
-        axes = momentumDepositionModule.defaultAxes( energyUnit, momentumUnit )
+        axes = averageProductMomentumModule.defaultAxes( energyUnit, momentumUnit )
         if( depMomentum[0][0] > EMin ) : depMomentum.insert( 0, [ EMin, 0. ] ) # Special case for bad data
-        momentumDep = momentumDepositionModule.XYs1d( data = depMomentum, axes = axes, label = style.label )
+        momentumDep = averageProductMomentumModule.XYs1d( data = depMomentum, axes = axes, label = style.label )
 
         return( [ energyDep ], [ momentumDep ] )
 
@@ -146,26 +143,37 @@ class LLNLPointwise( subform ) :
 
         return( self.data[0].evaluate( energyIn ) )
 
-    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = standardsModule.frames.productToken, LegendreOrder = 0 ) :
+    def fixDomains(self, domainMin, domainMax, fixToDomain):
+        """
+        Calls the **fixDomains** for each entry in *self.data*.
+        """
 
-        if( frame != standardsModule.frames.labToken ) : raise TypeError( "For LLNL Legendre data (i.e., I=4, l>0), only lab frame is supported." )
+        numberOfFixes = 0
+        for data in self.data:
+            numberOfFixes += data.fixDomains(domainMin, domainMax, fixToDomain)
+
+        return numberOfFixes
+
+    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.product, LegendreOrder = 0 ) :
+
+        if( frame != xDataEnumsModule.Frame.lab) : raise TypeError( "For LLNL Legendre data (i.e., I=4, l>0), only lab frame is supported." )
 
         if( muOut is None ) :
-            print( 'integrate of LegendreOrder not supported', type( form ) )
+            print( 'integrate of LegendreOrder not supported', type( Form ) )
             return( 0.0 )
 
         C_ls = []
         for data in self.data :
             C_l = data.evaluate( energyIn )
             domainMin, domainMax = miscellaneousModule.domainLimits( energyOut, C_l.domainMin, C_l.domainMax )
-            C_ls.append( float( C_l.integrate( domainMin, domainMax ) ) )
+            C_ls.append(C_l.integrate(domainMin, domainMax))
 
         series = series1dModule.LegendreSeries( C_ls )
         domainMin, domainMax = miscellaneousModule.domainLimits( muOut, -1.0, 1.0 )
 
         phi_evaluate = miscellaneousModule.muPhiEvaluate( None, phiOut )
 
-        return( phi_evaluate * float( series.integrate( domainMin, domainMax ) ) )
+        return(phi_evaluate * series.integrate(domainMin, domainMax))
 
     def processMultiGroup( self, style, tempInfo, indent ) :
 
@@ -213,29 +221,29 @@ class LLNLPointwise( subform ) :
             XYs3d.append( XYs2d )
         return( XYs3d )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlString = [ self.XMLStartTagString( indent = indent ) ]
-        xmlString += self.axes.toXMLList( indent2, **kwargs )
-        for l in self : xmlString += l.toXMLList( indent2, **kwargs )
+        xmlString += self.axes.toXML_strList( indent2, **kwargs )
+        for l in self : xmlString += l.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
-        axes = axesModule.axes.parseXMLNode( element.find( axesModule.axes.moniker ), xPath, linkData )
-        lpw = LLNLPointwise( axes )
+        axes = axesModule.Axes.parseNodeUsingClass(element.find(axesModule.Axes.moniker), xPath, linkData, **kwargs)
+        lpw = cls( axes )
         for lOrderData in element :
-            if( lOrderData.tag == axesModule.axes.moniker ) : continue
-            lpw.append( multiD_XYsModule.XYs2d.parseXMLNode( lOrderData, xPath, linkData ) )
+            if( lOrderData.tag == axesModule.Axes.moniker ) : continue
+            lpw.append(multiD_XYsModule.XYs2d.parseNodeUsingClass(lOrderData, xPath, linkData, **kwargs))
         xPath.pop( )
         return( lpw )
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
     """
     This is for ENDL I = 4 data with l > 0.
     This is a temporary class, to be removed once testing is done and all coefficients in endl99, H2(n,2n)p data are filled in.
@@ -246,12 +254,12 @@ class form( baseModule.form ) :
 
     def __init__( self, label, productFrame, LegendreSubform ) :
 
-        if( not( isinstance( LegendreSubform, subform ) ) ) : raise TypeError( 'instance is not a Legendre subform' )
-        baseModule.form.__init__( self, label, productFrame, ( LegendreSubform, ) )
+        if( not( isinstance( LegendreSubform, Subform ) ) ) : raise TypeError( 'instance is not a Legendre subform' )
+        baseModule.Form.__init__( self, label, productFrame, ( LegendreSubform, ) )
 
         for data in LegendreSubform.data :
-            if( data.interpolationQualifier == standardsModule.interpolation.noneQualifierToken ) :
-                data.interpolationQualifier = standardsModule.interpolation.unitBaseToken
+            if data.interpolationQualifier == xDataEnumsModule.InterpolationQualifier.none:
+                data.interpolationQualifier = xDataEnumsModule.InterpolationQualifier.unitBase
 
     @property
     def domainUnit( self ) :
@@ -264,11 +272,18 @@ class form( baseModule.form ) :
 
     def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
 
-        if( frame == standardsModule.frames.centerOfMassToken ) : TypeError( 'Lab to center-of-mass translation not supported.' )
+        if( frame == xDataEnumsModule.Frame.centerOfMass) : TypeError( 'Lab to center-of-mass translation not supported.' )
 
         return( self.Legendre.energySpectrumAtEnergy( energyIn ) )
 
-    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = standardsModule.frames.productToken, LegendreOrder = 0 ) :
+    def fixDomains(self, domainMin, domainMax, fixToDomain):
+        """
+        Calls the **fixDomains** for the **Legendre** members.
+        """
+
+        return self.Legendre.fixDomains(domainMin, domainMax, fixToDomain)
+
+    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.product, LegendreOrder = 0 ) :
 
         return( self.Legendre.integrate( reaction_suite, energyIn, energyOut = energyOut, muOut = muOut, phiOut = phiOut, frame = frame, LegendreOrder = LegendreOrder ) )
 
@@ -282,10 +297,10 @@ class form( baseModule.form ) :
         from . import energyAngularMC as energyAngularMCModule
 
         energy, energyAngular = self.Legendre.to_xs_pdf_cdf1d( style, tempInfo, indent )
-        return( energyAngularMCModule.form( style.label, self.productFrame, energy, energyAngular ) )        
+        return( energyAngularMCModule.Form( style.label, self.productFrame, energy, energyAngular ) )        
 
-    @staticmethod
-    def parseXMLNode( LegendreElement, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, LegendreElement, xPath, linkData, **kwargs):
 
         xPath.append( LegendreElement.tag )
         subformElement = LegendreElement[0]
@@ -293,7 +308,9 @@ class form( baseModule.form ) :
                 LLNLPointwise.moniker : LLNLPointwise,
             }.get( subformElement.tag )
         if( subformClass is None ) : raise Exception( "unknown Legendre subform: %s" % subformElement.tag )
-        LegendreSubform = subformClass.parseXMLNode( subformElement, xPath, linkData )
-        _form = form( LegendreElement.get( 'label' ), LegendreElement.get( 'productFrame' ), LegendreSubform )
+        LegendreSubform = subformClass.parseNodeUsingClass(subformElement, xPath, linkData, **kwargs)
+
+        _form = cls( LegendreElement.get( 'label' ), LegendreElement.get( 'productFrame' ), LegendreSubform )
+
         xPath.pop( )
         return( _form )

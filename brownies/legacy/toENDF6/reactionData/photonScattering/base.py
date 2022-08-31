@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -27,8 +27,9 @@ def toENDF6( self, MT, endfMFList, targetInfo ) :
                            endfFormatsModule.endfDataList( data ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
 
 baseModule.XYs1d.toENDF6 = toENDF6
+
 #
-# regions1d
+# Regions1d
 #
 def toENDF6( self, MT, endfMFList, targetInfo ) :
 
@@ -53,4 +54,4 @@ def toENDF6( self, MT, endfMFList, targetInfo ) :
                            endfFormatsModule.endfInterpolationList( endfInterpolation ) + \
                            endfFormatsModule.endfDataList( data ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
 
-baseModule.regions1d.toENDF6 = toENDF6
+baseModule.Regions1d.toENDF6 = toENDF6

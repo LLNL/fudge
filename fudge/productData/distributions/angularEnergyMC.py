@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,9 +13,8 @@ from xData import multiD_XYs as multiD_XYsModule
 from . import base as baseModule
 from . import angular as angularModule
 
-__metaclass__ = type
 
-class xs_pdf_cdf1d( xs_pdf_cdfModule.xs_pdf_cdf1d ) :
+class Xs_pdf_cdf1d( xs_pdf_cdfModule.Xs_pdf_cdf1d ) :
 
     pass
 
@@ -28,7 +27,7 @@ class XYs2d( multiD_XYsModule.XYs2d ) :
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( xs_pdf_cdf1d, ) )
+        return( ( Xs_pdf_cdf1d, ) )
 
 class XYs3d( multiD_XYsModule.XYs3d ) :
 
@@ -41,12 +40,14 @@ class XYs3d( multiD_XYsModule.XYs3d ) :
 
         return( ( XYs2d, ) )
 
-class subform( baseModule.subform ) :
+class Subform( baseModule.Subform ) :
     """Abstract base class for angularEnergyMC subforms."""
+
+    moniker = 'dummy'                   # This is not used but added to stop lylint from reporting.
 
     def __init__( self, data ) :
 
-        baseModule.subform.__init__( self )
+        baseModule.Subform.__init__( self )
         if( not( isinstance( data, self.allowedSubElements ) ) ) : raise TypeError( 'Invalid instance: %s' % type( data ) )
         self.data = data
         self.data.setAncestor( self )
@@ -56,60 +57,58 @@ class subform( baseModule.subform ) :
 
         self.data.convertUnits( unitMap )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        XMLStringList += self.data.toXMLList( indent2, **kwargs )
+        XMLStringList += self.data.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
-class angular( subform ) :
+class Angular( Subform ) :
 
     moniker = 'angular'
     allowedSubElements = ( angularModule.XYs2d, )
     ancestryMembers = ( 'angular', )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
-        subformElement = element[0]
-        subformClass = {    angularModule.XYs2d.moniker       : angularModule.XYs2d,
-                        }.get( subformElement.tag )
+        subformElement = node[0]
+        subformClass = {angularModule.XYs2d.moniker: angularModule.XYs2d}.get( subformElement.tag )
         if( subformClass is None ) : raise Exception( 'unknown angular subform "%s"' % subformElement.tag )
-        angularSubform = subformClass.parseXMLNode( subformElement, xPath, linkData )
+        angularSubform = subformClass.parseNodeUsingClass(subformElement, xPath, linkData, **kwargs)
 
-        _angular= angular( angularSubform )
+        _angular= cls(angularSubform)
 
         xPath.pop( )
         return( _angular )
 
-class angularEnergy( subform ) :
+class AngularEnergy( Subform ) :
 
     moniker = 'angularEnergy'
     allowedSubElements = ( XYs3d, )
     ancestryMembers = ( 'angularEnergy', )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
-        subformElement = element[0]
-        subformClass = {    XYs3d.moniker       : XYs3d,
-                        }.get( subformElement.tag )
+        subformElement = node[0]
+        subformClass = {XYs3d.moniker: XYs3d}.get( subformElement.tag )
         if( subformClass is None ) : raise Exception( 'unknown angularEnergy subform "%s"' % subformElement.tag )
-        angularEnergySubform = subformClass.parseXMLNode( subformElement, xPath, linkData )
+        angularEnergySubform = subformClass.parseNodeUsingClass(subformElement, xPath, linkData, **kwargs)
 
-        _angularEnergy = angularEnergy( angularEnergySubform )
+        _angularEnergy = cls(angularEnergySubform)
 
         xPath.pop( )
         return( _angularEnergy )
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'angularEnergyMC'
     subformAttributes = ( 'angular', 'angularEnergy' )
@@ -117,9 +116,9 @@ class form( baseModule.form ) :
 
     def __init__( self, label, productFrame, _angular, _angularEnergy ) :
 
-        if( not( isinstance( _angular, angular ) ) ) : raise TypeError( 'Invalid instance: %s' % type( _angular ) )
-        if( not( isinstance( _angularEnergy, angularEnergy ) ) ) : raise TypeError( 'Invalid instance: %s' % type( _angularEnergy ) )
-        baseModule.form.__init__( self, label, productFrame, ( _angular, _angularEnergy ) )
+        if( not( isinstance( _angular, Angular ) ) ) : raise TypeError( 'Invalid instance: %s' % type( _angular ) )
+        if( not( isinstance( _angularEnergy, AngularEnergy ) ) ) : raise TypeError( 'Invalid instance: %s' % type( _angularEnergy ) )
+        baseModule.Form.__init__( self, label, productFrame, ( _angular, _angularEnergy ) )
 
     def convertUnits( self, unitMap ) :
         "See documentation for reactionSuite.convertUnits."
@@ -127,24 +126,23 @@ class form( baseModule.form ) :
         self.angular.convertUnits( unitMap )
         self.angularEnergy.convertUnits( unitMap )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
-        """Translate <angularEnergyMC> element from xml."""
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """Translate a GNDS angularEnergyMC node."""
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
         _angular = None
         _angularEnergy = None
-        for child in element :
-            if( child.tag == angular.moniker ) :
-                _angular = angular.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == angularEnergy.moniker ) :
-                _angularEnergy = angularEnergy.parseXMLNode( child, xPath, linkData )
+        for child in node:
+            if( child.tag == Angular.moniker ) :
+                _angular = Angular.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            elif( child.tag == AngularEnergy.moniker ) :
+                _angularEnergy = AngularEnergy.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             else :
                 raise TypeError( "Encountered unknown yAngular subform: %s" % child.tag )
 
-        angularEnergyMC = form( element.get( "label" ), element.get('productFrame'), 
-                _angular, _angularEnergy )
+        angularEnergyMC = cls(node.get("label"), node.get('productFrame'), _angular, _angularEnergy)
 
         xPath.pop( )
-        return( angularEnergyMC ) 
+        return angularEnergyMC

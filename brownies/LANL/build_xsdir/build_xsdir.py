@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,7 @@ import os
 import argparse
 import time
 
-from PoPs.groups import misc as miscModule
+from PoPs.chemicalElements import misc as miscModule
 
 massFileDefault = 'xsdir_atomicMasses.dat'
 massFileDefault = os.path.join( os.path.realpath( os.path.dirname( __file__ ) ), 'xsdir_atomicMasses.dat' )
@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser( description = 'Copy and rename ACE files gener
 parser.add_argument( '-d', '--destination', action = 'store', required = True,              help = 'The directory to put the ACE files in.' )
 parser.add_argument( '-i', '--ID', action = 'store', type = int,                            help = 'An integer between 0 and 99 representing the evaluation ID.' )
 parser.add_argument( '-m', '--massFile', action = 'store', default = massFileDefault,       help = 'The path to a file containing the atom mass. Default = "%s"' % massFileDefault )
-parser.add_argument( '-v', '--verbose', action = 'count',                                   help = 'Verbose mode.' )
+parser.add_argument( '-v', '--verbose', action = 'count', default = 0,                      help = 'Verbose mode.' )
 parser.add_argument( 'files', nargs = '+',                                                  help = 'List of ACE files to add to xsdir file.' )
 
 args = parser.parse_args( )

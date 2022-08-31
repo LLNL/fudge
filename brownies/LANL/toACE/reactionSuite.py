@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,6 +9,7 @@
 This module adds the method toACE to the reactionSuite class.
 """
 
+from fudge import enums as enumsModule
 from fudge import styles as stylesModule
 from fudge import reactionSuite as reactionSuiteModule
 
@@ -31,7 +32,7 @@ def toACE( self, args, styleName, fileName, evaluationId, addAnnotation = False,
 
     cdf_style = self.styles[styleName].findDerivedFromStyle( stylesModule.MonteCarlo_cdf )
 
-    if self.interaction == reactionSuiteModule.Interaction.TNSL:
+    if self.interaction == enumsModule.Interaction.TNSL:
         GNDS_toACE_TNSL_Module.toACE(self, args, styleName, cdf_style, fileName, evaluationId, addAnnotation)
     else:
 
@@ -40,4 +41,4 @@ def toACE( self, args, styleName, fileName, evaluationId, addAnnotation = False,
         for reaction in self.reactions : reaction.toACE( styleName, cdf_style, ACE_data, delayedNeutronRateAndDatas, verbose )
         gndsToACEModule.toACE( self, styleName, cdf_style, fileName, evaluationId, ACE_data, delayedNeutronRateAndDatas, addAnnotation = addAnnotation )
 
-reactionSuiteModule.reactionSuite.toACE = toACE
+reactionSuiteModule.ReactionSuite.toACE = toACE

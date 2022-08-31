@@ -9,10 +9,10 @@ from brownies.BNL.plot_evaluation.plotio import readEvaluation
 import brownies.BNL.restools.resonance_generator as rg
 from fudge.core.utilities.brb import banner, winged_banner, uniquify
 import fudge.processing.resonances.reconstructResonances as RRReconstruct
-from xData.table import table as gndsTable, columnHeader as gndsColumnId
-import xData.XYs as XYsModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
-from PoPs.quantities.spin import suite as spinSuite
+from xData import table as tableModule
+from xData import XYs1d as XYs1dModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
+from PoPs.quantities.spin import Suite as spinSuite
 
 # --------------------------------------------------------------------
 #   Utility functions
@@ -224,11 +224,11 @@ def get_level_densities(__spingroups, __config, __urr):
             raise ValueError("Need URR region in evaluation to use ENDF file to initialize spacings")
         return dict(__urr.levelDensities)
     return {find_matching_spingroup(cfgsg, __spingroups).lj:
-                XYsModule.XYs1d(data=[[__config['Emin']*0.8, 1.0/cfgsg["D"]], [__config['Emax']*1.2, 1.0/cfgsg["D"]]],
-                                axes=XYsModule.XYs1d.defaultAxes(
+                XYs1dModule.XYs1d(data=[[__config['Emin']*0.8, 1.0/cfgsg["D"]], [__config['Emax']*1.2, 1.0/cfgsg["D"]]],
+                                axes=XYs1dModule.XYs1d.defaultAxes(
                                     labelsUnits={
-                                        XYsModule.yAxisIndex: ('level_density', '1/eV'),
-                                        XYsModule.xAxisIndex: ('excitation_energy', 'eV')}))
+                                        XYs1dModule.yAxisIndex: ('level_density', '1/eV'),
+                                        XYs1dModule.xAxisIndex: ('excitation_energy', 'eV')}))
             for cfgsg in __config['spingroups']}
 
 
@@ -249,19 +249,19 @@ def get_widths(__spingroups, __config, __urr):
             sg = find_matching_spingroup(cfgsg, __spingroups)
             aveWidths[sg.lj] = {}
             # Gamma widths
-            aveWidths[sg.lj]['capture'] = XYsModule.XYs1d(
+            aveWidths[sg.lj]['capture'] = XYs1dModule.XYs1d(
                                             data=[[__config['Emin']*0.8, cfgsg['Gg']], [__config['Emax']*1.2, cfgsg['Gg']]],
-                                            axes=XYsModule.XYs1d.defaultAxes(
+                                            axes=XYs1dModule.XYs1d.defaultAxes(
                                                 labelsUnits={
-                                                    XYsModule.yAxisIndex: ('width', 'eV'),
-                                                    XYsModule.xAxisIndex: ('excitation_energy', 'eV')}))
+                                                    XYs1dModule.yAxisIndex: ('width', 'eV'),
+                                                    XYs1dModule.xAxisIndex: ('excitation_energy', 'eV')}))
             # Neutron widths
-            aveWidths[sg.lj]['elastic'] = XYsModule.XYs1d(
+            aveWidths[sg.lj]['elastic'] = XYs1dModule.XYs1d(
                                             data=[[__config['Emin']*0.8, cfgsg['Gn']], [__config['Emax']*1.2, cfgsg['Gn']]],
-                                            axes=XYsModule.XYs1d.defaultAxes(
+                                            axes=XYs1dModule.XYs1d.defaultAxes(
                                                 labelsUnits={
-                                                    XYsModule.yAxisIndex: ('width', 'eV'),
-                                                    XYsModule.xAxisIndex: ('excitation_energy', 'eV')}))
+                                                    XYs1dModule.yAxisIndex: ('width', 'eV'),
+                                                    XYs1dModule.xAxisIndex: ('excitation_energy', 'eV')}))
             # No fission or competitive yet
     return aveWidths
 
@@ -463,22 +463,22 @@ if __name__ == "__main__":
         data.sort(key=lambda res: res[0])
 
         # Assemble final table of resonances
-        result = gndsTable(
+        result = tableModule.Table(
             columns=[
-                gndsColumnId(0, name="energy", unit="eV"),
-                gndsColumnId(1, name="L", unit=""),
-                gndsColumnId(2, name="J", unit=""),
-                gndsColumnId(4, name="elastic width", unit="eV"),
-                gndsColumnId(5, name="capture width", unit="eV")],
+                tableModule.ColumnHeader(0, name="energy", unit="eV"),
+                tableModule.ColumnHeader(1, name="L", unit=""),
+                tableModule.ColumnHeader(2, name="J", unit=""),
+                tableModule.ColumnHeader(4, name="elastic width", unit="eV"),
+                tableModule.ColumnHeader(5, name="capture width", unit="eV")],
             data=data)
 
         print("\n" + banner("Set of Fake Resonances"))
-        print('\n'.join(result.toXMLList()))  # toStringList()
+        print('\n'.join(result.toXML_strList()))  # toStringList()
 
     # Output to evaluation
     if args.outFile is not None:
         if args.outFormat == 'gnds':
-            open(args.outFile, mode='w').write('\n'.join(endfRS.toXMLList()))
+            open(args.outFile, mode='w').write('\n'.join(endfRS.toXML_strList()))
         else:
             FIRSTLINE = " $Rev:: 700      $  $Date:: 2016-01-13#$                             1 0  0    0"
             outLines = endfRS.toENDF6('eval', {'verbosity': args.verbose * 10}, covarianceSuite=endfCS).split('\n')

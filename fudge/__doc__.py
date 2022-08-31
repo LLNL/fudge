@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -34,7 +34,7 @@ In general, one should first create a reactionSuite class object (also sometimes
 Projectile + Target + Evaluation). For example the beginning of a fudge session may look like,
 
     >>> from fudge import reactionSuite
-    >>> RS = reactionSuite.readXML("path/to/GNDS/reactionSuite.xml")
+    >>> RS = reactionSuite.ReactionSuite.readXML_file("path/to/GNDS/reactionSuite.xml")
 
 It is therefore important to read the documentation on the reactionSuite class.
 For an overview of creating, visualizing and processing GNDS reactionSuites we recommend starting with

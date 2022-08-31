@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -51,7 +51,7 @@ for inFile in glob.glob('*.endf'):
 
     f = open( outFile, 'w' )
     try:
-        f.write( '\n'.join( x.toXMLList(  ) ) )
+        f.write( '\n'.join( x.toXML_strList(  ) ) )
     except Exception as err:
         sys.stderr.write( 'WARNING: MAIN ENDF WRITE HALTED BECAUSE "'+str(err)+'" for file %s\n'%inFile )
         if not args.keepGoing: exit()
@@ -59,7 +59,7 @@ for inFile in glob.glob('*.endf'):
     if c:
         f = open( outCovFile, 'w' )
         try:
-            f.write( '\n'.join( c.toXMLList(  ) ) )
+            f.write( '\n'.join( c.toXML_strList(  ) ) )
         except Exception as err:
             sys.stderr.write( 'WARNING: COVARIANCE ENDF WRITE HALTED BECAUSE  "'+str(err)+'" for file %s\n'%inFile )
             if not args.keepGoing: exit()

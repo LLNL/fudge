@@ -7,7 +7,7 @@ import collections
 import subprocess
 import os.path
 
-from PoPs.groups import misc as miscPoPsModule
+from PoPs.chemicalElements import misc as miscPoPsModule
 
 __doc__="""
 Construct a JSON file that collects all of the ENDF files for a specific element together, with the

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,9 +12,10 @@ from fudge.core.math import fudgemath
 
 from PoPs import IDs as IDsPoPsModule
 
-import xData.standards as standardsModule
-import xData.ancestry as ancestryModule
-import xData.values as valuesModule
+from LUPY import ancestry as ancestryModule
+
+from xData import enums as xDataEnumsModule
+from xData import values as valuesModule
 
 from . import angular as angularModule
 from . import energy as energyModule
@@ -24,16 +25,16 @@ from . import angularEnergy as angularEnergyModule
 from . import base as baseModule
 from . import miscellaneous as miscellaneousModule
 
-__metaclass__ = type
 
-class subform( ancestryModule.ancestry ) :
+class Subform( ancestryModule.AncestryIO ) :
 
     ancestryMembers = ( 'data', )
 
     def __init__( self, data, dataSubform ) :
 
+        ancestryModule.AncestryIO.__init__( self )
+
         if( not isinstance( data, dataSubform ) ) : raise TypeError( "Needed %s distribution subform" % self.moniker )
-        ancestryModule.ancestry.__init__( self )
         self.data = data
         self.data.setAncestor( self )
 
@@ -49,14 +50,21 @@ class subform( ancestryModule.ancestry ) :
 
     def copy( self ) :
 
-        return( self.__class__( self.data.copy( ) ) )
+        return self.__class__(self.data.copy())
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def fixDomains(self, energyMin, energyMax, domainsToFix):
+        """
+        Calls the *fixDomains* method on the *data* member.
+        """
+
+        return self.data.fixDomains(energyMin, energyMax, domainsToFix)
+
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlStringList = [ "%s<%s>" % ( indent, self.moniker ) ]
-        xmlStringList += self.data.toXMLList( indent2, **kwargs )
+        xmlStringList += self.data.toXML_strList( indent2, **kwargs )
         xmlStringList[-1] += "</%s>" % self.moniker
         return( xmlStringList )
 
@@ -64,7 +72,7 @@ class subform( ancestryModule.ancestry ) :
 
         data = self.data.to_xs_pdf_cdf1d( style, tempInfo, indent )
         if( data is None ) : return( None )
-        return( self.__class__( data ) )
+        return self.__class__(data)
 
     def findEntity(self, entityName, attribute=None, value=None):
         """
@@ -73,25 +81,30 @@ class subform( ancestryModule.ancestry ) :
 
         if self.data.moniker == entityName:
             return self.data
-        return ancestryModule.ancestry.findEntity(self, entityName, attribute, value)
+        return ancestryModule.Ancestry.findEntity(self, entityName, attribute, value)
 
-class angularSubform( subform ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+
+        pass
+
+class AngularSubform( Subform ) :
 
     moniker = 'angular'
 
     def __init__( self, data ) :
 
-        subform.__init__( self, data, angularModule.subform )
+        Subform.__init__( self, data, angularModule.Subform )
 
-class energySubform( subform ) :
+class EnergySubform( Subform ) :
 
     moniker = 'energy'
 
     def __init__( self, data ) :
 
-        subform.__init__( self, data, energyModule.subform )
+        Subform.__init__( self, data, energyModule.Subform )
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
     """
     Contains uncorrelated distributions for outgoing angle and outgoing energy. Use when the correlations
     between angle and energy are unknown.
@@ -103,10 +116,10 @@ class form( baseModule.form ) :
 
     def __init__( self, label, productFrame, _angularSubform, _energySubform ) :
 
-        if( not isinstance( _angularSubform, angularSubform ) ) : raise TypeError( "Needed angular distribution subform, got %s" %str(_angularSubform.__class__) )
-        if( not isinstance( _energySubform, energySubform ) ) : raise TypeError( "Needed energy distribution subform, got %s" % str(_energySubform.__class__) )
+        if( not isinstance( _angularSubform, AngularSubform ) ) : raise TypeError( "Needed angular distribution subform, got %s" %str(_angularSubform.__class__) )
+        if( not isinstance( _energySubform, EnergySubform ) ) : raise TypeError( "Needed energy distribution subform, got %s" % str(_energySubform.__class__) )
 
-        baseModule.form.__init__( self, label, productFrame, ( _angularSubform, _energySubform ) )
+        baseModule.Form.__init__( self, label, productFrame, ( _angularSubform, _energySubform ) )
 
     @property
     def domainUnit( self ) :
@@ -115,10 +128,10 @@ class form( baseModule.form ) :
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        if( isinstance( self.angularSubform.data, angularModule.regions2d ) ) :
-            raise Exception( 'regions2d angular is currently not supported' )
+        if( isinstance( self.angularSubform.data, angularModule.Regions2d ) ) :
+            raise Exception( 'Regions2d angular is currently not supported' )
 
-        if( isinstance( self.energySubform.data, energyModule.regions2d ) ) :
+        if( isinstance( self.energySubform.data, energyModule.Regions2d ) ) :
             aveEnergies = []
             aveMomenta = []
             EMax = kwargs['EMax']
@@ -137,7 +150,7 @@ class form( baseModule.form ) :
 
     def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
 
-        class angualarAtEnergyCOM :
+        class AngualarAtEnergyCOM :
 
             def __init__( self, angular ) :
 
@@ -149,14 +162,15 @@ class form( baseModule.form ) :
 
         if( self.productFrame == frame ) : return( self.energySubform.data.energySpectrumAtEnergy( energyIn ) )
 
-        if( self.productFrame == standardsModule.frames.labToken ) : TypeError( 'Lab to center-of-mass translation not supported.' )
+        if self.productFrame == xDataEnumsModule.Frame.lab:
+            TypeError( 'Lab to center-of-mass translation not supported.' )
 
-        if( self.product.id != IDsPoPsModule.photon ) :
+        if( self.product.pid != IDsPoPsModule.photon ) :
             energyProbabilityAtEnergy = self.energySubform.data.evaluate( energyIn )
             angularProbabilityAtEnergy = self.angularSubform.data.evaluate( energyIn )
             xys2d = miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energyProbabilityAtEnergy, 
-                    angualarAtEnergyCOM( angularProbabilityAtEnergy ) )
-            data = [ [ xys1d.outerDomainValue, float( xys1d.integrate( ) ) ] for xys1d in xys2d ]
+                    AngualarAtEnergyCOM( angularProbabilityAtEnergy ) )
+            data = [ [ xys1d.outerDomainValue, xys1d.integrate() ] for xys1d in xys2d ]
             return( energyModule.XYs1d( data = data, axes = energyModule.defaultAxes( self.domainUnit ) ) )
         else :                          # Ignore centerOfMass corrections for photons, for now anyway.
             return( self.energySubform.data.energySpectrumAtEnergy( energyIn ) )
@@ -164,7 +178,7 @@ class form( baseModule.form ) :
     def getSpectrumAtEnergy( self, energy ) :
         """Returns the energy spectrum for self at projectile energy."""
 
-        return( self.energySpectrumAtEnergy( energy, standardsModule.frames.labToken ) )
+        return self.energySpectrumAtEnergy(energy, xDataEnumsModule.Frame.lab)
 
     def findEntity( self, entityName, attribute = None, value = None ):
         """
@@ -174,9 +188,19 @@ class form( baseModule.form ) :
 
         if self.energySubform.moniker == entityName: return self.energySubform
         elif self.angularSubform.moniker == entityName: return self.angularSubform
-        return ancestryModule.ancestry.findEntity( self, entityName, attribute, value )
+        return ancestryModule.Ancestry.findEntity( self, entityName, attribute, value )
 
-    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = standardsModule.frames.productToken, LegendreOrder = 0 ) :
+    def fixDomains(self, energyMin, energyMax, domainsToFix):
+        """
+        Calls the *fixDomains* method on the *energy* and *angular* members.
+        """
+
+        numberOfFixes  = self.energySubform.fixDomains(energyMin, energyMax, domainsToFix)
+        numberOfFixes += self.angularSubform.fixDomains(energyMin, energyMax, domainsToFix)
+
+        return numberOfFixes
+
+    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.product, LegendreOrder = 0 ) :
 
         angularEvaluate = 1.0
         angularData = self.angularSubform.data
@@ -196,7 +220,7 @@ class form( baseModule.form ) :
 
         energyPartialIntegral = 0.0
         energyData = self.energySubform.data
-        if( isinstance( energyData, ( energyModule.discreteGamma, energyModule.primaryGamma ) ) ) :
+        if( isinstance( energyData, ( energyModule.DiscreteGamma, energyModule.PrimaryGamma ) ) ) :
             energyPartialIntegral = energyData.integrate( energyIn, energyOut )
         else :
             energyData1d = energyData.evaluate( energyIn )
@@ -204,11 +228,11 @@ class form( baseModule.form ) :
             if( energyOutMax is None ) :
                 energyPartialIntegral = energyData1d.evaluate( energyOutMin )
             else :
-                if( isinstance( energyData1d, energyModule.regions1d ) ) :
+                if( isinstance( energyData1d, energyModule.Regions1d ) ) :
                     limits = { energyData1d.axes[1].label : ( energyOutMin, energyOutMax ) }
-                    energyPartialIntegral = float( energyData1d.integrate( **limits ) )
+                    energyPartialIntegral = energyData1d.integrate(**limits)
                 else :
-                    energyPartialIntegral = float( energyData1d.integrate( energyOutMin, energyOutMax ) )
+                    energyPartialIntegral = energyData1d.integrate(energyOutMin, energyOutMax)
 
         phiEvaluate = miscellaneousModule.muPhiEvaluate( None, phiOut )
 
@@ -221,7 +245,7 @@ class form( baseModule.form ) :
         if( ( _angularSubform is not None ) or ( _energySubform is not None ) ) :
             if( _angularSubform is None ) : _angularSubform = self.angularSubform.copy( )
             if( _energySubform is None ) : _energySubform = self.energySubform.copy( )
-            _form = form( style.label, self.productFrame, _angularSubform, _energySubform )
+            _form = Form( style.label, self.productFrame, _angularSubform, _energySubform )
         else :
             _form = None
         return( _form )
@@ -244,8 +268,8 @@ class form( baseModule.form ) :
 
         crossSection = tempInfo['crossSection']
         product = tempInfo['product']
-        if( isinstance( energySubform, energyModule.discreteGamma ) ) :
-            if( product.id == IDsPoPsModule.photon ) :
+        if( isinstance( energySubform, energyModule.DiscreteGamma ) ) :
+            if( product.pid == IDsPoPsModule.photon ) :
                 Ep = float( energySubform.value )
                 TM_1, TM_E = transferMatricesModule.discreteGammaAngularData( style, tempInfo, Ep, crossSection,
                         angularSubform, multiplicity = product.multiplicity.evaluated,
@@ -254,7 +278,7 @@ class form( baseModule.form ) :
                 raise Exception( 'See Bret' )
         else :
             if( isinstance( energySubform, energyModule.NBodyPhaseSpace ) ) :
-                totalMass = energySubform.numberOfProductsMasses.getValueAs( massUnit )
+                totalMass = energySubform.mass.getValueAs( massUnit )
                 Q = tempInfo['reaction'].getQ( energyUnit, final = False )
                 TM_1, TM_E = transferMatricesModule.NBodyPhaseSpace( style, tempInfo, crossSection, 
                         energySubform.numberOfProducts, totalMass, Q, tempInfo['multiplicity'], 
@@ -270,10 +294,11 @@ class form( baseModule.form ) :
 
         if( frame == self.productFrame ) : return( self.toPointwise_withLinearXYs( **kwargs ) )
 
-        if( frame == standardsModule.frames.centerOfMassToken ) : raise Exception( 'Conversion of distribution from %s to %s not supported' % ( self.productFrame, frame ) )
+        if frame == xDataEnumsModule.Frame.centerOfMass:
+            raise Exception( 'Conversion of distribution from %s to %s not supported' % ( self.productFrame, frame ) )
 
         energiesIn = self.angularSubform.data.domainGrid + self.energySubform.data.domainGrid
-        energiesIn = valuesModule.values.sortAndThin( energiesIn, rel_tol = 1e-12 )
+        energiesIn = valuesModule.Values.sortAndThin( energiesIn, rel_tol = 1e-12 )
         xys3d = energyAngularModule.XYs3d( axes = energyAngularModule.defaultAxes( self.domainUnit ) )
         for energy in energiesIn : xys3d.append( self.spectrumAtEnergy( energy, frame ) )
 
@@ -281,7 +306,7 @@ class form( baseModule.form ) :
 
     def spectrumAtEnergy( self, energyIn, frame ) :
 
-        class angualarAtEnergyCOM :
+        class AngualarAtEnergyCOM :
 
             def __init__( self, angular ) :
 
@@ -305,9 +330,10 @@ class form( baseModule.form ) :
 
             return( probability )
 
-        if( frame == standardsModule.frames.centerOfMassToken ) : raise Exception( 'Conversion of distribution from %s to %s not supported' % ( self.productFrame, frame ) )
+        if frame == xDataEnumsModule.Frame.centerOfMass:
+            raise Exception( 'Conversion of distribution from %s to %s not supported' % ( self.productFrame, frame ) )
 
-        return( miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energyProbability, angualarAtEnergyCOM( angularProbability ) ) )
+        return( miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energyProbability, AngualarAtEnergyCOM( angularProbability ) ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
@@ -331,7 +357,7 @@ class form( baseModule.form ) :
             f_E_mu_Ep.append( f_mu_Ep )
         return( f_E_mu_Ep )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -340,25 +366,25 @@ class form( baseModule.form ) :
         if( self.productFrame is not None ) : attributeStr += ' productFrame="%s"' % self.productFrame
         xmlString = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
 
-        xmlString += self.angularSubform.toXMLList( indent2, **kwargs )
-        xmlString += self.energySubform.toXMLList( indent2, **kwargs )
+        xmlString += self.angularSubform.toXML_strList( indent2, **kwargs )
+        xmlString += self.energySubform.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
 
         return( xmlString )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         """Translate <uncorrelated> element from xml. Must contain one <angular> and one <energy> component."""
         
         xPath.append( element.tag )
         for child in element :
-            if( child.tag == angularModule.form.moniker ) :
-                _angularSubform = angularSubform( angularModule.form.parseXMLNode( child[0], xPath, linkData ) )
-            elif( child.tag == energyModule.form.moniker ) :
-                _energySubform = energySubform( energyModule.form.parseXMLNode( child[0], xPath, linkData ) )
+            if( child.tag == angularModule.Form.moniker ) :
+                _angularSubform = AngularSubform(angularModule.Form.parseNodeUsingClass(child[0], xPath, linkData, **kwargs))
+            elif( child.tag == energyModule.Form.moniker ) :
+                _energySubform = EnergySubform(energyModule.Form.parseNodeUsingClass(child[0], xPath, linkData, **kwargs))
             else :
                 raise ValueError( 'unsupported tag = "%s"' % child.tag )
-        uncorrelated = form( element.get( 'label' ), element.get( 'productFrame' ), _angularSubform, _energySubform )
+        uncorrelated = cls( element.get( 'label' ), element.get( 'productFrame' ), _angularSubform, _energySubform )
         xPath.pop( )
         return( uncorrelated )
 
@@ -371,12 +397,12 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
         Es.sort( )
         while( Es[0] < EMin ) : del Es[0]
         while( Es[-1] > EMax ) : del Es[-1]
-        return( valuesModule.values.sortAndThin( Es, 1e-6 ) )
+        return( valuesModule.Values.sortAndThin( Es, 1e-6 ) )
 
     def calculateAverageEnergy( self, Ein ) :
 
         averageEp = self.energySubform.averageEp( Ein )
-        if( self.productFrame == standardsModule.frames.centerOfMassToken ) :
+        if self.productFrame == xDataEnumsModule.Frame.centerOfMass:
             A_Ein = self.massRatio * Ein
             if( not( self.angularSubform.isIsotropic( ) ) ) : averageEp += 2 * math.sqrt( A_Ein * averageEp ) * self.angularSubform.averageMu( Ein )
             averageEp += A_Ein
@@ -387,7 +413,8 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
 
         pp, averageMu = 0., self.angularSubform.averageMu( Ein )
         if( averageMu != 0. ) : pp = energySubform.sqrtEp_AverageAtE( Ein ) * averageMu
-        if( self.productFrame == standardsModule.frames.centerOfMassToken ) : pp += math.sqrt( self.massRatio * Ein )
+        if self.productFrame == xDataEnumsModule.Frame.centerOfMass:
+            pp += math.sqrt( self.massRatio * Ein )
         return( multiplicity.evaluate( Ein ) * math.sqrt( 2. * self.productMass ) * pp )
 
     def calculateAverageMomentumForPhoton( self, Ein ) :
@@ -396,7 +423,7 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
         if( muAverage == 0. ) : return( 0. )
         return( multiplicity.evaluate( Ein ) * energySubform.averageEp( Ein ) * muAverage )
 
-    class calculateDepositionInfo :
+    class CalculateDepositionInfo :
 
         def __init__( self, productFrame, productMass, massRatio, angularSubform, energySubform, multiplicity ) :
 
@@ -452,7 +479,7 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
     EMin = kwargs['EMin']
     EMax = kwargs['EMax']
 
-    if( product.id == IDsPoPsModule.photon ) : productFrame = standardsModule.frames.labToken  # All gamma data treated as in lab frame.
+    if( product.pid == IDsPoPsModule.photon ) : productFrame = xDataEnumsModule.Frame.lab    # All gamma data treated as in lab frame.
     if( isinstance( energySubform, energyModule.NBodyPhaseSpace ) ) :
         Q = kwargs['reaction'].getQ( energyUnit, final = False )
         energySubform = NBodyPhaseSpace( energySubform, massUnit, projectileMass, targetMass, productMass, Q )
@@ -468,17 +495,17 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
         Es = sorted( set( energySubform.getEnergyArray( EMin, EMax ) + multiplicity.domainGrid ) )
         Es = fixLimits( EMin, EMax, Es )
         massRatio = projectileMass * productMass / ( projectileMass + targetMass )**2
-        calculationData = calculateDepositionInfo( productFrame, productMass, massRatio, angularSubform, energySubform, multiplicity )
+        calculationData = CalculateDepositionInfo( productFrame, productMass, massRatio, angularSubform, energySubform, multiplicity )
         calculationData.setEvaluateAtX( calculateAverageEnergy )
         aveEnergy = [ [ E, calculationData.evaluateAtX( E ) ] for E in Es ]
         absoluteTolerance = 1e-3 * energyAccuracy * max( [ Ep for E, Ep in aveEnergy ] )
         calculationData.setTolerances( energyAccuracy, absoluteTolerance )
         aveEnergy = fudgemath.thickenXYList( aveEnergy, calculationData )
 
-    if( isinstance( angularSubform, angularModule.isotropic2d ) and ( productFrame == standardsModule.frames.labToken ) ) :
+    if isinstance(angularSubform, angularModule.Isotropic2d) and productFrame == xDataEnumsModule.Frame.lab:
         aveMomentum = [ [ aveEnergy[0][0], 0. ], [ aveEnergy[-1][0], 0. ] ]
     else :
-        if( product.id == IDsPoPsModule.photon ) :
+        if( product.pid == IDsPoPsModule.photon ) :
             calculationData.setEvaluateAtX( calculateAverageMomentumForPhoton )
         else :
             calculationData.setEvaluateAtX( calculateAverageMomentum )

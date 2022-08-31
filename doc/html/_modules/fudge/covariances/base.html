@@ -50,18 +50,16 @@
 
 <span class="kn">import</span> <span class="nn">abc</span>
 
-<div class="viewcode-block" id="covariance"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.covariance">[docs]</a><span class="k">class</span> <span class="nc">covariance</span><span class="p">:</span>
-
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+<div class="viewcode-block" id="Covariance"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.Covariance">[docs]</a><span class="k">class</span> <span class="nc">Covariance</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 
     <span class="nd">@property</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">pass</span>
 
-<div class="viewcode-block" id="covariance.rowBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.covariance.rowBounds">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+<div class="viewcode-block" id="Covariance.rowBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.Covariance.rowBounds">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">rowBounds</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span> <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="covariance.columnBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.covariance.columnBounds">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+<div class="viewcode-block" id="Covariance.columnBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.Covariance.columnBounds">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">columnBounds</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span> <span class="k">pass</span></div>
 
     <span class="nd">@property</span>
@@ -72,10 +70,10 @@
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">isSymmetric</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">pass</span>
 
-<div class="viewcode-block" id="covariance.toCovarianceMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.covariance.toCovarianceMatrix">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+<div class="viewcode-block" id="Covariance.toCovarianceMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.Covariance.toCovarianceMatrix">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">toCovarianceMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span> <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="covariance.getUncertaintyVector"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.covariance.getUncertaintyVector">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+<div class="viewcode-block" id="Covariance.getUncertaintyVector"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.base.Covariance.getUncertaintyVector">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">getUncertaintyVector</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">theData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span> <span class="k">pass</span></div></div>
 </pre></div>
 

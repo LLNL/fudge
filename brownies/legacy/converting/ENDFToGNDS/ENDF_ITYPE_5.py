@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -16,9 +16,9 @@ from PoPs import styles as stylesPoPsModule
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.quantities import halflife as halflifeModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 from PoPs.fissionFragmentData import productYield as productYieldModule
-from PoPs.fissionFragmentData import duration as durationModule
+from PoPs.fissionFragmentData import elapsedTime as elapsedTimeModule
 from PoPs.fissionFragmentData import time as timeModule
 from PoPs.fissionFragmentData import yields as yieldsModule
 
@@ -47,7 +47,7 @@ def parseMF454_459( info, fissionFragmentData, MT, MTDatas ) :
         ZAFP = int( data[iFP*4] )
         FPS =  int( data[iFP*4+1] )
         FPID = chemicalElementMiscPoPsModule.idFromZA( ZAFP )
-        if( FPS > 0 ) : FPID = aliasModule.metaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex( FPID, FPS )
+        if( FPS > 0 ) : FPID = aliasModule.MetaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex(FPID, FPS)
         if( FPID in fissionProducts ) : raise Exception( 'FPID = "%s" already in fissionProducts.' % FPID )
         fissionProducts.append( FPID )
 
@@ -55,40 +55,44 @@ def parseMF454_459( info, fissionFragmentData, MT, MTDatas ) :
         uncertainties.append( data[iFP*4+3] )
 
     if( len( fissionFragmentData.productYields ) == 0 ) :
-        fissionFragmentData.productYields.add( productYieldModule.productYield( info.style, fissionProducts ) )
+        fissionFragmentData.productYields.add( productYieldModule.ProductYield( info.style, fissionProducts ) )
     else :
         if( fissionFragmentData.productYields[0].nuclides != fissionProducts ) :
             raise Exception( 'Fission products differ between independent and cumulative.' )
 
-    duration = durationModule.duration( )
     if( MT == 454 ) :
-        duration.time.add( timeModule.double( info.style, 0.0, 's' ) )
+        elapsedTime = elapsedTimeModule.ElapsedTime('initial')
+        elapsedTime.time.add( timeModule.Double( info.style, 0.0, 's' ) )
     else :
-        duration.time.add( timeModule.string( info.style, 'unspecified', 's' ) )
+        elapsedTime = elapsedTimeModule.ElapsedTime('unspecified')
+        elapsedTime.time.add( timeModule.String( info.style, 'unspecified', 's' ) )
 
-    duration.yields.values = yieldsModule.values( yields )
+    elapsedTime.yields.nuclides = yieldsModule.NuclidesLink(fissionFragmentData.productYields[0].nuclides, relative=True)
+    elapsedTime.yields.values = yieldsModule.Values( yields )
 
-    diagonal = arrayModule.diagonal( shape = ( len( uncertainties ), len( uncertainties  ) ), data = uncertainties )
-    covariance = yieldsModule.covariance( diagonal )
-    uncertainty = yieldsModule.uncertainty( covariance )
-    duration.yields.uncertainty = uncertainty
+    variances = [u**2 for u in uncertainties]
+    diagonal = arrayModule.Diagonal( shape = ( len( variances ), len( variances  ) ), data = variances )
+    covariance = yieldsModule.Covariance( diagonal )
+    uncertainty = yieldsModule.Uncertainty( covariance )
+    elapsedTime.yields.uncertainty = uncertainty
 
-    fissionFragmentData.productYields[0].durations.add( duration )
+    fissionFragmentData.productYields[0].elapsedTimes.add( elapsedTime )
 
 def ITYPE_5( MTDatas, info, verbose = 0 ) :
     """Parses ENDF SFY data."""
 
     errors = []
 
-    evalStyle = stylesPoPsModule.evaluated( 'eval', '', info.library, info.libraryVersion, info.Date )
+    evalStyle = stylesPoPsModule.Evaluated( 'eval', '', info.library, info.libraryVersion, info.Date )
     evalStyle.documentation.endfCompatible.body = '\n'.join( MTDatas[451][1][4:-info.NXC] )     # Add ENDF documentation
+    endfFileToGNDSMiscModule.completeDocumentation(info, evalStyle.documentation)
     info.PoPs.styles.add(evalStyle)
 
     parentAtom = toGNDSMiscModule.getPoPsParticle( info, info.targetZA, name = None, levelIndex = info.levelIndex, level = info.level, levelUnit = energyUnit )
     if( len( parentAtom.mass ) == 0 ) :
-        parentAtom.mass.add( massModule.double( info.PoPsLabel, info.massTracker.neutronMass * info.targetMass, quantityModule.stringToPhysicalUnit( 'amu' ) ) )
+        parentAtom.mass.add( massModule.Double( info.PoPsLabel, info.massTracker.neutronMass * info.targetMass, quantityModule.stringToPhysicalUnit( 'amu' ) ) )
     if( len( parentAtom.nucleus.halflife ) == 0 ) :
-        parentAtom.nucleus.halflife.add( halflifeModule.string( info.PoPsLabel, halflifeModule.UNSTABLE, halflifeModule.baseUnit ) )
+        parentAtom.nucleus.halflife.add( halflifeModule.String( info.PoPsLabel, halflifeModule.UNSTABLE, halflifeModule.baseUnit ) )
 
     fissionFragmentData = parentAtom.fissionFragmentData
 

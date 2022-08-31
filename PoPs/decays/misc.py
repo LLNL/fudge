@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,11 +9,15 @@
 Helper method for photon decay data
 """
 
+from LUPY import enums as enumsModule
+
 from .. import IDs as IDsModule
 from ..families import nucleus as nucleusModule
 from ..families import nuclide as nuclideModule
 
-electroMagneticToken = 'electroMagnetic'
+class Mode(enumsModule.Enum):
+
+    electroMagnetic = enumsModule.auto()
 
 def photonBranchingData( pops, id ) :
     """
@@ -33,15 +37,15 @@ def photonBranchingData( pops, id ) :
     """
 
     nuclide = pops[id]
-    if( isinstance( nuclide, nucleusModule.particle ) ) : nuclide = nuclide.nuclide
-    if( not( isinstance( nuclide, nuclideModule.particle ) ) ) : raise TypeError( 'id "%s" not a nuclide or nucleus' % id )
+    if( isinstance( nuclide, nucleusModule.Particle ) ) : nuclide = nuclide.nuclide
+    if( not( isinstance( nuclide, nuclideModule.Particle ) ) ) : raise TypeError( 'id "%s" not a nuclide or nucleus' % id )
 
     branchingData = {}
     for nuclide in nuclide.isotope :
         photons = []
         energy = nuclide.energy[0].pqu( )
         for decayMode in nuclide.decayData.decayModes :
-            if( decayMode.mode == electroMagneticToken ) :
+            if decayMode.mode == Mode.electroMagnetic:
                 probability = decayMode.probability[0].value
                 decayPath = decayMode.decayPath[0]
                 products = [ decayProduct.pid for decayProduct in decayPath.products ]

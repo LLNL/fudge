@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,9 +11,9 @@ from fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic im
 
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
-    if isinstance(self.link, CPNElasticModule.form):
+    if isinstance(self.link, CPNElasticModule.Form):
         self.link.toENDF6( MT, endfMFList, flags, targetInfo )
     else:
         pass
 
-referenceModule.form.toENDF6 = toENDF6
+referenceModule.Form.toENDF6 = toENDF6

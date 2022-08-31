@@ -1,19 +1,17 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
-
 import string
 import abc
 import inspect
 
-from . import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
 
-class Suite( ancestryModule.ancestry ) :
+class Suite(ancestryModule.AncestryIO_bare):
     """
     Abstract base class for holding a list of objects that can be indexed by an integer or a string.
     For integer indexing, the indexing is by order in which an object was put into the array or,
@@ -36,7 +34,7 @@ class Suite( ancestryModule.ancestry ) :
 
     def __init__( self, allowedClasses ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
         __allowedClasses = []
         for i1, cls in enumerate( allowedClasses ) :
@@ -270,7 +268,7 @@ class Suite( ancestryModule.ancestry ) :
         self.clear( )
         for item in other : self.add( item.copy( ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """
         Returns an list of XML strings representing *self* and its items.
         """
@@ -280,7 +278,7 @@ class Suite( ancestryModule.ancestry ) :
 
         if( ( len( self ) == 0 ) and not( showEmptySuites ) ) : return( [] )
         XML_stringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        for item in self : XML_stringList += item.toXMLList( indent = indent2, **kwargs )
+        for item in self : XML_stringList += item.toXML_strList( indent = indent2, **kwargs )
         XML_stringList[-1] += '</%s>' % self.moniker
 
         return( XML_stringList )
@@ -321,7 +319,7 @@ class Suite( ancestryModule.ancestry ) :
 
         return( item )
 
-    def parseNode( self, node, xPath, linkData, **kwargs ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
 
         xPath.append( node.tag )
 
@@ -334,21 +332,11 @@ class Suite( ancestryModule.ancestry ) :
             if( parseClass is None ) :
                 raise TypeError( 'Invalid node "%s" encountered in suite "%s".' % ( child.tag, self.moniker ) )
 
-            instance = parseClass.parseConstructBareNodeInstance( child, xPath, linkData, **kwargs )
-            instance.parseNode( child, xPath, linkData, **kwargs )
+            instance = parseClass.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             self.add( instance )
 
         xPath.pop( )
         return( self )
-
-    @classmethod
-    def parseStringUsingClass( cls, string ) :
-
-        from xml.etree import cElementTree
-
-        node = cElementTree.fromstring( string )
-        kwargs = node.attrib.copy( )
-        return( cls( **kwargs ).parseNode( node, [], [] ) )
 
 class SortedSuite( Suite ) :
     """
@@ -380,11 +368,11 @@ class Suite2( Suite ) :
     Like the **suite** class except the method **toXML** are added.
     """
 
-    toXML = ancestryModule.Ancestry2.toXML
+    pass
 
 class SortedSuite2( SortedSuite ) :
     """
     Like the **sortSuite** class except the method **toXML** are added.
     """
 
-    toXML = ancestryModule.Ancestry2.toXML
+    pass

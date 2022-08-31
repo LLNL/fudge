@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -56,7 +56,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
 
     resolved, unresolved = [],[]
     for section_ in self:
-        if isinstance(section_, modelParametersModule.averageParameterCovariance):
+        if isinstance(section_, modelParametersModule.AverageParameterCovariance):
             unresolved.append(section_)
         else:
             resolved.append(section_)
@@ -69,9 +69,9 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         if isinstance(res.resolved.evaluated, resolvedModule.BreitWigner):
             LFW = res.resolved.evaluated.resonanceParameters.table.getColumn('fissionWidth') is not None
         elif isinstance(res.resolved.evaluated, resolvedModule.RMatrix):
-            LFW = any( [RR.reactionLink.link.isFission() for RR in res.resolved.evaluated.resonanceReactions])
+            LFW = any([RR.link.link.isFission() for RR in res.resolved.evaluated.resonanceReactions])
     else:
-        LFW = any( [RR.reactionLink.link.isFission() for RR in res.unresolved.evaluated.resonanceReactions])
+        LFW = any([RR.link.link.isFission() for RR in res.unresolved.evaluated.resonanceReactions])
 
     # MF32 header information:
     ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
@@ -88,8 +88,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
 
     endfMFList[32][151].append( endfFormatsModule.endfSENDLineNumber() )
 
-covarianceSuiteModule.parameterCovariances.toENDF6 = toENDF6
-
+covarianceSuiteModule.ParameterCovariances.toENDF6 = toENDF6
 
 def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
     """
@@ -111,8 +110,8 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
     LRF = 7
     if isinstance(res.resolved.evaluated, resolvedModule.BreitWigner):
         LRF = {
-            resolvedModule.BreitWigner.singleLevel: 1,
-            resolvedModule.BreitWigner.multiLevel: 2
+            resolvedModule.BreitWigner.Approximation.singleLevel: 1,
+            resolvedModule.BreitWigner.Approximation.multiLevel: 2
         }[ res.resolved.evaluated.approximation ]
     elif 'LRF3' in conversionFlags:
         LRF = 3
@@ -132,14 +131,14 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         NRes = len(RPs)
 
         SPI = targetInfo['spin']
-        AP = res.resolved.evaluated.scatteringRadius.getValueAs('10*fm')
+        AP = res.resolved.evaluated.getScatteringRadius().getValueAs('10*fm')
 
         sortByL = "sortByL" in conversionFlags
         Ls = RPs.getColumn('L')
         NLS = len(set(Ls))
         LAD = 0
         if LCOMP in (1,2) or not sortByL: NLS = 0
-        ISR = any( [isinstance(parameter.link, scatteringRadiusModule.scatteringRadius) for parameter in self.parameters] )
+        ISR = any( [isinstance(parameter.link, scatteringRadiusModule.ScatteringRadius) for parameter in self.parameters] )
         endf.append( endfFormatsModule.endfHeadLine( SPI,AP,LAD,LCOMP,NLS,ISR ) )
         MLS = 0
         if ISR:
@@ -263,7 +262,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         LAD = 0
         if LCOMP==2 and res.resolved.evaluated.supportsAngularReconstruction: LAD=1
         if LCOMP==2 or not sortByL: NLS = 0
-        ISR = any( [isinstance(parameter.link, scatteringRadiusModule.scatteringRadius) for parameter in self.parameters] )
+        ISR = any( [isinstance(parameter.link, scatteringRadiusModule.ScatteringRadius) for parameter in self.parameters] )
         endf.append( endfFormatsModule.endfHeadLine( SPI,AP,LAD,LCOMP,NLS,ISR ) )
         MLS = 0
         matrix = self.matrix.constructArray()
@@ -440,7 +439,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
 
     endfMFList[32][151] += endf
 
-modelParametersModule.parameterCovarianceMatrix.toENDF6 = toENDF6
+modelParametersModule.ParameterCovarianceMatrix.toENDF6 = toENDF6
 
 
 def averageParametersToENDF6( averageParameterSections, endfMFList, flags, targetInfo, verbosityIndent):
@@ -457,10 +456,7 @@ def averageParametersToENDF6( averageParameterSections, endfMFList, flags, targe
     endf.append(endfFormatsModule.endfContLine(EL,EH,LRU,LRF,NRO,NAPS))
 
     SPI = targetInfo['spin']
-    if res.unresolved.evaluated.scatteringRadius is not None:
-        AP = res.unresolved.evaluated.scatteringRadius.getValueAs('10*fm')
-    else:
-        AP = res.scatteringRadius.getValueAs('10*fm')
+    AP = res.unresolved.evaluated.getScatteringRadius().getValueAs('10*fm')
 
     NLS = len(URR.evaluated.Ls)
     AWRI = targetInfo['mass']
@@ -478,6 +474,8 @@ def averageParametersToENDF6( averageParameterSections, endfMFList, flags, targe
             MPAR = 0
             for parameter in [jsection.levelSpacing] + list(jsection.widths):
                 if parameter.data.uncertainty is None: break
+                if parameter.data.uncertainty.data is None: break
+
                 covarianceMatrix = parameter.data.uncertainty.data.link
 
                 savedParams = targetInfo['ENDFconversionFlags'].get(covarianceMatrix,"").split(',')

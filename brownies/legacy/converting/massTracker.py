@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,9 +8,9 @@
 from brownies.legacy.endl.structure import masses as massModule
 import collections
 
-class massTracker:
+class MassTracker:
     """
-    ENDF has complex rules for particle masses, so the massTracker serves as a single interface for masses.
+    ENDF has complex rules for particle masses, so the MassTracker serves as a single interface for masses.
     It stores ground state masses in amu, and has methods to read in from ENDF AWR
     (converting from nuclear to atomic where appropriate).
     It can return either atomic mass in amu or as AWR (converting back to nuclear where appropriate)
@@ -79,7 +79,7 @@ class massTracker:
         warning = ''
         amuMass = AWR * self.neutronMass
         Z, A = divmod(ZA, 1000)
-        if not asTarget and Z in (1,2): # AWR should be a nuclear mass rather than atomic
+        if not asTarget and ZA in self.electronBindingEnergiesAmu: # AWR should be a nuclear mass rather than atomic
             self.ZA_AWRMasses_nuclear.setdefault( ZA, collections.Counter() ).update( [AWR] )
             amuMass += self.electronMass * Z + self.electronBindingEnergiesAmu[ZA]
         else:
@@ -95,7 +95,6 @@ class massTracker:
 
         self.amuMasses[ZA] = amuMass
         return warning
-
 
     def getMassAMU(self, ZA):
         """

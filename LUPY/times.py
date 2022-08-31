@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,7 +8,7 @@
 import os, time
 timeIndicesNames = { 0 : 'user', 1 : 'sys', 2 : 'children', 3 : 'childrenSys', 4 : 'wall' }
 
-class times :
+class Times :
 
     def __init__( self ) :
 
@@ -58,7 +58,7 @@ class times :
 
 if( __name__ == '__main__' ) :
 
-    t = times( )
+    t = Times( )
     print(t)
     time.sleep( 1.4 )
     print(t.toString( ))

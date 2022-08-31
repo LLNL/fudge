@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,7 +12,7 @@ This module contains classes to handle a MoP (Map of PoPs) instance.
 import os
 import re
 
-from xData import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
 from . import database as databaseModule
 
 class FormatVersion :
@@ -21,57 +21,11 @@ class FormatVersion :
 
     allowed = ( version_0_1, )
 
-class Base( ancestryModule.ancestry ) :
-    """Base class used by all other mop related classes. Mainly inherits class ancestryModule.ancestry and defines toXML."""
-
-    def __init( self ) :
-        """
-        Constructor for Base class.
-        """
-
-        ancestryModule.ancestry.__init__( self )
-
-    def toXML( self, indent = '', **kwargs ) :
-        """
-        Returns an XML string of self.
-
-        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
-        :param **kwargs:        A keyword list passed to self's toXML_list method.
-        """
-
-        return( '\n'.join( self.toXML_list( indent, **kwargs ) ) )
-
-    def saveToOpenedFile( self, fOut, **kwargs ) :
-        """
-        Saves the contents of self to an already opened python file object (e.g., one returned by the open function).
-
-        :param fOut:            A python file object.
-        :param **kwargs:        A keyword list passed to self's toXML method.
-        """
-
-        xmlString = self.toXML( **kwargs )
-        fOut.write( xmlString )
-        fOut.write( '\n' )
-
-    def saveToFile( self, fileName, **kwargs ) :
-        """
-        Saves the contents of self to the specified path (i.e., fileName).
-
-        :param fileName:        The path to save the contents of self to.
-        :param **kwargs:        A keyword list passed to self's saveToOpenedFile method.
-        """
-
-        dirname = os.path.dirname( fileName )
-        if( ( len( dirname ) > 0 ) and not( os.path.exists( dirname ) ) ) : os.makedirs( dirname )
-        with open( fileName, "w" ) as fout :
-            fout.write( '<?xml version="1.0" encoding="UTF-8"?>\n' )
-            self.saveToOpenedFile( fout, **kwargs )
-
-class Mop( Base ) :
+class Mop(ancestryModule.AncestryIO):
 
     moniker = 'mop'
 
-    def __init__( self, name, path = './', format = FormatVersion.version_0_1 ) :
+    def __init__(self, name, path = './', format=FormatVersion.version_0_1):
 
         """
         Constructor for a Mop instance.
@@ -81,7 +35,7 @@ class Mop( Base ) :
         :param format:          The format version for the mop.
         """
 
-        Base.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         if( not( isinstance( name, str ) ) ) : raise TypeError( 'Library must be a string.' )
         self.__name = name 
@@ -93,7 +47,7 @@ class Mop( Base ) :
         self.__format = format
 
         self.__entries = []
-        self.__pops = databaseModule.database( 'Internal', '0.1' )
+        self.__pops = databaseModule.Database( 'Internal', '0.1' )
 
     def __len__( self ) :
         """Returns the number of entries in self."""
@@ -163,7 +117,7 @@ class Mop( Base ) :
 
         return( matches )
 
-    def toXML_list( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
         """
         Returns a list of str instances representing the XML lines of self.
 
@@ -179,31 +133,13 @@ class Mop( Base ) :
         if( format not in FormatVersion.allowed ) : raise TypeError( 'Invalid format = "%s".' % format )
 
         XML_list = [ '%s<%s name="%s" format="%s">' % ( indent, self.moniker, self.name, format ) ]
-        for entry in self.__entries : XML_list += entry.toXML_list( indent2, **kwargs )
+        for entry in self.__entries : XML_list += entry.toXML_strList( indent2, **kwargs )
         XML_list[-1] +=  '</%s>' % self.moniker
 
         return( XML_list )
 
     @staticmethod
-    def readXML( path ) :
-        """
-        Reads in a XML mop file.
-
-        :param path:        Path to a mop file.
-
-        :return:            Mop instance containing all entries from the mop file.
-        """
-
-        from xml.etree import cElementTree
-        from LUPY.xmlNode import xmlNode
-
-        node = cElementTree.parse( path ).getroot( )
-        node = xmlNode( node, xmlNode.etree )
-
-        return( Mop.parseXML_node( node, path ) )
-
-    @staticmethod
-    def parseXML_node( node, path ) :
+    def parseNode( node, path ) :
         """
         Creates a Mop instance from an XML mop element.
 
@@ -225,15 +161,15 @@ class Mop( Base ) :
         settings = { 'format' : format }
         for child in node :
             if( child.tag == Import.moniker ) :
-                mop.append( Import.parseXML_node( settings, child ) )
+                mop.append( Import.parseNode( settings, child ) )
             elif( child.tag == PoPs.moniker ) :
-                mop.append( PoPs.parseXML_node( settings, child ) )
+                mop.append( PoPs.parseNode( settings, child ) )
             else :
                 raise ValueError( 'Invalid child tag "%s" for mop file.' % child.tag )
 
         return( mop )
 
-class EntryBase( Base ) :
+class EntryBase(ancestryModule.AncestryIO) :
     """
     Base class for mop entries.
     """
@@ -245,7 +181,7 @@ class EntryBase( Base ) :
         :param path:            Path to the file for the entry.
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         if( not( isinstance( path, str ) ) ) : raise TypeError( 'Path must be a string.' )
         self.__path = path
@@ -264,7 +200,7 @@ class EntryBase( Base ) :
 
         return( self.__path )
 
-class PoPs( EntryBase ) :
+class PoPs(EntryBase):
     """
     Class for storing a GNDS mop's PoPs instance.
     """
@@ -279,7 +215,7 @@ class PoPs( EntryBase ) :
         :param ids:             The list of particles ids in the PoPs.database file.
         """
 
-        EntryBase.__init__( self, path )
+        EntryBase.__init__(self, path)
         self.__pops = None
         self.__ids = ids
 
@@ -329,12 +265,12 @@ class PoPs( EntryBase ) :
         """
 
         if( ( self.__pops is None ) and readPoPs ) :
-            self.__pops = databaseModule.database.readFile( self.fileName )
+            self.__pops = databaseModule.read( self.fileName )
             self.__pops.setAncestor( self )
 
         return( self.__pops )
 
-    def toXML_list( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """
         Returns a list of str instances representing the XML lines of self.
 
@@ -346,8 +282,8 @@ class PoPs( EntryBase ) :
 
         return( [ '%s<%s path="%s">' % ( indent, self.moniker, self.path ) + ' '.join( self.__ids ) + '</%s>' % self.moniker ] )
 
-    @staticmethod
-    def parseXML_node( settings, node ) :
+    @classmethod
+    def parseNodeUsingClass(settings, node):
         """
         Creates an Import instance from an XML import element.
 
@@ -366,7 +302,7 @@ class PoPs( EntryBase ) :
 
         return( pops )
 
-class Import( EntryBase ) :
+class Import(EntryBase):
     """
     Class for storing a GNDS mop's Import instance.
     """
@@ -380,7 +316,7 @@ class Import( EntryBase ) :
         :param path:            Path to the GNDS mop file.
         """
 
-        EntryBase.__init__( self, path )
+        EntryBase.__init__(self, path)
         self.__mop = None
 
     @property
@@ -406,10 +342,10 @@ class Import( EntryBase ) :
         """
 
         if( self.__mop is None ) :
-            self.__mop = Mop.readXML( self.fileName )
+            self.__mop = Mop.readXML_file( self.fileName )
             self.__mop.setAncestor( self )
 
-    def toXML_list( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """
         Returns a list of str instances representing the XML lines of self.
 
@@ -422,7 +358,7 @@ class Import( EntryBase ) :
         return( [ '%s<%s path="%s"/>' % ( indent, self.moniker, self.path ) ] )
 
     @staticmethod
-    def parseXML_node( settings, node ) :
+    def parseNode( settings, node ) :
         """
         Creates an Import instance from an XML import element.
 

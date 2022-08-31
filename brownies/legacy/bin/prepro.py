@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,7 +13,7 @@ binDir = os.path.dirname( os.path.abspath( __file__ ) )
 sys.path.insert( 0, os.path.dirname( binDir ) )
 
 from pqu import PQU as PQUModule
-from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 
 import brownies.legacy.toENDF6.toENDF6     # this import adds 'toENDF6' methods to many GNDS classes
 from brownies.legacy.converting import endfFileToGNDS
@@ -89,7 +89,7 @@ def PREPRO( reaction ) :
 
     crossSection = reaction.crossSection
     evaluated = crossSection[evaluatedStyle]
-    if( isinstance( evaluated, crossSectionModule.reference ) ) : return
+    if( isinstance( evaluated, crossSectionModule.Reference ) ) : return
 
     if( reconStyle in crossSection ) : 
         crossSection.remove( evaluatedStyle )
@@ -98,9 +98,9 @@ def PREPRO( reaction ) :
 
     evaluated = crossSection[evaluatedStyle]
     linear = None
-    if( isinstance( evaluated, crossSectionModule.regions1d ) ) :
+    if isinstance(evaluated, crossSectionModule.Regions1d):
         linear = evaluated.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
-    elif( evaluated.interpolation != standardsModule.interpolation.linlinToken ) :
+    elif evaluated.interpolation != xDataEnumsModule.Interpolation.linlin:
         linear = evaluated.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
     if( linear is not None ) :
         crossSection.remove( evaluatedStyle )

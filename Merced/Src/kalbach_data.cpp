@@ -270,15 +270,15 @@ void Kdata::Kalbach_a::setup_params( )
   // Do the masses make sense?
   double massSlop = 1.0e-6;  // the masses should agree by at least this much
   double refMass = ( projectile.mass == 0 )? target.mass * massSlop:
-    projectile.mass / 40;
+    projectile.mass / 30;
   if( std::abs( projectile.mass + target.mass - compound.mass ) > refMass )
   {
     Msg::FatalError( "Kdata::Kalbach_a::setup_params",
 		     "Check the mass of the compound" );
   }
   refMass = ( eject.mass == 0 )? compound.mass * massSlop :
-    eject.mass / 40;
-  if( std::abs( eject.mass + residual.mass - compound.mass ) >  eject.mass/40 )
+    eject.mass / 30;
+  if( std::abs( eject.mass + residual.mass - compound.mass ) >  refMass )
   {
     Msg::FatalError( "Kdata::Kalbach_a::setup_params",
 		     "Check the mass of the residual" );

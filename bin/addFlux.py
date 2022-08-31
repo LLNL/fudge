@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,8 +10,6 @@
 import os
 
 from pqu import PQU as PQUModule
-from xData import axes as axesModule
-from xData import values as valuesModule
 
 from fudge.processing import flux as fluxModule
 
@@ -58,9 +56,9 @@ if( input is None ) :
     if( os.path.exists( args.output ) ) : input = args.output
 
 if( input is not None ) :
-    fluxes = fluxModule.fluxes.readXML( input )
+    fluxes = fluxModule.Fluxes.readXML_file(input)
 else :
-    fluxes = fluxModule.fluxes( )
+    fluxes = fluxModule.Fluxes( )
 
 if( flux.label in fluxes ) :
     if( not( args.override ) ) : raise ValueError( """Label "%s" already in flux file.""" % flux.label )

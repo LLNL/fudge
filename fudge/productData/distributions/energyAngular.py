@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,12 +9,12 @@
 
 import math
 
-import xData.axes as axesModule
-import xData.standards as standardsModule
-import xData.series1d as series1dModule
-import xData.XYs as XYsModule
-import xData.multiD_XYs as multiD_XYsModule
-import xData.regions as regionsModule
+from xData import enums as xDataEnumsModule
+from xData import axes as axesModule
+from xData import series1d as series1dModule
+from xData import XYs1d as XYs1dModule
+from xData import multiD_XYs as multiD_XYsModule
+from xData import regions as regionsModule
 
 from PoPs import IDs as PoPsIDsModule
 
@@ -22,24 +22,22 @@ from . import base as baseModule
 from . import energy as energyModule
 from . import miscellaneous as miscellaneousModule
 
-__metaclass__ = type
 
 def defaultAxes( energyUnit ) :
 
-    axes = axesModule.axes( rank = 4 )
-    axes[0] = axesModule.axis( 'P(energy_out,mu|energy_in)', 0, '1/' + energyUnit )
-    axes[1] = axesModule.axis( 'mu', 1, '' )
-    axes[2] = axesModule.axis( 'energy_out', 2, energyUnit )
-    axes[3] = axesModule.axis( 'energy_in', 3, energyUnit )
+    axes = axesModule.Axes(4)
+    axes[0] = axesModule.Axis( 'P(energy_out,mu|energy_in)', 0, '1/' + energyUnit )
+    axes[1] = axesModule.Axis( 'mu', 1, '' )
+    axes[2] = axesModule.Axis( 'energy_out', 2, energyUnit )
+    axes[3] = axesModule.Axis( 'energy_in', 3, energyUnit )
     return( axes )
 
-class XYs1d( XYsModule.XYs1d ) :    # FIXME: BRB, Should this class inherit from angular.XYs1d?
+class XYs1d( XYs1dModule.XYs1d ) :    # FIXME: BRB, Should this class inherit from angular.XYs1d?
 
     def averageMu( self ) :
 
-        allowedInterpolations = [ standardsModule.interpolation.linlinToken,
-                                  standardsModule.interpolation.flatToken ]
-        xys = self.changeInterpolationIfNeeded( allowedInterpolations, XYsModule.defaultAccuracy )
+        allowedInterpolations = [xDataEnumsModule.Interpolation.linlin, xDataEnumsModule.Interpolation.flat]
+        xys = self.changeInterpolationIfNeeded( allowedInterpolations, XYs1dModule.defaultAccuracy )
         return( xys.integrateWithWeight_x( ) )
 
     def toLinearXYsClass( self ) :
@@ -60,13 +58,15 @@ class XYs2d( multiD_XYsModule.XYs2d ) :
 
     def averageEnergy( self ) :
 
-        integralOfMu = [ [ pdfOfMuAtEp.outerDomainValue, float( pdfOfMuAtEp.integrate( ) ) ] for pdfOfMuAtEp in self ]
-        return( float( XYsModule.XYs1d( integralOfMu, interpolation = self.interpolation ).integrateWithWeight_x( ) ) )
+        integralOfMu = [ [ pdfOfMuAtEp.outerDomainValue, pdfOfMuAtEp.integrate() ] for pdfOfMuAtEp in self ]
+
+        return XYs1dModule.XYs1d(integralOfMu, interpolation = self.interpolation, axes=self.axes).integrateWithWeight_x()
 
     def averageForwardMomentum( self, sqrt_2_ProductMass ) :
 
         averageMu = [ [ pdfOfMuAtEp.outerDomainValue, pdfOfMuAtEp.averageMu( ) ] for pdfOfMuAtEp in self ]
-        return( sqrt_2_ProductMass * float( XYsModule.XYs1d( averageMu, interpolation = self.interpolation ).integrateWithWeight_sqrt_x( ) ) )
+
+        return sqrt_2_ProductMass * XYs1dModule.XYs1d(averageMu, interpolation = self.interpolation, axes=self.axes).integrateWithWeight_sqrt_x()
 
     def toLinearXYsClass( self ) :
 
@@ -77,17 +77,17 @@ class XYs2d( multiD_XYsModule.XYs2d ) :
 
         return( ( XYs1d, Legendre ) )
 
-class subform( baseModule.subform ) :
+class Subform( baseModule.Subform ) :
     """Abstract base class for energyAngular subforms."""
 
     pass
 
-class XYs3d( subform, multiD_XYsModule.XYs3d ) :
+class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
 
     def __init__( self, **kwargs ) :
 
         multiD_XYsModule.XYs3d.__init__( self, **kwargs )
-        subform.__init__( self )
+        Subform.__init__( self )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
@@ -107,7 +107,7 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
 #
         aveEnergy = []
         aveMomentum = []
-        if( productFrame == standardsModule.frames.labToken ) :
+        if productFrame == xDataEnumsModule.Frame.lab:
             for pdfOfEpMuAtE in self :
                 energy = pdfOfEpMuAtE.outerDomainValue
                 aveEnergy.append( [ energy, multiplicity.evaluate( energy ) * pdfOfEpMuAtE.averageEnergy( ) ] )
@@ -140,31 +140,31 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
         from fudge import warning
         from pqu import PQU
         warnings = []
-        axes = axesModule.axes()
+        axes = axesModule.Axes(2)
         axes[0] = self.axes[-2]
         axes[1] = self.axes[-1]
 
         for index, energy_in in enumerate(self):
             if isinstance(energy_in[0], Legendre):
-                integral = float( XYsModule.XYs1d( [ ( eout.outerDomainValue, eout.coefficients[0] ) for eout in energy_in ], axes = axes ).integrate( ) )
+                integral = XYs1dModule.XYs1d( [ ( eout.outerDomainValue, eout.coefficients[0] ) for eout in energy_in ], axes = axes ).integrate()
             else:
-                integral = float( XYsModule.XYs1d( [ ( eout.outerDomainValue, float(eout.integrate()) ) for eout in energy_in ], axes = axes ).integrate( ) )
+                integral = XYs1dModule.XYs1d( [ ( eout.outerDomainValue, eout.integrate() ) for eout in energy_in ], axes = axes ).integrate()
             if abs(integral-1.0) > info['normTolerance']:
-                warnings.append( warning.unnormalizedDistribution( PQU.PQU( energy_in.outerDomainValue, axes[0].unit ), index, integral, self.toXLink() ) )
+                warnings.append( warning.UnnormalizedDistribution( PQU.PQU( energy_in.outerDomainValue, axes[0].unit ), index, integral, self.toXLink() ) )
             energy_outs = {}
             for xy in energy_in :
-                energy_outs[xy.toPointwise_withLinearXYs( accuracy = XYsModule.defaultAccuracy, upperEps = 1e-8 ).rangeMin] = xy.outerDomainValue
+                energy_outs[xy.toPointwise_withLinearXYs( accuracy = XYs1dModule.defaultAccuracy, upperEps = 1e-8 ).rangeMin] = xy.outerDomainValue
             minProb = min( energy_outs.keys( ) )
             if minProb < 0:
-                warnings.append( warning.negativeProbability( PQU.PQU( energy_in.outerDomainValue, axes[0].unit ), value = minProb, 
+                warnings.append( warning.NegativeProbability( PQU.PQU( energy_in.outerDomainValue, axes[0].unit ), value = minProb, 
                         energy_out = PQU.PQU( energy_outs[minProb], axes[1].unit ), obj = energy_in ) )
-            if self.interpolationQualifier is standardsModule.interpolation.unitBaseToken:
+            if self.interpolationQualifier is xDataEnumsModule.InterpolationQualifier.unitBase:
                 # check for more than one outgoing distribution integrating to 0 at high end of incident energies
                 integrals = [eout.integrate() for eout in energy_in]
                 for idx, integral in enumerate(integrals[::-1]):
                     if integral != 0: break
                 if idx > 1:
-                    warnings.append( warning.extraOutgoingEnergy( PQU.PQU( energy_in.outerDomainValue, axes[-1].unit ), obj = energy_in ) )
+                    warnings.append( warning.ExtraOutgoingEnergy( PQU.PQU( energy_in.outerDomainValue, axes[-1].unit ), obj = energy_in ) )
         return warnings
 
     def energySpectrumAtEnergy( self, energyIn ) :
@@ -172,16 +172,16 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
         energyUnit = self.domainUnit
         flag, functional2d1, functional2d2, frac, interpolation, interpolationQualifier = self.getBoundingSubFunctions( energyIn )
         if( flag in [ '<', '>', None ] ) : return( energyModule.XYs1d( axes = energyModule.defaultAxes( energyUnit ) ) )
-        data = [ [ functional1d.outerDomainValue, float( functional1d.integrate( ) ) ] for functional1d in functional2d1 ]
+        data = [ [ functional1d.outerDomainValue, functional1d.integrate() ] for functional1d in functional2d1 ]
         functional1d = energyModule.XYs1d( data, interpolation = functional2d1.interpolation, axes = energyModule.defaultAxes( energyUnit ) )
         if( flag != '=' ) :
-            data = [ [ functional1d.outerDomainValue, float( functional1d.integrate( ) ) ] for functional1d in functional2d2 ]
+            data = [ [ functional1d.outerDomainValue, functional1d.integrate() ] for functional1d in functional2d2 ]
             functional1d2 = energyModule.XYs1d( data, interpolation = functional2d2.interpolation, axes = energyModule.defaultAxes( energyUnit ) )
             frac = ( energyIn - functional2d1.outerDomainValue ) / ( functional2d2.outerDomainValue - functional2d1.outerDomainValue )
             if( False ) :
                 functional1d = ( 1.0 - frac ) * functional1d + frac * functional1d2
             else :
-                functional1d = XYsModule.pointwiseXY_C.unitbaseInterpolate( energyIn, functional2d1.outerDomainValue, functional1d.nf_pointwiseXY,
+                functional1d = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( energyIn, functional2d1.outerDomainValue, functional1d.nf_pointwiseXY,
                         functional2d2.outerDomainValue, functional1d2.nf_pointwiseXY, 1 )
                 functional1d = energyModule.XYs1d( functional1d, interpolation = functional1d.getInterpolation( ), axes = energyModule.defaultAxes( energyUnit ) )
 
@@ -194,7 +194,7 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
         n = self
         if( not( insitu ) ) : n = self.copy( )
         for E_MuEpPs in n :
-            sum = float( E_MuEpPs.integrate( ) )
+            sum = E_MuEpPs.integrate()
             for muEpPs in E_MuEpPs : muEpPs.setData( muEpPs / sum )
         return( n )
 
@@ -222,8 +222,8 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
 
         energy = energyModule.XYs2d( axes = self.axes, interpolation = self.interpolation, interpolationQualifier = self.interpolationQualifier )
         for PofMuGivenEp in self :
-            data = energyModule.XYs1d( [ [ PofMu.outerDomainValue, float( PofMu.integrate( ) ) ] for PofMu in PofMuGivenEp ], interpolation = PofMuGivenEp.interpolation )
-            energy.append( energyModule.xs_pdf_cdf1d.fromXYs( data, outerDomainValue = PofMuGivenEp.outerDomainValue ) )
+            data = energyModule.XYs1d( [ [ PofMu.outerDomainValue, PofMu.integrate() ] for PofMu in PofMuGivenEp ], interpolation = PofMuGivenEp.interpolation )
+            energy.append( energyModule.Xs_pdf_cdf1d.fromXYs( data, outerDomainValue = PofMuGivenEp.outerDomainValue ) )
 
         xys3d = energyAngularMCModule.XYs3d( axes = self.axes )
         for PofMuGivenEp in self :
@@ -232,22 +232,22 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
                 _PofMu = PofMu
                 if( isinstance( PofMu, Legendre ) ) :
                     if( PofMu[0] == 0 ) : _PofMu = XYs1d( [ [ -1, 0.5 ], [ 1, 0.5 ] ] )
-                    _PofMu = _PofMu.toPointwise_withLinearXYs( accuracy = XYsModule.defaultAccuracy, upperEps = 1e-8 )
-                xys2d.append( energyAngularMCModule.xs_pdf_cdf1d.fromXYs( _PofMu, PofMu.outerDomainValue ) )
+                    _PofMu = _PofMu.toPointwise_withLinearXYs( accuracy = XYs1dModule.defaultAccuracy, upperEps = 1e-8 )
+                xys2d.append( energyAngularMCModule.Xs_pdf_cdf1d.fromXYs( _PofMu, PofMu.outerDomainValue ) )
             xys3d.append( xys2d )
-        return( energyAngularMCModule.energy( energy ), energyAngularMCModule.energyAngular( xys3d ) )
+        return( energyAngularMCModule.Energy( energy ), energyAngularMCModule.EnergyAngular( xys3d ) )
 
     @staticmethod
     def allowedSubElements( ) :
 
         return( ( XYs2d, ) )
 
-class regions3d( subform, regionsModule.regions3d ) :
+class Regions3d( Subform, regionsModule.Regions3d ) :
 
     def __init__( self, **kwargs ) :
 
-        regionsModule.regions3d.__init__( self, **kwargs )
-        subform.__init__( self )
+        regionsModule.Regions3d.__init__( self, **kwargs )
+        Subform.__init__( self )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
@@ -273,7 +273,7 @@ class regions3d( subform, regionsModule.regions3d ) :
 
         return( ( XYs3d, ) )
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'energyAngular'
     subformAttributes = ( 'energyAngularSubform', )
@@ -281,8 +281,8 @@ class form( baseModule.form ) :
 
     def __init__( self, label, productFrame, energyAngularSubform ) :
 
-        if( not( isinstance( energyAngularSubform, subform ) ) ) : raise TypeError( 'instance is not an energyAngular subform' )
-        baseModule.form.__init__( self, label, productFrame, ( energyAngularSubform, ) )
+        if( not( isinstance( energyAngularSubform, Subform ) ) ) : raise TypeError( 'instance is not an energyAngular subform' )
+        baseModule.Form.__init__( self, label, productFrame, ( energyAngularSubform, ) )
 
     @property
     def domainMin( self ) :
@@ -306,16 +306,23 @@ class form( baseModule.form ) :
 
     def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
 
-        if( self.product.id == PoPsIDsModule.photon ) : frame = self.productFrame       # Kludge for now.
+        if( self.product.pid == PoPsIDsModule.photon ) : frame = self.productFrame       # Kludge for now.
         if( self.productFrame == frame ) :
             return( self.energyAngularSubform.energySpectrumAtEnergy( energyIn ) )
         else :
-            if( self.productFrame == standardsModule.frames.labToken ) : raise TypeError( 'Lab to center-of-mass translation not supported.' )
-            xys2d = self.spectrumAtEnergy( energyIn, standardsModule.frames.labToken )
-            data = [ [ xys1d.outerDomainValue, float( xys1d.integrate( ) ) ] for xys1d in xys2d ]
+            if self.productFrame == xDataEnumsModule.Frame.lab: raise TypeError( 'Lab to center-of-mass translation not supported.' )
+            xys2d = self.spectrumAtEnergy(energyIn, xDataEnumsModule.Frame.lab)
+            data = [ [ xys1d.outerDomainValue, xys1d.integrate() ] for xys1d in xys2d ]
             return( energyModule.XYs1d( data, axes = energyModule.defaultAxes( self.domainUnit ), interpolation = xys2d.interpolation ) )
 
-    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = standardsModule.frames.productToken, LegendreOrder = 0 ) :
+    def fixDomains(self, energyMin, energyMax, domainToFix):
+        """
+        This method call **fixDomains* on the *energyAngularSubform* member.
+        """
+
+        return self.energyAngularSubform.fixDomains(energyMin, energyMax, domainToFix, tweakLower=True, epsilon=2e-2)
+        
+    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.product, LegendreOrder = 0 ) :
 
 # Need to check frame.
 
@@ -330,8 +337,8 @@ class form( baseModule.form ) :
             if( muOutMax is None ) :
                 muPartialIntegral = function1d.evaluate( muOutMin )
             else :
-                muPartialIntegral = float( function1d.integrate( muOutMin, muOutMax ) )
-            points.append( [ function1d.outerDomainValue, float( muPartialIntegral ) ] )
+                muPartialIntegral = function1d.integrate(muOutMin, muOutMax)
+            points.append( [ function1d.outerDomainValue, muPartialIntegral ] )
         xys = XYs1d( data = points )
 
         energyOutMin, energyOutMax = miscellaneousModule.domainLimits( energyOut, xys.domainMin, xys.domainMax )
@@ -349,7 +356,7 @@ class form( baseModule.form ) :
         from . import energyAngularMC as energyAngularMCModule
 
         energy, energyAngular = self.energyAngularSubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
-        return( energyAngularMCModule.form( style.label, self.productFrame, energy, energyAngular ) )
+        return( energyAngularMCModule.Form( style.label, self.productFrame, energy, energyAngular ) )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
 
@@ -361,7 +368,8 @@ class form( baseModule.form ) :
         if( not( isinstance( self.energyAngularSubform, XYs3d ) ) ) : raise TypeError( 'Form "%s" is not supported' % self.energyAngularSubform.moniker )
 
         if( frame == self.productFrame ) : return( self.energyAngularSubform.toPointwise_withLinearXYs( accuracy = 1e-3 ) )
-        if( frame == standardsModule.frames.centerOfMassToken ) : raise ValueError( 'Conversion from frame "%s" to "%s" not supported' % ( self.productFrame, frame ) )
+        if frame == xDataEnumsModule.Frame.centerOfMass:
+            raise ValueError( 'Conversion from frame "%s" to "%s" not supported' % ( self.productFrame, frame ) )
 
         xys3d = XYs3d( axes = defaultAxes( self.domainUnit ) )
         for energy in self.energyAngularSubform.domainGrid : xys3d.append( self.spectrumAtEnergy( energy, frame ) )
@@ -370,7 +378,7 @@ class form( baseModule.form ) :
 
     def spectrumAtEnergy( self, energyIn, frame ) :
 
-        class angualarAtEnergyCOM :
+        class AngualarAtEnergyCOM :
 
             def __init__( self, probability ) :
 
@@ -383,15 +391,16 @@ class form( baseModule.form ) :
         _spectrumAtEnergy = self.energyAngularSubform.evaluate( energyIn ).toPointwiseLinear( lowerEps = 1e-7 ) # lowerEps should be user input and not hardwired.
         if( frame == self.productFrame ) : return( _spectrumAtEnergy )
 
-        if( frame == standardsModule.frames.centerOfMassToken ) : raise ValueError( 'Conversion from frame "%s" to "%s" not supported' % ( self.productFrame, frame ) )
+        if frame == xDataEnumsModule.Frame.centerOfMass:
+            raise ValueError( 'Conversion from frame "%s" to "%s" not supported' % ( self.productFrame, frame ) )
 
-        energyProbability = [ [ probability.outerDomainValue, float( probability.integrate( ) ) ] for probability in _spectrumAtEnergy ]
+        energyProbability = [ [ probability.outerDomainValue, probability.integrate() ] for probability in _spectrumAtEnergy ]
         energyProbability = energyModule.XYs1d( energyProbability, axes = energyModule.defaultAxes( self.domainUnit ) )
         return( miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energyProbability, 
-                angualarAtEnergyCOM( _spectrumAtEnergy ), angularIsNormalized = False ) )
+                AngualarAtEnergyCOM( _spectrumAtEnergy ), angularIsNormalized = False ) )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         """Translate <energyAngular> element from xml."""
 
         xPath.append( element.tag )
@@ -400,7 +409,7 @@ class form( baseModule.form ) :
                 XYs3d.moniker: XYs3d,
                 }.get( subformElement.tag )
         if subformClass is None: raise Exception( "encountered unknown energyAngular subform: %s" % subformElement.tag )
-        subForm = subformClass.parseXMLNode( subformElement, xPath, linkData )
-        energyAngular = form( element.get( "label" ), element.get('productFrame'), subForm )
+        subForm = subformClass.parseNodeUsingClass(subformElement, xPath, linkData, **kwargs)
+        energyAngular = cls( element.get( "label" ), element.get('productFrame'), subForm )
         xPath.pop()
         return energyAngular

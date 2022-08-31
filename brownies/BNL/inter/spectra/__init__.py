@@ -43,8 +43,8 @@ def get_KENO_flux(file):
 
 def get_ENDF_flux(file, mat, mf, mt):
     import brownies.legacy.converting.ENDFToGNDS.endfFileToGNDSMisc as endfFileToGNDSMiscModule
-    import xData.axes as axesModule
-    import xData.XYs as XYsModule
+    from xData import axes as axesModule
+    from xData import XYs1d as XYs1dModule
     # Grab the data corresponding to the spectrum
     with open(file) as endffluxfile:
         MF3Data = [line.strip('\r\n') for line in endffluxfile.readlines() if
@@ -52,20 +52,20 @@ def get_ENDF_flux(file, mat, mf, mt):
                    int(line[70:72]) == int(mf) and
                    int(line[72:75]) == int(mt)]
     # Define the axes
-    spectrumAxes = axesModule.axes(rank=2)
-    spectrumAxes[0] = axesModule.axis('spectrum', 0, '1/eV')
-    spectrumAxes[1] = axesModule.axis('energy_in', 1, 'eV')
+    spectrumAxes = axesModule.Axes(2)
+    spectrumAxes[0] = axesModule.Axis('spectrum', 0, '1/eV')
+    spectrumAxes[1] = axesModule.Axis('energy_in', 1, 'eV')
     # Now make the spectrum as an XYs1d
     dataLine, TAB1, spectrumRegions = endfFileToGNDSMiscModule.getTAB1Regions(1, MF3Data, allowInterpolation6=True,
                                                                               logFile=None,  # info.logs,
                                                                               axes=spectrumAxes,
-                                                                              cls=XYsModule.XYs1d)
+                                                                              cls=XYs1dModule.XYs1d)
     if len(spectrumRegions) == 1:  # Store as XYs1d.
-        spectrumForm = XYsModule.XYs1d(data=spectrumRegions[0], label=None,
+        spectrumForm = XYs1dModule.XYs1d(data=spectrumRegions[0], label=None,
                                        axes=spectrumAxes, interpolation=spectrumRegions[0].interpolation)
     else:
         raise NotImplementedError("Fluxes with multiple regions for %s/%s/%s/%s" % (file, mat, mf, mt))
-        spectrumForm = crossSectionModule.regions1d(label=None, axes=spectrumAxes)
+        spectrumForm = crossSectionModule.Regions1d(label=None, axes=spectrumAxes)
         for region in spectrumRegions:
             if len(region) > 1:
                 spectrumForm.append(region)

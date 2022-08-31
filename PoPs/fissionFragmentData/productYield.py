@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,51 +8,57 @@
 from .. import misc as miscModule
 from .. import suite as suiteModule
 from . import nuclides as nuclidesModule
-from . import duration as durationModule
+from . import elapsedTime as elapsedTimeModule
 
-class productYield( miscModule.classWithLabelKey ) :
+class ProductYield( miscModule.ClassWithLabelKey ) :
 
     moniker = 'productYield'
 
     def __init__( self, label, nuclides ) :
 
-        miscModule.classWithLabelKey.__init__( self, '' )
+        miscModule.ClassWithLabelKey.__init__( self, label )
 
-        self.__nuclides = nuclidesModule.nuclides( nuclides )
+        self.__nuclides = nuclidesModule.Nuclides( nuclides )
         self.__nuclides.setAncestor( self )
 
-        self.__durations = durationModule.suite( )
-        self.__durations .setAncestor( self )
+        self.__elapsedTimes = elapsedTimeModule.Suite( )
+        self.__elapsedTimes.setAncestor( self )
 
     @property
-    def nuclides( self ) :
+    def nuclides(self):
 
-        return( self.__nuclides )
+        return self.__nuclides
 
     @property
-    def durations( self ) :
+    def elapsedTimes(self):
 
-        return( self.__durations )
+        return self.__elapsedTimes
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    @property
+    def durations(self):
+        # deprecated accessor using GNDS-1.9 name
+
+        return self.__elapsedTimes
+
+    def toXML_strList(self, indent = '', **kwargs):
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s> ' % ( indent, self.moniker ) ]
-        XMLStringList += self.__nuclides.toXMLList( indent2, **kwargs )
-        XMLStringList += self.__durations.toXMLList( indent2, **kwargs )
+        XMLStringList += self.__nuclides.toXML_strList( indent2, **kwargs )
+        XMLStringList += self.__elapsedTimes.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
 
         return( XMLStringList )
 
-    def parseXMLNode( self, element, xPath, linkData ):
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append(element.tag)
         for child in element:
-            if child.tag == nuclidesModule.nuclides.moniker:
-                self.nuclides.parseXMLNode(child, xPath, linkData)
-            elif child.tag == durationModule.suite.moniker:
-                self.durations.parseXMLNode(child, xPath, linkData)
+            if child.tag == nuclidesModule.Nuclides.moniker:
+                self.nuclides.parseNode(child, xPath, linkData, **kwargs)
+            elif child.tag == elapsedTimeModule.Suite.moniker:
+                self.elapsedTimes.parseNode(child, xPath, linkData, **kwargs)
             else:
                 raise TypeError("Unexpected child node '%s' in %s" % (child.tag, element.tag))
 
@@ -60,19 +66,19 @@ class productYield( miscModule.classWithLabelKey ) :
         return self
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append(element.tag)
         self = cls(label='', nuclides=[])
         xPath.pop()
-        self.parseXMLNode(element, xPath, linkData)
+        self.parseNode(element, xPath, linkData, **kwargs)
 
         return self
 
-class suite( suiteModule.suite ) :
+class Suite( suiteModule.Suite ) :
 
     moniker = 'productYields'
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, ( productYield, ) )
+        suiteModule.Suite.__init__( self, ( ProductYield, ) )

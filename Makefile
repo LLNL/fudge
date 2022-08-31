@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -33,7 +33,7 @@ inplace: inplace2
 inplace2: crossSectionAdjustForHeatedTarget numericalFunctions
 	cd fudge/processing/resonances; $(MAKE) PYTHON=$(PYTHON)
 
-# bin/Makefile calls both Merced/Makefile and upscatter/Makefile and copy executables
+# bin/Makefile calls both Merced/Makefile and fudge/processing/deterministic/upscatter/Makefile and copy executables
 bin:
 	cd bin; $(MAKE)
 
@@ -44,7 +44,7 @@ clean:
 	cd crossSectionAdjustForHeatedTarget; $(MAKE) realclean
 	cd numericalFunctions; $(MAKE) realclean
 	cd bin; $(MAKE) realclean
-	cd upscatter; $(MAKE) realclean
+	cd fudge/processing/deterministic/upscatter; $(MAKE) realclean
 	cd PoPs; $(MAKE) realclean
 	cd pqu; $(MAKE) realclean
 
@@ -115,6 +115,7 @@ FUDGETESTFILES =    fudge/core/math/test/testFudgeMath.py                       
                     fudge/covariances/test/test_summed.py                           fudge/covariances/test/test_covarianceSuite.py \
                     fudge/processing/resonances/test/test_reconstructResonances.py  fudge/processing/resonances/test/test_makeUnresolvedProbabilityTables.py \
                     xData/test/test_XYs.py
+
 
 check-merced:
 	echo ===== check-merced =====

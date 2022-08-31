@@ -1,30 +1,30 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 import unittest
-
-import xData.table as table
 from xml.etree import cElementTree as parser
 
+from xData import table as tableModule
 
 class TestTable(unittest.TestCase):
 
     def setUp(self):
-        self.tt = table.table( columns=[
-            table.columnHeader( 0, 'energy', 'eV' ),
-            table.columnHeader( 1, 'spin', '' ),
-            table.columnHeader( 2, 'neutronWidth', 'eV' ),
-            table.columnHeader( 3, 'captureWidth', 'eV' ), ] )
-        for dat in ([-1.7, table.blank(), 3.2, 0.089], [3.4, 0.5, 4.2, 0.072], [5.6, 1.5, 2.76, 0.064]):
+        self.tt = tableModule.Table( columns=[
+            tableModule.ColumnHeader( 0, 'energy', 'eV' ),
+            tableModule.ColumnHeader( 1, 'spin', '' ),
+            tableModule.ColumnHeader( 2, 'neutronWidth', 'eV' ),
+            tableModule.ColumnHeader( 3, 'captureWidth', 'eV' ), ] )
+        for dat in ([-1.7, tableModule.Blank(), 3.2, 0.089], [3.4, 0.5, 4.2, 0.072], [5.6, 1.5, 2.76, 0.064]):
             self.tt.addRow( dat )
-        self.xmlstring = '\n'.join( self.tt.toXMLList() )
+        self.xmlstring = '\n'.join( self.tt.toXML_strList() )
         element = parser.fromstring( self.xmlstring )
-        self.tt2 = table.table.parseXMLNode( element, xPath = [], linkData = {'conversionTable' : {'index':int} } )
-        self.xmlstring2 = '\n'.join( self.tt2.toXMLList() )
+        self.tt2 = tableModule.Table.parseNodeUsingClass(element, xPath = [],
+                linkData = {'conversionTable' : {'index':int} })
+        self.xmlstring2 = '\n'.join( self.tt2.toXML_strList() )
 
 
     def test_table(self):
@@ -34,7 +34,7 @@ class TestTable(unittest.TestCase):
     def test_getColumn(self):
         # extract a column, converting eV -> MeV
         self.assertListEqual(self.tt2.getColumn('captureWidth', 'MeV'), [8.899999999999999e-08, 7.2e-08, 6.4e-08])
-        # THIS^ WILL NOT WORK WITH blank() OBJECT TYPES, ONLY TESTS IF COLUMN IS EXTRACTED AND UNITS ARE CONVERTED
+        # THIS^ WILL NOT WORK WITH Blank() OBJECT TYPES, ONLY TESTS IF COLUMN IS EXTRACTED AND UNITS ARE CONVERTED
 
     def test_addrow(self):
         """ Test if the ValueError raises when adding row of unequal length"""

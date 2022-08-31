@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -132,7 +132,7 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
 
     for reaction in self.reactions:
         doubleDifferential = reaction.doubleDifferentialCrossSection[0]
-        if isinstance(doubleDifferential, coherentElasticModule.form):          # IDPNC = 4.
+        if isinstance(doubleDifferential, coherentElasticModule.Form):          # IDPNC = 4.
             IDPNC = 4
             gridded2d = doubleDifferential.S_table.gridded2d
             temperatures = gridded2d.axes[2]
@@ -144,7 +144,7 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
             ITCE_X = [energies, array]
             NXS[6-1] = -1
 
-        elif isinstance(doubleDifferential, incoherentElasticModule.form):      # IDPNC != 4.
+        elif isinstance(doubleDifferential, incoherentElasticModule.Form):      # IDPNC != 4.
             crossSection = reaction.crossSection[cdf_style.label]
             ITCE_X = crossSection.copyDataToXsAndYs( )
             NXS[6-1] = NCL
@@ -157,27 +157,27 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
                 energies = ITCE_X[0]
 
                 distribution = reaction.outputChannel.products[0].distribution[cdf_style.label]
-                if not isinstance( distribution, uncorrelatedModule.form ):
-                    raise Exception('Incoherent elastic distribution is "%s" but needs to be "%s".' % (distribution.moniker, uncorrelatedModule.form.moniker))
+                if not isinstance( distribution, uncorrelatedModule.Form ):
+                    raise Exception('Incoherent elastic distribution is "%s" but needs to be "%s".' % (distribution.moniker, uncorrelatedModule.Form.moniker))
 
                 angular2d = distribution.angularSubform.data
                 if not isinstance(angular2d, angularModule.XYs2d):
                     raise Exception('Incoherent elastic angular distribution is "%s" but needs to be "%s".' % (angular2d.moniker, angularModule.XYs2d.moniker))
 
                 for index, angular1d in enumerate(angular2d):
-                    if not isinstance(angular1d, angularModule.xs_pdf_cdf1d):
-                        raise Exception('Incoherent elastic 1d angular distribution is "%s" but needs to be "%s".' % (angular1d.moniker, angularModule.xs_pdf_cdf1d.moniker))
+                    if not isinstance(angular1d, angularModule.Xs_pdf_cdf1d):
+                        raise Exception('Incoherent elastic 1d angular distribution is "%s" but needs to be "%s".' % (angular1d.moniker, angularModule.Xs_pdf_cdf1d.moniker))
                     if ( abs(energies[index] - angular1d.outerDomainValue) > 1e-7 * energies[index] ):
                         raise Exception('Incoherent elastic cross section and angular energies differ at %s and %s.' % (energies[index], angular1d.outerDomainValue))
                     ITCA_X += getEqualProbableBins(angular1d, 2 * NCL, checkEqualProbableBinning)[::2]
 
-        elif isinstance(doubleDifferential, incoherentInelasticModule.form):
+        elif isinstance(doubleDifferential, incoherentInelasticModule.Form):
             crossSection = reaction.crossSection[cdf_style.label]
             ITIE_X = crossSection.copyDataToXsAndYs( )
 
             distribution = reaction.outputChannel.products[0].distribution[cdf_style.label]
-            if not isinstance( distribution, energyAngularMCModule.form ):
-                raise Exception('Incoherent inelastic distribution is "%s" but needs to be "%s".' % (distribution.moniker, energyAngularMCModule.form.moniker))
+            if not isinstance( distribution, energyAngularMCModule.Form ):
+                raise Exception('Incoherent inelastic distribution is "%s" but needs to be "%s".' % (distribution.moniker, energyAngularMCModule.Form.moniker))
             
             energy2d = distribution.energy.data
             if not isinstance(energy2d, energyModule.XYs2d):
@@ -194,8 +194,8 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
             NXS[7-1] = IFENG
 
             for index1, energy1d in enumerate(energy2d):
-                if not isinstance(energy1d, energyModule.xs_pdf_cdf1d):
-                    raise Exception('Incoherent inelastic outgoing energy1d is %s but needs to be "%s".' % (energy1d.moniker, energyModule.xs_pdf_cdf1d.moniker))
+                if not isinstance(energy1d, energyModule.Xs_pdf_cdf1d):
+                    raise Exception('Incoherent inelastic outgoing energy1d is %s but needs to be "%s".' % (energy1d.moniker, energyModule.Xs_pdf_cdf1d.moniker))
 
                 angular2d = angular3d[index1]
                 if not isinstance(angular2d, energyAngularMCModule.XYs2d):
@@ -212,8 +212,8 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
                 cdf = energy1d.cdf.values
                 subITIEA_X = []
                 for index2, angular1d in enumerate(angular2d):
-                    if not isinstance(angular1d, energyAngularMCModule.xs_pdf_cdf1d):
-                        raise Exception('Incoherent inelastic outgoing angular1d is %s but needs to be "%s".' % (angular1d.moniker, energyAngularMCModule.xs_pdf_cdf1d.moniker))
+                    if not isinstance(angular1d, energyAngularMCModule.Xs_pdf_cdf1d):
+                        raise Exception('Incoherent inelastic outgoing angular1d is %s but needs to be "%s".' % (angular1d.moniker, energyAngularMCModule.Xs_pdf_cdf1d.moniker))
 
                     subITIEA_X += [xs[index2], pdf[index2], cdf[index2]]
                     subITIEA_X += getEqualProbableBins(angular1d, 2 * NILm1, checkEqualProbableBinning)[::2]

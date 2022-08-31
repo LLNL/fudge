@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@
 
 from pqu import PQU as PQUModule
 
-from PoPs.groups import misc as chemicalElementMiscModule
+from PoPs.chemicalElements import misc as chemicalElementMiscModule
 
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
@@ -24,28 +24,28 @@ from PoPs.families import nuclide as nuclideModule
 index = 3
 name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( 'O16', index )
 
-level = nuclideModule.particle( name )
-energy = nuclearEnergyLevelModule.double( 'base', 6917100, quantityModule.stringToPhysicalUnit( 'eV' ) )
+level = nuclideModule.Particle( name )
+energy = nuclearEnergyLevelModule.Double( 'base', 6917100, quantityModule.stringToPhysicalUnit( 'eV' ) )
 level.nucleus.energy.add( energy )
 
-mass = massModule.double( 'base', 15.99491461956, quantityModule.stringToPhysicalUnit( 'amu' ) )
+mass = massModule.Double( 'base', 15.99491461956, quantityModule.stringToPhysicalUnit( 'amu' ) )
 level.mass.add( mass )
 
-charge = chargeModule.integer( 'base', 0, quantityModule.stringToPhysicalUnit( 'e' ) )
+charge = chargeModule.Integer( 'base', 0, quantityModule.stringToPhysicalUnit( 'e' ) )
 level.charge.add( charge )
 
-halflife = halflifeModule.double( 'base', 1e100, quantityModule.stringToPhysicalUnit( 's' ) )
+halflife = halflifeModule.Double( 'base', 1e100, quantityModule.stringToPhysicalUnit( 's' ) )
 level.halflife.add( halflife )
 
-spin = spinModule.fraction( 'base', spinModule.fraction.toValueType( '5/2' ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
+spin = spinModule.Fraction( 'base', spinModule.Fraction.toValueType( '5/2' ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
 level.spin.add( spin )
 
-parity = parityModule.integer( 'base', 1, quantityModule.stringToPhysicalUnit( '' ) )
+parity = parityModule.Integer( 'base', 1, quantityModule.stringToPhysicalUnit( '' ) )
 level.parity.add( parity )
 
 xmll1 = level.toXML( )
 print( xmll1 )
-level2 = nuclideModule.particle.parseXMLStringAsClass( level.toXML( ) )
+level2 = nuclideModule.Particle.parseXMLString(level.toXML())
 if( xmll1 != level2.toXML( ) ) : raise Exception( 'Fix me.' )
 
 print( level.mass[0].pqu( ) )

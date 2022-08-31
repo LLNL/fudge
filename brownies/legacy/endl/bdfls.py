@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,7 +12,7 @@ This module contains classes for dealing with a bdfls file and its contents.
 import os
 import sys
 
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
 from brownies.legacy.endl import fudgemisc
 from fudge.core.utilities import fudgeFileMisc
@@ -560,7 +560,7 @@ xylog meanings::
         if ( xLabel is None ) : xLabel = 'Energy (MeV)'
         if ( yLabel is None ) : yLabel = 'A. U.'
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
-        f = fudgeFileMisc.fudgeTempFile( )
+        f = fudgeFileMisc.FudgeTempFile( )
         for p in self.gb: f.write( "%15.7e 0.1\n%15.7e 10.\n\n" % ( p, p ) )
         f.close( )
         p = os.path.join( __file__.split( 'fudge/processing/' )[0], "fudge", "vis", "gnuplot", "endl2dplot.py" )
@@ -646,7 +646,7 @@ xylog meanings::
         if ( xLabel is None ) : xLabel = 'Energy (MeV)'
         if ( yLabel is None ) : yLabel = 'A. U.'
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
-        f = fudgeFileMisc.fudgeTempFile( )
+        f = fudgeFileMisc.FudgeTempFile( )
         for lGroup in self.EF_l:
             for p in lGroup: f.write( '   '.join( map( str, p ) ) + '\n' )
             f.write( '\n' )

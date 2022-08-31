@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -27,8 +27,8 @@ if args.outFile == None: outFile = args.inFilePrefix + '.endf'
 else:                    outFile = args.outFile
     
 # Read in XML files
-myEval = reactionSuite.readXML( inEvalFile )
-if os.path.exists( inCovFile ): myCov = covarianceSuite.readXML( inCovFile, reactionSuite=myEval )
+myEval = reactionSuite.ReactionSuite.readXML_file( inEvalFile )
+if os.path.exists( inCovFile ): myCov = covarianceSuite.CovarianceSuite.readXML_file( inCovFile, reactionSuite=myEval )
 else:                           myCov = None
 
 # Now translate

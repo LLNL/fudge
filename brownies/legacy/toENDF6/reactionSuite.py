@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -15,7 +15,7 @@ from PoPs.families import lepton as leptonPoPsModule
 from PoPs.families import baryon as baryonPoPsModule
 from PoPs.families import nuclide as nuclidePoPsModule
 from PoPs.families import nucleus as nucleusPoPsModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
 from brownies.legacy.converting import endf_endl as endf_endlModule, massTracker as massTrackerModule
 
@@ -28,21 +28,23 @@ from . import gndsToENDF6 as gndsToENDF6Module
 from . import ENDFconversionFlags as ENDFconversionFlagsModule
 from .productData import multiplicity as multiplicityModule
 
-__metaclass__ = type
-
 def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = None, useRedsFloatFormat = False,
              lineNumbers = True, **kwargs ) :
+
+    if self.domainUnit != 'eV':
+        self = self.copy()
+        self.convertUnits({ self.domainUnit : 'eV' })
 
     _useRedsFloatFormat = endfFormatsModule.useRedsFloatFormat
     endfFormatsModule.useRedsFloatFormat = useRedsFloatFormat
 
     style = self.styles[styleLabel]
-    if( not( isinstance( style, ( stylesModule.evaluated, stylesModule.crossSectionReconstructed ) ) ) ) :
+    if( not( isinstance( style, ( stylesModule.Evaluated, stylesModule.CrossSectionReconstructed ) ) ) ) :
         raise TypeError( 'Invalid style via label "%s".' % styleLabel )
     evaluatedStyle = style
     while( True ) :
         if( evaluatedStyle is None ) : raise Exception( 'No evaluated style found via label "%s".' % styleLabel )
-        if( isinstance( evaluatedStyle, stylesModule.evaluated ) ) : break
+        if( isinstance( evaluatedStyle, stylesModule.Evaluated ) ) : break
         evaluatedStyle = evaluatedStyle.derivedFromStyle
 
     if( flags == {} ) : flags['verbosity'] = 0
@@ -60,17 +62,25 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
 
     targetInfo['ENDFconversionFlags'] = {}
     if 'LLNL' in self.applicationData:
-        conversionFlags = [data for data in self.applicationData['LLNL']
-                           if isinstance(data, ENDFconversionFlagsModule.ENDFconversionFlags)]
-        if len(conversionFlags) > 0:
-            for link in conversionFlags[0].flags:
+        LLNL_institution = self.applicationData['LLNL']
+        ENDF_conversionFlags = [data for data in LLNL_institution.data if data.moniker == ENDFconversionFlagsModule.ENDFconversionFlags.moniker]
+        if len(ENDF_conversionFlags) > 0:
+            XML_string = '\n'.join(ENDF_conversionFlags[0].toXML_strList())
+            conversionFlags = ENDFconversionFlagsModule.ENDFconversionFlags.parseXMLString(XML_string)
+            for link in conversionFlags.flags:
+                if covarianceSuite and '/covarianceSuite/' in link.path:
+                    link.setAncestor(covarianceSuite)
+                else:
+                    link.setAncestor(self)
+                try:
+                    link.updateLink()
+                except:
+                    continue
                 targetInfo['ENDFconversionFlags'][link.link] = link.flags
 
     if( self.isThermalNeutronScatteringLaw() ) :
         EMAX = self.styles.getEvaluatedStyle().projectileEnergyDomain.max
-        conversionFlags = [data for data in self.applicationData['LLNL']
-                           if isinstance(data, ENDFconversionFlagsModule.ENDFconversionFlags)]
-        MAT,ZA = conversionFlags[0].flags[0].flags.split(',')
+        MAT,ZA = targetInfo['ENDFconversionFlags'][self].split(',')
         MAT = int(MAT.replace('MAT=',''))
         targetZA = int(ZA.replace('ZA=',''))
         target = None
@@ -91,11 +101,11 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
 
     targetZ, targetA = divmod( targetZA, 1000 )
 
-    targetInfo['massTracker'] = massTrackerModule.massTracker()
+    targetInfo['massTracker'] = massTrackerModule.MassTracker()
     for particle in self.PoPs :
-        if( isinstance( particle, ( gaugeBosonPoPsModule.particle, leptonPoPsModule.particle, baryonPoPsModule.particle, nuclidePoPsModule.particle ) ) ) : 
+        if( isinstance( particle, ( gaugeBosonPoPsModule.Particle, leptonPoPsModule.Particle, baryonPoPsModule.Particle, nuclidePoPsModule.Particle ) ) ) : 
             ZA = chemicalElementMiscPoPsModule.ZA( particle )
-            if( isinstance( particle, nuclidePoPsModule.particle ) ) :
+            if( isinstance( particle, nuclidePoPsModule.Particle ) ) :
                 if( particle.index != 0 ) : continue
             if( len( particle.mass ) > 0 ) : targetInfo['massTracker'].addMassAMU( ZA, particle.getMass( 'amu' ) )
 
@@ -113,7 +123,7 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
     levelEnergy_eV = 0
     STA = 0
 
-    if( isinstance( target, nuclidePoPsModule.particle ) ) :      # isomer target
+    if( isinstance( target, nuclidePoPsModule.Particle ) ) :      # isomer target
         levelIndex = target.index
         levelEnergy_eV = target.energy[0].float( 'eV' )
         if( len( target.nucleus.halflife ) > 0 ) :
@@ -121,6 +131,8 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
     if( levelIndex > 0 ) : STA = 1
 
     targetInfo['mass'] = targetInfo['massTracker'].getMassAWR( targetZA, levelEnergyInEv = levelEnergy_eV )
+    if( self.isThermalNeutronScatteringLaw() ) :
+        targetInfo['mass'] = self.PoPs[self.target].mass.float('amu') / targetInfo['massTracker'].neutronMass
 
     targetInfo['LIS'] = levelIndex
     targetInfo['metastables'] = {}
@@ -167,12 +179,19 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
             gndsToENDF6Module.gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas )
 
     for particle in self.PoPs :
-        if( isinstance( particle, ( nucleusPoPsModule.particle, nuclidePoPsModule.particle ) ) ) :
+        if( isinstance( particle, ( nucleusPoPsModule.Particle, nuclidePoPsModule.Particle ) ) ) :
             if( len( particle.decayData.decayModes ) > 0 ) :
+                doGammaDecay = True
                 for baseMT in [ 50, 600, 650, 700, 750, 800, 1000 ] :   # 1000 causes raise in endf_endlModule.ENDF_MTZAEquation.
+                    if baseMT == 1000:
+                        doGammaDecay = False
+                        break
                     residualZA = endf_endlModule.ENDF_MTZAEquation( projectileZA, targetZA, baseMT )[0][-1]
                     if( chemicalElementMiscPoPsModule.ZA( particle ) == residualZA ) : break
-                addDecayGamma( self.PoPs, particle, baseMT, endfMFList, flags, targetInfo )
+                if doGammaDecay:
+                    addDecayGamma(self, particle, baseMT, endfMFList, flags, targetInfo)
+                else:
+                    print('WARNING: Ignoring photon branching data for particle "%s".' % particle.id)
 
     if 'totalNubar' in targetInfo:
         multiplicityModule.fissionNeutronsToENDF6( 452, targetInfo['totalNubar'], endfMFList, flags, targetInfo )
@@ -195,13 +214,27 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
             else :
                 endfMFList[5][455] = MF5MT455List + [ endfFormatsModule.endfSENDLineNumber( ) ]
 
-    if( covarianceSuite ) :
+    if covarianceSuite:
+        if covarianceSuite.domainUnit != 'eV':
+            covarianceSuite = covarianceSuite.copy()
+            covarianceSuite.convertUnits({ covarianceSuite.domainUnit : 'eV' })
         if( styleLabel not in covarianceSuite.styles ) : targetInfo['style'] = covarianceSuite.styles[0].label       # FIXME, this is a kludge.
         covarianceSuite.toENDF6( endfMFList, flags, targetInfo )
         targetInfo['style'] = styleLabel
 
-    endfDoc = self.styles.getEvaluatedStyle().documentation.endfCompatible.body
-    if( endfDoc is None ) :
+    endfDoc = ''
+    otherDocs = ''
+    for style1 in self.styles:
+        if isinstance(style1, stylesModule.Evaluated):
+            if endfDoc == '':
+                endfDoc = style1.documentation.endfCompatible.body
+            else:
+                if style1.documentation.endfCompatible.body != '': otherDocs = '\n\n' + style1.documentation.endfCompatible.body + otherDocs
+    if otherDocs != '':
+        lines = endfDoc.split('\n')
+        endfDoc = '\n'.join(lines[:5]) + otherDocs + '\n'.join(lines[5:])
+
+    if endfDoc == '':
         evaluatedDate = evaluatedStyle.date.split('-')
         month = {1:'JAN',2:'FEB',3:'MAR',4:'APR',5:'MAY',6:'JUN',7:'JUL',8:'AUG',9:'SEP',10:'OCT',11:'NOV',12:'DEC'}[int(evaluatedDate[1])]
         year  = evaluatedDate[0][2:]
@@ -213,20 +246,15 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
                             { 1 : 'NEUTRON', 1001 : 'PROTON', 1002 : 'DEUTERON', 1003 : 'TRITON', 2003 : 'HELION', 2004 : 'ALPHA' }[projectileZA],
                         '------ENDF-6 FORMAT' ]
         endfDoc = [ 'Translated via GNDS to ENDF6 by FUDGE.', '' ' ************************ C O N T E N T S ***********************' ]
-        endlDoc = self.styles.getEvaluatedStyle().documentation.get( 'ENDL' ).getLines()
-        endlDoc2 = [ ]
-        if endlDoc != None: 
-            for line in endlDoc:
-                if 'endep' in line:    # remove text from the line before the ones containing 'endep'
-                    del endlDoc2[-1]
-                    break
-                newline = textwrap.wrap(line,width=66,drop_whitespace=False,subsequent_indent='    ')
-                if len(newline)==0: newline = [' ']   # do not let blank lines disappear altogether
-                endlDoc2 += newline
-            endfDoc = endlDoc2  + endfDoc
     else :
+        lines = endfDoc.split('\n')
+        endfDoc = []
+        for line in lines:
+            if len(line) < 67:
+                endfDoc.append(line)
+            else:
+                endfDoc += textwrap.wrap(line, 66, replace_whitespace=False, drop_whitespace=False)
         docHeader2 = []
-        endfDoc = endfDoc.split( '\n' )
 
         # update the documentation, including metadata on first 4 lines:
     if len( [reac for reac in self.reactions if reac.isFission()] ) > 0:
@@ -256,7 +284,11 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
         NLIB = +1   # ENDF/A for ENDL/B-VIII.1
         temperature = 0.
     else :
-        NVER, LREL, NMOD = map( int, version.split( '.' ) )    # Version stored as '7.2.1'
+        try:
+            NVER, LREL, NMOD = map( int, version.split( '.' ) )    # Version stored as '7.2.1'
+        except Exception:
+            print('Could not extract NVER/LREL/NMOD from version "%s". Defaulting to "0"' % version)
+            NVER, LREL, NMOD = 0,0,0
         NLIB = { "ENDF/B" :  0,     "ENDF/A" :  1,      "JEFF"                 :  2,    "EFF"      :  3,    "ENDF/B (HE)" :  4,
                  "CENDL"  :  5,     "JENDL"  :  6,      "SG-23"                : 21,    "INDL/V"   : 31,    "INDL/A"      : 32,
                  "FENDL"  : 33,     "IRDF"   : 34,      "BROND (IAEA version)" : 35,    "INGDB-90" : 36,    "FENDL/A"     : 37,
@@ -268,49 +300,53 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
         NSUB = 12
     LDRV = 0
 
-    NLIB = kwargs.get( 'NLIB', NLIB )
+    if kwargs.get('NLIB', -1) != -1: NLIB = kwargs.get('NLIB')
 
     projectileMass = targetInfo['massTracker'].getMassAWR( projectileZA, asTarget = False )
     docHeader = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], LRP, LFI, NLIB, NMOD ),
             endfFormatsModule.endfHeadLine( levelEnergy_eV, STA, levelIndex, targetInfo['LISO'], 0, NFOR ),
             endfFormatsModule.endfHeadLine( projectileMass, EMAX, LREL, 0, NSUB, NVER ),
             endfFormatsModule.endfHeadLine( temperature, 0, LDRV, 0, len( docHeader2 + endfDoc ), -1 ) ]
-    new_doc = documentationModule.documentation( 'endf', '\n'.join( docHeader + docHeader2 + endfDoc ) )
+    new_doc = documentationModule.Documentation( 'endf', '\n'.join( docHeader + docHeader2 + endfDoc ) )
     endfMFList[1][451] += endfFormatsModule.toEndfStringList( new_doc )
 
     endfFormatsModule.useRedsFloatFormat = _useRedsFloatFormat
 
     return( endfFormatsModule.endfMFListToFinalFile( endfMFList, MAT, lineNumbers = lineNumbers ) )
 
-reactionSuiteModule.reactionSuite.toENDF6 = toENDF6
+reactionSuiteModule.ReactionSuite.toENDF6 = toENDF6
 
-def addDecayGamma( PoPs, particle, baseMT, endfMFList, flags, targetInfo ) :
+def addDecayGamma(reactionSuite, particle, baseMT, endfMFList, flags, targetInfo):
 
     MF = 12
     LP = 0
     MT = baseMT + particle.index
-    gammaData = []
-    levelEnergy_eV = particle.energy[0].float( 'eV' )
-    for decayMode in particle.decayData.decayModes :
-        IDs = [ product.pid for decay in decayMode.decayPath for product in decay.products ]
-        IDs.remove( IDsPoPsModule.photon )
-        if( len( IDs ) != 1 ) : raise Exception( 'Do not know how to handle this.' )
-        probability = decayMode.probability[0].value
-        finalEnergy_eV = PoPs[IDs[0]].energy[0].float( 'eV' )
-        _data = [finalEnergy_eV, probability]
-        if decayMode.photonEmissionProbabilities:
-            _data.append( decayMode.photonEmissionProbabilities[0].value )
-        gammaData.append( _data )
+    doMT = False
+    for reaction in reactionSuite.reactions:
+        if reaction.ENDF_MT == MT: doMT = True
+    if doMT:
+        gammaData = []
+        levelEnergy_eV = particle.energy[0].float( 'eV' )
+        for decayMode in particle.decayData.decayModes :
+            IDs = [ product.pid for decay in decayMode.decayPath for product in decay.products ]
+            IDs.remove( IDsPoPsModule.photon )
+            if( len( IDs ) != 1 ) : raise Exception( 'Do not know how to handle this.' )
+            probability = decayMode.probability[0].value
+            finalEnergy_eV = reactionSuite.PoPs[IDs[0]].energy[0].float( 'eV' )
+            _data = [finalEnergy_eV, probability]
+            if decayMode.photonEmissionProbabilities:
+                _data.append( decayMode.photonEmissionProbabilities[0].value )
+            gammaData.append( _data )
 
-    gammaData.sort( reverse = True )
-    nGammas = len( gammaData )
-    LGp = len( gammaData[0] )
-    endfMFList[MF][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 2, LGp - 1, MT - baseMT, 0 ),
-        endfFormatsModule.endfHeadLine( levelEnergy_eV, 0., LP, 0, LGp * nGammas, nGammas ) ]
+        gammaData.sort( reverse = True )
+        nGammas = len( gammaData )
+        LGp = len( gammaData[0] )
+        endfMFList[MF][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 2, LGp - 1, MT - baseMT, 0 ),
+            endfFormatsModule.endfHeadLine( levelEnergy_eV, 0., LP, 0, LGp * nGammas, nGammas ) ]
 
-    endfMFList[MF][MT] += endfFormatsModule.endfNdDataList( gammaData )
-    endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
+        endfMFList[MF][MT] += endfFormatsModule.endfNdDataList( gammaData )
+        endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
 
-        # Currently, assume all distributions are isotropic
-    endfMFList[14][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 1, 0, nGammas, 0 ) ]
-    endfMFList[14][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
+            # Currently, assume all distributions are isotropic
+        endfMFList[14][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 1, 0, nGammas, 0 ) ]
+        endfMFList[14][MT].append( endfFormatsModule.endfSENDLineNumber( ) )

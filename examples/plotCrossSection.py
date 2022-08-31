@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -15,6 +15,7 @@ import os
 import sys
 import argparse
 
+from fudge import physicalQuantity as physicalQuantityModule
 from fudge import styles as stylesModule
 
 exampleDir = os.path.dirname( os.path.abspath( __file__ ) )
@@ -34,7 +35,7 @@ args = parser.parse_args()
 filename = args.file[0]
 if open(filename).readline().startswith( "<?xml" ):
     from fudge import reactionSuite
-    RS = reactionSuite.readXML( filename )
+    RS = reactionSuite.ReactionSuite.readXML_file( filename )
 else:
     from brownies.legacy.converting import endfFileToGNDS
     rce = endfFileToGNDS.endfFileToGNDS(filename)
@@ -49,11 +50,10 @@ for MT in args.mt:
     reac = reac[0]
 
     if args.temp:
-        from fudge import physicalQuantity
         from pqu import PQU
         temp = PQU.PQU( args.temp )
-        heatedStyle = stylesModule.heated( 'heated', derivedFrom=RS.styles.getEvaluatedStyle().label,
-                temperature=physicalQuantity.temperature( temp.value, temp.unit ) )
+        heatedStyle = stylesModule.Heated( 'heated', derivedFrom=RS.styles.getEvaluatedStyle().label,
+                temperature=physicalQuantityModule.Temperature( temp.value, temp.unit ) )
         data[(MT, reac.label)] = reac.crossSection.heat( heatedStyle, EMin=PQU.PQU(1e-5,'eV') )
     else:
         xsc = [form for form in reac.crossSection if hasattr(form, 'toPointwise_withLinearXYs')]

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,14 +8,14 @@
 from .. import suite as suiteModule
 from ..quantities import quantity as quantityModule
 
-class double( quantityModule.double ) :
+class Double( quantityModule.Double ) :
 
     pass
 
-class suite( suiteModule.sortedSuite ) :
+class Suite( suiteModule.SortedSuite ) :
 
     moniker = 'multiplicity'
 
     def __init__( self ) :
 
-        suiteModule.sortedSuite.__init__( self, allowedClasses = ( double, ) )
+        suiteModule.SortedSuite.__init__( self, allowedClasses = ( Double, ) )

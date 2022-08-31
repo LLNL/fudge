@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -17,10 +17,9 @@ Internally, data can be represented three ways:
 import math
 
 from pqu import PQU as PQUModule
+from xData import enums as xDataEnumsModule
 
-from xData import standards as standardsModule
-
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 from PoPs.families import nuclide as nuclideFamilyModule
 
 from fudge.core.math import fudgemath as fudgemathModule
@@ -34,27 +33,28 @@ from . import RutherfordScattering as RutherfordScatteringModule
 from . import nuclearAmplitudeExpansion as nuclearAmplitudeExpansionModule
 from . import nuclearPlusInterference as nuclearPlusInterferenceModule
 
-__metaclass__ = type
 
-class form( baseModule.form ):
+class Form( baseModule.Form ):
 
     moniker = "CoulombPlusNuclearElastic"
+    keyName = 'label'
+
     subformAttributes = ( 'RutherfordScattering', 'nuclearPlusInterference', 'nuclearAmplitudeExpansion' )
 
-    def __init__( self, pid, label, productFrame = standardsModule.frames.centerOfMassToken,
-                  RutherfordScattering = None, nuclearPlusInterference = None, nuclearAmplitudeExpansion = None, identicalParticles = False ):
+    def __init__(self, pid, label, productFrame=xDataEnumsModule.Frame.centerOfMass, RutherfordScattering=None,
+                nuclearPlusInterference=None, nuclearAmplitudeExpansion=None, identicalParticles=False ):
 
         if( RutherfordScattering is None) : RutherfordScattering = RutherfordScatteringModule.RutherfordScattering( )
         if( not isinstance( RutherfordScattering, ( RutherfordScatteringModule.RutherfordScattering, type( None ) ) ) ) :
             raise TypeError( "Invalid nuclearPlusInterference type: '%s' not allowed in %s" % ( type( RutherfordScattering ), self.moniker ) )
 
-        if( not isinstance( nuclearPlusInterference, ( nuclearPlusInterferenceModule.nuclearPlusInterference, type( None ) ) ) ) :
-            raise TypeError( "Invalid nuclearPlusInterference type: '%s' not allowed in %s" % ( type( nuclearPlusInterference ), self.moniker ) )
+        if( not isinstance( nuclearPlusInterference, ( nuclearPlusInterferenceModule.NuclearPlusInterference, type( None ) ) ) ) :
+            raise TypeError( "Invalid NuclearPlusInterference type: '%s' not allowed in %s" % ( type( nuclearPlusInterference ), self.moniker ) )
 
-        if( not isinstance( nuclearAmplitudeExpansion, ( nuclearAmplitudeExpansionModule.nuclearAmplitudeExpansion, type( None ) ) ) ) :
+        if( not isinstance( nuclearAmplitudeExpansion, ( nuclearAmplitudeExpansionModule.NuclearAmplitudeExpansion, type( None ) ) ) ) :
             raise TypeError( "Invalid nuclearAmplitudeExpansion type: '%s' not allowed in %s" % ( type( nuclearAmplitudeExpansion ), self.moniker ) )
 
-        baseModule.form.__init__( self, pid, label, productFrame, ( RutherfordScattering, nuclearPlusInterference, nuclearAmplitudeExpansion ), 
+        baseModule.Form.__init__( self, pid, label, productFrame, ( RutherfordScattering, nuclearPlusInterference, nuclearAmplitudeExpansion ), 
                 identicalParticles = identicalParticles )
 
         self.__data = self.nuclearPlusInterference
@@ -114,17 +114,22 @@ class form( baseModule.form ):
         projectile = RS.PoPs[ RS.projectile ]
         identicalParticles = target is projectile
         if identicalParticles and not self.identicalParticles:
-            warnings.append( warning.missingCoulombIdenticalParticlesFlag() )
+            warnings.append( warning.MissingCoulombIdenticalParticlesFlag() )
         elif not identicalParticles and self.identicalParticles:
-            warnings.append( warning.incorrectCoulombIdenticalParticlesFlag(
+            warnings.append( warning.IncorrectCoulombIdenticalParticlesFlag(
                 RS.projectile, RS.target ) )
 
         if self.data is not None:
             dataWarnings = self.data.check( info )
             if dataWarnings:
-                warnings.append( warning.context('%s:' % self.data.moniker, dataWarnings) )
+                warnings.append( warning.Context('%s:' % self.data.moniker, dataWarnings) )
 
         return warnings
+
+    def fixDomains(self, domainMin, domainMax, fixToDomain):
+        """This method does nothing."""
+
+        return 0
 
     def initialize( self ):
         """
@@ -133,10 +138,10 @@ class form( baseModule.form ):
 
         if( self.__etaCoefficient is not None ) : return        # Already initialized.
 
-        reactionSuite = self.getRootAncestor()
+        reactionSuite = self.rootAncestor
 
         projectile = reactionSuite.PoPs[reactionSuite.projectile]
-        if( isinstance( projectile, nuclideFamilyModule.particle ) ) : projectile = projectile.nucleus
+        if( isinstance( projectile, nuclideFamilyModule.Particle ) ) : projectile = projectile.nucleus
 
         targetID = reactionSuite.target
         if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs[targetID].pid
@@ -159,7 +164,17 @@ class form( baseModule.form ):
         A = mass2 / mass1
         self.__kCoefficient = (A / (A + 1)) * math.sqrt( 2 * mass1 ) / hbar_c * 1e-14        # 1e-14 = sqrt( barn )
 
-    def dSigma_dMu( self, energy, muCutoff, accuracy = 1e-3, epsilon = 1e-6, excludeRutherfordScattering = False ) :
+    def dSigma_dMu(self, energy, muCutoff, accuracy=1e-3, epsilon=1e-6, excludeRutherfordScattering=False, probability=False):
+        """
+        Returns d(Sigma)/d(mu) at the specified incident energy if probability is **False** and P(mu) otherwise.
+
+        :param energy:      Energy of the projectile.
+        :param accuracy:    The accuracy of the returned *dSigma_dMu*.
+        :param muMax:       Slices the upper domain mu to this value.
+        :param probability: If **True** P(mu) is returned instead of d(Sigma)/d(mu).
+
+        :return:            d(Sigma)/d(mu) at *energy*.
+        """
 
         def dullPoint( mu, epsilon ) :
 
@@ -175,10 +190,11 @@ class form( baseModule.form ):
             muMin = 0.0
 
         if( ( self.data is None ) or ( energy < self.data.domainMin ) ) :
-            _dSigma_dMu = angularModule.XYs1d( [ [ muMin, 0.0 ], [ muCutoff, 0.0 ] ], axes = miscModule.defaultAxes( self.domainUnit ) )
+            _dSigma_dMu = angularModule.XYs1d( [ [ -1.0, 0.0 ], [ 1.0, 0.0 ] ], axes = miscModule.defaultAxes( self.domainUnit ) )
         else :
-            _dSigma_dMu = self.data.dSigma_dMu( energy, accuracy = accuracy, muMax = muCutoff )
-        if( not( excludeRutherfordScattering ) ) : _dSigma_dMu += self.RutherfordScattering.dSigma_dMu( energy, accuracy = accuracy, muMax = muCutoff )
+            _dSigma_dMu = self.data.dSigma_dMu(energy, accuracy=accuracy, muMax=muCutoff, probability=probability)
+        if not excludeRutherfordScattering:
+            _dSigma_dMu += self.RutherfordScattering.dSigma_dMu(energy, accuracy=accuracy, muMax=muCutoff)
         _dSigma_dMu = _dSigma_dMu.thin( accuracy = 1e-3 )
 
         return( _dSigma_dMu )
@@ -208,7 +224,7 @@ class form( baseModule.form ):
 
     def processCoulombPlusNuclearMuCutoff( self, style, energyMin = None, accuracy = 1e-3, epsilon = 1e-6, excludeRutherfordScattering = False ) :
 
-        class tester :
+        class Tester :
 
             def __init__( self, dSigma_dMu, muCutoff, relativeTolerance, absoluteTolerance ) :
 
@@ -220,8 +236,9 @@ class form( baseModule.form ):
             def evaluateAtX( self, energy ) :
 
                 dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = self.relativeTolerance, excludeRutherfordScattering = excludeRutherfordScattering )
-                return( float( dSigma_dMu.integrate( ) ) )
+                return dSigma_dMu.integrate()
 
+        nuclearPlusInterferenceCrossSection = None
         if( self.nuclearPlusInterference is None ) :
             if( self.nuclearAmplitudeExpansion is None ) :
                 if( excludeRutherfordScattering ) : return( None, None )
@@ -231,7 +248,7 @@ class form( baseModule.form ):
                 nuclearTerm = self.nuclearAmplitudeExpansion.nuclearTerm.data
                 if( isinstance( nuclearTerm, angularModule.XYs2d ) ) :
                     energies = nuclearTerm.domainGrid
-                elif( isinstance( nuclearTerm, angularModule.regions2d ) ) :
+                elif( isinstance( nuclearTerm, angularModule.Regions2d ) ) :
                     energies = []
                     for region in nuclearTerm : energies += region.domainGrid
                     energies = sorted( set( energies ) )
@@ -239,28 +256,30 @@ class form( baseModule.form ):
                     raise Exception( 'distribution type "%s" not supported' % type( nuclearTerm ) )
         else :
             energies = self.nuclearPlusInterference.distribution.data.domainGrid
+            nuclearPlusInterferenceCrossSection = self.nuclearPlusInterference.crossSection.data.toPointwise_withLinearXYs(lowerEps=1e-6)
 
-        RutherfordEnergies = energies.copy( )
-        RutherfordEnergyMin = self.RutherfordScattering.domainMin
-        if( RutherfordEnergyMin is None ) : RutherfordEnergyMin = PQUModule.PQU( 1e-4, 'MeV' ).getValueAs( self.domainUnit )
-        if( energyMin is not None ) :
-            if( energyMin < RutherfordEnergyMin ) : RutherfordEnergyMin = energyMin
+        if not excludeRutherfordScattering:
+            RutherfordEnergies = energies.copy( )
+            RutherfordEnergyMin = self.RutherfordScattering.domainMin
+            if( RutherfordEnergyMin is None ) : RutherfordEnergyMin = PQUModule.PQU( 1e-4, 'MeV' ).getValueAs( self.domainUnit )
+            if( energyMin is not None ) :
+                if( energyMin < RutherfordEnergyMin ) : RutherfordEnergyMin = energyMin
 
-        nonRutherfordEnergyMin = energies[0]
-        index = 0
-        while( RutherfordEnergyMin < 0.8 * nonRutherfordEnergyMin ) :
-            RutherfordEnergies.insert( index, RutherfordEnergyMin )
-            index += 1
-            RutherfordEnergyMin *= 1.4142135623731
+            nonRutherfordEnergyMin = energies[0]
+            index = 0
+            while( RutherfordEnergyMin < 0.8 * nonRutherfordEnergyMin ) :
+                RutherfordEnergies.insert( index, RutherfordEnergyMin )
+                index += 1
+                RutherfordEnergyMin *= 1.4142135623731
 
-        energies = RutherfordEnergies
+            energies = RutherfordEnergies
 
         muCutoff = style.muCutoff
         crossSection = []
         for energy in energies :
             dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = accuracy, excludeRutherfordScattering = excludeRutherfordScattering )
-            crossSection.append( [ energy, float( dSigma_dMu.integrate( ) ) ] )
-        _tester = tester( self.dSigma_dMu, muCutoff, accuracy, accuracy * crossSection[-1][1] )
+            crossSection.append([ energy, dSigma_dMu.integrate() ])
+        _tester = Tester( self.dSigma_dMu, muCutoff, accuracy, accuracy * crossSection[-1][1] )
         crossSection = fudgemathModule.thickenXYList( crossSection, _tester, biSectionMax = 16 )
 
         crossSectionAxes = crossSectionModule.defaultAxes( self.domainUnit )
@@ -269,22 +288,27 @@ class form( baseModule.form ):
         xys2d = angularModule.XYs2d( axes = angularModule.defaultAxes( self.domainUnit ) )
 
         crossSectionData = []
+        probability = nuclearPlusInterferenceCrossSection is not None
         for energy in energies :
-            data = self.dSigma_dMu( energy, muCutoff, accuracy = accuracy, excludeRutherfordScattering = excludeRutherfordScattering )
+            data = self.dSigma_dMu(energy, muCutoff, accuracy=accuracy, excludeRutherfordScattering=excludeRutherfordScattering, probability=probability)
             if( excludeRutherfordScattering ) : data = data.clip( rangeMin = 0.0 )
 
-            xSec = float( data.integrate( ) )
+            xSec = data.integrate()
             crossSectionData.append( [ energy, xSec ] )
 
-            if( xSec == 0.0 ) :
-                data = [ [ -1.0, 0.5 ], [ 1.0, 0.5 ] ]
-                if( self.identicalParticles ) : data = [ [ 0.0, 1.0 ], [ 1.0, 1.0 ] ]
+            if xSec == 0.0:
+                data = [[-1.0, 0.5], [1.0, 0.5]]
+                if self.identicalParticles:
+                    data = [[-1.0, 0.0], [-1e-12, 0.0], [1e-12, 1.0], [1.0, 1.0]]
             else :
                 data /= xSec
-            xys1d = angularModule.XYs1d( data = data, axes = xys2d.axes, outerDomainValue = energy )
-            xys2d.append( xys1d )
 
-        if( excludeRutherfordScattering ) : crossSection = crossSectionModule.XYs1d( data = crossSectionData, axes = crossSectionAxes, label = style.label )
+            xys1d = angularModule.XYs1d(data=data, axes=xys2d.axes, outerDomainValue=energy)
+            xys2d.append(xys1d)
+
+        if excludeRutherfordScattering:
+            if nuclearPlusInterferenceCrossSection is not None: crossSectionData = nuclearPlusInterferenceCrossSection
+            crossSection = crossSectionModule.XYs1d(data=crossSectionData, axes=crossSectionAxes, label=style.label)
 
         return( crossSection, xys2d )
 
@@ -293,8 +317,8 @@ class form( baseModule.form ):
         print('    processMultiGroup not implemented for distribution form %s.' % self.moniker)
         return( None )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
@@ -303,19 +327,21 @@ class form( baseModule.form ):
         nuclearAmplitudeExpansion = None
         for child in element:
             if child.tag == RutherfordScatteringModule.RutherfordScattering.moniker:
-                RutherfordScattering = RutherfordScatteringModule.RutherfordScattering.parseXMLNode( child, xPath, linkData )
-            elif child.tag == nuclearPlusInterferenceModule.nuclearPlusInterference.moniker:
-                nuclearPlusInterference = nuclearPlusInterferenceModule.nuclearPlusInterference.parseXMLNode( child, xPath, linkData )
-            elif child.tag == nuclearAmplitudeExpansionModule.nuclearAmplitudeExpansion.moniker:
-                nuclearAmplitudeExpansion = nuclearAmplitudeExpansionModule.nuclearAmplitudeExpansion.parseXMLNode( child, xPath, linkData )
+                RutherfordScattering = RutherfordScatteringModule.RutherfordScattering.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            elif child.tag == nuclearPlusInterferenceModule.NuclearPlusInterference.moniker:
+                nuclearPlusInterference = nuclearPlusInterferenceModule.NuclearPlusInterference.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            elif child.tag == nuclearAmplitudeExpansionModule.NuclearAmplitudeExpansion.moniker:
+                nuclearAmplitudeExpansion = nuclearAmplitudeExpansionModule.NuclearAmplitudeExpansion.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             else:
                 raise TypeError( "Encountered unexpected element '%s' in %s" % ( child.tag, element.tag ) )
         subForms = ( RutherfordScattering, nuclearPlusInterference, nuclearAmplitudeExpansion )
         identicalParticles = element.get( 'identicalParticles', '' ) == 'true'
-        Coul = form( element.get( 'pid' ), element.get( 'label' ), element.get( 'productFrame' ), identicalParticles = identicalParticles,
+
+        Coul = cls( element.get( 'pid' ), element.get( 'label' ), element.get( 'productFrame' ), identicalParticles = identicalParticles,
                 RutherfordScattering = RutherfordScattering, nuclearPlusInterference = nuclearPlusInterference, nuclearAmplitudeExpansion = nuclearAmplitudeExpansion )
 
         xPath.pop( )
+
         return Coul
 
 class CoulombDepositionNotSupported( Exception ):

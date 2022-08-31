@@ -15,7 +15,7 @@ Finding data within them is often just a matter of using the same name as appear
     >>> elastic.crossSection
     <fudge.reactionData.crossSection.component object at 0x10220dcd0>
     >>> elastic.outputChannel.Q
-    <fudge.channelData.Q.component object at 0x10212a0d0>
+    <fudge.outputChannelData.Q.component object at 0x10212a0d0>
     >>> elastic.outputChannel.products
     <fudge.product.products object at 0x102608e10>
     >>> elastic.outputChannel.products[0].multiplicity

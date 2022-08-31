@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@
 This module contains a set of routines that return the symbol or name for an element.
 """
 
-from PoPs.groups import misc as chemicalElementMiscModule
+from PoPs.chemicalElements import misc as chemicalElementMiscModule
 
 def endl_nZs( ) :
     """Returns the number of elements, starting at neutron with Z = 0, for which data is present.

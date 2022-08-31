@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,10 +7,13 @@
 
 from pqu import PQU as PQUModule
 
-from xData import ancestry as ancestryModule
-from xData import standards as standardsModule
+from LUPY import ancestry as ancestryModule
+
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+
+from xData import enums as xDataEnumsModule
 from xData import physicalQuantity as physicalQuantityModule
-from xData import XYs as XYs1dModule
+from xData import XYs1d as XYs1dModule
 
 from PoPs import IDs as IDsPoPsModule
 
@@ -21,23 +24,31 @@ from . import incoherentElasticMisc as incoherentElasticMiscModule
 Thermal neutron scattering law incoherent elastic double difference cross section form and its supporting classes.
 """
 
-__metaclass__ = type
+class BoundAtomCrossSection(physicalQuantityModule.PhysicalQuantity):
 
-class characteristicCrossSection( physicalQuantityModule.physicalQuantity ):
+    moniker = 'boundAtomCrossSection'
 
-    moniker = 'characteristicCrossSection'
+    def toXML_strList(self, indent='', **kwargs):
 
-class DebyeWaller( ancestryModule.ancestry ) :
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
+        moniker = self.moniker
+        if formatVersion == GNDS_formatVersionModule.version_1_10:
+            moniker = 'characteristicCrossSection'
+        kwargs['moniker'] = moniker
+
+        return physicalQuantityModule.PhysicalQuantity.toXML_strList(self, indent, **kwargs)
+
+class DebyeWallerIntegral( ancestryModule.AncestryIO ) :
     """
     For incoherent elastic sections, all we need is a characteristic cross section and a
     temperature-dependent list of the Debye-Waller integral.
     """
 
-    moniker = "DebyeWaller"
+    moniker = "DebyeWallerIntegral"
 
     def __init__( self, function1d ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
         self.__function1d = function1d
         self.__function1d.setAncestor( self )
@@ -54,46 +65,53 @@ class DebyeWaller( ancestryModule.ancestry ) :
 
         self.__function1d.convertUnits( unitMap )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+        moniker = self.moniker
 
-        xmlStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        xmlStringList += self.__function1d.toXMLList( indent2, **kwargs )
-        xmlStringList[-1] += '</%s>' % self.moniker
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
+        if formatVersion == GNDS_formatVersionModule.version_1_10:
+            moniker = 'DebyeWaller'
+
+        xmlStringList = ['%s<%s>' % (indent, moniker)]
+        xmlStringList += self.__function1d.toXML_strList(indent2, **kwargs)
+        xmlStringList[-1] += '</%s>' % moniker
 
         return( xmlStringList )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append( node.tag )
 
-        xys1d = XYs1dModule.XYs1d.parseXMLNode( element[0], xPath, linkData )
-        DebyeWaller1 = DebyeWaller( xys1d )
+        xys1d = XYs1dModule.XYs1d.parseNodeUsingClass(node[0], xPath, linkData, **kwargs)
+        debyeWallerIntegral = cls(xys1d)
 
         xPath.pop( )
-        return( DebyeWaller1 )
+        return debyeWallerIntegral
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'thermalNeutronScatteringLaw_incoherentElastic'
+    keyName = 'label'
+
     process = 'thermalNeutronScatteringLaw incoherent-elastic'
-    subformAttributes = ( 'characteristicCrossSection', 'DebyeWaller' )
+    subformAttributes = ( 'boundAtomCrossSection', 'DebyeWallerIntegral' )
 
-    def __init__( self, label, _characteristicCrossSection, _DebyeWaller ) :
+    def __init__( self, label, boundAtomCrossSection, debyeWallerIntegral ) :
 
-        baseModule.form.__init__( self, IDsPoPsModule.neutron, label, standardsModule.frames.labToken, ( _characteristicCrossSection, _DebyeWaller, ) )
+        baseModule.Form.__init__( self, IDsPoPsModule.neutron, label, xDataEnumsModule.Frame.lab, ( boundAtomCrossSection, debyeWallerIntegral, ) )
 
     @property
     def domainUnit( self ) :
 
-        invUnit = 1 / PQUModule.PQU( 1, self.DebyeWaller.function1d.axes[0].unit )
+        invUnit = 1 / PQUModule.PQU( 1, self.DebyeWallerIntegral.function1d.axes[0].unit )
         return( str( invUnit.unit ) )
 
     def processThermalNeutronScatteringLaw( self, style, kwargs ) :
 
-        temperature = style.temperature.getValueAs( self.DebyeWaller.function1d.axes[1].unit )
+        temperature = style.temperature.getValueAs( self.DebyeWallerIntegral.function1d.axes[1].unit )
 
         energyMin = PQUModule.PQU( 1e-11, 'MeV' ).getValueAs( kwargs['incidentEnergyUnit'] )
         energyMin = kwargs.get( 'energyMin', energyMin )
@@ -104,16 +122,16 @@ class form( baseModule.form ) :
 
     def temperatures( self, _temperatures ) :
 
-        _temperatures['incoherent-elastic'] = [ self.DebyeWaller.function1d.axes[-1].unit, [ x for x, y in self.DebyeWaller.function1d ] ]
+        _temperatures['incoherent-elastic'] = [ self.DebyeWallerIntegral.function1d.axes[-1].unit, [ x for x, y in self.DebyeWallerIntegral.function1d ] ]
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
-        _characteristicCrossSection = characteristicCrossSection.parseXMLNode( element[0], xPath, linkData )
-        _DebyeWaller = DebyeWaller.parseXMLNode( element[1], xPath, linkData )
-        incoherentElastic = form( element.get( 'label' ), _characteristicCrossSection, _DebyeWaller )
+        boundAtomCrossSection = BoundAtomCrossSection.parseNodeUsingClass(node[0], xPath, linkData, **kwargs)
+        debyeWallerIntegral = DebyeWallerIntegral.parseNodeUsingClass(node[1], xPath, linkData, **kwargs)
+        incoherentElastic = cls(node.get('label'), boundAtomCrossSection, debyeWallerIntegral)
 
         xPath.pop( )
         return( incoherentElastic )

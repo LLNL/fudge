@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,8 +9,9 @@ import sys
 
 from pqu import PQU as PQUModule
 
-from xData import formatVersion as formatVersionModule
-from xData import standards as standardsModule
+from PoPs import IDs as IDsPoPsModule
+from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 
 from PoPs import database as databasePoPsModule
 from PoPs import alias as PoPsAliasModule
@@ -18,10 +19,12 @@ from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import halflife as halflifeModule
 from PoPs.quantities import mass as massModule
 from PoPs.families import nuclide as nuclideModule
-from PoPs.groups import chemicalElement as chemicalElementModule
-from PoPs.groups import misc as chemicalElementMiscModule
+from PoPs.chemicalElements import chemicalElement as chemicalElementModule
+from PoPs.chemicalElements import misc as chemicalElementMiscModule
 
+from xData import enums as xDataEnumsModule
 import fudge
+from fudge import enums as enumsModule
 from fudge import institution as institutionModule
 from fudge import physicalQuantity as physicalQuantityModule
 from fudge import reactionSuite as reactionSuiteModule
@@ -37,7 +40,7 @@ from . import toGNDSMisc
 
 from brownies.legacy.toENDF6 import ENDFconversionFlags as ENDFconversionFlagsModule
 
-class logFiles :
+class LogFiles :
 
     def __init__( self, toStdOut = False, toStdErr = False, logFile = None, defaultIsStderrWriting = True ) :
 
@@ -67,14 +70,15 @@ class logFiles :
             output.write( msg )
 
 
-def readMF1MT451( _MAT, _MTDatas, formatVersion, styleName='eval', logFile=None, verboseWarnings=False, **kwargs ):
+def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleName='eval', logFile=None, verboseWarnings=False, **kwargs):
 
     # We're going to save everything in the info instance
-    info = toGNDSMisc.infos(formatVersion, styleName)
+    info = toGNDSMisc.Infos(formatVersion, styleName)
     info.doRaise = []
     info.logs = logFile
     info.verboseWarnings = verboseWarnings
     info.ENDFconversionFlags = ENDFconversionFlagsModule.ENDFconversionFlags()
+    info.specialNuclearParticleID = specialNuclearParticleID
 
     # Line #1
     targetZA, targetMass, LRP, LFI, NLIB, NMOD = \
@@ -88,7 +92,7 @@ def readMF1MT451( _MAT, _MTDatas, formatVersion, styleName='eval', logFile=None,
 
     # Line #2
     targetExcitationEnergy, STA, LIS, LISO, dummy, NFOR = \
-        endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][1], logFile=logFiles)
+        endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][1], logFile=logFile)
     STA = int(STA)            # Is nucleus unstable
     LIS = int(LIS)            # Excitation number
     LISO = int(LISO)          # Isomeric state number
@@ -101,7 +105,7 @@ def readMF1MT451( _MAT, _MTDatas, formatVersion, styleName='eval', logFile=None,
 
     # Line #3
     projectileMass, EMAX, LREL, dummy, NSUB, NVER = \
-        endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][2], logFile=logFiles)
+        endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][2], logFile=logFile)
     NSUB = int(NSUB)  # 10 * ZA + iType for projectile
     NVER = int(NVER)  # Evaluation version number
     LREL = int(LREL)  # Evaluation sub-version number
@@ -111,11 +115,12 @@ def readMF1MT451( _MAT, _MTDatas, formatVersion, styleName='eval', logFile=None,
 
     # Line #4
     targetTemperature, dummy, LDRZ, dummy, NWD, NXC = \
-        endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][3], logFile=logFiles)
+        endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][3], logFile=logFile)
     LDRZ = int(LDRZ)  # Primary or special evaluation of this material
     NWD = int(NWD)    #
     NXC = int(NXC)    #
 
+    info.convertJENDL_stylePrimarygammas = NLIB == 6        # If True, treats Mf=6 primary gamma energies as binding energy, otherwise as gamma energy.
     # Save the library name and version
     info.library = {
         0: "ENDF/B",
@@ -174,7 +179,7 @@ def readMF1MT451( _MAT, _MTDatas, formatVersion, styleName='eval', logFile=None,
 
     # All evaluations need a particle database and we fill in a lot of that information from MF1MT451
     info.PoPsLabel = styleName
-    info.PoPs = databasePoPsModule.database('protare_internal', '1.0', formatVersion=formatVersion)
+    info.PoPs = databasePoPsModule.Database('protare_internal', '1.0', formatVersion=formatVersion)
 
     # Let's tell info about the target
     info.targetZA = targetZA
@@ -187,19 +192,21 @@ def readMF1MT451( _MAT, _MTDatas, formatVersion, styleName='eval', logFile=None,
         info.projectile=None
         info.projectileZA=None
     else:
-        info.projectile = {0: 'g', 1: 'n', 11: 'e-', 1001: 'H1', 1002: 'H2', 1003: 'H3', 2003: 'He3', 2004: 'He4'}[IPART]
+        name = {0: 'g', 1: IDsPoPsModule.neutron, 11: 'e-', 1001: 'H1', 1002: 'H2', 1003: 'H3', 2003: 'He3', 2004: 'He4'}[IPART]
+        info.projectile = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(name, specialNuclearParticleID)
         info.projectileZA = projectileZA
         info.addMassAWR(projectileZA, projectileMass, asTarget=False)
 
     return info
 
 
-def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evaluation = None,
-                    MTs2Skip = None, parseCrossSectionOnly = False, formatVersion = formatVersionModule.default,
-                    toStdOut = True, toStdErr = True, logFile = None, skipBadData = False, doCovariances = True,
-                    verboseWarnings = False, verbose = 1, reconstructResonances = True, **kwargs ) :
+def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation=None,
+                    MTs2Skip=None, parseCrossSectionOnly=False, formatVersion=GNDS_formatVersionModule.default,
+                    toStdOut=True, toStdErr=True, logFile=None, skipBadData=False, doCovariances=True,
+                    verboseWarnings=False, verbose=1, reconstructResonances=True, 
+                    specialNuclearParticleID=specialNuclearParticleIDPoPsModule.Mode.nuclide, **kwargs):
 
-    logs = logFiles( toStdOut = toStdOut, toStdErr = toStdErr, logFile = logFile, defaultIsStderrWriting = False )
+    logs = LogFiles( toStdOut = toStdOut, toStdErr = toStdErr, logFile = logFile, defaultIsStderrWriting = False )
     header, MAT, MTDatas = endfFileToGNDSMisc.parseENDFByMT_MF(fileName, logFile = logs)
 
     styleName = 'eval'
@@ -208,7 +215,8 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
     if MTs2Skip is None: MTs2Skip = []
 
     # Parse the ENDF documentation section
-    info = readMF1MT451( MAT, MTDatas, formatVersion, styleName = styleName, logFile = logs, verboseWarnings = verboseWarnings, **kwargs )
+    info = readMF1MT451(MAT, MTDatas, formatVersion, specialNuclearParticleID, styleName=styleName, logFile=logs, verboseWarnings=verboseWarnings, **kwargs)
+    info.missingRadioactiveProduct = []
 
     if( info.ITYPE == 1 ) :                                                         # NFY
         return( ENDF_ITYPE_1Module.ITYPE_1( MTDatas, info, verbose = verbose ) )
@@ -228,15 +236,15 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
         target = toGNDSMisc.getTypeNameGamma(info, info.targetZA, level = info.level, levelIndex = info.levelIndex)
         targetID = target.id
         if( ( info.STA != 0 ) ) :
-            halflife = halflifeModule.string( info.PoPsLabel, halflifeModule.UNSTABLE, halflifeModule.baseUnit )
+            halflife = halflifeModule.String( info.PoPsLabel, halflifeModule.UNSTABLE, halflifeModule.baseUnit )
             target = info.PoPs[targetID]
-            if( isinstance( target, nuclideModule.particle ) ) : target = target.nucleus
+            if( isinstance( target, nuclideModule.Particle ) ) : target = target.nucleus
             if( len( target.halflife ) == 0 ) : target.halflife.add( halflife )
     elif( info.ITYPE == 3 ) :  # Atomic transport data (e, x)
         targetZ = info.targetZA // 1000
         targetID = chemicalElementMiscModule.symbolFromZ[targetZ]
         targetName = chemicalElementMiscModule.nameFromZ[targetZ]
-        info.PoPs.add( chemicalElementModule.chemicalElement( targetID, targetZ, targetName ) )
+        info.PoPs.add( chemicalElementModule.ChemicalElement( targetID, targetZ, targetName ) )
     else :
         raise ValueError( "Unsupported ITYPE = %s" % info.ITYPE )
 
@@ -254,20 +262,20 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
     info.targetAliasID = targetID
     # Add alias if needed for metastable target
     if( info.LISO != 0 ) :
-        aliasName = PoPsAliasModule.metaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex( targetID, info.LISO )
-        info.PoPs.add( PoPsAliasModule.metaStable( aliasName, targetID, info.LISO ) )
+        aliasName = PoPsAliasModule.MetaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex(targetID, info.LISO)
+        info.PoPs.add(PoPsAliasModule.MetaStable(aliasName, targetID, info.LISO))
         info.targetAliasID = aliasName
 
     # Compute the reconstructed and evaluated Styles
-    projectileDomain = stylesModule.projectileEnergyDomain( 1e-5, 2e+7, 'eV' )  # will be overwritten after parsing all reactions
-    evaluatedStyle = fudge.styles.evaluated(styleName, '',
-                                                physicalQuantityModule.temperature(
-                                                    PQUModule.pqu_float.surmiseSignificantDigits(info.targetTemperature),
+    projectileDomain = stylesModule.ProjectileEnergyDomain( 1e-5, 2e+7, 'eV' )  # will be overwritten after parsing all reactions
+    evaluatedStyle = fudge.styles.Evaluated(styleName, '',
+                                                physicalQuantityModule.Temperature(
+                                                    PQUModule.PQU_float.surmiseSignificantDigits(info.targetTemperature),
                                                     'K'),
                                                 projectileDomain,
                                                 info.library, info.libraryVersion, date=info.Date)
     if (evaluation is None): evaluation = "%s-%d.%d" % (info.library, info.NVER, info.LREL)
-    info.reconstructedStyle = stylesModule.crossSectionReconstructed(reconstructedStyleName,
+    info.reconstructedStyle = stylesModule.CrossSectionReconstructed(reconstructedStyleName,
                                                                      derivedFrom=evaluatedStyle.label,
                                                                      date="2016-11-06")
 
@@ -280,6 +288,7 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
         if (option not in options): raise DeprecationWarning('invalid or deprecated option "%s"' % option)
         setattr(info, option, kwargs[option])
     evaluatedStyle.documentation.endfCompatible.body = info.documentation
+    endfFileToGNDSMisc.completeDocumentation(info, evaluatedStyle.documentation)
     info.evaluatedStyle = evaluatedStyle
     info.reconstructedAccuracy = 0.001
     info.MF12_LO2 = {}
@@ -288,12 +297,15 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
     info.missingTwoBodyMasses = {}
     info.MF4ForNonNeutrons = []
     projectile = toGNDSMisc.getTypeNameGamma(info, info.projectileZA)
+    projectileID = projectile.id
+    if projectile.id != IDsPoPsModule.photon:
+        projectileID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(projectile.id, specialNuclearParticleID)
 
     # Set up the reactionSuite
-    interaction = reactionSuiteModule.Interaction.nuclear
-    if( info.ITYPE == 3 ) : interaction = reactionSuiteModule.Interaction.atomic
-    reactionSuite = reactionSuiteModule.reactionSuite( projectile.id, info.targetAliasID, evaluation, interaction = interaction,
-            style = info.evaluatedStyle, MAT = MAT, PoPs = info.PoPs, formatVersion = info.formatVersion )
+    interaction = enumsModule.Interaction.nuclear
+    if( info.ITYPE == 3 ) : interaction = enumsModule.Interaction.atomic
+    reactionSuite = reactionSuiteModule.ReactionSuite(projectileID, info.targetAliasID, evaluation, interaction=interaction,
+            style=info.evaluatedStyle, MAT=MAT, PoPs=info.PoPs, formatVersion=info.formatVersion)
     MTDatas[451][1] = MTDatas[451][1][:4+info.NWD]
     info.reactionSuite = reactionSuite
     info.PoPs = reactionSuite.PoPs
@@ -328,6 +340,9 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
                 if reac.outputChannel.Q.getConstant() >= 0:
                     nonThresholdList.append( reac )
             elif hasattr(reac,'Q'):
+                print(type(reac.Q))
+                print(len(reac.Q))
+                print(type(reac.Q[0]))
                 if reac.Q.getConstant() >= 0:
                     nonThresholdList.append( reac )
             else:
@@ -342,6 +357,11 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
     info.evaluatedStyle.projectileEnergyDomain.min = domainMin
     info.evaluatedStyle.projectileEnergyDomain.max = domainMax
 
+    if covarianceSuite is not None:
+        # FIXME what if covariances span smaller domain than reactions?
+        covarianceSuite.styles[info.style].projectileEnergyDomain.min = domainMin
+        covarianceSuite.styles[info.style].projectileEnergyDomain.max = domainMax
+
     # Fill up the reactionSuite
     for reaction in reactionSuite.reactions : addUnspecifiedDistributions( info, reaction.outputChannel )
     for production in reactionSuite.productions : addUnspecifiedDistributions( info, production.outputChannel )
@@ -349,21 +369,21 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
     if len(info.ENDFconversionFlags.flags) > 0:
         flagsToPurge = []
         for conversion in info.ENDFconversionFlags.flags:
-            if conversion.link.getRootAncestor() is covarianceSuite:
+            if conversion.link.rootAncestor is covarianceSuite:
                 conversion.root = '$covariances'    # FIXME need better way of handling this
-            elif conversion.link.getRootAncestor() is not reactionSuite:
+            elif conversion.link.rootAncestor is not reactionSuite:
                 flagsToPurge.append( conversion )   # flag doesn't point to any GNDS node
         for flag in flagsToPurge:
             info.ENDFconversionFlags.flags.remove( flag )
         info.ENDFconversionFlags.flags.sort(key = lambda val: val.flags)
-        LLNLdata = institutionModule.institution("LLNL")
+        LLNLdata = institutionModule.Institution("LLNL")
         LLNLdata.append(info.ENDFconversionFlags)
         reactionSuite.applicationData.add( LLNLdata )
 
     PoPs = reactionSuite.PoPs
 
     lightMasses = { # atomic masses in amu, taken from AME2012 (http://www.nndc.bnl.gov/masses/mass.mas12)
-        'n':  1.00866491585,
+        IDsPoPsModule.neutron:  1.00866491585,
         'H1': 1.00782503223,
         'H2': 2.01410177812,
         'H3': 3.01604927791,
@@ -374,7 +394,7 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
         if pid in info.PoPs:
             if len(info.PoPs[pid].mass) == 0:
                 info.PoPs[pid].mass.add(
-                    massModule.double( info.PoPsLabel, lightMasses[pid], quantityModule.stringToPhysicalUnit('amu') )
+                    massModule.Double( info.PoPsLabel, lightMasses[pid], quantityModule.stringToPhysicalUnit('amu') )
                 )
 
     for product1ID in info.missingTwoBodyMasses :
@@ -388,17 +408,25 @@ def endfFileToGNDS( fileName, useFilesQAlways = True, singleMTOnly = None, evalu
         summedQM = 0
         for product2ID, QM in info.missingTwoBodyMasses[product1ID] : summedQM += QM
         mass = massPTmP1 - PQUModule.PQU( summedQM / len( info.missingTwoBodyMasses[product1ID] ), 'eV/c**2' ).getValueAs( 'amu' )
-        mass = massModule.double( info.PoPsLabel, mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
+        mass = massModule.Double( info.PoPsLabel, mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
         residual = reactionSuite.PoPs[info.missingTwoBodyMasses[product1ID][0][0]]
         if( len( residual.mass ) == 0 ) : residual.mass.add( mass )
 
     # Did we have trouble?
     if( ( len( info.MF4ForNonNeutrons ) > 0 ) and ( verbose > 0 ) ) :
         print('    WARNING: MF=4 data for non-neutron product: MTs = %s' % sorted( info.MF4ForNonNeutrons ))
+
     if( len( info.doRaise ) > 0 and not skipBadData ) :
         info.logs.write( '\nRaising due to following errors:\n' )
         for err in info.doRaise : info.logs.write( '    ' + err + '\n', True )
         raise Exception( 'len( info.doRaise ) > 0' )
+    if info.resonanceReconstructionFailed != '':
+        print('ERROR: Resonance reconstruction failed: "%s".' % info.resonanceReconstructionFailed)
+
+    if len(info.missingRadioactiveProduct) > 0:
+        print('Missing radioactive products:')
+        for missingRadioactiveProduct in info.missingRadioactiveProduct:
+            print('     ========', missingRadioactiveProduct)
 
     return( { 'reactionSuite' : reactionSuite, 'covarianceSuite' : covarianceSuite, 'errors' : info.doRaise, 'info':info } )
 
@@ -407,7 +435,7 @@ def addUnspecifiedDistributions( info, outputChannel ) :
     if( outputChannel is None ) : return
     for product in outputChannel :
         if( len( product.distribution ) == 0 ) :
-            product.distribution.add( unspecifiedModule.form( info.style, productFrame = standardsModule.frames.labToken ) )
+            product.distribution.add(unspecifiedModule.Form(info.style, productFrame = xDataEnumsModule.Frame.lab))
             info.ENDFconversionFlags.add( product, 'implicitProduct' )
         addUnspecifiedDistributions( info, product.outputChannel )
 
@@ -416,9 +444,9 @@ if( __name__ == '__main__' ) :
     rce = endfFileToGNDS( fileName = sys.argv[1])
     x, c = rce['reactionSuite'], rce['covarianceSuite']
     f = open( 'test.xml', 'w' )
-    f.write( '\n'.join( x.toXMLList( ) + [ '' ] ) )
+    f.write( '\n'.join( x.toXML_strList( ) + [ '' ] ) )
     f.close( )
     if( c is not None ) : # covariances
         f = open( 'test-covar.xml', 'w' )
-        f.write( '\n'.join( c.toXMLList( ) + [ '' ] ) )
+        f.write( '\n'.join( c.toXML_strList( ) + [ '' ] ) )
         f.close()

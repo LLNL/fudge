@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,7 +8,7 @@
 import sys
 sys.path.insert( 0, '../../' )
 
-from pqu.PQU import pqu_float, PQU
+from pqu.PQU import PQU_float, PQU
 
 def f( s, unc = None ) :
 
@@ -39,4 +39,4 @@ f( '14850. +/- 0.178 eV/mm' )
 
 print()
 f( '1485. +/- 1e1 eV/mm' )
-f( '1485. eV/mm', unc = pqu_float( 10, 1 ) )
+f( '1485. eV/mm', unc = PQU_float( 10, 1 ) )

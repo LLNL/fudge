@@ -1,24 +1,29 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from xData import ancestry as ancestryModule
-from xData import values as valuesModule
+from LUPY import ancestry as ancestryModule
+
+from xData import link as linkModule
 from xData import xDataArray as arrayModule
 
 from .. import misc as miscModule
-from .. import suite as suiteModule
+from . import nuclides as nuclidesModule
 
-class values( miscModule.classWithLabelKey ) :
+class NuclidesLink(linkModule.Link):
+
+    moniker = 'nuclides'
+
+class Values(miscModule.ClassWithLabelKey):
 
     moniker = 'values'
 
     def __init__( self, _values ) :
 
-        ancestryModule.ancestry.__init__( self )
+        miscModule.ClassWithLabelKey.__init__(self, 'label')
 
         self.__values = tuple( float( value ) for value in _values )
 
@@ -31,7 +36,7 @@ class values( miscModule.classWithLabelKey ) :
         n1 = len( self.__values )
         for i1 in range( n1 ) : yield self.__values[i1]
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -42,20 +47,20 @@ class values( miscModule.classWithLabelKey ) :
         return( XMLStringList )
 
     @classmethod
-    def parseXMLNodeAsClass(cls, element, xPath, linkData):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
         values_ = cls( map(float, element.text.split()) )
         xPath.pop()
         return values_
 
-class covariance( ancestryModule.ancestry ) :
+class Covariance( ancestryModule.AncestryIO):
 
     moniker = 'covariance'
 
     def __init__( self, _matrix ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__matrix = _matrix
 
@@ -63,36 +68,36 @@ class covariance( ancestryModule.ancestry ) :
 
         return( self.__matrix )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         if( 'valuesPerLine' not in kwargs ) : kwargs['valuesPerLine'] = 1000
         XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        XMLStringList += self.__matrix.toXMLList( indent2, **kwargs )
+        XMLStringList += self.__matrix.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
 
         return( XMLStringList )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         xPath.append(element.tag)
         child = element[0]
-        if child.tag == arrayModule.arrayBase.moniker:
-            _matrix = arrayModule.arrayBase.parseXMLNode(child, xPath, linkData)
+        if child.tag == arrayModule.ArrayBase.moniker:
+            _matrix = arrayModule.ArrayBase.parseNodeUsingClass(child, xPath, linkData, **kwargs)
         else:
             raise TypeError("Unexpected child node '%s' in %s" % (child.tag, element.tag))
         covar_ = cls(_matrix)
         xPath.pop()
         return covar_
 
-class uncertainty( ancestryModule.ancestry ) :
+class Uncertainty(ancestryModule.AncestryIO):
 
     moniker = 'uncertainty'
 
     def __init__( self, form ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__form = form
 
@@ -100,38 +105,52 @@ class uncertainty( ancestryModule.ancestry ) :
 
         return( self.__form )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        XMLStringList += self.__form.toXMLList( indent2, **kwargs )
+        XMLStringList += self.__form.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
 
         return( XMLStringList )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         xPath.append(element.tag)
         child = element[0]
-        if child.tag == covariance.moniker:
-            form = covariance.parseXMLNodeAsClass(child, xPath, linkData)
+        if child.tag == Covariance.moniker:
+            form = Covariance.parseNodeUsingClass(child, xPath, linkData, **kwargs)
         else:
             raise TypeError("Unexpected child node '%s' in %s" % (child.tag, element.tag))
         uncert_ = cls(form)
         xPath.pop()
         return uncert_
 
-class yields( ancestryModule.ancestry ) :
+class Yields(ancestryModule.AncestryIO):
 
     moniker = 'yields'
 
     def __init__( self ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
+        self.__nuclides = None
         self.__values = None
         self.__uncertainty = None
+
+    @property
+    def nuclides(self):
+
+        return self.__nuclides
+
+    @nuclides.setter
+    def nuclides(self, value):
+
+        if not isinstance(value, (NuclidesLink, nuclidesModule.Nuclides)):
+            raise TypeError( 'Invalid nuclides instance.' )
+        self.__nuclides = value
+        self.__nuclides.setAncestor(self)
 
     @property
     def values( self ) :
@@ -141,7 +160,7 @@ class yields( ancestryModule.ancestry ) :
     @values.setter
     def values( self, _values ) :
 
-        if( not( isinstance( _values, values ) ) ) : raise TypeError( 'Invalid values instance.' )
+        if( not( isinstance( _values, Values ) ) ) : raise TypeError( 'Invalid values instance.' )
         self.__values = _values
         self.__values.setAncestor( self )
 
@@ -153,29 +172,35 @@ class yields( ancestryModule.ancestry ) :
     @uncertainty.setter
     def uncertainty( self, _uncertainty ) :
 
-        if( not( isinstance( _uncertainty, uncertainty ) ) ) : raise TypeError( 'Invalid uncertainty instance.' )
+        if( not( isinstance( _uncertainty, Uncertainty ) ) ) : raise TypeError( 'Invalid Uncertainty instance.' )
         self.__uncertainty = _uncertainty
         self.__uncertainty.setAncestor( self )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        if( self.__values is not None ) : XMLStringList += self.__values.toXMLList( indent2, **kwargs )
-        if( self.__uncertainty is not None ) : XMLStringList += self.__uncertainty.toXMLList( indent2, **kwargs )
+        if( self.__nuclides is not None ) : XMLStringList += self.__nuclides.toXML_strList( indent2, **kwargs )
+        if( self.__values is not None ) : XMLStringList += self.__values.toXML_strList( indent2, **kwargs )
+        if( self.__uncertainty is not None ) : XMLStringList += self.__uncertainty.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
 
         return( XMLStringList )
 
-    def parseXMLNode( self, element, xPath, linkData ):
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append(element.tag)
         for child in element:
-            if child.tag == values.moniker:
-                self.values = values.parseXMLNodeAsClass(child, xPath, linkData)
-            elif child.tag == uncertainty.moniker:
-                self.uncertainty = uncertainty.parseXMLNodeAsClass(child, xPath, linkData)
+            if child.tag == NuclidesLink.moniker:
+                if child.get('href') is not None:
+                    self.nuclides = NuclidesLink.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+                else:
+                    self.nuclides = nuclidesModule.Nuclides.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            elif child.tag == Values.moniker:
+                self.values = Values.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            elif child.tag == Uncertainty.moniker:
+                self.uncertainty = Uncertainty.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             else:
                 raise TypeError("Unexpected child node '%s' in %s" % (child.tag, element.tag))
 
@@ -183,11 +208,11 @@ class yields( ancestryModule.ancestry ) :
         return (self)
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append(element.tag)
         self = cls()
         xPath.pop()
-        self.parseXMLNode(element, xPath, linkData)
+        self.parseNode(element, xPath, linkData, **kwargs)
 
         return self

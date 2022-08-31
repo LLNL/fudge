@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -24,11 +24,14 @@ each test only fools with one section otherwise you'll be chasing ghost bugs:
 import unittest
 from pqu import PQU
 from fudge import covariances
-import xData.axes as axesModule
-import xData.link as linkModule
-import xData.gridded as griddedModule
-import xData.values as valuesModule
-import xData.xDataArray as arrayModule
+from fudge.covariances import enums as covarianceEnumsModule
+
+from xData import enums as xDataEnumsModule
+from xData import axes as axesModule
+from xData import link as linkModule
+from xData import gridded as griddedModule
+from xData import values as valuesModule
+from xData import xDataArray as arrayModule
 
 class TestCaseBase( unittest.TestCase ):
 
@@ -52,67 +55,55 @@ class Test_summed( TestCaseBase ):
 
     def setUp(self):
         # ...................... example matrix 'a' ......................
-        axes = axesModule.axes(
-            labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
-                         2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
-                                  style=axesModule.boundariesGridToken,
-                                  values=valuesModule.values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
-        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
-                                  style=axesModule.linkGridToken,
-                                  values=linkModule.link(link=axes[2].values, relative=True))
-        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.symmetryLowerToken)
-        self.a = covariances.covarianceMatrix.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
-                                         type=covariances.tokens.relativeToken)
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=valuesModule.Values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.none,
+                                  values=linkModule.Link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.Symmetry.lower)
+        self.a = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                         type=covarianceEnumsModule.Type.relative)
 
         # ...................... example matrix 'b' ......................
-        axes = axesModule.axes(
-            labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
-                         2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
-                                  style=axesModule.boundariesGridToken,
-                                  values=valuesModule.values([1.0e-5, 0.100, 1.0, 20.0]))
-        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
-                                  style=axesModule.linkGridToken,
-                                  values=linkModule.link(link=axes[2].values, relative=True))
-        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.symmetryLowerToken)
-        self.b = covariances.covarianceMatrix.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
-                                         type=covariances.tokens.relativeToken)
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=valuesModule.Values([1.0e-5, 0.100, 1.0, 20.0]))
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.none,
+                                  values=linkModule.Link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.Symmetry.lower)
+        self.b = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                         type=covarianceEnumsModule.Type.relative)
 
         # ...................... example matrix 'c' ......................
-        axes = axesModule.axes(
-            labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
-                         2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
-                                  style=axesModule.boundariesGridToken,
-                                  values=valuesModule.values([1.0000E-07, 6.7380E-02, 1.1109E-01, 1.3534E+00]))
-        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
-                                  style=axesModule.linkGridToken,
-                                  values=linkModule.link(link=axes[2].values, relative=True))
-        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.symmetryLowerToken)
-        self.c = covariances.covarianceMatrix.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
-                                         type=covariances.tokens.relativeToken)
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=valuesModule.Values([1.0000E-07, 6.7380E-02, 1.1109E-01, 1.3534E+00]))
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.none,
+                                  values=linkModule.Link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.Symmetry.lower)
+        self.c = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                         type=covarianceEnumsModule.Type.relative)
 
         # ...................... combine them for example matrix 'abc' ......................
-        abc=covariances.mixed.mixedForm(components=[self.a, self.b, self.c])
+        abc=covariances.mixed.MixedForm(components=[self.a, self.b, self.c])
         # FIXME: learn how to add abc to a section & to a covarianceSuite!, sumabc is built wrong!
 
         # ...................... 'sumabc' is just a way to exercise the summed class ......................
         bds=abc.rowBounds()
-        self.sumabc=covariances.summed.summedCovariance(label='test', domainMin=float(bds[0]), domainMax=float(bds[1]),
-            domainUnit=abc[0].matrix.axes[-1].unit, summands=[covariances.summed.summand(link=abc, path=abc.toXLink(), coefficient=1.0)])
+        self.sumabc=covariances.summed.SummedCovariance(label='test', domainMin=float(bds[0]), domainMax=float(bds[1]),
+            domainUnit=abc[0].matrix.axes[-1].unit, summands=[covariances.summed.Summand(link=abc, path=abc.toXLink(), coefficient=1.0)])
 
     @unittest.skip("FIXME")
     def test__getitem__(self):
-        self.assertXMLListsEqual( self.sumabc.summands[0].toXMLList(),['<link coefficient="1.0" xlink:href="/mixed"/>'] )
+        self.assertXMLListsEqual( self.sumabc.summands[0].toXML_strList(),['<link coefficient="1.0" xlink:href="/mixed"/>'] )
 
     def test__len__(self):
         self.assertEqual( len(self.sumabc.summands), 1 )
 
     @unittest.skip("FIXME")
-    def test_toXMLList(self):
-        print('\n'.join(self.sumabc.toXMLList()))
-        self.assertXMLListsEqual( self.sumabc.toXMLList(),"""<sum lowerBound="1e-7 MeV" upperBound="20 MeV">
+    def test_toXML_strList(self):
+        print('\n'.join(self.sumabc.toXML_strList()))
+        self.assertXMLListsEqual( self.sumabc.toXML_strList(),"""<sum lowerBound="1e-7 MeV" upperBound="20 MeV">
   <!-- The matrix for this reaction equals the weighted sum of the following matrices: -->
   <link coefficient="1.0" xlink:href="/mixed"/></sum>""".split('\n') )
 
@@ -130,7 +121,7 @@ class Test_summed( TestCaseBase ):
 
     @unittest.skip("FIXME")
     def test_toCovarianceMatrix(self):
-        self.assertXMLListsEqual(self.sumabc.toCovarianceMatrix().toXMLList(),"""<covarianceMatrix label="composed" type="relative">
+        self.assertXMLListsEqual(self.sumabc.toCovarianceMatrix().toXML_strList(),"""<covarianceMatrix label="composed" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">

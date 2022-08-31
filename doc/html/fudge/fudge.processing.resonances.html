@@ -179,21 +179,19 @@ of numpy masked arrays is at work here to handle different regimes of eta.</p>
 </div>
 <div class="section" id="module-fudge.processing.resonances.reconstructResonances">
 <span id="fudge-processing-resonances-reconstructresonances-module"></span><h2>fudge.processing.resonances.reconstructResonances module<a class="headerlink" href="#module-fudge.processing.resonances.reconstructResonances" title="Permalink to this headline">¶</a></h2>
-<p>reconstruct resonance region
-cmattoon, 12/1/2010</p>
 <p>See ENDF-102 (endf documentation) appendix D for equations</p>
 <div class="section" id="basic-usage">
 <h3>Basic usage:<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><p>if x is a reactionSuite instance,:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="n">x</span><span class="o">.</span><span class="n">reconstructResonances</span><span class="p">(</span><span class="n">tolerance</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<div><p>if protare is a reactionSuite instance,:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="n">protare</span><span class="o">.</span><span class="n">reconstructResonances</span><span class="p">(</span><span class="n">tolerance</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This reconstructs all resolved/unresolved resonance sections. In each section,
 the results are accurate under linear interpolation to tolerance of 1% or better.
 Sections are summed together and then added to the appropriate background cross
 sections to form new pointwise, lin-lin cross sections that are stored in the
-appropriate reaction inside reactionSuite x.</p>
+appropriate reaction inside protare.</p>
 </div></blockquote>
 </div>
 <div class="section" id="alternate-uses">
@@ -201,7 +199,7 @@ appropriate reaction inside reactionSuite x.</p>
 <blockquote>
 <div><p>You can skip the final step (adding background cross sections) and just get the
 resonance parameter contribution to the cross section by doing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="n">xsecs</span> <span class="o">=</span> <span class="n">reconstructResonances</span><span class="o">.</span><span class="n">reconstructResonances</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="n">xsecs</span> <span class="o">=</span> <span class="n">reconstructResonances</span><span class="o">.</span><span class="n">reconstructResonances</span><span class="p">(</span><span class="n">protare</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Here,:</p>
@@ -210,7 +208,7 @@ resonance parameter contribution to the cross section by doing:</p>
 </div>
 <p>each cross section is an XYs class instance, containing data and also axes with units</p>
 <p>Another option would be to only reconstruct a single section:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">resCls</span> <span class="o">=</span> <span class="n">reconstructResonances</span><span class="o">.</span><span class="n">RMcrossSection</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">energyUnit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">)</span>   <span class="c1"># for Reich_Moore</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">resCls</span> <span class="o">=</span> <span class="n">reconstructResonances</span><span class="o">.</span><span class="n">RMcrossSection</span><span class="p">(</span><span class="n">protare</span><span class="p">,</span> <span class="n">energyUnit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">)</span>   <span class="c1"># for Reich_Moore</span>
 <span class="o">&gt;&gt;</span> <span class="n">energy_grid</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">generateEnergyGrid</span><span class="p">()</span>
 <span class="o">&gt;&gt;</span> <span class="n">crossSections</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getCrossSection</span><span class="p">(</span> <span class="n">energy_grid</span> <span class="p">)</span>
 <span class="c1"># the input to getCrossSection is the energy (or list of energies) in self.energyUnit</span>
@@ -489,11 +487,11 @@ Second, the maximum value of L will be l1max+l2max.  Hence, Lmax=2*lmax.</p>
 <code class="sig-name descname">k_competitive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Ex</span></em>, <em class="sig-param"><span class="n">pA</span></em>, <em class="sig-param"><span class="n">pB</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#RMatrixLimitedcrossSection.k_competitive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.k_competitive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate k for any 2-body output channel.</p>
 <p>Note that if pA and pB are target and neutron, this reduces to self.k(E) as defined above
-in the resonanceReconstructionBaseClass</p>
+in the ResonanceReconstructionBaseClass</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Ex</strong> – incident energy - Xi (Xi is the lab frame reaction threshold) in eV</p></li>
+<li><p><strong>Ex</strong> – incident energy - Xi (Xi is the lab frame reaction threshold)</p></li>
 <li><p><strong>pA</strong> – particle A</p></li>
 <li><p><strong>pB</strong> – particle B</p></li>
 </ul>
@@ -580,7 +578,7 @@ ENDF uses it for calculating the phase (but in truth, there should be no effecti
 <dl class="py class">
 <dt id="fudge.processing.resonances.reconstructResonances.RRBaseClass">
 <em class="property">class </em><code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">RRBaseClass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resolvedForm</span></em>, <em class="sig-param"><span class="n">lowerBound</span></em>, <em class="sig-param"><span class="n">upperBound</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#RRBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.RRBaseClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass" title="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass" title="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <dl class="py method">
 <dt id="fudge.processing.resonances.reconstructResonances.RRBaseClass.generateEnergyGrid">
 <code class="sig-name descname">generateEnergyGrid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lowBound</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">highBound</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stride</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#RRBaseClass.generateEnergyGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.RRBaseClass.generateEnergyGrid" title="Permalink to this definition">¶</a></dt>
@@ -624,13 +622,6 @@ reasonable average.</p>
 <dd class="field-even"><p>a dictionary of results, sorted by channel.  If an entry is None, this indicates it could not be computed</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="fudge.processing.resonances.reconstructResonances.RRBaseClass.getBackgroundRMatrix">
-<code class="sig-name descname">getBackgroundRMatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Ein</span></em>, <em class="sig-param"><span class="n">Emin</span></em>, <em class="sig-param"><span class="n">Emax</span></em>, <em class="sig-param"><span class="n">gamWidth</span></em>, <em class="sig-param"><span class="n">pole_strength</span></em>, <em class="sig-param"><span class="n">Rinf</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#RRBaseClass.getBackgroundRMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.RRBaseClass.getBackgroundRMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Froehner’s background R matrix.  See JEFF Report 18, Eq. (212).</p>
-<p>This could be vectorized for speed.  Not sure if it would be useful though.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1007,6 +998,52 @@ This method should NOT be used for R-Matrix Limited</p>
 </dd></dl>
 
 <dl class="py class">
+<dt id="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">ResonanceReconstructionBaseClass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resonanceForm</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ResonanceReconstructionBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Base class common to resolved and unresolved resonance reconstruction.</p>
+<dl class="py method">
+<dt id="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.getCrossSection">
+<em class="property">abstract </em><code class="sig-name descname">getCrossSection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ResonanceReconstructionBaseClass.getCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.getCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.k">
+<code class="sig-name descname">k</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energy</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ResonanceReconstructionBaseClass.k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the wave number for the projectile in the center of mass given the projectile energy in the lab frame.
+The returned value is in b**-1/2.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.penetrationFactor">
+<code class="sig-name descname">penetrationFactor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">rho</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ResonanceReconstructionBaseClass.penetrationFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.penetrationFactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.phi">
+<code class="sig-name descname">phi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">rho</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ResonanceReconstructionBaseClass.phi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.phi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.refineInterpolation">
+<code class="sig-name descname">refineInterpolation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">egrid</span></em>, <em class="sig-param"><span class="n">xsecs</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ResonanceReconstructionBaseClass.refineInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.refineInterpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>generateEnergyGrid may not give a fine enough grid to linearly interpolate to desired tolerance.
+My solution to that: for all consecutive points (x0,y0), (x1,y1) and (x2,y2) do a linear interpolation between
+(x0,y0) and (x2,y2). If the interpolation doesn’t agree with (x1,y1) within tolerance,
+subdivide up the region by adding two more calculated points.  Iterate until interpolation agrees within tolerance.</p>
+<p>This means that in the end we will have more points than required for given tolerance.
+The results can be thinned (thinning implemented in xData.XYs1d)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.shiftFactor">
+<code class="sig-name descname">shiftFactor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">rho</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ResonanceReconstructionBaseClass.shiftFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.shiftFactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate shift factor used in SLBW and MLBW formalisms</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="fudge.processing.resonances.reconstructResonances.SLBWcrossSection">
 <em class="property">class </em><code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">SLBWcrossSection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">BreitWignerForm</span></em>, <em class="sig-param"><span class="n">enableAngDists</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#SLBWcrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.SLBWcrossSection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.reconstructResonances.RRBaseClass" title="fudge.processing.resonances.reconstructResonances.RRBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.processing.resonances.reconstructResonances.RRBaseClass</span></code></a></p>
@@ -1058,7 +1095,7 @@ channelDicts have to have an additional layer of sorting that corresponds to the
 <dl class="py class">
 <dt id="fudge.processing.resonances.reconstructResonances.URRcrossSection">
 <em class="property">class </em><code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">URRcrossSection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">URRform</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#URRcrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.URRcrossSection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass" title="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass" title="fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass</span></code></a></p>
 <dl class="py method">
 <dt id="fudge.processing.resonances.reconstructResonances.URRcrossSection.generateEnergyGrid">
 <code class="sig-name descname">generateEnergyGrid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interpolateWidths</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#URRcrossSection.generateEnergyGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.URRcrossSection.generateEnergyGrid" title="Permalink to this definition">¶</a></dt>
@@ -1189,8 +1226,7 @@ the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equatio
 <dl class="py method">
 <dt id="fudge.processing.resonances.reconstructResonances.URRcrossSection.getWidthsAndSpacings">
 <code class="sig-name descname">getWidthsAndSpacings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#URRcrossSection.getWidthsAndSpacings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.URRcrossSection.getWidthsAndSpacings" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>URR tables give us the average resonance parameters, the average resonance spacing
+<dd><p>URR tables give us the average resonance parameters, the average resonance spacing
 and the number of degrees of freedom, assuming that the widths are distributed by a chi^2
 probability density function with the given number of degrees of freedom.</p>
 <p>However, later we’ll need the level densities.  Below we’ll construct them from the
@@ -1205,7 +1241,6 @@ average resonance spacing for each L, J.</p>
 
     <span class="o">..</span><span class="n">math</span><span class="p">::</span>
         \<span class="n">rho_</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">}(</span><span class="n">E</span><span class="p">)</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">D_</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">}(</span><span class="n">E</span><span class="p">)</span>
-
 
 <span class="o">-</span> <span class="n">averageWidths</span><span class="p">,</span> <span class="n">assigned</span> <span class="n">simple</span> <span class="n">labels</span> <span class="n">like</span> <span class="s1">&#39;elastic&#39;</span> <span class="ow">and</span> <span class="s1">&#39;capture&#39;</span> <span class="k">for</span> <span class="n">convenience</span><span class="p">::</span>
 
@@ -1222,24 +1257,18 @@ average resonance spacing for each L, J.</p>
   <span class="n">However</span><span class="p">,</span> <span class="n">ENDF</span><span class="s1">&#39;s reduced neutron width is wildly different (see Eq. (D.99) in ENDF-102)::</span>
 
     <span class="o">..</span><span class="n">math</span><span class="p">::</span>
-        \<span class="n">Gamma</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="n">n</span><span class="p">}</span> <span class="o">=</span> \<span class="n">Gamma_</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="n">n</span><span class="p">}</span><span class="o">^</span><span class="mi">0</span> \<span class="n">sqrt</span><span class="p">{</span><span class="n">E</span><span class="p">}</span> <span class="n">P_L</span><span class="o">/</span>
+        \<span class="n">Gamma</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="n">n</span><span class="p">}</span> <span class="o">=</span> \<span class="n">Gamma_</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="n">n</span><span class="p">}</span><span class="o">^</span><span class="mi">0</span> \<span class="n">sqrt</span><span class="p">{</span><span class="n">E</span><span class="p">}</span> <span class="n">P_L</span><span class="o">/</span>\<span class="n">rho</span>
+
+<span class="o">-</span> <span class="n">DOFs</span><span class="p">:</span> <span class="n">degrees</span> <span class="n">of</span> <span class="n">freedom</span> <span class="k">with</span> <span class="n">same</span> <span class="n">labels</span> <span class="k">as</span> <span class="n">averageWidths</span>
+
+<span class="o">-</span> <span class="n">reactionLabels</span><span class="p">:</span> <span class="n">which</span> <span class="n">reactions</span> <span class="n">correspond</span> <span class="n">to</span> <span class="s1">&#39;elastic&#39;</span><span class="p">,</span> <span class="s1">&#39;capture&#39;</span> <span class="ow">and</span> <span class="s1">&#39;fission&#39;</span>
 </pre></div>
 </div>
-</div></blockquote>
-<p>ho</p>
-<blockquote>
-<div><blockquote>
-<div><ul class="simple">
-<li><p>DOFs: degrees of freedom with same labels as averageWidths</p></li>
-<li><p>reactionLabels: which reactions correspond to ‘elastic’, ‘capture’ and ‘fission’</p></li>
-</ul>
-</div></blockquote>
 <dl class="field-list simple">
-<dt class="field-odd">return</dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -1315,17 +1344,17 @@ where I is the identity matrix, and j = sqrt(-1)</p>
 
 <dl class="py function">
 <dt id="fudge.processing.resonances.reconstructResonances.reconstructAngularDistributions">
-<code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">reconstructAngularDistributions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reactionSuite</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">energyUnit</span><span class="o">=</span><span class="default_value">'eV'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#reconstructAngularDistributions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.reconstructAngularDistributions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">reconstructAngularDistributions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reactionSuite</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#reconstructAngularDistributions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.reconstructAngularDistributions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reconstruct all pure two-body angular distributions from the resonance region.
 For MLBW and RM, that means ‘elastic’ channel only, but R-Matrix evaluations can support additional channels.
 SLBW cannot be used for angular distributions.</p>
 <p>Returns a Python dict.  They key is the reaction and the value is a reconstructed
-distributions.angular.XYs2d instance containing Legendre expansions for each incident energy.</p>
+angularModule.XYs2d instance containing Legendre expansions for each incident energy.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="fudge.processing.resonances.reconstructResonances.reconstructResonances">
-<code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">reconstructResonances</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reactionSuite</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">energyUnit</span><span class="o">=</span><span class="default_value">'eV'</span></em>, <em class="sig-param"><span class="n">disableUnresolvedWidthInterpolation</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#reconstructResonances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.reconstructResonances" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">reconstructResonances</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reactionSuite</span></em>, <em class="sig-param"><span class="n">tolerance</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">disableUnresolvedWidthInterpolation</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#reconstructResonances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.reconstructResonances" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reconstruct all resonance cross sections (resolved and unresolved) in reactionSuite,
 and add results together for full (resonance region) pointwise cross section.</p>
 <p>Optional arguments:</p>
@@ -1337,57 +1366,12 @@ That is, if tolerance = 0.001, points are added until lin-lin interpolation is g
 <li><p>‘significantDigits’: Controls how many digits can be used to represent the energy grid. For example,
 if significantDigits=4 the resulting energy grid can contain 1.034, 1.035, 1.036 but not 1.0345.
 Using significantDigits=8 should allow data to be written back to ENDF-6 without loss of precision.</p></li>
-<li><p>‘energyUnit’: unit to use for reconstruction. Resonance energies and widths will be converted to this unit.</p></li>
 <li><p>‘disableUnresolvedWidthInterpolation’: set ‘True’ to reproduce old ENDF recommendation to interpolate
 in cross sections rather than widths. That recommendation was reversed before ENDF-VIII release</p></li>
 </ul>
 </div></blockquote>
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.processing.resonances.reconstructResonances.</code><code class="sig-name descname">resonanceReconstructionBaseClass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resonanceForm</span></em>, <em class="sig-param"><span class="n">energyUnit</span><span class="o">=</span><span class="default_value">'eV'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#resonanceReconstructionBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt id="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.getCrossSection">
-<em class="property">abstract </em><code class="sig-name descname">getCrossSection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#resonanceReconstructionBaseClass.getCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.getCrossSection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.k">
-<code class="sig-name descname">k</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energy</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#resonanceReconstructionBaseClass.k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.k" title="Permalink to this definition">¶</a></dt>
-<dd><p>For an incident neutron, with energy in eV, the ENDF manual states
-<img class="math" src="../_images/math/ca75dfd27458a86963e4711143913a062473a020.png" alt="k = \frac{\sqrt{2m_n}}{hbar}\frac{AWRI}{AWRI+1}\sqrt{|E|}"/>
-sqrt( 2 * neutronMass ) / hbar == 2.196807e-3 (eV*barn)**-1/2. Thus for energy in eV, k is in b**-1/2.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.penetrationFactor">
-<code class="sig-name descname">penetrationFactor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">rho</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#resonanceReconstructionBaseClass.penetrationFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.penetrationFactor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.phi">
-<code class="sig-name descname">phi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">rho</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#resonanceReconstructionBaseClass.phi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.phi" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.refineInterpolation">
-<code class="sig-name descname">refineInterpolation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">egrid</span></em>, <em class="sig-param"><span class="n">xsecs</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#resonanceReconstructionBaseClass.refineInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.refineInterpolation" title="Permalink to this definition">¶</a></dt>
-<dd><p>generateEnergyGrid may not give a fine enough grid to linearly interpolate to desired tolerance.
-My solution to that: for all consecutive points (x0,y0), (x1,y1) and (x2,y2) do a linear interpolation between
-(x0,y0) and (x2,y2). If the interpolation doesn’t agree with (x1,y1) within tolerance,
-subdivide up the region by adding two more calculated points.  Iterate until interpolation agrees within tolerance.</p>
-<p>This means that in the end we will have more points than required for given tolerance.
-The results can be thinned (thinning implemented in xData.XYs1d)</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.shiftFactor">
-<code class="sig-name descname">shiftFactor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">rho</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#resonanceReconstructionBaseClass.shiftFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.resonanceReconstructionBaseClass.shiftFactor" title="Permalink to this definition">¶</a></dt>
-<dd><p>calculate shift factor used in SLBW and MLBW formalisms</p>
-</dd></dl>
-
+<p>Note that this does not add the background contribution if any (ENDF-MF3 portion).
+Use the method reactionSuite.reconstructResonances which adds the background contribution.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1497,8 +1481,8 @@ Modifies the local copy of the resolved parameters (self.RRR)</p>
 </dd></dl>
 
 </div>
-<div class="section" id="fudge-processing-resonances-setup-module">
-<h2>fudge.processing.resonances.setup module<a class="headerlink" href="#fudge-processing-resonances-setup-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-fudge.processing.resonances.setup">
+<span id="fudge-processing-resonances-setup-module"></span><h2>fudge.processing.resonances.setup module<a class="headerlink" href="#module-fudge.processing.resonances.setup" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-fudge.processing.resonances">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.processing.resonances" title="Permalink to this headline">¶</a></h2>
@@ -1527,7 +1511,7 @@ Modifies the local copy of the resolved parameters (self.RRR)</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-fudge.processing.resonances.makeUnresolvedProbabilityTables">fudge.processing.resonances.makeUnresolvedProbabilityTables module</a></li>
-<li><a class="reference internal" href="#fudge-processing-resonances-setup-module">fudge.processing.resonances.setup module</a></li>
+<li><a class="reference internal" href="#module-fudge.processing.resonances.setup">fudge.processing.resonances.setup module</a></li>
 <li><a class="reference internal" href="#module-fudge.processing.resonances">Module contents</a></li>
 </ul>
 </li>

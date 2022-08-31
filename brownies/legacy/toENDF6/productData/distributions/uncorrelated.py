@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,9 +9,9 @@ from pqu import PQU as PQUModule
 
 from PoPs import IDs as IDsPoPsModule
 
+from xData import enums as xDataEnumsModule
 from xData import axes as axesModule
 from xData import regions as regionsModule
-from xData import standards as standardsModule
 
 import fudge.productData.distributions.uncorrelated as uncorrelatedModule
 import fudge.productData.distributions.energy as energyModule
@@ -38,26 +38,26 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     if( isinstance( energySubform, energyModule.NBodyPhaseSpace ) ) :
         energySubform.toENDF6( MT, endfMFList, flags, targetInfo )
     elif( targetInfo['doMF4AsMF6'] ) :
-        if( isinstance( energySubform, ( energyModule.discreteGamma, energyModule.primaryGamma ) ) ) :
+        if( isinstance( energySubform, ( energyModule.DiscreteGamma, energyModule.PrimaryGamma ) ) ) :
 # BRB - this needs to be checked.
-            if( targetInfo['product'].id != IDsPoPsModule.photon ) : raise ValueError( 'This logic is only for discrete gammas' )
-            energyForm = energyModule.form( self.label, frame, energySubform )
-            angularForm = angularModule.form( self.label, frame, angularSubform )
+            if( targetInfo['product'].pid != IDsPoPsModule.photon ) : raise ValueError( 'This logic is only for discrete gammas' )
+            energyForm = energyModule.Form( self.label, frame, energySubform )
+            angularForm = angularModule.Form( self.label, frame, angularSubform )
             energyForm.toENDF6( MT, endfMFList, flags, targetInfo )
             angularForm.toENDF6( MT, endfMFList, flags, targetInfo )
-        elif( isinstance( angularSubform, angularModule.isotropic2d ) ) :                # Change to energyAngular with Legendre
+        elif( isinstance( angularSubform, angularModule.Isotropic2d ) ) :                # Change to energyAngular with Legendre
             if( not( isinstance( energySubform, energyModule.XYs2d ) ) ) : raise 'hell - fix me'
-            axes = axesModule.axes( rank = 4 )
-            axes[3] = axesModule.axis( 'energy_in', 3, 'eV' )
-            axes[2] = axesModule.axis( 'energy_out', 2, 'eV' )
-            axes[1] = axesModule.axis( 'l', 1, '' )
-            axes[0] = axesModule.axis( 'C_l(energy_out|energy_in)', 0, '1/eV' )
+            axes = axesModule.Axes(4)
+            axes[3] = axesModule.Axis( 'energy_in', 3, 'eV' )
+            axes[2] = axesModule.Axis( 'energy_out', 2, 'eV' )
+            axes[1] = axesModule.Axis( 'l', 1, '' )
+            axes[0] = axesModule.Axis( 'C_l(energy_out|energy_in)', 0, '1/eV' )
             energyAngularSubform = energyAngularModule.XYs3d( axes = axes, interpolation = energySubform.interpolation,
                     interpolationQualifier = energySubform.interpolationQualifier )
             EInFactor = PQUModule.PQU( 1, energySubform.axes[2].unit ).getValueAs( 'eV' )
 
             for EIn in energySubform :
-                if isinstance( EIn, regionsModule.regions1d ):
+                if isinstance( EIn, regionsModule.Regions1d ):
                     # writing to MF6 LAW=1, LANG=1 doesn't support multiple regions, must recombine.
                     if( len( set( [ ein.interpolation for ein in EIn ] ) ) != 1 ) :
                         raise NotImplemented( "ENDF MF6 LAW=1 LANG=1 doesn't support multiple E' interpolations!" )
@@ -76,17 +76,16 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 for e_out, Cls in EpCls :
                     multiD_2d.append( energyAngularModule.Legendre( [ Cls ], outerDomainValue = e_out ) )
                 energyAngularSubform.append( multiD_2d )
-            form = energyAngularModule.form( '', self.productFrame, energyAngularSubform )
+            form = energyAngularModule.Form( '', self.productFrame, energyAngularSubform )
             if( targetInfo.get( "gammaToENDF6" ) ) : return( form )
             form.toENDF6( MT, endfMFList, flags, targetInfo )
         elif( isinstance( energySubform, energyModule.XYs2d ) and isinstance( angularSubform, angularModule.XYs2d ) ) :
 
             LANG, LEP = 12, 2
-            if( energySubform.interpolation == standardsModule.interpolation.flatToken ) :
+            if energySubform.interpolation == xDataEnumsModule.Interpolation.flat:
                 LEP = 1  # interpolation for E_out
                 LANG = 11
-            elif( energySubform.interpolation in (standardsModule.interpolation.loglinToken,
-                standardsModule.interpolation.loglogToken ) ) :
+            elif energySubform.interpolation in (xDataEnumsModule.Interpolation.loglin, xDataEnumsModule.Interpolation.loglog):
                 LANG = 14
             MF6 = [ endfFormatsModule.endfContLine( 0, 0, LANG, LEP, 1, len( energySubform ) ) ]
             EInInterpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( energySubform.interpolation )
@@ -108,10 +107,10 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 ( energySubform.moniker, angularSubform.moniker ) )
     else :                          # original data is in uncorrelated form
         if( MT not in [ 527, 528 ] ) :
-            angularForm = angularModule.form( "", frame, self.angularSubform.data.copy() )
+            angularForm = angularModule.Form( "", frame, self.angularSubform.data.copy() )
             angularForm.toENDF6( MT, endfMFList, flags, targetInfo )
-        energyForm = energyModule.form( "", frame, self.energySubform.data.copy() )
+        energyForm = energyModule.Form( "", frame, self.energySubform.data.copy() )
         energyForm.toENDF6( MT, endfMFList, flags, targetInfo )
         if( MT == 527 ) : endfMFList[26][MT][0]     # FIXME statement has no effect
 
-uncorrelatedModule.form.toENDF6 = toENDF6
+uncorrelatedModule.Form.toENDF6 = toENDF6

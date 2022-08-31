@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,9 +11,7 @@ This module contains the production class, for storing production cross section 
 
 from . import base as baseModule
 
-__metaclass__ = type
-
-class production( baseModule.base_reaction ):
+class Production(baseModule.Base_reaction):
     """
     Production reactions are another special case of the <reaction> class, used to store the cross section for
     producing specific radioactive products. Requires a cross section and product id, but no distributions.

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     def getReactionSuite( filename, singleMTOnly = None ):
         try:
-            RS = reactionSuiteModule.readXML( filename )
+            RS = reactionSuiteModule.ReactionSuite.readXML_file( filename )
         except:
             try:
                 rce = endfFileToGNDS.endfFileToGNDS( filename, singleMTOnly = singleMTOnly,
@@ -128,9 +128,9 @@ if __name__ == '__main__':
         if len(reac) != 1:
             print("Couldn't find unique reaction for MT%d in %s" % (MT, reactionSuite.originalFile))
         xsc = reac[0].crossSection
-        if isinstance( xsc.evaluated, crossSection.resonancesWithBackground ):
+        if isinstance( xsc.evaluated, crossSection.ResonancesWithBackground ):
             evalStyle = reactionSuite.styles.getEvaluatedStyle()
-            reconstructedStyle = stylesModule.crossSectionReconstructed( reconstructedStyleName, derivedFrom=evalStyle.label )
+            reconstructedStyle = stylesModule.CrossSectionReconstructed( reconstructedStyleName, derivedFrom=evalStyle.label )
             reactionSuite.reconstructResonances( reconstructedStyle, accuracy=args.tolerance )
             pwxs = xsc[ reconstructedStyleName ]
         else:

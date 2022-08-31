@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-#
+# 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -13,7 +13,6 @@ from setuptools import setup, Extension
 import subprocess
 
 minimumNumpy = 1.15
-cwd = 'file://localhost%s/' % os.getcwd()
 try:
     import numpy
     assert float('.'.join(numpy.__version__.split('.')[:2])) >= minimumNumpy, numpyErrorMessage
@@ -25,7 +24,7 @@ except (ImportError, ModuleNotFoundError):
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
-        # copy C executables Merced/bin/merced and upscatter/bin/calcUpscatterKernel to Python environment bin folder
+        # copy C executables Merced/bin/merced and fudge/processing/deterministic/upscatter/bin/calcUpscatterKernel to Python environment bin folder
         workingFolder = os.getcwd()
         binFolder = os.path.join(sys.prefix, 'bin')
         os.chdir('Merced')
@@ -33,7 +32,7 @@ class CustomInstall(install):
         shutil.copy('bin/merced', binFolder)
         os.chdir(workingFolder)
 
-        os.chdir('upscatter')
+        os.chdir('fudge/processing/deterministic/upscatter')
         subprocess.check_call('make -j', shell=True)
         shutil.copy('bin/calcUpscatterKernel', binFolder)
         os.chdir(workingFolder)
@@ -60,7 +59,7 @@ setup(
     name='fudge',
     #    version = fudge.__version__,\
     version=versionModule.getVersionNumber(),
-    author='Computational Nuclear Physics Group, LLNL',
+    author='Nuclear Data and Theory Group, LLNL',
     author_email='mattoon1@llnl.gov',
     maintainer_email='mattoon1@llnl.gov',
     packages=[
@@ -71,8 +70,8 @@ setup(
         'fudge.core.math.test',
         'fudge.core.utilities',
         'fudge',
-        'fudge.channelData',
-        'fudge.channelData.fissionFragmentData',
+        'fudge.outputChannelData',
+        'fudge.outputChannelData.fissionFragmentData',
         'fudge.covariances',
         'fudge.covariances.test',
         'fudge.productData',
@@ -97,7 +96,7 @@ setup(
         'LUPY'
     ],
     package_dir = {'': '.'},
-    scripts = [x for x in glob.glob('bin/*.py') if 'fudgePipInstallForDevelopers.py' not in x],
+    scripts = glob.glob('bin/*.py'),
     package_data = {
         'fudge.legacy.endl.test': [ 'testdb/ascii/yi01/za001001/y*', 'testdb/ascii/yi01/za001001/*.txt', 'testdb/ascii/yi01/za001001/*xml' ],
         'fudge.processing.resonances.test': ['*.py'],
@@ -113,15 +112,15 @@ setup(
         Extension( 'fudge.processing.resonances._getCoulombWavefunctions',
             sources = ['fudge/processing/resonances/getCoulombWavefunctions.c', 'fudge/processing/resonances/coulfg2.c'], ),
     ],
-    url = 'https://github.com/llnl/fudge',
-        install_requires=[
-        'numpy',
-        'crossSectionAdjustForHeatedTarget @ %s/crossSectionAdjustForHeatedTarget#egg=crossSectionAdjustForHeatedTarget' % cwd,
-        'numericalFunctions @ %s/numericalFunctions#egg=numericalFunctions' % cwd,
-        'pqu @ %s/pqu#egg=pqu' % cwd,
-        'xData @ %s/xData#egg=xData' % cwd,
-        'PoPs @ %s/PoPs#egg=PoPs' % cwd,
-        'brownies @ %s/brownies#egg=brownies' % cwd
+    url = 'http://nuclear.llnl.gov/fudge',
+    install_requires=[
+        'numpy', 
+        'crossSectionAdjustForHeatedTarget @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/crosssectionadjustforheatedtarget.git@fudge6.0-rc1',
+        'numericalFunctions @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/numericalFunctions.git@fudge6.0-rc1',
+        'pqu @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/pqu.git@fudge6.0-rc1',
+        'xData @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/xData.git@fudge6.0-rc1',
+        'PoPs @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/pops/PoPs.git@fudge6.0-rc1',
+        'brownies @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/brownies.git@fudge6.0-rc1'
     ],
     license = open( 'LICENSE' ).read(),
     description = '',

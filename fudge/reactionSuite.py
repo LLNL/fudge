@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,91 +13,95 @@ reactionSuite is the top-level class for the GNDS structure.
 import re
 import os
 
+import numpy
+
 from pqu import PQU as PQUModule
+
+from LUPY import ancestry as ancestryModule
+from LUPY.hdf5 import HDF5_present, h5py
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+from LUPY import checksums as checksumsModule
 
 from PoPs import IDs as IDsPoPsModule
 from PoPs import database as PoPsModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
-from PoPs.groups import chemicalElement as chemicalElementPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import chemicalElement as chemicalElementPoPsModule
 from PoPs.decays import misc as decaysMiscPoPsModule
 from PoPs.families import unorthodox as unorthodoxPoPsModule
 
-from xData import formatVersion as formatVersionModule
-from xData import ancestry as ancestryModule
+from xData import enums as xDataEnumsModule
 from xData import axes as axesModule
 from xData import values as valuesModule
-from xData import standards as standardsModule
-from xData import XYs as XYs1dModule
-from xData.Documentation import documentation as documentationModule
+from xData import vector as vectorModule
+from xData import matrix as matrixModule
+from xData import productArray as productArrayModule
+from xData import XYs1d as XYs1dModule
 
+from . import enums as enumsModule
 from fudge.core.utilities import guessInteraction as guessInteractionModule
 from fudge.processing import group as groupModule
 from fudge.processing import nuclearPlusCoulombInterference as nuclearPlusCoulombInterferenceModule
 from fudge.processing.deterministic import multiGroupUpScatter as multiGroupUpScatterModule
+from fudge.processing.deterministic import particles as particlesModule
+from fudge.processing import transporting as transportingModule
 
-from fudge import resonances as resonancesModule
-from fudge import suites as suitesModule
-from fudge import sums as sumsModule
-from fudge import styles as stylesModule
-from fudge import warning as warningModule
-from fudge import product as productModule
+from . import suites as suitesModule
+from . import sums as sumsModule
+from . import styles as stylesModule
+from . import warning as warningModule
+from . import product as productModule
 from . import institution as institutionModule
+from .resonances import resonances as resonancesModule
 
 from .reactionData import crossSection as crossSectionModule
-from .channelData import Q as QModule
-from .productData import energyDeposition as energyDepositionModule
+from .outputChannelData import Q as QModule
+from .productData import averageProductEnergy as averageProductEnergyModule
 from .productData.distributions import angular as angularModule
 
 from brownies.legacy.toENDF6 import ENDFconversionFlags as ENDFconversionFlagsModule
 
 import fudge
 
-__metaclass__ = type
-
-class Interaction :
-    """Module (class) that defines the all interaction tokens."""
-
-    nuclear = 'nuclear'
-    atomic = 'atomic'
-    TNSL = 'TNSL'
-    LLNL_TNSL = 'LLNL_TNSL'
-
-    allowed = ( nuclear, atomic, TNSL, LLNL_TNSL )
-
-class nullDevice :
+class NullDevice :
     """For internal use. Used in methods to set logFile when one is not entered."""
 
     def write( self, **kwargs ) : pass
 
-class reactionSuite( ancestryModule.ancestry ) :
+class ReactionSuite(ancestryModule.AncestryIO):
     """
     This is the main class for a gnds projectile/target object. It contains
         * optional external files (e.g. for covariances or binary data stored in another file)
         * a 'styles' section describing all evaluated and processed data styles, documentation, etc.
-        * a 'PoPs' database with a list of all particles encountered in the file
+        * a 'PoPs' Database with a list of all particles encountered in the file
         * optional resonance data
         * a list of reactions
         * additional lists: summed reactions (e.g. total), production reactions, 'orphan products', etc.
     """
 
     moniker = 'reactionSuite'
-    ancestryMembers = ( '[externalFiles', '[styles', 'PoPs', 'resonances', '[reactions', '[orphanProducts', 'sums', '[productions', '[incompleteReactions', '[fissionComponents', 'applicationData' )
+    ancestryMembers = ( 'externalFiles', 'styles', 'PoPs', 'resonances', 'reactions', 'orphanProducts', 'productions', 'incompleteReactions', 'fissionComponents', 'sums', 'applicationData' )
     childNodeOrder = {
-            formatVersionModule.version_1_10 : ( suitesModule.externalFiles.moniker,                stylesModule.styles.moniker, 
-                                                 'documentations',                                  PoPsModule.database.moniker,
-                                                 resonancesModule.resonances.resonances.moniker,    suitesModule.reactions.moniker, 
-                                                 suitesModule.orphanProducts.moniker,               sumsModule.sums.moniker, 
-                                                 suitesModule.fissionComponents.moniker,            suitesModule.productions.moniker,
-                                                 suitesModule.incompleteReactions.moniker,          suitesModule.applicationData.moniker ),
-            formatVersionModule.version_2_0_LLNL_4 : (  suitesModule.externalFiles.moniker,                 stylesModule.styles.moniker,
-                                                        PoPsModule.database.moniker,
-                                                        resonancesModule.resonances.resonances.moniker,     suitesModule.reactions.moniker, 
-                                                        suitesModule.orphanProducts.moniker,                sumsModule.sums.moniker, 
-                                                        suitesModule.fissionComponents.moniker,             suitesModule.productions.moniker,
-                                                        suitesModule.incompleteReactions.moniker,           suitesModule.applicationData.moniker ) }
+            GNDS_formatVersionModule.version_1_10: (suitesModule.ExternalFiles.moniker,                stylesModule.Styles.moniker, 
+                                                 'documentations',                                  PoPsModule.Database.moniker,
+                                                 resonancesModule.Resonances.moniker,               suitesModule.Reactions.moniker, 
+                                                 suitesModule.OrphanProducts.moniker,               sumsModule.Sums.moniker, 
+                                                 suitesModule.FissionComponents.moniker,            suitesModule.Productions.moniker,
+                                                 suitesModule.IncompleteReactions.moniker,          suitesModule.ApplicationData.moniker ),
+            GNDS_formatVersionModule.version_2_0_LLNL_4: (suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
+                                                        PoPsModule.Database.moniker,
+                                                        resonancesModule.Resonances.moniker,        suitesModule.Reactions.moniker, 
+                                                        suitesModule.OrphanProducts.moniker,                sumsModule.Sums.moniker, 
+                                                        suitesModule.FissionComponents.moniker,             suitesModule.Productions.moniker,
+                                                        suitesModule.IncompleteReactions.moniker,           suitesModule.ApplicationData.moniker),
+            GNDS_formatVersionModule.version_2_0:      (suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
+                                                        PoPsModule.Database.moniker,
+                                                        resonancesModule.Resonances.moniker,        suitesModule.Reactions.moniker, 
+                                                        suitesModule.OrphanProducts.moniker,                sumsModule.Sums.moniker, 
+                                                        suitesModule.FissionComponents.moniker,             suitesModule.Productions.moniker,
+                                                        suitesModule.IncompleteReactions.moniker,           suitesModule.ApplicationData.moniker)}
 
-    def __init__( self, projectile, target, evaluation, interaction = None, formatVersion = formatVersionModule.default, style = None,
-            projectileFrame = standardsModule.frames.labToken, MAT = None, PoPs = None, sourcePath = None ) :
+    def __init__( self, projectile, target, evaluation, interaction = None, formatVersion = GNDS_formatVersionModule.default, style = None,
+            projectileFrame = xDataEnumsModule.Frame.lab, MAT = None, PoPs = None, sourcePath = None ) :
         """
         Creates a new reactionSuite object, containing all reaction data for a projectile/target combination.
 
@@ -109,11 +113,11 @@ class reactionSuite( ancestryModule.ancestry ) :
         :param style:           Indicates style of data in this reactionSuite (evaluated, processed, etc.).  Instance of styles.style
         :param projectileFrame: Frame of the projectile. Allowed values are 'lab' or 'centerOfMass'
         :param MAT:             Integer ENDF MAT number (only needed for writing back to ENDF-6)
-        :param PoPs:            A PoPs database that is copied to self's PoPs database
+        :param PoPs:            A PoPs Database that is copied to self's PoPs Database
         :return:
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
         if( not( isinstance( projectile, str ) ) ) : raise TypeError( 'projectile ID not a string' )
         self.__projectile = projectile
@@ -124,52 +128,54 @@ class reactionSuite( ancestryModule.ancestry ) :
         if( not( isinstance( evaluation, str ) ) ) : raise TypeError( 'evaluation not a string' )
         self.__evaluation = evaluation
 
+        if interaction == enumsModule.Interaction.legacyTNSL:
+            interaction = enumsModule.Interaction.TNSL
         self.interaction = interaction
         self.__guessedInteraction = False
 
-        if( formatVersion not in formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS PoPs structure '%s'!" % str( formatVersion ) )
+        if( formatVersion not in GNDS_formatVersionModule.allowedPlus ) : raise Exception( "Unsupported GNDS PoPs structure '%s'!" % str( formatVersion ) )
         self.formatVersion = formatVersion
 
-        self.__projectileFrame = projectileFrame
+        self.__projectileFrame = xDataEnumsModule.Frame.checkEnumOrString(projectileFrame)
 
         self.MAT = MAT
 
         self.__sourcePath = sourcePath
 
-        self.__externalFiles = suitesModule.externalFiles()
+        self.__externalFiles = suitesModule.ExternalFiles()
         self.__externalFiles.setAncestor( self )
 
-        self.__styles = stylesModule.styles( )
+        self.__styles = stylesModule.Styles( )
         self.__styles.setAncestor( self )
         if( style is not None ) : self.styles.add( style )
 
         if( PoPs is not None ) :
             self.__PoPs = PoPs.copy( )
         else :
-            self.__PoPs = PoPsModule.database( 'protare_internal', '1.0' )
+            self.__PoPs = PoPsModule.Database( 'protare_internal', '1.0' )
         self.__PoPs.setAncestor( self )
 
         self.__resonances = None
 
-        self.__reactions = suitesModule.reactions()
+        self.__reactions = suitesModule.Reactions()
         self.__reactions.setAncestor( self )
 
-        self.__orphanProducts = suitesModule.orphanProducts( )
+        self.__orphanProducts = suitesModule.OrphanProducts( )
         self.__orphanProducts.setAncestor( self )
 
-        self.__sums = sumsModule.sums()
+        self.__sums = sumsModule.Sums()
         self.__sums.setAncestor( self )
 
-        self.__productions = suitesModule.productions()
+        self.__productions = suitesModule.Productions()
         self.__productions.setAncestor( self )
 
-        self.__incompleteReactions = suitesModule.incompleteReactions()
+        self.__incompleteReactions = suitesModule.IncompleteReactions()
         self.__incompleteReactions.setAncestor( self )
 
-        self.__fissionComponents = suitesModule.fissionComponents()
+        self.__fissionComponents = suitesModule.FissionComponents()
         self.__fissionComponents.setAncestor( self )
 
-        self.__applicationData = suitesModule.applicationData()
+        self.__applicationData = suitesModule.ApplicationData()
         self.__applicationData.setAncestor( self )
 
         self._externalLinks = []    # keep track of links to external files
@@ -242,11 +248,11 @@ class reactionSuite( ancestryModule.ancestry ) :
     def interaction( self, value ) :
 
         if( value is None ) :
-            value = Interaction.nuclear
+            value = enumsModule.Interaction.nuclear
             print( 'Need to specify interaction when calling reactionSuite.__init__. Setting it to "%s". Please update your code as in the future this will execute a raise.' % value )
 
-        if( value not in Interaction.allowed ) : raise TypeError( 'Invalid interaction = "%s"' % value )
-        self.__interaction = value
+        self.__interaction = enumsModule.Interaction.checkEnumOrString(value)
+
 
     @property
     def guessedInteraction(self) :
@@ -290,13 +296,13 @@ class reactionSuite( ancestryModule.ancestry ) :
         return self.__resonances
 
     @resonances.setter
-    def resonances( self, _resonances ) :
+    def resonances(self, resonances):
         """Set resonances to the specified resonances instance."""
 
-        if not isinstance(_resonances, resonancesModule.resonances.resonances):
-            raise TypeError("Must be resonances instance, not '%s'" % type(_resonances))
-        self.__resonances = _resonances
-        self.__resonances.setAncestor( self )
+        if not isinstance(resonances, resonancesModule.Resonances):
+            raise TypeError("Must be Resonances instance, not '%s'" % type(resonances))
+        self.__resonances = resonances
+        self.__resonances.setAncestor(self)
 
     @property
     def reactions( self ) :
@@ -371,6 +377,7 @@ class reactionSuite( ancestryModule.ancestry ) :
 
     def convertUnits( self, unitMap ) :
         """
+        Recursively searches for units within all sections, converting units that appear in the unitMap.
         unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { 'eV' : 'MeV', 'b' : 'mb' }).
         """
 
@@ -382,6 +389,22 @@ class reactionSuite( ancestryModule.ancestry ) :
         self.productions.convertUnits( unitMap )
         self.PoPs.convertUnits( unitMap )
         self.fissionComponents.convertUnits( unitMap )
+
+    def fixDomains(self, energyMax):
+        """
+        For each reaction type and summed data, makes all projectile energy domains be consistent. This only modifies *evaluated* data and
+        not any *processed* data.
+        """
+
+        numberOfFixes, labels = self.styles.fixDomains(energyMax)
+        numberOfFixes += self.reactions.fixDomains(labels, 0.0, energyMax)               # The energyMin value is ignored by all "reaction" exclusive suites.
+        numberOfFixes += self.orphanProducts.fixDomains(labels, 0.0, energyMax)
+        numberOfFixes += self.productions.fixDomains(labels, 0.0, energyMax)
+        numberOfFixes += self.fissionComponents.fixDomains(labels, 0.0, energyMax)
+        numberOfFixes += self.incompleteReactions.fixDomains(labels, 0.0, energyMax)
+        numberOfFixes += self.sums.fixDomains(labels, energyMax)
+
+        return numberOfFixes
 
     def check( self, **kwargs ) :
         """
@@ -452,28 +475,31 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         warnings = []
 
-        if isinstance( self.target, PoPsModule.unorthodoxModule.particle ):
+        if isinstance( self.target, PoPsModule.unorthodoxModule.Particle ):
             warnings.append( warning.UnorthodoxParticleNotImplemented( self.target))
             return warning.context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
 
         evaluatedStyle = self.styles.getEvaluatedStyle()
         if evaluatedStyle is None:
             warnings.append( warning.NotImplemented( "Checking currently only supported for 'evaluated' style" ) )
-            return warning.context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
+            return warning.Context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
 
         # assemble some useful info, to be handed down to children's check() functions:
         incidentEnergyUnit = 'eV'
         massUnit = 'eV/c**2'
         projectile = self.PoPs[self.projectile]
-        projectileZ, dummy, projectileZA, dummy = chemicalElementMiscPoPsModule.ZAInfo( projectile )
+        projectileZ, projectileA, projectileZA, projectileLevelIndex = chemicalElementMiscPoPsModule.ZAInfo( projectile )
         target = self.PoPs[self.target]
         if hasattr(target,'id') and target.id in self.PoPs.aliases:
             target = self.PoPs[ target.pid ]
-        targetZ, dummy, targetZA, dummy = chemicalElementMiscPoPsModule.ZAInfo( target )
-        compoundZA = targetZA + projectileZA
+        targetZ, targetA, targetZA, targetLevelIndex = chemicalElementMiscPoPsModule.ZAInfo( target )
+        if targetA == 0:
+            compoundZA = 1000 * (projectileZ + targetZ) # elemental target
+        else:
+            compoundZA = targetZA + projectileZA
         CoulombChannel = ( targetZ != 0 ) and ( projectileZ != 0 )
-        elementalTarget=False
-        if hasattr( target, 'getMass' ):
+        elementalTarget = (targetA==0)
+        if not elementalTarget:
             projectileMass_amu = projectile.getMass( 'amu' )
             targetMass_amu = target.getMass( 'amu' )
             kinematicFactor = ( targetMass_amu + projectileMass_amu ) / targetMass_amu    # (M+m)/M
@@ -483,14 +509,13 @@ class reactionSuite( ancestryModule.ancestry ) :
             availableEnergy_eV = projectileMass + targetMass
         else:
             # For elemental targets, calculating these factors doesn't make sense since there is no defined target mass
+            warnings.append( warning.ElementalTarget(self.target) )
             kinematicFactor=1.0
-            elementalTarget=True
             availableEnergy_eV=None
-        if isinstance(target,chemicalElementPoPsModule.chemicalElement): elementalTarget=True
 
         info = { 'reactionSuite': self, 'kinematicFactor': kinematicFactor, 'compoundZA': compoundZA,
                 'availableEnergy_eV': availableEnergy_eV, 'CoulombChannel': CoulombChannel, 'style': evaluatedStyle,
-                'reconstructedStyleName': None }
+                'reconstructedStyleName': None, 'elementalTarget': elementalTarget }
         info.update( options )
         if elementalTarget:
             # For elemental targets, calculating energy balance isn't possible
@@ -498,43 +523,42 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         externalFileWarnings = []
         for externalFile in self.externalFiles:
-            from LUPY import checksums
             fullPath = os.path.join(
                 os.path.split(self.sourcePath)[0], externalFile.path
             )
             if not os.path.exists(fullPath):
-                warnings.append(warning.missingExternalFile(externalFile.path))
+                warnings.append(warning.MissingExternalFile(externalFile.path))
                 continue
 
             if externalFile.checksum is not None:
                 algorithm = externalFile.algorithm
-                checksum = checksums.checkers[algorithm].from_file(fullPath)
+                checksum = checksumsModule.checkers[algorithm].from_file(fullPath)
                 if checksum != externalFile.checksum:
                     warnings.append(
-                        warning.wrongExternalFileChecksum(externalFile.path,
+                        warning.WrongExternalFileChecksum(externalFile.path,
                                                           externalFile.checksum,
                                                           checksum))
 
         if externalFileWarnings:
-            warnings.append( warning.context('externalFiles', externalFileWarnings))
+            warnings.append( warning.Context('externalFiles', externalFileWarnings))
 
         if self.resonances is not None:
             resonanceWarnings = self.resonances.check( info )
             if resonanceWarnings:
-                warnings.append( warning.context('resonances', resonanceWarnings) )
+                warnings.append( warning.Context('resonances', resonanceWarnings) )
             if ( options['reconstructResonances'] and self.resonances.reconstructCrossSection ):
-                info['reconstructedStyleName'] = self.styles.getTempStyleNameOfClass( stylesModule.crossSectionReconstructed )
+                info['reconstructedStyleName'] = self.styles.getTempStyleNameOfClass( stylesModule.CrossSectionReconstructed )
                 # convert resonance parameters to pointwise data, interpolable to .1 percent:
-                reconstructedStyle = stylesModule.crossSectionReconstructed( info['reconstructedStyleName'], derivedFrom=evaluatedStyle.label )
-                try: self.reconstructResonances( reconstructedStyle, accuracy=0.001, thin=False, verbose=False )
+                reconstructedStyle = stylesModule.CrossSectionReconstructed( info['reconstructedStyleName'], derivedFrom=evaluatedStyle.label )
+                try: self.reconstructResonances( reconstructedStyle, 0.001, thin=False, verbose=False )
                 except Exception as e:
                     warnings.append( warning.ExceptionRaised( "when reconstructing resonances: %s" % e ) )
                     if info['failOnException']: raise
 
         if info['checkEnergyBalance']:
             # setup options for calculating average product energy and momentum
-            averageProductDataStyle = stylesModule.averageProductData(
-                    label = self.styles.getTempStyleNameOfClass( stylesModule.averageProductData ),
+            averageProductDataStyle = stylesModule.AverageProductData(
+                    label = self.styles.getTempStyleNameOfClass( stylesModule.AverageProductData ),
                     derivedFrom=evaluatedStyle.label )
 
             self.styles.add( averageProductDataStyle )
@@ -545,14 +569,14 @@ class reactionSuite( ancestryModule.ancestry ) :
                         'momentumUnit': incidentEnergyUnit + '/c',
                         'projectileMass': projectileMass, 'targetMass': targetMass,
                         'reactionSuite':self, 'photonBranchingData': self.photonBranchingData(),
-                        'isInfiniteTargetMass' : isinstance( target, chemicalElementPoPsModule.chemicalElement ) }
+                        'isInfiniteTargetMass' : isinstance( target, chemicalElementPoPsModule.ChemicalElement ) }
 
         if self.projectile == 'n' and self.target != 'n':
             # test Wick's limit: 0-degree elastic xsc >= ( total xsc * k/4pi )^2
             elastic = self.getReaction('elastic')
             total = self.getReaction('total')
             if total is None:
-                warnings.append( warning.testSkipped("Wick's limit", "can't find reaction 'total'" ) )
+                warnings.append( warning.TestSkipped("Wick's limit", "can't find reaction 'total'" ) )
             else:
                 try :
                     if( info['reconstructedStyleName'] in elastic.crossSection ) :
@@ -562,13 +586,13 @@ class reactionSuite( ancestryModule.ancestry ) :
                         elastic_xsc = elastic.crossSection.toPointwise_withLinearXYs(lowerEps=1e-8,upperEps=1e-8)
                         total_xsc = total.crossSection.toPointwise_withLinearXYs(lowerEps=1e-8,upperEps=1e-8)
                     elastic_distribution = elastic.outputChannel.getProductWithName('n').distribution[evaluatedStyle.label].angularSubform
-                    if isinstance( elastic_distribution, fudge.productData.distributions.angular.XYs2d ):
+                    if isinstance( elastic_distribution, angularModule.XYs2d ):
                         linearized = elastic_distribution.toPointwise_withLinearXYs()
                         forward_scattering = crossSectionModule.XYs1d( data=[], axes=crossSectionModule.XYs1d.defaultAxes() )
                         for energy_in in linearized.getEnergyArray():
                             forward_scattering.setValue( energy_in, linearized.interpolateAtValue( energy_in ).evaluate(1.0) )
-                    elif isinstance( elastic_distribution, fudge.productData.distributions.angular.regions2d ):
-                        forward_scattering = crossSectionModule.regions1d( axes=crossSectionModule.XYs1d.defaultAxes() )
+                    elif isinstance( elastic_distribution, angularModule.Regions2d ):
+                        forward_scattering = crossSectionModule.Regions1d( axes=crossSectionModule.XYs1d.defaultAxes() )
                         for region in elastic_distribution:
                             ptw = crossSectionModule.XYs1d( data=[] )
                             linearized = region.toPointwise_withLinearXYs()
@@ -598,15 +622,15 @@ class reactionSuite( ancestryModule.ancestry ) :
                     if info['failOnException']: raise
 
         particleWarnings = self.PoPs.check( **info )
-        if particleWarnings: warnings.append( warning.context('PoPs', particleWarnings) )
+        if particleWarnings: warnings.append( warning.Context('PoPs', particleWarnings) )
 
-        info['isInfiniteTargetMass'] = isinstance( target, chemicalElementPoPsModule.chemicalElement )
+        info['isInfiniteTargetMass'] = isinstance( target, chemicalElementPoPsModule.ChemicalElement )
         for reaction in self :
             reactionWarnings = reaction.check( info )
-            if reactionWarnings: warnings.append( warning.context('%s label %s'
+            if reactionWarnings: warnings.append( warning.Context('%s label %s'
                 % (reaction.moniker, reaction.label), reactionWarnings ) )
 
-        result = warning.context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
+        result = warning.Context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
         result.info = info
 
         if options['cleanUpTempFiles']:
@@ -616,17 +640,17 @@ class reactionSuite( ancestryModule.ancestry ) :
 
     def diff( self, other ) :
 
-        diffResults1 = warningModule.diffResults( self, other )
+        diffResults1 = warningModule.DiffResults( self, other )
 
-        if( not( isinstance( other, reactionSuite ) ) ) : raise ValueError( 'Other not a reactionSuite instance.' )
+        if( not( isinstance( other, ReactionSuite ) ) ) : raise ValueError( 'Other not a reactionSuite instance.' )
         if( self.domainUnit != other.domainUnit ) : raise ValueError( 'Energy units not the same.' )
 
         for style in self.styles :
-            if( not( isinstance( style, ( stylesModule.evaluated, stylesModule.crossSectionReconstructed ) ) ) ) :
+            if( not( isinstance( style, ( stylesModule.Evaluated, stylesModule.CrossSectionReconstructed ) ) ) ) :
                 raise TypeError( 'Style "%s" not allowed when diffing.' % style.moniker )
 
         for style in other.styles :
-            if( not( isinstance( style, ( stylesModule.evaluated, stylesModule.crossSectionReconstructed ) ) ) ) :
+            if( not( isinstance( style, ( stylesModule.Evaluated, stylesModule.CrossSectionReconstructed ) ) ) ) :
                 raise TypeError( 'Style "%s" not allowed when diffing.' % style.moniker )
 
         self.reactions.diff( other.reactions, diffResults1 )
@@ -664,7 +688,7 @@ class reactionSuite( ancestryModule.ancestry ) :
             for entity in getattr( self, entityName+'s' ):
                 if getattr( entity, attribute, None ) == value:
                     return entity
-        return( ancestryModule.ancestry.findEntity( self, entityName, attribute, value ) )
+        return( ancestryModule.Ancestry.findEntity( self, entityName, attribute, value ) )
 
     def findLinks( self ) :
 
@@ -695,9 +719,9 @@ class reactionSuite( ancestryModule.ancestry ) :
                     raise
 
             if( link2 is None ) :
-                if( isinstance( instance, ENDFconversionFlagsModule.conversion ) ) :
+                if( isinstance( instance, ENDFconversionFlagsModule.Conversion ) ) :
                     ENDFconversions.flags.pop( ENDFconversions.flags.index( instance ) )
-                elif( isinstance( instance, sumsModule.add ) ) :
+                elif( isinstance( instance, sumsModule.Add ) ) :
                     summands = instance.ancestor
                     summands.pop( summands.index( instance ) )
             elif( link is not link2 ) :
@@ -757,27 +781,31 @@ class reactionSuite( ancestryModule.ancestry ) :
 
 # CALEB: This logic need to use PoPs stuff.
         def parse(name):
-            if( IDsPoPsModule.photon in name ) : return 1,0,0,1
+            # FIXME remove '_natural'? Now using 'Os0' instead to indicate elemental target
+            if IDsPoPsModule.photon in name: return 1,0,0,1
             sign, mult, symbol, A = re.search(r"([-]?)([0-9]+)?([a-zA-Z]+)(_natural|[0-9]*)", name).groups()
             if not mult: mult = 1
-            if( ( symbol == IDsPoPsModule.neutron ) and not A ) : A = 1
+            if (symbol == IDsPoPsModule.neutron) and not A: A = 1
             if A!='_natural': A=int(A)
-            if( name == IDsPoPsModule.neutron ) :
+            if name == IDsPoPsModule.neutron:
                 Z = 0
-            else :
+            else:
                 Z = chemicalElementMiscPoPsModule.ZFromSymbol[symbol]
-            return( int( sign + '1' ), Z, A, int( mult ) )
+            return int( sign + '1' ), Z, A, int( mult )
 
-        retZ, retA = 0,0
+        retZ, retA = 0,None
         try:
             for nucleus in args:
+                if 'photon' in nucleus: continue
                 sign, Z, A, mult = parse(nucleus)
                 retZ += sign*mult*Z
-                if '_natural' in (A,retA):
-                    retA='_natural'
+                if retA is None:
+                    retA = A
+                elif A == 0 or retA == 0:
+                    retA = 0
                 else:
                     retA += sign*mult*A
-            return( '%s%s' % ( chemicalElementMiscPoPsModule.symbolFromZ[retZ], retA ) )
+            return '%s%s' % (chemicalElementMiscPoPsModule.symbolFromZ[retZ], retA)
         except:
             print ("      WARNING: couldn't extract isotope name from product list!")
 
@@ -792,7 +820,6 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         Raises 'KeyError' if specified channel can't be found.
         """
-        import numpy
 
         # If channel is an int, it might be an ENDF MT, so check those first
         if isinstance(channel, (int, numpy.integer)): # must be an ENDF MT
@@ -825,19 +852,26 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         if 'fission' in channel.lower():
             channel_fiss = channel.lower()
+
             def matchlist(*args):
-                return any( [a in channel_fiss for a in args] )
-            if channel_fiss=='fission' or 'total' in channel_fiss: genre='total'
-            elif matchlist('first','1st'): genre='firstChance'
-            elif matchlist('second','2nd'): genre='secondChance'
-            elif matchlist('third','3rd'): genre='thirdChance'
-            elif matchlist('fourth','4th'): genre='fourthChance'
+                return any([a in channel_fiss for a in args])
+
+            if channel_fiss == 'fission' or 'total' in channel_fiss:
+                fissionGenre = enumsModule.FissionGenre.total
+            elif matchlist('first', '1st'):
+                fissionGenre = enumsModule.FissionGenre.firstChance
+            elif matchlist('second', '2nd'):
+                fissionGenre = enumsModule.FissionGenre.secondChance
+            elif matchlist('third', '3rd'):
+                fissionGenre = enumsModule.FissionGenre.thirdChance
+            elif matchlist('fourth', '4th'):
+                fissionGenre = enumsModule.FissionGenre.fourthChance
             else:
-                print("Can't determine fission genre from '%s'" % channel_fiss)
-                genre = None
-            retVal  = [ r1 for r1 in self.reactions         if r1.fissionGenre == genre ]
-            retVal += [ r1 for r1 in self.fissionComponents if r1.fissionGenre == genre ]
-            if len(retVal)==1:
+                print('Cannot determine fission genre from "%s".' % channel_fiss)
+                fissionGenre = enumsModule.FissionGenre.none
+            retVal  = [r1 for r1 in self.reactions         if r1.fissionGenre == fissionGenre]
+            retVal += [r1 for r1 in self.fissionComponents if r1.fissionGenre == fissionGenre]
+            if len(retVal) == 1:
                 return retVal[0]
         else:
             # check if channel is in form '(z,2na)', 'n,4n' or similar:
@@ -872,9 +906,9 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         from fudge import reactionSuite as reactionSuiteModule
         from fudge import styles as stylesSuiteModule
-        reactionSuite = reactionSuiteModule.readXML( "16.xml" )
+        reactionSuite = reactionSuiteModule.ReactionSuite.readXML_file( "16.xml" )
 
-        style = stylesModule.averageProductData( label = 'productData', 'eval' )
+        style = stylesModule.AverageProductData( label = 'productData', 'eval' )
         reactionSuite.calculateAverageProductData( style )
 
         :param style: The style to use.
@@ -883,7 +917,7 @@ class reactionSuite( ancestryModule.ancestry ) :
         :return:
         """
 
-        if( not( isinstance( style, stylesModule.averageProductData ) ) ) : raise TypeError( 'Invalid style' )
+        if( not( isinstance( style, stylesModule.AverageProductData ) ) ) : raise TypeError( 'Invalid style' )
 
         verbosity = kwargs.get( 'verbosity', 0 )
         kwargs['verbosity'] = verbosity
@@ -892,7 +926,7 @@ class reactionSuite( ancestryModule.ancestry ) :
         kwargs['incrementalIndent'] = incrementalIndent
         indent2 = indent + incrementalIndent
 
-        logFile = kwargs.get( 'logFile', nullDevice( ) )
+        logFile = kwargs.get( 'logFile', NullDevice( ) )
         kwargs['logFile'] = logFile
 
         energyAccuracy = kwargs.get( 'energyAccuracy', 1e-5 )
@@ -906,11 +940,11 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         kwargs['projectileMass'] = self.PoPs[self.projectile].getMass( kwargs['massUnit'] )
         target = self.PoPs[self.target]
-        kwargs['isInfiniteTargetMass'] = isinstance( target, chemicalElementPoPsModule.chemicalElement )
+        kwargs['isInfiniteTargetMass'] = isinstance( target, chemicalElementPoPsModule.ChemicalElement )
         if( kwargs['isInfiniteTargetMass'] ) :
             kwargs['targetMass'] = None
         else :
-            if( target.id in self.PoPs.aliases ) : target = self.PoPs[target.pid]
+            if( target.id in self.PoPs.aliases ) : target = self.PoPs[target.id]
             kwargs['targetMass'] = target.getMass( kwargs['massUnit'] )
 
         if( verbosity > 0 ) : print ('%s%s' % (indent, self.inputParticlesToReactionString(suffix=" -->")))
@@ -942,17 +976,17 @@ class reactionSuite( ancestryModule.ancestry ) :
         :rtype: crossSectionSum instance
         """
 
-        crossSectionSum = sumsModule.crossSectionSum( sumLabel, ENDF_MT )
+        crossSectionSum = sumsModule.CrossSectionSum( sumLabel, ENDF_MT )
 
         sum = XYs1dModule.XYs1d( axes = crossSectionModule.defaultAxes( self.domainUnit ) )
         for key in reactionKeys :
             reaction = self.reactions[key]
             sum += reaction.crossSection.toPointwise_withLinearXYs( lowerEps = 1e-6, upperEps = 1e-6 )
-            crossSectionSum.summands.append( sumsModule.add( link = reaction.crossSection ) )
+            crossSectionSum.summands.append( sumsModule.Add( link = reaction.crossSection ) )
 
         crossSectionSum.crossSection.add( crossSectionModule.XYs1d( data = sum, label = styleLabel, axes = crossSectionModule.defaultAxes( self.domainUnit ) ) )
 
-        crossSectionSum.Q.add( QModule.constant1d( Q, domainMin = sum.domainMin, domainMax = sum.domainMax, axes = QModule.defaultAxes( self.domainUnit ), label = styleLabel ) )
+        crossSectionSum.Q.add( QModule.Constant1d( Q, domainMin = sum.domainMin, domainMax = sum.domainMax, axes = QModule.defaultAxes( self.domainUnit ), label = styleLabel ) )
 
         return( crossSectionSum )
 
@@ -967,9 +1001,9 @@ class reactionSuite( ancestryModule.ancestry ) :
         """
 
         style = self.__styles[styleName]
-        if( isinstance( style, stylesModule.heatedMultiGroup ) ) :
+        if( isinstance( style, stylesModule.HeatedMultiGroup ) ) :
             styleList = [ style ]
-        if( isinstance( style, stylesModule.griddedCrossSection ) ) :
+        elif( isinstance( style, stylesModule.GriddedCrossSection ) ) :
             styleList = []
             while( style is not None ) :
                 styleList.append( style )
@@ -1000,22 +1034,38 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         return False
 
+    def listOfProducts(self):
+        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for all reactions of *self*."""
+
+        products = set()
+        for reaction in self.reactions: products.update(reaction.listOfProducts())
+        for reaction in self.orphanProducts: products.update(reaction.listOfProducts())
+        for reaction in self.fissionComponents: products.update(reaction.listOfProducts())
+        for reaction in self.productions: products.update(reaction.listOfProducts())
+        for reaction in self.incompleteReactions: products.update(reaction.listOfProducts())
+
+        return products
+
     def loadCovariances(self):
         """
         Load all external files of type 'covarianceSuite', and resolve links between self and covarianceSuites
         @return: list of loaded covarianceSuites
         """
-        from LUPY import GNDSType as GNDSTypeModule
+
+        from fudge import GNDS_file as GNDS_fileModule
         from fudge.covariances import covarianceSuite as covarianceSuiteModule
+
         covariances = []
+        kwargs = {'reactionSuite': self}
         for external in self.externalFiles:
-            # TODO submit proposal to include file type attribute in the externalFile GNDS node so we don't need to run GNDSTypeModule.type
-            gndsType, metadata = GNDSTypeModule.type(external.realpath())
-            if gndsType == covarianceSuiteModule.covarianceSuite.moniker:
-                covariances.append(covarianceSuiteModule.readXML(external.realpath(), reactionSuite=self))
+            # TODO submit proposal to include file type attribute in the externalFile GNDS node so we don't need to run GNDS_fileModule.type
+            gndsType, metadata = GNDS_fileModule.type(external.realpath())
+            if gndsType == covarianceSuiteModule.CovarianceSuite.moniker:
+                covariances.append(covarianceSuiteModule.CovarianceSuite.readXML_file(external.realpath(), **kwargs))
+
         return covariances
 
-    def partialProductionIntegral( self, productID, energyIn, energyOut = None, muOut = None, phiOut = None, frame = standardsModule.frames.labToken,
+    def partialProductionIntegral( self, productID, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.lab,
                 LegendreOrder = 0, **kwargs ) :
 
         partialProductionIntegralSum = 0.0
@@ -1041,12 +1091,12 @@ class reactionSuite( ancestryModule.ancestry ) :
                 firstProduct = reaction.outputChannel[0]
                 secondProduct = reaction.outputChannel[1]
 
-                nuclearPlusCoulombInterference = nuclearPlusCoulombInterferenceModule.NuclearPlusCoulombInterference( )
+                nuclearPlusCoulombInterference = nuclearPlusCoulombInterferenceModule.NuclearPlusCoulombInterference(style.label)
 
                 try :
                     LLNL = self.applicationData['LLNL']
                 except :
-                    LLNL = institutionModule.institution( 'LLNL' )
+                    LLNL = institutionModule.Institution('LLNL')
                     self.applicationData.add( LLNL )
                 LLNL.append( nuclearPlusCoulombInterference )
 
@@ -1056,18 +1106,18 @@ class reactionSuite( ancestryModule.ancestry ) :
                 Q.label = style.label
                 nuclearPlusCoulombInterference.reaction.outputChannel.Q.add( Q )
 
-                product1 = productModule.product( firstProduct.id, firstProduct.label )
+                product1 = productModule.Product(firstProduct.pid, firstProduct.label)
                 product1.multiplicity.add( firstProduct.multiplicity[0].copy( ) )
                 product1.multiplicity[0].label = style.label
-                angularTwoBody1 = angularModule.twoBodyForm( crossSection.label, standardsModule.frames.centerOfMassToken, function2d )
+                angularTwoBody1 = angularModule.TwoBody( crossSection.label, xDataEnumsModule.Frame.centerOfMass, function2d )
                 product1.distribution.add( angularTwoBody1 )
                 nuclearPlusCoulombInterference.reaction.outputChannel.products.add( product1 )
 
-                product2 = productModule.product( secondProduct.id, secondProduct.label )
+                product2 = productModule.Product(secondProduct.pid, secondProduct.label)
                 product2.multiplicity.add( secondProduct.multiplicity[0].copy( ) )
                 product2.multiplicity[0].label = style.label
-                recoil = angularModule.recoil( link = product1.distribution[style.label], relative = True )
-                angularTwoBody2 = angularModule.twoBodyForm( crossSection.label, standardsModule.frames.centerOfMassToken, recoil )
+                recoil = angularModule.Recoil( link = product1.distribution[style.label], relative = True )
+                angularTwoBody2 = angularModule.TwoBody( crossSection.label, xDataEnumsModule.Frame.centerOfMass, recoil )
                 product2.distribution.add( angularTwoBody2 )
                 nuclearPlusCoulombInterference.reaction.outputChannel.products.add( product2 )
 
@@ -1113,13 +1163,14 @@ class reactionSuite( ancestryModule.ancestry ) :
 
     def processGriddedCrossSections( self, style, verbosity = 0, indent = '', incrementalIndent = '  ', additionalReactions = [] ) :
         """
-        Generate a union grid for all cross sections, spanning the same domain as elastic scattering.
+        Generate a union grid for all cross sections, for faster continuous energy Monte Carlo sampling.
+        The grid spans the same domain as the elastic scattering cross section.
         """
 
         def mutualDomain( style, reaction, thresholds ) :
 
             crossSection = style.findFormMatchingDerivedStyle( reaction.crossSection )
-            if( isinstance( crossSection, crossSectionModule.regions1d ) ) :
+            if( isinstance( crossSection, crossSectionModule.Regions1d ) ) :
                 crossSection = crossSection.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 1e-6 )
             crossSection = crossSection.domainSlice( domainMin, domainMax )                 # truncate to match elastic domain
             if( ( crossSection.domainMin > domainMin ) and ( crossSection[0][1] != 0 ) ) :
@@ -1134,7 +1185,7 @@ class reactionSuite( ancestryModule.ancestry ) :
         def photoAtomic( style, reaction, thresholds ) :
 
             crossSection = style.findFormMatchingDerivedStyle( reaction.crossSection )
-            if( isinstance( crossSection, crossSectionModule.regions1d ) ) :
+            if( isinstance( crossSection, crossSectionModule.Regions1d ) ) :
                 values = []
                 x1, y1 = crossSection[0][0]
                 for iRegion, region in enumerate( crossSection ) :
@@ -1149,7 +1200,7 @@ class reactionSuite( ancestryModule.ancestry ) :
 
             return( set( values ) )
 
-        evaluationStyle = style.findDerivedFromStyle( stylesModule.evaluated )
+        evaluationStyle = style.findDerivedFromStyle( stylesModule.Evaluated )
         projectileEnergyDomain = evaluationStyle.projectileEnergyDomain
         domainMin = projectileEnergyDomain.min
         domainMax = projectileEnergyDomain.max
@@ -1159,8 +1210,8 @@ class reactionSuite( ancestryModule.ancestry ) :
         isPhotoAtomic = False
         if( not( self.isThermalNeutronScatteringLaw( ) ) ) :
             target = self.PoPs[self.target]
-            isChemicalElement = isinstance( target, chemicalElementPoPsModule.chemicalElement )
-            isUnorthodox = isinstance( target, unorthodoxPoPsModule.particle )
+            isChemicalElement = isinstance( target, chemicalElementPoPsModule.ChemicalElement )
+            isUnorthodox = isinstance( target, unorthodoxPoPsModule.Particle )
             isPhotoAtomic = ( self.projectile == IDsPoPsModule.photon ) and ( isChemicalElement or isUnorthodox )
 
         thresholds = set( )
@@ -1184,8 +1235,8 @@ class reactionSuite( ancestryModule.ancestry ) :
             if( values[index] in thresholds ) : index -= 1
             del values[index]
 
-        values = valuesModule.values( values )
-        grid = axesModule.grid( total.axes[1].label, 1, total.axes[1].unit, axesModule.pointsGridToken, values )
+        values = valuesModule.Values( values )
+        grid = axesModule.Grid( total.axes[1].label, 1, total.axes[1].unit, xDataEnumsModule.GridStyle.points, values )
         style.grid = grid
 
         for reaction in self.reactions :
@@ -1209,13 +1260,27 @@ class reactionSuite( ancestryModule.ancestry ) :
 
     def processMultiGroup( self, style, legendreMax, verbosity = 0, indent = '', incrementalIndent = '  ', logFile = None, workDir = None,
                 restart = False, additionalReactions = [] ) :
+        """
+        Generate multi-group processed data, including cross sections, weighted multiplicities and Q-values and transfer matrices.
+        Processed results will be stored as new forms inside the reactionSuite.
+
+        :param style: fudge.gnds.styles.HeatedMultiGroup instance
+        :param legendreMax: number of Legendre orders to produce in transfer matrices.
+        :param verbosity: verbosity level
+        :param indent: indentation level for verbose output
+        :param incrementalIndent: amount to increase verbose output indentation when calling processMultiGroup on child classes
+        :param logFile: open file where log will be written.  FIXME logFile is a required argument, but default value = None
+        :param workDir: directory to save working files generated during processing. Note that this directory can become very large.
+        :param restart: load previous Merced outputs (if found) rather than recomputing, useful if a processProtare run times out or crashes.
+        :return: None, except ValueError is raised if any errors occurred during processing
+        """
 
         from LUPY import times as timesModule
 
         if( verbosity > 0 ) : print ('%s%s' % (indent, self.inputParticlesToReactionString(suffix=" -->")))
-        if( not( isinstance( style, stylesModule.heatedMultiGroup ) ) ) : raise( 'Instance is not a heatedMultiGroup style.' )
+        if( not( isinstance( style, stylesModule.HeatedMultiGroup ) ) ) : raise( 'Instance is not a HeatedMultiGroup style.' )
 
-        t0 = timesModule.times( )
+        t0 = timesModule.Times( )
 
         kwargs = { 'reactionSuite' : self }
         kwargs['failures'] = 0
@@ -1236,8 +1301,8 @@ class reactionSuite( ancestryModule.ancestry ) :
             kwargs['targetMass'] = None
             if( not( self.isThermalNeutronScatteringLaw( ) ) ) :
                 target = self.PoPs[self.target]
-                kwargs['isInfiniteTargetMass'] = isinstance( target, chemicalElementPoPsModule.chemicalElement )
-                if( not( isinstance( target, chemicalElementPoPsModule.chemicalElement ) ) ) :
+                kwargs['isInfiniteTargetMass'] = isinstance( target, chemicalElementPoPsModule.ChemicalElement )
+                if( not( isinstance( target, chemicalElementPoPsModule.ChemicalElement ) ) ) :
                     if( target.id in self.PoPs.aliases ) : target = self.PoPs[target.pid]
                     kwargs['targetMass'] = target.getMass( kwargs['massUnit'] )
                 kwargs['target'] = target
@@ -1263,7 +1328,7 @@ class reactionSuite( ancestryModule.ancestry ) :
             kwargs['groupedFlux'] = [ x for x in style.multiGroupFlux.array.constructArray( )[:,0] ]
 
 # BRB FIXME, must have test to determine if reconstructResonances is needed.
-#        self.reconstructResonances( styleName = 'reconstructed', accuracy = 1e-3, verbose = False )
+#        self.reconstructResonances( styleName = 'reconstructed', 1e-3, verbose = False )
             for i1, reaction in enumerate( self.reactions ) :
                 kwargs['reactionIndex'] = "%.4d" % i1
                 reaction.processMultiGroup( style, kwargs, indent + incrementalIndent )
@@ -1285,6 +1350,291 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         if logFile is not None: logFile.write( '    ' + str( t0 ) + '\n' )
         if( kwargs['failures'] > 0 ) : raise ValueError( "kwargs['failures'] = %d  > 0" % kwargs['failures'] )
+
+    def multiGroupVector(self, childSuite, multiGroupVectorMethod, multiGroupSettings, temperatureInfo, **kwargs):
+        """
+        General method to return multiGroupVector output from a specified multiGroupVectorMethod for specified reactionSuite child nodes.
+
+        :param childSuite: Suite which to iterate over.
+        :param multiGroupVectorMethod: Method to be executed for each entry in the suite of reactionSuite child nodes.
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param \*\*kwargs: Additional arguments for the selected method in the entries in the selected suite of reactionSuite child nodes.
+        """
+
+        vectorResult = vectorModule.Vector()
+        for suiteEntry in childSuite:
+            vectorMethod = getattr(suiteEntry, multiGroupVectorMethod)
+            vectorResult += vectorMethod(multiGroupSettings, temperatureInfo, **kwargs)
+        
+        return vectorResult
+
+    def multiGroupMatrix(self, childSuite, multiGroupMatrixMethod, multiGroupSettings, temperatureInfo, **kwargs):
+        """
+        General method to return multiGroupMatrix output from a specified multiGroupVectorMethod for specified reactionSuite child nodes.
+
+        :param childSuite: Suite which to iterate over.
+        :param multiGroupMatrixMethod: Method to be executed for each entry in the suite of reactionSuite child nodes.
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param kwargs: Additional arguments for the selected method in the entries in the selected suite of reactionSuite child nodes.
+        """
+
+        matrixResult = matrixModule.Matrix()
+        for suiteEntry in childSuite:
+            matrixMethod = getattr(suiteEntry, multiGroupMatrixMethod)
+            matrixResult += matrixMethod(multiGroupSettings, temperatureInfo, **kwargs)
+        
+        return matrixResult
+
+    def multiGroupCrossSection(self, multiGroupSettings, temperatureInfo):
+        """
+        Returns the multi-group, total cross section for the requested label. This is summed over all reactions.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        """
+
+        return self.multiGroupVector(self.reactions, 'multiGroupCrossSection', multiGroupSettings, temperatureInfo)
+
+    def multiGroupInverseSpeed(self, temperatureInfo):
+        """
+        Returns the inverse speeds for the requested label. The label must be for a heated multi-group style.
+
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        """
+
+        styleLabel = temperatureInfo['heatedMultiGroup']
+        return self.styles[styleLabel].inverseSpeed.data.constructVector()
+
+    def multiGroupQ(self, multiGroupSettings, temperatureInfo, includeFinalProducts):
+        """
+        Returns the multi-group, total Q for the requested label. This is a cross section weighted multiplicity summed over all reactions.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param includeFinalProducts: If true, the Q is calculated for all output channels, including those for products.
+        """
+
+        return self.multiGroupVector(self.reactions, 'multiGroupQ', multiGroupSettings, temperatureInfo, includeFinalProducts=includeFinalProducts)
+
+    def multiGroupMultiplicity(self, multiGroupSettings, temperatureInfo, productID):
+        """
+        Returns the multi-group, total multiplicity for the requested label for the requested product. This is a cross section weighted multiplicity.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param productID: Particle id for the requested product.
+        """
+
+        multiplicity = self.multiGroupVector(self.reactions, 'multiGroupMultiplicity', multiGroupSettings, temperatureInfo, productID=productID)
+        multiplicity += self.multiGroupVector(self.orphanProducts, 'multiGroupMultiplicity', multiGroupSettings, temperatureInfo, productID=productID)
+
+        return multiplicity
+
+    def multiGroupFissionNeutronMultiplicity(self, multiGroupSettings, temperatureInfo):
+        """
+        Returns the multi-group, total fission neutron multiplicity for the requested label. This is a cross section weighted multiplicity.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        """
+
+        multiplicity = vectorModule.Vector()
+        for reaction in self.reactions:
+            if reaction.isFission():
+                multiplicity += reaction.multiGroupMultiplicity(multiGroupSettings, temperatureInfo, IDsPoPsModule.neutron)
+
+        return multiplicity
+
+    def multiGroupAvailableEnergy(self, multiGroupSettings, temperatureInfo):
+        """
+        Returns the multi-group, total available energy for the requested label. This is a cross section weighted available energy summed over all reactions.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        """
+
+        return self.multiGroupVector(self.reactions, 'multiGroupAvailableEnergy', multiGroupSettings, temperatureInfo)
+
+    def multiGroupAverageEnergy(self, multiGroupSettings, temperatureInfo, productID):
+        """
+        Returns the multi-group, total average energy for the requested label for the requested product. This is a cross section weighted average energy summed over all reactions.
+        
+        This is a cross section weighted average energy summed over all products for this reaction.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param productID: Particle id for the requested product.
+        """
+
+        averageEnergy = self.multiGroupVector(self.reactions, 'multiGroupAverageEnergy', multiGroupSettings, temperatureInfo, productID=productID)
+        averageEnergy += self.multiGroupVector(self.orphanProducts, 'multiGroupAverageEnergy', multiGroupSettings, temperatureInfo, productID=productID)
+
+        return averageEnergy
+
+    def multiGroupDepositionEnergy(self, multiGroupSettings, temperatureInfo, particleIDs):
+        """
+        Returns the multi-group, total deposition energy for the requested label.
+        
+        This is a cross section weighted deposition energy summed over all reactions. The deposition energy is calculated by subtracting 
+        the average energy from each transportable particle from the available energy. The list of transportable particles is specified 
+        via the list of particle specified in the multiGroupSettings argument.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particleIDs: The list of particles to be transported.
+        """
+
+        depositionEnergy = self.multiGroupAvailableEnergy(multiGroupSettings, temperatureInfo)
+        for particleID in particleIDs:
+            depositionEnergy -= self.multiGroupAverageEnergy(multiGroupSettings, temperatureInfo, particleID)
+
+        return depositionEnergy 
+
+    def multiGroupAvailableMomentum(self, multiGroupSettings, temperatureInfo):
+        """
+        Returns the multi-group, total available momentum for the requested label.
+        
+        This is a cross section weighted available momentum summed over all reactions.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        """
+
+        return self.multiGroupVector(self.reactions, 'multiGroupAvailableMomentum', multiGroupSettings, temperatureInfo)
+
+    def multiGroupAverageMomentum(self, multiGroupSettings, temperatureInfo, productID):
+        """
+        Returns the multi-group, total average momentum for the requested label for the requested product.
+        
+        This is a cross section weighted average momentum summed over all reactions.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param productID: Particle id for the requested product.
+        """
+
+        averageMomentum = self.multiGroupVector(self.reactions, 'multiGroupAverageMomentum', multiGroupSettings, temperatureInfo, productID=productID)
+        averageMomentum += self.multiGroupVector(self.orphanProducts, 'multiGroupAverageMomentum', multiGroupSettings, temperatureInfo, productID=productID)
+
+        return averageMomentum
+
+    def multiGroupDepositionMomentum(self, multiGroupSettings, temperatureInfo, particleIDs):
+        """
+        Returns the multi-group, total deposition momentum for the requested label.
+        
+        This is a cross section weighted deposition momentum summed over all reactions. The deposition momentum is calculated by 
+        subtracting the average momentum from each transportable particle from the available momentum. The list of transportable 
+        particles is specified via the list of particle specified in the multiGroupSettings argument.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particleIDs: The list of particles to be transported.
+        """
+
+        depositionMomentum = self.multiGroupAvailableMomentum(multiGroupSettings, temperatureInfo)
+        for particleID in particleIDs:
+            depositionMomentum -= self.multiGroupAverageMomentum(multiGroupSettings, temperatureInfo, particleID)
+
+        return depositionMomentum
+
+    def multiGroupGain(self, multiGroupSettings, temperatureInfo, productID):
+        """
+        Returns the multi-group, gain for the requested particle and label.
+        
+        This is a cross section weighted gain summed over all reactions.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param productID: Particle id for the requested product.
+        """
+
+        particleGain = self.multiGroupVector(self.reactions, 'multiGroupGain', multiGroupSettings, temperatureInfo, \
+            productID=productID, projectileID=self.projectile)
+
+        return particleGain
+
+    def multiGroupTransportCorrection(self, multiGroupSettings, temperatureInfo, particles, legendreOrder, \
+        temperature, transportCorrectionType=transportingModule.TransportCorrectionType.none):
+        """
+        Returns the multi-group transport correction for the requested label.
+        
+        The transport correction is calculated from the transfer matrix for the projectile id for the Legendre order of legendreOrder + 1.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particles: The list of particles to be transported.
+        :param legendreOrder: Requested Legendre order.
+        :param temperature: The temperature of the flux to use when collapsing.
+        :param transportCorrectionType: Requested transport correction type.
+        """
+
+        if transportCorrectionType == transportingModule.TransportCorrectionType.Pendlebury:
+            multiGroupProductMatrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, \
+                self.projectile, legendreOrder + 1)
+
+            matrixCollapsed = particlesModule.CollapseMatrix(multiGroupProductMatrix, multiGroupSettings, particles, temperature, self.projectile)
+            transportCorrection = vectorModule.Vector(values=matrixCollapsed.matrix.diagonal())
+
+        elif transportCorrectionType is transportingModule.TransportCorrectionType.none:
+            transportCorrection = vectorModule.Vector()
+
+        else:
+            raise TypeError('Unsupported transport correction: only None and Pendlebury (i.e., Pendlebury/Underhill) are currently supported.')
+
+        return transportCorrection
+
+    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particles, productID, legendreOrder):
+        """
+        Returns the multi-group, total product matrix for the requested label for the requested product id for the requested Legendre order.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particles: The list of particles to be transported.
+        :param productID: Particle id for the requested product.
+        :param legendreOrder: Requested Legendre order.
+        """
+
+        productMatrix = self.multiGroupMatrix(self.reactions, 'multiGroupProductMatrix', multiGroupSettings, temperatureInfo, \
+            particles=particles, productID=productID, legendreOrder=legendreOrder)
+
+        productMatrix += self.multiGroupMatrix(self.orphanProducts, 'multiGroupProductMatrix', multiGroupSettings, temperatureInfo, \
+            particles=particles, productID=productID, legendreOrder=legendreOrder)
+
+        return productMatrix
+
+    def multiGroupFissionMatrix(self, multiGroupSettings, temperatureInfo, particles, legendreOrder):
+        fissionMatrix = self.multiGroupMatrix(self.reactions, 'multiGroupFissionMatrix', multiGroupSettings, temperatureInfo, \
+            particles=particles, legendreOrder=legendreOrder)
+
+        return fissionMatrix
+
+    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particles, productID):
+        """
+        Returns the full multi-group, total product array for the requested label for the requested product id.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particles: The list of particles to be transported.
+        :param productID: Particle id for the requested product.
+        """
+
+        productArray = productArrayModule.ProductArray()
+
+        for reaction in self.reactions:
+            productArray += reaction.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+
+        for reaction in self.orphanProducts:
+            productArray += reaction.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+
+        return productArray
+
+    def addMultiGroupSums(self, replace=False):
+
+        from .processing.deterministic import addMultiGroupSums as addMultiGroupSumsModule
+
+        addMultiGroupSumsModule.addMultiGroupSums(self, replace=replace)
 
     def processSnElasticUpScatter( self, style, legendreMax, verbosity = 0, indent = '', incrementalIndent = '  ', logFile = None ) :
 
@@ -1330,21 +1680,21 @@ class reactionSuite( ancestryModule.ancestry ) :
                 if( outgoingGroup not in TM_1[incidentGroup] ) : TM_1[incidentGroup] = {}
                 TM_1[incidentGroup][outgoingGroup] = list( array[incidentGroup][outgoingGroup] )
 
-        tempInfo['productName'] = product.id
+        tempInfo['productName'] = product.pid
         tempInfo['groupedFlux'] = [ x for x in style.derivedFromStyle.multiGroupFlux.array.constructArray( )[:,0] ]
         tempInfo['incidentEnergyUnit'] = incidentEnergyUnit
         tempInfo['crossSection']  = style.derivedFromStyle.findFormMatchingDerivedStyle( elasticReaction.crossSection )
         multiGroup = groupModule.TMs2Form( style, tempInfo, TM_1, TM_E )
         distribution.add( multiGroup )
 
-        energyDeposition = product.energyDeposition
-        axes = energyDepositionModule.defaultAxes( energyUnit = incidentEnergyUnit )
-        averageEnergy = energyDepositionModule.XYs1d( data = averageEnergy, axes = axes, label = style.label )
+        averageProductEnergy = product.averageProductEnergy
+        axes = averageProductEnergyModule.defaultAxes( energyUnit = incidentEnergyUnit )
+        averageEnergy = averageProductEnergyModule.XYs1d( data = averageEnergy, axes = axes, label = style.label )
         averageEnergy = averageEnergy.processMultiGroup( style, tempInfo, indent )
         grouped = averageEnergy.array.constructArray( )
-        array = energyDeposition[style.derivedFrom].array.constructArray( )
+        array = averageProductEnergy[style.derivedFrom].array.constructArray( )
         for incidentGroup in range( style.upperCalculatedGroup + 1, len( array ) ) : grouped[incidentGroup] = array[incidentGroup]
-        energyDeposition.add( groupModule.toMultiGroup1d( energyDepositionModule.gridded1d, style, tempInfo, averageEnergy.axes, grouped, zeroPerTNSL = tempInfo['zeroPerTNSL'] ) )
+        averageProductEnergy.add( groupModule.toMultiGroup1d( averageProductEnergyModule.Gridded1d, style, tempInfo, averageEnergy.axes, grouped, zeroPerTNSL = tempInfo['zeroPerTNSL'] ) )
 
     def removeStyles( self, styleLabels ) :
         """
@@ -1368,13 +1718,13 @@ class reactionSuite( ancestryModule.ancestry ) :
         if self.resonances is None: return False
         return self.resonances.reconstructCrossSection
 
-    def reconstructResonances( self, style, accuracy = None, thin = True, significantDigits = None, verbose = False ):
+    def reconstructResonances( self, style, accuracy, thin = True, significantDigits = None, verbose = False ):
         """
         Turn resonance parameters into pointwise cross sections, then merge the results with
         tabulated pointwise cross sections. Resulting pointwise cross sections are stored
         alongside the original 'resonancesWithBackground' data in the reactionSuite.
 
-        @:param style: style - an instance of style crossSectionReconstructed.
+        @:param style: style - an instance of style CrossSectionReconstructed.
         @:param accuracy: float - target accuracy during reconstruction. For example, 0.001.
         @:param thin: boolean - enable/disable thinning after reconstruction (disabling makes summed cross sections consistency checks easier).
         @:param significantDigits: int - energy grid will only include points that can be exactly represented using specified number of significant digits.
@@ -1386,21 +1736,19 @@ class reactionSuite( ancestryModule.ancestry ) :
             return # nothing to do
         from fudge.processing.resonances import reconstructResonances
 
-        if not isinstance( style, stylesModule.crossSectionReconstructed ):
-            raise TypeError("style must be an instance of crossSectionReconstructed, not %s" % type(style))
+        if not isinstance( style, stylesModule.CrossSectionReconstructed ):
+            raise TypeError("style must be an instance of CrossSectionReconstructed, not %s" % type(style))
 
-        xsecs = reconstructResonances.reconstructResonances(self, tolerance = accuracy, verbose = verbose,
-                significantDigits = significantDigits, energyUnit = self.domainUnit )
+        xsecs = reconstructResonances.reconstructResonances(self, accuracy, verbose = verbose, significantDigits = significantDigits )
         epsilon = 1e-8  # for joining multiple regions together
 
         # for each reaction, add tabulated pointwise data (ENDF MF=3) to reconstructed resonances:
-# BRB6 hardwired?
         possibleChannels = { 'elastic' : False, 'capture' : True, 'fission' : True, 'total' : False, 'nonelastic' : False }
         derivedFromLabel = ''
         for reaction in self :
-            if isinstance( reaction, sumsModule.multiplicitySum ): continue
+            if isinstance( reaction, sumsModule.MultiplicitySum ): continue
             evaluatedCrossSection = reaction.crossSection.evaluated
-            if not isinstance( evaluatedCrossSection, crossSectionModule.resonancesWithBackground ):
+            if not isinstance( evaluatedCrossSection, crossSectionModule.ResonancesWithBackground ):
                 continue
             # which reconstructed cross section corresponds to this reaction?
             if( derivedFromLabel == '' ) : derivedFromLabel = evaluatedCrossSection.label
@@ -1416,18 +1764,16 @@ class reactionSuite( ancestryModule.ancestry ) :
                     if( RRxsec is None ) :
                         if( reaction is self.getReaction( possibleChannel ) ) : RRxsec = xsecs[possibleChannel]
                     if( RRxsec is not None ) : break
-            if( RRxsec is None ) :
-                if verbose:
-                    print( "Warning: couldn't find appropriate reconstructed cross section to add to reaction %s" % reaction )
-                continue
+            if RRxsec is None:
+                raise ValueError("Couldn't find appropriate reconstructed cross section to add to reaction '%s'!" % reaction)
 
             background = evaluatedCrossSection.background
             try:
-                background = background.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = epsilon, upperEps = epsilon )
+                background = background.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = epsilon, upperEps = epsilon )
             except Exception as ex:
                 print("Encountered an error while linearizing background cross section for reaction '%s'!" % reaction.label)
                 raise ex
-            RRxsec = RRxsec.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = epsilon, upperEps = epsilon )
+            RRxsec = RRxsec.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = epsilon, upperEps = epsilon, removeOverAdjustedPoints=True )
             RRxsec.convertUnits( {RRxsec.domainUnit: background.domainUnit,  RRxsec.rangeUnit: background.rangeUnit } )
 
             background, RRxsec = background.mutualify(0,0,0, RRxsec, -epsilon,epsilon,True)
@@ -1466,7 +1812,7 @@ class reactionSuite( ancestryModule.ancestry ) :
                 RRxsec.setData(points)
 
             if thin:
-                RRxsec = RRxsec.thin( accuracy or .01 )
+                RRxsec = RRxsec.thin( accuracy )
             RRxsec.label = style.label
             reaction.crossSection.add( RRxsec )
 
@@ -1485,14 +1831,13 @@ class reactionSuite( ancestryModule.ancestry ) :
         @:param verbose: boolean - turn on/off verbosity
         """
 
-        if accuracy: raise NotImplementedError("Refining interpolation grid for angular distributions still TBD")
+        if accuracy is not None: raise NotImplementedError("Refining interpolation grid for angular distributions still TBD")
         if thin: raise NotImplementedError("Thinning for angular distributions still TBD")
 
         if( self.resonances is None ) : return
         from fudge.processing.resonances import reconstructResonances
-        from fudge.productData.distributions import angular as angularModule
 
-        newStyle = stylesModule.angularDistributionReconstructed( styleName, 'eval' )       # BRB6, FIXME - 'eval' should not be hardwired.
+        newStyle = stylesModule.AngularDistributionReconstructed( styleName, 'eval' )       # BRB6, FIXME - 'eval' should not be hardwired.
 
         distributions = reconstructResonances.reconstructAngularDistributions( self, tolerance=accuracy, verbose=verbose )
 
@@ -1503,13 +1848,13 @@ class reactionSuite( ancestryModule.ancestry ) :
             if key in 'elastic': productName = 'n'
             else:
 # BRB6 hardwired.
-                pairs = [ ( p.particle.getMass('amu'), p.id ) for p in reaction.outputChannel.products ]
+                pairs = [ ( p.particle.getMass('amu'), p.pid ) for p in reaction.outputChannel.products ]
                 productName = min(pairs)[1] # pick's the lightest product
             product = reaction.outputChannel.getProductWithName(productName)
             original = product.distribution.evaluated.angularSubform
             reconstructed = distributions[key]
 
-            merged = angularModule.regions2d( axes = original.axes )     # Caleb, FIXME - check that this is correct.
+            merged = angularModule.Regions2d( axes = original.axes )     # Caleb, FIXME - check that this is correct.
             merged.append( reconstructed )
 
             if isinstance( original, angularModule.XYs2d ):
@@ -1520,7 +1865,7 @@ class reactionSuite( ancestryModule.ancestry ) :
                     if( val.outerDomainValue <= reconstructed.domainMax ) : continue
                     newregion.append( val )
                 merged.append( newregion )
-            elif isinstance( original, angularModule.regions2d ):
+            elif isinstance( original, angularModule.Regions2d ):
                 for idx,region in enumerate(original):
                     if( region.domainMax > reconstructed.domainMax ) : break
                 if( region.domainMin != reconstructed.domainMax ) :
@@ -1535,7 +1880,7 @@ class reactionSuite( ancestryModule.ancestry ) :
                 for region in original[idx:]:
                     merged.append( region )
 
-            newForm = angularModule.twoBodyForm( label = newStyle.label,
+            newForm = angularModule.TwoBody( label = newStyle.label,
                     productFrame = product.distribution.evaluated.productFrame, angularSubform = merged )
             if overwrite and newStyle.label in product.distribution:
                 product.distribution.remove( newStyle.label )
@@ -1549,7 +1894,7 @@ class reactionSuite( ancestryModule.ancestry ) :
         :return:
         """
 
-        if isinstance(style, stylesModule.style): style = style.label
+        if isinstance(style, stylesModule.Style): style = style.label
 
         def removeStyleFromComponent( styleName, component ):
             if styleName in component:
@@ -1562,33 +1907,13 @@ class reactionSuite( ancestryModule.ancestry ) :
 
             if not hasattr(reaction, 'outputChannel'): continue
             for product in reaction.outputChannel:
-                removeStyleFromComponent( style, product.energyDeposition )
-                removeStyleFromComponent( style, product.momentumDeposition )
+                removeStyleFromComponent( style, product.averageProductEnergy )
+                removeStyleFromComponent( style, product.averageProductMomentum )
                 if product.outputChannel is None: continue
                 for dproduct in product.outputChannel:
-                    removeStyleFromComponent( style, dproduct.energyDeposition )
-                    removeStyleFromComponent( style, dproduct.momentumDeposition )
+                    removeStyleFromComponent( style, dproduct.averageProductEnergy )
+                    removeStyleFromComponent( style, dproduct.averageProductMomentum )
         self.styles.remove( style )
-
-    def saveToOpenedFile( self, fOut, **kwargs ) :
-
-        xmlString = self.toXMLList( **kwargs )
-        fOut.write( '\n'.join( xmlString ) )
-        fOut.write( '\n' )
-
-    def saveToFile( self, fileName, **kwargs ) :
-        """
-        Save the reactionSuite in GNDS/xml structure to specified file.
-        To suppress extra messages, change the 'verbosity' flag:
-        >>>self.saveToFile( "output.xml", flags={'verbosity':0} )
-        """
-
-        dirname = os.path.dirname( fileName )
-        if( ( len( dirname ) > 0 ) and not( os.path.exists( dirname ) ) ) : os.makedirs( dirname )
-        with open( fileName, "w" ) as fout :
-# BRB6 hardwired.
-            fout.write( '<?xml version="1.0" encoding="UTF-8"?>\n' )
-            self.saveToOpenedFile( fout, **kwargs )
 
     def saveToHybrid( self, xmlName, hdfName=None, minLength=4, flatten=False, compress=False, **kwargs ):
         """
@@ -1604,10 +1929,11 @@ class reactionSuite( ancestryModule.ancestry ) :
         :param kwargs:
         :return:
         """
-        import numpy
-        import h5py
+
         from . import externalFile as externalFileModule
         from LUPY import checksums
+        if not HDF5_present:
+            raise ImportError("Missing module 'h5py' must be installed to support generating HDF5 files.")
 
         if hdfName is None:
             if not xmlName.endswith('.xml'):
@@ -1615,6 +1941,8 @@ class reactionSuite( ancestryModule.ancestry ) :
             else:
                 hdfName = xmlName.replace('.xml','.h5')
 
+        dirname = os.path.dirname(hdfName)
+        if len(dirname) > 0 and not os.path.exists(dirname): os.makedirs(dirname)
         with h5py.File(hdfName, "w") as h5:
             HDF_opts = {
                 'h5file': h5,
@@ -1630,13 +1958,10 @@ class reactionSuite( ancestryModule.ancestry ) :
 
             # add filler external file, actual checksum computed below
             relHdfName = hdfName
-            if relHdfName == os.path.abspath(relHdfName):
-                relHdfName = os.path.basename(relHdfName)
-            self.externalFiles.add(
-                    externalFileModule.externalFile( "HDF", relHdfName,
-                        checksum = "deadbeef", algorithm="sha1" ) )
+            if relHdfName == os.path.abspath(relHdfName): relHdfName = os.path.basename(relHdfName)
+            self.externalFiles.add(externalFileModule.ExternalFile("HDF", relHdfName, checksum = "deadbeef", algorithm="sha1"))
 
-            xmlString = self.toXMLList( HDF_opts = HDF_opts, **kwargs )
+            xmlString = self.toXML_strList( HDF_opts = HDF_opts, **kwargs )
 
             if len(HDF_opts['iData']) > 0:
                 iData = numpy.array( HDF_opts['iData'], dtype=numpy.int32 )
@@ -1645,12 +1970,14 @@ class reactionSuite( ancestryModule.ancestry ) :
                 dData = numpy.array( HDF_opts['dData'], dtype=numpy.float64 )
                 h5.create_dataset('dData', data=dData, **HDF_opts['compression'])
 
-        sha1sum = checksums.sha1sum.from_file(hdfName)
+        sha1sum = checksumsModule.Sha1sum.from_file(hdfName)
         for idx, line in enumerate(xmlString):
             if 'externalFile' in line and 'checksum="deadbeef"' in line:
                 xmlString[idx] = line.replace("deadbeef", sha1sum)
                 break
 
+        dirname = os.path.dirname(xmlName)
+        if len(dirname) > 0 and not os.path.exists(dirname): os.makedirs(dirname)
         with open( xmlName, "w" ) as fout :
             fout.write( '<?xml version="1.0" encoding="UTF-8"?>\n')
             fout.write( '\n'.join( xmlString ) )
@@ -1658,64 +1985,46 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         self.externalFiles.pop("HDF")
 
-
     def thermalNeutronScatteringLawTemperatures( self ) :
 
         temperatures = {}
         for reaction in self.reactions : reaction.thermalNeutronScatteringLawTemperatures( temperatures )
         return( temperatures )
 
-    def toXML( self, indent = "", **kwargs ) :
-        """Returns an GNDS/XML string representation of self."""
-
-        return( '\n'.join( self.toXMLList( **kwargs ) ) )
-
-    def toXMLList( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
         """Returns a list of GNDS/XML strings representing self."""
 
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent
         indent3 = indent2 + incrementalIndent
+
         formatVersion = kwargs.get( 'formatVersion', self.formatVersion )
+        if formatVersion in (GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4):
+            print('INFO: converting GNDS format from "%s" to "%s".' % (formatVersion, GNDS_formatVersionModule.version_2_0))
+            formatVersion = GNDS_formatVersionModule.version_2_0
         kwargs['formatVersion'] = formatVersion
-        if( formatVersion not in formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
+        if( formatVersion not in GNDS_formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
 
-        xmlString = [ '%s<%s projectile="%s" target="%s" evaluation="%s" format="%s" projectileFrame="%s" interaction="%s">'
-            % ( indent, self.moniker, self.projectile, self.target, self.evaluation, formatVersion, self.projectileFrame, self.interaction ) ]
+        interaction = self.interaction
+        if interaction == enumsModule.Interaction.TNSL:
+            interaction = enumsModule.Interaction.getTNSLInteration(formatVersion)
+        xmlString = ['%s<%s projectile="%s" target="%s" evaluation="%s" format="%s" projectileFrame="%s" interaction="%s">'
+            % (indent, self.moniker, self.projectile, self.target, self.evaluation, formatVersion, self.projectileFrame, interaction)]
 
-        xmlString += self.externalFiles.toXMLList(indent2, **kwargs)
-        xmlString += self.styles.toXMLList( indent2, **kwargs )
-
-        if( formatVersion == formatVersionModule.version_1_10 ) :
-            # documentation used to live directly under reactionSuite
-            name = None
-            _documentation = self.styles.getEvaluatedStyle().documentation
-            if( _documentation.body.filled ) :
-                name = 'ENDL'
-                text = _documentation.body.body
-            elif( _documentation.endfCompatible.filled ) :
-                name = 'endfDoc'
-                text = _documentation.endfCompatible.body
-            if( name is not None ) :
-                from . import documentation as oldDocumentationModule
-
-                xmlString.append( '%s<documentations>' % indent2 )
-                documentation = oldDocumentationModule.documentation( name, text )
-                xmlString += documentation.toXMLList( indent3, **kwargs )
-                xmlString[-1] += '</documentations>'
-
-        xmlString += self.PoPs.toXMLList( indent2, **kwargs )
+        xmlString += self.externalFiles.toXML_strList(indent2, **kwargs)
+        xmlString += self.styles.toXML_strList( indent2, **kwargs )
+        xmlString += self.PoPs.toXML_strList( indent2, **kwargs )
 
         if self.resonances is not None:
-            xmlString += self.resonances.toXMLList( indent2, **kwargs )
+            xmlString += self.resonances.toXML_strList( indent2, **kwargs )
 
-        xmlString += self.reactions.toXMLList( indent2, **kwargs )
-        xmlString += self.orphanProducts.toXMLList( indent2, **kwargs )
-        xmlString += self.sums.toXMLList( indent2, **kwargs )
-        xmlString += self.fissionComponents.toXMLList( indent2, **kwargs )
-        xmlString += self.productions.toXMLList( indent2, **kwargs )
-        xmlString += self.incompleteReactions.toXMLList(indent2, **kwargs)
-        xmlString += self.applicationData.toXMLList(indent2, **kwargs)
+        xmlString += self.reactions.toXML_strList( indent2, **kwargs )
+        xmlString += self.orphanProducts.toXML_strList( indent2, **kwargs )
+        xmlString += self.sums.toXML_strList( indent2, **kwargs )
+        xmlString += self.fissionComponents.toXML_strList( indent2, **kwargs )
+        xmlString += self.productions.toXML_strList( indent2, **kwargs )
+        xmlString += self.incompleteReactions.toXML_strList(indent2, **kwargs)
+        xmlString += self.applicationData.toXML_strList(indent2, **kwargs)
 
         xmlString.append( '%s</%s>' % ( indent, self.moniker ) )
         return( xmlString )
@@ -1731,132 +2040,127 @@ class reactionSuite( ancestryModule.ancestry ) :
             indent3 = indent2
         return( s )
 
-def readXML( gndsFile, numberOfBrokenLinksToPrint = 5 ) :
-    """
-    Read a GNDS/xml file and create a new reactionSuite instance from the result.
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """Translates a <reactionSuite> xml node into a reactionSuite instance. Users should use the 'readXML_file' function instead."""
 
-    :param gndsFile: string path to a GNDS file or a file object.
-    :return: reactionSuite instance containing all data from the file.
-    """
+        xPath = ['reactionSuite']   # Keep track of location in the tree, in case errors come up.
 
-    from xml.etree import cElementTree
-    # wrapper around the xml parser:
-    from LUPY.xmlNode import xmlNode
+        verbosity = kwargs.get('verbosity', 1)
+        numberOfBrokenLinksToPrint = kwargs.get('numberOfBrokenLinksToPrint', 5)
 
-    rsElement = cElementTree.parse( gndsFile ).getroot()
-    rsElement = xmlNode( rsElement, xmlNode.etree )
-    return parseXMLNode( rsElement, sourcePath = gndsFile, numberOfBrokenLinksToPrint = numberOfBrokenLinksToPrint )
-
-def parseXMLNode( rsElement, **kwargs ):
-    """Translates a <reactionSuite> xml node into a reactionSuite instance. Users should use the 'readXML' function instead."""
-
-    xPath = ['reactionSuite']   # Keep track of location in the tree, in case errors come up.
-    try :
-        sourcePath = kwargs.get( 'sourcePath' )
-        if( not( isinstance( sourcePath, str ) ) ) : sourcePath = sourcePath.name
-        path = os.path.dirname( sourcePath )
-        numberOfBrokenLinksToPrint = kwargs.get( 'numberOfBrokenLinksToPrint', 5 )
-
-        formatVersion = rsElement.get( 'format' )
-        kwargs['formatVersion'] = formatVersion
-
-        projectile = rsElement.get( 'projectile' )
-        target = rsElement.get( 'target' )
-        evaluation = rsElement.get( 'evaluation' )
-        projectileFrame = rsElement.get( 'projectileFrame' )
-        interaction = rsElement.get( 'interaction' )
-        guessedInteraction, interaction = guessInteractionModule.guessInteraction(interaction, projectile, target)
-
-        rs = reactionSuite( projectile, target, evaluation, formatVersion = formatVersion, projectileFrame = projectileFrame, interaction = interaction, sourcePath = sourcePath )
-
-        if formatVersion == formatVersionModule.version_1_10:
-            rs.guessedInteraction = guessedInteraction
-        elif guessedInteraction:
-            raise Exception('Function guessInteraction had to guess at the interaction attribute for a non GNDS %s file.' % formatVersion)
-
-        linkData = { 'reactionSuite' : rs, 'unresolvedLinks' : [], 'format' : formatVersion }
-
-        externalFiles = rsElement.find( suitesModule.externalFiles.moniker )
-        if externalFiles is not None:
-            rs.externalFiles.parseXMLNode( externalFiles, xPath, linkData )
-
-        if "HDF" in rs.externalFiles:   # FIXME hard-coded label
-            h5File = os.path.join( path, rs.externalFiles["HDF"].path )
-            if not os.path.exists(h5File):
-                raise IOError("External HDF file %s not found" % h5File)
-
-            import h5py
-            h5File = h5py.File( h5File, 'r', libver='latest' )
-            linkData["HDF"] = {
-                "h5File": h5File
-                }
-            for key in ("iData", "dData"):
-                if key in h5File:
-                    linkData[key] = h5File[key][()]
-
-        styles = rsElement.find( 'styles' )
-        if( styles is not None ) : rs.styles.parseXMLNode( styles, xPath, linkData )
-        PoPs = rsElement.find( 'PoPs' )
-        if( PoPs is not None ) : rs.PoPs.parseXMLNode( PoPs.data, xPath, linkData )
-
-        oldDocumentationElement = None
-
-        for child in rsElement :
-            if( child.tag in ( 'styles', 'PoPs', suitesModule.externalFiles.moniker ) ) :
-                continue    # already read above
-            elif( child.tag == resonancesModule.resonances.resonances.moniker ) :
-                rs.resonances = resonancesModule.resonances.resonances.parseXMLNode(child, xPath, linkData)
-            elif( child.tag == rs.reactions.moniker ) :
-                rs.reactions.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == rs.orphanProducts.moniker ) :
-                rs.orphanProducts.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == rs.sums.moniker ) :
-                rs.sums.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == rs.productions.moniker ) :
-                rs.productions.parseXMLNode( child, xPath, linkData)
-            elif( child.tag == rs.incompleteReactions.moniker ) :
-                rs.incompleteReactions.parseXMLNode( child, xPath, linkData)
-            elif( child.tag == rs.fissionComponents.moniker ) :
-                rs.fissionComponents.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == rs.applicationData.moniker ) :
-                rs.applicationData.parseXMLNode( child, xPath, linkData )
-            else :
-                if( ( formatVersion == formatVersionModule.version_1_10 ) and ( child.tag == 'documentations' ) ) :
-                    oldDocumentationElement = child
-                else :
-                    print( "Warning: encountered unexpected element '%s' in reactionSuite!" % child.tag )
-
-        if( oldDocumentationElement is not None ) :
-            if( len( oldDocumentationElement ) > 1 ) :
-                print( 'Too many children of old documentations node: number of children = %s.' % len( oldDocumentationElement ) )
-            else :
-                oldDocumentationElement = oldDocumentationElement[0]
-                text = oldDocumentationElement.text.lstrip( '\n' )
-                if( len( text.split( '\n' ) ) < 2 ) :
-                    rs.styles.getEvaluatedStyle().documentation.body.body = text
-                else :
-                    rs.styles.getEvaluatedStyle().documentation.endfCompatible.body = text
-
-    except Exception :
-        print( "Error encountered at xpath = /%s" % '/'.join( xPath ) )
-        raise
-
-    # Fix links.
-    unresolvedLinksCounter = 0
-    for quant in linkData['unresolvedLinks'] :
         try :
-            if quant.path.startswith( '/' + reactionSuite.moniker ) :
-                quant.link = quant.follow( rs )
-            elif quant.path.startswith( '/covarianceSuite' ) :
-                rs._externalLinks.append( quant )
-            else:   # relative link
-                quant.link = quant.follow( quant )
-        except ancestryModule.XPathNotFound :
-            if( unresolvedLinksCounter < numberOfBrokenLinksToPrint ) : print( '    Cannot resolve link "%s".' % quant )
-            unresolvedLinksCounter += 1
-        except :
+            sourcePath = kwargs.get( 'sourcePath' )
+            if( not( isinstance( sourcePath, str ) ) ) : sourcePath = sourcePath.name
+            path = os.path.dirname( sourcePath )
+
+            formatVersion = node.get( 'format' )
+            kwargs['formatVersion'] = formatVersion
+
+            projectile = node.get( 'projectile' )
+            target = node.get( 'target' )
+            evaluation = node.get( 'evaluation' )
+            projectileFrame = node.get( 'projectileFrame' )
+
+            interaction = node.get('interaction')
+            if interaction == enumsModule.Interaction.legacyTNSL or interaction == enumsModule.Interaction.TNSL:
+                interaction = interaction = enumsModule.Interaction.TNSL
+                guessedInteraction = False
+            else:
+                guessedInteraction, interaction = guessInteractionModule.guessInteraction(interaction, projectile, target)
+
+
+            rs = cls(projectile, target, evaluation, formatVersion=formatVersion, projectileFrame=projectileFrame, interaction=interaction, sourcePath=sourcePath)
+
+            if formatVersion == GNDS_formatVersionModule.version_1_10:
+                rs.guessedInteraction = guessedInteraction
+            elif guessedInteraction:
+                raise Exception('Function guessInteraction had to guess at the interaction attribute for a non GNDS %s file.' % formatVersion)
+
+            linkData = { 'reactionSuite' : rs, 'unresolvedLinks' : [], 'format' : formatVersion }
+
+            externalFilesNode = node.find(suitesModule.ExternalFiles.moniker)
+            if externalFilesNode is not None: rs.externalFiles.parseNode(externalFilesNode, xPath, linkData, **kwargs)
+
+            if "HDF" in rs.externalFiles:   # FIXME hard-coded label
+                if not HDF5_present:
+                    raise ImportError("Missing module 'h5py' must be installed for HDF5 support.")
+                HDF_externalFile = rs.externalFiles.pop('HDF')
+                h5FilePath = os.path.join( path, HDF_externalFile.path )
+                if not os.path.exists(h5FilePath):
+                    raise IOError("External HDF file %s not found" % h5FilePath)
+
+                h5File = h5py.File( h5FilePath, 'r', libver='latest' )
+                linkData["HDF"] = { "h5File" : h5File }
+
+            resonancesNode = node.find(resonancesModule.Resonances.moniker)
+            if resonancesNode is not None:
+                rs.resonances = resonancesModule.Resonances.parseNodeUsingClass(resonancesNode, xPath, linkData, **kwargs)
+
+            kwargs['membersToSkip'] = [rs.externalFiles.moniker, resonancesModule.Resonances.moniker]
+
+            childNodesNotParse, membersNotFoundInNode = rs.parseAncestryMembers(node, xPath, linkData, **kwargs)
+            childNodesNotParse.pop(rs.externalFiles.moniker, None)
+            childNodesNotParse.pop(resonancesModule.Resonances.moniker, None)
+
+            oldDocumentationElement = None
+            oldDocumentationElement_3 = None
+
+            if formatVersion == GNDS_formatVersionModule.version_1_10: oldDocumentationElement = childNodesNotParse.pop('documentations', None)
+            if formatVersion == GNDS_formatVersionModule.version_2_0_LLNL_3: oldDocumentationElement_3 = childNodesNotParse.pop('documentation', None)
+
+            if oldDocumentationElement is not None:
+                if len(oldDocumentationElement) > 1:
+                    print( 'Too many children of old documentations node: number of children = %s.' % len( oldDocumentationElement ) )
+                else :
+                    oldDocumentationElement = oldDocumentationElement[0]
+                    text = oldDocumentationElement.text.lstrip( '\n' )
+                    if len( text.split( '\n' ) ) < 2:
+                        rs.styles.getEvaluatedStyle().documentation.body.body = text
+                    else:
+                        rs.styles.getEvaluatedStyle().documentation.endfCompatible.body = text
+            elif oldDocumentationElement_3:                         # Support some old 2.0.LLNL_3 files of YAHFC to GNDS for now. Hopefully, only temporary.
+                rs.styles[0].documentation.parseNode(oldDocumentationElement_3, xPath, linkData, **kwargs)
+
+            if len(childNodesNotParse) > 0: print("Warning: encountered unexpected child nodes '%s' in reactionSuite!" % ', '.join(list(childNodesNotParse.keys())))
+
+        except Exception :
+            print( "Error encountered at xpath = /%s" % '/'.join( xPath ) )
             raise
 
-    if( unresolvedLinksCounter > 0 ) : print( 'WARNING: %s unresolved links found while parsing file "%s".' % ( unresolvedLinksCounter, rs.sourcePath ) )
+        # Fix links.
+        unresolvedLinksCounter = 0
+        for quant in linkData['unresolvedLinks'] :
+            try :
+                if quant.path.startswith( '/' + ReactionSuite.moniker ) :
+                    quant.link = quant.follow( rs )
+                elif quant.path.startswith( '/covarianceSuite' ) :
+                    rs._externalLinks.append( quant )
+                else:   # relative link
+                    quant.link = quant.follow( quant )
+            except ancestryModule.XPathNotFound :
+                if verbosity > 0:
+                    if unresolvedLinksCounter < numberOfBrokenLinksToPrint: print( '    Cannot resolve link "%s".' % quant )
+                    unresolvedLinksCounter += 1
+                raise
+            except :
+                raise
 
-    return( rs )
+        if( unresolvedLinksCounter > 0 ) : print( 'WARNING: %s unresolved links found while parsing file "%s".' % ( unresolvedLinksCounter, rs.sourcePath ) )
+
+        return rs
+
+    @staticmethod
+    def read(fileName, **kwargs):
+        """
+        Reads in the file name *fileName* and returns a **ReactionSuite** instance.
+        """
+
+        return ReactionSuite.readXML_file(fileName, **kwargs)
+
+def read(fileName, **kwargs):
+    """
+    Reads in the file name *fileName* and returns a **ReactionSuite** instance.
+    """
+
+    return ReactionSuite.read(fileName, **kwargs)

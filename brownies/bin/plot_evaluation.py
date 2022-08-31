@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -221,10 +221,10 @@ if __name__ == "__main__":
                                                   ignoreBadDate=args.ignoreBadDate,
                                                   acceptBadMF10FissionZAP=args.acceptBadMF10FissionZAP)
             if args.doReResonanceReconstruction:
-                from fudge import styles
+                from fudge import styles as stylesModule
                 # Caleb helped here!
                 gndsMap[endf][0].removeStyle("recon") # remove previous reconstruction just to avoid confusion
-                gndsMap[endf][0].reconstructResonances( style=styles.crossSectionReconstructed(label="recon", derivedFrom="eval" ) )  # extra optional arguments when reconstructing include 'accuracy', 'verbose', etc.
+                gndsMap[endf][0].reconstructResonances( style=stylesModule.CrossSectionReconstructed(label="recon", derivedFrom="eval" ) )  # extra optional arguments when reconstructing include 'accuracy', 'verbose', etc.
 
         if endf not in gndsMap:
             continue

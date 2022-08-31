@@ -57,10 +57,10 @@ def getPointwiseCrossSection(reac):  # FIXME remove? logic is broken + appears t
 
 def getUncertainty(theCovariance, theData):
     """ extract absolute uncertainty vector (ie, in units of barn) from covariance """
-    from fudge.covariances.covarianceMatrix import covarianceMatrix
-    from fudge.covariances.mixed import mixedForm
+    from fudge.covariances.covarianceMatrix import CovarianceMatrix
+    from fudge.covariances.mixed import MixedForm
     theUncert = None
-    for form in (covarianceMatrix.moniker, mixedForm.moniker):
+    for form in (CovarianceMatrix.moniker, MixedForm.moniker):
         if form in theCovariance.forms:
             theUncert = theCovariance.forms[form].getUncertaintyVector(theData, relative=False)
     if theUncert is None:

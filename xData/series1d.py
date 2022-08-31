@@ -1,11 +1,9 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-
-__metaclass__ = type
 
 import abc
 import math
@@ -18,12 +16,11 @@ floatToShortestString = pointwiseXY_CModule.floatToShortestString
 from numericalFunctions import Legendre as Legendre_C
 maxLegendreOrder = Legendre_C.maxMaxOrder( )
 
+from . import enums as enumsModule
 from . import base as baseModule
-from . import standards as standardsModule
 from . import values as valuesModule
 from . import axes as axesModule
-from . import XYs as XYsModule
-from . import uncertainties as uncertaintiesModule
+from . import XYs1d as XYs1dModule
 
 def Legendre( n, mu, checkXRange = True ) :
     """
@@ -46,7 +43,7 @@ def Legendre( n, mu, checkXRange = True ) :
     return( Pnp1 )
 
 
-class series( baseModule.xDataFunctional ) :
+class Series1d( baseModule.XDataFunctional ) :
     """
     This class is the base class for storing a 1d function as a polynomial series. The function store the 
     polynomial coefficients and has methods for manipulations of the coefficients that are generic to
@@ -54,16 +51,12 @@ class series( baseModule.xDataFunctional ) :
     """
 
     dimension = 1
-    ancestryMembers = baseModule.xDataFunctional.ancestryMembers # + ( 'coefficients', )
+    ancestryMembers = baseModule.XDataFunctional.ancestryMembers # + ( 'coefficients', )
 
-    def __init__( self, coefficients, domainMin, domainMax, lowerIndex = 0, axes = None,
-            index = None, valueType = standardsModule.types.float64Token, outerDomainValue = None, label = None, sep = ' ' ) :
+    def __init__(self, coefficients, domainMin, domainMax, lowerIndex = 0, axes = None,
+            index = None, valueType = enumsModule.ValueType.float64, outerDomainValue = None, label = None):
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType, outerDomainValue = outerDomainValue, label = label )
-
-        if( not( isinstance( sep, str ) ) ) : raise TypeError( 'sep must be a str instance' )
-        if( len( sep ) != 1 ) : raise TypeError( 'sep length must be 1 not %d' % len( sep ) )
-        self.__sep = sep
+        baseModule.XDataFunctional.__init__(self, axes, index=index, valueType=valueType, outerDomainValue=outerDomainValue, label=label)
 
         self.__domainMin = float( domainMin )
         self.__domainMax = float( domainMax )
@@ -157,7 +150,7 @@ class series( baseModule.xDataFunctional ) :
 
     def checkSameSeriesType( self, other, operator ) :
 
-        if( not( isinstance( other, series ) ) ) : raise TypeError( 'other of type "%s"' % type( other ) )
+        if( not( isinstance( other, Series1d ) ) ) : raise TypeError( 'other of type "%s"' % type( other ) )
         if( self.moniker != other.moniker ) : raise TypeError( 'Cannot %s series %s to series %s' % ( operator, self.moniker, other.moniker ) )
 
     def convertUnits( self, unitMap ) :
@@ -165,7 +158,7 @@ class series( baseModule.xDataFunctional ) :
         unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
         """
 
-        if( self.axes is None ) : return
+        if len(self.axes) == 0: return
         factors = self.axes.convertUnits( unitMap )
         if( factors[:2] !=[ 1., 1. ] ) :
             self.__domainMin *= factors[1]
@@ -211,11 +204,6 @@ class series( baseModule.xDataFunctional ) :
 
         return( self.__lowerIndex + len( self ) )
 
-    @property
-    def sep( self ) :
-
-        return( self.__sep )
-
     def domainUnitConversionFactor( self, unitTo ) :
 
         if( unitTo is None ) : return( 1. )
@@ -259,91 +247,78 @@ class series( baseModule.xDataFunctional ) :
         str = [ "%d %16.8g" % ( l, coefficient ) for l, coefficient in enumerate( self.__coefficients ) ]
         return( '\n'.join( str ) )
 
-    def toXML( self, indent = '', **kwargs ) :
-        """This method returns the XML string representation of self."""
-
-        return( '\n'.join( self.toXMLList( **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
         """
-        This method returns self as a list of strings which converts to the XML string representation of self via
-        the python statement '\n'.join( XMLList ).
+        This method returns self as a list of strings.
         """
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        valueFormatter = kwargs.get( 'valueFormatter', floatToShortestString )
-        significantDigits = kwargs.get( 'significantDigits', 15 )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+        valueFormatter = kwargs.get('valueFormatter', floatToShortestString)
+        significantDigits = kwargs.get('significantDigits', 15)
 
-        attributesStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
-        if( None in self.fixedDomain( ) ) : attributesStr += ' domainMin="%s" domainMax="%s"' % (
-                valueFormatter( self.domainMin, significantDigits = significantDigits ),
-                valueFormatter( self.domainMax, significantDigits = significantDigits ) )
-        if( self.lowerIndex != 0 ) : attributesStr += ' lowerIndex="%s"' % self.lowerIndex
+        attributesStr = baseModule.XDataFunctional.attributesToXMLAttributeStr(self)
+        if None in self.fixedDomain(): attributesStr += ' domainMin="%s" domainMax="%s"' % (
+                valueFormatter(self.domainMin, significantDigits = significantDigits),
+                valueFormatter(self.domainMax, significantDigits = significantDigits) )
+        if self.lowerIndex != 0: attributesStr += ' lowerIndex="%s"' % self.lowerIndex
 
-        # FIXME: converting self.__coefficients to values for printing. Should it be stored as values in the first place?
-        coefs = valuesModule.values( self.__coefficients, valueType = self.valueType, sep = self.__sep )
+        # FIXME2: converting self.__coefficients to values for printing. Should it be stored as values in the first place?
+        coefs = valuesModule.Values(self.__coefficients, valueType = self.valueType)
 
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr) ]
-        if( self.isPrimaryXData( ) and ( self.axes is not None ) ) :
-            XMLList += self.axes.toXMLList( indent2, **kwargs )
-            XMLList += coefs.toXMLList( indent2, **kwargs )
-            if self.uncertainty:
-                XMLList += self.uncertainty.toXMLList( indent2, **kwargs )
-            XMLList[-1] += '</%s>' % self.moniker
-            return XMLList
+        XML_strList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr) ]
+        if self.isPrimaryXData() and len(self.axes) > 0:
+            XML_strList += self.axes.toXML_strList(indent2, **kwargs)
+            XML_strList += coefs.toXML_strList(indent2, **kwargs)
+            if self.uncertainty: XML_strList += self.uncertainty.toXML_strList(indent2, **kwargs)
+            XML_strList[-1] += '</%s>' % self.moniker
         else:
-            XMLList += coefs.toXMLList( '', **kwargs )
-            XMLList[-1] += '</%s>' % self.moniker
-            return( [ ''.join( XMLList ) ] )
+            XML_strList += coefs.toXML_strList('', **kwargs)
+            XML_strList[-1] += '</%s>' % self.moniker
+            XML_strList = [ ''.join(XML_strList) ]
+
+        return XML_strList
 
     @classmethod
     def returnAsClass( cls, self, coefficients, index = None, outerDomainValue = None ) :
 
-        return( cls( coefficients, self.domainMin, self.domainMax, lowerIndex = self.lowerIndex, axes = self.axes, index = index, 
-                valueType = self.valueType, outerDomainValue = outerDomainValue, label = self.label, sep = self.__sep ) )
+        return cls(coefficients, self.domainMin, self.domainMax, lowerIndex = self.lowerIndex, axes = self.axes, index = index, 
+                valueType = self.valueType, outerDomainValue = outerDomainValue, label = self.label)
 
     @classmethod
-    def parseXMLNode( cls, xDataElement, xPath, linkData, axes = None, **kwargs ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         Translate a series XML element into its python xData class.
         """
 
-        xPath.append( xDataElement.tag )
+        attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath)     # parseBareNodeCommonAttributes adds to xPath.
 
-        domainMin, domainMax = cls.fixedDomain( )
-        attrs = { 'label' : None, 'index' : None, 'outerDomainValue' : None, 'domainMin' : domainMin, 'domainMax' : domainMax, 'lowerIndex' : 0 }
-        attributes = { 'label' : str, 'index' : int, 'outerDomainValue' : float, 'domainMin' : float, 'domainMax' : float, 'lowerIndex' : int }
-        if xDataElement.find('axes') is not None:
-            axes = axesModule.axes.parseXMLNode( xDataElement.find('axes'), xPath, linkData )
-        for key, item in list( xDataElement.items( ) ) :
-            if( key == 'axes' ) : continue
-            if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
-            attrs[key] = attributes[key]( item )
-        if( attrs['domainMin'] == None ) : raise ValueError( 'missing attribute "domainMin"' )
-        if( attrs['domainMax'] == None ) : raise ValueError( 'missing attribute "domainMax"' )
-        values = valuesModule.values.parseXMLNode( xDataElement.find( 'values' ), xPath, linkData )
-        # FIXME store self.__coefficients as values instance instead of list?
-        coefficients = list( values )
-        series = cls( coefficients = coefficients, axes = axes, **attrs )
-        uncertElement = xDataElement.find(uncertaintiesModule.uncertainty.moniker)
-        if uncertElement is not None:
-            series.uncertainty = uncertaintiesModule.uncertainty.parseXMLNode(uncertElement, xPath, linkData)
-        xPath.pop( )
-        return( series )
+        domainMin, domainMax = cls.fixedDomain()
+        if domainMin is None: domainMin = float(extraAttributes['domainMin'])
+        extraAttributes.pop('domainMin', None)
+        if domainMax is None: domainMax = float(extraAttributes['domainMax'])
+        extraAttributes.pop('domainMax', None)
 
-    @classmethod
-    def parseXMLString( cls, XMLString ) :
+        series = cls([], domainMin=domainMin, domainMax=domainMax, **attributes)
 
-        from xml.etree import cElementTree
+        extraNodes = baseModule.XDataFunctional.parseNodeStandardChildren(series, node, xPath, linkData, **kwargs)
 
-        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ), [], [] ) )
+        if len(extraNodes) == 1:
+            values = extraNodes.pop()
+            values = valuesModule.Values.parseNodeUsingClass(values, xPath, linkData, **kwargs)
+            series.coefficients = values                                    # FIXME store self.__coefficients as values instance instead of list?
+
+        if len(extraNodes) > 0: raise Exception('Invalid nodes: %s.' % (', '.join([extraNode.tag for extraNode in extraNodes])))
+
+        xPath.pop()
+
+        return series
 
     @staticmethod
     def fixedDomain( ) :
 
         return( None, None )
 
-class LegendreSeries( series ) :
+class LegendreSeries( Series1d ) :
     """
     This class represent a Legendre series for a function f(mu) as:
 
@@ -363,13 +338,13 @@ class LegendreSeries( series ) :
     moniker = 'Legendre'
     dimension = 1
 
-    def __init__( self, coefficients, domainMin = -1, domainMax = 1, lowerIndex = 0, axes = None, index = None, 
-            valueType = standardsModule.types.float64Token, outerDomainValue = None, label = None, sep = ' ' ) :
+    def __init__(self, coefficients, domainMin = -1, domainMax = 1, lowerIndex = 0, axes = None, index = None, 
+            valueType = enumsModule.ValueType.float64, outerDomainValue = None, label = None):
 
         if( lowerIndex != 0 ) : raise ValueError( 'lowerIndex = %s must be 0' )
         if( ( domainMin != -1 ) or ( domainMax != 1 ) ) : raise ValueError( 'domain must be [-1, 1], not [%s, %s]' % ( domainMin, domainMax ) )
-        series.__init__( self, coefficients, -1, 1, axes = axes, index = index, valueType = valueType, outerDomainValue = outerDomainValue, 
-                label = label, sep = sep )
+        Series1d.__init__( self, coefficients, -1, 1, axes = axes, index = index, valueType = valueType, outerDomainValue = outerDomainValue, 
+                label = label)
 
     def __iter__( self ) :
 
@@ -444,7 +419,7 @@ class LegendreSeries( series ) :
 
     def toLinearXYsClass( self ) :
 
-        return( XYsModule.XYs1d )
+        return( XYs1dModule.XYs1d )
 
     def toPointwiseLinear( self, **kwargs ) :
         """
@@ -468,10 +443,10 @@ class LegendreSeries( series ) :
                 mu = -1. + ( 2. * i ) / n
                 P.append( [ mu, self.evaluate( mu ) ] )
             P.append( [ 1., self.evaluate( 1. ) ] )
-        axes = axesModule.axes( )
+        axes = axesModule.Axes(2)
         unit = self.getAxisUnitSafely( 0 )
-        axes[0] = axesModule.axis( 'P(mu)', 0, unit )
-        axes[1] = axesModule.axis( 'mu', 1, '' )
+        axes[0] = axesModule.Axis( 'P(mu)', 0, unit )
+        axes[1] = axesModule.Axis( 'mu', 1, '' )
         Pclass = self.toLinearXYsClass()
         P = Pclass( P, axes = axes, outerDomainValue = self.outerDomainValue )
         return( P.thin( accuracy = accuracy ) )
@@ -495,16 +470,16 @@ class LegendreSeries( series ) :
         axes = xys1d.axes
         return( LegendreSeries( Legendre_C.from_pointwiseXY_C( xys1d, maxOrder ), axes = axes ) )
 
-class polynomial1d( series ) :
+class Polynomial1d( Series1d ) :
 
     moniker = 'polynomial1d'
     dimension = 1
 
-    def __init__( self, coefficients, domainMin, domainMax, lowerIndex = 0, axes = None, index = None, 
-            valueType = standardsModule.types.float64Token, outerDomainValue = None, label = None, sep = ' ' ) :
+    def __init__(self, coefficients, domainMin, domainMax, lowerIndex = 0, axes = None, index = None, 
+            valueType = enumsModule.ValueType.float64, outerDomainValue = None, label = None):
 
-        series.__init__( self, coefficients, domainMin, domainMax, lowerIndex = lowerIndex, axes = axes, index = index, 
-                valueType = valueType, outerDomainValue = outerDomainValue, label = label, sep = sep )
+        Series1d.__init__( self, coefficients, domainMin, domainMax, lowerIndex = lowerIndex, axes = axes, index = index, 
+                valueType = valueType, outerDomainValue = outerDomainValue, label = label)
 
     def __findExtrema( self ):
 
@@ -536,9 +511,30 @@ class polynomial1d( series ) :
         extrema = self.__findExtrema()
         return max([self.evaluate(x) for x in extrema])
 
+    def fixDomains(self, domainMin, domainMax, fixToDomain):
+        """
+        Sets *domainMin* and *domainMax* per the arguments.
+        """
+
+        OldDomainMin = self.domainMin
+        OldDomainMax = self.domainMax
+
+        domainMin = max(domainMin, self.domainMin)
+        domainMax = min(domainMax, self.domainMax)
+        if fixToDomain == enumsModule.FixDomain.lower:
+            self.__domainMin = domainMin
+        elif fixToDomain == enumsModule.FixDomain.upper:
+            self.__domainMax = domainMax
+        else:
+            self.__domainMin = domainMin
+            self.__domainMax = domainMax
+
+        if OldDomainMin == self.domainMin and OldDomainMax == self.domainMax: return 0
+        return 1
+
     def toLinearXYsClass( self ) :
 
-        return( XYsModule.XYs1d )
+        return( XYs1dModule.XYs1d )
 
     def toPointwiseLinear( self, **kwargs ) :
         """
@@ -567,7 +563,7 @@ class polynomial1d( series ) :
 
         return( self.toPointwiseLinear( **kwargs ) )
 
-class linearSpline1d( series ) :
+class LinearSpline1d( Series1d ) :
     """
     This class is a simple linear spline.  It basically wraps the XYs1d class.
     Linear interpolation uses the linear spline or the "hat" basis.  The first basis function looks like this::
@@ -586,15 +582,15 @@ class linearSpline1d( series ) :
     moniker = 'linearSpline1d'
     dimension = 1
 
-    def __init__( self, xdata, ydata, axes, index = None, valueType = standardsModule.types.float64Token, outerDomainValue= None, label = None, sep = ' ' ) :
+    def __init__(self, xdata, ydata, axes, index = None, valueType = enumsModule.ValueType.float64, outerDomainValue= None, label = None):
 
         if( len( xdata ) != len( ydata ) ) : raise ValueError( "Number of x and y values not equal." )
 
-        series.__init__( self, ydata, xdata[0], xdata[-1], lowerIndex = 0, axes = axes, index = index, valueType = valueType, 
-                outerDomainValue = outerDomainValue, label = label, sep = sep )
+        Series1d.__init__(self, ydata, xdata[0], xdata[-1], lowerIndex = 0, axes = axes, index = index, valueType = valueType, 
+                outerDomainValue = outerDomainValue, label = label)
 
         self.axes = axes
-        self.basis = XYsModule.XYs1d( axes = self.axes, data = list( zip( xdata, ydata ) ), interpolation = standardsModule.interpolation.linlinToken )
+        self.basis = XYs1dModule.XYs1d(axes=self.axes, data=list(zip(xdata, ydata)), interpolation=enumsModule.Interpolation.linlin)
 
     def evaluateBasisFunction( self, x, i ) :
 
@@ -605,7 +601,7 @@ class linearSpline1d( series ) :
 
     def toLinearXYsClass( self ) :
 
-        return( XYsModule.XYs1d )
+        return( XYs1dModule.XYs1d )
 
     def toPointwiseLinear( self, **kwargs ) :
         """

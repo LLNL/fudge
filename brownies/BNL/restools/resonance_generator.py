@@ -1,8 +1,9 @@
 import numpy
-import xData.table as gndTables
-import xData.XYs as XYsModule
-from . import level_generator
 
+from xData import table as tableModule
+from xData import XYs1d as XYs1dModule
+
+from . import level_generator
 
 def getFakeResonanceSet(
         E0,
@@ -23,6 +24,9 @@ def getFakeResonanceSet(
     if seed is not None:
         numpy.random.seed(seed)
 
+    # FIXME assumes levelDensity is not None...
+    energyUnit = levelDensity.axes[-1].unit
+
     DOTIMING = verbose
     if DOTIMING:
         import datetime
@@ -35,13 +39,14 @@ def getFakeResonanceSet(
         DOFs = {}
 
     # GOE style is fancy and absolutely needs a levelDensity to work
+    # FIXME remove this and require evaluator to supply level density? GNDS already requires it...
     if levelDensity is None and style == "goe":
         if domainMax is not None and E0 is not None:
-            levelDensity = XYsModule.XYs1d(data=[[E0, 1.0/aveD], [domainMax, 1.0/aveD]],
-                                           axes=XYsModule.XYs1d.defaultAxes(
+            levelDensity = XYs1dModule.XYs1d(data=[[E0, 1.0/aveD], [domainMax, 1.0/aveD]],
+                                           axes=XYs1dModule.XYs1d.defaultAxes(
                                                labelsUnits={
-                                                    XYsModule.yAxisIndex: ('level_density', '1/eV'),
-                                                    XYsModule.xAxisIndex: ('excitation_energy', 'eV')}))
+                                                    XYs1dModule.yAxisIndex: ('level_density', '1/eV'),
+                                                    XYs1dModule.xAxisIndex: ('excitation_energy', 'eV')}))
         else:
             raise ValueError("Cannot set up levelDensity for GOE, need to specify domain and E0")
 
@@ -59,15 +64,15 @@ def getFakeResonanceSet(
         [x for x in _energies if (domainMin is None or x >= domainMin) and (domainMax is None or x <= domainMax)])
     numLevels = len(energies)
     if verbose:
-        print("Generated %d L=%s, J=%s resonances over the energy range %s to %s eV"
-              % (numLevels, L, J, min(_energies), max(_energies)))
+        print("Generated %d L=%s, J=%s resonances over the energy range %s to %s %s"
+              % (numLevels, L, J, min(_energies), max(_energies), energyUnit))
 
     # Build the column headers
-    columns = [gndTables.columnHeader(0, name='energy', unit='eV'),
-               gndTables.columnHeader(1, name="L", unit=""),
-               gndTables.columnHeader(2, name="J", unit="")]
+    columns = [tableModule.ColumnHeader(0, name='energy', unit=energyUnit),
+               tableModule.ColumnHeader(1, name="L", unit=""),
+               tableModule.ColumnHeader(2, name="J", unit="")]
     for iw, widthKey in enumerate(widthKeys):
-        columns.append(gndTables.columnHeader(iw + 3, widthKey, unit='eV'))
+        columns.append(tableModule.ColumnHeader(iw + 3, widthKey, unit=energyUnit))
 
     if DOTIMING:
         thisTime = datetime.datetime.now()
@@ -97,7 +102,7 @@ def getFakeResonanceSet(
         lastTime = thisTime
 
     # Now build the table itself (gotta find a way to make this faster)
-    resonances = gndTables.table(columns=columns)
+    resonances = tableModule.Table(columns=columns)
     for iE, E in enumerate(energies):
         row = [E, L, J]
         for widthKey in widthKeys:

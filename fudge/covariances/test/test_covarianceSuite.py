@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,14 +14,15 @@ dbrown, 12/5/2012
 """
 
 import unittest, os
+
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 from fudge.covariances import *
-from fudge.covariances.covarianceSuite import readXML as CovReadXML
-from fudge.reactionSuite import readXML as RxnReadXML
-from xData import formatVersion as formatVersionModule
+from fudge import reactionSuite
+from fudge.covariances import covarianceSuite
 
 TEST_DATA_PATH, this_filename = os.path.split(__file__)
-FeEvaluation =  RxnReadXML( TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gnds.xml')
-FeCovariance =  CovReadXML( TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gndsCov.xml', reactionSuite=FeEvaluation )
+FeEvaluation =  reactionSuite.ReactionSuite.readXML_file( TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gnds.xml')
+FeCovariance =  covarianceSuite.CovarianceSuite.readXML_file( TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gndsCov.xml', reactionSuite=FeEvaluation )
 
 
 class TestCaseBase( unittest.TestCase ):
@@ -47,8 +48,8 @@ class Test_covarianceSuite( TestCaseBase ):
         self.covSuite = FeCovariance
 
     def test_readXML(self):
-        '''Also tests __init__ & parseXMLNode'''
-        self.assertIsInstance( self.covSuite, covarianceSuite.covarianceSuite )
+        '''Also tests __init__ & parseNode'''
+        self.assertIsInstance( self.covSuite, covarianceSuite.CovarianceSuite )
 
     def test__getitem__(self):
         answer = """<covarianceSection label="nonelastic">
@@ -62,7 +63,7 @@ class Test_covarianceSuite( TestCaseBase ):
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values>1e-5 862270 4e6 2e7</values></grid>
-            <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+            <grid index="1" label="column_energy_bounds" unit="eV" style="boundaries">
               <link href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="3,3" compression="diagonal">
@@ -72,7 +73,7 @@ class Test_covarianceSuite( TestCaseBase ):
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values>1e-5 862270 1e6 2e6 4e6 6e6 8e6 1.4e7 2e7</values></grid>
-            <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+            <grid index="1" label="column_energy_bounds" unit="eV" style="boundaries">
               <link href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="8,8" compression="diagonal">
@@ -82,13 +83,13 @@ class Test_covarianceSuite( TestCaseBase ):
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values>1e-5 862270 1e6 2e6 4e6 6e6 8e6 1.4e7 2e7</values></grid>
-            <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+            <grid index="1" label="column_energy_bounds" unit="eV" style="boundaries">
               <link href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit="b**2"/></axes>
           <array shape="8,8" compression="diagonal">
             <values>0 4.84e-10 1.357e-5 9.8057e-6 2.6915e-5 3.3173e-5 3.2769e-5 3.0954e-5</values></array></gridded2d></shortRangeSelfScalingVariance></mixed></covarianceSection>""".split('\n')
         self.maxDiff = None
-        self.assertXMLListsEqual( self.covSuite.covarianceSections[2].toXMLList(formatVersion=formatVersionModule.gnds2_0), answer )
+        self.assertXMLListsEqual( self.covSuite.covarianceSections[2].toXML_strList(formatVersion=GNDS_formatVersionModule.gnds2_0), answer )
 
     def test__len__(self):
         self.assertEqual( len(self.covSuite.covarianceSections),60)
@@ -120,7 +121,7 @@ class Test_covarianceSuite( TestCaseBase ):
     def test_removeExtraZeros(self):
         pass
 
-    def test_toXMLList(self):
+    def test_toXML_strList(self):
         '''Tested already in test__getitem__'''
         pass
 

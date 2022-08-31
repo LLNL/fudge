@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,7 +7,8 @@
 
 import math
 
-from xData import XYs as XYsModule
+from xData import axes as axesModule
+from xData import XYs1d as XYs1dModule
 
 from fudge.productData.distributions import angular as angularModule
 from fudge.productData.distributions import uncorrelated as uncorrelatedModule
@@ -80,9 +81,9 @@ def process( self, label, energyMin, energyMax, temperature, kwargs ) :
 
     array = gridded2d.array.constructArray( )
 
-    energyGrid = gridded2d.axes[1].copy( [] )
+    energyGrid = gridded2d.axes[1].copy()
 
-    temperatureGrid = gridded2d.axes[2].copy( [] )
+    temperatureGrid = gridded2d.axes[2].copy()
     temperatureGrid.convertToUnit( kwargs['temperatureUnit'] )
     for index2, temperature2 in enumerate( temperatureGrid.values ) :
         if( temperature2 >= temperature ) : break
@@ -105,7 +106,7 @@ def process( self, label, energyMin, energyMax, temperature, kwargs ) :
             else:
                 Xs.append(energyMax)
                 Ys.append(Ys[-1])
-        return XYsModule.XYs1d( (Xs, Ys), dataForm = "XsAndYs", interpolation = energyGrid.interpolation )
+        return XYs1dModule.XYs1d((Xs, Ys), dataForm="XsAndYs", interpolation=energyGrid.interpolation, axes=axesModule.Axes(2))
 
     if( temperature > temperature2 ) :
         SofE = expandGrid(energyGrid, array[-1])
@@ -187,11 +188,11 @@ def process( self, label, energyMin, energyMax, temperature, kwargs ) :
     angular2d = angularModule.XYs2d( axes = axes )
     for energy, PofMu in angularData :
         angular2d.append( angularModule.XYs1d( data = PofMu, outerDomainValue = energy, axes = axes ).normalize( ) )
-    angular2d = uncorrelatedModule.angularSubform( angular2d )
+    angular2d = uncorrelatedModule.AngularSubform( angular2d )
 
     energy2d = baseModule.energyDelta2d( crossSection[0][0], crossSection[-1][0], epsilon, incidentEnergyUnit )
-    energy2d = uncorrelatedModule.energySubform( energy2d )
+    energy2d = uncorrelatedModule.EnergySubform( energy2d )
 
-    distribution = uncorrelatedModule.form( label, self.productFrame, angular2d, energy2d )
+    distribution = uncorrelatedModule.Form( label, self.productFrame, angular2d, energy2d )
 
     return( crossSection, averageProductEnergy, averageProductMomentum, distribution )

@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,9 +14,10 @@ import argparse
 
 from pqu import PQU as PQUModule
 
-from xData import standards as standardsModule
-from xData import XYs as XYs1dModule
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
 
+from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
 from PoPs import IDs as PoPsID_Module
 from PoPs.decays import misc as PoPsDecayMiscModule
 
@@ -68,7 +69,7 @@ parser.add_argument( 'product', type = str,                                     
 parser.add_argument( 'energy', type = float,                                                    help = 'Incident energy in units of "--energyUnit".' )
 parser.add_argument( '--energyUnit', choices = ( 'eV', 'MeV' ), default = energyUnitDefault,    help = 'Energy unit to use. Default is "%s".' % energyUnitDefault )
 parser.add_argument( '--com', action = 'store_true',                                            help = 'Produce the energy spectra in the center-of-mass frame. The default is the lab frame.' )
-parser.add_argument( '--temperature', action = 'store', default = None,                         help = 'Specifies the temperature of the target material.' )
+parser.add_argument( '--temperature', type = float,                                             help = 'Specifies the temperature of the target material.' )
 parser.add_argument( '--temperatureUnit', type = str, default = temperatureUnitDefault,         help = 'Temperature unit to convert to. Default is "%s".' % temperatureUnitDefault )
 parser.add_argument( '--outputDir', action = 'store',                                           help = 'If present, output energy spectrum for each reaction and total are written to the directory specified by this option.' )
 parser.add_argument( '--twoBodyCOMResolution', action = 'store', type = float, default = twoBodyCOMResolutionDefault,
@@ -76,13 +77,15 @@ parser.add_argument( '--twoBodyCOMResolution', action = 'store', type = float, d
 parser.add_argument( '--discreteGammaResolution', action = 'store', type = float, default = discreteGammaResolutionDefault,
                                                                                                 help = 'All discrete gammas pdfs are treated as a triangle with energy width equal to discreteGammaResolution * its energy. Default value is %s' % discreteGammaResolutionDefault )
 parser.add_argument( '--plot', action = 'store_true',                                           help = 'If present, the total spectrum is plotted.' )
+parser.add_argument( '--skipDelayedNeutrons', action = 'store_true',                            help = 'If present, delayed neutrons are not included in the energy spectra.' )
 parser.add_argument( '-v', '--verbose', action = 'count', default = 0,                          help = 'Determines the amount of vervosity - the more the merrier.' )
 parser.add_argument( '--selfCheck', action = 'store_true',                                      help = 'If true, no spectrum is printed to the screen.' )
 
 args = parser.parse_args( )
 
-frame = standardsModule.frames.labToken
-if( args.com ) : frame = standardsModule.frames.centerOfMassToken
+frame = xDataEnumsModule.Frame.lab
+if args.com:
+    frame = xDataEnumsModule.Frame.centerOfMass
 
 minimumLogPoint = PQUModule.PQU( 1.e-11, 'MeV' ).getValueAs( args.energyUnit )
 
@@ -94,13 +97,13 @@ productID = { PoPsID_Module.neutron : PoPsID_Module.neutron,
             'He4' : 'He4',          'a' : 'He4',
             PoPsID_Module.photon : PoPsID_Module.photon,    'gamma' : PoPsID_Module.photon,     'g' : PoPsID_Module.photon }[args.product]
 
-readTime = timesModule.times( )
-protare = singleProtareArguments.protare( args )
+readTime = timesModule.Times( )
+protare = singleProtareArguments.protare(args, verbosity = args.verbose, lazyParsing = True)
 readTime = readTime.toString( current = False )
 
 unitConversionTime = None
 if( args.energyUnit != protare.domainUnit ) :
-    unitConversionTime = timesModule.times( )
+    unitConversionTime = timesModule.Times( )
     protare.convertUnits( { protare.domainUnit : args.energyUnit } )
     unitConversionTime = unitConversionTime.toString( current = False )
 
@@ -121,7 +124,7 @@ styleLabel = protare.styles.preProcessingChainHead( ).label
 
 temperatures = {}
 for style in protare.styles :
-    if( isinstance( style, stylesModule.heated ) ) :
+    if( isinstance( style, stylesModule.Heated ) ) :
         temperatures[style.temperature.getValueAs( args.temperatureUnit )] = style.label 
 
 if( protare.isThermalNeutronScatteringLaw( ) ) :
@@ -152,54 +155,54 @@ def addCurves( curve1, curve2 ) :
 
     if( len( curve1 ) > 0 ) :
         if( curve1.interpolation != curve2.interpolation ) :
-            if( curve1.interpolation != standardsModule.interpolation.linlinToken ) :
-                curve1 = curve1.changeInterpolation( standardsModule.interpolation.linlinToken, accuracy, lowerUpperEpsilon, lowerUpperEpsilon )
-            if( curve2.interpolation != standardsModule.interpolation.linlinToken ) :
-                curve2 = curve2.changeInterpolation( standardsModule.interpolation.linlinToken, accuracy, lowerUpperEpsilon, lowerUpperEpsilon )
+            if curve1.interpolation != xDataEnumsModule.Interpolation.linlin:
+                curve1 = curve1.changeInterpolation(xDataEnumsModule.Interpolation.linlin, accuracy, lowerUpperEpsilon, lowerUpperEpsilon)
+            if curve2.interpolation != xDataEnumsModule.Interpolation.linlin:
+                curve2 = curve2.changeInterpolation(xDataEnumsModule.Interpolation.linlin, accuracy, lowerUpperEpsilon, lowerUpperEpsilon)
     if( not( curve1.areDomainsMutual( curve2 ) ) ) : curve1, curve2 = curve1.mutualify( lowerUpperEpsilon, lowerUpperEpsilon, True, curve2, lowerUpperEpsilon, lowerUpperEpsilon, True )
     return( curve1 + curve2 )
 
 def output( MT, reactionStr, prefix, spectrum, crossSection ) :
 
-        def write( curve, suffix, yLabel ) :
+    def write( curve, suffix, yLabel ) :
 
-            fOut = open( os.path.join( args.outputDir, prefix + '_%.3d.' % MT + suffix ), 'w' )
-            fOut.write( '# reaction = "%s"\n' % reactionStr )
-            fOut.write( '# cross section = %.5g\n' % crossSection )
-            fOut.write( '# x axes label = "Outgoing %s energy [%s]"\n' % ( args.product, args.energyUnit ) )
-            fOut.write( '# y axes label = "%s"\n' % yLabel )
-            if( len( curve ) > 0 ) : fOut.write( curve.toString( ) )
-            fOut.close( )
+        fOut = open( os.path.join( args.outputDir, prefix + '_%.3d.' % MT + suffix ), 'w' )
+        fOut.write( '# reaction = "%s"\n' % reactionStr )
+        fOut.write( '# cross section = %.5g\n' % crossSection )
+        fOut.write( '# x axes label = "Outgoing %s energy [%s]"\n' % ( args.product, args.energyUnit ) )
+        fOut.write( '# y axes label = "%s"\n' % yLabel )
+        if( len( curve ) > 0 ) : fOut.write( curve.toString( ) )
+        fOut.close( )
 
-        def addPointForLogPlotting( spectrum ) :
+    def addPointForLogPlotting( spectrum ) :
 
-            x1, y1 = spectrum[0]
-            x2, y2 = spectrum[1]                                    # Does not handle the case where y2 is 0.0.
-            if( x2 - x1 < 0.2 * x2 ) : return( spectrum )           # Mainly happends for discrete gammas.
-            if( ( x1 == 0.0 ) or ( y1 == 0.0 ) ) :
-                xMid = max( ( 1.0 + 1e-7 ) * x1, minimumLogPoint )
-                if( xMid < ( 1 - 1e-7 ) * x2 ) :
-                    yMid = spectrum.evaluate( xMid )
-                    spectrum = XYs1dModule.XYs1d( data = spectrum, interpolation = spectrum.interpolation )
-                    spectrum.setValue( xMid, yMid )
+        x1, y1 = spectrum[0]
+        x2, y2 = spectrum[1]                                    # Does not handle the case where y2 is 0.0.
+        if( x2 - x1 < 0.2 * x2 ) : return( spectrum )           # Mainly happends for discrete gammas.
+        if( ( x1 == 0.0 ) or ( y1 == 0.0 ) ) :
+            xMid = max( ( 1.0 + 1e-7 ) * x1, minimumLogPoint )
+            if( xMid < ( 1 - 1e-7 ) * x2 ) :
+                yMid = spectrum.evaluate( xMid )
+                spectrum = XYs1dModule.XYs1d( data = spectrum, interpolation = spectrum.interpolation )
+                spectrum.setValue( xMid, yMid )
 
-            return( spectrum )
+        return( spectrum )
 
-        if( len( spectrum ) == 0 ) : return
+    if( len( spectrum ) == 0 ) : return
 
-        spectrum = addPointForLogPlotting( spectrum )
+    spectrum = addPointForLogPlotting( spectrum )
 
-        write( spectrum, 'spec', 'spectrum [%s/%s]' % ( crossSectionUnit, args.energyUnit ) )
+    write( spectrum, 'spec', 'spectrum [%s/%s]' % ( crossSectionUnit, args.energyUnit ) )
 
-        pdf = spectrum
-        try :
-            pdf = spectrum.normalize( )
-        except :
-            return
-        write( pdf, '_pdf', 'pdf [1/%s]' % args.energyUnit )
+    pdf = spectrum
+    try :
+        pdf = spectrum.normalize( )
+    except :
+        return
+    write( pdf, '_pdf', 'pdf [1/%s]' % args.energyUnit )
 
-        cdf = XYs1dModule.XYs1d( data = [ pdf.domainGrid, pdf.runningIntegral( ) ], dataForm = 'xsandys' )
-        write( cdf, '_cdf', 'cdf' )
+    cdf = XYs1dModule.XYs1d( data = [ pdf.domainGrid, pdf.runningIntegral( ) ], dataForm = 'xsandys' )
+    write( cdf, '_cdf', 'cdf' )
 
 def productSpectrum( self, pid, energy, parentMultiplicity, spectrum, discreteGammaData ) :
 
@@ -213,14 +216,14 @@ def productSpectrum( self, pid, energy, parentMultiplicity, spectrum, discreteGa
                 discreteGammaData[gammaEnergy] += branchingRatio * probability
                 branchingGammas( finalState, photonBranchingData, branchingRatio * probability, discreteGammaData )
 
-    if( isinstance( self.multiplicity[0], multiplicityModule.branching1d ) ) :
+    if( isinstance( self.multiplicity[0], multiplicityModule.Branching1d ) ) :
         parentProduct = self.parentProduct
-        photonBranchingData = PoPsDecayMiscModule.photonBranchingData( protare.PoPs, parentProduct.id )
-        branchingGammas( parentProduct.id, photonBranchingData, 1.0, discreteGammaData )
+        photonBranchingData = PoPsDecayMiscModule.photonBranchingData( protare.PoPs, parentProduct.pid )
+        branchingGammas( parentProduct.pid, photonBranchingData, 1.0, discreteGammaData )
         return( 0.0 )
 
     multiplicityAtEnergy = self.multiplicity.evaluate( energy )
-    if( ( pid == self.id ) and( multiplicityAtEnergy != 0.0 ) ) :
+    if specialNuclearParticleIDPoPsModule.sameSpecialNuclearParticle(pid, self.pid) and multiplicityAtEnergy != 0.0:
         spectrum2 = self.distribution.energySpectrumAtEnergy( energy, frame, twoBodyCOMResolution = args.twoBodyCOMResolution, styleLabel = styleLabel )
         spectrum2 *= multiplicityAtEnergy
         spectrum2 = addCurves( spectrum, spectrum2 )
@@ -240,20 +243,25 @@ def outputChannelSpectrum( self, pid, energy, parentMultiplicity, spectrum, disc
     for product in self.products :
         multiplicityAtEnergy += productSpectrum( product, pid, energy, parentMultiplicity, spectrum, discreteGammaData )
 
+    if not args.skipDelayedNeutrons:
+        for delayedNeutron in self.fissionFragmentData.delayedNeutrons:
+            multiplicityAtEnergy += productSpectrum( delayedNeutron.product, pid, energy, parentMultiplicity, spectrum, discreteGammaData )
+
     return( multiplicityAtEnergy )
 
-def reactionSpectrum( self, pid, energy, totalSpectrum, totolDiscreteGammaData, totalCrossSection ) :
+def reactionSpectrum(self, pid, energy, totalSpectrum, totolDiscreteGammaData, totalCrossSection, reactionSuffix):
 
     global reactionCounter, outputLog
 
-    timing = timesModule.times( )
+    timing = timesModule.Times( )
 
     MT = self.ENDF_MT
     crossSection = 0.0
     multiplicityAtEnergy = 0.0
     if( ( energy >= self.domainMin ) or ( energy <= self.domainMax ) ) : crossSection = self.crossSection.evaluate( energy ) 
-    if( args.verbose == 1 ) : print( '    %s' % self )
-    if( args.verbose > 1 ) : print( '    %-40s' % self, crossSection )
+    reactionString = str(self) + reactionSuffix
+    if args.verbose == 1: print('    %s' % reactionString)
+    if args.verbose  > 1: print('    %-40s' % reactionString, crossSection)
     if( crossSection > 0.0 ) :
         spectrum = XYs1dModule.XYs1d( axes = energyAxes )
         discreteGammaData = {}
@@ -272,7 +280,7 @@ def reactionSpectrum( self, pid, energy, totalSpectrum, totolDiscreteGammaData, 
         if( crossSection > 0.0 ) :
             spectrum2 = addCurves( spectrum, discreteGammaSpectrumToPDF( discreteGammaData ) )
             if( args.outputDir is not None ) : output( MT, str( self ), '%3.3d' % reactionCounter, spectrum2, crossSection )
-            integral = float( spectrum2.integrate( ) ) / crossSection
+            integral = spectrum2.integrate() / crossSection
             for indicies in sums :
                 if( indicies[0] <= MT <= indicies[1] ) :
                     sums[indicies][0] += crossSection
@@ -282,7 +290,7 @@ def reactionSpectrum( self, pid, energy, totalSpectrum, totolDiscreteGammaData, 
         total = multiplicityAtEnergy
         error = 0.0
         if( ( total + integral ) != 0.0 ) : error = ( total - integral ) / max( total, integral )
-        if( args.outputDir is not None ) : outputLog.write( '%5d  %3d  %-40s  %12.5e %12.5e %12.5e %8.1e\n' % ( reactionCounter, MT, self, crossSection, total, integral, error ) )
+        if args.outputDir is not None: outputLog.write('%5d  %3d  %-40s  %12.5e %12.5e %12.5e %8.1e\n' % ( reactionCounter, MT, reactionString, crossSection, total, integral, error ))
         if( abs( error ) > 2e-5 ) :
             if( ( args.verbose > 0 ) or args.selfCheck ) :
                 if( args.verbose == 0 ) : print( '    %-32s' % self, crossSection )
@@ -292,7 +300,7 @@ def reactionSpectrum( self, pid, energy, totalSpectrum, totolDiscreteGammaData, 
 
     return( totalSpectrum, crossSection )
 
-def getSpectrum( reactions ) :
+def getSpectrum(reactions, reactionSuffix):
 
     global reactionCounter
 
@@ -301,7 +309,7 @@ def getSpectrum( reactions ) :
     totalCrossSection = 0.0
     for reactionIndex, reaction in enumerate( reactions ) :
         reactionCounter += 1
-        spectrum, crossSection = reactionSpectrum( reaction, productID, args.energy, spectrum, discreteGammaData, totalCrossSection )
+        spectrum, crossSection = reactionSpectrum(reaction, productID, args.energy, spectrum, discreteGammaData, totalCrossSection, reactionSuffix)
         totalCrossSection += crossSection
     return( spectrum, discreteGammaData, totalCrossSection )
 
@@ -313,9 +321,9 @@ if( args.outputDir is not None ) :
     outputLog.write( 'index   MT  label                                     crossSection  multiplicity    integral    error\n' )
     outputLog.write( '-----------------------------------------------------------------------------------------------------\n' )
 
-totalSpectraTime = timesModule.times( )
-reactionSpectrumNonDiscrete, discreteGammaData, totalCrossSection = getSpectrum( protare.reactions )
-orphanSpectrum, dummy, dummy = getSpectrum( protare.orphanProducts )
+totalSpectraTime = timesModule.Times( )
+reactionSpectrumNonDiscrete, discreteGammaData, totalCrossSection = getSpectrum(protare.reactions, '')
+orphanSpectrum, dummy, dummy = getSpectrum(protare.orphanProducts, ' (orphan product)')
 totalSpectraTime = totalSpectraTime.toString( current = False )
 
 discreteGammaSpectrum = discreteGammaSpectrumToPDF( discreteGammaData )
@@ -326,22 +334,22 @@ if( args.plot ) :
     reactionTotal = reactionSpectrumNonDiscrete + discreteGammaSpectrum
 
     reactionSpectrumNonDiscrete = reactionSpectrumNonDiscrete.thicken( fDomainMax = 2.0, sectionSubdivideMax = 10 )
-    reactionSpectrumNonDiscrete.plotLegendKey = 'reactions - non discrete'
+    reactionSpectrumNonDiscrete.plotLabel = 'reactions - non discrete'
     if( len( reactionSpectrumNonDiscrete ) > 0 ) : curves.append( reactionSpectrumNonDiscrete )
 
-    discreteGammaSpectrum.plotLegendKey = 'reactions - discrete'
+    discreteGammaSpectrum.plotLabel = 'reactions - discrete'
     if( len( discreteGammaSpectrum ) > 0 ) : curves.append( discreteGammaSpectrum )
 
     reactionTotal = reactionTotal.thicken( fDomainMax = 2.0, sectionSubdivideMax = 10 )
-    reactionTotal.plotLegendKey = 'reactions - total '
+    reactionTotal.plotLabel = 'reactions - total '
     if( len( reactionTotal ) > 0 ) : curves.append( reactionTotal )
 
     orphanSpectrum = orphanSpectrum.thicken( fDomainMax = 2.0, sectionSubdivideMax = 10 )
-    orphanSpectrum.plotLegendKey = 'orphanProducts'
+    orphanSpectrum.plotLabel = 'orphanProducts'
     if( len( orphanSpectrum ) > 0 ) : curves.append( orphanSpectrum )
 
     spectrumPlot = spectrum.thicken( fDomainMax = 2.0, sectionSubdivideMax = 10 )
-    spectrumPlot.plotLegendKey = 'total'
+    spectrumPlot.plotLabel = 'total'
     if( len( spectrum ) > 0 ) : curves.append( spectrumPlot )
 
     if( len( curves ) > 0 ) :

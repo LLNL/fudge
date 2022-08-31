@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -367,6 +367,11 @@ def symOrNameForYoOrZA( yoOrZA, wantName, ASep = "", ZAOnly = 0, AddNatural = 1,
     from . import endlmisc
 
     if( yoOrZA == 1 ) : return 'n'
+    if( yoOrZA == 2 ) : return 'p'
+    if( yoOrZA == 3 ) : return 'd'
+    if( yoOrZA == 4 ) : return 't'
+    if( yoOrZA == 5 ) : return 'h'
+    if( yoOrZA == 6 ) : return 'a'
     if( yoOrZA == 7 ) : return 'gamma'
     if( yoOrZA == 9 ) : return 'electron'
 

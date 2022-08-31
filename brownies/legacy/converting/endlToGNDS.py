@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -17,36 +17,39 @@ Nuclide particle name is composed of SA[_L]
 
 gamma: name is simply given as 'photon'.
 """
+
 import os
 import numpy
 from xml.etree import cElementTree
-import xData.xDataArray as arrayModule
-import xData.axes as axesModule
-import xData.gridded as griddedModule
-import xData.link as linkModule
-import xData.values as valuesModule
-import xData.uncertainties as uncertaintiesModule
+
+from pqu import PQU as PQUModule
+
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+
+from xData import enums as xDataEnumsModule
+from xData import xDataArray as arrayModule
+from xData import axes as axesModule
+from xData import gridded as griddedModule
+from xData import link as linkModule
+from xData import values as valuesModule
+from xData import uncertainties as uncertaintiesModule
+from xData import XYs1d as XYs1dModule
+from xData import multiD_XYs as multiD_XYsModule
+
+from fudge import enums as enumsModule
 import fudge.covariances.covarianceMatrix as covarianceMatrixModule
 import fudge.covariances.covarianceSection as covarianceSectionModule
 import fudge.covariances.covarianceSuite as covarianceSuiteModule
 import fudge.covariances.mixed as covarianceMixedModule
 
-
-
-from pqu import PQU as PQUModule
-
-from xData import formatVersion as formatVersionModule
-from xData import standards as standardsModule
-from xData import XYs as XYsModule
-from xData import multiD_XYs as multiD_XYsModule
-
+from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
 from PoPs import IDs as IDsPoPsModule
 from PoPs import database as databasePoPsModule
 from PoPs import alias as PoPsAliasModule
 from PoPs.quantities import quantity as quantityPoPsModule
 from PoPs.quantities import mass as massPoPsModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
-from PoPs.groups import chemicalElement as chemicalElementPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import chemicalElement as chemicalElementPoPsModule
 from PoPs.families import unorthodox as unorthodoxPoPsModule
 from PoPs.fissionFragmentData import rate as rateModule
 
@@ -58,9 +61,7 @@ from fudge import physicalQuantity as physicalQuantityModule
 from fudge import styles as stylesModule
 from fudge import reactionSuite as reactionSuiteModule
 from fudge import outputChannel as outputChannelModule
-from fudge import product as productModule
 from fudge import sums as sumsModule
-from fudge.reactions import base as reactionsBaseModule
 from fudge.reactions import reaction as reactionModule
 from fudge.reactions import orphanProduct as orphanProductModule
 
@@ -73,11 +74,12 @@ from fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic im
     nuclearPlusInterference as nuclearPlusInterferenceModule
 from fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic import RutherfordScattering as RutherfordScatteringModule
 
-from fudge.channelData import Q as QModule
-from fudge.channelData.fissionFragmentData import delayedNeutron as delayedNeutronModule
+from fudge.outputChannelData import Q as QModule
+from fudge.outputChannelData.fissionFragmentData import delayedNeutron as delayedNeutronModule
 
-from fudge.productData import energyDeposition as energyDepositionModule, multiplicity as multiplicityModule
-from fudge.productData import momentumDeposition as momentumDepositionModule
+from fudge.productData import averageProductEnergy as averageProductEnergyModule
+from fudge.productData import multiplicity as multiplicityModule
+from fudge.productData import averageProductMomentum as averageProductMomentumModule
 
 from fudge.productData.distributions import angular as angularModule
 from fudge.productData.distributions import energy as energyModule
@@ -98,8 +100,8 @@ energyUnit = "MeV"
 crossSectionAxes = crossSectionModule.defaultAxes( energyUnit )
 multiplicityAxes = multiplicityModule.defaultAxes( energyUnit )
 QAxes = QModule.defaultAxes( energyUnit )
-energyDepositionAxes = energyDepositionModule.defaultAxes( energyUnit )
-momentumDepositionAxes = momentumDepositionModule.defaultAxes( energyUnit, energyUnit + '/c' )
+averageProductEnergyAxes = averageProductEnergyModule.defaultAxes( energyUnit )
+averageProductMomentumAxes = averageProductMomentumModule.defaultAxes( energyUnit, energyUnit + '/c' )
 angularAxes = angularModule.defaultAxes( energyUnit )
 energyAxes = energyModule.defaultAxes( energyUnit )
 LLNLPointwiseAxes = LegendreModule.defaultAxes( energyUnit )
@@ -109,11 +111,11 @@ metaTargets = { 21046 : ( 1, 2 ), 95242 : ( 1, 2 ) }
 
 def uncorrelatedIsotropicGivenEnergySpectrum( info, product, ENDL_energySpectrum ) :
 
-    angularSubform = angularModule.isotropic2d( )
-    energySubform = energyModule.XYs2d( axes = energyAxes, interpolationQualifier = standardsModule.interpolation.unitBaseToken )
+    angularSubform = angularModule.Isotropic2d( )
+    energySubform = energyModule.XYs2d(axes=energyAxes, interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
     for energy, probability_list in ENDL_energySpectrum.data :
         energySubform.append( energyModule.XYs1d( data = probability_list, axes = energyAxes, outerDomainValue = energy ) )
-    form = uncorrelated( info.style, standardsModule.frames.labToken, angularSubform, energySubform )
+    form = uncorrelated(info.style, xDataEnumsModule.Frame.lab, angularSubform, energySubform)
 
     product.distribution.add( form )
 
@@ -186,12 +188,17 @@ def parse_endl_covariance(covFile):
 
 def getXYInterpolation( data ) :
 
-    if( data.columns != 2 ) : raise Exception( 'Only 2 column data supported, # of columns = %s for %s' % ( data.columns, str( data ) ) )
-    if( data.interpolation == 0 ) : return( standardsModule.interpolation.linlinToken )
-    if( data.interpolation == 1 ) : return( standardsModule.interpolation.linlogToken )
-    if( data.interpolation == 2 ) : return( standardsModule.interpolation.loglinToken )
-    if( data.interpolation == 3 ) : return( standardsModule.interpolation.loglogToken )
-    raise Exception( 'Unsupported interpolation = "%s" for %s' % ( data.interpolation, str( data ) ) )
+    if data.columns != 2:
+        raise Exception('Only 2 column data supported, # of columns = %s for %s' % (data.columns, str(data)))
+    if data.interpolation == 0:
+        return xDataEnumsModule.Interpolation.linlin
+    if data.interpolation == 1:
+        return xDataEnumsModule.Interpolation.linlog
+    if data.interpolation == 2:
+        return xDataEnumsModule.Interpolation.loglin
+    if data.interpolation == 3:
+        return xDataEnumsModule.Interpolation.loglog
+    raise Exception('Unsupported interpolation = "%s" for %s' % (data.interpolation, str(data)))
 
 def returnConstantQ( label, Q_MeV, crossSection ) :
 
@@ -199,12 +206,12 @@ def returnConstantQ( label, Q_MeV, crossSection ) :
 
 def uncorrelated( style, frame, angularSubform, energySubform ) :
 
-    _angularSubform = uncorrelatedModule.angularSubform( angularSubform )
-    _energySubform = uncorrelatedModule.energySubform( energySubform )
-    return( uncorrelatedModule.form( style, frame, _angularSubform, _energySubform ) )
+    _angularSubform = uncorrelatedModule.AngularSubform( angularSubform )
+    _energySubform = uncorrelatedModule.EnergySubform( energySubform )
+    return( uncorrelatedModule.Form( style, frame, _angularSubform, _energySubform ) )
 
-def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVersionModule.default, excludeAverageProductData = True,
-        TNSL_include_all_reactions = True, verbose = 0 ) :
+def toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=GNDS_formatVersionModule.default, excludeAverageProductData=True,
+        TNSL_include_all_reactions=True, verbose=0, specialNuclearParticleID=specialNuclearParticleIDPoPsModule.Mode.nuclide):
     """
     Returns an reactionSuite for self where self is an endlZA class.
     @param self: brownies.legacy.endl.endlZAClass instance to be translated to GNDS
@@ -213,7 +220,8 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
     @param excludeAverageProductData: if false, include C=10 / C=11 data in translation
     @param TNSL_include_all_reactions: if false and endlZA is a TNSL target, only translate thermal scattering reactions
     @param verbose: verbosity level (int)
-    @return:
+
+    @return:    reactionSuite and covarianceSuite
     """
 #
 #   A discrete N-body reaction is one where all the yo's are known and they have energy independent multiplicities.
@@ -301,7 +309,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
 
         def energy( data ) :
 
-            subform = energyModule.XYs2d( axes = energyAxes, interpolationQualifier = standardsModule.interpolation.unitBaseToken )
+            subform = energyModule.XYs2d(axes=energyAxes, interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
             for E1, EpP in data.data[0][1] : subform.append( energyModule.XYs1d( data = EpP, outerDomainValue = E1, axes = energyAxes ) )
             return( subform )
 
@@ -310,31 +318,31 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
             axes = LLNLPointwiseAxes
             subform = LegendreModule.LLNLPointwise( axes )
             for l, EEpPs in data.data :
-                w_xys = multiD_XYsModule.XYs2d( axes = axes, outerDomainValue = l, interpolationQualifier = standardsModule.interpolation.unitBaseToken )
+                w_xys = multiD_XYsModule.XYs2d(axes=axes, outerDomainValue=l, interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
                 for index, E_EpPs in enumerate( EEpPs ) :
                     xPrior = -1
                     E1, EpPs = E_EpPs
                     for xy in EpPs :
                         if( xy[0] == xPrior ) : xy[0] *= ( 1 + FUDGE_EPS )
                         xPrior = xy[0]
-                    w_xys.append( XYsModule.XYs1d( data = EpPs, axes = axes, outerDomainValue = E1 ) )
+                    w_xys.append( XYs1dModule.XYs1d( data = EpPs, axes = axes, outerDomainValue = E1 ) )
                 subform.append( w_xys )
             return( subform )
 
         def LLNLLegendrePointwise_L0_only( info, data ) :
             """Has only L=0 form, can be converted to uncorrelated angular (isotropic) and energy distributions."""
 
-            angularSubform = angularModule.isotropic2d( )
+            angularSubform = angularModule.Isotropic2d( )
             axes = energyAxes
-            energySubform = energyModule.XYs2d( axes = axes, interpolationQualifier = standardsModule.interpolation.unitBaseToken )
+            energySubform = energyModule.XYs2d(axes=axes, interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
             for index, ( energy, probability_list ) in enumerate( data.data[0][1] ) :
                 energySubform.append( energyModule.XYs1d( data = probability_list, axes = axes, outerDomainValue = energy ) )
-            return( uncorrelated( info.style, standardsModule.frames.labToken, angularSubform, energySubform ) )
+            return uncorrelated(info.style, xDataEnumsModule.Frame.lab, angularSubform, energySubform)
 
         def LLNLAngularEnergy( data ) :
 
             axes = angularEnergAxes
-            subform = LLNL_angularEnergyModule.XYs3d( axes = axes, interpolationQualifier = standardsModule.interpolation.unitBaseToken  )
+            subform = LLNL_angularEnergyModule.XYs3d(axes=axes, interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
             for i, E_MuEpPs in enumerate( data.data ) :
                 w_xys = LLNL_angularEnergyModule.XYs2d( outerDomainValue = E_MuEpPs[0], axes = axes )
                 for j, Mu_EpPs in enumerate( E_MuEpPs[1] ) :
@@ -363,51 +371,52 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
         if( Is == [] ) :
             if( len( datas ) ) :
                 if( ( len( datas ) == 1 ) and ( datas[0].S == 7 ) and ( datas[0].I == 7 ) ) :   # Special case for endl I, S = 7, 7 with no distribution data.
-                    form = referenceModule.form( link = promptNeutronParticle.distribution[info.style], label = info.style )
+                    form = referenceModule.Form( link = promptNeutronParticle.distribution[info.style], label = info.style )
                 else :
                     print()
                     for data in datas : print(data)
-                    raise Exception( "Unsupported data for particle %s: I's = %s." % (particle.id, repr(Is)))
+                    raise Exception( "Unsupported data for particle %s: I's = %s." % (particle.pid, repr(Is)))
         elif( Is == [ 941 ] ) :
             for i1 in range( len( datas ) ) :
                 if( datas[i1].I == 941 ) : break
             axes = baseModule.defaultAxes( 'coherent form factor', energyUnit = '1/cm' )
-            formFactor = coherentModule.regions1d( axes = axes )
+            formFactor = coherentModule.Regions1d( axes = axes )
             formFactor.append( coherentModule.XYs1d( data = datas[i1].data[:2], axes = axes ) )
-            formFactor.append( coherentModule.XYs1d( data = datas[i1].data[1:], axes = axes, interpolation = standardsModule.interpolation.loglogToken ) )
-            formFactor = coherentModule.formFactor( formFactor )
-            doubleDifferentialCrossSectionForm = coherentModule.form( particle.id, info.style, standardsModule.frames.labToken, formFactor, None, None )
-            form = photonScatteringModule.coherentPhotonScattering.form( label = info.style, link = doubleDifferentialCrossSectionForm )
+            formFactor.append(coherentModule.XYs1d(data=datas[i1].data[1:], axes=axes, interpolation=xDataEnumsModule.Interpolation.loglog))
+            formFactor = coherentModule.FormFactor( formFactor )
+            doubleDifferentialCrossSectionForm = coherentModule.Form( particle.pid, info.style, xDataEnumsModule.Frame.lab, formFactor, None, None )
+            form = photonScatteringModule.CoherentPhotonScattering.Form( label = info.style, link = doubleDifferentialCrossSectionForm )
             del datas[i1]
         elif( 942 in Is ) :
             for i1 in range( len( datas ) ) :
                 if( datas[i1].I == 942 ) : break
             axes = baseModule.defaultAxes( 'incoherent scattering function', energyUnit = '1/cm' )
-            scatteringFunction = incoherentModule.regions1d( axes = axes )
-            scatteringFunction.append( incoherentModule.XYs1d( data = datas[i1].data[:2], axes = axes ) )
-            scatteringFunction.append( incoherentModule.XYs1d( data = datas[i1].data[1:], axes = axes, interpolation = standardsModule.interpolation.loglogToken ) )
-            doubleDifferentialCrossSectionForm = incoherentModule.form( particle.id, info.style, standardsModule.frames.labToken, scatteringFunction )
-            form = photonScatteringModule.incoherentPhotonScattering.form( label = info.style, link = doubleDifferentialCrossSectionForm )
+            scatteringFactor = incoherentModule.Regions1d( axes = axes )
+            scatteringFactor.append( incoherentModule.XYs1d( data = datas[i1].data[:2], axes = axes ) )
+            scatteringFactor.append(incoherentModule.XYs1d(data=datas[i1].data[1:], axes=axes, interpolation=xDataEnumsModule.Interpolation.loglog))
+            scatteringFactor = incoherentModule.ScatteringFactor(scatteringFactor)
+            doubleDifferentialCrossSectionForm = incoherentModule.Form( particle.pid, info.style, xDataEnumsModule.Frame.lab, scatteringFactor )
+            form = photonScatteringModule.IncoherentPhotonScattering.Form( label = info.style, link = doubleDifferentialCrossSectionForm )
             del datas[i1]
         elif( Is == [ 1 ] ) : 
             if( datas[0].S == 3 ) :
-                energySubform = energyModule.discreteGamma( datas[0].getX1( ), crossSection.domainMin,
+                energySubform = energyModule.DiscreteGamma( datas[0].getX1( ), crossSection.domainMin,
                         crossSection.domainMax, axes = energyAxes )
                 angularSubform = getSubform( 1, datas, angular )
-                form = uncorrelated( info.style, standardsModule.frames.labToken, angularSubform, energySubform )
+                form = uncorrelated( info.style, xDataEnumsModule.Frame.lab, angularSubform, energySubform )
             elif( 1.99e-12 < datas[0].X1 < 2.01e-12 ) :
                 # Thermal neutron scattering law coherent elastic, needs to be translated as uncorrelated
                 from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import \
                     base as baseTNSLModule
-                productFrame = standardsModule.frames.labToken
+                productFrame = xDataEnumsModule.Frame.lab
                 angularSubform = getSubform( 1, datas, angular )
                 energySubform = baseTNSLModule.energyDelta2d(angularSubform.domainMin, angularSubform.domainMax, FUDGE_EPS, energyUnit )
-                form = uncorrelated( info.style, standardsModule.frames.labToken, angularSubform, energySubform )
+                form = uncorrelated( info.style, xDataEnumsModule.Frame.lab, angularSubform, energySubform )
             else :
                 for data in datas :
-                    if( data.I == 1 ) : productFrame = standardsModule.frames.centerOfMassToken
+                    if( data.I == 1 ) : productFrame = xDataEnumsModule.Frame.centerOfMass
                 subform = getSubform( 1, datas, angular )
-                form = angularModule.twoBodyForm( info.style, productFrame, subform )
+                form = angularModule.TwoBody( info.style, productFrame, subform )
         elif( Is == [ 4 ] ) :
             for i1 in range( len( datas ) ) :
                 if( datas[i1].I == 4 ) : break
@@ -416,22 +425,22 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 del datas[i1]
             else:
                 subform = getSubform( 4, datas, LLNLLegendrePointwise )
-                form = LegendreModule.form( info.style, standardsModule.frames.labToken, subform )
+                form = LegendreModule.Form( info.style, xDataEnumsModule.Frame.lab, subform )
         elif( Is == [ 1, 3 ] ) :
             angularSubform = getSubform( 1, datas, angular )
             if any([xys.domainMin != -1 for xys in angularSubform]):
-                angularSubform.interpolationQualifier = standardsModule.interpolation.unitBaseToken
+                angularSubform.interpolationQualifier = xDataEnumsModule.InterpolationQualifier.unitBase
             angularSubform = LLNL_angularEnergyModule.LLNLAngularOfAngularEnergySubform( angularSubform )
             angularEnergySubform = getSubform( 3, datas, LLNLAngularEnergy )
             angularEnergySubform = LLNL_angularEnergyModule.LLNLAngularEnergyOfAngularEnergySubform( angularEnergySubform )
-            form = LLNL_angularEnergyModule.LLNLAngularEnergyForm( info.style, standardsModule.frames.labToken,
+            form = LLNL_angularEnergyModule.LLNLAngularEnergyForm( info.style, xDataEnumsModule.Frame.lab,
                     angularSubform, angularEnergySubform )
         elif( Is == [ 1, 4 ] ) :
             angularSubform = getSubform( 1, datas, angular )
             energySubform = getSubform( 4, datas, energy )
-            form = uncorrelated( info.style, standardsModule.frames.labToken, angularSubform, energySubform )
+            form = uncorrelated( info.style, xDataEnumsModule.Frame.lab, angularSubform, energySubform )
         else :
-            raise Exception( "I's = %s not supported for particle %s." % (repr(Is), particle.id))
+            raise Exception( "I's = %s not supported for particle %s." % (repr(Is), particle.pid))
 
         for idx in range( len( datas ) - 1, -1, -1 ) :
             data = datas[idx]
@@ -445,15 +454,15 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                             axes = axes, interpolation = interpolation ) )
                 else :          # for I = 10 and 13
                     if( data.I == 10 ) :
-                        axes = energyDepositionAxes
-                        dataForm = energyDepositionModule.XYs1d( label = info.style, axes = axes, 
+                        axes = averageProductEnergyAxes
+                        dataForm = averageProductEnergyModule.XYs1d( label = info.style, axes = axes, 
                                 data = data.data, interpolation = interpolation )
-                        particle.energyDeposition.add( dataForm )
+                        particle.averageProductEnergy.add( dataForm )
                     elif( data.I == 13 ) :
-                        axes = momentumDepositionAxes
-                        dataForm = momentumDepositionModule.XYs1d( label = info.style, axes = axes, 
+                        axes = averageProductMomentumAxes
+                        dataForm = averageProductMomentumModule.XYs1d( label = info.style, axes = axes, 
                                 data = data.data, interpolation = interpolation )
-                        particle.momentumDeposition.add( dataForm )
+                        particle.averageProductMomentum.add( dataForm )
                 del datas[idx]
 
         if( not form is None ) : particle.distribution.add( form )
@@ -469,9 +478,9 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
         if yo in yosDatas:
             assert yosDatas[yo][0].I == 1
             yosDatas[yo] = []
-        productFrame = standardsModule.frames.centerOfMassToken
-        subform = angularModule.recoil( link = recoilPartner.distribution[info.style], relative=True )
-        form = angularModule.twoBodyForm( info.style, productFrame, subform )
+        productFrame = xDataEnumsModule.Frame.centerOfMass
+        subform = angularModule.Recoil( link = recoilPartner.distribution[info.style], relative=True )
+        form = angularModule.TwoBody( info.style, productFrame, subform )
         particle.distribution.add( form )
 
     def makeNBodyChannelFrom_mYos( channelClass, genre, mYos, ZAsYos, yosDatas, Q_MeV, crossSection,
@@ -563,16 +572,24 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
     for yo in range( 1, 7 ) : ZAsYos[endl2.yoToZA(yo)] = yo
     ZAsYos[7] = 7
     ZAsYos[9] = 9
-    ENDLCS_To_ENDFMT = endf_endlModule.ENDLCS_To_ENDFMT( self.projectileName )
+    if self.projectileName == IDsPoPsModule.neutron:
+        projectileName = IDsPoPsModule.neutron
+    elif self.projectileName == 'gamma':
+        projectileName = IDsPoPsModule.photon
+    else:
+        projectileName = specialNuclearParticleIDPoPsModule.nuclideID(self.projectileName)
+    ENDLCS_To_ENDFMT = endf_endlModule.ENDLCS_To_ENDFMT(projectileName)
+    projectileID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(projectileName, specialNuclearParticleID)
 
     level = None
     I0 = self.findDatas( I = 0 )[0]
     if( I0.getELevel( ) > 0 ) : level = I0.getELevel( )
 
-    info = toGNDSMiscModule.infos( formatVersion, styleName )
+    info = toGNDSMiscModule.Infos( formatVersion, styleName )
     info.PoPsLabel = styleName
-    info.PoPs = databasePoPsModule.database( 'protare_internal', '1.0', formatVersion = info.formatVersion )
+    info.PoPs = databasePoPsModule.Database( 'protare_internal', '1.0', formatVersion = info.formatVersion )
     info.ENDFconversionFlags = ENDFconversionFlagsModule.ENDFconversionFlags()
+    info.specialNuclearParticleID = specialNuclearParticleID
 
     I0s = self.findDatas( C = 46, S = 0, I = 0 )
     if( len( I0s ) == 2 ) :
@@ -584,8 +601,8 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
         if( metaZA not in metaTargets ) : raise Exception( 'Need meta level index for ZA = %s' % metaZA )
 
         excitedLevel = toGNDSMiscModule.getPoPsParticle( info, metaZA, name = None, levelIndex = metaTargets[metaZA][1], level = metaLevel, levelUnit = 'MeV' )
-        metaName = PoPsAliasModule.metaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex( excitedLevel.id, metaTargets[metaZA][0] )
-        info.PoPs.add( PoPsAliasModule.metaStable( metaName, excitedLevel.id, metaTargets[metaZA][0] ) )
+        metaName = PoPsAliasModule.MetaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex(excitedLevel.id, metaTargets[metaZA][0])
+        info.PoPs.add(PoPsAliasModule.MetaStable(metaName, excitedLevel.id, metaTargets[metaZA][0]))
         for dataM1 in dataM1s : dataM1.metaInfo = [ metaZA, metaName ]
 
     projectile = toGNDSMiscModule.getTypeName(info, abs(endl2.yoToZA(self.yi)))
@@ -621,20 +638,20 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
     if( self.yi == 7 and targetZA not in (99120, 99125) ) :
         targetID = chemicalElementMiscPoPsModule.symbolFromZ[targetZ]
         targetName = chemicalElementMiscPoPsModule.nameFromZ[targetZ]
-        info.PoPs.add( chemicalElementPoPsModule.chemicalElement( targetID, targetZ, targetName ) )
+        info.PoPs.add( chemicalElementPoPsModule.ChemicalElement( targetID, targetZ, targetName ) )
         info.targetID = targetID
     elif( self.yi == 9 ) :
         info.targetID = chemicalElementMiscPoPsModule.symbolFromZ[targetZ]
         targetName = chemicalElementMiscPoPsModule.nameFromZ[targetZ]
-        info.PoPs.add( chemicalElementPoPsModule.chemicalElement( info.targetID, targetZ, targetName ) )
+        info.PoPs.add( chemicalElementPoPsModule.ChemicalElement( info.targetID, targetZ, targetName ) )
     elif isThermalNeutronScatteringLawTarget:
         info.targetID = targetName
 
         # TNSL target (and mass) needs to be in PoPs for processProtare and other codes to work
-        TNSL_target = unorthodoxPoPsModule.particle( targetName )
+        TNSL_target = unorthodoxPoPsModule.Particle( targetName )
         mass = self.findDatas()[0].getMass()
         TNSL_target.mass.add(
-            massPoPsModule.double( info.PoPsLabel, mass, quantityPoPsModule.stringToPhysicalUnit( 'amu' ) ) )
+            massPoPsModule.Double( info.PoPsLabel, mass, quantityPoPsModule.stringToPhysicalUnit( 'amu' ) ) )
         info.PoPs.add(TNSL_target)
     else :
         target = toGNDSMiscModule.getTypeName( info, targetZA, name = targetName, level = level, levelIndex = levelIndex )
@@ -642,8 +659,8 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
 
     if( levelIndex is not None and levelIndex > 0 ):
         metastableIndex = 1 # FIXME can this be read from ENDL instead?
-        aliasName = PoPsAliasModule.metaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex( target.id, metastableIndex )
-        info.PoPs.add( PoPsAliasModule.metaStable( aliasName, target.id, metastableIndex ) )
+        aliasName = PoPsAliasModule.MetaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex(target.id, metastableIndex)
+        info.PoPs.add(PoPsAliasModule.MetaStable(aliasName, target.id, metastableIndex))
         info.targetID = aliasName
 
     maxDate = 19590101
@@ -657,17 +674,17 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 maxDate = max( date, maxDate )
     maxDate = str( maxDate )
     maxDate = '%s-%s-%s' % ( maxDate[:4], maxDate[4:6], maxDate[6:] )
-    projectileDomain = stylesModule.projectileEnergyDomain( 1e-11, 20, 'MeV' )  # will be overwritten after parsing all reactions
-    evaluatedStyle = stylesModule.evaluated( info.style, '',
-            physicalQuantityModule.temperature( PQUModule.pqu_float.surmiseSignificantDigits( I0.getTemperature( ) ), 'MeV/k' ),
+    projectileDomain = stylesModule.ProjectileEnergyDomain( 1e-11, 20, 'MeV' )  # will be overwritten after parsing all reactions
+    evaluatedStyle = stylesModule.Evaluated( info.style, '',
+            physicalQuantityModule.Temperature( PQUModule.PQU_float.surmiseSignificantDigits( I0.getTemperature( ) ), 'MeV/k' ),
             projectileDomain,
             evaluationLibrary, evaluationVersion, date = maxDate )
 
     evaluation = "%s-%s" % ( evaluationLibrary, evaluationVersion ) if evaluationVersion != '' else evaluationLibrary
-    interaction = reactionSuiteModule.Interaction.nuclear
-    if( projectile.id == IDsPoPsModule.photon ) : interaction = reactionSuiteModule.Interaction.atomic
-    if( ( self.A / 100 ) > 3 ) : interaction = reactionSuiteModule.Interaction.LLNL_TNSL
-    reactionSuite = reactionSuiteModule.reactionSuite( projectile.id, info.targetID, evaluation, style = evaluatedStyle, PoPs = info.PoPs,
+    interaction = enumsModule.Interaction.nuclear
+    if( projectile.id == IDsPoPsModule.photon ) : interaction = enumsModule.Interaction.atomic
+    if( ( self.A / 100 ) > 3 ) : interaction = enumsModule.Interaction.LLNL_TNSL
+    reactionSuite = reactionSuiteModule.ReactionSuite( projectileID, info.targetID, evaluation, style = evaluatedStyle, PoPs = info.PoPs,
             interaction = interaction, formatVersion = formatVersion )
     covarianceSuite = None  # initialized later if covariances found
     info.PoPs = reactionSuite.PoPs
@@ -706,6 +723,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 C_Others.append( reactionDatas )
         reactionsDatas = C_Others + C81s
 
+    crossSectionC8 = None
     for reactionDatas in reactionsDatas :
         doubleDifferentialCrossSectionForm = None
         isThermalNeutronScatteringLawReaction = False
@@ -739,7 +757,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 elif( data.I == 21 ) :
                     I21 = data
 
-            reaction = reactionModule.reaction( outputChannelModule.Genre.NBody, ENDF_MT = MT )
+            reaction = reactionModule.Reaction(str(MT), enumsModule.Genre.NBody, ENDF_MT=MT)
             crossSection = crossSectionModule.XYs1d( data = I0.data, interpolation = getXYInterpolation( I0 ), axes = crossSectionAxes, label = info.style )
             reaction.crossSection.add( crossSection )
 
@@ -756,15 +774,16 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
             residual = toGNDSMiscModule.newGNDSParticle( info, targetID, crossSection )
             outputChannel.products.add( outputChannel.products.uniqueLabel( residual ) )
 
+            reaction.updateLabel()
             reactionSuite.reactions.add( reaction )
             continue
 
         channelProcess = None
         if( S == 0 ) :
             if( 1 in CsAndSs[C] ) :
-                channelProcess = outputChannelModule.processes.continuum
+                channelProcess = outputChannelModule.Processes.continuum
             else :
-                if( C == inelasticC ) : channelProcess = outputChannelModule.processes.continuum
+                if( C == inelasticC ) : channelProcess = outputChannelModule.Processes.continuum
         I0, I12, I20 = None, None, None
         specialCase = None
         for yo in yosDatas : yosDatas[yo] = []
@@ -781,7 +800,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
         for data in reactionDatas :                         # yosDatas should only contain I = 1, 3, 4, 7, 9, 10, 13, 20, 21, 22, 941 and 942 type data.
             if( excludeAverageProductData and ( data.I in [ 10, 13 ] ) ) :
                 if( not( ( C == 82 ) and ( data.yo == 9 ) ) ) : continue
-            data.frame = (endlmisc.getNumberOfColumns_(data.I, '') * ('%s,' % standardsModule.frames.labToken))[:-1]
+            data.frame = (endlmisc.getNumberOfColumns_(data.I, '') * ('%s,' % xDataEnumsModule.Frame.lab))[:-1]
             if( data.S == 7 ) :                             # Special treatment for delayed neutron data.
                 decayRate = data.getX1( )
                 if( decayRate not in delayedNeutrons ) : delayedNeutrons[decayRate] = []
@@ -843,7 +862,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 I0.C = {26:11, 38:44, 43:42, 47:41, 48:40}[ I0.C ]
                 print( "    WARNING: recasting C=%d to C=%d" % ( C, I0.C ) )
         if( hasRegions ):
-            regions1d = crossSectionModule.regions1d( label = info.style, axes = axes )
+            regions1d = crossSectionModule.Regions1d( label = info.style, axes = axes )
             data = []
             x1 = -1
             for x2, y2 in I0.data :
@@ -858,9 +877,8 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 crossSection = regions1d
             crossSection.label = info.style
         elif( I0.C == 74 ) :                # First value is 0 so make it first two points lin-lin like mcfgen does.
-            crossSection = crossSectionModule.regions1d( label = info.style, axes = axes )
-            crossSection.append( crossSectionModule.XYs1d( data = I0.data[:2], interpolation = standardsModule.interpolation.linlinToken,
-                    axes = axes ) )
+            crossSection = crossSectionModule.Regions1d( label = info.style, axes = axes )
+            crossSection.append(crossSectionModule.XYs1d(data=I0.data[:2], interpolation=xDataEnumsModule.Interpolation.linlin, axes=axes))
             crossSection.append( crossSectionModule.XYs1d( data = I0.data[1:], interpolation = getXYInterpolation( I0 ), axes = axes ) )
         else :
             crossSection = crossSectionModule.XYs1d( data = I0.data, label = info.style, 
@@ -939,15 +957,15 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
             if( 0.9e-12 < reactionDatas[0].getX1( ) < 1.1e-12 ) :
                 TNSL_MT = 4
                 from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import incoherentInelastic
-                channelProcess = incoherentInelastic.form.process
+                channelProcess = incoherentInelastic.Form.process
             elif( 1.9e-12 < reactionDatas[0].getX1( ) < 2.1e-12 ) :
                 TNSL_MT = 2
                 from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import coherentElastic
-                channelProcess = coherentElastic.form.process
+                channelProcess = coherentElastic.Form.process
                 if( self.ZA == 1901 ) : channelProcess = "Inc" + channelProcess[1:]
             else :
                 raise Exception("Encountered TNSL data with unexpected X1 = %f!" % reactionDatas[0].getX1( ))
-            outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody, process = channelProcess )
+            outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=channelProcess)
             outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ), crossSection ) )
 
             firstParticle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, 1 ), crossSection )
@@ -965,21 +983,24 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 firstParticle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, yos[0] ),
                         crossSection )    # Assume first particle is in the ground state.
                 addDistributionDataAndRemove( firstParticle, ZAsYos[yos[0]], yosDatas, crossSection )
-                Q = returnConstantQ( info.style, I0.getQ( ), crossSection )
+                if crossSectionC8 is not None and C == 9:
+                    Q = returnConstantQ( info.style, I0.getQ( ), crossSectionC8 )
+                    crossSectionC8 = None
+                else:
+                    Q = returnConstantQ( info.style, I0.getQ( ), crossSection )
                 if( len( yos ) == 1 ) :                                 # Simple two-body, yos[0] + Residual [ + gamma].
                     resYo = residuals[0]
                     if( resYo in ZAsYos ) : resYo = ZAsYos[resYo] + 10
                     if( S == 1 ) :
                         Q = returnConstantQ( info.style, I0.getQ( ) - I0.getX1( ), crossSection )
-                        resParticle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, residuals[0] ),
-                                crossSection )
+                        resParticle = toGNDSMiscModule.newGNDSParticle(info, toGNDSMiscModule.getTypeName(info, residuals[0]), crossSection)
 
                         addResidual = False
                         decayChannel = None
                         if( 7 in yos ) : print( ' 7 in yos' )
 
                         if( yosDatas[7] != [] ) :
-                            decayChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody )
+                            decayChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
                             decayChannel.Q.add( returnConstantQ( info.style, I0.getX1( ), crossSection ) )  # Assume residual returns to ground state, hence Q = getX1( )
                             gammaParticle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, 7 ),
                                     crossSection )
@@ -994,7 +1015,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
 
                         if( ( residuals == [ 4008 ] ) and ( yosDatas[16] != [] ) ) :
                             if( decayChannel is None ) :
-                                decayChannel =  outputChannelModule.outputChannel( outputChannelModule.Genre.NBody )
+                                decayChannel =  outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
                                 decayChannel.Q.add( returnConstantQ( info.style, I0.getX1( ), crossSection ) )  # Assume residual returns to ground.
                             He4Particle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, 2004 ),
                                     crossSection, multiplicity = 2 )
@@ -1016,12 +1037,12 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                             groundState = particle.isotope.nuclides[0]
                             ZA = chemicalElementMiscPoPsModule.ZA( groundState )
                             multiplicity = secondParticle.multiplicity[0].copy()
-                            secondParticle.addOutputChannel( outputChannelModule.outputChannel( outputChannelModule.Genre.NBody ) )
+                            secondParticle.addOutputChannel(outputChannelModule.OutputChannel(enumsModule.Genre.NBody))
                             secondParticle.outputChannel.Q.add( toGNDSMiscModule.returnConstantQ(
                                 info.style, particle.nucleus.energy[0].value, multiplicity ) )
                             product = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getPoPsParticle( info, ZA, groundState.id ),
                                     crossSection, multiplicity = multiplicity )
-                            product.distribution.add( unspecifiedModule.form( info.style, standardsModule.frames.labToken ) )
+                            product.distribution.add( unspecifiedModule.Form(info.style, xDataEnumsModule.Frame.lab) )
                             secondParticle.outputChannel.products.add( product )
                     else :
                         decayChannel, level, levelIndex = None, None, None
@@ -1030,7 +1051,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                             levelIndex = None
                             if( C not in [ 8, 9, 10 ] ) :
                                 if( ( yosDatas[7] != [] ) and ( residuals[0] != 7 ) ) :
-                                    decayChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody )
+                                    decayChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
                                     decayChannel.Q.add( returnConstantQ( info.style, I0.getX1( ), crossSection ) )
                                     resParticle = toGNDSMiscModule.newGNDSParticle( info,
                                             toGNDSMiscModule.getTypeName( info, residuals[0] ), crossSection )       # Residual in ground state.
@@ -1063,18 +1084,18 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                         levelIndex, level = 1, I0.getX1( )
                     Q_MeV = endl2.reactionQByZAs([endl2.yoToZA(self.yi), targetZA], [yos[0], residualZA]) - level
                     residualName = toGNDSMiscModule.getTypeName( info, residualZA, level = level, levelIndex = levelIndex )
-                    decayChannel = makeNBodyChannelFrom_mYos( outputChannelModule.outputChannel, outputChannelModule.Genre.NBody, mYos, ZAsYos, yosDatas, 
-                            I0.getQ( ) - Q_MeV, crossSection, specialCase = specialCase )
+                    decayChannel = makeNBodyChannelFrom_mYos(outputChannelModule.OutputChannel, enumsModule.Genre.NBody, mYos, ZAsYos, yosDatas, 
+                            I0.getQ( ) - Q_MeV, crossSection, specialCase=specialCase)
                     secondParticle = toGNDSMiscModule.newGNDSParticle( info, residualName, crossSection,
                             outputChannel = decayChannel )
                     Q = returnConstantQ( info.style, Q_MeV, crossSection )
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.twoBody )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody)
                 outputChannel.Q.add( Q )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( secondParticle ) )
             elif( Is == [ 22 ] ) :
                 if( verbose > 0 ) : print( ' 2Body', end = '' )
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.twoBody )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody)
                 Q = returnConstantQ( info.style, 0.0, crossSection )
                 outputChannel.Q.add( Q )
 
@@ -1106,14 +1127,14 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 if( C == 83 ) :
                     channelProcess = 'excitation'
                     mYos = mYos[:-1]
-                outputChannel = makeNBodyChannelFrom_mYos( outputChannelModule.outputChannel, outputChannelModule.Genre.NBody, mYos, ZAsYos, yosDatas, I0.getQ( ), 
-                        crossSection, specialCase = specialCase, process = channelProcess )
+                outputChannel = makeNBodyChannelFrom_mYos(outputChannelModule.OutputChannel, enumsModule.Genre.NBody, mYos, ZAsYos, yosDatas, I0.getQ(), 
+                        crossSection, specialCase=specialCase, process=channelProcess)
                 if( C == 83 ) :
                     electron = outputChannel.products[0]
                     for data in reactionDatas :
                         if( ( data.yo == 9 ) and ( data.I == 10 ) ) :
-                            energyDeposition = energyDepositionModule.XYs1d( label = info.style, axes = energyDepositionAxes, data = data.data )
-                            electron.energyDeposition.add( energyDeposition )
+                            averageProductEnergy = averageProductEnergyModule.XYs1d( label = info.style, axes = averageProductEnergyAxes, data = data.data )
+                            electron.averageProductEnergy.add(averageProductEnergy)
                     particle = toGNDSMiscModule.newGNDSParticle( info, info.targetID, crossSection )
                     outputChannel.products.add( particle )
 
@@ -1123,7 +1144,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
             elif( I0.C == 15 ) :                              # Fission
                 if( verbose > 0 ) : print( ' Fission ', end = '' )
 
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
                 outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ), crossSection ) )
                 particle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, 1 ), crossSection )
                 addDistributionDataAndRemove( particle, 1, yosDatas, crossSection )
@@ -1164,25 +1185,25 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                     else :
                         addDistributionDataAndRemove( delayedParticle, 1, delayedData, crossSection, promptNeutronParticle = particle )
 
-                    product = productModule.product( id = IDsPoPsModule.neutron, label = IDsPoPsModule.neutron )
+                    product = delayedNeutronModule.Product( IDsPoPsModule.neutron, label = IDsPoPsModule.neutron )
                     product.multiplicity.add( delayedParticle.multiplicity[info.style] )
                     product.distribution.add( delayedParticle.distribution[info.style] )
-                    delayedNeutron = delayedNeutronModule.delayedNeutron( str( i1 ), product )
-                    delayedNeutron.rate.add( rateModule.double( info.style, decayRate, '1/s' ) )
+                    delayedNeutron = delayedNeutronModule.DelayedNeutron( str( i1 ), product )
+                    delayedNeutron.rate.add( rateModule.Double( info.style, decayRate, '1/s' ) )
                     outputChannel.fissionFragmentData.delayedNeutrons.add( delayedNeutron )
-                    decayedLinks.append( sumsModule.add( link = delayedNeutron.product.multiplicity ) )
+                    decayedLinks.append( sumsModule.Add( link = delayedNeutron.product.multiplicity ) )
 
                 if( len( decayRates ) > 0 ) :
-                    delayedNubar = sumsModule.multiplicitySum( label = "delayed fission neutron multiplicity", ENDF_MT = 455 )
+                    delayedNubar = sumsModule.MultiplicitySum( label = "delayed fission neutron multiplicity", ENDF_MT = 455 )
                     for summand in decayedLinks : delayedNubar.summands.append( summand )
                     delayedNubar.multiplicity.add( totalDelayedNuBar )
                     reactionSuite.sums.multiplicitySums.add( delayedNubar )
 
                     total = particle.multiplicity[info.style] + totalDelayedNuBar
                     total.label = info.style
-                    totalNubar = sumsModule.multiplicitySum( label = "total fission neutron multiplicity", ENDF_MT = 452 )
-                    totalNubar.summands.append( sumsModule.add( link = particle.multiplicity ) )
-                    totalNubar.summands.append( sumsModule.add( link = delayedNubar.multiplicity ) )
+                    totalNubar = sumsModule.MultiplicitySum( label = "total fission neutron multiplicity", ENDF_MT = 452 )
+                    totalNubar.summands.append( sumsModule.Add( link = particle.multiplicity ) )
+                    totalNubar.summands.append( sumsModule.Add( link = delayedNubar.multiplicity ) )
                     totalNubar.multiplicity.add( total )
                     reactionSuite.sums.multiplicitySums.add( totalNubar )
 
@@ -1199,7 +1220,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 doubleDifferentialCrossSectionForm = addDistributionDataAndRemove( firstParticle, 7, yosDatas, crossSection )
                 secondParticle = toGNDSMiscModule.newGNDSParticle( info, info.targetID, crossSection )
                 process = { 71 : 'coherent', 72 : 'incoherent' }[I0.C]
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.twoBody, process = process )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody, process=process)
                 outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ), crossSection ) )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( secondParticle ) )
@@ -1207,7 +1228,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 if( verbose > 0 ) : print( " 73", end = '' )
                 firstParticle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, 9 ), crossSection )
                 secondParticle = toGNDSMiscModule.newGNDSParticle( info, info.targetID, crossSection )
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody, process = "photo-electric" )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process="photo-electric")
                 outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ), crossSection ) )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( secondParticle ) )
@@ -1217,14 +1238,14 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 firstParticle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, 9 ), crossSection )
                 secondParticle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, 8 ), crossSection )
                 thirdParticle = toGNDSMiscModule.newGNDSParticle( info, info.targetID, crossSection )
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody, process = 'pair production: electron field' )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process='pair production: electron field')
                 outputChannel.Q.add( returnConstantQ( info.style, -crossSection.domainMin, crossSection ) )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( secondParticle ) )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( thirdParticle ) )
             elif( I0.C == 82 ) :
                 if( verbose > 0 ) : print( " 82", end = '' )
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody, process = "bremsstrahlung" )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process="bremsstrahlung")
                 outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ), crossSection ) )
 
                 product = toGNDSMiscModule.getTypeNameGamma( info, 0 )
@@ -1236,8 +1257,8 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 firstParticle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, 9 ), crossSection )
                 for data in reactionDatas :
                     if( ( data.yo == 9 ) and ( data.I == 10 ) ) :
-                        energyDeposition = energyDepositionModule.XYs1d( label = info.style, axes = energyDepositionAxes, data = data.data )
-                        firstParticle.energyDeposition.add( energyDeposition )
+                        averageProductEnergy = averageProductEnergyModule.XYs1d( label = info.style, axes = averageProductEnergyAxes, data = data.data )
+                        firstParticle.averageProductEnergy.add(averageProductEnergy)
                 outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
 
                 secondParticle = toGNDSMiscModule.newGNDSParticle( info, info.targetID, crossSection )
@@ -1247,11 +1268,11 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                     if( verbose > 0 ) : print( " production", end = '' )
                     if( yos[0] != -4 ) : raise Exception(
                         'Does not appear to be production channel. Internal error. C = %d, yos = %s' %(C, repr(yos)) )
-                    multiplicity = multiplicityModule.partialProduction( info.style )
+                    multiplicity = multiplicityModule.PartialProduction( info.style )
                     particle = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeName( info, yos[1] ),
                             crossSection, multiplicity = multiplicity )
                     addDistributionDataAndRemove( particle, ZAsYos[yos[1]], yosDatas, crossSection )
-                    outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody )
+                    outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
                     outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ), crossSection ) )
                     outputChannel.products.add( outputChannel.products.uniqueLabel( particle ) )
                 else :
@@ -1271,7 +1292,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
         else :
             channelList.append( tmp )
 
-        if( I12 is not None ) : 
+        if I12 is not None:
             Q = QModule.XYs1d( label = info.style, data = I12.data, axes = QAxes, interpolation = getXYInterpolation( I12 ) )
             outputChannel.Q.remove( info.style )    # replace constant approximation with energy-dependent version
             outputChannel.Q.add( Q )
@@ -1295,19 +1316,21 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
             MT = 528
         else :
             I0S = I0.S
-            if( ( outputChannel is not None ) and ( outputChannel.genre == outputChannelModule.Genre.twoBody ) ) : I0S = 1
+            if outputChannel is not None and outputChannel.genre == enumsModule.Genre.twoBody:
+                I0S = 1
             MT = ENDLCS_To_ENDFMT.getMTFromCS( I0.C, I0S, CCounts = CCounts )
         if( I20 is not None ) : endlmisc.printWarning('    WARNING: I20 URR data not currently supported.')
 
         if( C == 1 ) :
-            reaction = sumsModule.crossSectionSum( label = "total", ENDF_MT = MT )
-            for _reaction in reactionSuite.reactions : reaction.summands.append( sumsModule.add( link = _reaction.crossSection ) )
+            reaction = sumsModule.CrossSectionSum( label = "total", ENDF_MT = MT )
+            for _reaction in reactionSuite.reactions : reaction.summands.append( sumsModule.Add( link = _reaction.crossSection ) )
             iChannel += 1
             reaction.Q.add( returnConstantQ( info.style, I0.getQ( ), crossSection ) )
         else :
-            fissionGenre = None
-            if C == 15: fissionGenre = reactionsBaseModule.FissionGenre.total
-            reaction = reactionModule.reaction( outputChannel.genre, ENDF_MT = MT, fissionGenre = fissionGenre )
+            fissionGenre = enumsModule.FissionGenre.none
+            if C == 15:
+                fissionGenre = enumsModule.FissionGenre.total
+            reaction = reactionModule.Reaction( str(MT), outputChannel.genre, ENDF_MT=MT, fissionGenre=fissionGenre )
             endf_endlModule.setReactionsOutputChannelFromOutputChannel( info, reaction, outputChannel )
             if( S == 2 ) : reaction.outputChannel.process = 'ENDL:S2'
 
@@ -1319,8 +1342,9 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
         reaction._isThermalScatteringReaction = isThermalNeutronScatteringLawReaction
 
         if( ( self.yi != 9 ) and ( C in ( 8, 9 ) ) ) :
-            if( C==8 and self.findDatas( C=9 ) ) :
-                continue    # if both C=8 and C=9 are present, follow C==9 logic
+            if C == 8 and self.findDatas(C=9):
+                crossSectionC8 = crossSection
+                continue                            # If both C=8 and C=9 are present, follow C==9 logic.
 
             # convert cross section / distribution into nuclearPlusInterference instance:
 
@@ -1346,9 +1370,9 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                     effDist[idx] = tmpDist
 
                 effXsc.label = None # label unnecessary since it will reside inside CoulombPlusNuclearElastic
-                nuclearPlusInterference = nuclearPlusInterferenceModule.nuclearPlusInterference( muCutoff=muCutoff,
-                        crossSection=nuclearPlusInterferenceModule.crossSection( effXsc),
-                        distribution=nuclearPlusInterferenceModule.distribution( effDist)
+                nuclearPlusInterference = nuclearPlusInterferenceModule.NuclearPlusInterference( muCutoff=muCutoff,
+                        crossSection=nuclearPlusInterferenceModule.CrossSection( effXsc),
+                        distribution=nuclearPlusInterferenceModule.Distribution( effDist)
                         )
                 Rutherford = RutherfordScatteringModule.RutherfordScattering()
             else:   # Only have C=8 data. Only give the Rutherford scattering term
@@ -1357,7 +1381,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                         reaction.crossSection.domainMin, reaction.crossSection.domainMax,
                         reaction.crossSection.domainUnit )
 
-            CPElastic = CoulombPlusNuclearElasticModule.form( projectile.id, info.style, identicalParticles = identicalParticles,
+            CPElastic = CoulombPlusNuclearElasticModule.Form( projectileID, info.style, identicalParticles = identicalParticles,
                     RutherfordScattering = Rutherford, nuclearPlusInterference = nuclearPlusInterference )
             reaction.doubleDifferentialCrossSection.add( CPElastic )
             reaction.crossSection.remove( info.style )
@@ -1376,6 +1400,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
             # wait until all other reactions are done to handle C55
             c55s.append( reaction )
         else :
+            reaction.updateLabel()
             reactionSuite.reactions.add( reaction )
         if( excludeAverageProductData ) :
             for yo in yosDatas :
@@ -1394,8 +1419,8 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
         # sigma_total * mult_total = sigma_nonelastic * M, so M = (C55 data) / sigma_nonelastic.
         # Also need to store non-elastic as a cross section sum
 
-        nonElastic = sumsModule.crossSectionSum( label = "nonelastic", ENDF_MT = 3 )
-        summands = [ sumsModule.add( link = r.crossSection ) for r in reactionSuite.reactions
+        nonElastic = sumsModule.CrossSectionSum( label = "nonelastic", ENDF_MT = 3 )
+        summands = [ sumsModule.Add( link = r.crossSection ) for r in reactionSuite.reactions
                 if r is not reactionSuite.getReaction('elastic') and not r._isThermalScatteringReaction ]
         for summand in summands : nonElastic.summands.append( summand )
 
@@ -1412,8 +1437,8 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
         nonElastic.Q.add( returnConstantQ( info.style, 0, crossSection ) )
         reactionSuite.sums.crossSectionSums.add( nonElastic )
 
-        gammaProduction = orphanProductModule.orphanProduct( outputChannelModule.Genre.NBody, ENDF_MT = 3, label = '0' )
-        gammaProduction.crossSection.add( crossSectionModule.reference( link = nonElastic.crossSection, label = info.style ) )
+        gammaProduction = orphanProductModule.OrphanProduct('0', enumsModule.Genre.NBody, ENDF_MT = 3)
+        gammaProduction.crossSection.add( crossSectionModule.Reference( link = nonElastic.crossSection, label = info.style ) )
         gammaProduction.outputChannel.Q.add( c55s[0].outputChannel.Q.evaluated )
         for C55 in c55s:
             orphanGamma = C55.outputChannel.products[0]
@@ -1440,9 +1465,9 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
     covarianceFileCS = covarianceDict(self.source)   #  Dictionary covariance filenames from the user-input directory, key: (C,S)
 
     if len(covarianceFileCS) > 0:
-        axes = axesModule.axes( labelsUnits = { 0 : ( 'matrix_elements', '' ),
-                                                1 : ( 'column_energy_bounds', 'MeV' ),
-                                                2 : ( 'row_energy_bounds', 'MeV' ) } )
+        axes = axesModule.Axes(3, labelsUnits = { 0 : ( 'matrix_elements', '' ),
+                                                  1 : ( 'column_energy_bounds', 'MeV' ),
+                                                  2 : ( 'row_energy_bounds', 'MeV' ) } )
 
         sectionList = []
         for (C,S) in covarianceFileCS.keys():
@@ -1466,18 +1491,18 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                 I = int(thisCovarianceEntry.split('i')[1].split('s')[0])
                 if( I == 0 ):
                     # cross section covariance
-                    rowdat = covarianceSectionModule.rowData(root = '$reactions', link = reaction.crossSection.evaluated,
+                    rowdat = covarianceSectionModule.RowData(root = '$reactions', link = reaction.crossSection.evaluated,
                             ENDF_MFMT=f'33,{reaction.ENDF_MT}') 
                 elif( I == 4 and C == 15 ):
                     # Prompt fission neutron spectrum covariance
                     covar_label += ' [spectrum] energy range '
-                    rowdat = covarianceSectionModule.rowData(root = '$reactions',
+                    rowdat = covarianceSectionModule.RowData(root = '$reactions',
                             link = reaction.outputChannel.products[0].distribution.evaluated.energySubform,
                             ENDF_MFMT=f'35,{reaction.ENDF_MT}')
                 elif( I==7 ):
                     # nubar covariance
                     covar_label += ' neutron multiplicity [nubar]'
-                    rowdat = covarianceSectionModule.rowData(root = '$reactions',
+                    rowdat = covarianceSectionModule.RowData(root = '$reactions',
                             link = reaction.outputChannel.products[0].multiplicity.evaluated,
                             ENDF_MFMT=f'31,{reaction.ENDF_MT}')
                 else:
@@ -1495,21 +1520,21 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
 
                     if numpy.count_nonzero(rawMatrix - numpy.diag(numpy.diagonal(rawMatrix))):
                         lowerDiagonal = rawMatrix[numpy.tril_indices(len(rawMatrix))]
-                        matrix = arrayModule.full( rawMatrix.shape, lowerDiagonal, symmetry='lower')
+                        matrix = arrayModule.Full( rawMatrix.shape, lowerDiagonal, symmetry=arrayModule.Symmetry.lower)
                     else:   # matrix is diagonal
-                        matrix = arrayModule.diagonal( rawMatrix.shape, rawMatrix.diagonal() )
-                    axes[2] = axesModule.grid( axes[2].label, axes[2].index, axes[2].unit,
-                            style = axesModule.boundariesGridToken, values = valuesModule.values( energyBounds ) )
-                    axes[1] = axesModule.grid( axes[1].label, axes[1].index, axes[1].unit,
-                            style = axesModule.linkGridToken, values = linkModule.link( link = axes[2].values, relative = True ) )
-                    covmatrix = covarianceMatrixModule.covarianceMatrix(label = label, type = Type,
-                            matrix = griddedModule.gridded2d( axes, matrix ))
+                        matrix = arrayModule.Diagonal( rawMatrix.shape, rawMatrix.diagonal() )
+                    axes[2] = axesModule.Grid( axes[2].label, axes[2].index, axes[2].unit,
+                            style = xDataEnumsModule.GridStyle.boundaries, values = valuesModule.Values( energyBounds ) )
+                    axes[1] = axesModule.Grid( axes[1].label, axes[1].index, axes[1].unit,
+                            style = xDataEnumsModule.GridStyle.boundaries, values = linkModule.Link( link = axes[2].values, relative = True ) )
+                    covmatrix = covarianceMatrixModule.CovarianceMatrix(label = label, type = Type,
+                            matrix = griddedModule.Gridded2d( axes, matrix ))
                     return covmatrix
 
                 if (I == 4):
                     for index, covarianceEntry in enumerate(covarianceDatas):
                         label = covar_label + str(index)
-                        covarianceSection = covarianceSectionModule.covarianceSection(label = label, rowData = rowdat.copy())
+                        covarianceSection = covarianceSectionModule.CovarianceSection(label = label, rowData = rowdat.copy())
                         domain = covarianceEntry[3]
                         covarianceSection.rowData.slices.add(
                             covarianceSectionModule.Slice(2, domainUnit="MeV", domainMin=domain[0], domainMax=domain[1])
@@ -1518,13 +1543,13 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                         covarianceSection.add(covmatrix)
                         sectionList.append(covarianceSection)
                 else:
-                    covarianceSection=covarianceSectionModule.covarianceSection(label = covar_label, rowData = rowdat)
+                    covarianceSection=covarianceSectionModule.CovarianceSection(label = covar_label, rowData = rowdat)
                     if (len(covarianceDatas) > 1):
                         covarsThisSection = []
                         for index, covarianceEntry in enumerate(covarianceDatas):
                             covmatrix = createCovarianceMatrix(covarianceEntry, str(index))
                             covarsThisSection.append(covmatrix)
-                        covarianceForm = covarianceMixedModule.mixedForm(label = info.style, components=covarsThisSection)
+                        covarianceForm = covarianceMixedModule.MixedForm(label = info.style, components=covarsThisSection)
                         covarianceSection.add(covarianceForm)
 
                     elif (len(covarianceDatas) == 1):
@@ -1533,18 +1558,14 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
                     
                     sectionList.append(covarianceSection)
 
-                covarianceLink = uncertaintiesModule.covariance(link=covarianceSection[info.style], root="$covariances")  # Change cov[] to whatever is the equivalent in here
-                centralValue.uncertainty = uncertaintiesModule.uncertainty( functional=covarianceLink )
+                covarianceLink = uncertaintiesModule.Covariance(link=covarianceSection[info.style], root="$covariances")  # Change cov[] to whatever is the equivalent in here
+                centralValue.uncertainty = uncertaintiesModule.Uncertainty( functional=covarianceLink )
 
         if len(sectionList) > 0:
-            covarianceSuite = covarianceSuiteModule.covarianceSuite( projectile.id, info.targetID, evaluation )
+            covarianceSuite = covarianceSuiteModule.CovarianceSuite( projectileID, info.targetID, evaluation, interaction, formatVersion = formatVersion )
             
             for cov in sectionList:
                 covarianceSuite.covarianceSections.add(cov)
-
-    documentation = self.getDocumentation( )
-    if( documentation is None ) : documentation = "From ENDL: no documentation specified."
-    evaluatedStyle.documentation.body.body = documentation
 
     evaluatedStyle.projectileEnergyDomain.min = min( [ reaction.crossSection.domainMin for reaction in reactionSuite.reactions ] )
     if( projectile.id == IDsPoPsModule.neutron ) :          # Ignore case where the last point's y-value is 0.
@@ -1555,8 +1576,20 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
     else :
         evaluatedStyle.projectileEnergyDomain.max= min( [ reaction.crossSection.domainMax for reaction in reactionSuite.reactions ] )
 
-    for reaction in reactionSuite.reactions : toGNDSMiscModule.addUnspecifiedDistributions( info, reaction.outputChannel )
-    for production in reactionSuite.productions : toGNDSMiscModule.addUnspecifiedDistributions( info, production.outputChannel )
+    if covarianceSuite is not None:
+        covarianceSuite.styles.add(evaluatedStyle.copy())   # don't include documentation in covariances
+
+    documentation = self.getDocumentation( )
+    if( documentation is None ) : documentation = "From ENDL: no documentation specified."
+    evaluatedStyle.documentation.body.body = documentation
+
+    for reaction in reactionSuite.reactions:
+        frame = xDataEnumsModule.Frame.lab
+        if reaction.outputChannel.genre == enumsModule.Genre.twoBody and self.yi != 7:
+            frame = xDataEnumsModule.Frame.centerOfMass
+        toGNDSMiscModule.addUnspecifiedDistributions(info, reaction.outputChannel, frame)
+    for production in reactionSuite.productions:
+        toGNDSMiscModule.addUnspecifiedDistributions( info, production.outputChannel, xDataEnumsModule.Frame.lab)
 
     for chemicalElement in reactionSuite.PoPs.chemicalElements :
         for isotope in chemicalElement :
@@ -1564,10 +1597,7 @@ def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVe
             if( len( nuclide.mass ) > 0 ) : continue
             ZA = chemicalElementMiscPoPsModule.ZA( nuclide )
             mass = self.bdflsFile.mass( ZA )
-            mass = massPoPsModule.double( info.PoPsLabel, mass, quantityPoPsModule.stringToPhysicalUnit( 'amu' ) )
+            mass = massPoPsModule.Double( info.PoPsLabel, mass, quantityPoPsModule.stringToPhysicalUnit( 'amu' ) )
             nuclide.mass.add( mass )
-    
-    if covarianceSuite is not None:
-        covarianceSuite.styles.add(evaluatedStyle)
     
     return (reactionSuite, covarianceSuite)

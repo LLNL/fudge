@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,11 +11,11 @@ This module contains the GNDS documentation child node computerCodes and its chi
 
 import datetime
 
-from .. import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
+
 from .. import suite as suiteModule
 from .. import text as textModule
 from .. import date as dateModule
-from . import abstractClasses as abstractClassesModule
 
 class Version( textModule.Text ) :
 
@@ -43,25 +43,25 @@ class Version( textModule.Text ) :
         if not kwargs['addExtraAttributes'] : return ''
         return ' date="%s"' % self.date
 
-    def parseNode( self, node, xPath, linkData, **kwargs ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
         """
         Parses a version node.
         """
 
-        textModule.Text.parseNode( self, node, xPath, linkData, **kwargs )
+        textModule.Text.parseNode(self, node, xPath, linkData, **kwargs)
         xPath.append( node.tag )
 
         self.date = datetime.datetime.strptime( node.get( 'date' ), '%Y-%m-%d' )
 
         xPath.pop( )
 
-class CodeRepo( ancestryModule.Ancestry2 ) :
+class CodeRepo(ancestryModule.AncestryIO_bare):
 
     moniker = 'codeRepo'
 
-    def __init__( self, _revisionSystem, _href, _revisionID ) :
+    def __init__(self, _revisionSystem, _href, _revisionID):
 
-        ancestryModule.Ancestry2.__init__( self )
+        ancestryModule.AncestryIO_bare.__init__(self)
 
         self.__revisionSystem = textModule.raiseIfNotString( _revisionSystem, 'revisionSystem' )
         self.__href = textModule.raiseIfNotString( _href, 'href' )
@@ -82,13 +82,13 @@ class CodeRepo( ancestryModule.Ancestry2 ) :
 
         return( self.__revisionID )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         if( len( self.__revisionSystem + self.__href + self.__revisionID ) == 0 ) : return( [] )
 
         return( [ '%s<%s revisionSystem="%s" href="%s" revisionID="%s"/>' % ( indent, self.moniker, self.__revisionSystem, self.__href, self.__revisionID ) ] )
 
-    def parseNode( self, node, xPath, linkData, **kwargs ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
 
         xPath.append( node.tag )
 
@@ -113,6 +113,7 @@ class Note( textModule.Text ) :
 class InputDeck( textModule.Text ) :
 
     moniker = 'inputDeck'
+    keyName = 'label'
 
     def __init__( self, label, filename, text = None ) :
 
@@ -131,17 +132,21 @@ class InputDeck( textModule.Text ) :
 
         return ' filename="%s"' % self.filename
 
-    @staticmethod
-    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         _label = node.get( 'label' )
-        _filename = node.get('filename')
+        _filename = node.get('filename', '')
 
-        return( InputDeck( _label, _filename ) )
+        inputDeck = cls(_label, _filename)
+        inputDeck.parseNode(node, xPath, linkData, **kwargs)
+
+        return inputDeck
 
 class InputDecks( suiteModule.Suite ) :
 
     moniker = 'inputDecks'
+    suiteName = 'label'
 
     def __init__( self ) :
 
@@ -150,6 +155,7 @@ class InputDecks( suiteModule.Suite ) :
 class OutputDeck( textModule.Text ) :
 
     moniker = 'outputDeck'
+    keyName = 'label'
 
     def __init__( self, filename, text = None ) :
 
@@ -168,32 +174,34 @@ class OutputDeck( textModule.Text ) :
 
         return ' filename="%s"' % self.filename
 
-    @staticmethod
-    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        _filename = node.get('filename')
+        _filename = node.get('filename', '')
 
-        return( OutputDeck( _filename ) )
+        return cls( _filename)
 
 class OutputDecks( suiteModule.Suite ) :
 
     moniker = 'outputDecks'
+    suiteName = 'label'
 
     def __init__( self ) :
 
         suiteModule.Suite.__init__( self, [ OutputDeck ] )
 
-class ComputerCode( ancestryModule.Ancestry2 ) :
+class ComputerCode(ancestryModule.AncestryIO):
     """A class representing a GNDS documentation/computerCodes/computerCode node."""
 
 # Also need buildParameters as a text node.
 
     moniker = 'computerCode'
-    ancestryMembers = ( 'codeRepo', 'executionArguments', 'note', '[inputDecks', '[outputDecks' )
+    keyName = 'label'
+    ancestryMembers = ( 'codeRepo', 'executionArguments', 'note', 'inputDecks', 'outputDecks' )
 
     def __init__( self, label, name, version ) :
 
-        ancestryModule.Ancestry2.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__label = textModule.raiseIfNotString( label, 'label' )
         self.__name = textModule.raiseIfNotString( name, 'name' )
@@ -263,34 +271,38 @@ class ComputerCode( ancestryModule.Ancestry2 ) :
 
         return( self.__outputDecks )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLList = [ '%s<%s label="%s" name="%s" version="%s">' % ( indent, self.moniker, self.__label, self.__name, self.__version ) ]
-        XMLList += self.__codeRepo.toXMLList( indent2, **kwargs )
+        XMLList += self.__codeRepo.toXML_strList( indent2, **kwargs )
 
-        XMLList += self.__executionArguments.toXMLList( indent2, **kwargs )
-        XMLList += self.__note.toXMLList( indent2, **kwargs )
-        XMLList += self.__inputDecks.toXMLList( indent2, **kwargs )
-        XMLList += self.__outputDecks.toXMLList( indent2, **kwargs )
+        XMLList += self.__executionArguments.toXML_strList( indent2, **kwargs )
+        XMLList += self.__note.toXML_strList( indent2, **kwargs )
+        XMLList += self.__inputDecks.toXML_strList( indent2, **kwargs )
+        XMLList += self.__outputDecks.toXML_strList( indent2, **kwargs )
 
         XMLList[-1] += '</%s>' % self.moniker
 
         return( XMLList )
 
-    @staticmethod
-    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         label = node.get( 'label' )
         name = node.get( 'name' )
-        version = node.get( 'version' )
+        version = node.get( 'version', '' )
 
-        return( ComputerCode( label, name, version ) )
+        computerCode = cls(label, name, version)
+        computerCode.parseAncestryMembers(node, xPath, linkData, **kwargs)
+
+        return computerCode
 
 class ComputerCodes( suiteModule.Suite ) :
 
     moniker = 'computerCodes'
+    suiteName = 'label'
 
     def __init__( self ) :
 

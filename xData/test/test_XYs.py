@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,7 +13,8 @@ from numpy import logspace, flip, linspace
 import xData.unittest
 from fudge.reactionData.crossSection import upperEps
 from pqu import PQU
-from xData import XYs
+from xData import axes as axesModule
+from xData import XYs1d
 
 DOPLOTS=False
 
@@ -34,10 +35,10 @@ def function_to_XYs(func, fpars,
     that can be integrated, grouped, whatever.  We pre-defined a energy grid (in eV) that should work well
     even for pathological "spectra" like the problematic 1/E for the resonance integral.
     """
-    return XYs.XYs1d.createFromFunction(
-        XYs.XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex: (rangeName, rangeUnit),
-            XYs.xAxisIndex: (domainName, domainUnit)}),
+    return XYs1d.XYs1d.createFromFunction(
+        XYs1d.XYs1d.defaultAxes(labelsUnits={
+            XYs1d.yAxisIndex: (rangeName, rangeUnit),
+            XYs1d.xAxisIndex: (domainName, domainUnit)}),
         Xs=Egrid,
         func=func,
         parameters=fpars,
@@ -96,9 +97,8 @@ class Test_XYs(xData.unittest.TestCaseWithIsClose):
         def myExp2(E, *args):
             return math.exp(-E / 2.0)
 
-        a = function_to_XYs(myExp1, []).integrateTwoFunctions(function_to_XYs(myExp2, [])).inUnitsOf('1/eV')
-        b = PQU.PQU(0.666657, '1/eV')
-        self.assertIsClose(a, b, absTol=5e-7)
+        a = function_to_XYs(myExp1, []).integrateTwoFunctions(function_to_XYs(myExp2, []))
+        self.assertIsClose(a, 0.666657, absTol=5e-7)
 
     def test_one_over_E(self):
         """
@@ -109,7 +109,7 @@ class Test_XYs(xData.unittest.TestCaseWithIsClose):
         def oneFunc(x, *args): return 1.0
 
         one = function_to_XYs(oneFunc, [])
-        self.assertIsClose(DEFAULTONEOVEREXYs.integrateTwoFunctions(one), PQU.PQU(17.5044, '1/eV'), percent=1e-4)
+        self.assertIsClose(DEFAULTONEOVEREXYs.integrateTwoFunctions(one), 17.5044, percent=1e-4)
 
     def run_pdfOfY_test(self, testFunc, testFuncDomain, answer, ny=10, doPlot=False, verbose=False):
         """
@@ -132,7 +132,7 @@ class Test_XYs(xData.unittest.TestCaseWithIsClose):
         """
 
         # Contruct the numerical result for the pdfOfY from the test function testFunc
-        testFuncAsXYs1d = XYs.XYs1d(data=simple_function_to_XYs(testFunc, domain=testFuncDomain, nsteps=2))
+        testFuncAsXYs1d = XYs1d.XYs1d(data=simple_function_to_XYs(testFunc, domain=testFuncDomain, nsteps=2), axes=axesModule.Axes(2))
         testFuncPdfOfY = testFuncAsXYs1d.pdfOfY(epsilon=1e-8)
 
         # Plots, for debugging (if they currently work!)
@@ -188,7 +188,7 @@ class Test_XYs(xData.unittest.TestCaseWithIsClose):
         def f1(_x):
             return 1
 
-        answer = XYs.XYs1d(data=[[1.0 - epsilon, 0.0], [1.0, 1.0/epsilon], [1.0 + epsilon, 0.0]])
+        answer = XYs1d.XYs1d(data=[[1.0 - epsilon, 0.0], [1.0, 1.0/epsilon], [1.0 + epsilon, 0.0]])
         self.run_pdfOfY_test(testFunc=f1, answer=answer, testFuncDomain=(0.0, 1.0), ny=3, doPlot=DOPLOTS)
 
     def test_pdfOfY_test2(self):
@@ -204,7 +204,7 @@ class Test_XYs(xData.unittest.TestCaseWithIsClose):
         def f2(_x):
             return _x
 
-        answer = XYs.XYs1d(data=[[0.0, 1.0], [2.0, 1.0]])
+        answer = XYs1d.XYs1d(data=[[0.0, 1.0], [2.0, 1.0]], axes=axesModule.Axes(2))
         answer = answer.normalize()
         self.run_pdfOfY_test(testFunc=f2, answer=answer, testFuncDomain=(0.0, 2.0), doPlot=DOPLOTS, verbose=False)
 
@@ -228,7 +228,7 @@ class Test_XYs(xData.unittest.TestCaseWithIsClose):
             return 2.0 - x
 
         testFuncDomain = (0.0, 2.0)
-        answer = XYs.XYs1d(data=[[0.0, 1.0], [1.0, 1.0]])
+        answer = XYs1d.XYs1d(data=[[0.0, 1.0], [1.0, 1.0]], axes=axesModule.Axes(2))
         self.run_pdfOfY_test(testFunc=f3, answer=answer, testFuncDomain=testFuncDomain, doPlot=DOPLOTS)
 
     @unittest.skip("broken")

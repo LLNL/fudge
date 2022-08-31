@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,11 +11,14 @@ import os
 import glob
 from argparse import ArgumentParser
 
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+
+from fudge import externalFile as externalFileModule
+from LUPY import checksums as checksumsModule
+
 from brownies.legacy.endl.endlZA import endlZA as endlZAClass
 from brownies.legacy.endl import bdfls as bdflsModule
 from brownies.legacy.endl import fudgeParameters as fudgeParametersModule
-
-from xData import formatVersion as formatVersionModule
 
 fudgeParametersModule.VerboseMode = 0
 
@@ -36,7 +39,7 @@ parser.add_argument( '-o', '--output', action = 'store', default = None,        
 parser.add_argument( '-v', '--verbose', action = 'count', default = 0,              help = 'Verbose mode.' )
 parser.add_argument( '-V', '--version', action = 'store', default = defaultEvaluationVersion,
                                                                                     help = 'Evaluation version. Default is "%s".' % defaultEvaluationVersion )
-parser.add_argument("--formatVersion", default=formatVersionModule.default, choices=formatVersionModule.allowed,
+parser.add_argument("--formatVersion", default=GNDS_formatVersionModule.default, choices=GNDS_formatVersionModule.allowed,
                     help="Specifies the format for the outputted GNDS file. ")
 
 args = parser.parse_args( )
@@ -62,14 +65,11 @@ output = args.output
 if( output is None ) : output = ZA + '.xml'
 
 if covars is not None:
-    from fudge import externalFile
-    from LUPY import checksums
     cov_output = output.replace(".xml", "-covar.xml")
-    covars.externalFiles.add( externalFile.externalFile( "reactions", path=output) )
+    covars.externalFiles.add( externalFileModule.ExternalFile( "reactions", path=os.path.basename(output)) )
     covars.saveToFile( cov_output )
 
-    sha1sum = checksums.sha1sum.from_file(cov_output)
-    GNDS.externalFiles.add( externalFile.externalFile( "covariances", path=cov_output, checksum=sha1sum ) )
+    sha1sum = checksumsModule.Sha1sum.from_file(cov_output)
+    GNDS.externalFiles.add( externalFileModule.ExternalFile( "covariances", path=os.path.basename(cov_output), checksum=sha1sum ) )
 
 GNDS.saveToFile( output )
-

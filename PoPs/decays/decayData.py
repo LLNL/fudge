@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -37,7 +37,9 @@ for the two neutrons.
 
 import abc  # FIXME remove unused import?
 
-from xData import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+
 
 from .. import suite as suiteModule
 from .. import misc as miscModule
@@ -54,7 +56,7 @@ decayModesParticle = ""
 
 decayModeTypes = [decayModesIT, decayModesSF, decayModesParticle]
 
-class decay( miscModule.classWithIndexKey ) :
+class Decay( miscModule.ClassWithIndexKey ) :
     """
     Describes one step in a multi-step decay. For example, in beta-delayed 2-n emission
     the first <decay> is for the beta-decay, and the 2nd and 3rd <decay> elements describe the two neutrons
@@ -63,23 +65,23 @@ class decay( miscModule.classWithIndexKey ) :
 
     moniker = 'decay'
 
-    def __init__( self, index, type, complete = True ) :
+    def __init__( self, index, mode, complete = True ) :
         """
         :param index: int, identifies the position of this decay within the decayPath. 0 = first, 1 = second, etc.
-        :param type: string identifying a decay type, such as "isomeric transition"
+        :param mode: string identifying a decay mode, such as "isomeric transition"
         :param complete: boolean, whether all outgoing products are listed
         """
 
-        miscModule.classWithIndexKey.__init__( self, index )
+        miscModule.ClassWithIndexKey.__init__( self, index )
 
-        if( not( isinstance( type, str ) ) ) : raise TypeError( 'decay mode type not an instance of str' )
-        if( type not in decayModeTypes ) : raise ValueError( 'decay mode type invalid' )
-        self.__type = type
+        if( not( isinstance( mode, str ) ) ) : raise TypeError( 'decay mode type not an instance of str' )
+        if( mode not in decayModeTypes ) : raise ValueError( 'decay mode type invalid' )
+        self.__mode = mode
 
         if( not( isinstance( complete, bool ) ) ) : raise TypeError( 'complete not an instance of bool' )
         self.__complete = complete
 
-        self.__products = productModule.suite( )
+        self.__products = productModule.Suite( )
         self.__products.setAncestor( self )
 
     @property
@@ -93,9 +95,9 @@ class decay( miscModule.classWithIndexKey ) :
         return( self.__products )
 
     @property
-    def type( self ) :
+    def mode( self ) :
 
-        return( self.__type )
+        return( self.__mode )
 
     def convertUnits( self, unitMap ) :
         """See documentation in PoPs.database.convertUnits"""
@@ -104,50 +106,53 @@ class decay( miscModule.classWithIndexKey ) :
 
     def copy( self ) :
 
-        _decay = self.__class__( self.index, self.type, self.complete )
+        _decay = self.__class__( self.index, self.mode, self.complete )
         for item in self.__products : _decay.products.add( item.copy( ) )
         return( _decay )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         attributes = ''
-        if( self.type != '' ) : attributes = ' type="%s"' % self.type
-        if( not( self.complete ) ) : attributes = ' complete="false"'
+        if self.mode != '':
+            attrName = 'mode'
+            if kwargs.get('formatVersion') == GNDS_formatVersionModule.version_1_10:
+                attrName = 'type'
+            attributes = ' %s="%s"' % (attrName, self.mode)
+        if not self.complete: attributes = ' complete="false"'
         XMLStringList = [ '%s<%s index="%s"%s>' % ( indent, self.moniker, self.index, attributes ) ]
-        XMLStringList += self.products.toXMLList( indent = indent2, **kwargs )
+        XMLStringList += self.products.toXML_strList( indent = indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
 
         return( XMLStringList )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
-        self.products.parseXMLNode( element.find( self.products.moniker ), xPath, linkData )
+        self.products.parseNode(element.find(self.products.moniker), xPath, linkData, **kwargs)
 
         xPath.pop()
         return( self )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         complete = True
         if element.get('complete') == 'false': complete = False
-        self = cls( element.get('index'), element.get( 'type', '' ), complete )
+        mode = element.get('mode','')
+        if kwargs['formatVersion'] == GNDS_formatVersionModule.version_1_10:
+            mode = element.get('type','')
+        self = cls( element.get('index'), mode, complete )
         xPath.pop( )
-        self.parseXMLNode( element, xPath, linkData )
+        self.parseNode(element, xPath, linkData, **kwargs)
 
         return( self )
 
-class decayPath( suiteModule.suite ) :
+class DecayPath( suiteModule.Suite ) :
     """
     Stores all <decay> steps involved in a decayMode
     """
@@ -156,19 +161,19 @@ class decayPath( suiteModule.suite ) :
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, ( decay, ) )
+        suiteModule.Suite.__init__( self, ( Decay, ) )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         for child in element :
-            self.add( decay.parseXMLNodeAsClass( child, xPath, linkData ) )
+            self.add(Decay.parseNodeUsingClass(child, xPath, linkData, **kwargs))
 
         xPath.pop( )
         return( self )
 
-class decayMode( miscModule.classWithLabelKey ) :
+class DecayMode( miscModule.ClassWithLabelKey ) :
     """
     Describes one way a particle can decay. The description includes the probability, Q-value, outgoing products
     and spectra. For electro-magnetic decays, may also include a set of internal conversion coefficients
@@ -183,27 +188,31 @@ class decayMode( miscModule.classWithLabelKey ) :
         :param mode: string, describes the decay mode. Examples: "beta+ or e.c.", "beta-,n", "alpha", etc.
         """
 
-        miscModule.classWithLabelKey.__init__( self, label )
+        from ..decays import misc as miscDecaysModule
 
-        if( not( isinstance( mode, str ) ) ) : raise TypeError( 'mode not an instance of str' )
+        miscModule.ClassWithLabelKey.__init__( self, label )
+
+        if not isinstance(mode, str):
+            if not isinstance(mode, miscDecaysModule.Mode):
+                raise TypeError('mode is not a str or an enum of %s' % miscDecaysModule.Mode)
         self.__mode = mode
 
-        self.__probability = probabilityModule.suite( )
+        self.__probability = probabilityModule.Suite( )
         self.__probability.setAncestor( self )
 
-        self.__internalConversionCoefficients = spectrumModule.internalConversionCoefficients()
+        self.__internalConversionCoefficients = spectrumModule.InternalConversionCoefficients()
         self.__internalConversionCoefficients.setAncestor( self )
 
-        self.__photonEmissionProbabilities = spectrumModule.photonEmissionProbabilities()
+        self.__photonEmissionProbabilities = spectrumModule.PhotonEmissionProbabilities()
         self.__photonEmissionProbabilities.setAncestor( self )
 
-        self.__Q = QModule.suite( )
+        self.__Q = QModule.Suite( )
         self.__Q.setAncestor( self )
 
-        self.__decayPath = decayPath( )
+        self.__decayPath = DecayPath( )
         self.__decayPath.setAncestor( self )
 
-        self.__spectra = spectrumModule.spectra( )
+        self.__spectra = spectrumModule.Spectra( )
         self.__spectra.setAncestor( self )
 
     @property
@@ -261,42 +270,38 @@ class decayMode( miscModule.classWithLabelKey ) :
         for item in self.__spectra : other.spectra.add( item.copy( ) )
         return( other )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s label="%s" mode="%s">' % ( indent, self.moniker, self.label, self.mode ) ]
-        XMLStringList += self.probability.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.internalConversionCoefficients.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.photonEmissionProbabilities.toXMLList(indent=indent2, **kwargs)
-        XMLStringList += self.Q.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.decayPath.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.spectra.toXMLList( indent = indent2, **kwargs )
+        XMLStringList += self.probability.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.internalConversionCoefficients.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.photonEmissionProbabilities.toXML_strList(indent=indent2, **kwargs)
+        XMLStringList += self.Q.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.decayPath.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.spectra.toXML_strList( indent = indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
 
         return( XMLStringList )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( "%s[@label='%s']" % (element.tag, element.get('label')) )
 
         for child in element :
-            if( child.tag == probabilityModule.suite.moniker ) :
-                self.probability.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == spectrumModule.internalConversionCoefficients.moniker ) :
-                self.internalConversionCoefficients.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == spectrumModule.photonEmissionProbabilities.moniker ) :
-                self.photonEmissionProbabilities.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == QModule.suite.moniker ) :
-                self.Q.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == decayPath.moniker ) :
-                self.decayPath.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == spectrumModule.spectra.moniker ) :
-                self.spectra.parseXMLNode( child, xPath, linkData )
+            if( child.tag == probabilityModule.Suite.moniker ) :
+                self.probability.parseNode(child, xPath, linkData, **kwargs)
+            elif( child.tag == spectrumModule.InternalConversionCoefficients.moniker ) :
+                self.internalConversionCoefficients.parseNode(child, xPath, linkData, **kwargs)
+            elif( child.tag == spectrumModule.PhotonEmissionProbabilities.moniker ) :
+                self.photonEmissionProbabilities.parseNode(child, xPath, linkData, **kwargs)
+            elif( child.tag == QModule.Suite.moniker ) :
+                self.Q.parseNode(child, xPath, linkData, **kwargs)
+            elif( child.tag == DecayPath.moniker ) :
+                self.decayPath.parseNode(child, xPath, linkData, **kwargs)
+            elif( child.tag == spectrumModule.Spectra.moniker ) :
+                self.spectra.parseNode(child, xPath, linkData, **kwargs)
             else :
                 raise ValueError( 'Invalid tag = "%s"' % child.tag )
 
@@ -304,17 +309,25 @@ class decayMode( miscModule.classWithLabelKey ) :
         return( self )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        from ..decays import misc as miscDecaysModule
 
-        self = cls( element.get('label'), element.get('mode') )
-        self.parseXMLNode( element, xPath, linkData )
+        xPath.append( node.tag )
+
+        mode = node.get('mode')
+        try:
+            mode = miscDecaysModule.Mode.fromString(mode)
+        except:
+            pass
+
+        self = cls(node.get('label'), mode)
+        self.parseNode(node, xPath, linkData, **kwargs)
 
         xPath.pop( )
         return( self )
 
-class decayModes( suiteModule.suite ) :
+class DecayModes( suiteModule.Suite ) :
     """
     Contains a list of decayMode instances
     """
@@ -323,19 +336,19 @@ class decayModes( suiteModule.suite ) :
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, ( decayMode, ) )
+        suiteModule.Suite.__init__( self, ( DecayMode, ) )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         for child in element :
-            self.add( decayMode.parseXMLNodeAsClass( child, xPath, linkData ) )
+            self.add(DecayMode.parseNodeUsingClass(child, xPath, linkData, **kwargs))
 
         xPath.pop( )
         return( self )
 
-class decayData( ancestryModule.ancestry ) :
+class DecayData(ancestryModule.AncestryIO_bare):
     """
     Contains all decay information for a particle, including average energies for decay products
     and a list of decay modes.
@@ -345,12 +358,12 @@ class decayData( ancestryModule.ancestry ) :
 
     def __init__( self ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
-        self.__decayModes = decayModes( )
+        self.__decayModes = DecayModes( )
         self.__decayModes.setAncestor( self )
 
-        self.__averageEnergies = averageEnergyModule.averageEnergies( )
+        self.__averageEnergies = averageEnergyModule.AverageEnergies( )
         self.__averageEnergies.setAncestor( self )
 
     @property
@@ -374,7 +387,7 @@ class decayData( ancestryModule.ancestry ) :
         :return: deep copy of self
         """
 
-        _decayData = decayData( )
+        _decayData = DecayData( )
         self.copyItems( _decayData )
         return( _decayData )
 
@@ -387,16 +400,12 @@ class decayData( ancestryModule.ancestry ) :
         for item in self.__decayModes : other.decayModes.add( item.copy( ) )
         for item in self.__averageEnergies : other.averageEnergies.add( item.copy( ) )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        XMLStringList_subs  = self.__decayModes.toXMLList( indent = indent2, **kwargs )
-        XMLStringList_subs += self.averageEnergies.toXMLList( indent = indent2, **kwargs )
+        XMLStringList_subs  = self.__decayModes.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList_subs += self.averageEnergies.toXML_strList( indent = indent2, **kwargs )
         if( len( XMLStringList_subs ) == 0 ) : return( [] )
 
         XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ] + XMLStringList_subs
@@ -404,7 +413,7 @@ class decayData( ancestryModule.ancestry ) :
 
         return( XMLStringList )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
@@ -412,10 +421,10 @@ class decayData( ancestryModule.ancestry ) :
 
         for child in element :
             if( child.tag in children ) :
-                children[child.tag].parseXMLNode( child, xPath, linkData )
+                children[child.tag].parseNode(child, xPath, linkData, **kwargs)
             else:
-                if( not( self.parseExtraXMLElement( child, xPath, linkData ) ) ) :
-                    raise ValueError( 'sub-element = "%s" not allowed' % child.tag )
+                if not self.parseExtraXMLElement(child, xPath, linkData, **kwargs): raise ValueError('Sub-element = "%s" not allowed' % child.tag)
 
-        xPath.pop( )
-        return( self )
+        xPath.pop()
+
+        return self

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,14 +7,16 @@
 
 from pqu import PQU as PQUModule
 
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs import IDs as IDsPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
 from fudge.resonances import resolved as resolvedModule
 
 from brownies.legacy.toENDF6 import endfFormats as endfFormatsModule
 from brownies.legacy.toENDF6 import gndsToENDF6 as gndsToENDF6Module
 
-def toENDF6( self, flags, targetInfo, verbosityIndent='' ):
+
+def toENDF6(self, flags, targetInfo, verbosityIndent=''):
     """
     Write BreitWigner sections back to ENDF6
     :param self:
@@ -25,35 +27,34 @@ def toENDF6( self, flags, targetInfo, verbosityIndent='' ):
     """
 
     endf = []
-    AP = getattr( self, 'scatteringRadius' )
+    AP = self.getScatteringRadius()
     if AP.isEnergyDependent():
         scatRadius = AP.form
         NR, NP = 1, len(scatRadius)
-        endf.append( endfFormatsModule.endfHeadLine( 0,0,0,0, NR,NP ) )
-        endf += endfFormatsModule.endfInterpolationList( (NP,
-            gndsToENDF6Module.gndsToENDFInterpolationFlag( scatRadius.interpolation ) ) )
-        endf += endfFormatsModule.endfNdDataList( scatRadius.convertAxisToUnit( 0, '10*fm' ) )
+        endf.append(endfFormatsModule.endfHeadLine(0, 0, 0, 0, NR, NP))
+        endf += endfFormatsModule.endfInterpolationList(
+            (NP, gndsToENDF6Module.gndsToENDFInterpolationFlag(scatRadius.interpolation)))
+        endf += endfFormatsModule.endfNdDataList(scatRadius.convertAxisToUnit(0, '10*fm'))
         AP = 0
-    else :
-        AP = self.scatteringRadius.getValueAs( '10*fm' )
+    else:
+        AP = AP.getValueAs('10*fm')
     L_list = self.resonanceParameters.table.getColumn('L')
-    NLS = len( set(L_list) )
+    NLS = len(set(L_list))
     LAD = getattr(self, 'computeAngularDistribution') or 0
-    NLSC = getattr(self, 'LvaluesNeededForConvergence') or 0
-    endf += [endfFormatsModule.endfHeadLine( targetInfo['spin'], AP, LAD, 0, NLS, NLSC )]
+    endf += [endfFormatsModule.endfHeadLine(targetInfo['spin'], AP, LAD, 0, NLS, 0)]
 
-    table = [ self.resonanceParameters.table.getColumn('energy',unit='eV'),
-            self.resonanceParameters.table.getColumn('J') ]
+    table = [self.resonanceParameters.table.getColumn('energy', unit='eV'),
+             self.resonanceParameters.table.getColumn('J')]
     NE = len(table[0])
-    for attr in ('totalWidth','neutronWidth','captureWidth','fissionWidth'):
-        column = self.resonanceParameters.table.getColumn( attr, unit='eV' )
-        if not column: column = [0]*NE
-        table.append( column )
+    for attr in ('totalWidth', 'neutronWidth', 'captureWidth', 'fissionWidth'):
+        column = self.resonanceParameters.table.getColumn(attr, unit='eV')
+        if not column: column = [0] * NE
+        table.append(column)
     CS = self.resonanceParameters.table.getColumn('channelSpin')
     if CS is not None:  # ENDF hack: J<0 -> use lower available channel spin
         targetSpin = targetInfo['spin']
-        CS = [2*(cs-targetSpin) for cs in CS]
-        Js = [v[0]*v[1] for v in zip(table[1],CS)]
+        CS = [2 * (cs - targetSpin) for cs in CS]
+        Js = [v[0] * v[1] for v in zip(table[1], CS)]
         table[1] = Js
     table = list(zip(*table))
 
@@ -64,17 +65,18 @@ def toENDF6( self, flags, targetInfo, verbosityIndent='' ):
         APL = 0
         resonances = [table[i] for i in range(NE) if L_list[i] == L]
         NRS = len(resonances)
-        endf.append( endfFormatsModule.endfHeadLine( AWRI, APL, L, 0, 6*NRS, NRS ) )
+        endf.append(endfFormatsModule.endfHeadLine(AWRI, APL, L, 0, 6 * NRS, NRS))
         for row in resonances:
-            endf.append( endfFormatsModule.endfDataLine( row ) )
+            endf.append(endfFormatsModule.endfDataLine(row))
     return endf
 
 resolvedModule.BreitWigner.toENDF6 = toENDF6
 
+
 #
 # helper functions for RMatrix
 #
-def getENDFtuple( spin, parity ):
+def getENDFtuple(spin, parity):
     # ENDF combines spin & parity UNLESS spin==0. Then it wants (0,+/-1)
     if parity is None: raise ValueError("parity is None")
     if spin:
@@ -82,71 +84,81 @@ def getENDFtuple( spin, parity ):
     else:
         return (spin, parity)
 
-def writeRMatrixParticlePairs( RMatrixLimited, targetInfo ):
+
+def writeRMatrixParticlePairs(RMatrixLimited, targetInfo):
     """
     Used for writing both MF=2 and MF=32 to ENDF6
     :param RMatrixLimited:
+    :param targetInfo:
     :return:
     """
     endf = []
     NPP = len(RMatrixLimited.resonanceReactions)
-    endf.append( endfFormatsModule.endfHeadLine(0,0,NPP,0,12*NPP,2*NPP) )
+    endf.append(endfFormatsModule.endfHeadLine(0, 0, NPP, 0, 12 * NPP, 2 * NPP))
     PoPs = RMatrixLimited.PoPs
 
-    def MZIP( particle, ignoreMissingJpi=False ):  # helper: extract mass, z, spin and parity from particle list
+    def MZIP(particle, ignoreMissingJpi=False):  # helper: extract mass, z, spin and parity from particle list
 
         try:
-            nMass = PoPs['n'].getMass( 'amu' )
+            nMass = PoPs[IDsPoPsModule.neutron].getMass('amu')
         except:
-            nMass = 1.00866491578 # From ENDF102 manual, Appendix H.4
+            nMass = 1.00866491578  # From ENDF102 manual, Appendix H.4
 
-        mass = particle.getMass( 'amu' ) / nMass
+        mass = particle.getMass('amu') / nMass
 
-        if hasattr(particle, 'nucleus'): particle = particle.nucleus
-        Z = chemicalElementMiscPoPsModule.ZAInfo( particle )[0]
+        if hasattr(particle, 'nucleus'):
+            particle = particle.nucleus
+        Z = chemicalElementMiscPoPsModule.ZAInfo(particle)[0]
         try:
             parity = particle.parity[0].value
             spin = particle.spin.float('hbar')
-            I, P = getENDFtuple( spin, parity )
+            I, P = getENDFtuple(spin, parity)
         except IndexError as err:
             if ignoreMissingJpi:
-                I,P = (0,0) # ENDF omits spin/parity for compound nucleus from capture
+                I, P = (0, 0)  # ENDF omits spin/parity for compound nucleus from capture
             else:
-                raise ValueError( "When formatting particle %s, encountered %s" % ( particle.id, err ) )
+                raise ValueError("When formatting particle %s, encountered %s" % (particle.id, err))
         return mass, Z, I, P
 
-    for idx,pp in enumerate(RMatrixLimited.resonanceReactions):
-        reaction = pp.reactionLink.link
-        # get the PoPs instances for ejectile and residual:
-        pA = PoPs[ pp.ejectile ]
-        pB = PoPs[ pp.residual ]
+    for idx, pp in enumerate(RMatrixLimited.resonanceReactions):
+        reaction = pp.link.link
         MT = reaction.ENDF_MT
-        MA, ZA, IA, PA = MZIP( pA )
-        MB, ZB, IB, PB = MZIP( pB, ignoreMissingJpi=(MT == 102))
+        if reaction.isFission():
+            pA = PoPs[targetInfo['reactionSuite'].projectile]
+            pB = PoPs[targetInfo['reactionSuite'].target]
+        else:
+            # get the PoPs instances for ejectile and residual:
+            pA = PoPs[pp.ejectile]
+            pB = PoPs[pp.residual]
+        MA, ZA, IA, PA = MZIP(pA)
+        MB, ZB, IB, PB = MZIP(pB, ignoreMissingJpi=(MT == 102))
         PNT = 1
-        if not pp.computePenetrability:
-            PNT = -1
-            if MT in (19,102): PNT = 0  # special case
-        SHF = pp.computeShiftFactor
-        if pp.Q is not None: Q = pp.Q.getConstantAs('eV')
+        if MT in (18, 19, 102):
+            PNT = 0  # special case
+        SHF = 0
+        if pp.Q is not None:
+            Q = pp.Q.getConstantAs('eV')
         else:
             Q = reaction.getQ('eV')
             # getQ doesn't account for residual left in excited state:
             for particle in reaction.outputChannel:
-                if( hasattr( particle, 'getLevelAsFloat' ) ) : Q -= particle.getLevelAsFloat('eV')
-        if MT==102: Q = 0
-        endf.append( endfFormatsModule.endfDataLine( [MA,MB,ZA,ZB,IA,IB] ) )
-        endf.append( endfFormatsModule.endfDataLine( [Q,PNT,SHF,MT,PA,PB] ) )
-        pp.index = idx+1    # 1-based index in ENDF
+                if hasattr(particle, 'getLevelAsFloat'):
+                    Q -= particle.getLevelAsFloat('eV')
+        if MT in (18, 19, 102):
+            Q = 0
+        endf.append(endfFormatsModule.endfDataLine([MA, MB, ZA, ZB, IA, IB]))
+        endf.append(endfFormatsModule.endfDataLine([Q, PNT, SHF, MT, PA, PB]))
+        pp.index = idx + 1  # 1-based index in ENDF
 
     return endf
 
-def writeRMatrixSpinGroupHeader( RMatrixLimited, spingrp, targetInfo ):
+
+def writeRMatrixSpinGroupHeader(RMatrixLimited, spingrp, targetInfo):
     endf = []
     AJ, PJ = getENDFtuple(float(spingrp.spin), int(spingrp.parity))
     KBK = len([ch for ch in spingrp.channels if ch.externalRMatrix is not None
                or "LBK=0" in targetInfo["ENDFconversionFlags"].get(ch, "")])
-    KPS = 0 # AFAIK this option is not used in any library
+    KPS = 0  # AFAIK this option is not used in any library
     NCH = len(spingrp.resonanceParameters.table.columns) - 1  # skip the 'energy' column
     try:
         endf.append(endfFormatsModule.endfHeadLine(AJ, PJ, KBK, KPS, 6 * NCH, NCH))
@@ -167,16 +179,17 @@ def writeRMatrixSpinGroupHeader( RMatrixLimited, spingrp, targetInfo ):
         else:
             raise NotImplementedError("Writing boundary condition '%s' to ENDF-6" % RMatrixLimited.boundaryCondition)
 
-        APT = chan.scatteringRadius or rreac.scatteringRadius or PQUModule.PQU(0, 'fm')
+        APT = chan.getScatteringRadius()
         APE = chan.hardSphereRadius or rreac.hardSphereRadius or APT
         APT = APT.getValueAs('10*fm')
         APE = APE.getValueAs('10*fm')
-        if rreac.reactionLink.link.ENDF_MT == 102:
+        if rreac.link.link.ENDF_MT == 102:
             APT, APE = 0, 0
         endf.append(endfFormatsModule.endfDataLine([PPI, L, SCH, BND, APE, APT]))
     return NCH, endf
 
-def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
+
+def toENDF6(self, flags, targetInfo, verbosityIndent=''):
     """
     Write RMatrix section to ENDF6
     :param self:
@@ -186,35 +199,38 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
     :return:
     """
 
-    if "LRF3" in targetInfo["ENDFconversionFlags"].get(self,""):
-        return writeAsLRF3( self, flags, targetInfo, verbosityIndent = verbosityIndent )
+    if targetInfo.get("LRF7_as_LRF3"):
+        return writeAsLRF3(self, flags, targetInfo, verbosityIndent=verbosityIndent)
 
-    KRM = {resolvedModule.RMatrix.ReichMooreToken:3, resolvedModule.RMatrix.RMatrixToken:4} [self.approximation]
+    KRM = {resolvedModule.RMatrix.Approximation.ReichMoore: 3, resolvedModule.RMatrix.Approximation.RMatrix: 4}[self.approximation]
     try:
-        endf = [endfFormatsModule.endfHeadLine(0,0,self.reducedWidthAmplitudes,KRM,
-            len(self.spinGroups),self.relativisticKinematics)]
+        endf = [endfFormatsModule.endfHeadLine(0, 0, self.reducedWidthAmplitudes, KRM,
+                                               len(self.spinGroups), self.relativisticKinematics)]
     except TypeError as err:
-        raise TypeError("Got '%s' when formatting '%s'"%(err.message,str((0,0,self.reducedWidthAmplitudes,KRM,
-            len(self.spinGroups),self.relativisticKinematics))))
+        raise TypeError("Got '%s' when formatting '%s'" %
+                        (err.message, str((0, 0, self.reducedWidthAmplitudes, KRM, len(self.spinGroups),
+                                           self.relativisticKinematics))))
 
-    endf.extend( writeRMatrixParticlePairs(self, targetInfo) )
+    endf.extend(writeRMatrixParticlePairs(self, targetInfo))
 
     for spingrp in self.spinGroups:
         NCH, spinGroupHeader = writeRMatrixSpinGroupHeader(self, spingrp, targetInfo)
-        endf.extend( spinGroupHeader )
+        endf.extend(spinGroupHeader)
 
         # resonances:
         NRS = len(spingrp.resonanceParameters.table)
-        NX = (NCH//6 + 1)*NRS
-        if NRS==0: NX=1 # special case
-        endf.append( endfFormatsModule.endfHeadLine( 0,0,0,NRS,6*NX,NX ) )
+        NX = (NCH // 6 + 1) * NRS
+        if NRS == 0:
+            NX = 1  # special case
+        endf.append(endfFormatsModule.endfHeadLine(0, 0, 0, NRS, 6 * NX, NX))
         for res in spingrp.resonanceParameters.table:
-            for jidx in range(NCH//6+1):
-                endfLine = res[jidx*6:jidx*6+6]
-                while len(endfLine)<6: endfLine.append(0)
-                endf.append( endfFormatsModule.endfDataLine( endfLine ) )
-        if NRS==0:
-            endf.append( endfFormatsModule.endfDataLine( [0,0,0,0,0,0] ) )
+            for jidx in range(NCH // 6 + 1):
+                endfLine = res[jidx * 6:jidx * 6 + 6]
+                while len(endfLine) < 6:
+                    endfLine.append(0)
+                endf.append(endfFormatsModule.endfDataLine(endfLine))
+        if NRS == 0:
+            endf.append(endfFormatsModule.endfDataLine([0, 0, 0, 0, 0, 0]))
 
         for idx, channel in enumerate(spingrp.channels):
             if channel.externalRMatrix:
@@ -229,7 +245,7 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
                 ED = getTerm('singularityEnergyBelow', 'eV')
                 EU = getTerm('singularityEnergyAbove', 'eV')
                 if isinstance(channel.externalRMatrix, externalRMatrixModule.SAMMY):
-                    endf.append(endfFormatsModule.endfContLine(0, 0, idx+1, 2, 0, 0))
+                    endf.append(endfFormatsModule.endfContLine(0, 0, idx + 1, 2, 0, 0))
                     endf.append(endfFormatsModule.endfContLine(ED, EU, 0, 0, 5, 0))
                     R0 = getTerm('constantExternalR', '')
                     R1 = getTerm('linearExternalR', '1/eV')
@@ -239,60 +255,63 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
                     endf.append(endfFormatsModule.endfDataLine([R0, R1, R2, S0, S1, 0]))
                 elif isinstance(channel.externalRMatrix, externalRMatrixModule.Froehner):
                     endf.append(endfFormatsModule.endfContLine(0, 0, idx + 1, 3, 0, 0))
-                    endf.append( endfFormatsModule.endfContLine(ED, EU, 0, 0, 3, 0))
+                    endf.append(endfFormatsModule.endfContLine(ED, EU, 0, 0, 3, 0))
                     R0 = getTerm('constantExternalR', '')
                     S0 = getTerm('poleStrength', '')
                     GA = getTerm('averageRadiationWidth', 'eV')
                     endf.append(endfFormatsModule.endfDataLine([R0, S0, GA, 0, 0, 0]))
             elif "LBK=0" in targetInfo["ENDFconversionFlags"].get(channel, ""):
-                endf.append( endfFormatsModule.endfContLine(0, 0, idx+1, 0, 0, 0))
+                endf.append(endfFormatsModule.endfContLine(0, 0, idx + 1, 0, 0, 0))
     return endf
 
 resolvedModule.RMatrix.toENDF6 = toENDF6
 
+
 #
 # LRF=3 is converted and stored in RMatrix. Logic below translates back to LRF=3:
 #
-def writeAsLRF3( RMatrix, flags, targetInfo, verbosityIndent = '' ):
+def writeAsLRF3(RMatrix, flags, targetInfo, verbosityIndent=''):
     endf = []
     elastic, = [reac for reac in RMatrix.resonanceReactions if
-               reac.reactionLink.link == targetInfo['reactionSuite'].getReaction('elastic')]
+                reac.link.link == targetInfo['reactionSuite'].getReaction('elastic')]
     capture, = [reac for reac in RMatrix.resonanceReactions if
-                reac.reactionLink.link == targetInfo['reactionSuite'].getReaction('capture')]
-    AP = elastic.scatteringRadius
+                reac.link.link == targetInfo['reactionSuite'].getReaction('capture')]
+    AP = elastic.getScatteringRadius()
     if AP.isEnergyDependent():
         scatRadius = AP.form
         NR, NP = 1, len(scatRadius)
-        endf.append( endfFormatsModule.endfHeadLine( 0,0,0,0, NR,NP ) )
-        endf += endfFormatsModule.endfInterpolationList( (NP,
-            gndsToENDF6Module.gndsToENDFInterpolationFlag( scatRadius.interpolation ) ) )
-        endf += endfFormatsModule.endfNdDataList( scatRadius.convertAxisToUnit( 0, '10*fm' ) )
+        endf.append(endfFormatsModule.endfHeadLine(0, 0, 0, 0, NR, NP))
+        endf += endfFormatsModule.endfInterpolationList((NP,
+                                                         gndsToENDF6Module.gndsToENDFInterpolationFlag(
+                                                             scatRadius.interpolation)))
+        endf += endfFormatsModule.endfNdDataList(scatRadius.convertAxisToUnit(0, '10*fm'))
         AP = 0
-    else :
-        AP = AP.getValueAs( '10*fm' )
+    else:
+        AP = AP.getValueAs('10*fm')
 
-    table = {'Ls':[], 'energies':[], 'Js':[], 'elastic':[], 'capture':[], 'fission width_1':[], 'fission width_2':[]}
+    table = {'Ls': [], 'energies': [], 'Js': [], 'elastic': [], 'capture': [], 'fission width_1': [],
+             'fission width_2': []}
     APLs = {}
     for sg in RMatrix.spinGroups:
         elasticChan, = [chan for chan in sg.channels if chan.resonanceReaction == elastic.label]
         if elasticChan.scatteringRadius:
-            APL = elasticChan.scatteringRadius.getValueAs( '10*fm' )
+            APL = elasticChan.scatteringRadius.getValueAs('10*fm')
             if APL != AP: APLs[elasticChan.L] = APL
         J = float(sg.spin)
-        if 'ignoreChannelSpin' not in targetInfo["ENDFconversionFlags"].get(RMatrix,""):
-            if J!=0 and elasticChan.channelSpin < targetInfo['spin']: J *= -1
+        if 'ignoreChannelSpin' not in targetInfo["ENDFconversionFlags"].get(RMatrix, ""):
+            if J != 0 and elasticChan.channelSpin < targetInfo['spin']: J *= -1
 
-        energies = sg.resonanceParameters.table.getColumn('energy',unit='eV')
+        energies = sg.resonanceParameters.table.getColumn('energy', unit='eV')
         NE = len(energies)
         table['energies'] += energies
 
         table['Ls'] += [elasticChan.L] * NE
         table['Js'] += [J] * NE
-        table['elastic'] += sg.resonanceParameters.table.getColumn(elastic.label + ' width',unit='eV')
-        table['capture'] += sg.resonanceParameters.table.getColumn(capture.label + ' width',unit='eV')
-        for column in ('fission width_1','fission width_2'):
-            vals = sg.resonanceParameters.table.getColumn(column,unit='eV')
-            if not vals: vals = [0]*NE
+        table['elastic'] += sg.resonanceParameters.table.getColumn(elastic.label + ' width', unit='eV')
+        table['capture'] += sg.resonanceParameters.table.getColumn(capture.label + ' width', unit='eV')
+        for column in ('fission width_1', 'fission width_2'):
+            vals = sg.resonanceParameters.table.getColumn(column, unit='eV')
+            if not vals: vals = [0] * NE
             table[column] += vals
 
     L_list = sorted(set(table['Ls']))
@@ -301,17 +320,17 @@ def writeAsLRF3( RMatrix, flags, targetInfo, verbosityIndent = '' ):
         APLs[0] = AP
     LAD = int(RMatrix.supportsAngularReconstruction)
     NLSC = 0
-    conversionFlags = targetInfo['ENDFconversionFlags'].get(RMatrix,"")
+    conversionFlags = targetInfo['ENDFconversionFlags'].get(RMatrix, "")
     if 'LvaluesNeededForConvergence' in conversionFlags:
-        NLSC = int( conversionFlags.split('LvaluesNeededForConvergence=')[1].split(',')[0] )
+        NLSC = int(conversionFlags.split('LvaluesNeededForConvergence=')[1].split(',')[0])
     APtmp = AP
     if 'AP=0' in conversionFlags:
         APtmp = 0
     endf += [endfFormatsModule.endfHeadLine(targetInfo['spin'], APtmp, LAD, 0, NLS, NLSC)]
 
     sortedTable = sorted(zip(*(
-        table['Ls'],table['energies'],table['Js'],table['elastic'],table['capture'],
-        table['fission width_1'],table['fission width_2']
+        table['Ls'], table['energies'], table['Js'], table['elastic'], table['capture'],
+        table['fission width_1'], table['fission width_2']
     )))
 
     defaultAP = 0
@@ -321,14 +340,14 @@ def writeAsLRF3( RMatrix, flags, targetInfo, verbosityIndent = '' ):
     AWRI = target.getMass('amu') / targetInfo['massTracker'].neutronMass
 
     for L in L_list:
-        APL = APLs.get(L,defaultAP)
+        APL = APLs.get(L, defaultAP)
         resonances = [sortedTable[i][1:] for i in range(len(sortedTable)) if sortedTable[i][0] == L]
         NRS = len(resonances)
-        endf.append( endfFormatsModule.endfHeadLine( AWRI, APL, L, 0, 6*NRS, NRS ) )
+        endf.append(endfFormatsModule.endfHeadLine(AWRI, APL, L, 0, 6 * NRS, NRS))
         for row in resonances:
-            endf.append( endfFormatsModule.endfDataLine( row ) )
+            endf.append(endfFormatsModule.endfDataLine(row))
 
-    targetInfo['LRF3conversion'] = {    # save useful information for covariance re-translation
+    targetInfo['LRF3conversion'] = {  # save useful information for covariance re-translation
         'table': table,
         'sortedTable': sortedTable,
         'AP': AP,

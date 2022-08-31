@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@
 For translating ENDF ITYPE=4 data (radioactive decay data)
 """
 
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 from xData.uncertainty.physicalQuantity import uncertainty as uncertaintyModule
 from xData.uncertainty.physicalQuantity import standard as standardModule
 
@@ -27,7 +27,7 @@ from PoPs.decays import averageEnergy as averageEnergyModule
 from PoPs.quantities import halflife as halflifeModule
 from PoPs.quantities import mass as massModule
 
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
 from brownies.legacy.converting.ENDFToGNDS import endfFileToGNDSMisc
 from brownies.legacy.converting import toGNDSMisc
@@ -40,9 +40,9 @@ decayType = { 0 : 'gamma',
               2 : 'beta+ or e.c.', # or electron capture...
               3 : 'IT',
               4 : 'alpha',
-              5 : 'n',
+              5 : IDsPoPsModule.neutron,
               6 : 'SF',
-              7 : 'p',
+              7 : IDsPoPsModule.proton,
               8 : 'e-',
               9 : 'xray',
              10 : 'unknown' }
@@ -73,10 +73,10 @@ def addProductToDecayMode( info, decayMode, decayParticleID, RFS = 0, lastDecayM
 
     if( lastDecayMode and ( RFS != 0 ) ) :
         isotopeNuclideID = chemicalElementMiscPoPsModule.nuclideIDFromIsotopeSymbolAndIndex( decayParticleID, RFS )
-        metaStableID = PoPsAliasModule.metaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex( isotopeNuclideID, RFS )
-        info.PoPs.add( PoPsAliasModule.metaStable( metaStableID, isotopeNuclideID, RFS ) )
+        metaStableID = PoPsAliasModule.MetaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex(isotopeNuclideID, RFS)
+        info.PoPs.add(PoPsAliasModule.MetaStable(metaStableID, isotopeNuclideID, RFS))
         decayParticleID = metaStableID
-    decayMode.products.add( decayMode.products.uniqueLabel( productModule.product( decayParticleID, decayParticleID ) ) )
+    decayMode.products.add( decayMode.products.uniqueLabel( productModule.Product( decayParticleID, decayParticleID ) ) )
 
 def addDecayMode( info, decayMode, decayParticleIndex, parentZA, RFS, lastDecayMode ) :
 
@@ -92,7 +92,7 @@ def addDecayMode( info, decayMode, decayParticleIndex, parentZA, RFS, lastDecayM
             return
 
     complete = decayParticleIndex not in [ 2, 6 ]
-    _decay = decayDataModule.decay( str( len( decayMode.decayPath ) ), decayModeType, complete = complete )
+    _decay = decayDataModule.Decay( str( len( decayMode.decayPath ) ), decayModeType, complete = complete )
 
     decayParticleZ = 0
     decayParticleA = 0
@@ -142,7 +142,7 @@ def addDiscreteSpectra( decayModes, RTYP_key, decayParticleIndex, discreteSpectr
 
     def addInternalConversionCoefficients( discrete, RIC, dRIC, label ) :
 
-        internalConversionCoefficients = spectrumModule.shell( RIC, label = label )
+        internalConversionCoefficients = spectrumModule.Shell(RIC, label=label, unit='')
         addUncertainty( internalConversionCoefficients, dRIC )
         discrete.internalConversionCoefficients.add( internalConversionCoefficients )
 
@@ -152,7 +152,7 @@ def addDiscreteSpectra( decayModes, RTYP_key, decayParticleIndex, discreteSpectr
     decayParticleLabel = STYPProduct[decayParticleIndex]
     spectra = decayModes[RTYP_key].spectra
     if( decayParticleLabel not in spectra ) :
-        spectrum = spectrumModule.spectrum( decayParticleLabel, decayParticleID )
+        spectrum = spectrumModule.Spectrum( decayParticleLabel, decayParticleID )
         spectra.add( spectrum )
     else :
         spectrum = spectra[decayParticleLabel]
@@ -161,38 +161,38 @@ def addDiscreteSpectra( decayModes, RTYP_key, decayParticleIndex, discreteSpectr
     if( RIS != 0 ) : print( "STYP, RIS =", decayParticleIndex, RIS )
 
     if( TYPE == 1.0 ) :
-        type = spectrumModule.transitionType.allowed
+        type = spectrumModule.TransitionType.allowed
     elif( TYPE == 2.0 ) :
-        type = spectrumModule.transitionType.firstForbidden
+        type = spectrumModule.TransitionType.firstForbidden
     elif( TYPE == 3.0 ) :
-        type = spectrumModule.transitionType.secondForbidden
+        type = spectrumModule.TransitionType.secondForbidden
     else :
-        type = None
+        type = spectrumModule.TransitionType.none
 
-    intensity = spectrumModule.intensity( RI )
+    intensity = spectrumModule.Intensity( RI )
     addUncertainty( intensity, dRI )
 
-    energy = spectrumModule.energy( discreteSpectra['ER'], energyUnit )
+    energy = spectrumModule.Energy( discreteSpectra['ER'], energyUnit )
     addUncertainty( energy, discreteSpectra['dER'] )
 
     positronIntensity = None
     if( decayParticleIndex == 0 and RIS != 0 ) :
-        RIS = spectrumModule.internalPairFormationCoefficient( RIS )
+        RIS = spectrumModule.InternalPairFormationCoefficient( RIS )
     elif( decayParticleIndex == 2 and RIS != 0 ) :   # STYP=2 means interpret RIS differently
-        positronIntensity = spectrumModule.positronEmissionIntensity( RIS )
+        positronIntensity = spectrumModule.PositronEmissionIntensity( RIS )
         addUncertainty( positronIntensity, dRIS )
         RIS = None
     else  :
         RIS = None
 
-    discrete = spectrumModule.discrete( intensity, energy, type = type, _internalPairFormationCoefficient = RIS,
+    discrete = spectrumModule.Discrete( intensity, energy, type = type, _internalPairFormationCoefficient = RIS,
             _positronEmissionIntensity = positronIntensity )
     if( 'RICC' in discreteSpectra ) :
-        addInternalConversionCoefficients( discrete, discreteSpectra['RICC'], discreteSpectra['dRICC'], spectrumModule.shell.total )
+        addInternalConversionCoefficients( discrete, discreteSpectra['RICC'], discreteSpectra['dRICC'], spectrumModule.Shell.total )
     if( 'RICK' in discreteSpectra ) :
-        addInternalConversionCoefficients( discrete, discreteSpectra['RICK'], discreteSpectra['dRICK'], spectrumModule.shell.KShell )
+        addInternalConversionCoefficients( discrete, discreteSpectra['RICK'], discreteSpectra['dRICK'], spectrumModule.Shell.KShell )
     if( 'RICL' in discreteSpectra ) :
-        addInternalConversionCoefficients( discrete, discreteSpectra['RICL'], discreteSpectra['dRICL'], spectrumModule.shell.LShell )
+        addInternalConversionCoefficients( discrete, discreteSpectra['RICL'], discreteSpectra['dRICL'], spectrumModule.Shell.LShell )
     spectrum.append( discrete )
 
 def addContinuumSpectrum( decayModes, RTYP_key, decayParticleIndex, regions, covariance ) :
@@ -204,17 +204,17 @@ def addContinuumSpectrum( decayModes, RTYP_key, decayParticleIndex, regions, cov
     if RTYP_key not in decayModes: raise KeyError( "RTYP %s not found is list of decay modes, RTYP's in this evaluation are %s"%(RTYP_key,str(decayModes.keys())) )
     spectra = decayModes[RTYP_key].spectra
     if( decayParticleLabel not in spectra ) :
-        spectrum = spectrumModule.spectrum( decayParticleLabel, decayParticleID )
+        spectrum = spectrumModule.Spectrum( decayParticleLabel, decayParticleID )
         spectra.add( spectrum )
     else :
         spectrum = spectra[decayParticleLabel]
 
     if( len( regions ) == 1 ) :
-        data = XYsModule.XYs1d( regions[0], axes = spectrumModule.continuum.defaultAxes( energyUnit ) )
+        data = XYs1dModule.XYs1d( regions[0], axes = spectrumModule.Continuum.defaultAxes( energyUnit ) )
     else :
         print( "len( regions ) > 1" )
         return
-    continuum = spectrumModule.continuum( data )
+    continuum = spectrumModule.Continuum( data )
     spectrum.append( continuum )
 
 def addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, cls ) :
@@ -231,7 +231,7 @@ def addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, cls ) :
 def addUncertainty( quantity, value ) :
 
     if( value == 0 ) : return
-    quantity.uncertainty = uncertaintyModule.uncertainty( standardModule.standard( uncertaintyModule.double( value ) ) )
+    quantity.uncertainty = uncertaintyModule.Uncertainty( standardModule.Standard( uncertaintyModule.Double( value ) ) )
 
 def printInfo( verbose, dataIndex, MT457MF8Data ) :
 
@@ -243,8 +243,9 @@ def ITYPE_4( MTDatas, info, verbose = 0 ) :
 
     errors = []
 
-    evalStyle = stylesPoPsModule.evaluated( 'eval', '', info.library, info.libraryVersion, info.Date )
+    evalStyle = stylesPoPsModule.Evaluated( 'eval', '', info.library, info.libraryVersion, info.Date )
     evalStyle.documentation.endfCompatible.body = '\n'.join( MTDatas[451][1][4:-info.NXC] )     # Add ENDF documentation
+    endfFileToGNDSMisc.completeDocumentation(info, evalStyle.documentation)
 
     info.PoPs.styles.add( evalStyle )
 
@@ -252,7 +253,7 @@ def ITYPE_4( MTDatas, info, verbose = 0 ) :
     parentAtom = toGNDSMisc.getPoPsParticle(info, info.targetZA, name = None, levelIndex = info.levelIndex, level = info.level,
                                             levelUnit = energyUnit)
     parentAtom.mass.add(
-        massModule.double( info.style, info.massTracker.amuMasses[info.targetZA], 'amu' )
+        massModule.Double( info.style, info.massTracker.amuMasses[info.targetZA], 'amu' )
     )
     decayParticle = parentAtom
     if(chemicalElementMiscPoPsModule.hasNucleus( parentAtom)) : decayParticle = parentAtom.nucleus
@@ -269,7 +270,7 @@ def ITYPE_4( MTDatas, info, verbose = 0 ) :
 
         if( LIS != 0 ) :
             aliasID = "%s_m%s" % ( parentAtom.isotope.symbol, LISO )
-            info.PoPs.add( PoPsAliasModule.metaStable( aliasID, parentAtom.id, LISO ) )
+            info.PoPs.add(PoPsAliasModule.MetaStable(aliasID, parentAtom.id, LISO))
 
         HL, dHL, dummy, dummy, NC2, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MT457MF8Data[dataIndex], intIndices=[4])
         dataIndex += printInfo( verbose, dataIndex, MT457MF8Data )
@@ -283,23 +284,23 @@ def ITYPE_4( MTDatas, info, verbose = 0 ) :
             dataIndex += printInfo( verbose, dataIndex, MT457MF8Data )
 
         if( len( [ aveDecayEnergy for aveDecayEnergy in aveDecayEnergies if( aveDecayEnergy != 0 ) ] ) > 0 ) :
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.lightParticles )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.electroMagneticRadiation )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.heavyParticles )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.betaMinus )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.betaPlus )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.LightParticles )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.ElectroMagneticRadiation )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.HeavyParticles )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.BetaMinus )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.BetaPlus )
             aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.AugerElectron )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.conversionElectron )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.gamma )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.xRay )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.internalBremsstrahlung )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.annihilation )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.alpha )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.recoil )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.spontaneousFission )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.fissionNeutrons )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.proton )
-            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.neutrino )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.ConversionElectron )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.Gamma )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.XRay )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.InternalBremsstrahlung )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.Annihilation )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.Alpha )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.Recoil )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.SpontaneousFission )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.FissionNeutrons )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.Proton )
+            aveDecayEnergies = addAverageDecayEnergyIfPresent( decayData, aveDecayEnergies, averageEnergyModule.Neutrino )
 
         SPI, PAR, dum, dum, NDK6, NDK = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MT457MF8Data[dataIndex], intIndices = [1, 2, 3, 4, 5])
         dataIndex += printInfo( verbose, dataIndex, MT457MF8Data )
@@ -314,7 +315,7 @@ def ITYPE_4( MTDatas, info, verbose = 0 ) :
         if( NST == 1 ) :                                # Nucleus is stable, nothing to do
             pass
         elif( NST == 0 ) :                              # Nucleus is unstable
-            halflife = halflifeModule.double( info.PoPsLabel, HL, halflifeModule.baseUnit )
+            halflife = halflifeModule.Double( info.PoPsLabel, HL, halflifeModule.baseUnit )
             addUncertainty( halflife, dHL )
             decayParticle.halflife.add( halflife )
 
@@ -328,14 +329,14 @@ def ITYPE_4( MTDatas, info, verbose = 0 ) :
                 RFS = int( RFS )                    # BRB, Isometic state of daughter
 
                 allDecays = [ initialDecay ] + otherDecays
-                decayMode = decayDataModule.decayMode( str( i1 ), ','.join( [ decayType[r_id] for r_id in allDecays ] ) )
+                decayMode = decayDataModule.DecayMode( str( i1 ), ','.join( [ decayType[r_id] for r_id in allDecays ] ) )
                 decayModes[RTYP_key] = decayMode
 
-                Q = QModule.double( '', Q, energyUnit )
+                Q = QModule.Double( info.PoPsLabel, Q, energyUnit )
                 addUncertainty( Q, dQ )
                 decayMode.Q.add( Q )
 
-                probability = probabilityModule.double( "BR", BR, '' )
+                probability = probabilityModule.Double( "BR", BR, '' )
                 addUncertainty( probability, dBR )
                 decayMode.probability.add( probability )
                                                                                                     # FIXME: what should we do for really small probabilities, so small ENDF gives 0, like spontaneous fission?

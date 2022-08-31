@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,8 +12,7 @@ import glob
 import argparse
 import xml.sax
 
-from LUPY import GNDSType as GNDSTypeModule
-from fudge import map as mapModule
+from fudge import map as mapModule, GNDS_file as GNDS_fileModule
 
 description = """
 This script examines all map files in the specified directory and prints the minimun list of map files that
@@ -30,7 +29,7 @@ directoryRealPath = os.path.realpath(args.directory)
 
 def checkMap(mapFile, uniqueMapFiles):
 
-    map = mapModule.Map.readXML(mapFile)
+    map = mapModule.Map.readXML_file(mapFile)
     for entry in map :
         if( isinstance( entry, mapModule.Import ) ) :
             realpath = os.path.realpath(entry.fileName)
@@ -47,7 +46,7 @@ mapFiles = []
 for file in files:
     if os.path.isfile(file) :
         try:
-            moniker, data = GNDSTypeModule.type(file)
+            moniker, data = GNDS_fileModule.type(file)
         except xml.sax._exceptions.SAXParseException:
             continue
         if moniker == mapModule.Map.moniker:

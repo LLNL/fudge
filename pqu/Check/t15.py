@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,17 +8,17 @@
 import sys
 sys.path.insert( 0, '../../' )
 
-from pqu.PQU import pqu_float, pqu_uncertainty, PQU
+from pqu.PQU import PQU_float, PQU_uncertainty, PQU
 
-a = pqu_float( 1.234, 4 )
-b = pqu_float( 1.234, 4, True )
+a = PQU_float( 1.234, 4 )
+b = PQU_float( 1.234, 4, True )
 print(a)
 print(a.info( significantDigits = 15 ))
 print()
 print(b)
 print(b.info( significantDigits = 15 ))
 print()
-u = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, .12, isPercent = True )
+u = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, .12, isPercent = True )
 print(u)
 print(u.info( significantDigits = 15 ))
 

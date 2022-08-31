@@ -1,40 +1,34 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
+from LUPY import ancestry as ancestryModule
 
-from xData import ancestry as ancestryModule
-from xData import axes as axesModule
-
+from fudge import enums as enumsModule
 from fudge import suites as suitesModule
 
 from . import group as groupModule
 
-class conserve :
-
-    number = 'number'
-    energyOut = 'energyOut'
-
-class transportable( ancestryModule.ancestry ) :
+class Transportable(ancestryModule.AncestryIO):
     """
     This class stores the product conserve and the group for one particle.
     """
 
     moniker = 'transportable'
 
-    def __init__( self, particle, _conserve, group ) :
+    def __init__(self, particle, conserve, group):
+
+        ancestryModule.AncestryIO.__init__(self)
 
         if( not( isinstance( particle, str ) ) ) : raise TypeError( 'particle must only be a string instance.' )
-        if( _conserve not in [ conserve.number, conserve.energyOut ] ) :
-            raise TypeError( 'Invalid product conserve' )
-        if( not( isinstance( group, groupModule.group ) ) ) : raise TypeError( 'Group boundaries must only be a grid instance.' )
-
         self.__particle = particle
-        self.__conserve = _conserve
+
+        self.__conserve = enumsModule.Conserve.checkEnumOrString(conserve)
+
+        if( not( isinstance( group, groupModule.Group ) ) ) : raise TypeError( 'Group boundaries must only be a grid instance.' )
         self.__group = group
 
     @property
@@ -57,34 +51,42 @@ class transportable( ancestryModule.ancestry ) :
 
         return( self.__group )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def convertUnits(self, unitMap):
+        '''
+        Converts unit per *unitMap*.
+        '''
+
+        self.__group.convertUnits(unitMap)
+
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlStringList = [ '%s<%s label="%s" conserve="%s">' % ( indent, self.moniker, self.label, self.conserve ) ]
-        xmlStringList += self.group.toXMLList( indent2, **kwargs )
+        xmlStringList += self.group.toXML_strList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        label = element.get('label')
-        xPath.append( '%s[@label="%s"]' % (element.tag,label) )
-        group = groupModule.group.parseXMLNode( element.find(
-            groupModule.group.moniker ), xPath, linkData )
-        conserve = element.get('conserve')
+        xPath.append('%s[@label="%s"]' % (node.tag, node.get('label')))
+
+        label = node.get('label')
+        group = groupModule.Group.parseNodeUsingClass(node.find(groupModule.Group.moniker), xPath, linkData, **kwargs)
+        conserve = node.get('conserve')
+
         xPath.pop()
-        return transportable( label, conserve, group )
 
+        return cls( label, conserve, group )
 
-class transportables( suitesModule.suite ) :
+class Transportables( suitesModule.Suite ) :
     """
-    This class stores a transportable instanse for each particle type.
+    This class stores a Transportable instanse for each particle type.
     """
 
     moniker = 'transportables'
 
     def __init__( self ) :
 
-        suitesModule.suite.__init__( self, ( transportable, ), allow_href = True )
+        suitesModule.Suite.__init__( self, ( Transportable, ), allow_href = True )

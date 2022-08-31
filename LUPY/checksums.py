@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -36,7 +36,7 @@ class NoneSum:
 
         return None
 
-class sha1sum:
+class Sha1sum:
     algorithm = "sha1"
 
     @staticmethod
@@ -73,7 +73,7 @@ class sha1sum:
         return str(checksum.hexdigest())
 
 
-class md5sum:
+class MD5sum:
     algorithm = "md5"
 
     @staticmethod
@@ -112,7 +112,7 @@ class md5sum:
 
 checkers = {
     NoneSum.algorithm: NoneSum,
-    sha1sum.algorithm: sha1sum,
-    md5sum.algorithm: md5sum
+    Sha1sum.algorithm: Sha1sum,
+    MD5sum.algorithm: MD5sum
 }
 supportedAlgorithms = checkers.keys()

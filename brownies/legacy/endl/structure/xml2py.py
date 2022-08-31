@@ -1,14 +1,11 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-try   :
-    from xml.etree.cElementTree import ElementTree, tostring, SubElement, Element
-except ImportError   :
-    from ElementTree import ElementTree, tostring, SubElement, Element
+from xml.etree.ElementTree import ElementTree, tostring, Element
 
 class XML2PY( object ) :
     def __init__( self ) :

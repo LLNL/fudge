@@ -1,5 +1,5 @@
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
-from fudge.reactionData.crossSection import component
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
+from fudge.reactionData.crossSection import Component
 
 
 # Crack the isotope name to get the ZA
@@ -32,5 +32,5 @@ def getSymAFromGNDSName(name):
 
 
 def check_is_cross_section(x):
-    if not isinstance(x, component):
-        raise TypeError("Not instance of fudge.reactionData.crossSection.component")
+    if not isinstance(x, Component):
+        raise TypeError("Not instance of fudge.reactionData.crossSection.Component")

@@ -1,7 +1,10 @@
 import math
 import numpy
 import scipy.optimize
-from xData import axes, XYs, standards
+
+from xData import enums as xDataEnumsModule
+from xData import axes as axesModule
+from xData import XYs1d as XYs1dModule
 from brownies.BNL.utilities.fitting import bounded_nonlinear_curve_fit
 
 # ---------------------------------------------------------------------------------
@@ -106,7 +109,7 @@ class LevelSequenceAnalyzer:
 
         :return: An XYs1d containing the level density
         """
-        myAxes = axes.axes(rank=2, labelsUnits={0: ('Level density', '1/' + self.energyUnit),
+        myAxes = axesModule.Axes(2, labelsUnits={0: ('Level density', '1/' + self.energyUnit),
                                                 1: ('Excitation energy', self.energyUnit)})
         theData = []
         for thisEnergy in self.levels:
@@ -114,7 +117,7 @@ class LevelSequenceAnalyzer:
                 continue  # Deal with corner case where two levels are degenerate
             else:
                 theData.append([thisEnergy, 1.0 / self.mean_spacing])
-        return XYs.XYs1d(axes=myAxes, data=theData)
+        return XYs1dModule.XYs1d(axes=myAxes, data=theData)
 
     def getCumulativeLevelDistribution(self, c0=1.0, domainMin=None, domainMax=None):
         """
@@ -125,7 +128,7 @@ class LevelSequenceAnalyzer:
         :param domainMax:
         :return: An XYs1d containing the histogram of the cummulative level distribution
         """
-        myAxes = axes.axes(rank=2, labelsUnits={0: ('Number of levels', ''), 1: ('Excitation energy', self.energyUnit)})
+        myAxes = axesModule.Axes(2, labelsUnits={0: ('Number of levels', ''), 1: ('Excitation energy', self.energyUnit)})
         theData = []
         if domainMin is not None and domainMin < self.levels[0]:
             theData.append([domainMin, c0])
@@ -139,7 +142,7 @@ class LevelSequenceAnalyzer:
                 theData.append([thisEnergy, theData[-1][1] + 1])
         if domainMax is not None and domainMax > self.levels[-1]:
             theData.append([domainMax, theData[-1][1]])
-        return XYs.XYs1d(axes=myAxes, data=theData, interpolation=standards.interpolation.flatToken).domainSlice(
+        return XYs1dModule.XYs1d(axes=myAxes, data=theData, interpolation=xDataEnumsModule.InterpolationQualifier.flat).domainSlice(
             domainMin=domainMin, domainMax=domainMax)
 
     def getNNSDist(self, normalizeByMeanLevelSpacing=True, normalizeDistribution=True, numBins=None):

@@ -31,11 +31,11 @@ CF252SPECTRUMAVE = function_to_XYs(CF252SPECTRUMAVEFUNCTION, [])
 
 
 def getProjectileAndTargetMasses(_xs):
-    targetID = _xs.getRootAncestor().target
-    if targetID in _xs.getRootAncestor().PoPs.aliases:
-        targetID = _xs.getRootAncestor().PoPs[targetID].pid
-    targ = _xs.getRootAncestor().PoPs[targetID]
-    proj = _xs.getRootAncestor().PoPs[_xs.getRootAncestor().projectile]
+    targetID = _xs.rootAncestor.target
+    if targetID in _xs.rootAncestor.PoPs.aliases:
+        targetID = _xs.rootAncestor.PoPs[targetID].pid
+    targ = _xs.rootAncestor.PoPs[targetID]
+    proj = _xs.rootAncestor.PoPs[_xs.rootAncestor.projectile]
     try:
         m2 = targ.mass[0].float('amu')
     except IndexError:
@@ -149,11 +149,11 @@ def computeMACS(xs, T, a=None, useCovariance=True, covariance=None, normalize=Fa
     kT = convert_units_to_energy(T)
 
     if a is None:
-        # targetID = xs.getRootAncestor().target
-        # if targetID in xs.getRootAncestor().PoPs.aliases:
-        #     targetID = xs.getRootAncestor().PoPs[targetID].pid
-        # targ = xs.getRootAncestor().PoPs[targetID]
-        # proj = xs.getRootAncestor().PoPs[xs.getRootAncestor().projectile]
+        # targetID = xs.rootAncestor.target
+        # if targetID in xs.rootAncestor.PoPs.aliases:
+        #     targetID = xs.rootAncestor.PoPs[targetID].pid
+        # targ = xs.rootAncestor.PoPs[targetID]
+        # proj = xs.rootAncestor.PoPs[xs.rootAncestor.projectile]
         # try:
         #     m2 = targ.mass[0].float('amu')
         # except IndexError:
@@ -339,8 +339,8 @@ def computeAstrophysicalReactionRate(xs, T, useCovariance=True, covariance=None)
     else:
         kT = convert_units_to_energy(T)
 
-    # m2 = xs.getRootAncestor().PoPs[xs.getRootAncestor().target].getMass('amu')
-    # m1 = xs.getRootAncestor().PoPs[xs.getRootAncestor().projectile].getMass('amu')
+    # m2 = xs.rootAncestor.PoPs[xs.rootAncestor.target].getMass('amu')
+    # m1 = xs.rootAncestor.PoPs[xs.rootAncestor.projectile].getMass('amu')
     m1, m2 = getProjectileAndTargetMasses(xs)
     mu = PQU.PQU(m1 * m2 / (m1 + m2), 'amu')
 

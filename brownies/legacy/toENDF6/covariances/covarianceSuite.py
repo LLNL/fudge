@@ -1,14 +1,13 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from xData import standards as standardsModule
-
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 from PoPs.families import nuclide as nuclideModule
+from xData import enums as xDataEnumsModule
 
 from brownies.legacy.converting import endf_endl as endf_endlModule
 
@@ -18,7 +17,6 @@ from fudge.covariances import mixed as covarianceMixedModule
 from .. import endfFormats as endfFormatsModule
 from .. import gndsToENDF6 as gndsToENDF6Module
 from .modelParameters import averageParametersToENDF6
-
 
 def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
     """Convert to ENDF format."""
@@ -87,13 +85,12 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                 else:
                     L2 = L1
                 NI = 1
-                if isinstance(form, covarianceMixedModule.mixedForm):
+                if isinstance(form, covarianceMixedModule.MixedForm):
                     NI = len(form)
                     frame = form[0].productFrame
                 else:
                     frame = form.productFrame
-                LCT = {standardsModule.frames.labToken: 1,
-                       standardsModule.frames.centerOfMassToken: 2}[frame]
+                LCT = {xDataEnumsModule.Frame.lab: 1, xDataEnumsModule.Frame.centerOfMass: 2}[frame]
                 if 'LCT=0' in conversionFlags:
                     LCT = 0
                 endf += [ endfFormatsModule.endfHeadLine( 0.0, 0.0, L1, L2, LCT, NI ) ]
@@ -110,12 +107,12 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                         product = quant.findAttributeInAncestry('outputChannel')[0]
                         QI = quant.findAttributeInAncestry('getQ')('eV')
                         LFS, level = 0, 0.
-                        particle = reactionSuite.PoPs[product.id]
-                        if( isinstance( particle, nuclideModule.particle ) ) :
+                        particle = reactionSuite.PoPs[product.pid]
+                        if( isinstance( particle, nuclideModule.Particle ) ) :
                             LFS = particle.index
                             level = particle.energy[0].float( 'eV' )
                         QM = QI + level
-                        IZAP = chemicalElementMiscPoPsModule.ZA( reactionSuite.PoPs[product.id] )
+                        IZAP = chemicalElementMiscPoPsModule.ZA( reactionSuite.PoPs[product.pid] )
                     NL = 1
                     endf += [endfFormatsModule.endfHeadLine( QM, QI, IZAP, LFS, 0, NL ) ]
                     XMF1, XLFS1, NC, NI = 10,LFS, 0,1
@@ -139,4 +136,4 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                     endfFormatsModule.endfSENDLineNumber() ]
     return
 
-covarianceSuiteModule.covarianceSuite.toENDF6 = toENDF6
+covarianceSuiteModule.CovarianceSuite.toENDF6 = toENDF6

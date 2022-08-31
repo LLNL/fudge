@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,7 @@ import random
 
 from PoPs import database as databaseModule
 
-from PoPs.groups import misc as chemicalElementMiscModule
+from PoPs.chemicalElements import misc as chemicalElementMiscModule
 
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
@@ -22,13 +22,9 @@ from PoPs.quantities import halflife as halflifeModule
 from PoPs.quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 
 from PoPs.families import gaugeBoson as gaugeBosonModule
-
 from PoPs.families import nuclide as nuclideModule
 
-from PoPs.groups import isotope as isotopeModule
-from PoPs.groups import chemicalElement as chemicalElementModule
-
-database = databaseModule.database( 'test', '1.2.3' )
+database = databaseModule.Database( 'test', '1.2.3' )
 
 O16Data = { 0 : [ 15.99491461956, 0,       None, None, None, None ],
             1 : [           None, 6049400, None, None, None, None ],
@@ -44,47 +40,47 @@ for A, data in [ [ 17, O16Data ], [ 16, O16Data ] ] :
         mass, energy, charge, halflife, spin, parity = data[index]
 
         name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( isotopeID, index )
-        level = nuclideModule.particle( name )
-        energy = nuclearEnergyLevelModule.double( 'base', energy, quantityModule.stringToPhysicalUnit( 'keV' ) )
+        level = nuclideModule.Particle( name )
+        energy = nuclearEnergyLevelModule.Double( 'base', energy, quantityModule.stringToPhysicalUnit( 'keV' ) )
         level.nucleus.energy.add( energy )
 
         if( mass is not None ) :
-            mass = massModule.double( 'base', mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
+            mass = massModule.Double( 'base', mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
             level.mass.add( mass )
 
         if( charge is not None ) :
-            charge = chargeModule.integer( 'base', charge, quantityModule.stringToPhysicalUnit( 'e' ) )
+            charge = chargeModule.Integer( 'base', charge, quantityModule.stringToPhysicalUnit( 'e' ) )
             level.charge.add( charge )
 
         if( halflife is not None ) :
-            halflife = halflifeModule.double( 'base', halflife, quantityModule.stringToPhysicalUnit( 's' ) )
+            halflife = halflifeModule.Double( 'base', halflife, quantityModule.stringToPhysicalUnit( 's' ) )
             level.halflife.add( halflife )
 
         if( spin is not None ) :
-            spin = spinModule.fraction( 'base', spinModule.fraction.toValueType( spin ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
+            spin = spinModule.Fraction( 'base', spinModule.Fraction.toValueType( spin ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
             level.spin.add( spin )
 
         if( parity is not None ) :
-            parity = parityModule.integer( 'base', parity, quantityModule.stringToPhysicalUnit( '' ) )
+            parity = parityModule.Integer( 'base', parity, quantityModule.stringToPhysicalUnit( '' ) )
             level.parity.add( parity )
 
         database.add( level )
 
-photon = gaugeBosonModule.particle( 'photon' )
+photon = gaugeBosonModule.Particle( 'photon' )
 
-mass = massModule.double( 'base', 0, quantityModule.stringToPhysicalUnit( 'amu' ) )
+mass = massModule.Double( 'base', 0, quantityModule.stringToPhysicalUnit( 'amu' ) )
 photon.mass.add( mass )
 
-charge = chargeModule.integer( 'base', 0, quantityModule.stringToPhysicalUnit( 'e' ) )
+charge = chargeModule.Integer( 'base', 0, quantityModule.stringToPhysicalUnit( 'e' ) )
 photon.charge.add( charge )
 
-halflife = halflifeModule.string( 'base', 'stable', quantityModule.stringToPhysicalUnit( 's' ) )
+halflife = halflifeModule.String( 'base', 'stable', quantityModule.stringToPhysicalUnit( 's' ) )
 photon.halflife.add( halflife )
 
-spin = spinModule.fraction( 'base', spinModule.fraction.toValueType( '1' ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
+spin = spinModule.Fraction( 'base', spinModule.Fraction.toValueType( '1' ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
 photon.spin.add( spin )
 
-parity = parityModule.integer( 'base', 1, quantityModule.stringToPhysicalUnit( '' ) )
+parity = parityModule.Integer( 'base', 1, quantityModule.stringToPhysicalUnit( '' ) )
 photon.parity.add( parity )
 
 database.add( photon )

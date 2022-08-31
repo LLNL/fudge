@@ -27,4 +27,3 @@ Subpackages
 
     GNDS hierarchy <fudge>
     Processing support <fudge.processing>
-    C extensions for low-level numerics <numericalFunctions>

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -17,7 +17,8 @@ import shutil
 import copy
 import re
 
-from xData import formatVersion as formatVersionModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
 
 from fudge.core.utilities import fudgeExceptions, brb
 from brownies.legacy.endl import fudgeDefaults, fudgeParameters
@@ -1155,13 +1156,12 @@ can be used to get a reference to the neutron in-elastic cross section,
                 if( datum.I == 9 ) : addFile( datum.toZAsFrame( newProjectileMass, newTargetMass, halflife, self.bdflsFile )[0], halflife )
         return( newTarget )
 
-    def toGNDS( self, evaluationLibrary, evaluationVersion, formatVersion = formatVersionModule.default, excludeAverageProductData = True,
-                TNSL_include_all_reactions = True, testing = False, verbose = 0 ) :
+    def toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=GNDS_formatVersionModule.default, excludeAverageProductData=True,
+                TNSL_include_all_reactions=True, testing=False, verbose=0, specialNuclearParticleID=specialNuclearParticleIDPoPsModule.Mode.nuclide):
 
         import brownies.legacy.converting.endlToGNDS as endlToGNDS
-        return(endlToGNDS.toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion = formatVersion,
-                                 excludeAverageProductData = excludeAverageProductData,
-                                 TNSL_include_all_reactions = TNSL_include_all_reactions, verbose = verbose))
+        return(endlToGNDS.toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=formatVersion, excludeAverageProductData=excludeAverageProductData,
+                TNSL_include_all_reactions=TNSL_include_all_reactions, verbose=verbose, specialNuclearParticleID=specialNuclearParticleID))
 
     def adjustcs( self, C = 10, S = None, X1 = None, X2 = None, X3 = None, X4 = None, Q = None, f = 5.e-5, csRelChangeNotice = .1 ) :
         """Adjust the cross section given by C, S, X1, X2, X3, X4 and Q  so that the total cross section remains fixed.  

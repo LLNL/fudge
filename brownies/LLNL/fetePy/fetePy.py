@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,11 +10,11 @@
 import os, sys
 from argparse import ArgumentParser
 
-from xData import standards as standardsModule
-from xData import XYs as XYsModule
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
 
 from PoPs import IDs as IDsPoPsModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 from PoPs.families import nuclide as nuclideModule
 
 from fudge import outputChannel as outputChannelModule
@@ -26,6 +26,7 @@ from brownies.legacy.converting import endfFileToGNDS as endfFileToGNDSModule, e
 from brownies.legacy.endl import endlZA as endlZAClass
 from brownies.legacy.endl import bdfls as bdflsModule, endlmisc as endlmiscModule
 
+from fudge import enums as enumsModule
 from fudge.productData import multiplicity as multiplicityModule
 from fudge.productData.distributions import angular as angularModule
 from fudge.productData.distributions import energy as energyModule
@@ -106,7 +107,7 @@ if( reactionSuite.target in reactionSuite.PoPs.aliases ) :
 else :
     target = reactionSuite.PoPs[reactionSuite.target]
 ZA = chemicalElementMiscPoPsModule.ZA( target )
-if( isinstance( target, nuclideModule.particle ) ) : ELevel = target.nucleus.energy[0].float( 'MeV' )
+if( isinstance( target, nuclideModule.Particle ) ) : ELevel = target.nucleus.energy[0].float( 'MeV' )
 
 endlZA = endlZAClass( ZA, yi, suffix = suffix, workDir = args.output, bdflsFile = bdflsFile )
 if( args.verbose > 0 ) : print( 'Using bdfls files %s' % endlZA.bdflsFile.template )
@@ -137,8 +138,8 @@ def gammaDeltaDistribution( energy ) :
 
     deltaEnergy = float( "1e%s" % ("%.0e" % ( energy * energyEps )).split( 'e' )[1] )
     eMin, eMax = energy - deltaEnergy, energy + deltaEnergy
-    if( eMin < 0 ) : return( XYsModule.XYs1d( [ [ energy, 1. ], [ eMax, 0. ] ] ).normalize( ) )
-    return( XYsModule.XYs1d( [ [ eMin, 0. ], [ energy, 1 ], [ eMax, 0. ] ] ).normalize( ) )
+    if( eMin < 0 ) : return( XYs1dModule.XYs1d( [ [ energy, 1. ], [ eMax, 0. ] ] ).normalize( ) )
+    return( XYs1dModule.XYs1d( [ [ eMin, 0. ], [ energy, 1 ], [ eMax, 0. ] ] ).normalize( ) )
 
 def finalDistributionCheck( fullDistribution ) :
 
@@ -147,10 +148,10 @@ def finalDistributionCheck( fullDistribution ) :
             if( i2 > 0 ) :
                 if( ( PEout2[0] - PEout1[0] ) < 0.1 * energyEps * PEout2[0] ) : PEout2[0] = ( 1 + 0.1 * energyEps ) * PEout1[0]
             PEout1 = PEout2
-        PEout = XYsModule.XYs1d( fullDistribution[0][1] )
+        PEout = XYs1dModule.XYs1d( fullDistribution[0][1] )
         if( abs( PEout.integrate( ) - 1 ) > 1e-5 ) : fullDistribution[i1][1] = PEout.normalize( ).copyDataToXYs( )
 
-class primaryGamma :
+class PrimaryGamma :
 
     def __init__( self, multiplicity, energy, massRatio, angularForm ) :
 
@@ -168,7 +169,7 @@ class primaryGamma :
         else :
             return( None )
 
-class discreteGamma :
+class DiscreteGamma :
 
     def __init__( self, multiplicity, energy, angularForm ) :
 
@@ -185,7 +186,7 @@ class discreteGamma :
         else :
             return( None )
 
-class continuumGammaIsotropic :
+class ContinuumGammaIsotropic :
 
     def __init__( self, multiplicity, energyForm ) :
 
@@ -210,7 +211,7 @@ class continuumGammaIsotropic :
                     return( None )
 
             energyForm = self.energyForm
-            if( isinstance( energyForm, ( energyModule.regions2d, ) ) ) :
+            if( isinstance( energyForm, ( energyModule.Regions2d, ) ) ) :
                 for region in energyForm :
                     if( energy < region.domainMax ) : break
                 energyForm = region
@@ -229,7 +230,7 @@ class continuumGammaIsotropic :
                 energyForm1 = PofEp1.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = energyEps, upperEps = energyEps )
                 energyForm2 = PofEp2.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = energyEps, upperEps = energyEps )
                 try :
-                    energyForm = XYsModule.pointwiseXY_C.unitbaseInterpolate( energy, PofEp1.value, energyForm1, PofEp2.value, energyForm2, 1 )
+                    energyForm = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( energy, PofEp1.value, energyForm1, PofEp2.value, energyForm2, 1 )
                 except :
                     if( fraction2 > 0.5 ) :
                         energyForm = energyForm2
@@ -238,7 +239,7 @@ class continuumGammaIsotropic :
             lowerEps = energyEps
             if( energyForm.domainMin == 0 ) : lowerEps = 0
             energyForm = energyForm.dullEdges( lowerEps = lowerEps, upperEps = energyEps )
-            energyForm = XYsModule.XYs1d( energyForm )
+            energyForm = XYs1dModule.XYs1d( energyForm )
             multiplicity = getMultiplicityForDistributionSum( self, energy, energies, numberOfGammas, zeroTotal )
             distribution = multiplicity * energyForm
             return( distribution )
@@ -248,21 +249,21 @@ class continuumGammaIsotropic :
 def processGamma( gamma, gammas, crossSection ) :
 
     distribution = gamma.distribution[style]
-    if( isinstance( distribution, unspecifiedModule.form ) ) :
+    if( isinstance( distribution, unspecifiedModule.Form ) ) :
         if( args.verbose > 1 ) : print( '            No distribution data' )
         return
 
     MF13 = False
     if( 'ENDFconversionFlag' in gamma.attributes ) : MF13 = gamma.attributes['ENDFconversionFlag'] == 'MF13'
     multiplicity = gamma.multiplicity[style]
-    if(   isinstance( multiplicity, ( multiplicityModule.constant1d ) ) ) :
+    if(   isinstance( multiplicity, ( multiplicityModule.Constant1d ) ) ) :
         domainMin, domainMax = multiplicity.domainMin, multiplicity.domainMax
-        multiplicity = XYsModule.XYs1d( [ [ float( domainMin ), multiplicity.value ], [ float( domainMax ), multiplicity.value ] ],
-                axes = XYsModule.XYs1d.defaultAxes( labelsUnits = { 1 : ( 'energy_in', 'MeV' ) } ) )
-    elif( isinstance( multiplicity, ( multiplicityModule.XYs1d, multiplicityModule.regions1d ) ) ) :
-        if( isinstance( multiplicity, multiplicityModule.regions1d ) and MF13 ) :
+        multiplicity = XYs1dModule.XYs1d( [ [ float( domainMin ), multiplicity.value ], [ float( domainMax ), multiplicity.value ] ],
+                axes = XYs1dModule.XYs1d.defaultAxes( labelsUnits = { 1 : ( 'energy_in', 'MeV' ) } ) )
+    elif( isinstance( multiplicity, ( multiplicityModule.XYs1d, multiplicityModule.Regions1d ) ) ) :
+        if( isinstance( multiplicity, multiplicityModule.Regions1d ) and MF13 ) :
             for region in multiplicity :
-                if( region.interpolation == standardsModule.interpolation.flatToken ) :
+                if region.interpolation == xDataEnumsModule.Interpolation.flat:
                     print( '    WARNING: This may need to be fixed.' )
         if( MF13 and isinstance( multiplicity, multiplicityModule.XYs1d ) ) :
             pass
@@ -278,7 +279,7 @@ def processGamma( gamma, gammas, crossSection ) :
     if( crossSection is not None ) :
         if( MF13 ) :
             values = [ [ E1, m1 * crossSection.evaluate( E1 ) ] for E1, m1 in multiplicity ]
-            multiplicity = XYsModule.XYs1d( values, axes = multiplicity.axes, interpolation = multiplicity.interpolation )
+            multiplicity = XYs1dModule.XYs1d( values, axes = multiplicity.axes, interpolation = multiplicity.interpolation )
             multiplicity = multiplicity.toPointwise_withLinearXYs( lowerEps = energyEps, upperEps = energyEps )
             multiplicity.axes[0].unit = "b"
         else :
@@ -296,7 +297,7 @@ def processGamma( gamma, gammas, crossSection ) :
                 raise
             multiplicity = multiplicity.trim( )
 
-    if( isinstance( distribution, uncorrelatedModule.form ) ) :
+    if( isinstance( distribution, uncorrelatedModule.Form ) ) :
         angularForm = distribution.angularSubform.data
         energyForm = distribution.energySubform.data
         if( isinstance( angularForm, angularModule.XYs2d ) ) :
@@ -306,17 +307,17 @@ def processGamma( gamma, gammas, crossSection ) :
             isIsotropic = angularForm.isIsotropic( )
             if( not( isIsotropic ) ) : raise Exception( 'unsupported angular distribution' )
         if( isIsotropic ) :
-            if( isinstance( energyForm, energyModule.primaryGamma ) ) :
-                gammas['primaries'].append( primaryGamma( multiplicity, energyForm.value,
+            if( isinstance( energyForm, energyModule.PrimaryGamma ) ) :
+                gammas['primaries'].append( PrimaryGamma( multiplicity, energyForm.value,
                         float( energyForm.massRatio ), angularForm ) )
-            elif( isinstance( energyForm, energyModule.discreteGamma ) ) :
-                gammas['discretes'].append( discreteGamma( multiplicity, energyForm.value, angularForm ) )
+            elif( isinstance( energyForm, energyModule.DiscreteGamma ) ) :
+                gammas['discretes'].append( DiscreteGamma( multiplicity, energyForm.value, angularForm ) )
             else :
-                if( isinstance( energyForm, ( energyModule.XYs2d, energyModule.regions2d ) ) ) :
+                if( isinstance( energyForm, ( energyModule.XYs2d, energyModule.Regions2d ) ) ) :
                     pass
                 else :
                     raise Exception( 'Unsupported energy form "%s"' % energyForm.moniker )
-                gammas['continuum'].append( continuumGammaIsotropic( multiplicity, energyForm ) )
+                gammas['continuum'].append( ContinuumGammaIsotropic( multiplicity, energyForm ) )
         else :
             raise Exception( 'Unsupported angular form "%s"' % angularForm.moniker )
     else :
@@ -326,22 +327,22 @@ def processChannel( channel, gammas, branchingGammas, crossSection = None ) :
 
     numberOfGammasProcessed = 0
     for product in channel :
-        if( product.id in branchingGammas ) :
-            gammas['branchingGammas'].append( ( product.id, branchingGammas[product.id] ) )
+        if( product.pid in branchingGammas ) :
+            gammas['branchingGammas'].append( ( product.pid, branchingGammas[product.pid] ) )
         else :
-            if( product.id == IDsPoPsModule.photon ) :
+            if( product.pid == IDsPoPsModule.photon ) :
                 energy = ''
                 distribution = product.distribution[style]
-                if( isinstance( distribution, uncorrelatedModule.form ) ) :
+                if( isinstance( distribution, uncorrelatedModule.Form ) ) :
                     energyForm = distribution.energySubform.data
-                    if( isinstance( energyForm, energyModule.primaryGamma ) ) :
+                    if( isinstance( energyForm, energyModule.PrimaryGamma ) ) :
                         energy = ": primary energy = %s" % ( energyForm.value )
-                    elif( isinstance( energyForm, energyModule.discreteGamma ) ) :
+                    elif( isinstance( energyForm, energyModule.DiscreteGamma ) ) :
                         energy = ": discrete energy = %s" % ( energyForm.value )
                 if( args.verbose > 1 ) : print( '        %-40s: %-12s%s' % ( product, product.label, energy ) )
-                if( channel.genre == outputChannelModule.Genre.twoBody ) :
-                    print( '    WARNING: skipping two body gamma' )
-                else :
+                if channel.genre == enumsModule.Genre.twoBody:
+                    print('    WARNING: skipping two body gamma')
+                else:
                     processGamma( product, gammas, crossSection )
                     numberOfGammasProcessed += 1
             if( product.outputChannel is not None ) :
@@ -399,7 +400,7 @@ def sumDistributions( multiplicity, gammaList ) :
 def writeGammas( ENDLFiles, C, S, Q, X1, multiplicity, fullDistribution ) :
 
     trimmed = multiplicity.trim( )
-    if( isinstance( trimmed, XYsModule.XYs1d ) ) :
+    if( isinstance( trimmed, XYs1dModule.XYs1d ) ) :
         domainMin, rangeMax = trimmed.domainMin, trimmed.rangeMax
     else :
         domainMin, rangeMax = trimmed.domainMin( ), trimmed.rangeMax( )
@@ -440,7 +441,7 @@ for residualID in branchingData :
         for probability, gammaEnergy in branchingData[residualID] :
             spectrum = probability * gammaDeltaDistribution( float( gammaEnergy ) )
             data = [ [ float( "%.14e" % x ), y ] for x, y in spectrum ]
-            spectrum = XYsModule.XYs1d( data, axes = spectrum.axes )
+            spectrum = XYs1dModule.XYs1d( data, axes = spectrum.axes )
             multiplicity += probability
             if( spectra is None ) :
                 spectra = spectrum
@@ -470,7 +471,7 @@ for reaction in reactionSuite.reactions :
     X1 = 0.
     if( len( reaction.outputChannel ) == 2 ) :
         particle = reaction.outputChannel[1].particle
-        if( isinstance( particle, nuclideModule.particle ) ) :
+        if( isinstance( particle, nuclideModule.Particle ) ) :
             X1 = particle.energy[0].value
     Q += X1                                     # BRB, is this the right Q?
     if( C not in CSQList ) : CSQList[C] = {}
@@ -502,7 +503,7 @@ for reaction in reactionSuite.reactions :
         if( len( gammas['branchingGammas'] ) not in ( 0, 1 ) ) : raise Exception( 'need to support this' )
         for levelName, ( gammaMultiplicity, spectrum ) in gammas['branchingGammas'] :
             domainMin, domainMax = reaction.domainMin, reaction.domainMax
-            multiplicity = XYsModule.XYs1d( [ [ domainMin, gammaMultiplicity ], [ domainMax, gammaMultiplicity ] ] )
+            multiplicity = XYs1dModule.XYs1d( [ [ domainMin, gammaMultiplicity ], [ domainMax, gammaMultiplicity ] ] )
             fullDistribution = [ [ domainMin, spectrum ], [ domainMax, spectrum ] ]
 
     if( multiplicity is not None ) :

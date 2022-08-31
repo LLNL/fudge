@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -20,7 +20,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 # BRB, why is this?
     MF = None
     for product in self.outputChannel :
-        if( product.id == IDsPoPsModule.photon ) :
+        if( product.pid == IDsPoPsModule.photon ) :
             if( product.distribution.hasData( ) ) :
                 productMF = 12
                 if( 'MF13' in targetInfo['ENDFconversionFlags'].get(product,"") ) : productMF = 13
@@ -28,7 +28,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
                 if( MF != productMF ) : raise Exception( 'MF = %s mixed with MF = %s' % ( MF, productMF ) )
     if( MF is not None ) :
         outputChannel = self.outputChannel
-        productName = outputChannel[0].id
+        productName = outputChannel[0].pid
         if( productName != IDsPoPsModule.photon ) : raise Exception( 'production only supported for gamma as product: product is "%s"' % productName )
 
         if( MT not in targetInfo['production_gammas'] ) : targetInfo['production_gammas'][MT] = [ MF ]
@@ -39,4 +39,4 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         if( MT not in targetInfo['MF8'] ) : targetInfo['MF8'][MT] = []
         targetInfo['MF8'][MT].append( self )
 
-productionModule.production.toENDF6 = toENDF6
+productionModule.Production.toENDF6 = toENDF6

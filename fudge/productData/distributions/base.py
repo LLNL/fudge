@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,42 +7,24 @@
 
 """Base classes for distributions."""
 
-import xData.ancestry as ancestryModule
-import xData.standards as standardsModule
+from LUPY import ancestry as ancestryModule
+from xData import enums as xDataEnumsModule
 
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
 from fudge import abstractClasses as abstractClassesModule
 
-__metaclass__ = type
+class Form( abstractClassesModule.Form ) :
 
-#
-# Standard genre can only be composited from one of the following standard forms.
-#
-
-angularTwoBodyGenre = 'angularTwoBody'
-unknownGenre = 'unknown'
-referenceGenre = 'reference'
-NBodyGenre = 'NBody'
-
-noneFormToken = 'none'
-semiPiecewiseFormToken = 'semiPiecewise'
-equalProbableBinsFormToken = 'equalProbableBins'
-LegendrePointwiseFormToken = 'LegendrePointwise'
-LegendrePiecewiseFormToken = 'LegendrePiecewise'
-
-class form( abstractClassesModule.form ) :
+    keyName = 'label'
 
     def __init__( self, label, productFrame, subForms ) :
 
-        abstractClassesModule.form.__init__( self )
+        abstractClassesModule.Form.__init__( self )
 
         self.label = label
-
-        if( productFrame is not None ) :
-            if( productFrame not in standardsModule.frames.allowedFrames ) :
-                raise TypeError( 'Invalid productFrame = "%s"' % productFrame )
-        self.__productFrame = productFrame
+#        self.productFrame = productFrame                # This does not seem to work, hence the next line.
+        self.__productFrame = xDataEnumsModule.Frame.checkEnumOrString(productFrame)
 
         for i1, subform_ in enumerate( subForms ) :
             setattr( self, self.subformAttributes[i1], subform_ )
@@ -66,12 +48,18 @@ class form( abstractClassesModule.form ) :
 
         from fudge import product as productModule
 
-        return( self.findClassInAncestry( productModule.product ) )
+        return self.findClassInAncestry(productModule.Product)
 
     @property
     def productFrame( self ) :
 
         return( self.__productFrame )
+
+    @productFrame.setter
+    def productFrame(self, frame):
+        """Set the distribution's product frame."""
+
+        self.__productFrame = xDataEnumsModule.Frame.checkEnumOrString(frame)
 
     def convertUnits( self, unitMap ) :
         """See documentation for reactionSuite.convertUnits."""
@@ -88,7 +76,7 @@ class form( abstractClassesModule.form ) :
 
         for subform_ in self.subforms :
             if( subform_.moniker == entityName ) : return( subform_ )
-        return( ancestryModule.ancestry.findEntity( self, entityName, attribute, value ) )
+        return( ancestryModule.Ancestry.findEntity( self, entityName, attribute, value ) )
 
     def isTwoBody( self ) :
 
@@ -119,23 +107,27 @@ class form( abstractClassesModule.form ) :
 
         return( self.subforms[0].toPointwise_withLinearXYs( **kwargs ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         attributeStr = ''
-        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
-        if( self.productFrame is not None ) : attributeStr += ' productFrame="%s"' % self.productFrame
+        if self.label is not None:
+            attributeStr += ' label="%s"' % self.label
+        if self.productFrame != xDataEnumsModule.Frame.none:
+            attributeStr += ' productFrame="%s"' % self.productFrame
+
         xmlString = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
-        for subform_ in self.subforms : xmlString += subform_.toXMLList( indent2, **kwargs )
+        for subform_ in self.subforms : xmlString += subform_.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
+
         return( xmlString )
 
-class subform( ancestryModule.ancestry ) :
+class Subform( ancestryModule.AncestryIO ) :
 
     def __init__( self ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
         self.label = None
 
     def XMLStartTagString( self, indent = '', extraAttributesAsStrings = '', emptyTag = False ) :

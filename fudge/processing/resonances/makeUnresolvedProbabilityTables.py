@@ -2,7 +2,7 @@
 #encoding: utf-8
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -19,7 +19,6 @@ from pqu import PQU as PQUModule
 
 from xData import table as tableModule
 from xData import axes as axesModule
-from xData import XYs as XYsModule
 from xData import multiD_XYs as multiD_XYsModule
 
 from . import reconstructResonances
@@ -34,8 +33,6 @@ Usage example:
 tableGenerator = ProbabilityTableGenerator( reactionSuite, verbose=True )
 pdfs = tableGenerator.generatePDFs( resClass = reconstructResonances.SLBWcrossSection, nSamples = 10 )
 """
-
-__metaclass__ = type
 
 debug = False   # set True before debugging (disables multiprocessing)
 if not debug:
@@ -61,11 +58,11 @@ class ProbabilityTableGenerator:
         self.backgrounds = {}
         if not self.URR.URR.useForSelfShieldingOnly:
             for reaction in self.URR.URR.resonanceReactions:
-                xsc = reaction.reactionLink.link.crossSection.evaluated
-                assert isinstance(xsc, crossSectionModule.resonancesWithBackground)
+                xsc = reaction.link.link.crossSection.evaluated
+                assert isinstance(xsc, crossSectionModule.ResonancesWithBackground)
                 key = reaction.label
                 for simpleKey in ('elastic', 'capture', 'fission', 'total'):
-                    if reaction.reactionLink.link is reactionSuite.getReaction(simpleKey):
+                    if reaction.link.link is reactionSuite.getReaction(simpleKey):
                         key = simpleKey
 
                 self.backgrounds[key] = xsc.background.unresolvedRegion.data
@@ -134,7 +131,7 @@ class ProbabilityTableGenerator:
         """
         if self.RRR:
             # For multiple regions, we need to do each region separately, then add them to the unified xs table & egrid
-            if isinstance(self.RRR, commonResonancesModule.energyIntervals):
+            if isinstance(self.RRR, commonResonancesModule.EnergyIntervals):
                 return self.RRR[-1]
             else:  # Single region, everything goes on unified grid
                 return self.RRR
@@ -157,7 +154,7 @@ class ProbabilityTableGenerator:
                     continue
                 if x[1] == l and x[2] == j: return x[0]
         else:   # R-Matrix
-            elastic, = [reac for reac in resolved.resonanceReactions if reac.reactionLink.link is
+            elastic, = [reac for reac in resolved.resonanceReactions if reac.link.link is
                         self.reactionSuite.getReaction('elastic')]
             elasticLabel = elastic.label
 
@@ -195,7 +192,7 @@ class ProbabilityTableGenerator:
             return xys1d
 
         # make local copies of widths, densities and scattering radius rather than modifying the evaluation
-        self.scatteringRadius = self.URR.URR.scatteringRadius.copy()
+        self.scatteringRadius = self.URR.URR.getScatteringRadius().copy()
         if self.scatteringRadius.isEnergyDependent():
             self.scatteringRadius.form = addPoints( self.scatteringRadius.form, newDomainMin, newDomainMax )
 
@@ -393,7 +390,7 @@ class ProbabilityTableGenerator:
         def to_XYs2ds(thePDFs, normalize=False):
             # helper method, used after all samples collected to pack final results.
             # May also be used to write intermediate results for debugging
-            probabilityTableAxes = axesModule.axes(rank=3, labelsUnits={2:('energy_in',energyUnit),
+            probabilityTableAxes = axesModule.Axes(3, labelsUnits={2:('energy_in',energyUnit),
                                                                         1:('crossSection','b'),
                                                                         0:('P(crossSection|energy_in)','')})
             newPDFs = {}
@@ -427,7 +424,7 @@ class ProbabilityTableGenerator:
 
             # sort by energy (probably not necessary):
             combinedData.sort(key=lambda res: res[0])
-            combinedTable = tableModule.table( columns=columnHeaders, data=combinedData )
+            combinedTable = tableModule.Table( columns=columnHeaders, data=combinedData )
 
             # FIXME following necessary since BreitWigner and URR use different naming conventions:
             renameColumns = {
@@ -440,13 +437,13 @@ class ProbabilityTableGenerator:
                     column.name = renameColumns[column.name]
 
             resolvedRealization = resolvedModule.BreitWigner(label="realization",
-                approximation=resolvedModule.BreitWigner.singleLevel,
-                resonanceParameters=commonResonancesModule.resonanceParameters( combinedTable ),
+                approximation=resolvedModule.BreitWigner.Approximation.singleLevel,
+                resonanceParameters=commonResonancesModule.ResonanceParameters( combinedTable ),
                 scatteringRadius=self.scatteringRadius,
                 PoPs=self.URR.URR.PoPs)
 
             # FIXME: next lines are required since the domain currently lives on <resolved> rather than the form
-            resolvedContainer = resolvedModule.resolved(self.lowerBound, self.upperBound, self.URR.energyUnit)
+            resolvedContainer = resolvedModule.Resolved(self.lowerBound, self.upperBound, self.URR.energyUnit)
             resolvedContainer.add(resolvedRealization)
             resolvedContainer.setAncestor(self.reactionSuite)
 
@@ -681,7 +678,7 @@ class ProbabilityTableGenerator:
                 for temp in pdfsNow:
                     for reac in pdfsNow[temp]:
                         with open(os.path.join(outDir, "iteration%s_%s_%sK.xml" % (str(iSample).zfill(3), reac, temp)), "w") as fout:
-                            fout.write('\n'.join(pdfsNow[temp][reac].toXMLList()))
+                            fout.write('\n'.join(pdfsNow[temp][reac].toXML_strList()))
 
 
         # all realizations complete. Convert results for each reaction / temperature into XYs2d

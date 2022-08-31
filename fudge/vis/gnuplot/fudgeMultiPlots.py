@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -59,7 +59,7 @@ Also see the routine qmultiPlot.
             except :
                 print("Warning in multiPlot: cannot plot object named %s" % dataset.__class__.__name__)
                 continue
-            f = fudgeFileMisc.fudgeTempFile( )
+            f = fudgeFileMisc.FudgeTempFile( )
             for x, y in xys : f.write( "%.10e %14.8e\n" % ( x, y ) )
             f.close( )
             fs.append( f.getName( ) )
@@ -99,7 +99,7 @@ See the routine multiPlot for additional information."""
 
     def qmultiPlotAddPlot( dataset, g, t, withLineWidth ) :
 
-        f = fudgeFileMisc.fudgeTempFile( )
+        f = fudgeFileMisc.FudgeTempFile( )
         for x, y in dataset.copyDataToXYs( ) : f.write( "%.12e %.12e\n" % ( x, y ) )
         f.close( )
         gf = Gnuplot.File( f.getName( ), title = t ) # , with = withLineWidth )
@@ -197,7 +197,7 @@ def multiPlot3d( dataList, xyzlog = 0, xMin = None, xMax = None, yMin = None, yM
         xLabel = getLabel( dataset, 'xLabel', xLabel )
         yLabel = getLabel( dataset, 'yLabel', yLabel )
         zLabel = getLabel( dataset, 'zLabel', zLabel )
-        f = fudgeFileMisc.fudgeTempFile( )
+        f = fudgeFileMisc.FudgeTempFile( )
         fs += [ f.getName( ) ]
         if( hasattr( dataset, 'label' ) ) : fs += [ 'title', dataset.label ]
         for x, yz in w_xys :

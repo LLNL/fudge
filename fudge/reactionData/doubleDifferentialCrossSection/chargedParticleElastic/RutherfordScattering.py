@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,15 +8,17 @@
 import math
 
 from pqu import PQU as PQUModule
+from xData import multiD_XYs as multiD_XYsModule
 
-from xData import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
 
 from fudge.core.math import fudgemath as fudgemathModule
+from fudge.reactionData import crossSection as crossSectionModule
 from fudge.productData.distributions import angular as angularModule
 
 from . import misc as miscModule
 
-class RutherfordScattering( ancestryModule.ancestry ):
+class RutherfordScattering( ancestryModule.AncestryIO ):
     """
     Stores the pure-Coulomb contribution to charged-particle elastic scattering
     """
@@ -25,7 +27,7 @@ class RutherfordScattering( ancestryModule.ancestry ):
 
     def __init__(self, domainMin=None, domainMax=None, domainUnit=None ):
 
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
 
         self.domainMin = domainMin
         self.domainMax = domainMax
@@ -60,18 +62,74 @@ class RutherfordScattering( ancestryModule.ancestry ):
             self.domainMax *= factor
             self.domainUnit = newUnit
 
-    def dSigma_dMu( self, energy, accuracy = 1e-3, muMax = 0.999 ) :
+    def crossSectionVersusEnergy(self, muMax, accuracy=1e-3, energyMin=None, energyMax=None):
+        """
+        Returns the Rutherford cross section.
+        """
+
+        class Tester:
+
+            def __init__(self, dSigma_dMu, muMax, relativeTolerance, absoluteTolerance):
+
+                self.dSigma_dMu = dSigma_dMu
+                self.muMax = muMax
+                self.relativeTolerance = relativeTolerance
+                self.absoluteTolerance = absoluteTolerance
+
+            def evaluateAtX(self, energy):
+
+                dSigma_dMu = self.dSigma_dMu(energy, muMax=muMax, accuracy=self.relativeTolerance)
+                return dSigma_dMu.integrate()
+
+        energyUnit, energyMin, energyMax = self.energyDomain(energyMin, energyMax)
+        energies = [energyMin, math.sqrt(energyMin * energyMax), energyMax]
+
+        crossSection = []
+        for energy in energies:
+            dSigma_dMu = self.dSigma_dMu(energy, muMax=muMax, accuracy=accuracy)
+            crossSection.append([energy, dSigma_dMu.integrate()])
+
+        tester = Tester(self.dSigma_dMu, muMax, accuracy, accuracy * crossSection[-1][1])
+        crossSection = fudgemathModule.thickenXYList(crossSection, tester, biSectionMax=16)
+
+        return crossSectionModule.XYs1d(data=crossSection, axes=crossSectionModule.defaultAxes(energyUnit))
+
+
+    def dSigma_dMuVersusEnergy(self, muMax, accuracy=1e-3, energyMin=None, energyMax=None):
+        """
+        Calls **dSigma_dMu** on self at various energies.
+        """
+
+        energyUnit, energyMin, energyMax = self.energyDomain(energyMin, energyMax)
+
+        energyFactor = math.sqrt(10.)
+        energies = [energyMin]
+        energy = energyMin
+        while True:
+            energy *= energyFactor
+            if energy > 0.9 * energyMax: break
+            energies.append(energy)
+        energies.append(energyMax)
+
+        xys2d = multiD_XYsModule.XYs2d(axes=self.defaultAxes(energyUnit))
+        for energy in energies:
+            xys2d.append(self.dSigma_dMu(energy, accuracy=accuracy, muMax=muMax))
+
+        return xys2d
+
+    def dSigma_dMu(self, energy, accuracy=1e-3, muMax=0.999, probability=False):
         """
         Returns d(Sigma)/d(mu) at the specified incident energy.
 
         :param energy:      Energy of the projectile.
         :param accuracy:    The accuracy of the returned *dSigma_dMu*.
         :param muMax:       Slices the upper domain mu to this value.
+        :param probability: If **True** P(mu) is returned instead of d(Sigma)/d(mu).
 
         :return:            d(Sigma)/d(mu) at *energy*.
         """
 
-        class tester :
+        class Tester :
 
             def __init__( self, evaluate, energy, relativeTolerance, absoluteTolerance ) :
 
@@ -85,14 +143,37 @@ class RutherfordScattering( ancestryModule.ancestry ):
                 return( self.evaluate( self.energy, mu ) )
 
         muMin = -1.0
-        if( self.identicalParticles ) : muMin = 0.0
+        if self.identicalParticles: muMin = 1e-8
         _dSigma_dMu = [ [ muMin, self.evaluate( energy, muMin ) ], [ muMax, self.evaluate( energy, muMax ) ] ]
         average = sum( y for x, y in _dSigma_dMu ) / len( _dSigma_dMu )
-        _tester = tester( self.evaluate, energy, accuracy, accuracy * average )
-        _dSigma_dMu = 2.0 * math.pi * angularModule.XYs1d( fudgemathModule.thickenXYList( _dSigma_dMu, _tester, biSectionMax = 16 ) )
+        _tester = Tester( self.evaluate, energy, accuracy, accuracy * average )
+        _dSigma_dMu = fudgemathModule.thickenXYList(_dSigma_dMu, _tester, biSectionMax=16)
+        if self.identicalParticles: _dSigma_dMu = [[-1.0, 0.0], [0.0, 0.0]] + _dSigma_dMu
+        if _dSigma_dMu[-1][0] < 1:
+            _dSigma_dMu += [[_dSigma_dMu[-1][0] * (1 + 1e-5 ), 0.0], [1.0, 0.0]]
+        _dSigma_dMu = 2.0 * math.pi * angularModule.XYs1d(_dSigma_dMu, axes=self.defaultAxes(self.domainUnit))
         _dSigma_dMu.axes = self.defaultAxes( self.domainUnit )
 
+        if probability: _dSigma_dMu = _dSigma_dMu.normalize()
+
+        _dSigma_dMu.outerDomainValue = energy
         return( _dSigma_dMu )
+
+    def energyDomain(self, energyMin=None, energyMax=None):
+        """
+        Returns the tuple (energyUnit, energyMin, energyMax).
+        """
+
+        energyUnit = self.domainUnit
+        if energyUnit is None: energyUnit = self.ancestor.domainUnit
+
+        if energyMin is None: energyMin = self.domainMin
+        if energyMin is None: energyMin = PQUModule.PQU('1e-4 MeV').getValueAs(energyUnit)
+
+        if energyMax is None: energyMax = self.domainMax
+        if energyMax is None: energyMax = PQUModule.PQU('30 MeV').getValueAs(energyUnit)
+
+        return energyUnit, energyMin, energyMax
 
     def evaluate( self, energy, mu, phi = 0.0 ) :
         """
@@ -116,20 +197,20 @@ class RutherfordScattering( ancestryModule.ancestry ):
         else:
             return eta**2 / (k**2 * (1-mu)**2 )
 
-    def toXMLList( self, indent='', **kwargs ):
+    def toXML_strList( self, indent='', **kwargs ):
 
         attrStr = ''
         for attribute in ('domainMin','domainMax','domainUnit'):
             if getattr(self,attribute) is not None: attrStr += ' %s="%s"' % (attribute, getattr(self,attribute))
         return ['%s<%s%s/>' % (indent, self.moniker, attrStr)]
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         domainMin, domainMax = element.get('domainMin'), element.get('domainMax')
         if domainMin is not None:
             domainMin, domainMax = map(float, (domainMin, domainMax) )
-        return RutherfordScattering( domainMin, domainMax, element.get('domainUnit') )
+        return cls( domainMin, domainMax, element.get('domainUnit') )
 
     @staticmethod
     def defaultAxes( energyUnit, crossSectionUnit = 'b' ) :

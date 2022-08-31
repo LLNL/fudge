@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,7 +7,8 @@
 
 from pqu import PQU as PQUModule
 
-from xData import XYs as XYsModule
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
 
 from fudge.productData.distributions import KalbachMann as KalbachMannModule
 
@@ -28,9 +29,10 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     if len(outgoingInterpolation) != 1:
         raise NotImplementedError("Only one outgoing interpolation supported when writing Kalbach-Mann to ENDF-6")
 
-    LEP = { 'flat': 1, 'lin-lin': 2 }[outgoingInterpolation.pop()]
+    LEP = {xDataEnumsModule.Interpolation.flat: 1, xDataEnumsModule.Interpolation.linlin: 2 }[outgoingInterpolation.pop()]
     ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 2, LEP, 1, len( fSubform ) ) ]
-    ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( fSubform ), 2 ] )
+    interpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag(fSubform.interpolation, fSubform.interpolationQualifier)
+    ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( fSubform ), interpolation ] )
     EInUnit = fSubform.axes[2].unit
     EpUnit = fSubform.axes[1].unit
     fUnit = fSubform.axes[0].unit
@@ -39,8 +41,8 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     fFactor = PQUModule.PQU( 1, fUnit ).getValueAs( '1/eV' )
     for i1, fAtEnergy in enumerate( fSubform ) :
         rAtEnergy = rSubform[i1]
-        if( not( isinstance( fAtEnergy, XYsModule.XYs1d ) ) ) : raise 'hell - FIXME'
-        if( not( isinstance( rAtEnergy, XYsModule.XYs1d ) ) ) : raise 'hell - FIXME'
+        if( not( isinstance( fAtEnergy, XYs1dModule.XYs1d ) ) ) : raise 'hell - FIXME'
+        if( not( isinstance( rAtEnergy, XYs1dModule.XYs1d ) ) ) : raise 'hell - FIXME'
         value = fAtEnergy.outerDomainValue
         if( value != rAtEnergy.outerDomainValue ) : raise 'hell - FIXME'
         value *= EInFactor
@@ -54,4 +56,4 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
         ENDFDataList += endfFormatsModule.endfDataList( coefficients )
     gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 1, self.productFrame, ENDFDataList )
 
-KalbachMannModule.form.toENDF6 = toENDF6
+KalbachMannModule.Form.toENDF6 = toENDF6

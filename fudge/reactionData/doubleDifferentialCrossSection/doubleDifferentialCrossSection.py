@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -19,14 +19,14 @@ from .thermalNeutronScatteringLaw import incoherentInelastic as TNSL_incoherentI
 #
 # Double differential cross section component.
 #
-class component( abstractClassesModule.component ) :
+class Component( abstractClassesModule.Component ) :
 
     moniker = 'doubleDifferentialCrossSection'
 
     def __init__( self ) :
 
-        abstractClassesModule.component.__init__( self, ( coherentModule.form, incoherentModule.form, CoulombPlusNuclearElasticModule.form,
-                TNSL_coherentElasticModule.form, TNSL_incoherentElasticModule.form, TNSL_incoherentInelasticModule.form ) )
+        abstractClassesModule.Component.__init__( self, ( coherentModule.Form, incoherentModule.Form, CoulombPlusNuclearElasticModule.Form,
+                TNSL_coherentElasticModule.Form, TNSL_incoherentElasticModule.Form, TNSL_incoherentInelasticModule.Form ) )
 
     def domainUnitConversionFactor( self, unitTo ) :
 
@@ -47,3 +47,17 @@ class component( abstractClassesModule.component ) :
     def domainUnit( self ) :
 
         return( self.evaluated.domainUnit )
+
+    def fixDomains(self, labels, energyMin, energyMax):
+        """This method does nothing."""
+
+        return 0
+
+    def listOfProducts(self):
+        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for *self*."""
+
+        products = set()
+        if len(self) > 0: products.add(self[0].pid)
+
+        return products
+

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(0, 0, width, height)
 
         # generate plot
-        self.plotInstance = plotCanvas(self, widthInches, heightInches, plotAttributes, plotData, dpi, plotType)
+        self.plotInstance = PlotCanvas(self, widthInches, heightInches, plotAttributes, plotData, dpi, plotType)
         self.setCentralWidget(self.plotInstance)
 
         self.addToolBar(NavigationToolbar(self.plotInstance, self))
@@ -118,7 +118,7 @@ class MainWindow(QMainWindow):
             self.dialogWindow.accept()
 
 
-class plotCanvas(FigureCanvas):
+class PlotCanvas(FigureCanvas):
     """
     The canvas the plot figure renders to.
 
@@ -705,7 +705,7 @@ class OverallPlotOptions(QWidget):
 
     def redrawPlot(self):
         """
-        Local method that calls the plotCanvas.redrawPlot method.
+        Local method that calls the PlotCanvas.redrawPlot method.
         """
 
         self.plotInstance.redrawPlot()
@@ -836,7 +836,7 @@ class IndividualPlotOptions(QWidget):
 
     def redrawPlot(self):
         """
-        Local method that calls the plotCanvas.redrawPlot method.
+        Local method that calls the PlotCanvas.redrawPlot method.
         """
 
         self.plotInstance.redrawPlot()

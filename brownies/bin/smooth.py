@@ -4,13 +4,16 @@ import copy
 import os
 import math
 import pqu.PQU as PQU
-import xData.XYs as XYs
+
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1d
+from xData import axes as axesModule
+from xData import values as valuesModule
+from xData import link as linkModule
+from xData import xDataArray as arrayModule
+from xData import gridded as griddedModule
+
 from fudge.reactionData.crossSection import XYs1d as pointwise
-import xData.axes as axesModule
-import xData.values as valuesModule
-import xData.link as linkModule
-import xData.xDataArray as arrayModule
-import xData.gridded as griddedModule
 
 # -------------------------------------------
 # Variables ---------------------------------
@@ -35,9 +38,9 @@ def defaultAxes(xName, xUnit, yName, yUnit):
     :param yUnit: the PQU unit of the y axis
     :return: the axes instance, ready to be attached to an XYs1d
     """
-    axes = axesModule.axes(rank=2)
-    axes[0] = axesModule.axis(yName, 0, yUnit)
-    axes[1] = axesModule.axis(xName, 1, xUnit)
+    axes = axesModule.Axes(2)
+    axes[0] = axesModule.Axis(yName, 0, yUnit)
+    axes[1] = axesModule.Axis(xName, 1, xUnit)
     return axes
 
 
@@ -77,7 +80,7 @@ def InelasticThreshold(Ecut, Ethreshold, xsAtEcut):
             return __the_const * math.sqrt(E - Ethreshold)
     __this_grid = copy.copy(Egrid) + [Ecut, Ethreshold]
     __this_grid.sort()
-    return XYs.XYs1d.createFromFunction(
+    return XYs1d.XYs1d.createFromFunction(
         defaultAxes(xName='E', xUnit='eV', yName='Sigma(E)', yUnit='b'),
         Xs=__this_grid,
         func=__sqrtThingee,
@@ -92,7 +95,7 @@ def InelasticThreshold(Ecut, Ethreshold, xsAtEcut):
 def Lorentzian(E0, dE):
     def __lorentzian(E, *args):
         return 1.0 / ((E - E0) ** 2 + dE * dE)
-    return XYs.XYs1d.createFromFunction(
+    return XYs1d.XYs1d.createFromFunction(
         defaultAxes(xName='E', xUnit='eV', yName="Lorentzian(E)", yUnit='1/eV'),
         Xs=make_egrid(E0, dE),
         func=__lorentzian,
@@ -107,7 +110,7 @@ def Lorentzian(E0, dE):
 def Gaussian(E0, dE):
     def __gaussian(E, *args):
         return math.exp(-(E - E0) ** 2 / 2.0 / dE / dE)
-    return XYs.XYs1d.createFromFunction(
+    return XYs1d.XYs1d.createFromFunction(
         defaultAxes(xName='E', xUnit='eV', yName="Gaussian(E)", yUnit='1/eV'),
         Xs=make_egrid(E0, dE),
         func=__gaussian,
@@ -125,7 +128,7 @@ def WindowFunction(E0, dE):
             return 0.5 / dE
         else:
             return 0.0
-    return XYs.XYs1d.createFromFunction(
+    return XYs1d.XYs1d.createFromFunction(
         defaultAxes(xName='E', xUnit='eV', yName="Window(E)", yUnit='1/eV'),
         Xs=make_egrid(E0, dE),
         func=__window,
@@ -236,7 +239,7 @@ def readXYdXdYData(filename):
 def convertXYdYToGNDCrossSectionAndCovariance(xydyList, doCov=True):
     # Load the cross section into a pointwise cross section object
     import fudge.reactionData.crossSection
-    _theXS = fudge.reactionData.crossSection.component()
+    _theXS = fudge.reactionData.crossSection.Component()
     _theXS.add(
         pointwise(
             axes=defaultAxes(xName='energy', xUnit='eV', yName='crossSection', yUnit='b'),
@@ -257,22 +260,22 @@ def convertXYdYToGNDCrossSectionAndCovariance(xydyList, doCov=True):
         energyBounds.append(xydyList[-1][0] + dE)
 
         # axes are standard covariance ones
-        axes = axesModule.axes(labelsUnits={0: ('matrix_elements', 'b**2'),
+        axes = axesModule.Axes(labelsUnits={0: ('matrix_elements', 'b**2'),
                                             1: ('column_energy_bounds', 'eV'),
                                             2: ('row_energy_bounds', 'eV')})
-        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
-                                  style=axesModule.boundariesGridToken,
-                                  values=valuesModule.values(energyBounds))
-        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
-                                  style=axesModule.linkGridToken,
-                                  values=linkModule.link(link=axes[2].values, relative=False))
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=valuesModule.Values(energyBounds))
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=linkModule.Link(link=axes[2].values, relative=False))
 
         # matrix is diagonal, constructed from uncertainties
-        matrix = arrayModule.diagonal([triplet[2] ** 2 for triplet in xydyList])
+        matrix = arrayModule.Diagonal([triplet[2] ** 2 for triplet in xydyList])
 
         # the covariance itself
-        _cov = fudge.covariances.covarianceMatrix.covarianceMatrix(
-            label='converted', matrix=griddedModule.gridded2d(axes, matrix))
+        _cov = fudge.covariances.covarianceMatrix.CovarianceMatrix(
+            label='converted', matrix=griddedModule.Gridded2d(axes, matrix))
 
     else:
         _cov = None
@@ -374,9 +377,9 @@ if __name__ == "__main__":
             from fudge import reactionSuite
             from fudge.covariances import covarianceSuite
 
-            theRxnSuite = reactionSuite.readXML(args.ENDF)
+            theRxnSuite = reactionSuite.ReactionSuite.readXML_file(args.ENDF)
             if os.path.exists(args.ENDF.replace('gnds.xml', 'gndsCov.xml')):
-                theCovSuite = covarianceSuite.readXML(args.ENDF.replace('gnds.xml', 'gndsCov.xml'))
+                theCovSuite = covarianceSuite.CovarianceSuite.readXML_file(args.ENDF.replace('gnds.xml', 'gndsCov.xml'))
             else:
                 theCovSuite = None
         else:

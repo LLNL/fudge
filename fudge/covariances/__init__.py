@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,7 +7,7 @@
 
 from . import covarianceSuite
 from . import covarianceSection
-from . import tokens
+from . import enums
 from . import covarianceMatrix
 from . import mixed
 from . import summed

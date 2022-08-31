@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -18,8 +18,6 @@ else :
     import tkinter.simpledialog as tkSimpleDialog
     import tkinter.filedialog as tkFileDialog
     import tkinter.messagebox as tkMessageBox
-
-__metaclass__ = type
 
 # Things to add line type, line width, symbol type, symbol width, symbol fill color
 

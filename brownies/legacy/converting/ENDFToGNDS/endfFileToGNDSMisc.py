@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,10 +11,13 @@ Helper functions to streamline reading ENDF-6 formatted data
 
 import copy, sys
 
-import xData.standards as standardsModule
-import xData.axes as axesModule
-import xData.XYs as XYsModule
-import xData.regions as regionsModule
+from xData import enums as xDataEnumsModule
+from xData import axes as axesModule
+from xData import XYs1d as XYs1dModule
+from xData import regions as regionsModule
+from xData import date as dateModule
+from xData.Documentation import dates as datesModule
+from xData.Documentation import author as authorModule
 
 FUDGE_EPS = 1e-8
 
@@ -55,26 +58,32 @@ def parseENDFByMT_MF( fileName, stripMATMFMTCount = True, logFile = sys.stderr )
 
 def ENDFInterpolationToGNDS1d( interpolation ) :
 
-    if( interpolation == 1 ) : return( standardsModule.interpolation.flatToken )
-    if( interpolation == 2 ) : return( standardsModule.interpolation.linlinToken )
-    if( interpolation == 3 ) : return( standardsModule.interpolation.linlogToken )
-    if( interpolation == 4 ) : return( standardsModule.interpolation.loglinToken )
-    if( interpolation == 5 ) : return( standardsModule.interpolation.loglogToken )
-    if( interpolation == 6 ) : return( standardsModule.interpolation.chargedParticleToken )
-    raise Exception( 'Unsupport 2d interpolation = %d' % interpolation )
+    if interpolation == 1:
+        return xDataEnumsModule.Interpolation.flat
+    if interpolation == 2:
+        return xDataEnumsModule.Interpolation.linlin
+    if interpolation == 3:
+        return xDataEnumsModule.Interpolation.linlog
+    if interpolation == 4:
+        return xDataEnumsModule.Interpolation.loglin
+    if interpolation == 5:
+        return xDataEnumsModule.Interpolation.loglog
+    if interpolation == 6:
+        return xDataEnumsModule.Interpolation.chargedParticle
+    raise Exception('Unsupport 2d interpolation = %d' % interpolation)
 
 def ENDFInterpolationToGNDS2plusd( interpolation ) :
 
-    if(    0 < interpolation < 10 ) :
-        interpolationQualifier = standardsModule.interpolation.noneQualifierToken
+    if    0 < interpolation < 10:
+        interpolationQualifier = xDataEnumsModule.InterpolationQualifier.none
         normalInterpolation = interpolation
-    elif( 10 < interpolation < 20 ) :
-        interpolationQualifier = standardsModule.interpolation.correspondingPointsToken
+    elif 10 < interpolation < 20:
+        interpolationQualifier = xDataEnumsModule.InterpolationQualifier.correspondingPoints
         normalInterpolation = interpolation - 10
-    elif( 20 < interpolation < 30 ) :
-        interpolationQualifier = standardsModule.interpolation.unitBaseToken
+    elif 20 < interpolation < 30:
+        interpolationQualifier = xDataEnumsModule.InterpolationQualifier.unitBase
         normalInterpolation = interpolation - 20
-    else :
+    else:
         raise Exception( 'Unsupport 2+d interpolation = %d' % interpolation )
     return( interpolationQualifier, ENDFInterpolationToGNDS1d( normalInterpolation ) )
 
@@ -161,8 +170,15 @@ def readDiscreteAndLegendre( numDiscrete, numContinua, startLine, lines, dimensi
         startLine += 1
 
     discretes = []                                  # Data for discrete gammas is [ gammaEnergy, multiplicity ]
+    duplicateCounter = 0
     for i1 in range( 0, dimension * numDiscrete, dimension ) :
-        discretes.append( [ floats[i1], floats[i1+1:i1+dimension] ] )
+        Eg = floats[i1]
+        if i1 > 0:
+            if Eg != EgPrior: duplicateCounter = 0
+        duplicateCounter += 1
+        discretes.append( [ Eg, duplicateCounter, floats[i1+1:i1+dimension] ] )
+        EgPrior = Eg
+        
     continua = []
     offset = dimension * numDiscrete
     for i1 in range( offset, offset + dimension * numContinua, dimension ) :
@@ -288,7 +304,7 @@ def getTAB2_Lists( startLine, dataLines, logFile = sys.stderr ) :
     return( lineNumber, TAB2 )
 
 def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile = sys.stderr, dimension = 1, axes = None,
-        cls = XYsModule.XYs1d ) :
+        cls = XYs1dModule.XYs1d ) :
 
     endLine, TAB1 = getTAB1( startLine, dataLines, logFile = logFile )
     n1, i1, mode, data = TAB1['NR'], 0, 0, TAB1['data']
@@ -441,17 +457,27 @@ def toEnergyFunctionalData( info, dataLine, MF5Data, LF, moniker, unit, xLabel =
 
     import fudge.productData.distributions.energy as energyModule
 
-    axes = axesModule.axes( labelsUnits = { 0 : ( moniker , unit ), 1 : ( xLabel, xUnit ) } )
+    axes = axesModule.Axes(2, labelsUnits = { 0 : ( moniker , unit ), 1 : ( xLabel, xUnit ) } )
     dataLine, TAB1, data = getTAB1Regions( dataLine, MF5Data, logFile = info.logs, axes = axes )
     EFclass = None
-    for tmp in ( energyModule.a, energyModule.b, energyModule.theta, energyModule.g, energyModule.T_M ):
+    for tmp in ( energyModule.A, energyModule.B, energyModule.Theta, energyModule.G, energyModule.T_M ):
         if ( tmp.moniker == moniker ):
             EFclass = tmp
 
     if( len( data ) == 1 ) :
         oneD = data[0]
     else :
-        oneD = regionsModule.regions1d( axes = data[0].axes )
+        oneD = regionsModule.Regions1d( axes = data[0].axes )
         for datum in data : oneD.append( datum )
 
     return( dataLine, TAB1, EFclass( oneD ) )
+
+def completeDocumentation(info, documentation):
+
+    documentation.body.body = 'See the endfCompatible section.'
+    date = datesModule.Date(dateModule.Date.parse(info.Date), datesModule.DateType.created)
+    documentation.dates.add(date)
+    documentation.title.body = 'ENDF-6 file form %s version %s translated to GNDS by FUDGE.' % (info.library, info.libraryVersion)
+    if '&' in info.author:
+        info.author = info.author.replace('&', 'and')  # make XML-friendly.  Could also split into two authors
+    documentation.authors.add(authorModule.Author(info.author, '', ''))

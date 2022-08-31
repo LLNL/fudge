@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,8 +7,10 @@
 
 import math
 
+from xData import enums as xDataEnumsModule
 from PoPs.families import nuclide as nuclideModule
 
+from fudge import enums as enumsModule
 from fudge import outputChannel as outputChannelModule
 import fudge.reactionData.crossSection as crossSectionModule
 import fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic as CPElasticModule
@@ -41,11 +43,11 @@ def toENDF6( self, MT, endfMFList, targetInfo, level, LR ) :
                 targetID = reactionSuite.target
                 if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs[targetID].pid
                 target = reactionSuite.PoPs[targetID]
-                if( isinstance( target, nuclideModule.particle ) ) :
+                if( isinstance( target, nuclideModule.Particle ) ) :
                     if( target.index != 0 ) : QM = QI
             else :
                 if( targetInfo['reaction'] is not None ) :
-                    if( targetInfo['reaction'].outputChannel.genre == outputChannelModule.Genre.twoBody ) :
+                    if targetInfo['reaction'].outputChannel.genre == enumsModule.Genre.twoBody:
                         QM = QI + level
                     else :
                         QM = targetInfo['reaction'].thresholdQAs( 'eV', final = True )
@@ -66,7 +68,7 @@ def toENDF6( self, MT, endfMFList, targetInfo, level, LR ) :
         endfMFList[MF][MT] += endfFormatsModule.endfDataList( crossSectionFlatData )
         endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
 
-crossSectionModule.component.toENDF6 = toENDF6
+crossSectionModule.Component.toENDF6 = toENDF6
 
 def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
 
@@ -86,11 +88,12 @@ def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
         ENDFInterpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( region.interpolation )
         data = region.copyDataToXYs( )
         if( lastX is not None ) :
-            if( lastY == data[0][1] ) :
+            isLogY = region.interpolation in [xDataEnumsModule.Interpolation.loglin, xDataEnumsModule.Interpolation.loglog]
+            if lastY == data[0][1]:
                 data = data[1:]
-            elif( ( lastY == 0 ) and region.interpolation[4:] == 'log' ) :
+            elif lastY == 0 and isLogY:
                 interpolationFlatData[-2] += 1
-            elif( ENDFInterpolation == lastENDFInterpolation ) :
+            elif ENDFInterpolation == lastENDFInterpolation:
                 interpolationFlatData = interpolationFlatData[:-2]
         counter += len( data )
         interpolationFlatData.append( counter )
@@ -100,7 +103,7 @@ def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
         lastENDFInterpolation = ENDFInterpolation
     return( interpolationFlatData, crossSectionFlatData )
 
-crossSectionModule.regions1d.toENDF6Data = toENDF6Data
+crossSectionModule.Regions1d.toENDF6Data = toENDF6Data
 
 def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
 
@@ -117,7 +120,7 @@ def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
 
         if isinstance(term.data, crossSectionModule.XYs1d):
             regions.append(term.data.copy())
-        elif isinstance(term.data, crossSectionModule.regions1d):
+        elif isinstance(term.data, crossSectionModule.Regions1d):
             regions.append(term.data[0].copy())
 
         if mergeFlag is not None:
@@ -129,31 +132,31 @@ def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
                 data = reg1.copyDataToXYs()[:-1] + reg2.copyDataToXYs()
             reg1.setData(data)
 
-        if isinstance(term.data, crossSectionModule.regions1d):
+        if isinstance(term.data, crossSectionModule.Regions1d):
             for region in term.data[1:]:
                 regions.append(region.copy())
 
         mergeFlag = targetInfo['ENDFconversionFlags'].get(term)
 
-    regions_ = crossSectionModule.regions1d(axes=axes)
+    regions_ = crossSectionModule.Regions1d(axes=axes)
     for region in regions:
         regions_.append( region )
 
     return regions_.toENDF6Data( MT, endfMFList, targetInfo, level )
 
-crossSectionModule.resonancesWithBackground.toENDF6Data = toENDF6Data
+crossSectionModule.ResonancesWithBackground.toENDF6Data = toENDF6Data
 
 def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
 
-    if isinstance( self.link, CPElasticModule.CoulombPlusNuclearElastic.form ):
-        if isinstance( self.link.data, CPElasticModule.nuclearAmplitudeExpansion.nuclearAmplitudeExpansion ):
+    if isinstance( self.link, CPElasticModule.CoulombPlusNuclearElastic.Form ):
+        if isinstance( self.link.data, CPElasticModule.nuclearAmplitudeExpansion.NuclearAmplitudeExpansion ):
             # actual cross section is in the Coulomb expansion, MF=3 stores a dummy value:
             return( [ 2, 2 ], [ self.link.domainMin,1, self.link.domainMax,1] )
-        elif isinstance(self.link.data, CPElasticModule.nuclearPlusInterference.nuclearPlusInterference):
+        elif isinstance(self.link.data, CPElasticModule.nuclearPlusInterference.NuclearPlusInterference):
             # ENDF-6 uses different convention than GNDS or ENDL: factor of 2pi smaller
             crossSection = crossSectionModule.XYs1d( data = self.link.data.crossSection.data / (2 * math.pi) )
             return crossSection.toENDF6Data( MT, endfMFList, targetInfo, level )
     else :
         return( [ None, None ] )
 
-crossSectionModule.reference.toENDF6Data = toENDF6Data
+crossSectionModule.Reference.toENDF6Data = toENDF6Data

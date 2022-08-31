@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@ import math
 import numpy
 
 from pqu.PQU import PhysicalQuantityWithUncertainty as PQU
-from xData import XYs
+from xData import XYs1d
 
 SQRT2 = math.sqrt(2.0)
 SQRTTWOOVERPI = math.sqrt(2.0 / math.pi)
@@ -24,7 +24,7 @@ import abc
 import xData.base as baseModule
 
 
-class XYs1dFunctional(baseModule.xDataFunctional):
+class XYs1dFunctional(baseModule.XDataFunctional):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
@@ -100,7 +100,7 @@ class PDF1d(XYs1dFunctional):
     def drawSample(self, size=None): pass
 
 
-class UnivariatePDF(XYs.XYs1d, PDF1d):
+class UnivariatePDF(XYs1d.XYs1d, PDF1d):
     """
     Simple implmentation of a generic probability distribution function.
 
@@ -156,26 +156,26 @@ class UnivariatePDF(XYs.XYs1d, PDF1d):
 
         # Construct interpolation table of the PDF
         if 'pdfTable' in kwds:
-            XYs.XYs1d.__init__(self,
-                               axes=XYs.XYs1d.defaultAxes(labelsUnits={1: (xLabel, xUnit), 0: (yLabel, yUnit)}),
+            XYs1d.XYs1d.__init__(self,
+                               axes=XYs1d.XYs1d.defaultAxes(labelsUnits={1: (xLabel, xUnit), 0: (yLabel, yUnit)}),
                                data=[xGrid, list(kwds['pdfTable']) + list(kwds['pdfTable'][-1:])],
                                interpolation='flat', dataForm='xsandys', **kwds)
         elif 'XYs1d' in kwds:
-            XYs.XYs1d.__init__(self,
+            XYs1d.XYs1d.__init__(self,
                                axes=kwds['XYs1d'].axes,
                                data=kwds['XYs1d'],
                                interpolation=kwds['XYs1d'].interpolation, index=kwds['XYs1d'].index)
         elif kwds:
-            XYs.XYs1d.__init__(self, **kwds)
+            XYs1d.XYs1d.__init__(self, **kwds)
         else:
-            tmp = XYs.XYs1d.createFromFunction(
-                axes=XYs.XYs1d.defaultAxes(labelsUnits={1: (xLabel, xUnit), 0: (yLabel, yUnit)}),
+            tmp = XYs1d.XYs1d.createFromFunction(
+                axes=XYs1d.XYs1d.defaultAxes(labelsUnits={1: (xLabel, xUnit), 0: (yLabel, yUnit)}),
                 Xs=xGrid,
                 func=self.__class__.getValueRawPDF,
                 parameters=params,
                 accuracy=accuracy,
                 biSectionMax=50)
-            XYs.XYs1d.__init__(self, axes=tmp.axes, data=tmp.copyDataToXsAndYs(), dataForm='xsandys', **kwds)
+            XYs1d.XYs1d.__init__(self, axes=tmp.axes, data=tmp.copyDataToXsAndYs(), dataForm='xsandys', **kwds)
 
         # Compute the CDF
         self.__cdf = self.getCDF(params, xGrid, xLabel, xUnit)
@@ -305,8 +305,8 @@ class UnivariatePDF(XYs.XYs1d, PDF1d):
 
         # OK, so there is a getValueRawCDF, let's use that to build the cdf
         if have_getValueRawCDF:
-            cdf = XYs.XYs1d.createFromFunction(
-                axes=XYs.XYs1d.defaultAxes(labelsUnits={1: (xLabel, xUnit), 0: (yLabel, yUnit)}),
+            cdf = XYs1d.XYs1d.createFromFunction(
+                axes=XYs1d.XYs1d.defaultAxes(labelsUnits={1: (xLabel, xUnit), 0: (yLabel, yUnit)}),
                 Xs=xGrid,
                 func=self.__class__.getValueRawCDF,
                 parameters=params,

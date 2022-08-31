@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -36,13 +36,14 @@ For translating ENDF ITYPE=3 data (photo-atomic and electro-atomic interactions)
 #   T(e-,e-?)T{}      528
 
 from PoPs import IDs as IDsPoPsModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
+from xData import enums as xDataEnumsModule
 
-import xData.standards as standardsModule
 import brownies.legacy.converting.toGNDSMisc as toGNDSMiscModule
 
+from fudge import enums as enumsModule
 from fudge import outputChannel as outputChannelModule
-import fudge.sums as sumsModule
+from fudge import sums as sumsModule
 
 import fudge.reactions.reaction as reactionModule
 import fudge.reactions.incompleteReaction as incompleteReactionModule
@@ -64,10 +65,10 @@ photonSumLabels = { 501 : 'total', 516 : 'pair product', 522 : 'photoelectric ab
 
 def readMF27( info, MT, MF27Datas, label, warningList ) :
 
-    _class = { 502 : coherentModule.formFactor, 
+    _class = { 502 : coherentModule.FormFactor, 
                504 : None,
-               505 : coherentModule.imaginaryAnomalousFactor,
-               506 : coherentModule.realAnomalousFactor }[MT]
+               505 : coherentModule.ImaginaryAnomalousFactor,
+               506 : coherentModule.RealAnomalousFactor }[MT]
 
     XYs1d = coherentModule.XYs1d
     if( MT == 504 ) : XYs1d = incoherentModule.XYs1d
@@ -83,9 +84,9 @@ def readMF27( info, MT, MF27Datas, label, warningList ) :
         data = coherentModule.XYs1d( data = MF27s[0], axes = axes )
     else :
         if( MT == 504 ) :
-            data = incoherentModule.regions1d( axes = axes )
+            data = incoherentModule.Regions1d( axes = axes )
         else :
-            data = coherentModule.regions1d( axes = axes )
+            data = coherentModule.Regions1d( axes = axes )
         for region in MF27s :
             if( len( region ) > 1 ) : data.append( region )
         if( MT == 504 ) : return( data )
@@ -144,7 +145,7 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
                 for product in productList :
                     if( isinstance( product.multiplicity[0], multiplicityModule.XYs1d ) ) :
                         multiplicity = product.multiplicity.pop( product.multiplicity[0].label )
-                        multiplicity = multiplicityModule.constant1d( 1, multiplicity.domainMin, multiplicity.domainMax, 
+                        multiplicity = multiplicityModule.Constant1d( 1, multiplicity.domainMin, multiplicity.domainMax, 
                                 axes = multiplicity.axes, label = multiplicity.label )
                         product.multiplicity.add( multiplicity )
 
@@ -157,7 +158,7 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
         except KeyError:
             process = None
         if( MT in [ 502, 504, 522 ] ) :
-            outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.twoBody, process = process )
+            outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody, process=process)
             outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, 0, crossSection ) )
             if( MT in [ 502 , 504 ] ) :
                 product = toGNDSMiscModule.getTypeNameGamma( info, 0 )
@@ -165,25 +166,26 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
                 outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
                 if( MT == 502 ) :
                     formFactor = readMF27( info, MT, MTData, 'coherent form factor', warningList )
-                    doubleDifferentialCrossSectionForm = coherentModule.form( product.id, info.style, standardsModule.frames.labToken, 
+                    doubleDifferentialCrossSectionForm = coherentModule.Form( product.pid, info.style, xDataEnumsModule.Frame.lab, 
                             formFactor, MT506, MT505 )
-                    form = photonScatteringModule.coherentPhotonScattering.form( label = info.style, link = doubleDifferentialCrossSectionForm )
+                    form = photonScatteringModule.CoherentPhotonScattering.Form( label = info.style, link = doubleDifferentialCrossSectionForm )
                 else :
                     subform = readMF27( info, MT, MTData, 'incoherent scattering function', warningList )
-                    doubleDifferentialCrossSectionForm = incoherentModule.form( product.id, info.style, standardsModule.frames.labToken, subform )
-                    form = photonScatteringModule.incoherentPhotonScattering.form( label = info.style, link = doubleDifferentialCrossSectionForm )
+                    scatteringFactor = incoherentModule.ScatteringFactor(subform)
+                    doubleDifferentialCrossSectionForm = incoherentModule.Form(product.pid, info.style, xDataEnumsModule.Frame.lab, scatteringFactor)
+                    form = photonScatteringModule.IncoherentPhotonScattering.Form( label = info.style, link = doubleDifferentialCrossSectionForm )
                 product.distribution.add( form )
         elif( MT in [ 525, 526, 527, 528 ] ) :
             if( isTwoBody ) :
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.twoBody, process = process )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody, process=process)
             else :
-                outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody, process = process )
+                outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=process)
             outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, 0, crossSection ) )
             productsNeeded = [ IDsPoPsModule.electron ]
             if( MT == 527 ) : productsNeeded.insert( 0, IDsPoPsModule.photon )
         else :
             if( MT in [ 515, 517 ] ) : EPE = -crossSection.domainMin
-            outputChannel = outputChannelModule.outputChannel( outputChannelModule.Genre.NBody, process = process )
+            outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=process)
             outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, EPE, crossSection ) )
             if( MT in MT_AtomicConfigurations ) :
                 productsNeeded = [ IDsPoPsModule.electron ]
@@ -213,7 +215,7 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             if( MT >= 534 ) : elementSymbol += '{%s}' % MT_AtomicConfigurations[MT]
             residual = toGNDSMiscModule.newGNDSParticle( info, elementSymbol, crossSection )
             residual.distribution.add(
-                unspecifiedModule.form( info.style, productFrame = standardsModule.frames.labToken )
+                unspecifiedModule.Form(info.style, productFrame = xDataEnumsModule.Frame.lab)
             )
             outputChannel.products.add( outputChannel.products.uniqueLabel( residual ) )
             info.ENDFconversionFlags.add( residual, 'implicitProduct' )
@@ -226,9 +228,9 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             continue
 
         if( MT == 525 ) :
-            reaction = incompleteReactionModule.incompleteReaction( outputChannel.genre, ENDF_MT = MT )
+            reaction = incompleteReactionModule.IncompleteReaction( None, outputChannel.genre, ENDF_MT = MT )
         else :
-            reaction = reactionModule.reaction( outputChannel.genre, ENDF_MT = MT )
+            reaction = reactionModule.Reaction( None, outputChannel.genre, ENDF_MT = MT )
         endf_endlModule.setReactionsOutputChannelFromOutputChannel( info, reaction, outputChannel )
         reaction.crossSection.add( crossSection )
         if( doubleDifferentialCrossSectionForm is not None ) : reaction.doubleDifferentialCrossSection.add( doubleDifferentialCrossSectionForm )
@@ -248,10 +250,10 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             summandMTs = list( { 501 : range( 502, 573 ), 516 : ( 515, 517 ), 522 : range( 534, 573 ) }[MT] )
             if( 525 in summandMTs ) : summandMTs.remove( 525 )
 
-            summedCrossSection = sumsModule.crossSectionSum( label=photonSumLabels[MT], ENDF_MT=MT )
+            summedCrossSection = sumsModule.CrossSectionSum( label=photonSumLabels[MT], ENDF_MT=MT )
             summedCrossSection.crossSection.add( crossSection )
             for reaction in reactionSuite :
-                if( reaction.ENDF_MT in summandMTs ) : summedCrossSection.summands.append( sumsModule.add( link = reaction.crossSection ) )
+                if( reaction.ENDF_MT in summandMTs ) : summedCrossSection.summands.append( sumsModule.Add( link = reaction.crossSection ) )
             Q = outputChannel.Q[info.style]
             if( Q is not None ) : summedCrossSection.Q.add( Q )
             reactionSuite.sums.crossSectionSums.add( summedCrossSection )

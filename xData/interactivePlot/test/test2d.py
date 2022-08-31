@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,7 +14,7 @@ from fudge import reactionSuite as reactionSuiteModule
 
 # assume input GNDS file is in this script's folder
 filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'n-094_Pu_239_reactionSuite.gnds.xml')
-reactionSuite = reactionSuiteModule.readXML(filename)
+reactionSuite = reactionSuiteModule.ReactionSuite.readXML_file(filename)
 
 fissionReaction = reactionSuite.reactions['m(E)*n + photon [total fission]']
 fissionDistributionXYs = fissionReaction.outputChannel.products['n'].distribution.evaluated.energySubform.data

@@ -1,12 +1,13 @@
 import copy, os, pprint, math, traceback, sys, collections
 from pqu.PQU import PhysicalQuantityWithUncertainty as PhysicalQuantity
 from brownies.legacy.endl.structure import masses
-from fudge.resonances.common import spin, parity
-from PoPs.groups.misc import symbolFromZ as elementSymbolFromZ
-from PoPs.groups.misc import idFromZA as nucleusNameFromZA
-from PoPs.groups.misc import ZAInfo_fromString
+from fudge.resonances.common import Spin, Parity
+from PoPs.chemicalElements.misc import symbolFromZ as elementSymbolFromZ
+from PoPs.chemicalElements.misc import idFromZA as nucleusNameFromZA
+from PoPs.chemicalElements.misc import ZAInfo_fromString
 from brownies.BNL.plot_evaluation.plotio import readEvaluation
-from xData import axes, XYs
+from xData import axes as axesModule
+form xData import XYs1d as XYs1dModule
 
 ENDFFILEPATH = os.environ['HOME'] + "/Sites/endfb71.dev/neutrons"
 
@@ -53,9 +54,9 @@ def is_transition_allowed( multipolarity, startJ, startPi, stopJ, stopPi ):
         PiTest=1
     else:
         PiTest=-1
-    if isinstance(startJ, spin):
+    if isinstance(startJ, Spin):
         startJ=startJ.value
-    if isinstance(stopJ, spin):
+    if isinstance(stopJ, Spin):
         stopJ=stopJ.value
     if multipolarity[0] == "E" and PiTest != pow(-1,multipolarity[1]):
         return False
@@ -235,9 +236,9 @@ class nucleus:
                 for level in RR.nativeData.resonanceParameters.data:
                     iLevel += 1
                     iRes+=1
-                    J = spin(str(int(abs(level[2])*2.0))+'/2')
-                    if level[2] == 0.0: Pi = parity(-1)
-                    else: Pi = parity(+1)
+                    J = Spin(str(int(abs(level[2])*2.0))+'/2')
+                    if level[2] == 0.0: Pi = Parity(-1)
+                    else: Pi = Parity(+1)
                     self.addLevel(
                         nuclearLevel(
                             name=self.symbol+str(self.A)+'_r%i'%(iRes),
@@ -351,7 +352,7 @@ class nucleus:
         return dummyLevel
 
     def getCumulativeLevelDistribution(self, J=None, Pi=None):
-        myAxes = axes.axes(labelsUnits={0: ('Excitation energy', 'MeV'), 1: ('Number of levels', '')})
+        myAxes = axesModule.Axes(labelsUnits={0: ('Excitation energy', 'MeV'), 1: ('Number of levels', '')})
         theData = [[0.0, 1.0]]
         def JPiMatches(level):
             Jmatch = J is None or str(level.spin)=='?'
@@ -365,10 +366,10 @@ class nucleus:
                 theData[-1][1] = theData[-1][1] + 1  # Deal with corner case where two levels are degenerate
             else:
                 theData.append([thisEnergy, theData[-1][1] + 1])
-        return XYs.XYs1d(interpolation='flat',axes=myAxes, data=theData, accuracy=1e-5)
+        return XYs1dModule.XYs1d(interpolation='flat',axes=myAxes, data=theData, accuracy=1e-5)
 
     def getLevelSpacingDistribution(self):
-        myAxes = axes.defaultAxes(dimension=2, independentInterpolation='linear', dependentInterpolation='flat',
+        myAxes = axesModule.defaultAxes(dimension=2, independentInterpolation='linear', dependentInterpolation='flat',
                                   labelsUnits={0: ( 'Excitation energy', 'MeV' ), 1: ( 'Level spacing, D', 'MeV' )})
         theData = []
         levelList = self.levels.keys()
@@ -378,7 +379,7 @@ class nucleus:
             lastEnergy = copy.copy(thisEnergy)
             thisEnergy = float(self.levels[level].energy.inUnitsOf('MeV').value)
             theData.append([thisEnergy, thisEnergy - lastEnergy])
-        return XYs.XYs(myAxes, data=theData, accuracy=1e-5)
+        return XYs1dModule.XYs(myAxes, data=theData, accuracy=1e-5)
 
     def getLastLevelInCompleteSchemeIndex(self):
         if self.lastLevelInCompleteScheme == None: raise NotImplementedError()
@@ -394,7 +395,7 @@ class nucleus:
             theSpin=x.spin
             theParity=x.parity
             if type(theSpin)==float:
-                theSpin=spin(str(int(2.0*x.spin))+'/2')
+                theSpin=Spin(str(int(2.0*x.spin))+'/2')
             if type(theParity)==int:
                 theParity=parity(x.parity)
             tmp = (theSpin, theParity)
@@ -662,7 +663,7 @@ class nuclearLevel:
         :return: None
         """
         try:
-            self.spin=spin(J)
+            self.spin=Spin(J)
         except:
             raise TypeError("J must be a str, float or int")
 
@@ -1167,12 +1168,12 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
                 if J == -1:
                     J = None
                 else:
-                    J = spin(J)
+                    J = Spin(J)
                 Pi = int(line[21:24])
                 if Pi == 0:
                     Pi = None
                 else:
-                    Pi=parity(Pi)
+                    Pi=Parity(Pi)
                 howJPiDetermined = line[38:40].strip()
                 alternateJPiAssignments = line[40:64].strip()
 

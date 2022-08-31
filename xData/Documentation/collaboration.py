@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,14 +11,17 @@ from .. import suite as suiteModule
 This module contains the class for the GNDS documentation child node collaboration.
 """
 
-from .. import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
 
-class Collaboration( ancestryModule.Ancestry2 ) :
+class Collaboration(ancestryModule.AncestryIO):
     """A class representing a GNDS documentation/collaborations/collaboration node."""
 
     moniker = 'collaboration'
+    keyName = 'label'
 
-    def __init__( self, name, href = '' ) :
+    def __init__(self, name, href=''):
+
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__name = name
         self.__href = href
@@ -35,24 +38,25 @@ class Collaboration( ancestryModule.Ancestry2 ) :
 
         return( self.__href )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         href = ''
         if( len( self.__href ) > 0 ) : href = ' href="%s"' % self.__href
 
         return( [ '%s<%s name="%s"%s/>' % ( indent, self.moniker, self.__name, href ) ] )
 
-    @staticmethod
-    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         name = node.get( 'name' )
         href = node.get( 'href' )
 
-        return( Collaboration( name, href ) )
+        return cls( name, href)
 
 class Collaborations( suiteModule.Suite ) :
 
     moniker = 'collaborations'
+    suiteName = 'label'
 
     def __init__( self ) :
 

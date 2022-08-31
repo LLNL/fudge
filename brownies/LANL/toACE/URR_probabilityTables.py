@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@
 This module adds the URR probability tables if they exists.
 """
 
-from xData import XYs as XYs1dModule
+from xData import XYs1d as XYs1dModule
 from fudge import styles as stylesModule
 
 def toACE_tables( reactionCrossSection, GNDS_URR_data, cumulatives ) :
@@ -25,7 +25,7 @@ def toACE_tables( reactionCrossSection, GNDS_URR_data, cumulatives ) :
         xs = [ inv_cdf.evaluate( cumulative ) for cumulative in cumulatives ] + [ inv_cdf[-1][1] ]
         for i1, x2 in enumerate( xs )  :
             if( i1 > 0 ) :
-                ACE_URR_crossSections.append( float( pdf.integrateWithWeight_x( domainMin = x1, domainMax = x2 ) / pdf.integrate( domainMin = x1, domainMax = x2 ) ) )
+                ACE_URR_crossSections.append( pdf.integrateWithWeight_x( domainMin = x1, domainMax = x2 ) / pdf.integrate( domainMin = x1, domainMax = x2 ) )
             x1 = x2
         ACE_URR_data[function.outerDomainValue] = [ reactionCrossSection.evaluate( function.outerDomainValue ), ACE_URR_crossSections ]
 
@@ -44,7 +44,7 @@ def URR_probabilityTable( self, numberOfProbabilities = 20 ) :
             while( True ) :
                 heatedStyle = self.styles[heatedStyle.derivedFrom]
                 if( heatedStyle is None ) : raise Exception( 'Could not find heated style for URR data.' )
-                if( isinstance( heatedStyle, stylesModule.heated ) ) : break
+                if( isinstance( heatedStyle, stylesModule.Heated ) ) : break
 
             cumulatives = [ i1 / float( numberOfProbabilities ) for i1 in range( numberOfProbabilities ) ]
             URR_label = URR_style.label

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,16 +14,16 @@ from . import quantity as quantityModule
 
 baseUnit = quantityModule.stringToPhysicalUnit( '' )
 
-class integer( quantityModule.integer ) :
+class Integer( quantityModule.Integer ) :
 
     baseUnit = baseUnit
 
     def __init__( self, label, value, unit, documentation = '' ) :
 
-        quantityModule.integer.__init__( self, label, value, unit, documentation = documentation )
+        quantityModule.Integer.__init__( self, label, value, unit, documentation = documentation )
         if( self.value not in [ -1, 1 ] ) : raise ValueError( 'parity value %d not allowed' % self.value )
 
-class suite( quantityModule.suite ) :
+class Suite( quantityModule.Suite ) :
 
     moniker = 'parity'
-    _allowedClasses = [ integer ]
+    _allowedClasses = [ Integer ]

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -46,7 +46,7 @@ def floatsAlmostEqual(float1, float2, epsilon=1e-15):
 
 if VERBOSE:
     print('reading MLBWExampleZr90...')
-MLBWExampleZr90 = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'MLBWExampleZr90_testFile.gnds.xml')
+MLBWExampleZr90 = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'MLBWExampleZr90_testFile.gnds.xml')
 
 
 class TestWithIsClose(unittest.TestCase):
@@ -158,7 +158,7 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
             for r in fakeRR[lj0].data:
                 widths[w].append(r[i])
             aveWidthFunc=self.Zr90URR.averageWidths[lj0][w]
-            aveWidth=(aveWidthFunc.integrate()/(aveWidthFunc.domainMax-aveWidthFunc.domainMin)).getValue()
+            aveWidth=aveWidthFunc.integrate() / (aveWidthFunc.domainMax-aveWidthFunc.domainMin)
             if w == 'capture':
                 self.assertWithinXPercent(numpy.mean(widths[w]), aveWidth, 20.0)
             #else:

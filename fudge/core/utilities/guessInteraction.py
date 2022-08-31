@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,8 +11,8 @@ is missing; and if so, return a good guess of what its value should be.
 '''
 
 from PoPs import IDs as PoPsIDsModule
-from PoPs.groups import misc as PoPsGroupMiscModule
-from fudge import reactionSuite as reactionSuiteModule
+from PoPs.chemicalElements import misc as PoPsGroupMiscModule
+from fudge import enums as enumsModule
 
 names = ( 'HinCH2',                 'HinH2O',               'HinC5O2H8',                'HinIceIh',     'HinYH2',
           'HinZrH',                 'ortho-H',              'para-H',                   'DinD2O',       'ortho-D',
@@ -44,14 +44,14 @@ def guessInteraction(interaction, projectileID, targetID):
     if interaction is None:
         guessedInteraction = True
         if 'ENDL9912' in targetID:
-            interaction = reactionSuiteModule.Interaction.nuclear if projectileID != PoPsIDsModule.photon else reactionSuiteModule.Interaction.atomic
+            interaction = enumsModule.Interaction.nuclear if projectileID != PoPsIDsModule.photon else enumsModule.Interaction.atomic
         elif isTNSL_name(targetID):
-            interaction = reactionSuiteModule.Interaction.TNSL
+            interaction = enumsModule.Interaction.TNSL
         elif targetID in PoPsGroupMiscModule.ZFromSymbol:
-            interaction = reactionSuiteModule.Interaction.atomic
+            interaction = enumsModule.Interaction.atomic
         else:
-            interaction = reactionSuiteModule.Interaction.nuclear
+            interaction = enumsModule.Interaction.nuclear
     else:
-        if interaction not in reactionSuiteModule.Interaction.allowed: raise ValueError('Invalid interaction "%s".' % interaction)
+        interaction = enumsModule.Interaction.checkEnumOrString(interaction)
 
     return guessedInteraction, interaction

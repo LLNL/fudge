@@ -1,13 +1,13 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 from pqu import PQU as PQUModule
-from xData import standards as standardsModule
 
+from xData import enums as xDataEnumsModule
 from fudge.productData.distributions import angularEnergy as angularEnergyModule
 
 from ... import gndsToENDF6 as gndsToENDF6Module
@@ -25,7 +25,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     else :
         print( 'WARNING: angularEnergy subform "%s" has no toENDF6 method' % subform.moniker )
 
-angularEnergyModule.form.toENDF6 = toENDF6
+angularEnergyModule.Form.toENDF6 = toENDF6
 
 #
 # XYs3d
@@ -50,6 +50,6 @@ def toENDF6( self, flags, targetInfo ) :
             MF6 += endfFormatsModule.endfInterpolationList( [ numEout, pdf_of_EpInterpolation ] )
             xys = entries.copyDataToXYs( )
             MF6 += endfFormatsModule.endfNdDataList( xys )
-    return( 7, standardsModule.frames.labToken, MF6 )
+    return 7, xDataEnumsModule.Frame.lab, MF6
 
 angularEnergyModule.XYs3d.toENDF6 = toENDF6

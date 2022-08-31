@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,34 +13,34 @@ import math
 
 from pqu import PQU as PQUModule
 
-import xData.ancestry as ancestryModule
-import xData.standards as standardsModule
-import xData.XYs as XYsModule
+from LUPY import ancestry as ancestryModule
+
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
 
 from fudge.core.math import fudgemath as fudgemathModule
 from ... import crossSection as crossSectionModule
 from .. import base as baseModule
 
-__metaclass__ = type
 
 class XYs1d( baseModule.XYs1d ) :
 
     pass
 
-class regions1d( baseModule.regions1d ) :
+class Regions1d( baseModule.Regions1d ) :
 
     @staticmethod
     def allowedSubElements( ) :
 
         return( ( XYs1d, ) )
 
-class coherentFunctionBase( ancestryModule.ancestry ) :
+class CoherentFunctionBase( ancestryModule.AncestryIO ) :
 
     def __init__( self, data ) :
 
-        ancestryModule.ancestry.__init__( self )
-        if( not( isinstance( data, ( baseModule.XYs1d, baseModule.regions1d ) ) ) ) :
-            raise TypeError( "Needed %s baseModulesubform." % self.moniker )
+        ancestryModule.AncestryIO.__init__( self )
+        if not isinstance(data, (XYs1d, Regions1d)):
+            raise TypeError( "Invalid data type: got %s." % type(data))
 
         self.data = data
         self.data.setAncestor( self )
@@ -53,69 +53,70 @@ class coherentFunctionBase( ancestryModule.ancestry ) :
 
         return( [] )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlStringList = [ "%s<%s>" % ( indent, self.moniker ) ]
-        xmlStringList += self.data.toXMLList( indent = indent2, **kwargs )
+        xmlStringList += self.data.toXML_strList( indent = indent2, **kwargs )
         xmlStringList[-1] += "</%s>" % self.moniker
         return( xmlStringList )
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         data = element[0]
         if( data.tag == baseModule.XYs1d.moniker ) :
-            data = XYs1d.parseXMLNode( data, xPath, linkData )
-        elif( data.tag == baseModule.regions1d.moniker ) :
-            data = regions1d.parseXMLNode( data, xPath, linkData )
+            data = XYs1d.parseNodeUsingClass(data, xPath, linkData, **kwargs)
+        elif( data.tag == baseModule.Regions1d.moniker ) :
+            data = Regions1d.parseNodeUsingClass(data, xPath, linkData, **kwargs)
         else :
             raise TypeError( 'Invalid data "%s" for "%s"' % ( data.tag, cls.tag ) )
 
-        xPath.pop( )
-        return( cls( data ) )
+        instance = cls(data)
 
-class formFactor( coherentFunctionBase ) :
+        xPath.pop( )
+
+        return instance
+
+class FormFactor( CoherentFunctionBase ) :
 
     moniker = 'formFactor'
     ENDFMT = 502
 
-class imaginaryAnomalousFactor( coherentFunctionBase ) :
+class ImaginaryAnomalousFactor( CoherentFunctionBase ) :
 
     moniker = 'imaginaryAnomalousFactor'
     ENDFMT = 505
 
-class realAnomalousFactor( coherentFunctionBase ) :
+class RealAnomalousFactor( CoherentFunctionBase ) :
 
     moniker = 'realAnomalousFactor'
     ENDFMT = 506
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'coherentPhotonScattering'
+    keyName = 'label'
+
     subformAttributes = ( 'formFactor', 'anomalousScatteringFactor_realPart', 'anomalousScatteringFactor_imaginaryPart' )
 
     def __init__( self, pid, label, productFrame, _formFactor, realPart, imaginaryPart ) :
 
-        if( not( isinstance( _formFactor, formFactor ) ) ) :
-            raise Exception( 'Instance is class "%s" and not formFactor' % formFactor.__class__ )
+        if( not( isinstance( _formFactor, FormFactor ) ) ) :
+            raise Exception( 'Instance is class "%s" and not formFactor' % FormFactor.__class__ )
 
         if( realPart is not None ) :
-            if( not( isinstance( realPart, realAnomalousFactor ) ) ) :
-                raise Exception( 'Instance is class "%s" and not realAnomalousFactor' % realPart.__class__ )
+            if( not( isinstance( realPart, RealAnomalousFactor ) ) ) :
+                raise Exception( 'Instance is class "%s" and not RealAnomalousFactor' % realPart.__class__ )
 
         if( imaginaryPart is not None ) :
-            if( not( isinstance( imaginaryPart, imaginaryAnomalousFactor ) ) ) :
-                raise Exception( 'Instance is class "%s" and not imaginaryAnomalousFactor' % imaginaryPart.__class__ )
+            if( not( isinstance( imaginaryPart, ImaginaryAnomalousFactor ) ) ) :
+                raise Exception( 'Instance is class "%s" and not ImaginaryAnomalousFactor' % imaginaryPart.__class__ )
 
-        baseModule.form.__init__( self, pid, label, productFrame, ( _formFactor, realPart, imaginaryPart ) )
+        baseModule.Form.__init__( self, pid, label, productFrame, ( _formFactor, realPart, imaginaryPart ) )
 
     def check( self, info ) :
 
@@ -141,7 +142,7 @@ class form( baseModule.form ) :
         verbosity = tempInfo['verbosity']
         if( verbosity > 2 ) : print('%sGrouping %s' % (indent, self.moniker))
 
-        anomalousScatteringFactor = XYsModule.XYs1d( [ [ 0.0, 0.0 ], [ 21., 0.0 ] ] )
+        anomalousScatteringFactor = XYs1dModule.XYs1d( [ [ 0.0, 0.0 ], [ 21., 0.0 ] ] )
         anomalousScatteringFactor_realPart = anomalousScatteringFactor
         if( self.anomalousScatteringFactor_realPart is not None ) :
             anomalousScatteringFactor_realPart = self.anomalousScatteringFactor_realPart.data
@@ -154,7 +155,7 @@ class form( baseModule.form ) :
                 comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
-    def crossSection(  self, tolerance = 1e-3, interpolation = standardsModule.interpolation.linlinToken ) :
+    def crossSection(self, tolerance=1e-3, interpolation=xDataEnumsModule.Interpolation.linlin):
         """
         Integrates the double differential cross section to get the cross section :math:`\\sigma(E)` where :math:`E` is the projectile's energy.
         """
@@ -163,7 +164,7 @@ class form( baseModule.form ) :
 
             pass
 
-        class tester :
+        class Tester :
 
             def __init__( self, parameters, relativeTolerance, absoluteTolerance, anomalousScatteringFactor_realPart, anomalousScatteringFactor_imaginaryPart ) :
 
@@ -261,10 +262,10 @@ class form( baseModule.form ) :
         parameters.factor_crossSection = factor_crossSection
 
         formFactor = self.formFactor.data
-        if( isinstance( formFactor, regions1d ) ) :
+        if( isinstance( formFactor, Regions1d ) ) :
             _formFactor = formFactor.copy( )
         else :
-            raise Exception( 'Form factor must be a regions1d instance' )
+            raise Exception( 'Form factor must be a Regions1d instance' )
         _formFactor.axes[1].unit = product.domainUnit
         factor_E2x = 1.0 / PQUModule.PQU( 1.0, '%s / hplanck / c' % product.domainUnit ).getValueAs( formFactor.axes[1].unit )
         for region in _formFactor : region.scaleOffsetXAndY( factor_E2x, 0.0, 1.0, 0.0, True )
@@ -300,28 +301,29 @@ class form( baseModule.form ) :
         for energy in initialEnergies :
             energy_crossSection.append( [ energy, integratedCrossSection( energy, parameters, anomalousScatteringFactor_realPart, anomalousScatteringFactor_imaginaryPart ) ] )
 
-        _tester = tester( parameters, tolerance, tolerance * energy_crossSection[-1][1], 
+        _tester = Tester( parameters, tolerance, tolerance * energy_crossSection[-1][1], 
                 anomalousScatteringFactor_realPart, anomalousScatteringFactor_imaginaryPart )
         energy_crossSection = fudgemathModule.thickenXYList( energy_crossSection, _tester, biSectionMax = 10, interpolation = interpolation )
         return( crossSectionModule.XYs1d( data = energy_crossSection, axes = crossSectionModule.defaultAxes( product.domainUnit ),
                 interpolation = interpolation ) )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
-        subForms = { formFactor.moniker : None, realAnomalousFactor.moniker : None, imaginaryAnomalousFactor.moniker : None }
+        subForms = { FormFactor.moniker : None, RealAnomalousFactor.moniker : None, ImaginaryAnomalousFactor.moniker : None }
         for child in element :
-            for _class in ( formFactor, realAnomalousFactor, imaginaryAnomalousFactor ) :
+            for _class in ( FormFactor, RealAnomalousFactor, ImaginaryAnomalousFactor ) :
                 if( child.tag == _class.moniker ) : break
 
             if( child.tag != _class.moniker ) : raise TypeError( "Invalid element '%s' encountered '%s'" % ( child.tag, _class.moniker ) )
-            subForms[_class.moniker] = _class.parseXMLNode( child, xPath, linkData )
+            subForms[_class.moniker] = _class.parseNodeUsingClass(child, xPath, linkData, **kwargs)
 
-        _form = form( element.get( 'pid' ), element.get( 'label' ), element.get( 'productFrame' ),
-                        subForms[formFactor.moniker], subForms[realAnomalousFactor.moniker],
-                        subForms[imaginaryAnomalousFactor.moniker] )
+        _form = cls( element.get( 'pid' ), element.get( 'label' ), element.get( 'productFrame' ),
+                        subForms[FormFactor.moniker], subForms[RealAnomalousFactor.moniker],
+                        subForms[ImaginaryAnomalousFactor.moniker] )
 
         xPath.pop( )
+
         return( _form )

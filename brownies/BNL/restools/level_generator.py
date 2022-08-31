@@ -3,7 +3,7 @@ import numpy
 
 from fudge.core.math.pdf import UnivariatePDF, WignerDistribution, PoissonDistribution, \
     BrodyDistribution, GOEDistribution
-from xData import XYs
+from xData import XYs1d
 
 """
 Collection of fake level sequence generators, including the One True Generator: getGOEFakeLevelSequence
@@ -46,7 +46,7 @@ def getFakeLevelSequence(E0=0.0, aveD=None, numLevels=None, style='goe', BrodyW=
         if levelDensity is None:
             raise ValueError("For GOE style, need a level density")
         if numLevels is None:
-            numLevels = numpy.random.poisson(levelDensity.integrate().value)
+            numLevels = numpy.random.poisson(levelDensity.integrate())
             print("setting numLevels to", numLevels)
 
     if style == 'wigner':
@@ -187,13 +187,13 @@ def getBrodyFakeLevelSequence(E0, aveD, numLevels, BrodyW=0.5):
 
 
 def getCLDInverse(levelDensity):
-    if not isinstance(levelDensity, XYs.XYs1d):
+    if not isinstance(levelDensity, XYs1d.XYs1d):
         raise TypeError("For GOE, levelDensity must be a XYs instance")
 
     DOPLOTS = False
 
     # Normalized level density as a PDF
-    totalNumLevels = int(float(levelDensity.integrate().value))
+    totalNumLevels = int(levelDensity.integrate())
     fakePDF = levelDensity / totalNumLevels
     fakePDF.axes[0].label = "PDF(E)"
     if DOPLOTS:

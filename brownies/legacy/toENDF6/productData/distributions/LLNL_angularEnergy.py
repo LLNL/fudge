@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,47 +7,44 @@
 
 from pqu import PQU as PQUModule
 
+from xData import enums as xDataEnumsModule
 from fudge.productData.distributions import LLNL_angularEnergy as LLNL_angularEnergyModule
+from fudge.productData.distributions import angularEnergy as angularEnergyModule
 
 from ... import gndsToENDF6 as gndsToENDF6Module
-
+from ... import endfFormats as endfFormatsModule
 
 #
 # LLNLAngularEnergyForm
 #
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :    # FIXME appears to be broken code
+def toENDF6(self, MT, endfMFList, flags, targetInfo):
 
-    angularForm = self.angularForm
-    angularEnergyForm = self.angularEnergyForm
+    angularForm = self.angularSubform.data
+    angularEnergyForm = self.angularEnergySubform.data
+    if len(angularForm) != len(angularEnergyForm):
+        raise Exception('len(angularForm) = %s != len(angularEnergyForm) = %s.', (len(angularForm), len(angularEnergyForm)))
 
-    energy_inInterpolation, energy_inFunctionInterpolation, energy_inInterpolationQualifier = angularEnergyForm.axes[0].interpolation.getInterpolationTokens( )
-    muInterpolation, muFunctionInterpolation, muQualifier = angularEnergyForm.axes[1].interpolation.getInterpolationTokens( )
-    energy_outInterpolation, probabilityInterpolation, energy_outQualifier = angularEnergyForm.axes[2].interpolation.getInterpolationTokens( )
-    frame = angularEnergyForm.getProductFrame( )
-    axes = pointwise.defaultAxes( energyInterpolation = energy_inInterpolation, energyFunctionInterpolation = energy_inFunctionInterpolation, 
-            energyInterpolationQualifier = energy_inInterpolationQualifier, muInterpolation = muInterpolation, 
-            energy_outInterpolation = energy_outInterpolation, probabilityInterpolation = probabilityInterpolation )
-    E_inRatio = PQUModule.PQU( 1, angularEnergyForm.axes[0].getUnit( ) ).getValueAs( 'eV' )
-    E_outRatio = PQUModule.PQU( 1, angularEnergyForm.axes[2].getUnit( ) ).getValueAs( 'eV' )
-    LAW7 = pointwise( axes, self.getProductFrame( ) )
+    axes = angularEnergyModule.defaultAxes(angularForm.domainUnit)
 
-    if( len( angularForm ) != len( angularEnergyForm ) ) :
-        raise Exception( "len( angularForm ) = %s != len( angularEnergyForm ) = %s" % ( len( angularForm ), len( angularEnergyForm ) ) )
-    for indexE, EMuP in enumerate( angularForm ) :
-        EMuEpP = angularEnergyForm[indexE]
-        if( EMuP.outerDomainValue != EMuEpP.outerDomainValue ) : raise Exception( "At indexE = %d, EMuP.outerDomainValue %s != EMuEpP.outerDomainValue = %s" % ( indexE, EMuP.outerDomainValue, EMuEpP.outerDomainValue ) )
-        if( len( EMuP ) != len( EMuEpP ) ) :
-            raise Exception( "At indexE = %d (E_in = %s), len( EMuP ) %s != len( EMuEpP ) = %s" % ( indexE, EMuP.outerDomainValue, len( EMuP ), len( EMuEpP ) ) )
-        w_xys = W_XYs.W_XYs( axesW_XY, index = indexE, outerDomainValue = EMuP.outerDomainValue )
-        for indexMu, muP in enumerate( EMuP ) :
-            muEpP = EMuEpP[indexMu]
-            if( muP[0] != muEpP.outerDomainValue ) : raise Exception( "At indexE = %d, mu = %s != muEpP.outerDomainValue = %s" % ( indexE, muP[0], muEpP.outerDomainValue ) )
-            xys = [ [ E_outRatio * Ep, muP[1] * P / E_outRatio ] for Ep, P in muEpP ]
-            xys = XYs.XYs( axesXY, xys, accuracy = muEpP.getAccuracy( ), outerDomainValue = muP[0], index = indexMu, parent = w_xys )
-            w_xys.append( XYs.XYs( axesXY, muEpP * muP[1], accuracy = muEpP.getAccuracy( ), outerDomainValue = muP[0], index = indexMu, parent = w_xys ) )
-        LAW7.append( w_xys )
+    xys3d = angularEnergyModule.XYs3d(axes=axes, interpolation=xDataEnumsModule.Interpolation.linlin, 
+            interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
 
-    LAW, frame, MF6 = LAW7.toENDF6( flags, targetInfo )
-    gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
+    energyConversionFactor = PQUModule.PQU(1, angularForm.axes[-1].unit ).getValueAs('eV')
+    for energyInIndex, P_ofMus in enumerate(angularForm):
+        P_ofEpGiveEMus = angularEnergyForm[energyInIndex]
+        if len(P_ofMus) != len(P_ofEpGiveEMus):
+            raise Exception('For incident energy %.7e, len(P_ofMus) %s != len(P_ofEpGiveEMus) = %s' % 
+                    (P_ofMus.outerDomainValue, len(P_ofMus), len(P_ofEpGiveEMus)))
+
+        xys2d = angularEnergyModule.XYs2d(axes=axes, interpolation=xDataEnumsModule.Interpolation.linlin, outerDomainValue=P_ofMus.outerDomainValue)
+        for muIndex, P_ofMu in enumerate(P_ofMus):
+            mu, muProbability = P_ofMu
+            P_ofEpGiveEMu = muProbability * P_ofEpGiveEMus[muIndex]
+            xys1d = angularEnergyModule.XYs1d(data=P_ofEpGiveEMu, axes=axes, outerDomainValue=mu)
+            xys2d.append(xys1d)
+        xys3d.append(xys2d)
+
+    angularEnergy = angularEnergyModule.Form('temp', xDataEnumsModule.Frame.lab, xys3d)
+    angularEnergy.toENDF6(MT, endfMFList, flags, targetInfo)
 
 LLNL_angularEnergyModule.LLNLAngularEnergyForm.toENDF6 = toENDF6

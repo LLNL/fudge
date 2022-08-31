@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -21,7 +21,7 @@ from .. import misc as miscModule
 from ..decays import decayData as decayDataModule
 from ..quantities import bindingEnergy as bindingEnergyModule
 
-class configuration( miscModule.classWithSubshellKey ) :
+class Configuration( miscModule.ClassWithSubshellKey ) :
 
     moniker = 'configuration'
 
@@ -31,15 +31,15 @@ class configuration( miscModule.classWithSubshellKey ) :
         :param electronNumber: number of electrons in the subshell when neutral
         """
 
-        miscModule.classWithSubshellKey.__init__( self, subshell )
+        miscModule.ClassWithSubshellKey.__init__( self, subshell )
 
         if( not( isinstance( electronNumber, float ) ) ) : raise TypeError( 'electronNumber is not a float' )
         self.__electronNumber = electronNumber
 
-        self.__bindingEnergy = bindingEnergyModule.suite( )
+        self.__bindingEnergy = bindingEnergyModule.Suite( )
         self.__bindingEnergy.setAncestor( self )
 
-        self.__decayData = decayDataModule.decayData( )
+        self.__decayData = decayDataModule.DecayData( )
         self.__decayData.setAncestor( self )
 
     @property
@@ -73,30 +73,26 @@ class configuration( miscModule.classWithSubshellKey ) :
         self.__decayData.copyItems( _configuration.decayData )
         return( _configuration )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s subshell="%s" electronNumber="%s">' % ( indent, self.moniker, self.subshell, self.electronNumber ) ]
-        XMLStringList += self.__bindingEnergy.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.__decayData.toXMLList( indent = indent2, **kwargs )
+        XMLStringList += self.__bindingEnergy.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.__decayData.toXML_strList( indent = indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
 
         return( XMLStringList )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         for child in element :
-            if( child.tag == bindingEnergyModule.suite.moniker ) :
-                self.bindingEnergy.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == decayDataModule.decayData.moniker ) :
-                self.decayData.parseXMLNode( child, xPath, linkData )
+            if( child.tag == bindingEnergyModule.Suite.moniker ) :
+                self.bindingEnergy.parseNode(child, xPath, linkData, **kwargs)
+            elif( child.tag == decayDataModule.DecayData.moniker ) :
+                self.decayData.parseNode(child, xPath, linkData, **kwargs)
             else :
                 raise ValueError( 'Invalid tag = "%s"' % child.tag )
 
@@ -104,30 +100,30 @@ class configuration( miscModule.classWithSubshellKey ) :
         return( self )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         self = cls( element.get('subshell'), float( element.get('electronNumber') ) )
-        self.parseXMLNode( element, xPath, linkData )
+        self.parseNode(element, xPath, linkData, **kwargs)
 
         xPath.pop( )
         return( self )
 
-class configurations( suiteModule.suite ) :
+class Configurations( suiteModule.Suite ) :
 
     moniker = 'configurations'
 
     def __init__( self, replace = True ) :
 
-        suiteModule.suite.__init__( self, ( configuration, ), replace = replace )
+        suiteModule.Suite.__init__( self, ( Configuration, ), replace = replace )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         for child in element :
-            self.add( configuration.parseXMLNodeAsClass( child, xPath, linkData ) )
+            self.add( Configuration.parseNodeUsingClass(child, xPath, linkData, **kwargs))
 
         xPath.pop( )
         return( self )

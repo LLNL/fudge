@@ -1,23 +1,23 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from . import ancestry as ancestryModule
-from . import standards as standardsModule
-from . import values as valuesModule
-from . import base as xDataBaseModule
-from . import axes as axesModule
-from . import XYs as XYsModule
+from LUPY import ancestry as ancestryModule
 
-class data( ancestryModule.ancestry ) :
+from xData import enums as enumsModule
+from . import values as valuesModule
+from . import base as baseModule
+from . import XYs1d as XYs1dModule
+
+class Data(ancestryModule.AncestryIO):
 
     def __init__( self, values ) :
 
-        if( not( isinstance( values, valuesModule.values ) ) ) : raise TypeError( 'Not a values type' )
-        ancestryModule.ancestry.__init__( self )
+        if( not( isinstance( values, valuesModule.Values ) ) ) : raise TypeError( 'Not a values type' )
+        ancestryModule.AncestryIO.__init__(self)
 
         self.values = values
 
@@ -33,65 +33,63 @@ class data( ancestryModule.ancestry ) :
 
         self.values.offsetScaleValues( offset, scale )
 
-    def toXML( self, indent = '', **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
         XMLStringList = '%s<%s>' % ( indent, self.moniker )
-        XMLStringList += ''.join( self.values.toXMLList( '', **kwargs ) )
+        XMLStringList += ''.join(self.values.toXML_strList('', **kwargs))
         XMLStringList += '</%s>' % self.moniker
 
-        return( [ XMLStringList ] )
+        return [ XMLStringList ]
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
-        data1 = cls( valuesModule.values.parseXMLNode( element[0], xPath, linkData ) )
+        data1 = cls(valuesModule.Values.parseNodeUsingClass(node[0], xPath, linkData, **kwargs))
 
-        xPath.pop( )
-        return( data1 )
+        xPath.pop()
 
-class xs( data ) :
+        return data1
+
+class Xs( Data ) :
 
     moniker = 'xs'
 
-class pdf( data ) :
+class Pdf( Data ) :
 
     moniker = 'pdf'
 
-class cdf( data ) :
+class Cdf( Data ) :
 
     moniker = 'cdf'
 
-class xs_pdf_cdf1d( xDataBaseModule.xDataFunctional ) :
+class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
 
     moniker = 'xs_pdf_cdf1d'
     dimension = 1
+    ancestryMembers = ( 'xs', 'pdf', 'cdf' )
 
-    def __init__( self, _xs, _pdf, _cdf, outerDomainValue = None, axes = None, interpolation = standardsModule.interpolation.linlinToken ) :
+    def __init__(self, _xs, _pdf, _cdf, axes=None, label=None, index=None, outerDomainValue=None, interpolation=enumsModule.Interpolation.linlin):
 
-        xDataBaseModule.xDataFunctional.__init__( self, self.moniker, axes = axes, outerDomainValue = outerDomainValue )
+        baseModule.XDataFunctional.__init__(self, axes=axes, label=label, index=index, outerDomainValue=outerDomainValue)
 
-        self.interpolation = interpolation
+        self.interpolation = enumsModule.Interpolation.checkEnumOrString(interpolation)
 
-        if( not( isinstance( _xs, xs ) ) ) : raise TypeError( 'Invalid xs: "%s"' % type( _xs ) )
+        if not isinstance(_xs, Xs): raise TypeError('Invalid Xs: "%s"' % type(_xs))
         self.__xs = _xs
-        self.__xs.setAncestor( self )
+        self.__xs.setAncestor(self)
 
-        if( not( isinstance( _pdf, pdf ) ) ) : raise TypeError( 'Invalid pdf: "%s"' % type( _pdf ) )
+        if not isinstance(_pdf, Pdf): raise TypeError('Invalid pdf: "%s"' % type(_pdf))
         self.__pdf = _pdf
-        self.__pdf.setAncestor( self )
+        self.__pdf.setAncestor(self)
 
-        if( not( isinstance( _cdf, cdf ) ) ) : raise TypeError( 'Invalid cdf: "%s"' % type( _cdf ) )
+        if not isinstance(_cdf, Cdf): raise TypeError('Invalid cdf: "%s"' % type(_cdf))
         self.__cdf = _cdf
-        self.__cdf.setAncestor( self )
+        self.__cdf.setAncestor(self)
 
-        if( len( _xs ) != len( _pdf ) != len( _cdf ) ) :
-            raise ValueError( 'lenghts not the same: %s %s %s' % ( len( _xs ), len( _pdf ), len( _cdf ) ) )
+        if len(_xs) != len(_pdf) != len(_cdf):
+            raise ValueError('lenghts not the same: %s %s %s' % ( len(_xs), len(_pdf), len(_cdf) ))
 
     def __len__( self ) :
 
@@ -157,66 +155,73 @@ class xs_pdf_cdf1d( xDataBaseModule.xDataFunctional ) :
 
         return( _pdf, _cdf )
 
-    def toXML( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        xs_pdf_cdf1d_singleLine = kwargs.get( 'xs_pdf_cdf1d_singleLine', False )
-        incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
+        xs_pdf_cdf1d_singleLine = kwargs.get('xs_pdf_cdf1d_singleLine', False)
+        incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent
-        if( xs_pdf_cdf1d_singleLine ) : indent2 = ''
+        if xs_pdf_cdf1d_singleLine: indent2 = ''
 
-        attributeStr = xDataBaseModule.xDataFunctional.attributesToXMLAttributeStr( self )
+        attributeStr = baseModule.XDataFunctional.attributesToXMLAttributeStr(self)
         interpolationStr = ''
-        if( self.interpolation != standardsModule.interpolation.linlinToken ) :
+        if self.interpolation != enumsModule.Interpolation.linlin:
             interpolationStr = ' interpolation="%s"' % self.interpolation
-        XMLStringList = [ '%s<%s%s%s>' % ( indent, self.moniker, attributeStr, interpolationStr ) ]
-        if( self.isPrimaryXData( ) ) :
-            if( self.axes is not None ) : XMLStringList += self.axes.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.xs.toXMLList( indent2, **kwargs )
-        XMLStringList += self.pdf.toXMLList( indent2, **kwargs )
-        XMLStringList += self.cdf.toXMLList( indent2, **kwargs )
-        XMLStringList[-1] += '</%s>' % self.moniker
+        XML_strList = [ '%s<%s%s%s>' % ( indent, self.moniker, attributeStr, interpolationStr ) ]
+        if self.isPrimaryXData():
+            if self.axes is not None: XML_strList += self.axes.toXML_strList(indent = indent2, **kwargs)
+        XML_strList += self.xs.toXML_strList(indent2, **kwargs)
+        XML_strList += self.pdf.toXML_strList(indent2, **kwargs)
+        XML_strList += self.cdf.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
 
-        if( xs_pdf_cdf1d_singleLine ) : XMLStringList = [ ''.join( XMLStringList ) ]
-        return( XMLStringList )
+        if xs_pdf_cdf1d_singleLine: XML_strList = [ ''.join(XML_strList) ]
+
+        return XML_strList
 
     def toLinearXYsClass( self ) :
 
-        return( XYsModule.XYs1d )
+        return( XYs1dModule.XYs1d )
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData, axes = None ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parses *node* into class *cls*.
+        """
 
-        xPath.append( element.tag )
+        attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath, allowInterapolation=True) # parseBareNodeCommonAttributes adds to xPath.
+        if len(extraAttributes) > 0: raise Exception('Invalid attributes: %s.' % ( ', '.join(list(extraAttributes.keys())) ))
 
-        values = { 'xs' : xs, 'pdf' : pdf, 'cdf' : cdf, 'axes' : axesModule.axes }
-        data1 = {}
-        outerDomainValue = element.get( 'outerDomainValue', None )
-        interpolation = element.get( 'interpolation', standardsModule.interpolation.linlinToken )
-        for child in element :
-            data1[child.tag] = values[child.tag].parseXMLNode( child, xPath, linkData )
+        datas = {}
+        children = { 'xs': Xs, 'pdf': Pdf, 'cdf': Cdf }
+        for child in node:
+            if child.tag in children: datas[child.tag] = children[child.tag].parseNodeUsingClass(child, xPath, linkData, **kwargs)
 
-        axes = data1.pop( 'axes', None )
-        data1 = cls( data1['xs'], data1['pdf'], data1['cdf'], outerDomainValue = outerDomainValue, interpolation = interpolation, axes = axes )
+        axes = kwargs.get('axes', None)
+        if axes is not None: attributes['axes'] = axes
 
-        xPath.pop( )
-        return( data1 )
+        instance = cls(datas['xs'], datas['pdf'], datas['cdf'], **attributes)
 
-    @classmethod
-    def parseXMLString( cls, XMLString ) :
+        extraNodesList = baseModule.XDataFunctional.parseNodeStandardChildren(instance, node, xPath, linkData, **kwargs)
+        extraNodes = {}
+        for extraNode in extraNodesList: extraNodes[extraNode.tag] = extraNode
+        extraNodes.pop('xs')
+        extraNodes.pop('pdf')
+        extraNodes.pop('cdf')
 
-        from xml.etree import cElementTree
+        if len(extraNodes) > 0: raise Exception('Invalid nodes: %s.' % (', '.join([extraNode.tag for extraNode in extraNodes])))
 
-        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ), xPath=[], linkData={} ) )
+        xPath.pop()
+
+        return instance
 
     @classmethod
     def fromXYs( cls, xys, outerDomainValue = None ) :
 
-        if( xys.interpolation not in [ standardsModule.interpolation.linlinToken, standardsModule.interpolation.flatToken ] ) :
+        if xys.interpolation not in [enumsModule.Interpolation.linlin, enumsModule.Interpolation.flat]:
             xys = xys.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 0, upperEps = 1e-8 )
+
+        if outerDomainValue is None:
+            outerDomainValue = xys.outerDomainValue
 
         try :
             norm = xys.normalize( )
@@ -230,21 +235,8 @@ class xs_pdf_cdf1d( xDataBaseModule.xDataFunctional ) :
         _cdf = norm.runningIntegral( )
         _cdf[-1] = 1.0
         _xs, _pdf = norm.copyDataToXsAndYs( )
-        _xs = xs( valuesModule.values( _xs ) )
-        _pdf = pdf( valuesModule.values( _pdf ) )
-        _cdf = cdf( valuesModule.values( _cdf ) )
+        _xs = Xs( valuesModule.Values( _xs ) )
+        _pdf = Pdf( valuesModule.Values( _pdf ) )
+        _cdf = Cdf( valuesModule.Values( _cdf ) )
 
         return( cls( _xs, _pdf, _cdf, outerDomainValue = outerDomainValue, interpolation = xys.interpolation ) )
-
-if( __name__ == '__main__' ) :
-
-    xys = XYsModule.XYs1d( [ [ 1, 0 ], [ 2, 1 ], [ 4, 1 ], [ 6, .5 ], [ 7, .1 ] ] )
-
-    xs1 = xs_pdf_cdf1d.fromXYs( xys, 1e-5 )
-    xsXML1 = xs1.toXML( )
-    print( xsXML1 )
-
-    xs2 = xs_pdf_cdf1d.parseXMLString( xsXML1 )
-    xsXML2 = xs2.toXML( )
-
-    print( xsXML1 == xsXML2 )
