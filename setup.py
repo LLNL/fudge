@@ -112,7 +112,7 @@ setup(
         Extension( 'fudge.processing.resonances._getCoulombWavefunctions',
             sources = ['fudge/processing/resonances/getCoulombWavefunctions.c', 'fudge/processing/resonances/coulfg2.c'], ),
     ],
-    url = 'http://nuclear.llnl.gov/fudge',
+    url = 'https://github.com/llnl/fudge',
     install_requires=[
         'numpy', 
         'crossSectionAdjustForHeatedTarget @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/crosssectionadjustforheatedtarget.git@fudge6.0-rc1',
