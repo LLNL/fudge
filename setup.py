@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import os, glob, shutil
+import os, sys, glob, shutil
 import setuptools
 from setuptools.command.install import install
 from setuptools.command.build_ext import build_ext
@@ -13,6 +13,7 @@ from setuptools import setup, Extension
 import subprocess
 
 minimumNumpy = 1.15
+cwd = 'file://localhost%s/' % os.getcwd()
 try:
     import numpy
     assert float('.'.join(numpy.__version__.split('.')[:2])) >= minimumNumpy, numpyErrorMessage
@@ -114,23 +115,16 @@ setup(
     ],
     url = 'https://github.com/llnl/fudge',
     install_requires=[
-        'numpy', 
-        'crossSectionAdjustForHeatedTarget @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/crosssectionadjustforheatedtarget.git@fudge6.0-rc1',
-        'numericalFunctions @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/numericalFunctions.git@fudge6.0-rc1',
-        'pqu @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/pqu.git@fudge6.0-rc1',
-        'xData @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/common/xData.git@fudge6.0-rc1',
-        'PoPs @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/pops/PoPs.git@fudge6.0-rc1',
-        'brownies @ git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/brownies.git@fudge6.0-rc1'
+        'numpy',
+        'crossSectionAdjustForHeatedTarget @ %s/crossSectionAdjustForHeatedTarget#egg=crossSectionAdjustForHeatedTarget' % cwd,
+        'numericalFunctions @ %s/numericalFunctions#egg=numericalFunctions' % cwd,
+        'pqu @ %s/pqu#egg=pqu' % cwd,
+        'xData @ %s/xData#egg=xData' % cwd,
+        'PoPs @ %s/PoPs#egg=PoPs' % cwd,
+        'brownies @ %s/brownies#egg=brownies' % cwd
     ],
     license = open( 'LICENSE' ).read(),
     description = '',
     long_description = open( 'README.md' ).read(), requires=['numpy'],
     cmdclass={'install': CustomInstall, 'build_ext': CustomBuildExt}
 )
-
-# Also call the setup.py in externals packages
-# curdir = os.path.realpath( os.curdir )
-# for extension in ('numericalFunctions', 'crossSectionAdjustForHeatedTarget'): #'Merced', 'statusMessageReporting'):
-#     os.chdir( extension )
-#     run_setup('setup.py', ['--quiet','build'])
-#     os.chdir( curdir )
