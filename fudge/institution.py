@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,24 +14,28 @@ they be well-formed xml. Codes reading in GNDS files are free to ignore any unre
 """
 
 from xml.etree import ElementTree
+from xml.sax import saxutils
 
-from xData import ancestry as ancestryModule
-from brownies.legacy.toENDF6 import ENDFconversionFlags as ENDFconversionFlagsModule
+from LUPY import ancestry as ancestryModule
+
+from fudge.reactions import reaction as reactionModule
+from fudge import outputChannel as outputChannelModule
 from fudge.processing import nuclearPlusCoulombInterference as nuclearPlusCoulombInterferenceModule
+from fudge.processing.deterministic import tokens as deterministicTokensModule
 
-__metaclass__ = type
-
-class institution(ancestryModule.ancestry):
+class Institution(ancestryModule.AncestryIO):
 
     moniker = "institution"
+    keyName = 'label'
 
     def __init__(self, label):
 
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.__label = label
         self.__data = []
 
     def __getitem__(self, item):
+
         return self.__data[item]
 
     @property
@@ -50,76 +54,88 @@ class institution(ancestryModule.ancestry):
         for item in self :
             if( hasattr( item, 'findLinks' ) ) : getattr( item, 'findLinks' )( links )
 
-    def toXMLList( self, indent='', **kwargs ):
+    def toXML_strList( self, indent='', **kwargs ):
 
         indent2 = indent + kwargs.get('incrementalIndent','  ')
         xml = ['%s<%s label="%s">' % (indent,self.moniker,self.label)]
         for data in self:
-            xml += data.toXMLList(indent2, **kwargs)
+            xml += data.toXML_strList(indent2, **kwargs)
         xml[-1] += '</%s>' % self.moniker
         return xml
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append('%s[@label="%s"]' % (element.tag, element.get('label')))
+        label = node.get('label')
+        xPath.append('%s[@label="%s"]' % (node.tag, label))
 
-        if( element.get( 'label' ) != "LLNL" ) :
-            _institution = UnknownInstitution( UnknownInstitutionXMLNode( element ) )
-        else :
-            _institution = cls(element.get('label'))
-            for child in element:
-                if child.tag == ENDFconversionFlagsModule.ENDFconversionFlags.moniker:
-                    _institution.append( ENDFconversionFlagsModule.ENDFconversionFlags.parseXMLNode( child, xPath, linkData ) )
-                elif child.tag == nuclearPlusCoulombInterferenceModule.NuclearPlusCoulombInterference.moniker:
-                    _institution.append( nuclearPlusCoulombInterferenceModule.NuclearPlusCoulombInterference.parseNodeUsingClass( child, xPath, linkData ) )
+        if node.get('label') == "LLNL":
+            institution = cls(label)
+            for child in node:
+                if child.tag == nuclearPlusCoulombInterferenceModule.NuclearPlusCoulombInterference.moniker:
+                    institution.append(nuclearPlusCoulombInterferenceModule.NuclearPlusCoulombInterference.parseNodeUsingClass(child, xPath, linkData))
                 else:
-                    print("WARNING: encountered unknown data type '%s' in %s" % (child.tag, element.tag))
+                    institution.append(UnknownLLNL_child(child.tag, UnknownLLNL_XML_child(child)))
+        elif label == deterministicTokensModule.multiGroupReactions:
+            institution = cls(label)
+            for child in node:
+                if child.tag == reactionModule.Reaction.moniker:
+                    institution.append(reactionModule.Reaction.parseNodeUsingClass(child, xPath, linkData))
+                else:                       # This should not happen.
+                    raise Exception('Unsupported child "%s" for institution "%s".' % (child.tag, label))
+        elif label == deterministicTokensModule.multiGroupDelayedNeutrons:
+            institution = cls(label)
+            for child in node:
+                if child.tag == outputChannelModule.OutputChannel.moniker:
+                    institution.append(outputChannelModule.OutputChannel.parseNodeUsingClass(child, xPath, linkData))
+                else:                       # This should not happen.
+                    raise Exception('Unsupported child "%s" for institution "%s".' % (child.tag, label))
+        else :
+            institution = UnknownInstitution(UnknownInstitutionXML_node(node))
 
         xPath.pop()
 
-        return _institution
+        return institution
 
-class UnknownInstitution( ancestryModule.ancestry ) :
+class UnknownInstitution(ancestryModule.AncestryIO):
 
-    moniker = 'institution'
+    moniker = 'institution2'
+    keyName = 'label'
 
-    def __init__( self, node ) :
+    def __init__(self, node):
 
+        ancestryModule.AncestryIO.__init__(self)
+
+        if not (hasattr(node, 'label') and hasattr(node, 'toXML_strList')): raise TypeError('Node is missing a label and/or toXML_strList method.')
         self.__node = node
 
     @property
-    def label( self ) :
-        """This method returng the label of self."""
+    def label(self):
+        """This method returns the label of self."""
 
-        return( self.__node.label )
+        return self.__node.label
 
     @property
-    def node( self ) :
+    def node(self):
         """This method returns the node instance of self."""
 
-        return( self.__node )
+        return self.__node
 
-    @node.setter
-    def node( self, a_node ) :
-        """This method replaces the current node with a_node. a_node must have methods label and toXMLList."""
-
-        if( hasattr( a_node, 'label' ) and hasattr( a_node, 'toXMLList' ) ) :
-            self.__node = a_node
-        else :
-            raise TypeError( 'Node is missing a label and/or toXMLList method.' )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
         """This method returng the XML text that was not parsed."""
 
-        return( self.__node.toXMLList( indent = indent, **kwargs ) )
+        return self.__node.toXML_strList(indent = indent, **kwargs)
 
-class UnknownInstitutionXMLNode :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        return cls(UnknownInstitutionXML_node(node))
 
-    def __init__( self, element ) :
+class UnknownInstitutionXML_node:
 
-        self.__label = element.get( 'label' )
-        self.__stringList = ElementTree.tostring( element.data, encoding = 'unicode' ).rstrip( ).split( '\n' )
+    def __init__(self, XML_node):
+
+        self.__label = XML_node.get( 'label' )
+        self.__stringList = ElementTree.tostring(XML_node.data, encoding='unicode').rstrip().split('\n')
 
     @property
     def label( self ) :
@@ -133,14 +149,64 @@ class UnknownInstitutionXMLNode :
 
         return( self.__stringList )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """This method returng the XML text that was not parsed."""
 
         strings = self.stringList
         if( len( strings ) > 0 ) : strings[0] = indent + strings[0]
+
         return( self.stringList )
 
-    @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+class UnknownLLNL_child(ancestryModule.Ancestry):
+    """
+    This class stores a child node of 'applicationData/institution['[@label="LLNL"]' which is not supported by a class under
+    the fudge module (i.e., directory). Currently, only the ENDFconversionFlags class is not supported by the fudge module.
+    """
 
-        return( cls( element, xPath, linkData ) )
+    def __init__(self, moniker, node):
+
+        self.__moniker = moniker
+
+        if not isinstance(node, UnknownLLNL_XML_child): raise Exception('Invalid UnknownLLNL_child node.')
+        self.__node = node
+
+    @property
+    def moniker(self):
+        """This method returns the moniker of self."""
+
+        return self.__moniker
+
+    @property
+    def node(self):
+        """This method returns the node instance of self."""
+
+        return self.__node
+
+    def toXML_strList(self, indent = '', **kwargs):
+        """This method returng the XML text that was not parsed."""
+
+        return self.__node.toXML_strList(indent=indent, **kwargs)
+
+class UnknownLLNL_XML_child:
+    """
+    An XML sub-node for use with an UnknownLLNL_child instance.
+    """
+
+    def __init__(self, XML_node):
+
+        self.__stringList = saxutils.unescape(ElementTree.tostring(XML_node.data, encoding='unicode')).rstrip().split('\n')
+
+    @property
+    def stringList(self):
+        """This method returng the XML text that was not parsed."""
+
+        return self.__stringList
+
+    def toXML_strList(self, indent='', **kwargs):
+        """This method returng the XML text that was not parsed."""
+
+        stringList = self.__stringList
+        if len(stringList) > 0:
+            if stringList[0][0] != ' ': stringList[0] = indent + stringList[0]
+
+        return stringList

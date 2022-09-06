@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -17,7 +17,7 @@ parser.add_argument('--allReactions', default=False, action='store_true',
     help='Option to plot the evaluated cross sections for either a single or all reactions in the reactionSuite')
 args = parser.parse_args()
 
-reactionSuite = reactionSuiteModule.readXML(args.filename)
+reactionSuite = reactionSuiteModule.ReactionSuite.readXML_file(args.filename)
 
 if args.allReactions:
     curve1ds = []

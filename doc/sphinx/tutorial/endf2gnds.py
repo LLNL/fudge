@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -27,6 +27,6 @@ else:
 # Now translate
 rce = endfFileToGNDS( args.inFile, toStdOut=True, skipBadData=True )
 myEval, myCov = rce['reactionSuite'], rce['covarianceSuite']
-open( outEvalFile, mode='w' ).writelines( line+'\n' for line in myEval.toXMLList( ) )
+open( outEvalFile, mode='w' ).writelines( line+'\n' for line in myEval.toXML_strList( ) )
 if myCov is not None:
-     open( outCovFile, mode='w' ).writelines( line+'\n' for line in myCov.toXMLList( ) )
+     open( outCovFile, mode='w' ).writelines( line+'\n' for line in myCov.toXML_strList( ) )

@@ -1,4 +1,5 @@
 from pqu.PQU import PhysicalQuantityWithUncertainty as PQU
+from xData import enums as xDataEnumsModule
 from fudge.core.math.pdf import WignerDistribution, Chi2Distribution
 from brownies.BNL.restools import level_generator
 from brownies.BNL.restools.level_analysis import *
@@ -198,7 +199,7 @@ class TestLevelAnalyzer_90Zr(AssertMixIn):
             None)  # applyFunc supposed to operate on y values, but really works on x
         cls.Emin = cls.levelDensity.domainMin
         cls.Emax = cls.levelDensity.domainMax
-        cls.numLevels = int(cls.levelDensity.integrate().getValue())
+        cls.numLevels = int(cls.levelDensity.integrate())
         cls.aveD = (cls.Emax - cls.Emin) / cls.numLevels
 
         # Set up plotting data (if needed)
@@ -270,7 +271,7 @@ class TestLevelAnalyzer_90Zr(AssertMixIn):
             for sD_over_aveD in cls._testNNSDValues:
                 D_over_aveD = float(sD_over_aveD)
                 cls._testNNSDValues[sD_over_aveD].append(
-                    makeXYs(thisNNSD[0], interpolation=standards.interpolation.flatToken).evaluate(D_over_aveD))
+                    makeXYs(thisNNSD[0], interpolation=xDataEnumsModule.InterpolationQualifier.flat).evaluate(D_over_aveD))
             if DEBUG:
                 nnsdOutputFile.write('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in thisNNSD]) + '\n')
                 nnsdOutputFile.write('&\n')

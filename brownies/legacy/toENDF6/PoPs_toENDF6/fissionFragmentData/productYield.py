@@ -1,15 +1,15 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+import numpy
 from brownies.legacy.toENDF6 import endfFormats as endfFormatsModule
 
 from PoPs.fissionFragmentData import productYield as productYieldModule
 
-from brownies.legacy.converting import massTracker as massTrackerModule
 from brownies.legacy.endl import misc as miscENDLModule
 
 
@@ -26,7 +26,8 @@ def toENDF6( self, endfMFList, flags, info, verbosityIndent = '' ) :
     # spontaneous yields are broken into two sections: prompt yields go in MT=454, delayed go in MT=459
     for duration in self.durations:
         yieldList = list(duration.yields.values)
-        uncertaintyList = list(duration.yields.uncertainty.form().matrix().constructArray().diagonal())
+        variances = duration.yields.uncertainty.form().matrix().constructArray().diagonal()
+        uncertaintyList = list(numpy.sqrt(variances))
 
         datalist = header + [endfFormatsModule.endfHeadLine(0,0,0,0, 4*len(productZAs), len(productZAs))]
 
@@ -40,4 +41,4 @@ def toENDF6( self, endfMFList, flags, info, verbosityIndent = '' ) :
             MT = 459
         endfMFList[8][MT] = datalist
 
-productYieldModule.productYield.toENDF6 = toENDF6
+productYieldModule.ProductYield.toENDF6 = toENDF6

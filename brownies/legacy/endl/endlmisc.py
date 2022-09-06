@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -643,10 +643,18 @@ class endlCheckerObject :
             self.X4 = data.X4
             self.Q = data.Q
 
+    def __lt__(self, other):
+
+        return self.__cmp__(other) < 0
+
     def __cmp__( self, other ) :
 
         def diffWithNone( v1, v2 ) :
 
+            if v1 is None:
+                return -1
+            if v2 is None:
+                return 1
             if( v1 == v2 ) : return( 0 )
             if( v1  > v2 ) : return( 1 )
             return( -1 )

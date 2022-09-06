@@ -1,17 +1,18 @@
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
+from xData import axes as axesModule
+
 from fudge.reactionData.crossSection import XYs1d, upperEps
 from brownies.BNL.utilities.bins import *
-from xData import XYs, standards, axes
-
 
 # -------------------------------------------------------------------------------
 # Utilities
 # -------------------------------------------------------------------------------
 
 
-def makeXYs(data, xUnit='eV', xLabel='energy_in', yUnit='b', yLabel="crossSection", dataForm="xys",
-            interpolation=standards.interpolation.linlinToken):
-    return XYs.XYs1d(
-        axes=axes.axes(rank=2, labelsUnits={0: (yLabel, yUnit), 1: (xLabel, xUnit)}),
+def makeXYs(data, xUnit='eV', xLabel='energy_in', yUnit='b', yLabel="crossSection", dataForm="xys", interpolation=xDataEnumsModule.Interpolation.linlin):
+    return XYs1dModule.XYs1d(
+        axes=axesModule.Axes(2, labelsUnits={0: (yLabel, yUnit), 1: (xLabel, xUnit)}),
         data=data,
         dataForm=dataForm,
         interpolation=interpolation
@@ -34,10 +35,10 @@ def function_to_XYs(func, fpars,
     that can be integrated, grouped, whatever.  We pre-defined a energy grid (in eV) that should work well
     even for pathological "spectra" like the problematic 1/E for the resonance integral.
     """
-    return XYs.XYs1d.createFromFunction(
+    return XYs1dModule.XYs1d.createFromFunction(
         XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex: (rangeName, rangeUnit),
-            XYs.xAxisIndex: (domainName, domainUnit)}),
+            XYs1dModule.yAxisIndex: (rangeName, rangeUnit),
+            XYs1dModule.xAxisIndex: (domainName, domainUnit)}),
         Xs=Egrid,
         func=func,
         parameters=fpars,
@@ -53,12 +54,11 @@ def grouped_values_to_XYs(groupBdries, valueList,
     if len(groupBdries) != len(valueList) + 1:
         raise ValueError("Group boundries and value lists have incompatable lengths: "
                          "len(bdries)=%i, len(vals)=%i" % (len(groupBdries), len(valueList)))
-    curve = XYs.XYs1d(
+    curve = XYs1dModule.XYs1d(
         data=[groupBdries, [valueList[0]] + valueList],
         dataForm="xsandys",
-        interpolation=standards.interpolation.flatToken,
-        axes=XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex: (rangeName, rangeUnit),
-            XYs.xAxisIndex: (domainName, domainUnit)}))
+        interpolation=xDataEnumsModule.InterpolationQualifier.flat,
+        axes=XYs1d.defaultAxes(labelsUnits={XYs1dModule.yAxisIndex: (rangeName, rangeUnit), XYs1dModule.xAxisIndex: (domainName, domainUnit)}))
+
     return curve
 

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,16 +13,16 @@ from ..quantities import quantity as quantityModule
 
 baseUnit = quantityModule.stringToPhysicalUnit( '' )
 
-class double( quantityModule.double ) :
+class Double( quantityModule.Double ) :
 
     __baseUnit = baseUnit
 
     def __init__( self, label, value, unit = None, documentation = '' ) :
 
         if( unit is None ) : unit = quantityModule.stringToPhysicalUnit( '' )
-        quantityModule.double.__init__( self, label, value, unit, documentation = documentation )
+        quantityModule.Double.__init__( self, label, value, unit, documentation = documentation )
 
-class suite( quantityModule.numberSuite ) :
+class Suite( quantityModule.NumberSuite ) :
 
     moniker = 'probability'
-    _allowedClasses = [ double ]
+    _allowedClasses = [ Double ]

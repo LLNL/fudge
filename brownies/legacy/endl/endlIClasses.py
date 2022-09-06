@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -235,7 +235,7 @@ class endlI10(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         """Constructor for the endlI10 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
-        self.name = productDataModule.energyDeposition.component.moniker
+        self.name = productDataModule.averageProductEnergy.Component.moniker
         endlNd.endlNd.__init__(self, f, 10, yo, C, I, S, h, points, bdflsFile = bdflsFile)
         self.variablesUnits = 'energy_in[MeV];energy_deposition[MeV]'
 
@@ -280,7 +280,7 @@ class endlI11(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         """Constructor for the endlI11 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
-        self.name = productDataModule.energyDeposition.component.moniker
+        self.name = productDataModule.averageProductEnergy.Component.moniker
         endlNd.endlNd.__init__(self, f, 11, yo, C, I, S, h, points, bdflsFile = bdflsFile)
         self.variablesUnits = 'energy_in[MeV];energy_deposition[MeV]'
 
@@ -370,7 +370,7 @@ class endlI13(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         """Constructor for the endlI13 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
-        self.name = productDataModule.momentumDeposition.component.moniker
+        self.name = productDataModule.averageProductMomentum.Component.moniker
         endlNd.endlNd.__init__(self, f, 13, yo, C, I, S, h, points, bdflsFile = bdflsFile)
         self.variablesUnits = 'energy_in[MeV];momentum_deposition[MeV/c]'
 
@@ -1197,7 +1197,7 @@ class endlI3(endlNd.endlNd, endl4dmathClasses.endl4dmath) :
     def convertToI4( self, i1=None, lmax=0 ):
         """Converts the self and the I=1 data given as an argument to an endlI4 instance where the new object has Legendre orders 0, 1, ..., lmax"""
 
-        from xData import series1d as seriesModule
+        from xData import series1d as series1dModule
 
         # Set up the I=4 file, especially the header crap
         dummy = endlI3( None, self.yo, self.C, self.I, self.S, self.h, [] )
@@ -1208,7 +1208,7 @@ class endlI3(endlNd.endlNd, endl4dmathClasses.endl4dmath) :
         # Loop through l's expanding the product of the I=1 and I=3 files into Legendre polynomials
         for l in range( 0, lmax+1 ):
             thisLTerm = endl3dmathClasses.endl3dmath()
-            legPoly = endl2dmathmisc.convertFunctionToLinLin(lambda x: (2 * l + 1) * seriesModule.Legendre(l, x), -1.0, 1.0, 1e-4)
+            legPoly = endl2dmathmisc.convertFunctionToLinLin(lambda x: (2 * l + 1) * series1dModule.Legendre(l, x), -1.0, 1.0, 1e-4)
             for iE in range( len ( self.data ) ):
                 E = self.E( iE )
                 i1_muP = endl2dmathClasses.endl2dmath(data = i1.data[ iE][1])
@@ -1389,10 +1389,10 @@ class endlI4(endlNd.endlNd, endl4dmathClasses.endl4dmath) :
         returned object. This method will only convert up to Legendre order l = min( lMax, series1d.maxLegendreOrder ) 
         of self's data."""
 
-        from xData import series1d as seriesModule
+        from xData import series1d as series1dModule
 
-        if( lMax is None ) : lMax = seriesModule.maxLegendreOrder
-        lMax = max( 0, min( lMax, seriesModule.maxLegendreOrder ) )
+        if( lMax is None ) : lMax = series1dModule.maxLegendreOrder
+        lMax = max( 0, min( lMax, series1dModule.maxLegendreOrder ) )
             
         I3Data = []
         if ( len( self ) == 1 ) :
@@ -1423,7 +1423,7 @@ class endlI4(endlNd.endlNd, endl4dmathClasses.endl4dmath) :
             for l, EEpP in self.data :
                 if( l > lMax ) : break
                 LArray = []
-                for mu in muArray : LArray.append( seriesModule.Legendre( l, mu ) )
+                for mu in muArray : LArray.append( series1dModule.Legendre( l, mu ) )
                 l_LArray.append( LArray )
             iE = -1
             for E in EArray :

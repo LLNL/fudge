@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,26 +9,37 @@
 This module contains the classes representing the GNDS documentation nodes author and authors.
 """
 
-from .. import ancestry as ancestryModule
+from LUPY import enums as enumsModule
+from LUPY import ancestry as ancestryModule
+
 from .. import suite as suiteModule
 from .. import date as dateModule
 from . import abstractClasses as abstractClassesModule
 
-class DateType:
+class DateType(enumsModule.Enum):
 
-    allowed = ( 'accepted', 'available', 'copyrighted', 'collected', 'created', 'issued', 'submitted', 'updated', 'valid', 'withdrawn' )
+    accepted = enumsModule.auto()
+    available = enumsModule.auto()
+    copyrighted = enumsModule.auto()
+    collected = enumsModule.auto()
+    created = enumsModule.auto()
+    issued = enumsModule.auto()
+    submitted = enumsModule.auto()
+    updated = enumsModule.auto()
+    valid = enumsModule.auto()
+    withdraw = enumsModule.auto()
 
-class Date(ancestryModule.Ancestry2):
+class Date(ancestryModule.AncestryIO):
 
     moniker = 'date'
     keyName = 'dateType'
 
     def __init__(self, start, dateType):
 
-        ancestryModule.Ancestry2.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__start = dateModule.raiseIfNotDate(start)
-        self.__dateType = abstractClassesModule.raiseIfNotInList(dateType, DateType.allowed, 'dateType')
+        self.__dateType = DateType.checkEnumOrString(dateType)
 
     @property
     def start(self):
@@ -46,23 +57,24 @@ class Date(ancestryModule.Ancestry2):
 
         return ' %s dateType="%s"' % ( self.start.asXML_attribute(name = 'value'), self.dateType )
 
-    def toXMLList(self, **kwargs):
+    def toXML_strList(self, **kwargs):
 
         indent = kwargs.get('indent', '')
 
         return [ '%s<%s%s dateType="%s"/>' % ( indent, self.moniker, self.start.asXML_attribute(name = 'value'), self.dateType ) ]
 
-    @staticmethod
-    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        start = dateModule.Date.parse(node.get('value'))
+        start = dateModule.Date.parse(node.get('value'))        # FIXME2, what is this? How is Date to have a date?
         dateType = node.get('dateType')
 
-        return Date(start, dateType)
+        return cls(start, dateType)
 
 class Dates(suiteModule.Suite):
 
     moniker = 'dates'
+    suiteName = 'dateType'
 
     def __init__(self):
 
@@ -70,4 +82,4 @@ class Dates(suiteModule.Suite):
 
     def toXML(self, indent = '', **kwargs):
 
-        return '\n'.join(self.toXMLList(**kwargs))
+        return '\n'.join(self.toXML_strList(**kwargs))

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,8 @@
 This module contains the Affiliation, Affiliations, Note and AuthorAbstract classes.
 """
 
-from .. import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
+
 from .. import suite as suiteModule
 from .. import text as textModule
 
@@ -17,6 +18,7 @@ class Affiliation( textModule.Text ) :
     """A class representing a GNDS author/affiliations/affiliation node."""
 
     moniker = 'affiliation'
+    keyName = 'label'
 
     def __init__( self, name = '', href = '' ) :
 
@@ -55,17 +57,18 @@ class Affiliation( textModule.Text ) :
 
         return attributes
 
-    @staticmethod
-    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         name = node.get( 'name' )
         href = node.get( 'href' )
 
-        return( Affiliation( name, href ) )
+        return cls(name, href)
 
 class Affiliations( suiteModule.Suite ) :
 
     moniker = 'affiliations'
+    suiteName = 'label'
 
     def __init__( self ) :
 
@@ -76,13 +79,13 @@ class Note( textModule.Text ) :
 
     moniker = 'note'
 
-class AuthorAbstract( ancestryModule.Ancestry2 ) :
+class AuthorAbstract(ancestryModule.AncestryIO):
 
     ancestryMembers = ( 'affiliations', 'note' )
 
     def __init__( self, name, orcid, email ) :
 
-        ancestryModule.Ancestry2.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__name = textModule.raiseIfNotString( name, 'name' )
         self.__orcid = textModule.raiseIfNotString( orcid, 'orcid' )
@@ -131,18 +134,13 @@ class AuthorAbstract( ancestryModule.Ancestry2 ) :
 
         return attributes
 
-    def toXMLList(self, indent = '', **kwargs):
+    def toXML_strList(self, indent = '', **kwargs):
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
         XMLList = [ '%s<%s%s>' % ( indent, self.moniker, self.XML_extraAttributes(**kwargs) ) ]
-        XMLList += self.__affiliations.toXMLList( indent = indent2, **kwargs )
-        XMLList += self.__note.toXMLList( indent = indent2, **kwargs )
+        XMLList += self.__affiliations.toXML_strList( indent = indent2, **kwargs )
+        XMLList += self.__note.toXML_strList( indent = indent2, **kwargs )
         XMLList[-1] += '</%s>' % self.moniker
 
         return( XMLList )
-
-def raiseIfNotInList(string, allowed, name):
-
-    if string not in allowed: TypeError('String "%s" for %s is not in allowed.' % ( string, name ))
-    return string

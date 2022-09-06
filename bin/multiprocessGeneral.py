@@ -1,43 +1,72 @@
 #! /usr/bin/env python3
  
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import sys, os, time, multiprocessing
-from argparse import ArgumentParser, FileType
+import sys
+import os
+import time
+import json
+import multiprocessing
+import argparse
 
-description = """Runs multiprocess threading on a general script. For example:
+description = """Runs a code on a list of files. For each file of the list, the code is run 
+on a separate thread. For example, the following will execute the code "./convertEndfToGnd.py"
+for each file matching "endl2009.2/endf/*/*.endf" on a unique thread:
 
 python multiprocessGeneral.py ./convertEndfToGnd.py endl2009.2/endf/*/*.endf
 """
 
-parser = ArgumentParser( description = description )
-parser.add_argument( "code",                                                        help = "code to use" )
-parser.add_argument( "files", nargs='+',                                            help = "list of file arguments to pass to code" )
-parser.add_argument( "-o", "--options", default='',                                 help = "other options to pass to code (use quoted string for multiple args)" )
-parser.add_argument( "-n", "--numberOfProcesses",type = int, default = 8,           help = "number of simultaneous processes" )
-parser.add_argument( "-l", "--logFile", default = sys.stderr, type = FileType('w'), help = "summary log file" )
-parser.add_argument( "-c", "--changeDir", action = 'store_true',                    help = "cd to same directory as file before executing the code" )
-parser.add_argument( "-p", "--pythonInterpreter", default=None,                     help = "Python interpreter to use with args.code" )
+parser = argparse.ArgumentParser( description = description, formatter_class = argparse.RawTextHelpFormatter )
+parser.add_argument( 'code',                                                        help = 'Code to use.' )
+parser.add_argument( 'files', nargs='+',                                            help = 'List of files to be processed by the code. One code/file per thread.' )
+parser.add_argument( '-o', '--options', default='',                                 help = 'Options to pass to code (use quoted string for multiple args).' )
+parser.add_argument( "-j", '--optionsJSON', default=None,                           help = "location of JSON file with individual file command line arguments")
+parser.add_argument( '-n', '--numberOfProcesses',type = int, default = 8,           help = 'Number of simultaneous processes (i.e., threads).' )
+parser.add_argument( '-l', '--logFile', default = sys.stderr, type = argparse.FileType('w'), help = 'Log file.' )
+parser.add_argument( '-p', '--pythonInterpreter', default = '',                     help = 'Python interpreter to use with code if it is a Python script.' )
+parser.add_argument( '-v', '--verbose', action = 'count', default = 0,              help = 'Prints out the cmd executed for each file. This is meant for debugging.' )
+
+group = parser.add_mutually_exclusive_group( )
+group.add_argument( '-c', '--changeDir', action = 'store_true',                     help = 'Cd to same directory as file before executing the code. This options and "--cd" are mutually exclusive.')
+group.add_argument( '--cd', action = 'store', default = '',                         help = 'Cd to the directory specified by the next argument. If the directory does not exist, it is created.' )
 
 args = parser.parse_args( )
 
+if args.optionsJSON is not None:
+    with open(args.optionsJSON) as fileObject:
+        individualFileOptions = json.load(fileObject)
+
+
 def f( filename ) :
 
+    fileOptions = args.options if args.optionsJSON is None else '%s %s' % (individualFileOptions[filename], args.options)
+
     CD = ''
-    if args.changeDir :
+    if args.cd != '':
+        CD = 'cd %s;' % args.cd
+        filename = os.path.realpath(filename)
+    elif args.changeDir :
         CD = 'cd %s;' % os.path.dirname( os.path.abspath(filename) )
         filename = os.path.basename(filename)
+
+    code = os.path.realpath(args.code)
     if args.pythonInterpreter is not None:
-        status = os.system( '%s %s %s %s %s' % ( CD, args.pythonInterpreter, args.code, filename, args.options) )
+        cmd = '%s %s %s %s %s' % ( CD, args.pythonInterpreter, code, filename, fileOptions)
     else:
-        status = os.system( '%s %s %s %s' % ( CD, args.code, filename, args.options) )
+        cmd = '%s %s %s %s' % ( CD, args.code, filename, fileOptions)
+
+    if args.verbose: print(cmd)
+    status = os.system(cmd)
     if( status != 0 ) : status = 1
     sys.exit( status )
+
+if args.cd != '':
+    if not os.path.exists(args.cd): os.makedirs(args.cd)
 
 index = 0
 def addProcess( processes, file ) :
@@ -52,6 +81,8 @@ for i1 in range( 0, min( n1, args.numberOfProcesses ) ) :
     addProcess( processes, args.files[index] )
     index += 1
 
+indexFormat = '%%%dd' % len('%s' % n1)
+format = '%s of %s: %%s' % ( indexFormat, indexFormat)
 ik = 0
 statusMessage = {}
 while( ik < n1 ) :
@@ -60,7 +91,7 @@ while( ik < n1 ) :
         if( process.is_alive( ) ) :
             nextProcesses.append( [ i2, file, process ] )
         else :
-            s = "%3d of %3d : %s" % ( i2 + 1, n1, file )
+            s = format % ( i2 + 1, n1, file )
             if( process.exitcode != 0 ) : s += ' ********* FAILED'
             statusMessage[i2] = s
             if( index < n1 ) :

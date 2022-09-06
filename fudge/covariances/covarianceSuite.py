@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,83 +12,91 @@ Module with containers for covariances in several different forms
 import sys
 import os
 
-from xData import formatVersion as formatVersionModule
-from xData.ancestry import ancestry
+from LUPY import ancestry as ancestryModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 
+from xData import axes as axesModule
+
+from fudge import enums as enumsModule
 from fudge import styles as stylesModule, suites as suitesModule
 from . import covarianceSection as sectionModule, summed as summedModule, mixed as mixedModule, modelParameters as modelParametersModule
 
-__metaclass__ = type
-
-
-class covarianceSections( suitesModule.suite ):
+class CovarianceSections( suitesModule.Suite ):
     """
     Most covariances are stored in 'sections', each representing either the internal covariance
     for a single quantity (i.e. cross section) or the cross-term between two quantities
     """
 
     moniker = 'covarianceSections'
-    legacyMemberNameMapping = { 'section' : sectionModule.covarianceSection.moniker }
+    legacyMemberNameMapping = { 'section' : sectionModule.CovarianceSection.moniker }
 
     def __init__(self):
-        suitesModule.suite.__init__(self, (sectionModule.covarianceSection,))
+        suitesModule.Suite.__init__(self, (sectionModule.CovarianceSection,))
 
-class parameterCovariances( suitesModule.suite ):
+class ParameterCovariances( suitesModule.Suite ):
     """
-    Resolved and unresolved resonance parameters are stored inside the parameterCovariances
+    Resolved and unresolved resonance parameters are stored inside the parameterCovariances.
     """
 
     moniker = 'parameterCovariances'
-    legacyMemberNameMapping = { 'section' : modelParametersModule.averageParameterCovariance.moniker }
+    legacyMemberNameMapping = { 'section' : modelParametersModule.AverageParameterCovariance.moniker }
 
     def __init__( self ):
-        suitesModule.suite.__init__(self, (modelParametersModule.parameterCovariance,
-                                           modelParametersModule.averageParameterCovariance) )
+        suitesModule.Suite.__init__(self, (modelParametersModule.ParameterCovariance,
+                                           modelParametersModule.AverageParameterCovariance) )
 
-class covarianceSuite( ancestry ):
+class CovarianceSuite(ancestryModule.AncestryIO):
     """
-    All covariances for a target/projectile combination are stored in a :py:class:`covarianceSuite` in gnds.
-    The :py:class:`covarianceSuite` is stored in a separate file from the reactionSuite.
+    All covariances for a target/projectile combination are stored in a :py:class:`CovarianceSuite` in gnds.
+    The :py:class:`CovarianceSuite` is stored in a separate file from the reactionSuite.
 
-    Within the :py:class:`covarianceSuite`, data is sorted into :py:class:`sections` (see the section module), each
+    Within the :py:class:`CovarianceSuite`, data is sorted into :py:class:`sections` (see the section module), each
     of which contains one section of the full covariance matrix.
     
     """
 
     moniker = 'covarianceSuite'
     childNodeOrder = {
-            formatVersionModule.version_1_10 :       (  suitesModule.externalFiles.moniker,                 stylesModule.styles.moniker,
-                                                        covarianceSections.moniker,                         parameterCovariances.moniker ),
-            formatVersionModule.version_2_0_LLNL_4 : (  suitesModule.externalFiles.moniker,                 stylesModule.styles.moniker,
-                                                        covarianceSections.moniker,                         parameterCovariances.moniker ) }
+            GNDS_formatVersionModule.version_1_10 :       (  suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
+                                                             CovarianceSections.moniker,                         ParameterCovariances.moniker ),
+            GNDS_formatVersionModule.version_2_0_LLNL_4 : (  suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
+                                                             CovarianceSections.moniker,                         ParameterCovariances.moniker ),
+            GNDS_formatVersionModule.version_2_0:         (  suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
+                                                             CovarianceSections.moniker,                         ParameterCovariances.moniker ) }
 
-    def __init__( self, projectile, target, evaluation, formatVersion = formatVersionModule.default, sourcePath = None ) :
+    def __init__( self, projectile, target, evaluation, interaction = None,
+                  formatVersion = GNDS_formatVersionModule.default, sourcePath = None ) :
         """
         :param projectile:  particle id
         :param target:      particle id
         :param evaluation:  evaluation id
+        :param interaction: type of interaction (typically 'nuclear')
         """
 
-        ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
-        if formatVersion not in formatVersionModule.allowed: raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
+        if formatVersion not in GNDS_formatVersionModule.allowedPlus: raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
 
         self.projectile = projectile            #: The projectile
         self.target = target                    #: The target
         self.evaluation = evaluation
 
+        if interaction == enumsModule.Interaction.legacyTNSL:
+            interaction = enumsModule.Interaction.TNSL
+        self.interaction = interaction
+
         self.__sourcePath = sourcePath
 
-        self.__externalFiles = suitesModule.externalFiles()
+        self.__externalFiles = suitesModule.ExternalFiles()
         self.__externalFiles.setAncestor( self )
 
-        self.__styles = stylesModule.styles( )
+        self.__styles = stylesModule.Styles( )
         self.__styles.setAncestor( self )
 
-        self.__covarianceSections = covarianceSections()
+        self.__covarianceSections = CovarianceSections()
         self.__covarianceSections.setAncestor( self )
 
-        self.__parameterCovariances = parameterCovariances()
+        self.__parameterCovariances = ParameterCovariances()
         self.__parameterCovariances.setAncestor( self )
 
         self.formatVersion = formatVersion 
@@ -115,6 +123,39 @@ class covarianceSuite( ancestry ):
     def parameterCovariances(self):
         return self.__parameterCovariances
 
+    @property
+    def domainMin( self ) :
+        """Returns the minimum of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles."""
+
+        return( self.styles[0].projectileEnergyDomain.min )
+
+    @property
+    def domainMax( self ) :
+        """Returns the maximum of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles."""
+
+        return( self.styles[0].projectileEnergyDomain.min )
+
+    @property
+    def domainUnit( self ) :
+        """Returns the unit of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles."""
+
+        return( self.styles[0].projectileEnergyDomain.unit )
+
+    @property
+    def interaction(self):
+        """Returns self's interaction."""
+
+        return(self.__interaction)
+
+    @interaction.setter
+    def interaction(self, value):
+
+        if value is None:
+            value = enumsModule.Interaction.nuclear
+            print('Need to specify interaction when calling reactionSuite.__init__. Setting it to "%s". Please update your code as in the future this will execute a raise.' % value)
+
+        self.__interaction = enumsModule.Interaction.checkEnumOrString(value)
+
     def convertUnits( self, unitMap ) :
         """
         unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { 'eV' : 'MeV', 'b' : 'mb' }).
@@ -123,21 +164,6 @@ class covarianceSuite( ancestry ):
         for section in self.covarianceSections: section.convertUnits( unitMap )
         for mpsection in self.parameterCovariances: mpsection.convertUnits( unitMap )
 
-    def saveToOpenedFile( self, fOut, **kwargs ) :
-
-        xmlString = self.toXMLList( **kwargs )
-        fOut.write( '\n'.join( xmlString ) )
-        fOut.write( '\n' )
-
-    def saveToFile( self, fileName, **kwargs ):
-
-        dirname = os.path.dirname( fileName )
-        if len(dirname) > 0 and not os.path.exists(dirname): os.makedirs(dirname)
-
-        with open(fileName,"w") as fout:
-            fout.write( '<?xml version="1.0" encoding="UTF-8"?>\n' )
-            self.saveToOpenedFile( fout, **kwargs )
-    
     def check( self, **kwargs ):
         """
         Check all covariance sections, returning a list of warnings. 
@@ -149,7 +175,7 @@ class covarianceSuite( ancestry ):
         :keyword float negativeEigenTolerance: Ignore negative eigenvalues smaller than this (default: -1e-6) 
         :keyword float eigenvalueRatioTolerance: Warn if smallest eigenvalue < this value * biggest (default: 1e-8)
         :keyword float eigenvalueAbsoluteTolerance: Warn if smallest eigenvalue < this value (default: 1e-14)
-        :rtype: warning.context
+        :rtype: warning.Context
         """
 
         from fudge import warning
@@ -199,31 +225,31 @@ class covarianceSuite( ancestry ):
 
         def get_edges( section_, style ):   #: return list of all pointers from this section
             natDat = section_[style]
-            if isinstance(natDat, summedModule.summedCovariance): return [v.link for v in natDat]
-            elif isinstance(natDat, mixedModule.mixedForm):
+            if isinstance(natDat, summedModule.SummedCovariance): return [v.link for v in natDat]
+            elif isinstance(natDat, mixedModule.MixedForm):
                 edges = []
                 for part in natDat:
-                    if isinstance(part, summedModule.summedCovariance): edges += [v.link for v in part]
+                    if isinstance(part, summedModule.SummedCovariance): edges += [v.link for v in part]
                 return edges
         nodes = [sec for sec in self.covarianceSections if get_edges( sec, info['style'] )]  # sections that contain pointers
 
         if nodes:
             cycle = find_cycle(nodes, get_edges, info['style'])
             if cycle:
-                warnings.append( warning.cyclicDependency( cycle ) )
+                warnings.append( warning.CyclicDependency( cycle ) )
 
         # check each section
         for section_ in self.covarianceSections:
             sectionWarnings = section_.check( info )
             if sectionWarnings:
-                warnings.append( warning.context("covarianceSection '%s':" % section_.label, sectionWarnings ) )
+                warnings.append( warning.Context("covarianceSection '%s':" % section_.label, sectionWarnings ) )
 
         for parameterCovariance in self.parameterCovariances:
             pcwarnings = parameterCovariance.check( info )
             if pcwarnings:
-                warnings.append(warning.context("parameterCovariance '%s':" % parameterCovariance.label, pcwarnings))
+                warnings.append(warning.Context("parameterCovariance '%s':" % parameterCovariance.label, pcwarnings))
 
-        return warning.context('CovarianceSuite: %s + %s' % (self.projectile, self.target), warnings)
+        return warning.Context('CovarianceSuite: %s + %s' % (self.projectile, self.target), warnings)
 
     def fix( self, **kwargs ):
         """
@@ -264,7 +290,7 @@ class covarianceSuite( ancestry ):
         # do the fixing
         warnings = []
         for section_ in self.covarianceSections: warnings += section_.fix( **info )
-        return warning.context('CovarianceSuite: %s + %s' % (self.projectile, self.target), warnings)
+        return warning.Context('CovarianceSuite: %s + %s' % (self.projectile, self.target), warnings)
     
     def removeExtraZeros(self):
         """
@@ -274,63 +300,67 @@ class covarianceSuite( ancestry ):
             for form in section_:
                 if hasattr(form, "removeExtraZeros"):
                     form.removeExtraZeros()
-                if isinstance(form, mixedModule.mixedForm):
+                if isinstance(form, mixedModule.MixedForm):
                     for covar in form:
                         if hasattr(covar, "removeExtraZeros"):
                             covar.removeExtraZeros()
 
-    def toXML( self, indent = '', **kwargs ) :
-        """Returns an GNDS/XML string representation of self."""
-
-        return( '\n'.join( self.toXMLList( **kwargs ) ) )
-    
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """Returns a list of GNDS/XML strings representing self."""
 
         incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
         indent2 = indent + incrementalIndent
-        formatVersion = kwargs.get( 'formatVersion', self.formatVersion )
-        kwargs['formatVersion'] = formatVersion
-        if formatVersion not in formatVersionModule.allowed: raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
 
-        xmlString = [ '%s<%s projectile="%s" target="%s" evaluation="%s" format="%s">'
-                % ( indent, self.moniker, self.projectile, self.target, self.evaluation, formatVersion ) ]
-        xmlString += self.externalFiles.toXMLList( indent2, **kwargs )
-        xmlString += self.styles.toXMLList( indent2, **kwargs )
-        xmlString += self.covarianceSections.toXMLList( indent2, **kwargs )
-        xmlString += self.parameterCovariances.toXMLList( indent2, **kwargs )
+        formatVersion = kwargs.get( 'formatVersion', self.formatVersion )
+        if formatVersion in (GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4):
+            print('INFO: converting GNDS format from "%s" to "%s".' % (formatVersion, GNDS_formatVersionModule.version_2_0))
+            formatVersion = GNDS_formatVersionModule.version_2_0
+        kwargs['formatVersion'] = formatVersion
+        if formatVersion not in GNDS_formatVersionModule.allowed: raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
+
+        interaction = self.interaction
+        if interaction == enumsModule.Interaction.TNSL:
+            interaction = enumsModule.Interaction.getTNSLInteration(formatVersion)
+        xmlString = ['%s<%s projectile="%s" target="%s" evaluation="%s" interaction="%s" format="%s">'
+                % (indent, self.moniker, self.projectile, self.target, self.evaluation, interaction, formatVersion)]
+        xmlString += self.externalFiles.toXML_strList( indent2, **kwargs )
+        xmlString += self.styles.toXML_strList( indent2, **kwargs )
+        xmlString += self.covarianceSections.toXML_strList( indent2, **kwargs )
+        xmlString += self.parameterCovariances.toXML_strList( indent2, **kwargs )
         xmlString.append( '%s</%s>' % (indent, self.moniker) )
         return xmlString
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData, **kwargs ):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag) # keep track of location in the tree, in case errors come up
 
-        sourcePath = kwargs.get( 'sourcePath' )
+        linkData = {'reactionSuite': kwargs.get('reactionSuite'), 'unresolvedLinks':[]}
 
+        sourcePath = kwargs.get('sourcePath')
         try:
             formatVersion = element.get('format')
             linkData['formatVersion'] = formatVersion
-            CS = covarianceSuite(element.get('projectile'), element.get('target'), element.get('evaluation'),
-                    formatVersion, sourcePath=sourcePath)
+            CS = cls(element.get('projectile'), element.get('target'), element.get('evaluation'),
+                    element.get('interaction'), formatVersion, sourcePath=sourcePath)
             for child in element:
                 if child.tag == 'styles':
-                    CS.styles.parseXMLNode( child, xPath, linkData )
-                elif child.tag == suitesModule.externalFiles.moniker:
-                    CS.externalFiles.parseXMLNode( child, xPath, linkData )
-                elif child.tag == covarianceSections.moniker:
-                    CS.covarianceSections.parseXMLNode( child, xPath, linkData )
-                elif child.tag == parameterCovariances.moniker:
-                    CS.parameterCovariances.parseXMLNode( child, xPath, linkData )
+                    CS.styles.parseNode(child, xPath, linkData, **kwargs)
+                elif child.tag == suitesModule.ExternalFiles.moniker:
+                    CS.externalFiles.parseNode(child, xPath, linkData, **kwargs)
+                elif child.tag == CovarianceSections.moniker:
+                    CS.covarianceSections.parseNode(child, xPath, linkData, **kwargs)
+                elif child.tag == ParameterCovariances.moniker:
+                    CS.parameterCovariances.parseNode(child, xPath, linkData, **kwargs)
                 else:
                     print("Warning: encountered unexpected element '%s' in covarianceSuite!" % child.tag)
         except Exception:
-            print( "Error encountered at xpath = /%s" % '/'.join( xPath ) )
+            print( 'Error encountered at xpath "%s" while parsing %s.' % ('/'.join(xPath), cls.moniker))
             raise
 
         # fix links:
         for link_ in linkData['unresolvedLinks']:
+            if isinstance(link_.ancestor, axesModule.Grid) and link_.path[0:3] == '../': continue
             path = link_.path
             if link_.root is None:
                 if path.startswith('/covarianceSuite'):
@@ -348,19 +378,14 @@ class covarianceSuite( ancestry ):
             link_.link = res
 
         xPath.pop()
+
         return CS
 
-def readXML( gndsCovariancesFile, reactionSuite=None, warningNoReactionSuite=True ):
-    if reactionSuite is None:
-        if( warningNoReactionSuite ) : sys.stderr.write("WARNING: without a reactionSuite instance, covariances will have unresolved links!\n")
-    from xml.etree import cElementTree
-    csElement = cElementTree.parse( gndsCovariancesFile ).getroot()
-    # wrapper around the xml parser:
-    from LUPY.xmlNode import xmlNode
-    csElement = xmlNode( csElement, xmlNode.etree )
-    linkData = {'reactionSuite': reactionSuite, 'unresolvedLinks':[]}
-    covSuite = covarianceSuite.parseXMLNode( csElement, xPath=[], linkData=linkData, sourcePath = gndsCovariancesFile )
-    if reactionSuite is not None:
-        for externalLink in reactionSuite._externalLinks:
-            externalLink.link = externalLink.follow( covSuite )
-    return covSuite
+    def parseCleanup(self, node, **kwargs):
+
+        reactionSuite = kwargs.get('reactionSuite')
+        if reactionSuite is not None:
+            for externalLink in reactionSuite._externalLinks:
+                externalLink.link = externalLink.follow(self)
+
+        return CovarianceSuite

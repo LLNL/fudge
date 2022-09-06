@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,7 +8,8 @@
 import os, sys, subprocess
 
 import fudge as fudgeModule
-from LUPY import subprocessing, times
+from LUPY import subprocessing as subprocessingModule
+from LUPY import times as timesModule
 from fudge.processing.deterministic import transferMatrices as transferMatricesModule
 
 def SnElasticUpScatter( style, tempInfo, comment = None ) :
@@ -65,10 +66,10 @@ def executeCommand( cmd, workDir, workFile ) :
     fullFileName = 'upscatter_%s'%workFile 
     infoFile = '%s.log' % fullFileName
     
-    t0 = times.times( )
+    t0 = timesModule.Times( )
     try :
         #print(cmd)
-        status, stdout, stderr = subprocessing.executeCommand( cmd, stdout = infoFile , stderr = subprocess.STDOUT )
+        status, stdout, stderr = subprocessingModule.executeCommand( cmd, stdout = infoFile , stderr = subprocess.STDOUT )
     except :
         fErr = open( fullFileName + ".err", "w" )
         fErr.close( )

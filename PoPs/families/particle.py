@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -24,13 +24,11 @@ from ..quantities import halflife as halflifeModule
 
 from ..decays import decayData as decayDataModule
 
-class alias( miscModule.classWithIDKey ) :
-
-    __metaclass__ = abc.ABCMeta
+class Alias(miscModule.ClassWithIDKey, abc.ABC):
 
     def __init__( self, id, particle ) :
 
-        miscModule.classWithIDKey.__init__( self, id )
+        miscModule.ClassWithIDKey.__init__( self, id )
 
         self.__particle = particle
 
@@ -87,19 +85,28 @@ class alias( miscModule.classWithIDKey ) :
 
         return( True )
 
-class particle( miscModule.classWithIDKey ) :
+    def toXML_strList(self, indent = '', **kwargs):
+        """This method needs work. Actually, the class probably needs to be removed."""
+
+        raise Exception('This needs work.')
+
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """This method needs work. Actually, the class probably needs to be removed."""
+
+        raise Exception('This needs work.')
+
+class Particle(miscModule.ClassWithIDKey, abc.ABC):
     """
     This is the abstract base class for all particles.
     """
-
-    __metaclass__ = abc.ABCMeta
 
     def __init__( self, id ) :
         """
         :param id: The particle id. Every particle in a PoPs database must have a unique id.
         """
 
-        miscModule.classWithIDKey.__init__( self, id )
+        miscModule.ClassWithIDKey.__init__( self, id )
 
         base, anti, qualifier = miscModule.baseAntiQualifierFromID( id )
 
@@ -110,7 +117,7 @@ class particle( miscModule.classWithIDKey ) :
         self.__parity = self.addSuite( parityModule )
         self.__charge = self.addSuite( chargeModule )
         self.__halflife = self.addSuite( halflifeModule )
-        self.__decayData = decayDataModule.decayData( )
+        self.__decayData = decayDataModule.DecayData( )
         self.__decayData.setAncestor( self )
 
     def __eq__( self, other ) :
@@ -189,7 +196,7 @@ class particle( miscModule.classWithIDKey ) :
 
     def addSuite( self, module ) :      # FIXME rename this __addSuite? Not intended for public use
 
-        suite = module.suite( )
+        suite = module.Suite( )
         suite.setAncestor( self )
         return( suite )
 
@@ -206,7 +213,7 @@ class particle( miscModule.classWithIDKey ) :
 # CMM FIXME
 #        probabilitySum = sum( [decay.probability for decay in self.decays] )
 #        if self.decays and abs(probabilitySum - 1.0) > BRSumAbsTol:
-#            warnings.append(warningModule.unnormalizedDecayProbabilities(probabilitySum, self))
+#            warnings.append(warningModule.UnnormalizedDecayProbabilities(probabilitySum, self))
         return warnings
 
     def buildFromRawData( self, mass = None, spin = None, parity = None, charge = None, halflife = None, label = 'default' ) :
@@ -226,16 +233,16 @@ class particle( miscModule.classWithIDKey ) :
             if( isinstance( unit, str ) ) : unit = quantityModule.stringToPhysicalUnit( unit )
             return( unit )
 
-        if( mass is not None ) : self.mass.add( massModule.double( label, mass[0], getUnit( mass[1] ) ) )
+        if( mass is not None ) : self.mass.add( massModule.Double( label, mass[0], getUnit( mass[1] ) ) )
         if( spin is not None ) :
-            self.spin.add( spinModule.fraction( label, spin[0], spin[1] ) )
-        if( parity is not None ) : self.parity.add( parityModule.integer( label, parity[0], getUnit( parity[1] ) ) )
-        if( charge is not None ) : self.charge.add( chargeModule.integer( label, charge[0], getUnit( charge[1] ) ) )
+            self.spin.add( spinModule.Fraction( label, spin[0], spin[1] ) )
+        if( parity is not None ) : self.parity.add( parityModule.Integer( label, parity[0], getUnit( parity[1] ) ) )
+        if( charge is not None ) : self.charge.add( chargeModule.Integer( label, charge[0], getUnit( charge[1] ) ) )
         if( halflife is not None ) :
             if( isinstance( halflife[0], float ) ) :
-                _halflife = halflifeModule.double( label, halflife[0], getUnit( halflife[1] ) )
+                _halflife = halflifeModule.Double( label, halflife[0], getUnit( halflife[1] ) )
             elif( isinstance( halflife[0], str ) ) :
-                _halflife = halflifeModule.string( label, halflife[0], getUnit( halflife[1] ) )
+                _halflife = halflifeModule.String( label, halflife[0], getUnit( halflife[1] ) )
             else :
                 TypeError( 'halflife neither double or str instance' )
             self.halflife.add( _halflife )
@@ -272,7 +279,7 @@ class particle( miscModule.classWithIDKey ) :
 
     def familyOrderLessThan( self, other ) :
 
-        if( not( isinstance( other, particle ) ) ) : raise TypeError( 'Other must be a particle: %s.' % other.__class__ )
+        if( not( isinstance( other, Particle ) ) ) : raise TypeError( 'Other must be a Particle: %s.' % other.__class__ )
         if( self.familyOrder < other.familyOrder ) : return( True )
         return( False )
 
@@ -280,7 +287,7 @@ class particle( miscModule.classWithIDKey ) :
         """
         Copy data from other into self
 
-        :param other: another particle instance
+        :param other: another Particle instance
         """
 
         self.__mass.replicate( other.mass )
@@ -320,23 +327,28 @@ class particle( miscModule.classWithIDKey ) :
         if( self.id == other.id ) : return( 0 )
         return( -1 )
 
-    def toXML( self, indent = '', **kwargs ) :
+    def particleCompare(self, other):
+        """Compares *self* to particle *other* which can be from an particle family."""
 
-        return( '\n'.join( self.toXMLList( indent, **kwargs )  ) )
+        if self.familyOrder != other.familyOrder:
+            return self.familyOrder - other.familyOrder
+        if self.id > other.id: return 1
+        if self.id == other.id: return 0
+        return -1 
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s id="%s"%s>' % ( indent, self.moniker, self.id, self.extraXMLAttributes( ) ) ]
 
-        XMLStringList += self.mass.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.spin.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.parity.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.charge.toXMLList( indent = indent2, **kwargs )
-        XMLStringList += self.halflife.toXMLList( indent = indent2, **kwargs )
+        XMLStringList += self.mass.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.spin.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.parity.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.charge.toXML_strList( indent = indent2, **kwargs )
+        XMLStringList += self.halflife.toXML_strList( indent = indent2, **kwargs )
 
-        XMLStringList += self.decayData.toXMLList( indent = indent2, **kwargs )
+        XMLStringList += self.decayData.toXML_strList( indent = indent2, **kwargs )
 
         XMLStringList += self.extraXMLElements( indent2, **kwargs )
 
@@ -344,11 +356,11 @@ class particle( miscModule.classWithIDKey ) :
 
         return( XMLStringList )
 
-    def parseExtraXMLElement( self, element, xPath, linkData ) :
+    def parseExtraXMLElement(self, element, xPath, linkData, **kwarg):
 
         return( False )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( '%s[@id="%s"]' % ( element.tag, element.get( 'id' ) ) )
 
@@ -356,69 +368,106 @@ class particle( miscModule.classWithIDKey ) :
                      'charge' : chargeModule,   'halflife' : halflifeModule }
         for child in element :
             if( child.tag in children ) :
-                children[child.tag].suite.parseXMLNode( getattr( self, child.tag ), child, xPath, linkData )
-            elif( child.tag == decayDataModule.decayData.moniker ) :  # not a suite so can't be treated like other children
-                self.decayData.parseXMLNode( child, xPath, linkData )
+                children[child.tag].Suite.parseNode(getattr(self, child.tag), child, xPath, linkData, **kwargs)
+            elif( child.tag == decayDataModule.DecayData.moniker ) :  # not a suite so can't be treated like other children
+                self.decayData.parseNode(child, xPath, linkData, **kwargs)
             else :
-                if( not( self.parseExtraXMLElement( child, xPath, linkData ) ) ) :
+                if not self.parseExtraXMLElement(child, xPath, linkData, **kwargs):
                     raise ValueError( 'sub-element = "%s" not allowed' % child.tag )
 
         xPath.pop( )
         return( self )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( '%s[@id="%s"]' % ( element.tag, element.get( 'id' ) ) )
 
-        kwargs = {v[0]:v[1] for v in element.items()}
-        del kwargs['id']
-        self = cls( element.get('id'), **kwargs )
+        attrs = {v[0]:v[1] for v in element.items()}
+        del attrs['id']
+        self = cls( element.get('id'), **attrs )
         xPath.pop()
 
-        self.parseXMLNode( element, xPath, linkData )
+        self.parseNode(element, xPath, linkData, **kwargs)
 
         return( self )
 
-    @classmethod
-    def parseXMLStringAsClass( cls, string ) :
-
-        from xml.etree import cElementTree
-
-        element = cElementTree.fromstring( string )
-        return( cls.parseXMLNodeAsClass( element, [], [] ) )
-
-class suite( suiteModule.sortedSuite ) :
+class Suite( suiteModule.SortedSuite ) :
 
     def __init__( self, replace = True ) :
 
-        suiteModule.sortedSuite.__init__( self, allowedClasses = ( self.particle, ), replace = replace )
+        suiteModule.SortedSuite.__init__( self, allowedClasses = ( self.particle, ), replace = replace )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         for child in element :
-            self.add( self.particle.parseXMLNodeAsClass( child,  xPath, linkData ) )
+            self.add(self.particle.parseNodeUsingClass(child,  xPath, linkData, **kwargs))
 
         xPath.pop( )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         self = cls( )
         for child in element :
-            self.add( self.particle.parseXMLNodeAsClass( child,  xPath, linkData ) )
+            self.add(self.particle.parseNodeUsingClass(child,  xPath, linkData, **kwargs))
 
         xPath.pop( )
         return( self )
 
-    @classmethod
-    def parseXMLStringAsClass( cls, string ) :
+class ParticleSorter:
+    """
+    """
 
-        from xml.etree import cElementTree
+    def __init__(self, overwrite=False):
+        """Constructor."""
 
-        element = cElementTree.fromstring( string )
-        return( cls.parseXMLNodeAsClass( element, [], [] ) )
+        self.__overwrite = overwrite
+        self.__particles = []
+
+    def __len__(self):
+        """Returns the number of particles in *self*."""
+
+        return len(self.__particles)
+
+    def __getitem__(self, index):
+        """Returns the particle(s) specified by *index*."""
+
+        return self.__particles[index]
+
+    def __iter__(self):
+        """Iterates over the particles in *self*."""
+
+        n1 = len(self)
+        for i1 in range(n1): yield self.__particles[i1]
+
+    @property
+    def overwrite(self):
+        """Returns the value of self.__overwrite."""
+
+        return self.__overwrite
+
+    def add(self, particle):
+        """Determines the location of *particle* in *self* and inserts it at that location."""
+
+        if not isinstance(particle, Particle):
+            raise TypeError('Invalid particle of type "%s".' % type(particle))
+
+        cmp = 0
+        index = 0
+        for index, item in enumerate(self):
+            cmp = particle.particleCompare(item)
+            if cmp == 0:
+                if not self.__overwrite:
+                    raise Exception('ParticleSorter instance does not allow overwriting (i.e., replacing) a particle (id = "%s"). %s %s' % (particle.id, item.id, cmp))
+                del self.__particles[index]
+                break
+            elif cmp < 0:
+                break
+        if cmp > 0: index += 1
+
+        self.__particles.insert(index, particle)

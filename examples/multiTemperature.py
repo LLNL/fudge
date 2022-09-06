@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -17,7 +17,7 @@ import argparse
 
 from fudge import styles as stylesModule
 
-from fudge import physicalQuantity
+from fudge import physicalQuantity as physicalQuantityModule
 from pqu import PQU
 
 exampleDir = os.path.dirname( os.path.abspath( __file__ ) )
@@ -36,7 +36,7 @@ args = parser.parse_args()
 filename = args.filename
 if open(filename).readline().startswith( "<?xml" ):
     from fudge.gnds import reactionSuite
-    RS = reactionSuite.readXML( filename )
+    RS = reactionSuite.ReactionSuite.readXML_file( filename )
 else:
     from fudge.legacy.converting import endfFileToGNDS
     rce = endfFileToGNDS.endfFileToGNDS( filename )
@@ -49,8 +49,8 @@ for temp in args.temps:
 
     temp = PQU.PQU( temp, args.temperatureUnit )
     print("Heating to %s" % temp)
-    heatedStyle = stylesModule.heated( 'heated', derivedFrom=RS.styles.getEvaluatedStyle().label,
-            temperature=physicalQuantity.temperature( temp.value, temp.unit ) )
+    heatedStyle = stylesModule.Heated( 'heated', derivedFrom=RS.styles.getEvaluatedStyle().label,
+            temperature=physicalQuantityModule.Temperature( temp.value, temp.unit ) )
     data[temp] = reaction.crossSection.heat( heatedStyle, EMin=PQU.PQU(1e-5,'eV') )
 
     

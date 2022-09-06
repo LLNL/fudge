@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -76,7 +76,7 @@ def dismemberACE( fileName ) :
 
     NXS  = dismemberACE_miscModule.get8Integers( lines[6] )
     NXS += dismemberACE_miscModule.get8Integers( lines[7] )
-    NXS = dismemberACE_miscModule.listBase1( NXS )
+    NXS = dismemberACE_miscModule.ListBase1( NXS )
     for i1 in range( 1, 16 ) : fOut.write( 'NXS[%2d] = %9d\n' % ( i1, NXS[i1] ) )
 
     fOut.write( '\n' )
@@ -84,7 +84,7 @@ def dismemberACE( fileName ) :
     JXS += dismemberACE_miscModule.get8Integers( lines[9] )
     JXS += dismemberACE_miscModule.get8Integers( lines[10] )
     JXS += dismemberACE_miscModule.get8Integers( lines[11] )
-    JXS = dismemberACE_miscModule.listBase1( JXS )
+    JXS = dismemberACE_miscModule.ListBase1( JXS )
     for i1 in range( 1, 32 ) : fOut.write( 'JXS[%2d] = %9d\n' % ( i1, JXS[i1] ) )
 
     fOut.close( )
@@ -110,7 +110,7 @@ def dismemberACE( fileName ) :
             count += 1
             fOut.write( '%20.12e\n' % XX )
     fOut.close( )
-    XSS = dismemberACE_miscModule.listBase1( XSS )
+    XSS = dismemberACE_miscModule.ListBase1( XSS )
     dismemberACE_miscModule.cites = len( XSS ) * [ 0 ]
 
     if( cls in [ 'c', 'nc' ] ) :

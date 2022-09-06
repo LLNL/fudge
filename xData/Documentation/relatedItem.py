@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,32 +9,63 @@
 This module contains the classes representing the GNDS documentation nodes author and authors.
 """
 
-from .. import ancestry as ancestryModule
+from LUPY import enums as enumsModule
+from LUPY import ancestry as ancestryModule
+
 from .. import suite as suiteModule
 from .. import text as textModule
 from . import abstractClasses as abstractClassesModule
 
-class RelationType:
+class RelationType(enumsModule.Enum):
 
-    allowed = ( 'IsCitedBy', 'Cites', 'IsSupplementTo', 'IsSupplementedBy', 'IsContinuedBy', 'Continues', 'Describes', 'IsDescribedBy',
-                'HasMetadata', 'IsMetadataFor', 'HasVersion', 'IsVersionOf', 'IsNewVersionOf', 'IsPreviousVersionOf', 'IsPartOf',
-                'HasPart', 'IsPublishedIn', 'IsReferencedBy', 'References', 'IsDocumentedBy', 'Documents', 'IsCompiledBy', 'Complies',
-                'IsVariantFormOf', 'IsOriginalFormOf', 'IsIdenticalTo', 'IsReviewedBy', 'Reviews', 'IsDerivedFrom', 'IsSourceOf',
-                'IsRequiredBy', 'Requires', 'Obsoletes', 'IsObsoletedBy' )
+    none = enumsModule.auto()
+    isCitedBy = 'IsCitedBy'
+    cites = 'Cites'
+    isSupplementTo = 'IsSupplementTo'
+    isSupplementedBy = 'IsSupplementedBy'
+    isContinuedBy = 'IsContinuedBy'
+    continues = 'Continues'
+    describes = 'Describes'
+    isDescribedBy = 'IsDescribedBy'
+    hasMetadata = 'HasMetadata'
+    isMetadataFor = 'IsMetadataFor'
+    hasVersion = 'HasVersion'
+    isVersionOf = 'IsVersionOf'
+    isNewVersionOf = 'IsNewVersionOf'
+    isPreviousVersionOf = 'IsPreviousVersionOf'
+    isPartOf = 'IsPartOf'
+    hasPart = 'HasPart'
+    isPublishedIn = 'IsPublishedIn'
+    isReferencedBy = 'IsReferencedBy'
+    references = 'References'
+    isDocumentedBy = 'IsDocumentedBy'
+    documents = 'Documents'
+    isCompiledBy = 'IsCompiledBy'
+    complies = 'Complies'
+    isVariantFormOf = 'IsVariantFormOf'
+    isOriginalFormOf = 'IsOriginalFormOf'
+    isIdenticalTo = 'IsIdenticalTo'
+    isReviewedBy = 'IsReviewedBy'
+    reviews = 'Reviews'
+    isDerivedFrom = 'IsDerivedFrom'
+    isSourceOf = 'IsSourceOf'
+    isRequiredBy = 'IsRequiredBy'
+    requires = 'Requires'
+    obsoletes = 'Obsoletes'
+    isObsoletedBy = 'IsObsoletedBy'
 
-class RelatedItem(ancestryModule.Ancestry2):
+class RelatedItem(ancestryModule.AncestryIO):
 
     moniker = 'relatedItem'
     keyName = 'name'
 
     def __init__(self, name, href, relationType):
 
-
-        ancestryModule.Ancestry2.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__name = textModule.raiseIfNotString(name, 'name')
         self.__href = textModule.raiseIfNotString(href, 'href')
-        self.__relationType = abstractClassesModule.raiseIfNotInList(relationType, RelationType.allowed, 'relationType')
+        self.__relationType = RelationType.checkEnumOrString(relationType)
 
     @property
     def name(self):
@@ -54,7 +85,7 @@ class RelatedItem(ancestryModule.Ancestry2):
 
         return self.__relationType
 
-    def toXMLList(self, **kwargs):
+    def toXML_strList(self, **kwargs):
 
         indent = kwargs.get('indent', '')
 
@@ -64,18 +95,19 @@ class RelatedItem(ancestryModule.Ancestry2):
 
         return [ '%s<%s%s/>' % ( indent, self.moniker, attributes ) ]
 
-    @staticmethod
-    def parseConstructBareNodeInstance(node, xPath, linkData, **kwargs):
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         name = node.get('name')
         href = node.get('href', '')
         relationType = node.get('relationType', '')
 
-        return RelatedItem(name, href, relationType)
+        return cls(name, href, relationType)
 
 class RelatedItems(suiteModule.Suite):
 
     moniker = 'relatedItems'
+    suiteName = 'name'
 
     def __init__(self):
 
@@ -83,4 +115,4 @@ class RelatedItems(suiteModule.Suite):
 
     def toXML(self, indent = '', **kwargs):
 
-        return '\n'.join(self.toXMLList(**kwargs))
+        return '\n'.join(self.toXML_strList(**kwargs))

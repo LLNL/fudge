@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -24,8 +24,8 @@ parser.add_argument( "GNDSFile2",                                       help = "
 
 args = parser.parse_args( )
 
-protare1 = reactionSuiteModule.readXML( args.GNDSFile1 )
-protare2 = reactionSuiteModule.readXML( args.GNDSFile2 )
+protare1 = reactionSuiteModule.ReactionSuite.readXML_file(args.GNDSFile1)
+protare2 = reactionSuiteModule.ReactionSuite.readXML_file(args.GNDSFile2)
 
 if( protare1.format != protare2.format ) : raise Exception( 'GNDS formats not the same: "%s" vs. "%s".' % ( protare1.format, protare2.format ) )
 

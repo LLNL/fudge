@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -16,19 +16,23 @@ dbrown, 12/5/2012
 import unittest, copy, os
 defaultAccuracy = 0.001
 
-from fudge.covariances.covarianceSuite import readXML as CovReadXML
-from fudge.reactionSuite import readXML as RxnReadXML
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+from fudge import reactionSuite
 from fudge import covariances
-import xData.axes as axesModule
-import xData.link as linkModule
-import xData.gridded as griddedModule
-import xData.values as valuesModule
-import xData.xDataArray as arrayModule
-import xData.formatVersion as formatVersionModule
+
+from fudge.covariances import covarianceSuite
+from fudge.covariances import enums as covarianceEnumsModule
+
+from xData import enums as xDataEnumsModule
+from xData import axes as axesModule
+from xData import link as linkModule
+from xData import gridded as griddedModule
+from xData import values as valuesModule
+from xData import xDataArray as arrayModule
 
 TEST_DATA_PATH, this_filename = os.path.split(__file__)
-HEvaluation =  RxnReadXML( open(TEST_DATA_PATH+os.sep+'n-001_H_001.endf.gnds.xml') )
-HCovariance =  CovReadXML( open(TEST_DATA_PATH+os.sep+'n-001_H_001.endf.gndsCov.xml'), reactionSuite=HEvaluation )
+HEvaluation =  reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'n-001_H_001.endf.gnds.xml')
+HCovariance =  covarianceSuite.CovarianceSuite.readXML_file(TEST_DATA_PATH+os.sep+'n-001_H_001.endf.gndsCov.xml', reactionSuite=HEvaluation)
 
 
 class TestCaseBase( unittest.TestCase ):
@@ -63,8 +67,8 @@ class Test_covariance_baseClass( TestCaseBase ):
         self.__groupBoundaries.reverse()
         self.__groupUnit = 'eV'
 
-    def test_toXMLList(self):
-        self.assertXMLListsEqual( HCovariance.covarianceSections[1].toXMLList(formatVersion=formatVersionModule.version_1_10), '''<section label="n + H1">
+    def test_toXML_strList(self):
+        self.assertXMLListsEqual( HCovariance.covarianceSections[1].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''<section label="n + H1">
     <rowData ENDF_MFMT="33,2" href="$reactions#/reactionSuite/reactions/reaction[@label='n + H1']/crossSection/XYs1d[@label='eval']"/>
     <covarianceMatrix label="eval" type="relative">
       <gridded2d>
@@ -139,43 +143,40 @@ class Test_covariance_baseClass( TestCaseBase ):
         listAssertEqual( originalUnits, [ a.unit for a in HCovariance.covarianceSections[1]['eval'].matrix.axes ] )
 
     def test_toCovarianceMatrix(self):
-        self.assertXMLListsEqual(HCovariance.covarianceSections[1]['eval'].toXMLList(),
-            HCovariance.covarianceSections[1]['eval'].toCovarianceMatrix().toXMLList())
+        self.assertXMLListsEqual(HCovariance.covarianceSections[1]['eval'].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
+            HCovariance.covarianceSections[1]['eval'].toCovarianceMatrix().toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10))
 
     @unittest.skip("interactive test")
     def test_plot(self):
         from fudge import covariances
         # ...................... example matrix 'a' ......................
-        axes = axesModule.axes(
-            labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
-                         2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
-                                  style=axesModule.boundariesGridToken,
-                                  values=valuesModule.values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
-        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
-                                  style=axesModule.linkGridToken,
-                                  values=linkModule.link(link=axes[2].values, relative=True))
-        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.symmetryLowerToken)
-        a=covariances.covarianceMatrix.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
-                                              type=covariances.tokens.relativeToken)
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=valuesModule.Values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=linkModule.Link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.Symmetry.lower)
+        a=covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                              type=covarianceEnumsModule.Type.relative)
         a.plot()
 
     def test_toCorrelationMatrix(self):
-        x = axesModule.axes(rank=3)
-        x[0] = axesModule.axis(index="0", label="matrix_elements", unit="")
-        x[2] = axesModule.grid(index="2", label="row_energy_bounds", unit="eV", style="boundaries",
-                               values=valuesModule.values([1e-5, 0.1e6, 1.0e6, 2.0e6, 20.0e6]))
-        x[1] = axesModule.grid(index="1", label="column_energy_bounds", unit="eV", style="link",
-                               values=linkModule.link(x[2].values, relative=True))
-        a = arrayModule.diagonal(data=valuesModule.values([0.0, 0.25, 0.16, 0.0]), shape=(4, 4))
-        g = griddedModule.gridded2d(x, a)
-        m = covariances.covarianceMatrix.covarianceMatrix(label='0', matrix=g, type='absolute')
+        x = axesModule.Axes(3)
+        x[0] = axesModule.Axis(index="0", label="matrix_elements", unit="")
+        x[2] = axesModule.Grid(index="2", label="row_energy_bounds", unit="eV", style=xDataEnumsModule.GridStyle.boundaries,
+                               values=valuesModule.Values([1e-5, 0.1e6, 1.0e6, 2.0e6, 20.0e6]))
+        x[1] = axesModule.Grid(index="1", label="column_energy_bounds", unit="eV", style=xDataEnumsModule.GridStyle.boundaries,
+                               values=linkModule.Link(x[2].values, relative=True))
+        a = arrayModule.Diagonal(data=valuesModule.Values([0.0, 0.25, 0.16, 0.0]), shape=(4, 4))
+        g = griddedModule.Gridded2d(x, a)
+        m = covariances.covarianceMatrix.CovarianceMatrix(label='0', matrix=g, type='absolute')
         m.removeExtraZeros()
-        self.assertXMLListsEqual(m.getCorrelationMatrix().toXMLList(), """<gridded2d>
+        self.assertXMLListsEqual(m.getCorrelationMatrix().toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
+          """<gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values>1e5 1e6 2e6</values></grid>
-            <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+            <grid index="1" label="column_energy_bounds" unit="eV" style="boundaries">
               <link href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="2,2" symmetry="lower">
@@ -202,15 +203,15 @@ class Test_covariance_baseClass( TestCaseBase ):
         original = copy.copy(HCovariance.covarianceSections[1]['eval'])
 
         # start as relative, so first call should do nothing
-        self.assertEqual( HCovariance.covarianceSections[1]['eval'].toRelative().toXMLList(), original.toXMLList() )
+        self.assertEqual( HCovariance.covarianceSections[1]['eval'].toRelative().toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), original.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10) )
 
         # call to absolute better change things
         self.assertNotEqual(
-            HCovariance.covarianceSections[1]['eval'].toAbsolute(ptwise).toXMLList(),
-            [ x.replace('relative','absolute').replace('eval','toAbsolute') for x in original.toXMLList() ] )
+            HCovariance.covarianceSections[1]['eval'].toAbsolute(ptwise).toXML_strList(),
+            [ x.replace('relative','absolute').replace('eval','toAbsolute') for x in original.toXML_strList() ] )
 
         # call to relative better bring us back
-        self.assertEqual( HCovariance.covarianceSections[1]['eval'].toRelative().toXMLList(), original.toXMLList() )
+        self.assertEqual( HCovariance.covarianceSections[1]['eval'].toRelative().toXML_strList(), original.toXML_strList() )
 
     def test_check(self):
 
@@ -223,23 +224,19 @@ class Test_covariance_baseClass( TestCaseBase ):
 
     def test_group1(self):
         '''a covariance on a a coarse group whose group boundaries align with the COMMARA-2.0 group boundaries'''
-        axes = axesModule.axes(
-            labelsUnits={0: ('matrix_elements', ''), 1: ('column_energy_bounds', 'MeV'),
-                         2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
-                                  style=axesModule.boundariesGridToken,
-                                  values=valuesModule.values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
-        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
-                                  style=axesModule.linkGridToken,
-                                  values=linkModule.link(link=axes[2].values, relative=True))
-        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
-                                    symmetry=arrayModule.symmetryLowerToken)
-        a = covariances.covarianceMatrix.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
-                                         type=covariances.tokens.relativeToken)
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', ''), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=valuesModule.Values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=linkModule.Link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
+                                    symmetry=arrayModule.Symmetry.lower)
+        a = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                         type=covarianceEnumsModule.Type.relative)
 
         self.assertEqual( list( map( str, a.check(
             {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [] )
-        self.assertXMLListsEqual(a.toXMLList(), '''<covarianceMatrix label="eval" type="relative">
+        self.assertXMLListsEqual(a.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''<covarianceMatrix label="eval" type="relative">
     <gridded2d>
       <axes>
         <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
@@ -250,26 +247,26 @@ class Test_covariance_baseClass( TestCaseBase ):
       <array shape="3,3" symmetry="lower">
         <values>4 1 9 0 0 25</values></array></gridded2d></covarianceMatrix>'''.split('\n'))
 
-        from xData import XYs as XYsModule
-        testXYsAxes = axesModule.axes(labelsUnits={0: ('crossSection', 'b'), 1: ('energy_in', 'MeV')})
-        testXYsAxes[0] = axesModule.axis(axes[2].label, axes[2].index, axes[2].unit)
-        testXYsAxes[1] = axesModule.axis(axes[1].label, axes[1].index, axes[1].unit)
-        testXYs = XYsModule.XYs1d([[1.0000E-07, 2.0], [1.9640E+01, 2.0]], axes=testXYsAxes)
-        aAbs = a.toAbsolute(rowData=testXYs)
-        self.assertXMLListsEqual(aAbs.toXMLList(),
+        from xData import XYs1d as XYs1dModule
+        testXYsAxes = axesModule.Axes(3, labelsUnits={0: ('crossSection', 'b'), 1: ('energy_in', 'MeV')})
+        testXYsAxes[0] = axesModule.Axis(axes[2].label, axes[2].index, axes[2].unit)
+        testXYsAxes[1] = axesModule.Axis(axes[1].label, axes[1].index, axes[1].unit)
+        testXYs = XYs1dModule.XYs1d([[1.0000E-07, 2.0], [1.9640E+01, 2.0]], axes=testXYsAxes)
+        aAbs = a.toAbsolute(rowData=testXYs, colData=testXYs)
+        self.assertXMLListsEqual(aAbs.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
                                  '''<covarianceMatrix label="toAbsolute" type="absolute">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
         <values>1e-7 0.11109 1.3534 19.64</values></grid>
-      <grid index="1" label="column_energy_bounds" unit="MeV" style="link">
+      <grid index="1" label="column_energy_bounds" unit="MeV" style="boundaries">
         <link href="../../grid[@index='2']/values"/></grid>
       <axis index="0" label="matrix_elements" unit="MeV**2"/></axes>
     <array shape="3,3" symmetry="lower">
       <values>16 4 36 0 0 1e2</values></array></gridded2d></covarianceMatrix>'''.split('\n'))
 
         aRel = aAbs.toRelative(rowData=testXYs)
-        self.assertEqual('\n'.join(aRel.toXMLList()), '\n'.join(a.toXMLList()))
+        self.assertEqual('\n'.join(aRel.toXML_strList()), '\n'.join(a.toXML_strList()))
 
         g = a.group(groupBoundaries=(self.__groupBoundaries, self.__groupBoundaries),
                     groupUnit=(self.__groupUnit, self.__groupUnit))
@@ -278,12 +275,13 @@ class Test_covariance_baseClass( TestCaseBase ):
         self.assertEqual(g.matrix.axes[2].unit, 'eV')
         self.assertEqual( list( map(str, g.check(
             {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
-        self.assertXMLListsEqual(g.toXMLList(), '''<covarianceMatrix label="eval" type="relative">
+        self.assertXMLListsEqual(g.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
+            '''<covarianceMatrix label="eval" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
         <values>1e-7 0.11109 1.3534 19.64</values></grid>
-      <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+      <grid index="1" label="column_energy_bounds" unit="eV" style="boundaries">
         <link href="../../grid[@index='2']/values"/></grid>
       <axis index="0" label="matrix_elements" unit=""/></axes>
     <array shape="33,33" symmetry="lower">
@@ -302,23 +300,19 @@ class Test_covariance_baseClass( TestCaseBase ):
 
     def test_group2(self):
         '''a covariance on a coarse group whose group boundaries don't quite align with the COMMARA-2.0 group boundaries'''
-        axes = axesModule.axes(
-            labelsUnits={0: ('matrix_elements', ''), 1: ('column_energy_bounds', 'MeV'),
-                         2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
-                                  style=axesModule.boundariesGridToken,
-                                  values=valuesModule.values([1.0e-5, 0.100, 1.0, 20.0]))
-        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
-                                  style=axesModule.linkGridToken,
-                                  values=linkModule.link(link=axes[2].values, relative=True))
-        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
-                                    symmetry=arrayModule.symmetryLowerToken)
-        a = covariances.covarianceMatrix.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
-                                         type=covariances.tokens.relativeToken)
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', ''), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=valuesModule.Values([1.0e-5, 0.100, 1.0, 20.0]))
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=linkModule.Link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
+                                    symmetry=arrayModule.Symmetry.lower)
+        a = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                         type=covarianceEnumsModule.Type.relative)
 
         self.assertEqual( list( map(str, a.check(
             {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
-        self.assertXMLListsEqual(a.toXMLList(),
+        self.assertXMLListsEqual(a.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
                          """<covarianceMatrix label="eval" type="relative">
   <gridded2d>
     <axes>
@@ -338,13 +332,13 @@ class Test_covariance_baseClass( TestCaseBase ):
         self.assertEqual(g.matrix.axes[2].unit, 'MeV')
         self.assertEqual( list( map(str, g.check(
             {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
-        self.assertXMLListsEqual(g.toXMLList(),
+        self.assertXMLListsEqual(g.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
                          '''<covarianceMatrix label="eval" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
         <values>1e-11 1e-7 1e-6 2e-5</values></grid>
-      <grid index="1" label="column_energy_bounds" unit="MeV" style="link">
+      <grid index="1" label="column_energy_bounds" unit="MeV" style="boundaries">
         <link href="../../grid[@index='2']/values"/></grid>
       <axis index="0" label="matrix_elements" unit="b**2"/></axes>
     <array shape="33,33" symmetry="lower">
@@ -363,26 +357,22 @@ class Test_covariance_baseClass( TestCaseBase ):
 
     def test_group3(self):
         '''a covariance on a fine group whose group boundaries don't align with the COMMARA-2.0 group boundaries at all'''
-        axes = axesModule.axes(
-            labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
-                         2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
-                                  style=axesModule.boundariesGridToken,
-                                  values=valuesModule.values([1.0e-5, 0.100, 1.0, 20.0]))
-        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
-                                  style=axesModule.linkGridToken,
-                                  values=linkModule.link(link=axes[2].values, relative=True))
-        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
-                                    symmetry=arrayModule.symmetryLowerToken)
-        a = covariances.covarianceMatrix.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
-                                         type=covariances.tokens.absoluteToken)
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=valuesModule.Values([1.0e-5, 0.100, 1.0, 20.0]))
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.boundaries,
+                                  values=linkModule.Link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
+                                    symmetry=arrayModule.Symmetry.lower)
+        a = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                         type=covarianceEnumsModule.Type.absolute)
 
         import numpy
         fineBoundaries = numpy.linspace(1e-11, 20.0, num=100).tolist()
 
         self.assertEqual( list( map(str, a.check(
             {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
-        self.assertXMLListsEqual(a.toXMLList(),
+        self.assertXMLListsEqual(a.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
                          '''<covarianceMatrix label="eval" type="absolute">
   <gridded2d>
     <axes>
@@ -401,13 +391,13 @@ class Test_covariance_baseClass( TestCaseBase ):
         self.assertEqual(g.matrix.axes[2].unit, 'keV')
         self.assertEqual( list( map(str, g.check(
             {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
-        self.assertXMLListsEqual(g.toXMLList(),
+        self.assertXMLListsEqual(g.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
                          """<covarianceMatrix label="eval" type="absolute">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="keV" style="boundaries">
         <values>1e-2 1e2 1e3 2e4</values></grid>
-      <grid index="1" label="column_energy_bounds" unit="keV" style="link">
+      <grid index="1" label="column_energy_bounds" unit="keV" style="boundaries">
         <link href="../../grid[@index='2']/values"/></grid>
       <axis index="0" label="matrix_elements" unit="b**2"/></axes>
     <array shape="99,99" symmetry="lower">
@@ -469,20 +459,21 @@ class Test_covariance_baseClass( TestCaseBase ):
             g.plot(xlog=True, ylog=True)
 
     def test_removeExtraZeros(self):
-        x=axesModule.axes(rank=3)
-        x[0]=axesModule.axis(index="0", label="matrix_elements", unit="")
-        x[2]=axesModule.grid(index="2", label="row_energy_bounds", unit="eV", style="boundaries", values=valuesModule.values([1e-5,0.1e6,1.0e6,2.0e6,20.0e6]))
-        x[1]=axesModule.grid(index="1", label="column_energy_bounds", unit="eV", style="link", values=linkModule.link(x[2].values, relative=True))
-        a=arrayModule.diagonal(data=valuesModule.values([0.0,0.25,0.25,0.0]),shape=(4,4))
-        g=griddedModule.gridded2d(x,a)
-        m=covariances.covarianceMatrix.covarianceMatrix(label='0', matrix=g, type='relative')
+        x=axesModule.Axes(3)
+        x[0]=axesModule.Axis(index="0", label="matrix_elements", unit="")
+        x[2]=axesModule.Grid(index="2", label="row_energy_bounds", unit="eV", style=xDataEnumsModule.GridStyle.boundaries, values=valuesModule.Values([1e-5,0.1e6,1.0e6,2.0e6,20.0e6]))
+        x[1]=axesModule.Grid(index="1", label="column_energy_bounds", unit="eV", style=xDataEnumsModule.GridStyle.boundaries, values=linkModule.Link(x[2].values, relative=True))
+        a=arrayModule.Diagonal(data=valuesModule.Values([0.0,0.25,0.25,0.0]),shape=(4,4))
+        g=griddedModule.Gridded2d(x,a)
+        m=covariances.covarianceMatrix.CovarianceMatrix(label='0', matrix=g, type='relative')
         m.removeExtraZeros()
-        self.assertXMLListsEqual(m.toXMLList(),"""<covarianceMatrix label="0" type="relative">
+        self.assertXMLListsEqual(m.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
+              """<covarianceMatrix label="0" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
         <values>1e5 1e6 2e6</values></grid>
-      <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+      <grid index="1" label="column_energy_bounds" unit="eV" style="boundaries">
         <link href="../../grid[@index='2']/values"/></grid>
       <axis index="0" label="matrix_elements" unit=""/></axes>
     <array shape="2,2" symmetry="lower">

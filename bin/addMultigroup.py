@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -45,19 +45,19 @@ else :
 
 boundaries = list( map( float, values.split( ) ) )
 if( sorted( boundaries ) != boundaries ) : raise ValueError( "Boundaries not in ascending order." )
-boundaries = valuesModule.values( boundaries )
+boundaries = valuesModule.Values( boundaries )
 
-grid = axesModule.grid( "energy", 0, args.unit, "boundaries", boundaries )
-group = groupModule.group( args.label, grid )
+grid = axesModule.Grid( "energy", 0, args.unit, "boundaries", boundaries )
+group = groupModule.Group( args.label, grid )
 
 input = args.input
 if( input is None ) :
     if( os.path.exists( args.output ) ) : input = args.output
 
 if( input is not None ) :
-    multiGroups = groupModule.groups.readXML( input )
+    multiGroups = groupModule.Groups.readXML_file(input)
 else :
-    multiGroups = groupModule.groups( )
+    multiGroups = groupModule.Groups( )
 
 if( group.label in multiGroups ) :
     if( not( args.override ) ) : raise ValueError( """Label "%s" already in multi-group file.""" % group.label )

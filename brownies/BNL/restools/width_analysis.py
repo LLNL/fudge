@@ -61,12 +61,12 @@ def getPorterThomasFitToWidths(reducedWidthList, verbose=False):
         hist, bin_edges = makeWidthHistogram(reducedWidthList, verbose=verbose)
 
         if False:
-            from xData import XYs
+            from xData import XYs1d
             xys = [[], []]
             for i in range(len(hist)):
                 xys[0].append((bin_edges[i] + bin_edges[i + 1]) / 2)
                 xys[1].append(hist[i])
-            XYs.XYs1d(data=xys, dataForm='xsandys').plot()
+            XYs1d.XYs1d(data=xys, dataForm='xsandys').plot()
 
         if verbose:
             print('    fitting:')

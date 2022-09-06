@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,8 +7,6 @@
 
 from fudge.core.utilities.brb import uniquify
 from pqu import PQU
-
-__metaclass__ = type
 
 INCLASSAXISSETTING = False
 
@@ -326,9 +324,9 @@ class DataSetParameters:
         r = ''
         if self.color is not None and len(self.color) == 1:
             r += self.color
-        if self.symbol and len(self.symbol) == 1 is not None:
+        if self.symbol is not None and len(self.symbol) == 1:
             r += self.symbol
-        if self.lineStyle and len(self.lineStyle) == 1 is not None:
+        if self.lineStyle is not None and len(self.lineStyle) == 1:
             r += self.lineStyle
         return r
 
@@ -546,7 +544,7 @@ class DataSet3d(DataSetParameters):
     def getW_XYs(self):
 
         from xData import axes as axesModule
-        from xData import XYs as XYsModule
+        from xData import XYs1d as XYs1dModule
         from xData import multiD_XYs as multiD_XYsModule
 
         xUnit, yUnit, zUnit = '', '', ''
@@ -556,19 +554,19 @@ class DataSet3d(DataSetParameters):
             yUnit = self.yUnit
         if self.zUnit is not None:
             zUnit = self.zUnit
-        axes_3d = axesModule.axes(3)
-        axes_3d[0] = axesModule.axis('z', 0, zUnit)
-        axes_3d[1] = axesModule.axis('y', 0, yUnit)
-        axes_3d[2] = axesModule.axis('x', 0, xUnit)
+        axes_3d = axesModule.Axes(3)
+        axes_3d[0] = axesModule.Axis('z', 0, zUnit)
+        axes_3d[1] = axesModule.Axis('y', 0, yUnit)
+        axes_3d[2] = axesModule.Axis('x', 0, xUnit)
         w_xys = multiD_XYsModule.XYs2d(axes=axes_3d)
 
-        axes_2d = axesModule.axes()
+        axes_2d = axesModule.Axes(2)
         axes_2d[0] = axes_3d[0]
         axes_2d[1] = axes_3d[1]
 
         for ix, x in enumerate(self.x):
             xys = [[y, self.z[iy][ix]] for iy, y in enumerate(self.y)]
-            w_xys[ix] = XYsModule.XYs1d(xys, axes=axes_2d, outerDomainValue=x)
+            w_xys[ix] = XYs1dModule.XYs1d(xys, axes=axes_2d, outerDomainValue=x)
         return w_xys
 
     @property
@@ -874,7 +872,7 @@ def plotTests(_tests=(False, False, False, False, False, False, False, False, Fa
     from brownies.legacy.endl.endl3dmathClasses import endl3dmath
     from fudge import __path__
     from xData import axes as axesModule
-    from xData import XYs as XYsModule
+    from xData import XYs1d as XYs1dModule
     from xData import multiD_XYs as multiD_XYsModule
 
     testData = """
@@ -918,7 +916,7 @@ def plotTests(_tests=(False, False, False, False, False, False, False, False, Fa
             d.append(sline[0:2])
             u.append(sline[2:4])
 
-    xyAxes = axesModule.axes(labelsUnits={1: (xAxis.label, xAxis.unit), 0: (yAxis.label, yAxis.unit)})
+    xyAxes = axesModule.Axes(labelsUnits={1: (xAxis.label, xAxis.unit), 0: (yAxis.label, yAxis.unit)})
 
     # Simple test, here we make a plot of one set
 
@@ -926,7 +924,7 @@ def plotTests(_tests=(False, False, False, False, False, False, False, False, Fa
         xSec = za.findData(I=0, C=46)
         makePlot2d([xSec], xAxisSettings=xAxis, yAxisSettings=yAxis, title='$^1$H$(n,\\gamma)$ Cross Section',
                    outFile=None)
-        xys = XYsModule.XYs1d(xSec.data, axes=xyAxes)
+        xys = XYs1dModule.XYs1d(xSec.data, axes=xyAxes)
         makePlot2d([xys], xAxisSettings=xAxis, yAxisSettings=yAxis, title='$^1$H$(n,\\gamma)$ Cross Section',
                    outFile=None)
         dataset = DataSet2d(xys, xUnit=xAxis.unit, yUnit=yAxis.unit)
@@ -942,7 +940,7 @@ def plotTests(_tests=(False, False, False, False, False, False, False, False, Fa
     if _tests[2]:
         xSecs = za.findDatas(I=0)
         makePlot2d(xSecs, xAxisSettings=xAxis, yAxisSettings=yAxis, title='$^1$H$(n,*)$ Cross Sections', outFile=None)
-        xySecs = [XYsModule.XYs1d(xSec.data, axes=xyAxes) for xSec in xSecs]
+        xySecs = [XYs1dModule.XYs1d(xSec.data, axes=xyAxes) for xSec in xSecs]
         xySecs = (xySecs[0], xySecs[1], xySecs[2])
         makePlot2d(xySecs, xAxisSettings=xAxis, yAxisSettings=yAxis, title='$^1$H$(n,*)$ Cross Sections', outFile=None)
 
@@ -967,9 +965,9 @@ def plotTests(_tests=(False, False, False, False, False, False, False, False, Fa
         makePlot2dContour(DataSet3d(data=endfData, legend='ENDF/B-VII.0', xUnit=EAxis.unit, yUnit=muAxis.unit),
                           xAxisSettings=EAxis, yAxisSettings=muAxis, title='$^1$H$(n,el)$ Angular Distribution',
                           outFile=None)
-        w_xys = multiD_XYsModule.XYs2d(axes=axesModule.axes(rank=3, labelsUnits={2: ('$E_n$', 'MeV')}))
+        w_xys = multiD_XYsModule.XYs2d(axes=axesModule.Axes(3, labelsUnits={2: ('$E_n$', 'MeV')}))
         for w, xy in endfData.data:
-            w_xys.append(XYsModule.XYs1d(xy, axes=axesModule.axes(), outerDomainValue=w))
+            w_xys.append(XYs1dModule.XYs1d(xy, axes=axesModule.Axes(2), outerDomainValue=w))
         dataset = DataSet3d(data=w_xys, legend='ENDF/B-VII.0')
         dataset.convertUnits('eV', None, None)
         makePlot2dContour(dataset, xAxisSettings=EAxis, yAxisSettings=muAxis,

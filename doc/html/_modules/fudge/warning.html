@@ -46,27 +46,25 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Store and report warnings and errors in GNDS data, in order to discover problems in the library.</span>
-<span class="sd">The reactionSuite.check() function returns a nested list of warning objects:</span>
+<span class="sd">The reactionSuite.check() function returns a nested list of Warning objects:</span>
 
 <span class="sd">    &gt;&gt;&gt; warnings = reactionSuite.check()</span>
 <span class="sd">    &gt;&gt;&gt; print(warnings)</span>
 
-<span class="sd">May include or exclude specific classes of warning using the filter command.</span>
+<span class="sd">May include or exclude specific classes of Warning using the filter command.</span>
 <span class="sd">filter() returns a new context instance:</span>
 
-<span class="sd">    &gt;&gt;&gt; warnings2 = warnings.filter( exclude=[warning.energyImbalance] )</span>
+<span class="sd">    &gt;&gt;&gt; warnings2 = warnings.filter( exclude=[Warning.EnergyImbalance] )</span>
 
 <span class="sd">Or, for easier searching you may wish to flatten the list (to get warnings alone without context messages):</span>
 
 <span class="sd">    &gt;&gt;&gt; flat = warnings.flatten()</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
-
-<div class="viewcode-block" id="context"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.context">[docs]</a><span class="k">class</span> <span class="nc">context</span><span class="p">:</span>
+<div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Store warnings in context. This class contains location information (reactionSuite, reaction, etc)</span>
-<span class="sd">    plus a nested list of warnings or other context instances</span>
+<span class="sd">    Store warnings in Context. This class contains location information (reactionSuite, reaction, etc)</span>
+<span class="sd">    plus a nested list of warnings or other Context instances</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">warningList</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
@@ -86,17 +84,17 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">message</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">warningList</span>
 
-<div class="viewcode-block" id="context.filter"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.context.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Filter warning list to only include (or exclude) specific classes of warning. For example:</span>
+<div class="viewcode-block" id="Context.filter"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Context.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Filter warning list to only include (or exclude) specific classes of Warning. For example:</span>
 
-<span class="sd">            &gt;&gt;&gt; newWarnings = warnings.filter( exclude=[warning.energyImbalance, warning.Q_mismatch] )</span>
+<span class="sd">            &gt;&gt;&gt; newWarnings = warnings.filter( exclude=[Warning.EnergyImbalance, Warning.Q_mismatch] )</span>
 
 <span class="sd">        Note that if both &#39;include&#39; and &#39;exclude&#39; lists are provided, exclude is ignored.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span>
         <span class="n">newWarningList</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">warning</span><span class="p">,</span> <span class="n">context</span> <span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">warning</span><span class="p">,</span> <span class="n">Context</span> <span class="p">):</span>
                 <span class="n">newContext</span> <span class="o">=</span> <span class="n">warning</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span> <span class="n">include</span><span class="p">,</span> <span class="n">exclude</span> <span class="p">)</span>
                 <span class="k">if</span> <span class="n">newContext</span><span class="p">:</span> <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">newContext</span> <span class="p">)</span>
             <span class="k">elif</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -105,9 +103,9 @@
             <span class="k">else</span><span class="p">:</span> <span class="c1"># exclude is not None:</span>
                 <span class="k">if</span> <span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
                     <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span> <span class="p">)</span>
-        <span class="k">return</span> <span class="n">context</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">newWarningList</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Context</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">newWarningList</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="context.flatten"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.context.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Context.flatten"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Context.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;From a nested hierarchy of warnings, get back a flat list for easier searching:</span>
 
 <span class="sd">            &gt;&gt;&gt; w = reactionSuite.check()</span>
@@ -115,20 +113,20 @@
 
         <span class="n">List</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">warning</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="ne">Warning</span><span class="p">):</span>
                 <span class="n">List</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">List</span> <span class="o">+=</span> <span class="n">val</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">List</span></div>
 
-<div class="viewcode-block" id="context.toStringList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.context.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dIndent</span><span class="o">=</span><span class="s1">&#39;    &#39;</span> <span class="p">):</span>
+<div class="viewcode-block" id="Context.toStringList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Context.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dIndent</span><span class="o">=</span><span class="s1">&#39;    &#39;</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Format warnings for printing. Returns a list of warning strings with indentation. &quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)]</span>
         <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">+=</span> <span class="n">warning</span><span class="o">.</span><span class="n">toStringList</span><span class="p">(</span> <span class="n">indent</span><span class="o">+</span><span class="n">dIndent</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">s</span></div></div>
 
-<div class="viewcode-block" id="diffResult"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.diffResult">[docs]</a><span class="k">class</span> <span class="nc">diffResult</span> <span class="p">:</span>
+<div class="viewcode-block" id="DiffResult"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.DiffResult">[docs]</a><span class="k">class</span> <span class="nc">DiffResult</span> <span class="p">:</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">link1</span><span class="p">,</span> <span class="n">link2</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -141,7 +139,7 @@
 
         <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">    </span><span class="si">%s</span><span class="se">\n</span><span class="s2">    </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">link1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">link2</span> <span class="p">)</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="diffResults"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.diffResults">[docs]</a><span class="k">class</span> <span class="nc">diffResults</span> <span class="p">:</span>
+<div class="viewcode-block" id="DiffResults"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.DiffResults">[docs]</a><span class="k">class</span> <span class="nc">DiffResults</span> <span class="p">:</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">protare1</span><span class="p">,</span> <span class="n">protare2</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -167,18 +165,18 @@
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Make a copy of self.&quot;&quot;&quot;</span>
 
-        <span class="n">diffResults1</span> <span class="o">=</span> <span class="n">diffResults</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">protare1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span> <span class="p">)</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">diffResults1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">diffResult</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link1</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link2</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">diffResults1</span> <span class="o">=</span> <span class="n">DiffResults</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">protare1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">diffResults1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">DiffResult</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link1</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link2</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">diffResults1</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="diffResults.append"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.diffResults.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">link1</span><span class="p">,</span> <span class="n">link2</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Adds a diffResult instance to self.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DiffResults.append"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.DiffResults.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">link1</span><span class="p">,</span> <span class="n">link2</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Adds a DiffResult instance to self.&quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">diffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">diffResult</span><span class="p">(</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">link1</span><span class="p">,</span> <span class="n">link2</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">DiffResult</span><span class="p">(</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">link1</span><span class="p">,</span> <span class="n">link2</span> <span class="p">)</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="diffResults.cull"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.diffResults.cull">[docs]</a>    <span class="k">def</span> <span class="nf">cull</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">code</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Removes all diffResult instance that contain the specified code.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DiffResults.cull"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.DiffResults.cull">[docs]</a>    <span class="k">def</span> <span class="nf">cull</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">code</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Removes all DiffResult instance that contain the specified code.&quot;&quot;&quot;</span>
 
         <span class="n">cullList</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffs</span> <span class="p">)</span> <span class="p">:</span>
@@ -186,20 +184,20 @@
         <span class="n">cullList</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="n">cullList</span> <span class="p">:</span> <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffs</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="diffResults.patch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.diffResults.patch">[docs]</a>    <span class="k">def</span> <span class="nf">patch</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">library</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="DiffResults.patch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.DiffResults.patch">[docs]</a>    <span class="k">def</span> <span class="nf">patch</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">library</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">chains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">chains</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">chains</span> <span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;Only one styles chain is supported.&quot;</span> <span class="p">)</span>
 
         <span class="n">chain</span> <span class="o">=</span> <span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">chain</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">evaluated</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">evaluated</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;At least one evaluated style must be present in file to patch.&quot;</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">Evaluated</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">Evaluated</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;At least one evaluated style must be present in file to patch.&quot;</span> <span class="p">)</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffs</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span><span class="o">.</span><span class="n">styles</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Label already in file to patch.&quot;</span> <span class="p">)</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">library</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">library</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">library</span>
-            <span class="n">evaluateStyle</span> <span class="o">=</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">evaluated</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">version</span> <span class="p">)</span>
+            <span class="n">evaluateStyle</span> <span class="o">=</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">Evaluated</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">version</span> <span class="p">)</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">library</span> <span class="o">==</span> <span class="n">evaluateStyle</span><span class="o">.</span><span class="n">library</span> <span class="p">)</span> <span class="p">:</span>
                 <span class="k">if</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="n">evaluateStyle</span><span class="o">.</span><span class="n">version</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Library and version must be different than one in patch file.&quot;</span> <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">evaluateStyle</span> <span class="p">)</span>
@@ -220,17 +218,17 @@
                 <span class="k">else</span> <span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;&quot;&quot;Unsupported diff code &quot;</span><span class="si">%s</span><span class="s2">&quot;.&quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">diff</span><span class="o">.</span><span class="n">code</span> <span class="p">)</span>
 
-        <span class="n">crossSectionReconstructedStyles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getStylesOfClass</span><span class="p">(</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">crossSectionReconstructed</span> <span class="p">)</span>
+        <span class="n">crossSectionReconstructedStyles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getStylesOfClass</span><span class="p">(</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">CrossSectionReconstructed</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">crossSectionReconstructedStyles</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">crossSectionReconstructedStyles</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;Multiple cross section reconstructed styles present which is not supported.&quot;</span> <span class="p">)</span>
             <span class="n">crossSectionReconstructedStyle</span> <span class="o">=</span> <span class="n">crossSectionReconstructedStyles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span><span class="o">.</span><span class="n">removeStyle</span><span class="p">(</span> <span class="n">crossSectionReconstructedStyle</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
-            <span class="n">crossSectionReconstructedStyle</span> <span class="o">=</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">crossSectionReconstructed</span><span class="p">(</span> <span class="n">crossSectionReconstructedStyle</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span><span class="o">.</span><span class="n">reconstructResonances</span><span class="p">(</span> <span class="n">crossSectionReconstructedStyle</span> <span class="p">)</span></div></div>
+            <span class="n">crossSectionReconstructedStyle</span> <span class="o">=</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">CrossSectionReconstructed</span><span class="p">(</span> <span class="n">crossSectionReconstructedStyle</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">protare2</span><span class="o">.</span><span class="n">reconstructResonances</span><span class="p">(</span><span class="n">crossSectionReconstructedStyle</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="warning"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.warning">[docs]</a><span class="k">class</span> <span class="nc">warning</span><span class="p">(</span> <span class="ne">BaseException</span> <span class="p">):</span>
+<div class="viewcode-block" id="Warning"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Warning">[docs]</a><span class="k">class</span> <span class="nc">Warning</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    General warning class. Contains link to problem object,</span>
+<span class="sd">    General Warning class. Contains link to problem object,</span>
 <span class="sd">    xpath in case the object leaves memory,</span>
 <span class="sd">    and information about the warning or error.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -246,16 +244,16 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span>
 
-<div class="viewcode-block" id="warning.toStringList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.warning.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="p">):</span>
+<div class="viewcode-block" id="Warning.toStringList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Warning.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">WARNING: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="p">)]</span></div></div>
 
 <span class="c1">#</span>
-<span class="c1"># specific warning classes:</span>
+<span class="c1"># specific Warning classes:</span>
 <span class="c1">#</span>
 
-<div class="viewcode-block" id="NotImplemented"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NotImplemented">[docs]</a><span class="k">class</span> <span class="nc">NotImplemented</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="NotImplemented"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NotImplemented">[docs]</a><span class="k">class</span> <span class="nc">NotImplemented</span><span class="p">(</span> <span class="ne">Warning</span> <span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -264,9 +262,9 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">form</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="UnorthodoxParticleNotImplemented"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnorthodoxParticleNotImplemented">[docs]</a><span class="k">class</span> <span class="nc">UnorthodoxParticleNotImplemented</span><span class="p">(</span> <span class="n">warning</span><span class="p">):</span>
+<div class="viewcode-block" id="UnorthodoxParticleNotImplemented"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnorthodoxParticleNotImplemented">[docs]</a><span class="k">class</span> <span class="nc">UnorthodoxParticleNotImplemented</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particleId</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">particleId</span> <span class="o">=</span> <span class="n">particleId</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -275,17 +273,35 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particleId</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">particleId</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="ElementalTarget"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ElementalTarget">[docs]</a><span class="k">class</span> <span class="nc">ElementalTarget</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particleId</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">particleId</span> <span class="o">=</span> <span class="n">particleId</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Elemental target &#39;</span><span class="si">%s</span><span class="s2">&#39;!  Some checks (e.g. energy balance and Q-values) will be skipped&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">particleId</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particleId</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">particleId</span><span class="p">)</span></div>
+
+
 <span class="c1"># external files:</span>
 
-<div class="viewcode-block" id="missingExternalFile"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.missingExternalFile">[docs]</a><span class="k">class</span> <span class="nc">missingExternalFile</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="MissingExternalFile"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingExternalFile">[docs]</a><span class="k">class</span> <span class="nc">MissingExternalFile</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;External file &#39;</span><span class="si">%s</span><span class="s2">&#39; is missing&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span></div>
 
-<div class="viewcode-block" id="wrongExternalFileChecksum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.wrongExternalFileChecksum">[docs]</a><span class="k">class</span> <span class="nc">wrongExternalFileChecksum</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="WrongExternalFileChecksum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WrongExternalFileChecksum">[docs]</a><span class="k">class</span> <span class="nc">WrongExternalFileChecksum</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">computed</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expected</span> <span class="o">=</span> <span class="n">expected</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">computed</span> <span class="o">=</span> <span class="n">computed</span>
@@ -298,8 +314,11 @@
 
 <span class="c1"># resonance region:</span>
 
-<div class="viewcode-block" id="badScatteringRadius"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.badScatteringRadius">[docs]</a><span class="k">class</span> <span class="nc">badScatteringRadius</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="BadScatteringRadius"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadScatteringRadius">[docs]</a><span class="k">class</span> <span class="nc">BadScatteringRadius</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">gotAP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expectedAP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">E</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">=</span><span class="n">factor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gotAP</span><span class="o">=</span><span class="n">gotAP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expectedAP</span><span class="o">=</span><span class="n">expectedAP</span>
@@ -314,8 +333,11 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">s</span><span class="o">+=</span><span class="s2">&quot; for E=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">s</span></div>
 
-<div class="viewcode-block" id="badSpinStatisticalWeights"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.badSpinStatisticalWeights">[docs]</a><span class="k">class</span> <span class="nc">badSpinStatisticalWeights</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="BadSpinStatisticalWeights"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadSpinStatisticalWeights">[docs]</a><span class="k">class</span> <span class="nc">BadSpinStatisticalWeights</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">gJ</span><span class="p">,</span> <span class="n">expectedgJ</span><span class="p">,</span> <span class="n">reaction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">=</span><span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gJ</span><span class="o">=</span><span class="n">gJ</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expectedgJ</span><span class="o">=</span><span class="n">expectedgJ</span>
@@ -329,8 +351,11 @@
             <span class="n">s</span><span class="o">+=</span><span class="s1">&#39;for reaction &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">reaction</span>
         <span class="k">return</span> <span class="n">s</span></div>
 
-<div class="viewcode-block" id="invalidAngularMomentaCombination"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.invalidAngularMomentaCombination">[docs]</a><span class="k">class</span> <span class="nc">invalidAngularMomentaCombination</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="InvalidAngularMomentaCombination"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.InvalidAngularMomentaCombination">[docs]</a><span class="k">class</span> <span class="nc">InvalidAngularMomentaCombination</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">L</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">=</span><span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">=</span><span class="n">S</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="o">=</span><span class="n">J</span>
@@ -339,8 +364,11 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;Invalid angular momenta combination: cannot couple L = </span><span class="si">%s</span><span class="s1"> and S = </span><span class="si">%s</span><span class="s1"> up to J = </span><span class="si">%s</span><span class="s1"> for channel &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="invalidParity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.invalidParity">[docs]</a><span class="k">class</span> <span class="nc">invalidParity</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="InvalidParity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.InvalidParity">[docs]</a><span class="k">class</span> <span class="nc">InvalidParity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">L</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="n">Pi</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">=</span><span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">=</span><span class="n">S</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="o">=</span><span class="n">J</span>
@@ -350,15 +378,21 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;Invalid parity </span><span class="si">%s</span><span class="s1"> for channel &quot;</span><span class="si">%s</span><span class="s1">&quot; with L=</span><span class="si">%s</span><span class="s1">, S=</span><span class="si">%s</span><span class="s1">, J=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pi</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="unknownSpinParity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.unknownSpinParity">[docs]</a><span class="k">class</span> <span class="nc">unknownSpinParity</span><span class="p">(</span> <span class="n">warning</span><span class="p">):</span>
+<div class="viewcode-block" id="UnknownSpinParity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnknownSpinParity">[docs]</a><span class="k">class</span> <span class="nc">UnknownSpinParity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">reaction</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span> <span class="o">=</span> <span class="n">reaction</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Could not determine product spin/parities for reaction &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span></div>
 
-<div class="viewcode-block" id="missingResonanceChannel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.missingResonanceChannel">[docs]</a><span class="k">class</span> <span class="nc">missingResonanceChannel</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="MissingResonanceChannel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingResonanceChannel">[docs]</a><span class="k">class</span> <span class="nc">MissingResonanceChannel</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">L</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">=</span><span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">=</span><span class="n">S</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="o">=</span><span class="n">J</span>
@@ -368,8 +402,11 @@
         <span class="k">return</span> <span class="s1">&#39;Missing a channel with angular momenta combination L = </span><span class="si">%s</span><span class="s1">, S = </span><span class="si">%s</span><span class="s1"> and J = </span><span class="si">%s</span><span class="s1"> for &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="invalidSpinCombination"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.invalidSpinCombination">[docs]</a><span class="k">class</span> <span class="nc">invalidSpinCombination</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="InvalidSpinCombination"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.InvalidSpinCombination">[docs]</a><span class="k">class</span> <span class="nc">InvalidSpinCombination</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Ia</span><span class="p">,</span><span class="n">Ib</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ia</span><span class="o">=</span><span class="n">Ia</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ib</span><span class="o">=</span><span class="n">Ib</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">=</span><span class="n">S</span>
@@ -378,8 +415,11 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;Invalid spin combination: cannot couple Ia = </span><span class="si">%s</span><span class="s1"> and Ib = </span><span class="si">%s</span><span class="s1"> up to S = </span><span class="si">%s</span><span class="s1"> for channel &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ia</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ib</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="potentialScatteringNotConverged"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.potentialScatteringNotConverged">[docs]</a><span class="k">class</span> <span class="nc">potentialScatteringNotConverged</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="PotentialScatteringNotConverged"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.PotentialScatteringNotConverged">[docs]</a><span class="k">class</span> <span class="nc">PotentialScatteringNotConverged</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">fom</span><span class="p">,</span> <span class="n">fomTarget</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">=</span><span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">=</span><span class="n">E</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fom</span><span class="o">=</span><span class="n">fom</span>
@@ -391,16 +431,19 @@
         <span class="k">return</span> <span class="n">s</span></div>
 
 
-<div class="viewcode-block" id="RRmultipleRegions"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.RRmultipleRegions">[docs]</a><span class="k">class</span> <span class="nc">RRmultipleRegions</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="RRmultipleRegions"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.RRmultipleRegions">[docs]</a><span class="k">class</span> <span class="nc">RRmultipleRegions</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Use of more than one resolved resonance regions is deprecated&quot;</span></div>
 
-<div class="viewcode-block" id="URRdomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRdomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">URRdomainMismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="URRdomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRdomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">URRdomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lval</span><span class="p">,</span> <span class="n">Jval</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">=</span> <span class="n">Lval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">=</span> <span class="n">Jval</span>
 
@@ -410,9 +453,11 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">Lval</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">Jval</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="URRinsufficientEnergyGrid"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRinsufficientEnergyGrid">[docs]</a><span class="k">class</span> <span class="nc">URRinsufficientEnergyGrid</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="URRinsufficientEnergyGrid"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRinsufficientEnergyGrid">[docs]</a><span class="k">class</span> <span class="nc">URRinsufficientEnergyGrid</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lval</span><span class="p">,</span> <span class="n">Jval</span><span class="p">,</span> <span class="n">eLow</span><span class="p">,</span> <span class="n">eHigh</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">=</span> <span class="n">Lval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">=</span> <span class="n">Jval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eLow</span> <span class="o">=</span> <span class="n">eLow</span>
@@ -424,8 +469,11 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">Lval</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">Jval</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">eLow</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">eLow</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">eHigh</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">eHigh</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="unresolvedLink"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.unresolvedLink">[docs]</a><span class="k">class</span> <span class="nc">unresolvedLink</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="UnresolvedLink"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnresolvedLink">[docs]</a><span class="k">class</span> <span class="nc">UnresolvedLink</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">link</span><span class="p">):</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="o">=</span><span class="n">link</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -433,9 +481,11 @@
 
 <span class="c1"># reaction objects:</span>
 
-<div class="viewcode-block" id="WicksLimitError"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WicksLimitError">[docs]</a><span class="k">class</span> <span class="nc">WicksLimitError</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="WicksLimitError"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WicksLimitError">[docs]</a><span class="k">class</span> <span class="nc">WicksLimitError</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percentErr</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">percentErr</span> <span class="o">=</span> <span class="n">percentErr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
 
@@ -445,13 +495,16 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">percentErr</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">percentErr</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy_in</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ZAbalanceWarning"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ZAbalanceWarning">[docs]</a><span class="k">class</span> <span class="nc">ZAbalanceWarning</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="ZAbalanceWarning"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ZAbalanceWarning">[docs]</a><span class="k">class</span> <span class="nc">ZAbalanceWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;ZA doesn&#39;t balance for this reaction!&quot;</span></div>
 
-<div class="viewcode-block" id="Q_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Q_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Q_mismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="Q_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Q_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Q_mismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Qcalc</span><span class="p">,</span> <span class="n">Qactual</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Qcalc</span> <span class="o">=</span> <span class="n">Qcalc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Qactual</span> <span class="o">=</span> <span class="n">Qactual</span>
 
@@ -461,9 +514,11 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qcalc</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">Qcalc</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qactual</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">Qactual</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="badFissionEnergyRelease"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.badFissionEnergyRelease">[docs]</a><span class="k">class</span> <span class="nc">badFissionEnergyRelease</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="BadFissionEnergyRelease"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadFissionEnergyRelease">[docs]</a><span class="k">class</span> <span class="nc">BadFissionEnergyRelease</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worstCase</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">worstCase</span> <span class="o">=</span> <span class="n">worstCase</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -472,9 +527,11 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">worstCase</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">worstCase</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="negativeDelayedRate"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.negativeDelayedRate">[docs]</a><span class="k">class</span> <span class="nc">negativeDelayedRate</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="NegativeDelayedRate"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeDelayedRate">[docs]</a><span class="k">class</span> <span class="nc">NegativeDelayedRate</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -483,9 +540,11 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">rate</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="threshold_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.threshold_mismatch">[docs]</a><span class="k">class</span> <span class="nc">threshold_mismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="Threshold_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Threshold_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Threshold_mismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">thresholdCalc</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalc</span> <span class="o">=</span> <span class="n">thresholdCalc</span>
 
@@ -496,13 +555,16 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">threshold</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalc</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">thresholdCalc</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Coulomb_threshold_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Coulomb_threshold_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Coulomb_threshold_mismatch</span><span class="p">(</span> <span class="n">threshold_mismatch</span> <span class="p">):</span>
+<div class="viewcode-block" id="Coulomb_threshold_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Coulomb_threshold_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Coulomb_threshold_mismatch</span><span class="p">(</span><span class="n">Threshold_mismatch</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Tabulated threshold </span><span class="si">%s</span><span class="s2"> below calculated threshold </span><span class="si">%s</span><span class="s2">!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalc</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nonZero_crossSection_at_threshold"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.nonZero_crossSection_at_threshold">[docs]</a><span class="k">class</span> <span class="nc">nonZero_crossSection_at_threshold</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="NonZero_crossSection_at_threshold"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NonZero_crossSection_at_threshold">[docs]</a><span class="k">class</span> <span class="nc">NonZero_crossSection_at_threshold</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -511,9 +573,11 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="gapInCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.gapInCrossSection">[docs]</a><span class="k">class</span> <span class="nc">gapInCrossSection</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="GapInCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.GapInCrossSection">[docs]</a><span class="k">class</span> <span class="nc">GapInCrossSection</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minGapEnergy</span><span class="p">,</span> <span class="n">maxGapEnergy</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minGapEnergy</span> <span class="o">=</span> <span class="n">minGapEnergy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxGapEnergy</span> <span class="o">=</span> <span class="n">maxGapEnergy</span>
 
@@ -524,9 +588,11 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">minGapEnergy</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">minGapEnergy</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxGapEnergy</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">maxGapEnergy</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="negativeCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.negativeCrossSection">[docs]</a><span class="k">class</span> <span class="nc">negativeCrossSection</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="NegativeCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeCrossSection">[docs]</a><span class="k">class</span> <span class="nc">NegativeCrossSection</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
 
@@ -537,13 +603,16 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy_in</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="badCrossSectionReference"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.badCrossSectionReference">[docs]</a><span class="k">class</span> <span class="nc">badCrossSectionReference</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="BadCrossSectionReference"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadCrossSectionReference">[docs]</a><span class="k">class</span> <span class="nc">BadCrossSectionReference</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Cross section reference outside of current reactionSuite not allowed!&quot;</span></div>
 
-<div class="viewcode-block" id="summedCrossSectionMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.summedCrossSectionMismatch">[docs]</a><span class="k">class</span> <span class="nc">summedCrossSectionMismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="SummedCrossSectionMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedCrossSectionMismatch">[docs]</a><span class="k">class</span> <span class="nc">SummedCrossSectionMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxPercentDiff</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxPercentDiff</span> <span class="o">=</span> <span class="n">maxPercentDiff</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -554,17 +623,21 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxPercentDiff</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">maxPercentDiff</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="summedCrossSectionDomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.summedCrossSectionDomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">summedCrossSectionDomainMismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="SummedCrossSectionDomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedCrossSectionDomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">SummedCrossSectionDomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Cross section domain does not match domain of linked reaction cross section sum&quot;</span></div>
 
-<div class="viewcode-block" id="summedCrossSectionZeroDivision"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.summedCrossSectionZeroDivision">[docs]</a><span class="k">class</span> <span class="nc">summedCrossSectionZeroDivision</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="SummedCrossSectionZeroDivision"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedCrossSectionZeroDivision">[docs]</a><span class="k">class</span> <span class="nc">SummedCrossSectionZeroDivision</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Divide by 0 error when comparing summed cross section to components!&quot;</span></div>
 
-<div class="viewcode-block" id="summedMultiplicityMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.summedMultiplicityMismatch">[docs]</a><span class="k">class</span> <span class="nc">summedMultiplicityMismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="SummedMultiplicityMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedMultiplicityMismatch">[docs]</a><span class="k">class</span> <span class="nc">SummedMultiplicityMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxPercentDiff</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxPercentDiff</span> <span class="o">=</span> <span class="n">maxPercentDiff</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -575,17 +648,17 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxPercentDiff</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">maxPercentDiff</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="summedMultiplicityDomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.summedMultiplicityDomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">summedMultiplicityDomainMismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="SummedMultiplicityDomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedMultiplicityDomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">SummedMultiplicityDomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Multiplicity domain does not match domain of linked product multiplicity sum&quot;</span></div>
 
-<div class="viewcode-block" id="summedMultiplicityZeroDivision"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.summedMultiplicityZeroDivision">[docs]</a><span class="k">class</span> <span class="nc">summedMultiplicityZeroDivision</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="SummedMultiplicityZeroDivision"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedMultiplicityZeroDivision">[docs]</a><span class="k">class</span> <span class="nc">SummedMultiplicityZeroDivision</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Divide by 0 error when comparing summed multiplicity to components!&quot;</span></div>
 
-<div class="viewcode-block" id="negativeMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.negativeMultiplicity">[docs]</a><span class="k">class</span> <span class="nc">negativeMultiplicity</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="NegativeMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeMultiplicity">[docs]</a><span class="k">class</span> <span class="nc">NegativeMultiplicity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -594,9 +667,9 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="domain_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.domain_mismatch">[docs]</a><span class="k">class</span> <span class="nc">domain_mismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="Domain_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Domain_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Domain_mismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lowBound</span><span class="p">,</span> <span class="n">highBound</span><span class="p">,</span> <span class="n">xscLowBound</span><span class="p">,</span> <span class="n">xscHighBound</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">highBound</span> <span class="o">=</span> <span class="n">lowBound</span><span class="p">,</span> <span class="n">highBound</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xscLowBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xscHighBound</span> <span class="o">=</span> <span class="n">xscLowBound</span><span class="p">,</span> <span class="n">xscHighBound</span>
 
@@ -608,9 +681,9 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowBound</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lowBound</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">highBound</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">highBound</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="missingDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.missingDistribution">[docs]</a><span class="k">class</span> <span class="nc">missingDistribution</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="MissingDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingDistribution">[docs]</a><span class="k">class</span> <span class="nc">MissingDistribution</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">productName</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">productName</span> <span class="o">=</span> <span class="n">productName</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -620,19 +693,19 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">productName</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">productName</span><span class="p">)</span></div>
 
 <span class="sd">&quot;&quot;&quot; eliminate this one?</span>
-<span class="sd">class noDistributions( warning ):</span>
+<span class="sd">class NoDistributions(Warning):</span>
 <span class="sd">    # more serious than missingDistributions:</span>
 <span class="sd">    def __str__(self):</span>
 <span class="sd">        return &quot;No distribution data available for *any* of this reaction&#39;s products!&quot;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="missingRecoilDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.missingRecoilDistribution">[docs]</a><span class="k">class</span> <span class="nc">missingRecoilDistribution</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="MissingRecoilDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingRecoilDistribution">[docs]</a><span class="k">class</span> <span class="nc">MissingRecoilDistribution</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Recoil distribution type specified, but recoil partner has unsupported distribution type!&quot;</span></div>
 
-<div class="viewcode-block" id="wrongDistributionComponent"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.wrongDistributionComponent">[docs]</a><span class="k">class</span> <span class="nc">wrongDistributionComponent</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="WrongDistributionComponent"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WrongDistributionComponent">[docs]</a><span class="k">class</span> <span class="nc">WrongDistributionComponent</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">reactionType</span><span class="o">=</span><span class="s1">&#39;2-body&#39;</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="n">component</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reactionType</span> <span class="o">=</span> <span class="n">reactionType</span>
 
@@ -643,13 +716,13 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">component</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">component</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactionType</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">reactionType</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="wrong2BodyFrame"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.wrong2BodyFrame">[docs]</a><span class="k">class</span> <span class="nc">wrong2BodyFrame</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="Wrong2BodyFrame"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Wrong2BodyFrame">[docs]</a><span class="k">class</span> <span class="nc">Wrong2BodyFrame</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;2-body reaction not in center-of-mass frame!&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="uncorrelatedFramesMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.uncorrelatedFramesMismatch">[docs]</a><span class="k">class</span> <span class="nc">uncorrelatedFramesMismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="UncorrelatedFramesMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UncorrelatedFramesMismatch">[docs]</a><span class="k">class</span> <span class="nc">UncorrelatedFramesMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angleFrame</span><span class="p">,</span> <span class="n">energyFrame</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">angleFrame</span> <span class="o">=</span> <span class="n">angleFrame</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energyFrame</span> <span class="o">=</span> <span class="n">energyFrame</span>
 
@@ -661,22 +734,22 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">angleFrame</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">angleFrame</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energyFrame</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energyFrame</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="flatIncidentEnergyInterpolation"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.flatIncidentEnergyInterpolation">[docs]</a><span class="k">class</span> <span class="nc">flatIncidentEnergyInterpolation</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="FlatIncidentEnergyInterpolation"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.FlatIncidentEnergyInterpolation">[docs]</a><span class="k">class</span> <span class="nc">FlatIncidentEnergyInterpolation</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;For distributions, flat interpolation along incident energy is unphysical!&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="energyDistributionBadU"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.energyDistributionBadU">[docs]</a><span class="k">class</span> <span class="nc">energyDistributionBadU</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="EnergyDistributionBadU"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.EnergyDistributionBadU">[docs]</a><span class="k">class</span> <span class="nc">EnergyDistributionBadU</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;For energy distribution functional form, parameter &#39;U&#39; results in negative outgoing energies!&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="negativeDiscreteGammaEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.negativeDiscreteGammaEnergy">[docs]</a><span class="k">class</span> <span class="nc">negativeDiscreteGammaEnergy</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="NegativeDiscreteGammaEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeDiscreteGammaEnergy">[docs]</a><span class="k">class</span> <span class="nc">NegativeDiscreteGammaEnergy</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Discrete gamma energy &lt;= 0&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="primaryGammaEnergyTooLarge"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.primaryGammaEnergyTooLarge">[docs]</a><span class="k">class</span> <span class="nc">primaryGammaEnergyTooLarge</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="PrimaryGammaEnergyTooLarge"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.PrimaryGammaEnergyTooLarge">[docs]</a><span class="k">class</span> <span class="nc">PrimaryGammaEnergyTooLarge</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Primary gamma energy at threshold should be &lt;= available energy (depending on which discrete level it ends up in)&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">fraction</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fraction</span> <span class="o">=</span> <span class="n">fraction</span>
 
@@ -688,9 +761,9 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fraction</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">fraction</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MadlandNixBadParameters"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MadlandNixBadParameters">[docs]</a><span class="k">class</span> <span class="nc">MadlandNixBadParameters</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="MadlandNixBadParameters"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MadlandNixBadParameters">[docs]</a><span class="k">class</span> <span class="nc">MadlandNixBadParameters</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">EFL</span><span class="p">,</span> <span class="n">EFH</span><span class="p">,</span> <span class="n">minTm</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">EFL</span> <span class="o">=</span> <span class="n">EFL</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">EFH</span> <span class="o">=</span> <span class="n">EFH</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minTm</span> <span class="o">=</span> <span class="n">minTm</span>
@@ -703,13 +776,13 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">EFL</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">EFL</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">EFH</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">EFH</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">minTm</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">minTm</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="weightsDontSumToOne"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.weightsDontSumToOne">[docs]</a><span class="k">class</span> <span class="nc">weightsDontSumToOne</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="WeightsDontSumToOne"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WeightsDontSumToOne">[docs]</a><span class="k">class</span> <span class="nc">WeightsDontSumToOne</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Weights don&#39;t sum to 1.0!&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="unnormalizedDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.unnormalizedDistribution">[docs]</a><span class="k">class</span> <span class="nc">unnormalizedDistribution</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="UnnormalizedDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnnormalizedDistribution">[docs]</a><span class="k">class</span> <span class="nc">UnnormalizedDistribution</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">integral</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">integral</span> <span class="o">=</span> <span class="n">integral</span>
@@ -722,12 +795,12 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy_in</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">integral</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">integral</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="unnormalizedDistributionAtMu"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.unnormalizedDistributionAtMu">[docs]</a><span class="k">class</span> <span class="nc">unnormalizedDistributionAtMu</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="UnnormalizedDistributionAtMu"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnnormalizedDistributionAtMu">[docs]</a><span class="k">class</span> <span class="nc">UnnormalizedDistributionAtMu</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Only appears when checking legacy ENDL data (I=1 and 3)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">integral</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">integral</span> <span class="o">=</span> <span class="n">integral</span>
 
@@ -738,12 +811,19 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">mu</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">integral</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">integral</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="unnormalizedKMDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.unnormalizedKMDistribution">[docs]</a><span class="k">class</span> <span class="nc">unnormalizedKMDistribution</span><span class="p">(</span> <span class="n">unnormalizedDistribution</span> <span class="p">):</span>
-    <span class="k">pass</span>    <span class="c1"># identical to unnormalizedDistribution, except it needs a special fix() function</span></div>
+<div class="viewcode-block" id="UnnormalizedKMDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnnormalizedKMDistribution">[docs]</a><span class="k">class</span> <span class="nc">UnnormalizedKMDistribution</span><span class="p">(</span><span class="n">UnnormalizedDistribution</span><span class="p">):</span>
+    <span class="k">pass</span>    <span class="c1"># identical to UnnormalizedDistribution, except it needs a special fix() function</span></div>
 
-<div class="viewcode-block" id="incompleteDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.incompleteDistribution">[docs]</a><span class="k">class</span> <span class="nc">incompleteDistribution</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="KalbachMannDomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.KalbachMannDomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">KalbachMannDomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Kalbach-Mann terms do not span the same incident energy domain!&quot;</span></div>
+
+<div class="viewcode-block" id="IncompleteDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.IncompleteDistribution">[docs]</a><span class="k">class</span> <span class="nc">IncompleteDistribution</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">lowerMu</span><span class="p">,</span> <span class="n">upperMu</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowerMu</span> <span class="o">=</span> <span class="n">lowerMu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">upperMu</span> <span class="o">=</span> <span class="n">upperMu</span>
@@ -756,10 +836,10 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy_in</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerMu</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lowerMu</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">upperMu</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">upperMu</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="negativeProbability"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.negativeProbability">[docs]</a><span class="k">class</span> <span class="nc">negativeProbability</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="NegativeProbability"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeProbability">[docs]</a><span class="k">class</span> <span class="nc">NegativeProbability</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">energy_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_out</span> <span class="o">=</span> <span class="n">energy_out</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span>
@@ -777,12 +857,12 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy_in</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_out</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy_out</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="extraOutgoingEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.extraOutgoingEnergy">[docs]</a><span class="k">class</span> <span class="nc">extraOutgoingEnergy</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="ExtraOutgoingEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ExtraOutgoingEnergy">[docs]</a><span class="k">class</span> <span class="nc">ExtraOutgoingEnergy</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;If an outgoing energy distribution ends with more than one energy with probability=0,</span>
 <span class="sd">    proper unitbase treatment is unclear. Distribution should end with exactly one P=0 point.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -792,16 +872,16 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy_in</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="missingCoulombIdenticalParticlesFlag"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.missingCoulombIdenticalParticlesFlag">[docs]</a><span class="k">class</span> <span class="nc">missingCoulombIdenticalParticlesFlag</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="MissingCoulombIdenticalParticlesFlag"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingCoulombIdenticalParticlesFlag">[docs]</a><span class="k">class</span> <span class="nc">MissingCoulombIdenticalParticlesFlag</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Need &#39;identicalParticles=</span><span class="se">\&quot;</span><span class="s2">true</span><span class="se">\&quot;</span><span class="s2">&#39; when target==projectile&quot;</span></div>
 
-<div class="viewcode-block" id="incorrectCoulombIdenticalParticlesFlag"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.incorrectCoulombIdenticalParticlesFlag">[docs]</a><span class="k">class</span> <span class="nc">incorrectCoulombIdenticalParticlesFlag</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="IncorrectCoulombIdenticalParticlesFlag"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.IncorrectCoulombIdenticalParticlesFlag">[docs]</a><span class="k">class</span> <span class="nc">IncorrectCoulombIdenticalParticlesFlag</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span> <span class="o">=</span> <span class="n">projectile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
 
@@ -812,9 +892,9 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">target</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">projectile</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="energyImbalance"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.energyImbalance">[docs]</a><span class="k">class</span> <span class="nc">energyImbalance</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="EnergyImbalance"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.EnergyImbalance">[docs]</a><span class="k">class</span> <span class="nc">EnergyImbalance</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">availableEnergy</span><span class="p">,</span> <span class="n">deposition_per_product</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span> <span class="o">=</span> <span class="n">availableEnergy</span>
@@ -834,16 +914,16 @@
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deposition_per_product</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">deposition_per_product</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_deposited</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">total_deposited</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="fissionEnergyImbalance"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.fissionEnergyImbalance">[docs]</a><span class="k">class</span> <span class="nc">fissionEnergyImbalance</span><span class="p">(</span> <span class="n">energyImbalance</span> <span class="p">):</span>
+<div class="viewcode-block" id="FissionEnergyImbalance"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.FissionEnergyImbalance">[docs]</a><span class="k">class</span> <span class="nc">FissionEnergyImbalance</span><span class="p">(</span><span class="n">EnergyImbalance</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">per_product</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = </span><span class="si">%.4g%%</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deposition_per_product</span><span class="p">[:</span><span class="mi">5</span><span class="p">]])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">deposition_per_product</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">per_product</span> <span class="o">+=</span> <span class="s1">&#39;, ...&#39;</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Fission energy imbalance at incident energy </span><span class="si">%s</span><span class="s2"> (index </span><span class="si">%i</span><span class="s2">). Total deposited = </span><span class="si">%.4g%%</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">), leaving insufficient energy for fission products!&quot;</span> <span class="o">%</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_deposited</span><span class="p">,</span> <span class="n">per_product</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="valueOutOfRange"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.valueOutOfRange">[docs]</a><span class="k">class</span> <span class="nc">valueOutOfRange</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="ValueOutOfRange"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ValueOutOfRange">[docs]</a><span class="k">class</span> <span class="nc">ValueOutOfRange</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contextMessage</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="n">upperBound</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contextMessage</span> <span class="o">=</span> <span class="n">contextMessage</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span> <span class="o">=</span> <span class="n">lowerBound</span>
@@ -858,10 +938,10 @@
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lowerBound</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">upperBound</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">upperBound</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="testSkipped"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.testSkipped">[docs]</a><span class="k">class</span> <span class="nc">testSkipped</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="TestSkipped"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.TestSkipped">[docs]</a><span class="k">class</span> <span class="nc">TestSkipped</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; indicate if test was skipped due to missing information &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">testName</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">testName</span> <span class="o">=</span> <span class="n">testName</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
 
@@ -871,10 +951,12 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">testName</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">testName</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">reason</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExceptionRaised"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ExceptionRaised">[docs]</a><span class="k">class</span> <span class="nc">ExceptionRaised</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; if we run into an exception when running check(), try to exit gracefully and return this warning &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ExceptionRaised"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ExceptionRaised">[docs]</a><span class="k">class</span> <span class="nc">ExceptionRaised</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;If we run into an exception when running check(), try to exit gracefully and return this warning.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Exception_String</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Exception_String</span> <span class="o">=</span> <span class="n">Exception_String</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -887,15 +969,15 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Exception raised when calculating energy deposition: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">Exception_String</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SkippedCoulombElasticEnergyDeposition"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SkippedCoulombElasticEnergyDeposition">[docs]</a><span class="k">class</span> <span class="nc">SkippedCoulombElasticEnergyDeposition</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="SkippedCoulombElasticEnergyDeposition"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SkippedCoulombElasticEnergyDeposition">[docs]</a><span class="k">class</span> <span class="nc">SkippedCoulombElasticEnergyDeposition</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Energy/momentum deposition cannot be computed for charged-particle elastic&quot;</span><span class="p">)</span></div>
 
 <span class="c1">### covarianceSuite warnings: ###</span>
 
-<div class="viewcode-block" id="cyclicDependency"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.cyclicDependency">[docs]</a><span class="k">class</span> <span class="nc">cyclicDependency</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="CyclicDependency"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.CyclicDependency">[docs]</a><span class="k">class</span> <span class="nc">CyclicDependency</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cycle</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cycle</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -907,9 +989,9 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">cycle</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="varianceTooSmall"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.varianceTooSmall">[docs]</a><span class="k">class</span> <span class="nc">varianceTooSmall</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="VarianceTooSmall"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.VarianceTooSmall">[docs]</a><span class="k">class</span> <span class="nc">VarianceTooSmall</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">variance</span>
 
@@ -920,9 +1002,9 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">variance</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="varianceTooLarge"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.varianceTooLarge">[docs]</a><span class="k">class</span> <span class="nc">varianceTooLarge</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="VarianceTooLarge"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.VarianceTooLarge">[docs]</a><span class="k">class</span> <span class="nc">VarianceTooLarge</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">variance</span>
 
@@ -933,9 +1015,9 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">variance</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="negativeEigenvalues"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.negativeEigenvalues">[docs]</a><span class="k">class</span> <span class="nc">negativeEigenvalues</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="NegativeEigenvalues"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeEigenvalues">[docs]</a><span class="k">class</span> <span class="nc">NegativeEigenvalues</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">negativeCount</span><span class="p">,</span> <span class="n">worstCase</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">negativeCount</span> <span class="o">=</span> <span class="n">negativeCount</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">worstCase</span> <span class="o">=</span> <span class="n">worstCase</span>
 
@@ -946,9 +1028,9 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">negativeCount</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">negativeCount</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">worstCase</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">worstCase</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="badEigenvalueRatio"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.badEigenvalueRatio">[docs]</a><span class="k">class</span> <span class="nc">badEigenvalueRatio</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="BadEigenvalueRatio"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadEigenvalueRatio">[docs]</a><span class="k">class</span> <span class="nc">BadEigenvalueRatio</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ratio</span> <span class="o">=</span> <span class="n">ratio</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -957,9 +1039,9 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">ratio</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="invalidShortRangeVarianceData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.invalidShortRangeVarianceData">[docs]</a><span class="k">class</span> <span class="nc">invalidShortRangeVarianceData</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="InvalidShortRangeVarianceData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.InvalidShortRangeVarianceData">[docs]</a><span class="k">class</span> <span class="nc">InvalidShortRangeVarianceData</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrixType</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrixType</span> <span class="o">=</span> <span class="n">matrixType</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -968,9 +1050,9 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrixType</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">matrixType</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="parameterCovarianceMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.parameterCovarianceMismatch">[docs]</a><span class="k">class</span> <span class="nc">parameterCovarianceMismatch</span><span class="p">(</span> <span class="n">warning</span> <span class="p">):</span>
+<div class="viewcode-block" id="ParameterCovarianceMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ParameterCovarianceMismatch">[docs]</a><span class="k">class</span> <span class="nc">ParameterCovarianceMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nParams</span><span class="p">,</span> <span class="n">matrixShape</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nParams</span> <span class="o">=</span> <span class="n">nParams</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrixShape</span> <span class="o">=</span> <span class="n">matrixShape</span>
 

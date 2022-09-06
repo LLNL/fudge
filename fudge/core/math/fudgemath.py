@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -18,13 +18,10 @@ except :
     numpyFloat64 = 1.
 
 from pqu import PQU as PQUModule
-import xData.standards as standardsModule
-
+from xData import enums as xDataEnumsModule
 from fudge.core.utilities import brb
 
-__metaclass__ = type
-
-def thickenXYList( list, tester, biSectionMax = 6, interpolation = standardsModule.interpolation.linlinToken ) :
+def thickenXYList( list, tester, biSectionMax=6, interpolation=xDataEnumsModule.Interpolation.linlin):
     """
     This functions takes a list of (x,y) points and a function, tester.evaluateAtX, and bi-sectionally adds points to 
     obtain linear-linear tolerance of the returned list and tester.evaluateAtX to tester.relativeTolerance. At most 
@@ -38,12 +35,12 @@ def thickenXYList( list, tester, biSectionMax = 6, interpolation = standardsModu
 
         if( level == biSectionMax ) : return
         level += 1
-        if( ( interpolation == standardsModule.interpolation.linlinToken ) or ( interpolation == standardsModule.interpolation.loglinToken ) ) :
+        if interpolation == xDataEnumsModule.Interpolation.linlin or interpolation == xDataEnumsModule.Interpolation.loglin:
             xMid = 0.5  * ( xl + xu )
         else :
             xMid = math.sqrt( xl * xu );
 
-        if( ( interpolation == standardsModule.interpolation.linlinToken ) or ( interpolation == standardsModule.interpolation.linlogToken ) ) :
+        if interpolation == xDataEnumsModule.Interpolation.linlin or interpolation == xDataEnumsModule.Interpolation.linlog:
             yMid = 0.5  * ( yl + yu )
         else :
             yMid = math.sqrt( yl * yu )

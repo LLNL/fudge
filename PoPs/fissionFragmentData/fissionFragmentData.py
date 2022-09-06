@@ -1,31 +1,32 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 """
-This module defines the fissionFragmentData class, used to store fission product yields
+This module defines the FissionFragmentData class, used to store fission product yields
 and the delayed neutrons and gammas emitted by the decay of those fission products.
 """
-from xData import ancestry as ancestryModule
+
+from LUPY import ancestry as ancestryModule
 
 from . import delayedNeutronData as delayedNeutronDataModule
 from . import productYield as productYieldModule
 
-class fissionFragmentData( ancestryModule.ancestry ) :
+class FissionFragmentData(ancestryModule.AncestryIO):
 
     moniker = 'fissionFragmentData'
 
     def __init__( self ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
-        self.__delayedNeutronData = delayedNeutronDataModule.delayedNeutronData( )
+        self.__delayedNeutronData = delayedNeutronDataModule.DelayedNeutronData( )
         self.__delayedNeutronData.setAncestor( self )
 
-        self.__productYields = productYieldModule.suite( )
+        self.__productYields = productYieldModule.Suite( )
         self.__productYields.setAncestor( self )
         
     @property
@@ -51,17 +52,13 @@ class fissionFragmentData( ancestryModule.ancestry ) :
         self.__productYields = other.productYields
         self.__productYields.setAncestor( self )
 
-    def toXML( self, indent = '', **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s> ' % ( indent, self.moniker ) ]
-        XMLStringList += self.__delayedNeutronData.toXMLList( indent2, **kwargs )
-        XMLStringList += self.__productYields.toXMLList( indent2, **kwargs )
+        XMLStringList += self.__delayedNeutronData.toXML_strList( indent2, **kwargs )
+        XMLStringList += self.__productYields.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
 
         if( len( XMLStringList ) == 1 ) : XMLStringList = []
@@ -69,15 +66,15 @@ class fissionFragmentData( ancestryModule.ancestry ) :
         return( XMLStringList )
 
     @classmethod
-    def parseXMLNode(cls, element, xPath, linkData):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
         FFD = cls()
         for child in element:
-            if child.tag == delayedNeutronDataModule.delayedNeutronData.moniker:
-                FFD.delayedNeutronData.parseXMLNode(child, xPath, linkData)
-            elif child.tag == productYieldModule.suite.moniker:
-                FFD.productYields.parseXMLNode(child, xPath, linkData)
+            if child.tag == delayedNeutronDataModule.DelayedNeutronData.moniker:
+                FFD.delayedNeutronData.parseNode(child, xPath, linkData, **kwargs)
+            elif child.tag == productYieldModule.Suite.moniker:
+                FFD.productYields.parseNode(child, xPath, linkData, **kwargs)
             else:
                 raise TypeError("Encountered unknown node '%s' in %s" % (child.tag, element.tag))
 

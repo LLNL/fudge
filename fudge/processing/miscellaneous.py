@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,21 +7,22 @@
 
 accuracy = 1e-6
 
+from xData import enums as xDataEnumsModule
 from xData import link as linkModule
-from xData import standards as standardsModule
 from xData import axes as axesModule
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 from xData import regions as regionsModule
 
 from . import group as groupModule
 
 def _toLinear( func ) :
 
-    if( isinstance( func, XYsModule.XYs1d ) ) :
-        if( func.interpolation == standardsModule.interpolation.linlinToken ) : return( func )
+    if( isinstance( func, XYs1dModule.XYs1d ) ) :
+        if func.interpolation == xDataEnumsModule.Interpolation.linlin:
+            return func
         func = func.copy( )
         return( func.toPointwise_withLinearXYs( accuracy = accuracy, upperEps = 1e-8 ) )
-    elif( isinstance( func, regionsModule.regions1d ) ) :
+    elif( isinstance( func, regionsModule.Regions1d ) ) :
         return( func.toPointwise_withLinearXYs( accuracy = accuracy, upperEps = 1e-8 ) )
 
     print(type(func))
@@ -56,7 +57,7 @@ def _mutualifyGrouping3Data( f1, f2, f3, printMutualDomainWarning = False ) :
 
 def groupOneFunctionAndFlux( style, tempInfo, f1, styleFilter = None ) :
 
-    if( isinstance( f1, linkModule.link ) ) : f1 = style.findFormMatchingDerivedStyle( f1.link, styleFilter = styleFilter )
+    if( isinstance( f1, linkModule.Link ) ) : f1 = style.findFormMatchingDerivedStyle( f1.link, styleFilter = styleFilter )
     f1 = _toLinear( f1 )
     groupBoundaries, flux = _groupFunctionsAndFluxInit( style, tempInfo, f1 )
     return( f1.groupTwoFunctions( groupBoundaries, flux, norm = tempInfo['groupedFlux'] ) )
@@ -77,7 +78,7 @@ def groupFunctionCrossSectionAndFlux( cls, style, tempInfo, f1, printMutualDomai
 
     unit = crossSection.axes[0].unit
     if( f1.axes[0].unit != '' ) : unit = '%s * %s' % ( f1.axes[0].unit, unit )
-    axis = axesModule.axis( label = '%s * %s' % ( f1.axes[0].label, crossSection.axes[0].label ), unit = unit, index = 0 )
+    axis = axesModule.Axis( label = '%s * %s' % ( f1.axes[0].label, crossSection.axes[0].label ), unit = unit, index = 0 )
     axes = f1.axes.copy( )
     axes[0] = axis
     return( groupModule.toMultiGroup1d( cls, style, tempInfo, axes, grouped, zeroPerTNSL = tempInfo['zeroPerTNSL'] ) )

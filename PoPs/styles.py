@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,13 +8,10 @@
 import abc
 import datetime
 
-import xData.ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
 from xData.Documentation import documentation as documentationModule
-from xData import formatVersion as formatVersionModule
 
-__metaclass__ = type
-
-class styles( ancestryModule.ancestry ) :
+class Styles(ancestryModule.AncestryIO_base):
     """
     Stores the list of PoPs styles that appear inside a database.
     """
@@ -24,7 +21,7 @@ class styles( ancestryModule.ancestry ) :
 
     def __init__( self ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
         self.__styles = []
 
     def __contains__( self, label ) :
@@ -57,13 +54,13 @@ class styles( ancestryModule.ancestry ) :
         :param _style: style instance
         """
 
-        if( not( isinstance( _style, style ) ) ) : raise TypeError( 'invalid style instance' )
+        if( not( isinstance( _style, Style ) ) ) : raise TypeError( 'invalid style instance' )
 
         for __style in self :
             if( __style.label == _style.label ) : raise ValueError( 'style labeled "%s" already exists' % _style.label )
 
         self.__styles.append( _style )
-        _style.setAncestor( self, 'label' )
+        _style.setAncestor(self)
 
     def convertUnits( self, unitMap ) :
         """See database.convertUnits"""
@@ -84,42 +81,41 @@ class styles( ancestryModule.ancestry ) :
         self.__styles.pop(index)
 
     def getEvaluatedStyle(self):
-        _evaluateds = [_style for _style in self if isinstance(_style, evaluated)]
+        _evaluateds = [_style for _style in self if isinstance(_style, Evaluated)]
         if len(_evaluateds) == 0:
             raise Exception("No evaluated style found.")
         if len(_evaluateds) > 1:
             raise Exception("Multiple (%d) evaluated styles found." % len(_evaluateds))
         return _evaluateds[0]
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         if( len( self ) == 0 ) : return( [] )
 
         xmlStringList = ['%s<%s>' % (indent, self.moniker)]
-        for _style in self : xmlStringList += _style.toXMLList( indent2, **kwargs )
+        for _style in self : xmlStringList += _style.toXML_strList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
-    def parseXMLNode( self, stylesElement, xPath, linkData ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
 
-        xPath.append( stylesElement.tag )
+        xPath.append(node.tag)
 
         classDict = {}
-        for _style in ( evaluated, ) : classDict[_style.moniker] = _style
-        for styleElement in stylesElement :
-            _class = classDict.get( styleElement.tag, None )
+        for _style in ( Evaluated, ) : classDict[_style.moniker] = _style
+        for child in node:
+            _class = classDict.get( child.tag, None )
             if( _class is None ) :
-                raise TypeError( 'encountered unknown style "%s"' % styleElement.tag )
-            self.add( _class.parseXMLNode( styleElement, xPath, linkData ) )
+                raise TypeError( 'encountered unknown style "%s"' % child.tag )
+            self.add(_class.parseNodeUsingClass(child, xPath, linkData, **kwargs))
+
 
         xPath.pop()
 
-class style( ancestryModule.ancestry ) :
+class Style(ancestryModule.AncestryIO, abc.ABC):
     """ Abstract base class for all 'style' classes in PoPs """
-
-    __metaclass__ = abc.ABCMeta
 
     def __init__( self, label, derivedFrom, date = None ) :
         """
@@ -128,7 +124,7 @@ class style( ancestryModule.ancestry ) :
         :param date: optional date when style was generated. Defaults to today's date
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
         if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a str instance.' )
         self.__label = label
@@ -228,17 +224,20 @@ class style( ancestryModule.ancestry ) :
         return( XMLCommon )
 
     @staticmethod
-    def parseXMLNodeBase( element, xPath ) :
+    def parseBaseNodeCommons(node, xPath, **kwargs):
+        """
+        Parse *label*, *derivedFrom* and *date* that are common to all style nodes. Also, set xPath.
+        """
 
-        label = element.get( 'label' )
-        xPath.append( '%s[@label="%s"]' % ( element.tag, label ) )
+        label = node.get('label')
+        xPath.append('%s[@label="%s"]' % (node.tag, label))
 
-        derivedFrom = element.get( 'derivedFrom', "" )
-        date = element.get( 'date', None )
+        derivedFrom = node.get('derivedFrom', '')
+        date = node.get('date', None)
 
-        return( label, derivedFrom, date )
+        return label, derivedFrom, date
 
-class evaluated( style ) :
+class Evaluated(Style):
 
     moniker = 'evaluated'
 
@@ -251,7 +250,7 @@ class evaluated( style ) :
         :param date: optional date when style was generated. Defaults to today's date
         """
 
-        style.__init__( self, label, derivedFrom, date = date )
+        Style.__init__( self, label, derivedFrom, date = date )
 
         if( not( isinstance( library, str ) ) ) : raise TypeError( 'library must be a string' )
         self.__library = library
@@ -281,34 +280,35 @@ class evaluated( style ) :
 
     def copy( self ) :
 
-        return( evaluated( self.label, self.derivedFrom, library = self.library, version = self.version, date = self.date ) )
+        return( Evaluated( self.label, self.derivedFrom, library = self.library, version = self.version, date = self.date ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
         xmlStringList = [ '%s<%s %s library="%s" version="%s">' %
                 ( indent, self.moniker, self.XMLCommonAttributes( ), self.library, self.version ) ]
 
-        if kwargs.get('formatVersion') != formatVersionModule.version_1_10:
-            xmlStringList += self.documentation.toXMLList( indent2, **kwargs )
+        if kwargs.get('formatVersion') != '0.1':  # PoPs version corresponding to GNDS 1.10
+            xmlStringList += self.documentation.toXML_strList( indent2, **kwargs )
 
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
+        label, derivedFrom, date = Style.parseBaseNodeCommons(node, xPath, **kwargs)        # Also adds to xPath.
 
-        library = element.get( 'library', '' )
-        version = element.get( 'version', '' )
+        library = node.get('library', '')
+        version = node.get('version', '')
 
-        _evaluated = evaluated( label, derivedFrom, library, version, date = date )
+        _evaluated = cls( label, derivedFrom, library, version, date = date )
 
-        _documentation = element.find(documentationModule.Documentation.moniker)
+        _documentation = node.find(documentationModule.Documentation.moniker)
         if _documentation is not None:
-            _evaluated.documentation.parseNode(_documentation, xPath, linkData)
+            _evaluated.documentation.parseNode(_documentation, xPath, linkData, **kwargs)
 
-        xPath.pop( )
-        return( _evaluated )
+        xPath.pop()                 # Need to pop as parseBaseNodeCommons added to it.
+
+        return _evaluated

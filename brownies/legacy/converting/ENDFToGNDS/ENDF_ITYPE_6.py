@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,12 +9,11 @@
 For translating ENDF ITYPE=6 data  (atomic relaxation sub-library)
 """
 
-
 from PoPs import IDs as IDsPoPsModule
 from PoPs import styles as stylesPoPsModule
 from PoPs import database as databasePoPsModule
-from PoPs.groups import misc as chemicalElementMiscModule
-from PoPs.groups import chemicalElement as chemicalElementModule
+from PoPs.chemicalElements import misc as chemicalElementMiscModule
+from PoPs.chemicalElements import chemicalElement as chemicalElementModule
 from PoPs.atomic import atomic as atomicModule
 from PoPs.atomic import configuration as configurationModule
 from PoPs.decays import decayData as decayDataModule
@@ -44,15 +43,16 @@ def ITYPE_6( Z, MTDatas, info, verbose = 0 ) :
         raise Exception( 'For MT %s data, only allowed MF is 28: %s' % ( MT, list( MFData.keys( ) ) ) )
     MF28 = MFData[28]
 
-    PoPs = databasePoPsModule.database( "ENDF atomic relaxation for Z = %s" % Z, '1.0', formatVersion = info.formatVersion )
-    evalStyle = stylesPoPsModule.evaluated( 'eval', '', info.library, info.libraryVersion, info.Date )
+    PoPs = databasePoPsModule.Database( "ENDF atomic relaxation for Z = %s" % Z, '1.0', formatVersion = info.formatVersion )
+    evalStyle = stylesPoPsModule.Evaluated( 'eval', '', info.library, info.libraryVersion, info.Date )
     evalStyle.documentation.endfCompatible.body = info.documentation
+    endfFileToGNDSMisc.completeDocumentation(info, evalStyle.documentation)
 
     PoPs.styles.add( evalStyle )
-    chemicalElement = chemicalElementModule.chemicalElement( elementSymbol, Z, chemicalElementMiscModule.nameFromZ[Z] )
+    chemicalElement = chemicalElementModule.ChemicalElement( elementSymbol, Z, chemicalElementMiscModule.nameFromZ[Z] )
     PoPs.add( chemicalElement )
 
-    atomicData = atomicModule.atomic( )
+    atomicData = atomicModule.Atomic( )
     chemicalElement.atomicData = atomicData
 
     offset = 0
@@ -64,9 +64,9 @@ def ITYPE_6( Z, MTDatas, info, verbose = 0 ) :
         EBI, ELN, dummy, dummy, dummy, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MF28[offset], intIndices = [ ], logFile = info.logs)
         offset += 1
 
-        configuration = configurationModule.configuration( MT_AtomicConfigurations[534+SUBI-1], ELN )
+        configuration = configurationModule.Configuration( MT_AtomicConfigurations[534+SUBI-1], ELN )
         atomicData.configurations.add( configuration )
-        configuration.bindingEnergy.add( bindingEnergyModule.double( 'eval', EBI, 'eV' ) )
+        configuration.bindingEnergy.add( bindingEnergyModule.Double( 'eval', EBI, 'eV' ) )
 
         decayData = configuration.decayData
 
@@ -76,17 +76,17 @@ def ITYPE_6( Z, MTDatas, info, verbose = 0 ) :
             SUBJ, SUBK, ETR, FTF, dummy, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MF28[offset], intIndices = [0, 1], logFile = info.logs)
             offset += 1
 
-            decayMode = decayDataModule.decayMode( str( i1 ), 'atomicRelaxation' )
-            decayMode.probability.add( probabilityModule.double( "BR", FTF, '' ) )
-            decay = decayDataModule.decay( str( 0 ), decayDataModule.decayModesParticle )
+            decayMode = decayDataModule.DecayMode( str( i1 ), 'atomicRelaxation' )
+            decayMode.probability.add( probabilityModule.Double( "BR", FTF, '' ) )
+            decay = decayDataModule.Decay( str( 0 ), decayDataModule.decayModesParticle )
 
             if( SUBK == 0 ) :
-                decay.products.add( productModule.product( IDsPoPsModule.photon, IDsPoPsModule.photon ) )
+                decay.products.add( productModule.Product( IDsPoPsModule.photon, IDsPoPsModule.photon ) )
                 elementID = '%s{%s}' % ( elementSymbol, MT_AtomicConfigurations[534+SUBJ-1] )
             else :
-                decay.products.add( productModule.product( IDsPoPsModule.electron, IDsPoPsModule.electron ) )
+                decay.products.add( productModule.Product( IDsPoPsModule.electron, IDsPoPsModule.electron ) )
                 elementID = '%s{%s,%s}' % ( elementSymbol, MT_AtomicConfigurations[534+SUBJ-1], MT_AtomicConfigurations[534+SUBK-1] )
-            decay.products.add( productModule.product( elementID, elementID ) )
+            decay.products.add( productModule.Product( elementID, elementID ) )
             probabilitySum += FTF
             decayMode.decayPath.add( decay )
             decayData.decayModes.add( decayMode )

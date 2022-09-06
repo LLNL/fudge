@@ -1,5 +1,6 @@
 import unittest
-from xData import standards
+
+from xData import enums as xDataEnumsModule
 from brownies.BNL.restools.level_density import *
 
 
@@ -25,17 +26,13 @@ class TestNuclearLevelDensity(unittest.TestCase):
 class TestXYs(unittest.TestCase):
 
     def setUp(self):
-        self.vl1 = axes.axes()
+        self.vl1 = axes.axes(2)
         self.vl1[1] = axes.axis('energy_in', 1, 'eV')
         self.vl1[0] = axes.axis('crossSection', 0, 'b')
-        self.pXY1 = XYs.XYs1d(axes=self.vl1, data=[[1, 0], [3, 2], [4, 1]],
-                              interpolation=standards.interpolation.linlinToken)
-        self.pXY2 = XYs.XYs1d(axes=self.vl1, data=[[1, 0], [4, 2]],
-                              interpolation=standards.interpolation.linlinToken)
-        self.pXY3 = XYs.XYs1d(axes=self.vl1, data=[[1, 1], [2, 2], [4, 3], [7, 1]],
-                              interpolation=standards.interpolation.linlinToken)
-        self.pXY4 = XYs.XYs1d(axes=self.vl1, data=[[1, 0], [2.5, 2], [3, 3], [7, 0]],
-                              interpolation=standards.interpolation.linlinToken, safeDivide=True)
+        self.pXY1 = XYs.XYs1d(axes=self.vl1, data=[[1, 0], [3, 2], [4, 1]], interpolation=xDataEnumsModule.Interpolation.linlin)
+        self.pXY2 = XYs.XYs1d(axes=self.vl1, data=[[1, 0], [4, 2]], interpolation=xDataEnumsModule.Interpolation.linlin)
+        self.pXY3 = XYs.XYs1d(axes=self.vl1, data=[[1, 1], [2, 2], [4, 3], [7, 1]], interpolation=xDataEnumsModule.Interpolation.linlin)
+        self.pXY4 = XYs.XYs1d(axes=self.vl1, data=[[1, 0], [2.5, 2], [3, 3], [7, 0]], interpolation=xDataEnumsModule.Interpolation.linlin, safeDivide=True)
 
     def test_toString(self):
         self.assertEqual(str(self.pXY1.axes),
@@ -587,11 +584,11 @@ class TestXYs(unittest.TestCase):
                          '   7.00000000e+00   1.36137594e-02\n')
 
     def test_integrate(self):
-        self.assertEqual(self.pXY1.integrate(), PhysicalQuantity(3.5, 'eV*b'))
-        self.assertEqual(self.pXY1.integrate(2, 4), PhysicalQuantity(3.0, 'eV*b'))
-        self.assertEqual(self.pXY2.integrate(), PhysicalQuantity(3.0, 'eV*b'))
-        self.assertEqual(self.pXY3.integrate(1.0, 2.0), PhysicalQuantity(1.5, 'eV*b'))
-        self.assertEqual(self.pXY4.integrate(), PhysicalQuantity(8.75, 'eV*b'))
+        self.assertEqual(self.pXY1.integrate(), float(PhysicalQuantity(3.5, 'eV*b')))
+        self.assertEqual(self.pXY1.integrate(2, 4), float(PhysicalQuantity(3.0, 'eV*b')))
+        self.assertEqual(self.pXY2.integrate(), float(PhysicalQuantity(3.0, 'eV*b')))
+        self.assertEqual(self.pXY3.integrate(1.0, 2.0), float(PhysicalQuantity(1.5, 'eV*b')))
+        self.assertEqual(self.pXY4.integrate(), float(PhysicalQuantity(8.75, 'eV*b')))
 
     def test_indefiniteIntegral(self):
         self.assertEqual(self.pXY1.indefiniteIntegral().toString(),

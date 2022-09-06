@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,13 +10,13 @@ Base form for all thermal neutron scattering law forms.
 """
 
 from fudge.reactionData import crossSection as crossSectionModule
-from fudge.productData import energyDeposition as averageProductEnergyModule
-from fudge.productData import momentumDeposition as averageProductMomentumModule
+from fudge.productData import averageProductEnergy as averageProductEnergyModule
+from fudge.productData import averageProductMomentum as averageProductMomentumModule
 from fudge.productData.distributions import energy as energyModule
 
 from .. import base as baseModule
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     @property
     def domainMin( self ) :
@@ -75,12 +75,12 @@ def getNumberOfAtomsPerMolecule( form ):
     """
     from fudge import reactionSuite as reactionSuiteModule
     from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import incoherentInelastic as incoherentInelasticModule
-    RS = form.findClassInAncestry(reactionSuiteModule.reactionSuite)
+    RS = form.findClassInAncestry(reactionSuiteModule.ReactionSuite)
     IIform = None
     for reaction in RS.reactions:
         if reaction.doubleDifferentialCrossSection:
             doubleDifferentialForm = reaction.doubleDifferentialCrossSection.evaluated
-            if isinstance(doubleDifferentialForm, incoherentInelasticModule.form):
+            if isinstance(doubleDifferentialForm, incoherentInelasticModule.Form):
                 IIform = doubleDifferentialForm
                 break
     if not IIform:

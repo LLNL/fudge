@@ -1,4 +1,8 @@
 import fudge
+
+from xData import XYs1d as XYs1dModule
+from xData import axes as axesModule
+from xData import regions as regionsModule
 from fudge.vis.matplotlib import plot2d, DataSet2d, DataSet3d
 import fudge.sums
 from brownies.legacy.endl import misc as miscENDLModule
@@ -1025,8 +1029,7 @@ def makeEnergyDepositPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=N
                           outFile=None, plotStyle=None, figsize=(20, 10), useBokeh=False):
     raise NotImplementedError("FIXME: I need updating for new FUDGE")
 
-    from fudge.productData import energyDeposition
-    import fudge.core.math.xData.XYs as XYs
+    from fudge.productData import averageProductEnergy as averageProductEnergyModule
 
     endfData = []
 
@@ -1057,8 +1060,8 @@ def makeEnergyDepositPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=N
         # Compute the energy deposits and available energy
         Q = reaction.outputChannel.Q.toPointwise_withLinearXYs(accuracy=1e-3, upperEps=1e-8)
         energyDep = [
-            [prod.getLabel(), prod.data[energyDeposition.component.genre].getNativeData()]
-            for prod in reaction.outputChannel.particles if energyDeposition.component.genre in prod.data]
+            [prod.getLabel(), prod.data[averageProductEnergyModule.Component.genre].getNativeData()]
+            for prod in reaction.outputChannel.particles if averageProductEnergyModule.Component.genre in prod.data]
         if energyDep:
             totalEDep = energyDep[0][1].copy()
             for idx in range(1, len(energyDep)):
@@ -1067,7 +1070,7 @@ def makeEnergyDepositPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=N
                 totalEDep += energyDep[idx][1]
         else:
             totalEDep = []
-        expectedTotalEnergy = XYs.XYs1d(axes_=Q.axes, data=[[x[0], x[1] + x[0]] for x in Q.copyDataToXYs()],
+        expectedTotalEnergy = XYs1dModule.XYs1d(axes_=Q.axes, data=[[x[0], x[1] + x[0]] for x in Q.copyDataToXYs()],
                                         accuracy=1e-8)
 
         # Add sets to plot list
@@ -1121,8 +1124,7 @@ def makeMomentumDepositPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData
                             outFile=None, plotStyle=None, figsize=(20, 10), useBokeh=False):
     raise NotImplementedError("FIXME: I need updating for new FUDGE")
 
-    from fudge.productData import momentumDeposition
-    import fudge.core.math.xData.XYs as XYs
+    from fudge.productData import averageProductMomentum as averageProductMomentumModule
     import math
 
     projectileMass = None
@@ -1160,8 +1162,8 @@ def makeMomentumDepositPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData
         # Compute the energy deposits and available energy
         #        Q = reaction.outputChannel.Q.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
         momDep = [
-            [prod.getLabel(), prod.data[momentumDeposition.component.genre].getNativeData()]
-            for prod in reaction.outputChannel.particles if momentumDeposition.component.genre in prod.data]
+            [prod.getLabel(), prod.data[averageProductMomentumModule.Component.genre].getNativeData()]
+            for prod in reaction.outputChannel.particles if averageProductMomentumModule.Component.genre in prod.data]
         if momDep:
             totalMomDep = momDep[0][1].copy()
             for idx in range(1, len(momDep)):
@@ -1170,7 +1172,7 @@ def makeMomentumDepositPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData
                 totalMomDep += momDep[idx][1]
         else:
             totalMomDep = []
-        expectedTotalMom = XYs.XYs1d(axes_=totalMomDep.axes,
+        expectedTotalMom = XYs1dModule.XYs1d(axes_=totalMomDep.axes,
                                      data=[[x[0], math.sqrt(2.0 * x[0] * projectileMass)] for x in
                                            totalMomDep.copyDataToXYs()], accuracy=1e-8)
 
@@ -1299,9 +1301,8 @@ def makeAngDistLegendreMomentPlot(gndsMap={}, xyData={}, xydyData={}, xdxydyData
                                   evaluationStyle='eval', referenceFrame='centerOfMass',
                                   outFile=None, plotStyle={}, figsize=(20, 10), useBokeh=False):
     def get_LegendreMoments(theAngDist):
-        from xData import axes, XYs, regions
 
-        if isinstance(theAngDist, regions.regions2d):
+        if isinstance(theAngDist, regionsModule.Regions2d):
             myRegions = theAngDist.regions
         else:
             myRegions = [theAngDist]
@@ -1352,12 +1353,12 @@ def makeAngDistLegendreMomentPlot(gndsMap={}, xyData={}, xydyData={}, xdxydyData
             theLegMoments[L] = newList
 
         # Construct the axes for all the XY's we'll need below
-        coeffAxes = axes.axes()
+        coeffAxes = axesModule.Axes(2)
         coeffAxes[0] = theAngDist.axes[0]
         coeffAxes[1] = theAngDist.axes[-1]
 
         # Convert them to XYs
-        return {L: XYs.XYs1d(data=theLegMoments[L], axes=coeffAxes) for L in range(Lmax + 1)}
+        return {L: XYs1dModule.XYs1d(data=theLegMoments[L], axes=coeffAxes) for L in range(Lmax + 1)}
 
     # Declare the main reaction type
     try:

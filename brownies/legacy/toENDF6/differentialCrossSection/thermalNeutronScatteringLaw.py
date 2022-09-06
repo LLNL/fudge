@@ -1,11 +1,18 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 import itertools
+import numpy
+
+from PoPs import IDs as IDsPoPsModule
+
+from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import incoherentInelastic
+
+from xData import gridded as griddedModule
 
 from fudge.reactionData.doubleDifferentialCrossSection import thermalNeutronScatteringLaw as thermalScatteringModule
 
@@ -21,7 +28,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
     endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, LTHR, 0, 0, 0 )]
     endf += self.S_table.toENDF6( flags, targetInfo, verbosityIndent = '' )
     endfMFList[7][2] = endf + [99999]
-thermalScatteringModule.coherentElastic.form.toENDF6 = toENDF6
+thermalScatteringModule.coherentElastic.Form.toENDF6 = toENDF6
 
 #
 # S_table
@@ -61,69 +68,107 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
         endf[0] = endfFormatsModule.endfHeadLine( ZAM, AWT, LTHR, 0, 0, 0 )
     else:
         endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, LTHR, 0, 0, 0 )]
-    targetInfo['characteristicCrossSection'] = self.characteristicCrossSection.getValueAs('b')
-    endf += self.DebyeWaller.toENDF6( flags, targetInfo, verbosityIndent = verbosityIndent )
-    del targetInfo['characteristicCrossSection']
+    targetInfo['boundAtomCrossSection'] = self.boundAtomCrossSection.getValueAs('b')
+    endf += self.DebyeWallerIntegral.toENDF6( flags, targetInfo, verbosityIndent = verbosityIndent )
+    del targetInfo['boundAtomCrossSection']
     endfMFList[7][2] = endf + [99999]
-thermalScatteringModule.incoherentElastic.form.toENDF6 = toENDF6
+thermalScatteringModule.incoherentElastic.Form.toENDF6 = toENDF6
 
 #
-# DebyeWaller
+# DebyeWallerIntegral
 #
 def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
     data = self.function1d
     NR = 1; NP = len(data)
-    endf = [endfFormatsModule.endfHeadLine( targetInfo['characteristicCrossSection'], 0, 0, 0, NR, NP )]
+    endf = [endfFormatsModule.endfHeadLine( targetInfo['boundAtomCrossSection'], 0, 0, 0, NR, NP )]
     interp = gndsToENDF6.gndsToENDFInterpolationFlag( data.interpolation )
     endf += endfFormatsModule.endfInterpolationList( (NP, interp) )
     endf += endfFormatsModule.endfDataList( list( itertools.chain( *data.copyDataToXYs() ) ) )
     return endf
-thermalScatteringModule.incoherentElastic.DebyeWaller.toENDF6 = toENDF6
+thermalScatteringModule.incoherentElastic.DebyeWallerIntegral.toENDF6 = toENDF6
 
 #
 # incoherentInelastic
 #
 def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
     ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
-    LTHR, LAT, LASYM = 0, self.options.calculatedAtThermal, self.options.asymmetric
+    LTHR, LAT = 0, self.calculatedAtThermal
+    neutronMass = self.findAttributeInAncestry('PoPs')[IDsPoPsModule.neutron].mass.float('amu')
+
+    scatteringKernel = self.getPrimaryScatterer().selfScatteringKernel.kernel
+    if not isinstance(scatteringKernel, griddedModule.Gridded3d):
+        raise TypeError("ENDF-6 does not support %s scattering kernel for primary scatterer" % type(scatteringKernel))
+
+    Tlist = list( scatteringKernel.axes[3].values )
+    betas = list( scatteringKernel.axes[2].values )
+    alphas = list( scatteringKernel.axes[1].values )
+
+    LASYM = min(betas) < 0  # S_ab not symmetric in beta
     endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, LTHR, LAT, LASYM, 0 )]
+
     # describe scattering atoms:
     LLN, NS = 0, len( self.scatteringAtoms ) - 1
+    if self in targetInfo['ENDFconversionFlags']:
+        flags = targetInfo['ENDFconversionFlags'][self]
+        LLN, LLN_min = flags.split(',')
+        LLN = int(LLN.split('=')[1])
+        LLN_min = float(LLN_min.split('=')[1])
     NI = 6*(NS+1)
     endf += [endfFormatsModule.endfHeadLine( 0, 0, LLN, 0, NI, NS )]
+
     # principal scattering atom:
-    atom = self.scatteringAtoms[0]
-    neutronMass = self.findAttributeInAncestry('PoPs')['n'].mass.float('amu')
-    endf += [endfFormatsModule.endfDataLine( [atom.freeAtomCrossSection.value * atom.numberPerMolecule,
-        atom.e_critical.value, atom.mass.value / neutronMass, atom.e_max.value, 0, atom.numberPerMolecule] )]
-    for atom in list(self.scatteringAtoms)[1:]:
-        a1 = {'SCT':0.0, 'free_gas':1.0, 'diffusive_motion':2.0} [ atom.functionalForm ]
-        endf += [endfFormatsModule.endfDataLine( [a1, atom.freeAtomCrossSection.value * atom.numberPerMolecule,
+    atom1 = self.getPrimaryScatterer()
+    freeAtomCrossSection = atom1.boundAtomCrossSection.value * atom1.mass.value**2 / (atom1.mass.value + neutronMass)
+    endf += [endfFormatsModule.endfDataLine( [freeAtomCrossSection * atom1.numberPerMolecule,
+        atom1.e_critical.value, atom1.mass.value / neutronMass, atom1.e_max.value, 0, atom1.numberPerMolecule] )]
+    for atom in list(self.scatteringAtoms):
+        if atom is atom1: continue
+        a1 = {
+            incoherentInelastic.SCTApproximation: 0.0,
+            incoherentInelastic.FreeGasApproximation: 1.0
+            # note: 'diffusive motion' (a1 = 2.0) appears to be unused and isn't supported by GNDS-2.0
+        }[type(atom.selfScatteringKernel.kernel)]
+        freeAtomCrossSection = atom.boundAtomCrossSection.value * atom.mass.value**2 / (atom.mass.value + neutronMass)
+        endf += [endfFormatsModule.endfDataLine( [a1, freeAtomCrossSection * atom.numberPerMolecule,
             atom.mass.value / neutronMass, 0, 0, atom.numberPerMolecule] )]
 
     # convert data form: sort first by beta, then E, then T
-    gridded = self.S_alpha_beta.gridded3d
-    array = gridded.array.constructArray()   # 3D numpy array
-
-    Tlist = list( gridded.axes[3].values )
-    betas = list( gridded.axes[2].values )
-    alphas = list( gridded.axes[1].values )
+    array = scatteringKernel.array.constructArray()   # 3D numpy array
 
     # switch array back to ENDF ordering:  1st beta, then T, then alpha:
     array = array.transpose( (1,0,2) )
 
+    interpolations = {
+        'T': scatteringKernel.axes[3].interpolation,
+        'beta': scatteringKernel.axes[2].interpolation,
+        'alpha': scatteringKernel.axes[1].interpolation
+    }
+
+    if LLN == 1:
+        with numpy.errstate(invalid='ignore', divide='ignore'):
+            array2 = numpy.log(array)
+            array2[array==0] = LLN_min
+            array = array2
+
+        for key in interpolations:
+            if interpolations[key] is None:
+                continue
+            if not interpolations[key].startswith('log'):
+                raise ValueError("Expected log interpolation on S (linear on ln(S)) but got %s" % interpolations[key])
+            interpolations[key] = interpolations[key].replace('log','lin',1)
+
     NR = 1; NB = len(betas)
-    beta_interp = gndsToENDF6.gndsToENDFInterpolationFlag( gridded.axes[2].interpolation )
+    beta_interp = gndsToENDF6.gndsToENDFInterpolationFlag( interpolations['beta'] )
     endf += [endfFormatsModule.endfHeadLine( 0, 0, 0, 0, NR, NB )]
     endf += endfFormatsModule.endfInterpolationList( (NB, beta_interp) )
     #endf += ['%11i%11i%44s' % ( NB, 4, '' )]  # FIXME add 'suppressTrailingZeros' option to endfInterpolationList
 
     LT = len(Tlist)-1
     if LT:
-        T_interp = gndsToENDF6.gndsToENDFInterpolationFlag( gridded.axes[3].interpolation )
+        T_interp = gndsToENDF6.gndsToENDFInterpolationFlag( interpolations['T'] )
     else:
         T_interp = None
-    alpha_interp = gndsToENDF6.gndsToENDFInterpolationFlag( gridded.axes[1].interpolation )
+    alpha_interp = gndsToENDF6.gndsToENDFInterpolationFlag( interpolations['alpha'] )
 
     for index, beta in enumerate( betas ):
         data = array[index,:,:] # 2D sub-array for this beta
@@ -143,7 +188,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
         if atom.T_effective is not None:
             endf += atom.T_effective.toENDF6( flags, targetInfo, verbosityIndent = '' )
     endfMFList[7][4] = endf + [99999]
-thermalScatteringModule.incoherentInelastic.form.toENDF6 = toENDF6
+thermalScatteringModule.incoherentInelastic.Form.toENDF6 = toENDF6
 
 #
 # T_effective

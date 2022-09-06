@@ -1,22 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-
-import os
-
-from setuptools.command.install import install
-
-class CustomInstall(install):
-    """Custom handler for the 'install' command."""
-    def run(self):
-        # Exclude brownies.bin.lev-vis.py since brownies.BNL.RIPL is not included in 'pip install'
-        filePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin', 'lev-vis.py')
-        os.remove(filePath)
-
-        super().run()
+import glob
 
 def setup():
     from setuptools import setup
@@ -42,13 +30,12 @@ def setup():
             'brownies.legacy.toENDL', 'brownies.legacy.toENDL.productData', 'brownies.legacy.toENDL.productData.distributions',
             'brownies.legacy.toENDF6', 'brownies.legacy.toENDF6.PoPs_toENDF6', 'brownies.legacy.toENDF6.PoPs_toENDF6.atomic',
             'brownies.legacy.toENDF6.PoPs_toENDF6.decays', 'brownies.legacy.toENDF6.PoPs_toENDF6.fissionFragmentData',
-            'brownies.legacy.toENDF6.channelData', 'brownies.legacy.toENDF6.covariances', 'brownies.legacy.toENDF6.differentialCrossSection',
+            'brownies.legacy.toENDF6.outputChannelData', 'brownies.legacy.toENDF6.covariances', 'brownies.legacy.toENDF6.differentialCrossSection',
             'brownies.legacy.toENDF6.productData', 'brownies.legacy.toENDF6.productData.distributions', 'brownies.legacy.toENDF6.reactions',
             'brownies.legacy.toENDF6.reactionData', 'brownies.legacy.toENDF6.reactionData.chargedParticleElastic',
             'brownies.legacy.toENDF6.reactionData.photonScattering', 'brownies.legacy.toENDF6.resonances'],
         package_dir={'brownies': '.'},
-        scripts=['legacy/bin/prepro.py']+['bin/check.py', 'bin/grokres.py', 'bin/mcres.py', 'bin/plot_evaluation.py', \
-            'bin/inter.py', 'bin/plot_covariance.py', 'bin/endf2gnds.py', 'bin/gnds2endf.py'],
+        scripts=['legacy/bin/prepro.py']+['bin/check.py', 'bin/grokres.py', 'bin/mcres.py', 'bin/plot_evaluation.py', 'bin/inter.py', 'bin/plot_covariance.py'],
         package_data = {
             'brownies.BNL.inter': ['README.txt', '*.json'],
             'brownies.BNL.inter.test': ['*.endf'],
@@ -61,7 +48,7 @@ def setup():
         description='Fudge brownies',
         author='David Brown',
         author_email='dbrown@bnl.gov',
-        url='',
+        url='http://www.nndc.bnl.gov',
         download_url='',
         keywords=['ENDF', 'Fudge'],
         classifiers=[
@@ -78,8 +65,7 @@ def setup():
             'Topic :: Software Development :: Interpreters',
             'Topic :: Scientific/Engineering',
         ],
-        long_description='''''',
-        cmdclass={'install': CustomInstall}
+        long_description=''''''
     )
 
 

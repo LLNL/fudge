@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,34 +7,33 @@
 
 """This module contains the 'unspecified' form for distribution."""
 
-from xData import standards as standardsModule
-
+from xData import enums as xDataEnumsModule
 from . import base as baseModule
 
-__metaclass__ = type
-
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'unspecified'
     subformAttributes = []
-    ancestryMembers = ( '', )
 
-    def __init__( self, label, productFrame = standardsModule.frames.labToken ) :
+    def __init__(self, label, productFrame=xDataEnumsModule.Frame.lab):
 
-        baseModule.form.__init__( self, label, productFrame, [] )
+        if productFrame is None:
+            raise 'hell'
+            productFrame = xDataEnumsModule.Frame.lab      # This is a kludge and needs to be fixed. Ergo, None should never be allowed as a productFrame value.
+        baseModule.Form.__init__( self, label, productFrame, [] )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
-        UC = form( element.get( 'label' ), element.get( 'productFrame' ) )
+        UC = cls( element.get( 'label' ), element.get( 'productFrame' ) )
         xPath.pop( )
         return( UC )
 
     @property
     def domainUnit( self ) :
 
-        return( self.getRootAncestor( ).domainUnit )
+        return( self.rootAncestor.domainUnit )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
@@ -42,7 +41,14 @@ class form( baseModule.form ) :
 
     def copy( self ):
 
-        return form( self.label, self.productFrame )
+        return Form( self.label, self.productFrame )
+
+    def fixDomains(self, energyMin, energyMax, domainsToFix):
+        """
+        The method does nothing.
+        """
+
+        return 0
 
     def isSpecified( self ) :
 

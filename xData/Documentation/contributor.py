@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,15 +9,35 @@
 This module contains the classes representing the GNDS documentation nodes author and authors.
 """
 
+from LUPY import enums as enumsModule
+
 from .. import suite as suiteModule
 from .. import text as textModule
 from . import abstractClasses as abstractClassesModule
 
-class ContributorType:
+class ContributorType(enumsModule.Enum):
 
-    allowed = ( 'ContactPerson', 'DataCollector', 'DataCurator', 'DataManager', 'Distributor', 'Editor', 'HostingInstitution',
-                'Producer', 'ProjectLeader', 'ProjectManager', 'ProjectMember', 'RegistrationAgency', 'RegistrationAuthoriy',
-                'RelatedPerson', 'Researcher', 'ResearchGroup', 'RightsHolder', 'Sponsor', 'Supervisor', 'WorkPackageLeader', 'Other' )
+    contactPerson = 'ContactPerson'
+    dataCollector = 'DataCollector'
+    dataCurator = 'DataCurator'
+    dataManager = 'DataManager'
+    distributor = 'Distributor'
+    editor = 'Editor'
+    hostingInstitution = 'HostingInstitution'
+    producer = 'Producer'
+    projectLeader = 'ProjectLeader'
+    projectManager = 'ProjectManager'
+    projectMember = 'ProjectMember'
+    registrationAgency = 'RegistrationAgency'
+    registrationAuthoriy = 'RegistrationAuthoriy'
+    relatedPerson = 'RelatedPerson'
+    researcher = 'Researcher'
+    researchGroup = 'ResearchGroup'
+    rightsHolder = 'RightsHolder'
+    sponsor = 'Sponsor'
+    supervisor = 'Supervisor'
+    workPackageLeader = 'WorkPackageLeader'
+    other  = 'Other'
 
 class Contributor(abstractClassesModule.AuthorAbstract):
 
@@ -28,7 +48,7 @@ class Contributor(abstractClassesModule.AuthorAbstract):
 
         abstractClassesModule.AuthorAbstract.__init__(self, name, orcid, email)
 
-        self.__contributorType = abstractClassesModule.raiseIfNotInList(contributorType, ContributorType.allowed, 'contributorType')
+        self.__contributorType = ContributorType.checkEnumOrString(contributorType)
 
     @property
     def contributorType(self):
@@ -42,19 +62,20 @@ class Contributor(abstractClassesModule.AuthorAbstract):
         attributes += ' contributorType="%s"' % self.__contributorType
         return attributes
 
-    @staticmethod
-    def parseConstructBareNodeInstance(node, xPath, linkData, **kwargs):
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         name = node.get('name')
         orcid = node.get('orcid', '')
         email = node.get('email', '')
         contributorType = node.get('contributorType', '')
 
-        return Contributor(name, orcid, email, contributorType)
+        return cls(name, orcid, email, contributorType)
 
 class Contributors(suiteModule.Suite):
 
     moniker = 'contributors'
+    suiteName = 'name'
 
     def __init__(self):
 
@@ -62,4 +83,4 @@ class Contributors(suiteModule.Suite):
 
     def toXML(self, indent = '', **kwargs):
 
-        return '\n'.join(self.toXMLList(**kwargs))
+        return '\n'.join(self.toXML_strList(**kwargs))

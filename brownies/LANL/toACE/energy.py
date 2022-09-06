@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,8 +9,8 @@
 This module adds the method toACE to the classes in the fudge.productData.distributions.energy module.
 """
 
-from xData import standards as standardsModule
-from xData import XYs as XYsModule
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
 
 from fudge.productData.distributions import energy as energyModule
 
@@ -18,14 +18,14 @@ def ACEInterpolation( function, label ) :
 
     interpolation = function.interpolation
     INTE = -1
-    if( interpolation == standardsModule.interpolation.flatToken ) :
+    if interpolation == xDataEnumsModule.Interpolation.flat:
         INTE = 1
-    elif( interpolation == standardsModule.interpolation.linlinToken ) :
+    elif interpolation == xDataEnumsModule.Interpolation.linlin:
         INTE = 2
     if( INTE == -1 ) :
         INTE = 2
         print('    WARNING: for %s changing interpolation from "%s" to "%s"' %
-              (label, interpolation, standardsModule.interpolation.linlinToken))
+              (label, interpolation, xDataEnumsModule.Interpolation.linlin))
 
     return( INTE )
 #
@@ -67,18 +67,18 @@ def toACE( self, label, offset, weight, **kwargs ) :
             XYs2d.append( xs_pdf_cdf1d )
     return( XYs2d.toACE( label, offset, weight, **kwargs ) )
 
-energyModule.regions2d.toACE = toACE
+energyModule.Regions2d.toACE = toACE
 #
 #   NBodyPhaseSpace logic
 #
 def toACE( self, label, offset, weight, massUnit = None, neutronMass = None, **kwargs ) :
 
-    return( [ 0, 66, offset + len( weight ) + 4 ] + weight + [ self.numberOfProducts, self.numberOfProductsMasses.getValueAs( massUnit ) / neutronMass  ] )
+    return( [ 0, 66, offset + len( weight ) + 4 ] + weight + [ self.numberOfProducts, self.mass.getValueAs( massUnit ) / neutronMass  ] )
 
 energyModule.NBodyPhaseSpace.toACE = toACE
 
 #
-#   evaporationSpectrum and simpleMaxwellianFissionSpectrum logic
+#   Evaporation and SimpleMaxwellian logic
 #
 def toACE( self, label, offset, weight, **kwargs ) :
 
@@ -93,11 +93,11 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
     return( header + [ 0, NE ] + e_ins + Ts + [ self.U.getValueAs( 'MeV' ) ] )
 
-energyModule.evaporationSpectrum.toACE = toACE
-energyModule.simpleMaxwellianFissionSpectrum.toACE = toACE
+energyModule.Evaporation.toACE = toACE
+energyModule.SimpleMaxwellianFission.toACE = toACE
 
 #
-#   weightedFunctionals logic
+#   WeightedFunctionals logic
 #
 def toACE( self, label, offset, weight, **kwargs ) :
 
@@ -116,7 +116,7 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
     return( DLWs )        
 
-energyModule.weightedFunctionals.toACE = toACE
+energyModule.WeightedFunctionals.toACE = toACE
 
 #
 #   Watt spectrum logic
@@ -138,7 +138,7 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
     return( header + data )
 
-energyModule.WattSpectrum.toACE = toACE
+energyModule.Watt.toACE = toACE
 
 #
 #   MadlandNix spectrum logic
@@ -150,14 +150,14 @@ def toACE( self, label, offset, weight, **kwargs ) :
 energyModule.MadlandNix.toACE = toACE
 
 #
-#   generalEvaporationSpectrum logic
+#   GeneralEvaporation logic
 #
 def toACE( self, label, offset, weight, **kwargs ) :
 
     header = [ 0, self.LF, offset + len( weight ) + 4 ] + weight
 
     theta = self.parameter1.data
-    if( not( isinstance( theta, XYsModule.XYs1d ) ) ) : raise TypeError( 'unsupported theta form: moniker = "%s".' % theta.moniker )
+    if( not( isinstance( theta, XYs1dModule.XYs1d ) ) ) : raise TypeError( 'unsupported theta form: moniker = "%s".' % theta.moniker )
 
     function = self.parameter2.data
     xys1d = energyModule.XYs1d( [ function.xs.values.values, function.pdf.values.values ], dataForm = 'xsandys',
@@ -170,4 +170,4 @@ def toACE( self, label, offset, weight, **kwargs ) :
     xs_pdf_cdf1d = xys2d.to_xs_pdf_cdf1d( None, None, None )
     return( xs_pdf_cdf1d.toACE( label, offset, weight, **kwargs ) )
 
-energyModule.generalEvaporationSpectrum.toACE = toACE
+energyModule.GeneralEvaporation.toACE = toACE

@@ -1,18 +1,14 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-try  :
-    from xml.etree.cElementTree import ElementTree, tostring
-except ImportError  :
-    from ElementTree import ElementTree, tostring
 import os
 from brownies.legacy.endl import fudgeDefaults
 from brownies.legacy.endl import misc as miscENDLModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 from . import xml2py
 
 __metaclass__ = type

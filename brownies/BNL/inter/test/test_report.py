@@ -17,11 +17,11 @@ if VERBOSE:
     print('reading test data...')
 
 with open(TEST_DATA_PATH + os.sep + 'n-001_H_001.endf.gnds.xml', mode='r') as H1file:
-    H1TestData = reactionSuite.readXML(H1file)
+    H1TestData = reactionSuite.ReactionSuite.readXML_file(H1file)
 with open(TEST_DATA_PATH + os.sep + 'n-026_Fe_056.endf.gnds.xml', mode='r') as Fe56file:
-    Fe56TestData = reactionSuite.readXML(Fe56file)
+    Fe56TestData = reactionSuite.ReactionSuite.readXML_file(Fe56file)
 with open(TEST_DATA_PATH + os.sep + 'n-092_U_241.endf.gnds.xml', mode='r') as U241file:
-    U241TestData = reactionSuite.readXML(U241file)
+    U241TestData = reactionSuite.ReactionSuite.readXML_file(U241file)
 
 
 class TestReport(TestCaseWithExtras):

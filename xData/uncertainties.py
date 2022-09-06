@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,189 +11,120 @@
     Multiple types of uncertainty are supported:
         pointwise (stored in the XYs1d class),
         links,
-        covariances,
+        Covariances,
         ...
 
     May contain more than one uncertainty, e.g. to support asymmetric uncertainties
 """
 
-__metaclass__ = type
+from LUPY import ancestry as ancestryModule
 
-from . import ancestry as ancestryModule
 from . import base as baseModule
 from . import link as linkModule
 
-class uncertainties( baseModule.xDataCoreMembers ):
-
-    moniker = 'uncertainties'
-
-    def __init__(self, uncertainties):
-
-        baseModule.xDataCoreMembers.__init__(self, self.moniker)
-        self.__uncertainties = uncertainties or []
-
-    def __getitem__(self, item):
-        return self.__uncertainties[item]
-
-    def __len__(self):
-        return len( self.__uncertainties )
-
-    def convertUnits( self, unitMap ) :
-
-        for uncertainty in self.__uncertainties : uncertainty.convertUnits( unitMap )
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        if len(self) == 0: return( [] )
-
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-
-        XMLList = ['%s<%s>' % (indent, self.moniker)]
-        for uncertainty in self : XMLList += uncertainty.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
-
-    @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
-        """
-        Translate <uncertainties> element into uncertainties instance.
-        """
-
-        xPath.append( element.tag )
-        uncertaintyList = [uncertainty.parseXMLNode( child, xPath, linkData ) for child in element ]
-        uncertainties_ = uncertainties( uncertaintyList )
-        xPath.pop()
-        return uncertainties_
-
-
-class uncertainty( baseModule.xDataCoreMembers ):
+class Uncertainty(ancestryModule.AncestryIO_bare):
 
     moniker = 'uncertainty'
+    keyName = None
 
     defaultType='variance'
     defaultPdf='normal'
     defaultRelation='offset'
 
-    def __init__(self, index=None, label=None, functional=None, type=None, pdf=None,
-                 relation=None):
+    def __init__(self, functional=None):
 
-        baseModule.xDataCoreMembers.__init__(self, self.moniker, index=index, label=label )
-        #FIXME check that each of the following are in the allowed list:
+        baseModule.XDataCoreMembers.__init__(self)
+
         self.__functional = functional
-        self.__type = type or self.defaultType
-        self.__pdf = pdf or self.defaultPdf
-        self.__relation = relation or self.defaultRelation
-
-    @property
-    def type(self):
-
-        return self.__type
-
-    @property
-    def pdf(self):
-
-        return self.__pdf
-
-    @property
-    def relation(self):
-
-        return self.__relation
 
     @property
     def data(self):
 
         return self.__functional
 
-    def convertUnits( self, unitMap ) :
+    def convertUnits(self, unitMap):
 
-        self.__functional.convertUnits( unitMap )
+        if self.__functional is not None: self.__functional.convertUnits(unitMap)
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        attributes = ''
-        for attr in ( 'index', 'label' ) :
-            if getattr(self,attr) is not None:
-                attributes += ' %s="%s"' % (attr, getattr(self,attr))
-        if self.type != self.defaultType: attributes += ' type="%s"' % self.type
-        if self.pdf != self.defaultPdf: attributes += ' pdf="%s"' % self.pdf
-        if self.relation != self.defaultRelation: attributes += ' relation="%s"' % self.relation
-        XMLList = ['%s<%s%s>' % (indent, self.moniker, attributes)]
-        XMLList += self.data.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
+        if self.data is None: return []
 
-    @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+        XML_strList = ['%s<%s>' % ( indent, self.moniker )]
+        XML_strList += self.__functional.toXML_strList(indent=indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
+
+        return XML_strList
+
+    def parseNode(self, node, xPath, linkData, **kwargs):
         """
-        Translate <uncertainty> element into uncertainty instance.
+        Translate <uncertainty> node into uncertainty instance.
         """
 
-        from . import XYs as XYsModule
+        from . import XYs1d as XYs1dModule
         from . import series1d as series1dModule
 
-        xPath.append( element.tag )
-        kwargs = {}
-        for attribute in ( 'index', 'label', 'type', 'pdf', 'relation' ) :
-            kwargs[attribute] = element.get(attribute,None)
-        if len(element) != 1:
-            raise TypeError("uncertainty element must contain exactly one functional")
-        functionalClass = {
-            linkModule.link.moniker: linkModule.link,
-            XYsModule.XYs1d.moniker: XYsModule.XYs1d,
-            series1dModule.polynomial1d.moniker: series1dModule.polynomial1d,
-            covariance.moniker: covariance,
-            listOfCovariances.moniker: listOfCovariances,
-        }.get( element[0].tag )
-        kwargs['functional'] = functionalClass.parseXMLNode( element[0], xPath, linkData )
-        uncertainty_ = uncertainty( **kwargs )
+        xPath.append( node.tag )
+
+        if len(node) != 0:
+            if len(node) != 1: raise TypeError("uncertainty node must contain exactly one functional.")
+
+            kwargs = {}
+            functionalClass = {
+                linkModule.Link.moniker: linkModule.Link,
+                XYs1dModule.XYs1d.moniker: XYs1dModule.XYs1d,
+                series1dModule.Polynomial1d.moniker: series1dModule.Polynomial1d,
+                Covariance.moniker: Covariance,
+                ListOfCovariances.moniker: ListOfCovariances,
+            }.get(node[0].tag)
+            self.__functional = functionalClass.parseNodeUsingClass(node[0], xPath, linkData, **kwargs)
+
         xPath.pop()
-        return uncertainty_
 
-
-class covariance(linkModule.link):
+class Covariance(linkModule.Link):
 
     moniker = 'covariance'
 
-class listOfCovariances(ancestryModule.ancestry):
+class ListOfCovariances(ancestryModule.AncestryIO):
 
     moniker = 'listOfCovariances'
 
     def __init__(self):
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.__items = []
 
     def __getitem__(self, item):
         return self.__items[item]
 
     def add(self, obj):
-        if not isinstance(obj, covariance):
-            raise TypeError("Expected covariance instance, got '%s'" % type(obj))
+        if not isinstance(obj, Covariance):
+            raise TypeError("Expected Covariance instance, got '%s'" % type(obj))
         obj.setAncestor(self)
         obj.label = 'cov%d' % len(self.__items)
         self.__items.append(obj)
 
-    def toXMLList(self, indent='', **kwargs):
+    def toXML_strList(self, indent='', **kwargs):
 
         indent2 = indent + kwargs.get('incrementalIndent','  ')
-        xml = ['%s<%s>' % (indent, self.moniker)]
-        for item in self:
-            xml += item.toXMLList(indent2, **kwargs)
-        xml[-1] += '</%s>' % self.moniker
+        XML_strList = ['%s<%s>' % (indent, self.moniker)]
+        for item in self: XML_strList += item.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
 
-        return xml
+        return XML_strList
 
     @classmethod
-    def parseXMLNode(cls, element, xPath, linkData):
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append(element.tag)
-        CL = cls()
-        for child in element:
-            covClass = {
-                covariance.moniker: covariance
-            }.get( child.tag )
-            CL.add( covClass.parseXMLNode(child, xPath, linkData) )
+        xPath.append(node.tag)
+
+        listOfCovariances1 = cls()
+
+        for child in node:
+            covClass = { Covariance.moniker: Covariance }.get(child.tag)
+            listOfCovariances1.add(covClass.parseNodeUsingClass(child, xPath, linkData, **kwargs))
 
         xPath.pop()
-        return CL
+
+        return listOfCovariances1

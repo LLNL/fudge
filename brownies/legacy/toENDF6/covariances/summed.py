@@ -1,11 +1,11 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from fudge.covariances.summed import summedCovariance
+from fudge.covariances import summed as summedModule
 
 from .. import endfFormats as endfFormatsModule
 
@@ -28,4 +28,4 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
         for i in j] )
     return endf
 
-summedCovariance.toENDF6 = toENDF6
+summedModule.SummedCovariance.toENDF6 = toENDF6

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -21,9 +21,9 @@ def dismemberACE( args, NXS, JXS, XSS ) :
 
 # JINC Block.
     NE = 21         # Fixed number of incoherent scattering function points.
-    incoherentScatteringFunction = dismemberACE_miscModule.getData( 'incoherentScatteringFunction', XSS, JXS[2], NE )
-    fOut = dismemberACE_miscModule.openFile( 504, 'incoherentScatteringFunction' )
-    for value in incoherentScatteringFunction : fOut.write( '%20.12e\n' % value )
+    incoherentScatteringFactor = dismemberACE_miscModule.getData( 'incoherentScatteringFactor', XSS, JXS[2], NE )
+    fOut = dismemberACE_miscModule.openFile( 504, 'incoherentScatteringFactor' )
+    for value in incoherentScatteringFactor: fOut.write( '%20.12e\n' % value )
     fOut.close( )
 
     NE = 55         # Fixed number of coherent form factor points.

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -22,7 +22,8 @@
 #                                               (0 based) of the cross section dataset to plot.
 #
 import sys, os, glob
-from fudge.core.math.xData import axes, XYs
+from xData import axes as axesModule
+from xData import XYs1d as XYs1dModule
 from fudge.vis.gnuplot import fudgeMultiPlots
 
 if( len( sys.argv ) != 4 ) : raise Exception( 'need ENDL_file, temperature and dataset_number_within_ENDL_file' )
@@ -33,7 +34,7 @@ status = os.system( 'resolutionTestFile.py %s %s' % ( endlFile, sys.argv[2] ) )
 if( status != 0 ) : raise
 
 nDataset = int( sys.argv[3] )
-axes_ = axes.defaultAxes( labelsUnits = { 0 : ( 'energy_in', 'eV' ), 1 : ( 'crossSection' , 'b' ) } )
+axes_ = axesModule.defaultAxes( labelsUnits = { 0 : ( 'energy_in', 'eV' ), 1 : ( 'crossSection' , 'b' ) } )
 
 def getDataset( n, file ) :
 
@@ -54,11 +55,11 @@ def getDataset( n, file ) :
         else :
             ls = ls[j+1:]
 
-endlData = XYs.XYs( axes_, getDataset( nDataset, endlFile ), 1e-3 )
+endlData = XYs1dModule.XYs1d( axes_, getDataset( nDataset, endlFile ), 1e-3 )
 endlData.label = endlFileName
-lowData = XYs.XYs( axes_, getDataset( nDataset, glob.glob( '%s_T*eV_low' % endlFileName )[0] ), 1e-3 )
+lowData = XYs1dModule.XYs1d( axes_, getDataset( nDataset, glob.glob( '%s_T*eV_low' % endlFileName )[0] ), 1e-3 )
 lowData.label = 'low res.'
-highData = XYs.XYs( axes_, getDataset( nDataset, glob.glob( '%s_T*eV_high' % endlFileName )[0] ), 1e-3 )
+highData = XYs1dModule.XYs1d( axes_, getDataset( nDataset, glob.glob( '%s_T*eV_high' % endlFileName )[0] ), 1e-3 )
 highData.label = 'high res.'
 
 fudgeMultiPlots.multiPlot( [ endlData, lowData, highData ] )

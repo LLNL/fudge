@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -24,9 +24,3 @@ try:
     import numericalFunctions
 except ImportError:
     raise ImportError("Cannot import required modules! Have extensions been compiled?")
-
-from .core import *
-from . import vis
-
-# if we want to export a smaller set of files with 'from fudge import *':
-#__all__ = ['core',...]

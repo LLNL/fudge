@@ -45,7 +45,8 @@
 <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">subprocess</span>
 
 <span class="kn">import</span> <span class="nn">fudge</span> <span class="k">as</span> <span class="nn">fudgeModule</span>
-<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">subprocessing</span><span class="p">,</span> <span class="n">times</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">subprocessing</span> <span class="k">as</span> <span class="n">subprocessingModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">times</span> <span class="k">as</span> <span class="n">timesModule</span>
 <span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="kn">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
 
 <div class="viewcode-block" id="SnElasticUpScatter"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter">[docs]</a><span class="k">def</span> <span class="nf">SnElasticUpScatter</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
@@ -102,10 +103,10 @@
     <span class="n">fullFileName</span> <span class="o">=</span> <span class="s1">&#39;upscatter_</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">workFile</span> 
     <span class="n">infoFile</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.log&#39;</span> <span class="o">%</span> <span class="n">fullFileName</span>
     
-    <span class="n">t0</span> <span class="o">=</span> <span class="n">times</span><span class="o">.</span><span class="n">times</span><span class="p">(</span> <span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">timesModule</span><span class="o">.</span><span class="n">Times</span><span class="p">(</span> <span class="p">)</span>
     <span class="k">try</span> <span class="p">:</span>
         <span class="c1">#print(cmd)</span>
-        <span class="n">status</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocessing</span><span class="o">.</span><span class="n">executeCommand</span><span class="p">(</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">infoFile</span> <span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span> <span class="p">)</span>
+        <span class="n">status</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocessingModule</span><span class="o">.</span><span class="n">executeCommand</span><span class="p">(</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">infoFile</span> <span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span> <span class="p">)</span>
     <span class="k">except</span> <span class="p">:</span>
         <span class="n">fErr</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fullFileName</span> <span class="o">+</span> <span class="s2">&quot;.err&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span> <span class="p">)</span>
         <span class="n">fErr</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,30 +8,48 @@
 import sys
 import abc
 
-from xData import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
 
-from LUPY import times
+from LUPY import times as timesModule
 
 from . import suites as suitesModule
 from . import styles as stylesModule
 
-__metaclass__ = type
 
-class component( suitesModule.suite ) :
-
-    __metaclass__ = abc.ABCMeta
+class Component( suitesModule.Suite, abc.ABC ) :
 
     def __init__( self, allowedClasses ) :
 
-        suitesModule.suite.__init__( self, allowedClasses )
+        suitesModule.Suite.__init__( self, allowedClasses )
+
+    def __getitem__(self, key):
+        """Returns entry with key value *key*."""
+
+        instance = suitesModule.Suite.__getitem__(self, key)
+        if isinstance( instance, LazyParsingHelper):
+            instance = instance.parse()
+            self.replace(instance)
+
+        return instance
+
+    def __iter__(self):
+
+        hrefInstance = self.hrefInstance( )
+        if( hrefInstance is not None ) :
+            hrefInstance.__iter__( )
+        else :
+            n1 = len( self )
+            for i1 in range( n1 ) :
+                instance = self.__getitem__(i1)
+                yield instance
 
     @property
     def evaluated( self ) :
 
-        if not hasattr( self.getRootAncestor(), 'styles' ) :
+        if not hasattr( self.rootAncestor, 'styles' ) :
             return self[0]                  # A hack to deal with orphaned components that are not part of a full reactionSuite.
 
-        evaluated = self.getRootAncestor( ).styles.getEvaluatedStyle( )
+        evaluated = self.rootAncestor.styles.getEvaluatedStyle( )
         try :
             return( self[evaluated.label] )
         except :
@@ -62,9 +80,23 @@ class component( suitesModule.suite ) :
         for label in self.labels( ) :                   # Remove all but keeping form.
             if( label != keeperLabel ) : self.pop( label )
 
+    def diff(self, other, diffResults):
+        """
+        Check the first form of *self* with that of *other*.
+        """
+
+        if len(self) == 0 and len(other) == 0: return
+
+        if len(self) == 0:
+            diffResults.append('%s missing - 1' % self.moniker, '', other[0].toXLink(), '')
+        elif len(other) == 0:
+            diffResults.append('%s missing - 2' % self.moniker, '', self[0].toXLink(), '')
+        else:
+            self[0].diff( other[0], diffResults )
+
     def getStylesOfClass( self, cls ) :
 
-        styles = self.getRootAncestor( ).styles.getStylesOfClass( cls )
+        styles = self.rootAncestor.styles.getStylesOfClass( cls )
         formList = []
         for _form in self :
             for style in styles :
@@ -73,7 +105,7 @@ class component( suitesModule.suite ) :
 
     def getStyleOfClass( self, cls ) :
 
-        style = self.getRootAncestor( ).styles.getStyleOfClass( cls )
+        style = self.rootAncestor.styles.getStyleOfClass( cls )
         if( style is not None ) : style = self[style.label]
         return( style )
 
@@ -95,14 +127,14 @@ class component( suitesModule.suite ) :
 
         def styleFilter( style ) :
 
-            if( isinstance( style, ( stylesModule.MonteCarlo_cdf, stylesModule.griddedCrossSection ) ) ) : return( False )
+            if( isinstance( style, ( stylesModule.MonteCarlo_cdf, stylesModule.GriddedCrossSection ) ) ) : return( False )
             return( True )
 
         indent2 = indent + tempInfo['incrementalIndent']
         verbosity = tempInfo['verbosity']
         addToComponent = tempInfo.get( 'addToComponent', True )
 
-        if( verbosity > 3 ) : time = times.times( )
+        if( verbosity > 3 ) : time = timesModule.Times( )
 
         _form = style.findFormMatchingDerivedStyle( self, styleFilter )
         if( _form is None ) :
@@ -128,10 +160,10 @@ class component( suitesModule.suite ) :
 
     def toLinear( self, label = None, **kwargs ) :
 
-        if( not hasattr( self.getRootAncestor( ), 'styles' ) ) :            # An orphaned component that is not part of a full reactionSuite.
+        if( not hasattr( self.rootAncestor, 'styles' ) ) :            # An orphaned component that is not part of a full reactionSuite.
             linear = self[0]
         else :
-            linear = self[self.getRootAncestor( ).styles.preProcessingHeadInChainWithLabel( label ).label]
+            linear = self[self.rootAncestor.styles.preProcessingHeadInChainWithLabel( label ).label]
 
         return( linear.toPointwise_withLinearXYs( **kwargs ) )              # This is not correct. Need toLinear for each class and use it.
 
@@ -157,21 +189,83 @@ class component( suitesModule.suite ) :
         for form in self:
             formWarnings = form.check( info )
             if formWarnings:
-                warnings.append( warning.context('form "%s":' % form.label, formWarnings) )
+                warnings.append( warning.Context('form "%s":' % form.label, formWarnings) )
 
         return warnings
 
-class form( ancestryModule.ancestry ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
+
+        if node is None: return
+
+        xPath.append(node.tag)
+
+        lazyParsing = kwargs.get('lazyParsing', False)
+
+        for child in node:
+            parseClass = None
+            for class1 in self.allowedClasses:
+                tag = self.legacyMemberNameMapping.get(child.tag, child.tag)
+                if tag == class1.moniker:
+                    parseClass = class1
+                    break
+            if parseClass is None: raise TypeError("Invalid node '%s' encountered in suite '%s'" % (child.tag, self.moniker))
+
+            if lazyParsing:
+                self.add(LazyParsingHelper('label', child, parseClass, linkData, **kwargs), addLazyParsingHelper=True)
+            else:
+                self.add(parseClass.parseNodeUsingClass(child, xPath, linkData, **kwargs))
+
+        href = label = node.get('href')
+        if href is not None: self.set_href(href)
+
+        xPath.pop()
+
+class LazyParsingHelper(ancestryModule.Ancestry):
     """
-    This is the base class which is used as a form base class for channelData, reactionData and productData form classes.
+    This class stores the required data needed to parse a node. When parsing is needed, the *parse* method will returned the constructed instance.
     """
 
-    __metaclass__ = abc.ABCMeta
+    moniker = 'LazyParsingHelper'
+
+    def __init__(self, keyName, node, Class, linkData, **kwargs):
+        """Constructor for LazyParsingHelper class."""
+
+        self.__keyName = keyName
+        self.__keyValue = node.get(keyName)
+
+        self.node = node
+        self.Class = Class
+        self.linkData = linkData
+
+        if 'LazyParsingHelperCounter' not in linkData: linkData['LazyParsingHelperCounter'] = 0
+        linkData['LazyParsingHelperCounter'] += 1
+        self.kwargs = kwargs
+
+    @property
+    def keyName(self):
+        """Returns the *keyName* for *self*."""
+
+        return self.__keyName
+
+    @property
+    def keyValue(self):
+        """Returns the *keyValue* for *self*."""
+
+        return self.__keyValue
+
+    label = keyValue
+
+    def parse(self):
+        """Parses the stored node and returns the constructued instance."""
+
+        self.linkData['LazyParsingHelperCounter'] -= 1
+        return self.Class.parseNodeUsingClass(self.node, [], self.linkData, **self.kwargs)
+
+class Form( ancestryModule.AncestryIO, abc.ABC ) :
+    """
+    This is the base class which is used as a form base class for outputChannelData, reactionData and productData form classes.
+    """
 
     def getComponentsClass( self ) :
 
-        return( sys.modules[self.__module__].component )
-
-    def toXML( self, indent = '', **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
+        return( sys.modules[self.__module__].Component )

@@ -1,31 +1,31 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
 
 import os
 import string
 import abc
 
-from xData import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+
+from xData import enums as xDataEnumsModule
 from xData import link as linkModule
-from xData import formatVersion as formatVersionModule
 from PoPs.families import particle as particleModule
 
-class suite( ancestryModule.ancestry ) :
+class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
     """
     Base class for a class member that is list like. For example, the lists inside the class 
     reactionSuite ('reactions', 'sums', 'productions' and 'fissionComponents').
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__( self, allowedClasses, allow_href = False ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO_bare.__init__(self)
         self.__allowedClasses = [ cls for cls in allowedClasses ]
 
         self.__items = []
@@ -57,19 +57,22 @@ class suite( ancestryModule.ancestry ) :
         hrefInstance = self.hrefInstance( )
         if( hrefInstance is not None ) : return( hrefInstance[label] )
 
-        if( isinstance( label, int ) ) : return( self.__items[label] )
+        if isinstance(label, slice): return [self.__items[index] for index in range(*label.indices(len(self)))]
+        if isinstance(label, int): return self.__items[label]
+
         if( not( isinstance( label, str ) ) ) : raise TypeError( "label must be a string" )
         for item in self.__items :
             if( item.label == label ) : return( item )
 
         # requested style not found, but what about styles it derives from?
-        requestedStyle = self.getRootAncestor().styles[ label ]
-        parentStyle = requestedStyle.derivedFromStyle
+        if hasattr(self.rootAncestor, 'styles'):
+            requestedStyle = self.rootAncestor.styles[ label ]
+            parentStyle = requestedStyle.derivedFromStyle
 
-        while parentStyle is not None:
-            if parentStyle.label in self:
-                return self[parentStyle.label]
-            parentStyle = parentStyle.derivedFromStyle
+            while parentStyle is not None:
+                if parentStyle.label in self:
+                    return self[parentStyle.label]
+                parentStyle = parentStyle.derivedFromStyle
 
         raise KeyError( "item with label '%s' not found in suite '%s'" % ( label, self.moniker ) )
 
@@ -104,7 +107,7 @@ class suite( ancestryModule.ancestry ) :
 
         return( self.__allow_href )
 
-    def add( self, newItem, setAncestor = True ) :
+    def add(self, newItem, setAncestor = True, addLazyParsingHelper=False):
         """
         Adds newItem to the suite. If another item in the suite has the same label as newItem, a KeyError is raised.
         If newItem is not an allowed class, a TypeError is raised.
@@ -116,34 +119,40 @@ class suite( ancestryModule.ancestry ) :
         if( self.hrefInstance( ) is not None ) : raise AttributeError( 'href suite does not support modification of href instance.' )
 
         if( not( isinstance( newItem.label, str ) ) ) : raise IndexError( '''Item's label must be a string: %s''' % type( newItem.label ) )
-        found = False
-        for cls in self.__allowedClasses :
-            if( isinstance( newItem, cls ) ) :
-                found = True
-                break
-        if( not( found ) ) : raise TypeError( 'Invalid class "%s" for suite "%s"' % ( newItem.__class__, self.moniker ) )
+
+        allowedClasses = [ allowedClass for allowedClass in self.__allowedClasses ]
+        if hasattr(self, 'specialAllowedClasses'):                      # Currently, this happends in incompleteReactions.
+            for allowedClass in getattr(self, 'specialAllowedClasses'): allowedClasses.append(allowedClass)
+
+        if not addLazyParsingHelper:
+            found = False
+            for cls in allowedClasses :
+                if( isinstance( newItem, cls ) ) :
+                    found = True
+                    break
+            if not found: raise TypeError( 'Invalid class "%s" for suite "%s"' % ( newItem.__class__, self.moniker ) )
 
         for i1, item in enumerate( self.__items ) :
             if( item.label == newItem.label ) : raise KeyError( 'item with label = "%s" already present in suite' % item.label )
 
-        if( setAncestor ) : newItem.setAncestor( self, attribute = 'label' )
+        if( setAncestor ) : newItem.setAncestor(self)
         self.__items.append( newItem )
 
     def amendForPatch( self, fromLabel, toLabel ) :
 
         if( self.hrefInstance( ) is None ) :
-            for item in self.__items : item.amendForPatch( fromLabel, toLabel )
+            for item in self: item.amendForPatch(fromLabel, toLabel)
 
     def convertUnits( self, unitMap ) :
         "See documentation for reactionSuite.convertUnits."
 
         if( self.hrefInstance( ) is None ) :
-            for index, item in enumerate( self.__items ) : item.convertUnits( unitMap )
+            for index, item in enumerate(self): item.convertUnits(unitMap)
 
     def checkAncestry( self, verbose = 0, level = 0 ) :
 
         if( self.hrefInstance( ) is None ) :
-            for item in self.__items : item.checkAncestry( verbose = verbose, level = level )
+            for item in self: item.checkAncestry(verbose = verbose, level = level)
 
     def diff( self, other, diffResults ) :
 
@@ -188,7 +197,22 @@ class suite( ancestryModule.ancestry ) :
             if( hasattr( item, 'findLinks' ) ) :
                 getattr( item, 'findLinks' )( links )
             else :
-                if( isinstance( item, ( linkModule.link, linkModule.link2 ) ) ) : links.append( [ item, item.link, item.path ] )
+                if( isinstance( item, ( linkModule.Link, linkModule.Link2 ) ) ) : links.append( [ item, item.link, item.path ] )
+
+    def fixDomains(self, labels, energyMin, energyMax):
+        """
+        Class **fixDomains** for each entry of *self* if it has a **fixDomains** method.
+        """
+
+        numberOfFixes = 0
+        for entry in self:
+            if entry.label in labels:
+                if hasattr(entry, 'fixDomains'):
+                    numberOfFixes += entry.fixDomains(energyMin, energyMax, xDataEnumsModule.FixDomain.both)
+                else:
+                    print('WARNING: type "%s" does not have a "fixDomains" method.' % type(entry))
+
+        return numberOfFixes
 
     def hrefInstance( self ) :
 
@@ -226,7 +250,7 @@ class suite( ancestryModule.ancestry ) :
     def cullStyles( self, styleList ) :
 
         if( self.hrefInstance( ) is None ) :
-            for item in self.__items : item.cullStyles( styleList )
+            for item in self: item.cullStyles(styleList)
 
     def labels( self ) :
         """
@@ -285,7 +309,7 @@ class suite( ancestryModule.ancestry ) :
             if( item.label == newItem.label ) :
                 del self.__items[i1]
                 self.__items.insert( i1, newItem )
-                newItem.setAncestor( self, attribute = 'label' )
+                newItem.setAncestor(self)
                 return
 
         raise KeyError( 'item with label = "%s" not present in suite' % newItem.label )
@@ -300,11 +324,7 @@ class suite( ancestryModule.ancestry ) :
 
         self.__items = []
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         if( self.__href is not None ) : return( [ '%s<%s href="%s"/>' % ( indent, self.moniker, self.__href ) ] )
 
@@ -313,7 +333,7 @@ class suite( ancestryModule.ancestry ) :
         if( len( self ) == 0 ) : return( [] )
         moniker = self.monikerByFormat.get(kwargs.get('formatVersion'), self.moniker)
         xmlString = [ '%s<%s>' % ( indent, moniker ) ]
-        for item in self.__items : xmlString += item.toXMLList( indent2, **kwargs )
+        for item in self: xmlString += item.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % moniker
 
         return( xmlString )
@@ -354,62 +374,40 @@ class suite( ancestryModule.ancestry ) :
             item.label = label__ + suffix
         return( item )
 
-    def saveToOpenedFile( self, fOut, **kwargs ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
 
-        xmlString = self.toXMLList( **kwargs )
-        fOut.write( '\n'.join( xmlString ) )
-        fOut.write( '\n' )
+        xPath.append(node.tag)
 
-    def saveToFile( self, fileName, **kwargs ) :
+        allowedClasses = {}
+        for allowedClass in self.allowedClasses: allowedClasses[allowedClass.moniker] = allowedClass
+
+        nodesNotParsed = []
+        for child in node:
+            cls = allowedClasses.get(child.tag)
+            if cls is None:
+                cls = allowedClasses.get(self.legacyMemberNameMapping[child.tag])
+                if cls is None:
+                    nodesNotParsed.append(tag)
+                    continue
+            self.add(cls.parseNodeUsingClass(child, xPath, linkData, **kwargs))
+
+        if len(nodesNotParsed) > 0: raise Exception("Encountered unexpected child nodes '%s'!" % ', '.join(nodesNotParsed))
+
+        xPath.pop() 
+
+class ExclusiveSuite(Suite):
+
+    def fixDomains(self, labels, energyMin, energyMax):
         """
-        Writes to the specified file.
-        """
-
-        dirname = os.path.dirname( fileName )
-        if( ( len( dirname ) > 0 ) and not( os.path.exists( dirname ) ) ) : os.makedirs( dirname )
-        with open( fileName, "w" ) as fout :
-            fout.write( '<?xml version="1.0" encoding="UTF-8"?>\n' )
-            self.saveToOpenedFile( fout, **kwargs )
-
-    def parseXMLNode( self, element, xPath, linkData ):
-
-        if( element is None ) : return( )
-
-        xPath.append( element.tag )
-        for child in element:
-            parseClass = None
-            for _class in self.__allowedClasses :
-                tag = self.legacyMemberNameMapping.get( child.tag, child.tag )
-                if( tag == _class.moniker ) :
-                    parseClass = _class
-                    break
-            if parseClass is None:
-                raise TypeError( "Invalid element '%s' encountered in suite '%s'" % (child.tag, self.moniker) )
-
-            self.add( parseClass.parseXMLNode( child, xPath, linkData ) )
-
-        href = label = element.get( 'href' )
-        if( href is not None ) : self.set_href( href )
-
-        xPath.pop()
-
-    @classmethod
-    def readXML( cls, fileName ) :
-        """
-        Reads the file as a suite.
+        Calls the **fixDomains** for each entry in self.
         """
 
-        from xml.etree import cElementTree
-        from LUPY.xmlNode import xmlNode
+        numberOfFixes = 0
+        for entry in self: numberOfFixes += entry.fixDomains(labels, energyMin, energyMax)
 
-        element = cElementTree.parse( fileName ).getroot( )
-        element = xmlNode( element, xmlNode.etree )
-        self = cls( )
-        self.parseXMLNode( element, [], {} )
+        return numberOfFixes
 
-        return( self )
-
-class externalFiles( suite ) :
+class ExternalFiles(ExclusiveSuite):
 
     moniker = 'externalFiles'
 
@@ -417,9 +415,9 @@ class externalFiles( suite ) :
 
         from fudge import externalFile as externalFileModule
 
-        suite.__init__( self, [ externalFileModule.externalFile ] )
+        ExclusiveSuite.__init__( self, [ externalFileModule.ExternalFile ] )
 
-class reactions( suite ) :
+class Reactions(ExclusiveSuite):
 
     moniker = 'reactions'
 
@@ -427,12 +425,12 @@ class reactions( suite ) :
 
         from fudge.reactions import reaction as reactionModule
 
-        suite.__init__( self, [ reactionModule.reaction ] )
+        ExclusiveSuite.__init__( self, [ reactionModule.Reaction ] )
 
     def asSortedList( self, PoPs ) :
         """Returns a list of the reactions sorted. This method uses a reaction's reactionProducts method to determine sorting order."""
 
-        class Particle( particleModule.particle ) :
+        class Particle( particleModule.Particle ) :
 
             moniker = 'dummy'
             familyOrder = 999
@@ -491,7 +489,7 @@ class reactions( suite ) :
                 if( reaction1.reactionProducts( ).cullPhotons( ) == reaction2.reactionProducts( ).cullPhotons( ) ) :
                     compare = '='
                 else :
-                    dummy = reactions( )
+                    dummy = Reactions( )
                     dummy.add( reaction1, setAncestor = False )
                     dummy.add( reaction2, setAncestor = False )
                     dummy = dummy.asSortedList( twoPoPs )
@@ -524,7 +522,7 @@ class reactions( suite ) :
         sortedReactions = self.asSortedList( PoPs )
         return( [ reaction.reactionProducts( ) for reaction in sortedReactions ] )
 
-class orphanProducts( suite ) :
+class OrphanProducts(ExclusiveSuite):
 
     moniker = 'orphanProducts'
 
@@ -532,31 +530,31 @@ class orphanProducts( suite ) :
 
         from fudge.reactions import orphanProduct as orphanProductModule
 
-        suite.__init__( self, [ orphanProductModule.orphanProduct ] )
+        ExclusiveSuite.__init__( self, [ orphanProductModule.OrphanProduct ] )
 
-class crossSectionSums( suite ) :
+class CrossSectionSums(ExclusiveSuite):
 
     moniker = 'crossSectionSums'
-    monikerByFormat = { formatVersionModule.version_1_10: 'crossSections' }
+    monikerByFormat = { GNDS_formatVersionModule.version_1_10: 'crossSections', GNDS_formatVersionModule.version_2_0_LLNL_3 : 'crossSections' }
 
     def __init__( self ) :
 
         from fudge import sums as sumsModule
 
-        suite.__init__( self, [sumsModule.crossSectionSum] )
+        ExclusiveSuite.__init__( self, [sumsModule.CrossSectionSum] )
 
-class multiplicitySums( suite ) :
+class MultiplicitySums(ExclusiveSuite):
 
     moniker = 'multiplicitySums'
-    monikerByFormat = { formatVersionModule.version_1_10: 'multiplicities' }
+    monikerByFormat = { GNDS_formatVersionModule.version_1_10: 'multiplicities', GNDS_formatVersionModule.version_2_0_LLNL_3 : 'multiplicities' }
 
     def __init__( self ) :
 
         from fudge import sums as sumsModule
 
-        suite.__init__( self, [sumsModule.multiplicitySum] )
+        ExclusiveSuite.__init__( self, [sumsModule.MultiplicitySum] )
 
-class productions( suite ) :
+class Productions(ExclusiveSuite):
 
     moniker = 'productions'
 
@@ -564,9 +562,9 @@ class productions( suite ) :
 
         from fudge.reactions import production as productionModule
 
-        suite.__init__( self, [productionModule.production] )
+        ExclusiveSuite.__init__( self, [productionModule.Production] )
 
-class incompleteReactions( suite ) :
+class IncompleteReactions(ExclusiveSuite):
 
     moniker = 'incompleteReactions'
 
@@ -575,9 +573,10 @@ class incompleteReactions( suite ) :
         from .reactions import reaction as reactionModule
         from .reactions import incompleteReaction as incompleteReactionModule
 
-        suite.__init__( self, [ incompleteReactionModule.incompleteReaction, reactionModule.reaction ] )    # Allow reaction as it is needed at times.
+        ExclusiveSuite.__init__(self, [incompleteReactionModule.IncompleteReaction])
+        self.specialAllowedClasses = (reactionModule.Reaction, )                            # Allow reaction as it is needed at times but do not remember why.
 
-class fissionComponents( suite ) :
+class FissionComponents(ExclusiveSuite):
 
     moniker = 'fissionComponents'
 
@@ -585,9 +584,9 @@ class fissionComponents( suite ) :
 
         from fudge.reactions import fissionComponent as fissionComponentModule
 
-        suite.__init__( self, [fissionComponentModule.fissionComponent] )
+        ExclusiveSuite.__init__( self, [fissionComponentModule.FissionComponent] )
 
-class applicationData( suite ) :
+class ApplicationData(Suite):
 
     moniker = 'applicationData'
 
@@ -595,4 +594,4 @@ class applicationData( suite ) :
 
         from fudge import institution as institutionModule
 
-        suite.__init__( self, [ institutionModule.institution, institutionModule.UnknownInstitution ] )
+        Suite.__init__( self, [ institutionModule.Institution, institutionModule.UnknownInstitution ] )

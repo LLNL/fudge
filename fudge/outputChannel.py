@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -29,30 +29,24 @@ Output and decay channels can be further divided into twoBody or NBody channels.
                     differential data for each product must be given.
 """
 
-__metaclass__ = type
-
 from PoPs import IDs as IDsPoPsModule
 
-from xData import ancestry as ancestryModule
-from xData import standards as standardsModule
+from LUPY import ancestry as ancestryModule
 
-from fudge import reactionProducts as reactionProductsModule
-from .channelData import Q as QModule
+from xData import enums as xDataEnumsModule
+from xData import vector as vectorModule
+from xData import matrix as matrixModule
+from xData import productArray as productArrayModule
 
-class Genre :
+from . import enums as enumsModule
+from . import reactionProducts as reactionProductsModule
+from .outputChannelData import Q as QModule
 
-    twoBody = 'twoBody'
-    NBody = 'NBody'
-    production = 'production'
-    sumOfRemainingOutputChannels = 'sumOfRemainingOutputChannels'
-
-    allowed = ( twoBody, NBody, production, sumOfRemainingOutputChannels )
-
-class processes :
+class Processes :
 
     continuum = 'continuum'
 
-class outputChannel( ancestryModule.ancestry ) :
+class OutputChannel( ancestryModule.AncestryIO ) :
     """This is the GNDS outputChannel which is a Q value and a list of products (i.e., product objects)."""
 
     moniker = 'outputChannel'
@@ -62,20 +56,20 @@ class outputChannel( ancestryModule.ancestry ) :
         """Constructor for outputChannel."""
 
         from . import product as productModule
-        from .channelData.fissionFragmentData import fissionFragmentData as fissionFragmentDataModule
+        from .outputChannelData.fissionFragmentData import fissionFragmentData as fissionFragmentDataModule
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
-        self.__genre = genre                            # Need to check for valid genre.
+        self.genre = genre                              # Need to check for valid genre.
         self.__process = process
 
-        self.__Q = QModule.component( )
+        self.__Q = QModule.Component( )
         self.__Q.setAncestor( self )
 
-        self.__products = productModule.products( )
+        self.__products = productModule.Products()
         self.__products.setAncestor( self )
 
-        self.__fissionFragmentData = fissionFragmentDataModule.fissionFragmentData( )
+        self.__fissionFragmentData = fissionFragmentDataModule.FissionFragmentData( )
         self.__fissionFragmentData.setAncestor( self )
 
     def findLinks( self, links ) :
@@ -136,7 +130,7 @@ class outputChannel( ancestryModule.ancestry ) :
     @genre.setter
     def genre( self, value ) :
 
-        self.__genre = value
+        self.__genre = enumsModule.Genre.checkEnumOrString(value)
 
     @property
     def process( self ) :
@@ -174,7 +168,7 @@ class outputChannel( ancestryModule.ancestry ) :
         productIDs = []
         productIDs1 = {}
         for product in self.products :
-            pid = product.id
+            pid = product.pid
             if( pid in aliases ) : pid = aliases[pid].pid             # Handle old GNDS files which used meta-stable ids instead of nuclear level ids.
             if( pid not in productIDs ) : productIDs.append( pid )
             if( pid not in productIDs1 ) : productIDs1[pid] = []
@@ -183,7 +177,7 @@ class outputChannel( ancestryModule.ancestry ) :
         aliases = other.rootAncestor.PoPs.aliases
         productIDs2 = {}
         for product in other.products : 
-            pid = product.id
+            pid = product.pid
             if( pid in aliases ) : pid = aliases[pid].pid             # Handle old GNDS files which used meta-stable ids instead of nuclear level ids.
             if( pid not in productIDs ) : productIDs.append( pid )
             if( pid not in productIDs2 ) : productIDs2[pid] = []
@@ -195,12 +189,29 @@ class outputChannel( ancestryModule.ancestry ) :
             elif( productID not in productIDs2 ) :      # This should only happen for photons and for reaction 'sumOfRemainingOutputChannels'.
                 diffResults.append( 'Product missing from channel - 2', 'product id = "%s"' % productID, self.toXLink( ), other.toXLink( ) )
             else :
-                if( len( productIDs1[productID] ) != len( productIDs2[productID] ) ) :
-                    diffResults.append( 'More than one product with same id', 'product id = "%s"' % productID, self.toXLink( ), other.toXLink( ) )
+                if len(productIDs1[productID]) != len(productIDs2[productID]):
+                    isspecified1 = True
+                    for i1, product in enumerate(productIDs1[productID]):
+                        if not product.isSpecified():
+                            isspecified1 = False
+
+                    isspecified2 = True
+                    for i2, product in enumerate(productIDs2[productID]):
+                        if not product.isSpecified():
+                            isspecified2 = False
+
+                    if isspecified1 and isspecified2:
+                        diffResults.append('More than one product with same id', 'product id = "%s"' % productID, self.toXLink(), other.toXLink())
+                    elif isspecified1:
+                        diffResults.append('More than one product with same id and unspecified - 2', 'product id = "%s"' % productID, self.toXLink(), other.toXLink())
+                    elif isspecified2:
+                        diffResults.append('More than one product with same id and unspecified - 1', 'product id = "%s"' % productID, self.toXLink(), other.toXLink())
+                    else:
+                        diffResults.append('More than one product with same id and unspecified - both', 'product id = "%s"' % productID, self.toXLink(), other.toXLink())
                 else :
-                    for i1, product1 in enumerate( productIDs1[productID] ) :
+                    for i1, product1 in enumerate(productIDs1[productID]):
                         product2 = productIDs2[productID][i1]
-                        product1.diff( product2, diffResults )
+                        product1.diff(product2, diffResults)
 
     def getFinalProductList( self ) :
         """Returns a list of [ multiplicity, name ] in order for the final products of this channel."""
@@ -212,7 +223,7 @@ class outputChannel( ancestryModule.ancestry ) :
                     multiplicity = product.multiplicity.getConstant( )
                 except :
                     multiplicity = "(?)"                        # ????? This needs work.
-                mP += [ [ multiplicity, product.id ] ]
+                mP += [ [ multiplicity, product.pid ] ]
             else :
                 mP += product.outputChannel.getFinalProductList( )
         return( mP )
@@ -220,7 +231,7 @@ class outputChannel( ancestryModule.ancestry ) :
     def getProductsWithName( self, name ) :
         """Returns a list of all the channel's products with given name ('gamma','n', etc)."""
 
-        return [ prod for prod in self if prod.id == name ]
+        return [ prod for prod in self if prod.pid == name ]
 
     def getProductWithName( self, name ) :
         """
@@ -236,6 +247,26 @@ class outputChannel( ancestryModule.ancestry ) :
         self.__Q.cullStyles( styleList )
         self.__products.cullStyles( styleList )
         self.__fissionFragmentData.cullStyles( styleList )
+
+    def fixDomains(self, labels, energyMin, energyMax):
+        """
+        Calls the **fixDomains** for the *Q*, *products* and *fissionFragmentDat* members.
+        """
+
+        numberOfFixes  = self.__Q.fixDomains(labels, energyMin, energyMax)
+        numberOfFixes += self.__products.fixDomains(labels, energyMin, energyMax)
+        numberOfFixes += self.__fissionFragmentData.fixDomains(labels, energyMin, energyMax)
+
+        return numberOfFixes
+
+    def listOfProducts(self):
+        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for *self*."""
+
+        products = set()
+        for product in self.__products: products.update(product.listOfProducts())
+        products.update(self.__fissionFragmentData.listOfProducts())
+
+        return products
 
     def reactionProducts( self, _reactionProducts ) :
 
@@ -256,7 +287,7 @@ class outputChannel( ancestryModule.ancestry ) :
             Q = self.__Q.thresholdQAs( unit )
         else :                      # Calculate from particle masses.
             massUnit = unit + '/c**2'
-            reactionSuite = self.getRootAncestor( )
+            reactionSuite = self.rootAncestor
             projectile = reactionSuite.PoPs[reactionSuite.projectile]
             targetID = reactionSuite.target
             if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs[targetID].pid
@@ -266,7 +297,7 @@ class outputChannel( ancestryModule.ancestry ) :
                 try :   
                     Q -= product.getMass(massUnit) * product.multiplicity.getConstant()
                 except :
-                    if( product.id == IDsPoPsModule.photon ) : continue
+                    if( product.pid == IDsPoPsModule.photon ) : continue
                     raise ValueError( "Non-constant Q-value must be explicitly listed in GNDS!" )
         if( final ) :
             for product in self.__products : Q += product.thresholdQAs( unit, final = final )
@@ -291,7 +322,7 @@ class outputChannel( ancestryModule.ancestry ) :
         self.__fissionFragmentData.calculateAverageProductData( style, indent, **kwargs )
 
     def partialProductionIntegral( self, reaction_suite, productID, energyIn, energyOut = None, muOut = None, phiOut = None, 
-                frame = standardsModule.frames.labToken, LegendreOrder = 0, **kwargs ) :
+                frame = xDataEnumsModule.Frame.lab, LegendreOrder = 0, **kwargs ) :
 
         partialProductionIntegralSum = 0.0
         for product in self.__products :
@@ -318,11 +349,119 @@ class outputChannel( ancestryModule.ancestry ) :
 
         for productIndex, product in enumerate( self ) :
             tempInfo['productIndex'] = str( productIndex )
-            tempInfo['productName'] = product.id
+            tempInfo['productName'] = product.pid
             tempInfo['productLabel'] = product.label
             product.processMultiGroup( style, tempInfo, indent2 )
 
         self.__fissionFragmentData.processMultiGroup( style, tempInfo, indent2 )
+
+    def multiGroupQ(self, multiGroupSettings, temperatureInfo, includeFinalProducts):
+        """
+        Returns the sum of the multi-group, Q for the requested label for the this output channel. This is a cross section weighted Q.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param includeFinalProducts: Boolean value indicating whether to include the contriibution from the final fission product data.
+        """
+
+        Q = multiGroupSettings.formAsVector(self.__Q, temperatureInfo)
+
+        if includeFinalProducts:
+            for product in self.products:
+                Q += product.multiGroupQ(multiGroupSettings, temperatureInfo, includeFinalProducts)
+
+        Q += self.__fissionFragmentData.multiGroupQ(multiGroupSettings, temperatureInfo)
+
+        return Q
+
+    def multiGroupMultiplicity(self, multiGroupSettings, temperatureInfo, productID):
+        """
+        Returns the sum of the multi-group multiplicity for the requested label for the request product of this output channel. This is a cross section weighted multiplicity.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param productID: Particle id for the requested product.
+        """
+
+        multiplicity = vectorModule.Vector()
+        for product in self.products:
+            multiplicity += product.multiGroupMultiplicity(multiGroupSettings, temperatureInfo, productID)
+
+        multiplicity += self.fissionFragmentData.multiGroupMultiplicity(multiGroupSettings, temperatureInfo, productID)
+
+        return multiplicity
+
+    def multiGroupAverageEnergy(self, multiGroupSettings, temperatureInfo, productID):
+        """
+        Returns the sum of the multi-group, average energy for the requested label for the requested product. This is a cross section weighted average energy.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param productID: Particle id for the requested product.
+        """
+
+        averageEnergy = vectorModule.Vector()
+        for product in self.products:
+            averageEnergy += product.multiGroupAverageEnergy(multiGroupSettings, temperatureInfo, productID)
+
+        averageEnergy += self.fissionFragmentData.multiGroupAverageEnergy(multiGroupSettings, temperatureInfo, productID)
+
+        return averageEnergy
+
+    def multiGroupAverageMomentum(self, multiGroupSettings, temperatureInfo, productID):
+        """
+        Returns the sum of the multi-group, average momentum for the requested label for the requested product. This is a cross section weighted average momentum.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param productID: Particle id for the requested product.
+        """
+
+        averageMomentum = vectorModule.Vector()
+        for product in self.products:
+            averageMomentum += product.multiGroupAverageMomentum(multiGroupSettings, temperatureInfo, productID)
+
+        averageMomentum += self.fissionFragmentData.multiGroupAverageMomentum(multiGroupSettings, temperatureInfo, productID)
+
+        return averageMomentum
+
+    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particles, productID, legendreOrder):
+        """
+        Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particles: The list of particles to be transported.
+        :param productID: Particle id for the requested product.
+        :param legendreOrder: Requested Legendre order.
+        """
+
+        productMatrix = matrixModule.Matrix()
+        for product in self.products:
+            productMatrix += product.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, legendreOrder)
+
+        productMatrix += self.fissionFragmentData.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, legendreOrder)
+
+        return productMatrix
+
+    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particles, productID):
+        """
+        Returns the full multi-group, total product array for the requested label for the requested product id.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particles: The list of particles to be transported.
+        :param productID: Particle id for the requested product.
+        """
+
+        productArray = productArrayModule.ProductArray()
+
+        for product in self.products:
+            productArray += product.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+
+        productArray += self.fissionFragmentData.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+
+        return productArray
 
     def QToPointwiseLinear( self, final = True, **kwargs ) :
 
@@ -332,22 +471,23 @@ class outputChannel( ancestryModule.ancestry ) :
                 if( product.outputChannel is not None ) : linearQ += product.outputChannel.Q.toPointwise_withLinearXYs( final = final, **kwargs )
         return( linearQ )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         qualifiers = ''
         if( self.process is not None ) : qualifiers += ' process="%s"' % str( self.process )
         xmlStringList = [ '%s<%s genre="%s"%s>' % ( indent, self.moniker, self.genre, qualifiers ) ]
-        xmlStringList += self.__Q.toXMLList( indent2, **kwargs )
-        xmlStringList += self.__products.toXMLList( indent2, **kwargs )
-        xmlStringList += self.__fissionFragmentData.toXMLList( indent2, **kwargs )
+        xmlStringList += self.__Q.toXML_strList( indent2, **kwargs )
+        xmlStringList += self.__products.toXML_strList( indent2, **kwargs )
+        xmlStringList += self.__fissionFragmentData.toXML_strList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
     def channelParticlesToString( self, prefix = "", suffix = "", MT = 0 ) :
 
-        if( self.genre == Genre.sumOfRemainingOutputChannels ) : return( 'sumOfRemainingOutputChannels' )
+        if self.genre == enumsModule.Genre.sumOfRemainingOutputChannels:
+            return str(enumsModule.Genre.sumOfRemainingOutputChannels)
 
         return( prefix + self.toString( simpleString = True ) + suffix )
 
@@ -375,14 +515,15 @@ class outputChannel( ancestryModule.ancestry ) :
         """Returns a string representation of self. If simpleString is True, the string contains only the initial
         products, and not any decay products."""
 
-        if( self.genre == Genre.sumOfRemainingOutputChannels ) :
-            if( self.process is None ) : return( 'sumOfRemainingOutputChannels' )
+        if self.genre == enumsModule.Genre.sumOfRemainingOutputChannels:
+            if self.process is None:
+                return str(enumsModule.Genre.sumOfRemainingOutputChannels)
 
         s = ''
         p = ''
         gammaString = None
         for product in self.__products :
-            if( product.id == IDsPoPsModule.photon ) :
+            if( product.pid == IDsPoPsModule.photon ) :
                 gammaStringP = product.toString( simpleString = True, exposeGammaMultiplicity = exposeGammaMultiplicity )
                 if( gammaString is None ) : gammaString = gammaStringP
                 if( 'energyDependent' in gammaStringP ) : gammaString = gammaStringP
@@ -393,38 +534,31 @@ class outputChannel( ancestryModule.ancestry ) :
         if( self.process is not None ) : s += " [%s]" % self.process
         return( indent + s )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
 
-        from . import product as productModule
-        from .channelData.fissionFragmentData import fissionFragmentData as fissionFragmentDataModule
+        xPath.append(node.tag)
 
-        xPath.append( element.tag )
+        self.genre = node.get('genre')
+        self.process = node.get('process')
+        self.fissionGenre = node.get('fissionGenre', enumsModule.FissionGenre.none)      # This is needed as some legacy files have the fissionGenre on the outputChannel 
+                                                                # instead of the reaction. Removing this will also require a change to parseNode in reactions/base.py.
 
-        self.genre = element.get( 'genre' )
-        self.process = element.get( 'process' )
+        childNodesNotParse, membersNotFoundInNode = self.parseAncestryMembers(node, xPath, linkData, **kwargs)
 
-        for child in element :
-            if( child.tag == QModule.component.moniker ) :
-                Q = QModule.parseXMLNode( child, xPath, linkData )
-                for QForm in Q : self.__Q.add( QForm )
-            elif( child.tag == productModule.products.moniker ) :
-                self.__products.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == fissionFragmentDataModule.fissionFragmentData.moniker ) :
-                self.fissionFragmentData.parseXMLNode( child, xPath, linkData )
-            else :
-                raise ValueError( "Parsing %s not yet supported" % child.tag )
+        if len(childNodesNotParse) != 0: raise Exception("Encountered unexpected child nodes '%s' in %s!" % (self.moniker, ', '.join(list(childNodesNotParse.keys()))))
 
         xPath.pop( )
 
-def parseXMLNode( element, xPath, linkData ) :
-    """Translate '<outputChannel>' from xml."""
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """Translate '<outputChannel>' from xml."""
 
-    xPath.append( element.tag )
+        xPath.append( element.tag )
 
-    _outputChannel = outputChannel( Genre.NBody )
+        outputChannel = cls(enumsModule.Genre.NBody)
 
-    xPath.pop( )
+        xPath.pop( )
 
-    _outputChannel.parseXMLNode( element, xPath, linkData )
+        outputChannel.parseNode(element, xPath, linkData, **kwargs)
 
-    return( _outputChannel )
+        return outputChannel

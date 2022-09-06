@@ -11,18 +11,18 @@ Subpackages
 Submodules
 ----------
 
-fudge.productData.energyDeposition module
------------------------------------------
+fudge.productData.averageProductEnergy module
+---------------------------------------------
 
-.. automodule:: fudge.productData.energyDeposition
+.. automodule:: fudge.productData.averageProductEnergy
     :members:
     :undoc-members:
     :show-inheritance:
 
-fudge.productData.momentumDeposition module
--------------------------------------------
+fudge.productData.averageProductMomentum module
+-----------------------------------------------
 
-.. automodule:: fudge.productData.momentumDeposition
+.. automodule:: fudge.productData.averageProductMomentum
     :members:
     :undoc-members:
     :show-inheritance:

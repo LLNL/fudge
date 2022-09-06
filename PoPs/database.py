@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -49,13 +49,14 @@ for one or more particles).
 
 import os
 
-from xData import formatVersion as formatVersionModule
-from xData import ancestry as ancestryModule
-from xData.Documentation import documentation as documentationModule
+from LUPY import ancestry as ancestryModule
 
-from .groups import chemicalElements as chemicalElementsModule
-from .groups import chemicalElement as chemicalElementModule
-from .groups import isotope as isotopeModule
+from xData.Documentation import documentation as documentationModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+
+from .chemicalElements import chemicalElements as chemicalElementsModule
+from .chemicalElements import chemicalElement as chemicalElementModule
+from .chemicalElements import isotope as isotopeModule
 from .families import particle as particleModule
 from .families import gaugeBoson as gaugeBosonModule
 from .families import lepton as leptonModule
@@ -66,22 +67,20 @@ from .families import unorthodox as unorthodoxModule
 
 from . import styles as stylesModule
 from . import alias as aliasModule
-from . import parentDatabase as parentDatabaseModule
 
-class database( ancestryModule.ancestry ) :
+class Database(ancestryModule.AncestryIO):
 
     moniker = 'PoPs'
     ancestryMembers = ( 'styles', 'documentation', 'aliases', 'gaugeBosons', 'leptons', 'baryons', 'chemicalElements', 'unorthodoxes' )
 
-    def __init__( self, name, version, formatVersion = formatVersionModule.default, parentDatabase = None ) :
+    def __init__( self, name, version, formatVersion = GNDS_formatVersionModule.default ) :
         """
         :param name: string naming the database
         :param version: database version
         :param formatVersion: the GNDS format the data are represented in.
-        :param parentDatabase: optional link to a parent PoPs database
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__format = formatVersion
 
@@ -89,31 +88,29 @@ class database( ancestryModule.ancestry ) :
 
         self.version = version
 
-        self.__styles = stylesModule.styles( )
+        self.__styles = stylesModule.Styles( )
         self.__styles.setAncestor( self )
 
         self.__documentation = documentationModule.Documentation( )
         self.__documentation.setAncestor( self )
 
-        self.__aliases = aliasModule.suite( )
+        self.__aliases = aliasModule.Suite( )
         self.__aliases.setAncestor( self )
 
-        self.__gaugeBosons = gaugeBosonModule.suite( )
+        self.__gaugeBosons = gaugeBosonModule.Suite( )
         self.__gaugeBosons.setAncestor( self )
 
-        self.__leptons = leptonModule.suite( )
+        self.__leptons = leptonModule.Suite( )
         self.__leptons.setAncestor( self )
 
-        self.__baryons = baryonModule.suite( )
+        self.__baryons = baryonModule.Suite( )
         self.__baryons.setAncestor( self )
 
-        self.__chemicalElements = chemicalElementsModule.chemicalElements( )
+        self.__chemicalElements = chemicalElementsModule.ChemicalElements( )
         self.__chemicalElements.setAncestor( self )
 
-        self.__unorthodoxes = unorthodoxModule.suite( )
+        self.__unorthodoxes = unorthodoxModule.Suite( )
         self.__unorthodoxes.setAncestor( self )
-
-        self.__parentDatabase = parentDatabase
 
     def __contains__( self, key ) :
 
@@ -123,12 +120,15 @@ class database( ancestryModule.ancestry ) :
         if( key in self.__baryons ) : return( True )
         if( key in self.__chemicalElements ) : return( True )
         if( key in self.__unorthodoxes ) : return( True )
-        if( self.parentDatabase is not None ) : return( key in self.parentDatabase.link )
+        parentDB = self.parentDatabase()
+        if parentDB is not None:
+            return key in parentDB
         return( False )
 
     def __getitem__( self, key ) :
         """
         :param key: id or symbol of a particle or particle group
+
         :return: particle with given key. KeyError is raised if the key is not found.
         """
 
@@ -141,7 +141,7 @@ class database( ancestryModule.ancestry ) :
         if( key in self.__aliases ) :
             alias = self.__aliases[key]
             item = self.__getitem( alias.pid, level + 1 )
-            if( level == 0 ) : item = item.alias( key, item )
+            if( level == 0 ) : item = item.alias(key, item)
             return( item )
         for suite in [ self.__gaugeBosons, self.__leptons, self.__baryons, self.__chemicalElements, self.__unorthodoxes ] :
             try :
@@ -150,8 +150,9 @@ class database( ancestryModule.ancestry ) :
                 continue
             except :
                 raise
-        if( self.parentDatabase is not None ) :
-            return( self.parentDatabase.link[ key ] )
+        parentDB = self.parentDatabase()
+        if parentDB is not None:
+            return parentDB[key]
         raise KeyError( 'id = "%s" not found' % key )
 
     def __iter__( self ) :
@@ -170,8 +171,9 @@ class database( ancestryModule.ancestry ) :
                     yield nuclide.nucleus
         for item in self.__unorthodoxes : yield item
         for item in self.__aliases : yield item
-        if( self.parentDatabase is not None ) :
-            for item in self.parentDatabase.link : yield item    # FIXME skip particles that are overridden in child database?
+        parentDB = self.parentDatabase()
+        if parentDB is not None:
+            for item in parentDB: yield item    # FIXME skip particles that are overridden in child database?
 
     def keys( self ) :
         """Return a list of ids for all particles in self"""
@@ -240,17 +242,20 @@ class database( ancestryModule.ancestry ) :
 
         return( self.__aliases )
 
-    @property
-    def parentDatabase( self ) :
+    def parentDatabase(self):
+        """
+        Search up ancestry chain for another PoPs database.
+        Return PoPs.database if found, otherwise return None.
+        """
+        parentDB = None
+        try:
+            grandparent = self.ancestor.ancestor
+            parentDB = grandparent.findAttributeInAncestry(Database.moniker)
+        except Exception as ex:
+            # no parent database found
+            pass
 
-        return( self.__parentDatabase )
-
-    @parentDatabase.setter
-    def parentDatabase( self, value ) :
-
-        if not isinstance( value, parentDatabaseModule.parentDatabase ) :
-            raise TypeError("Expected parentDatabase instance, got '%s' instead" % type(value))
-        self.__parentDatabase = value
+        return parentDB
 
     @property
     def documentation( self ) :
@@ -262,20 +267,20 @@ class database( ancestryModule.ancestry ) :
         """
         Add a particle to the database, inside the appropriate particle family.
 
-        :param particle: instance of families.particle.particle or derived class
+        :param particle: instance of families.particle.Particle or derived class
         """
 
-        if( isinstance( particle, gaugeBosonModule.particle ) ) :
+        if( isinstance( particle, gaugeBosonModule.Particle ) ) :
             self.__gaugeBosons.add( particle )
-        elif( isinstance( particle, leptonModule.particle ) ) :
+        elif( isinstance( particle, leptonModule.Particle ) ) :
             self.__leptons.add( particle )
-        elif( isinstance( particle, baryonModule.particle ) ) :
+        elif( isinstance( particle, baryonModule.Particle ) ) :
             self.__baryons.add( particle )
-        elif( isinstance( particle, ( chemicalElementModule.chemicalElement, isotopeModule.isotope, nuclideModule.particle ) ) ) :
+        elif( isinstance( particle, ( chemicalElementModule.ChemicalElement, isotopeModule.Isotope, nuclideModule.Particle ) ) ) :
             self.__chemicalElements.add( particle )
-        elif( isinstance( particle, unorthodoxModule.particle ) ) :
+        elif( isinstance( particle, unorthodoxModule.Particle ) ) :
             self.__unorthodoxes.add( particle )
-        elif( isinstance( particle, aliasModule.alias ) ) :
+        elif( isinstance(particle, aliasModule.BaseAlias)) :
             if( particle.id not in self.__aliases ) :      # Do not allow an alias id to overwrite a particle id.
                 if( particle.id in self ) : raise ValueError( 'particle with id = "%s" already in database' % particle.id )
             self.__aliases.add( particle )
@@ -288,10 +293,10 @@ class database( ancestryModule.ancestry ) :
         not replaced.
         """
 
-        pops = self.readFile( fileName )
+        pops = self.read(fileName)
         for particle in pops :
             if( not( replace ) and particle.id in self ) : continue
-            if( isinstance( particle, nucleusModule.particle ) ) : continue
+            if( isinstance( particle, nucleusModule.Particle ) ) : continue
             self.add( particle )
 
     def check( self, **kwargs ) :
@@ -301,16 +306,18 @@ class database( ancestryModule.ancestry ) :
         :param kwargs: options controlling i.e. how strict checks should be. Currently unused.
         :return: list of warnings along with context about where they appear in the database
         """
+
         from . import warning as warningModule
+
         warnings = []
         info = kwargs
         info['PoPs'] = self
         for suite in ( self.__gaugeBosons, self.__leptons, self.__baryons, self.__chemicalElements, self.__unorthodoxes, self.__aliases ) :
             suiteWarnings = suite.check( info )
             if suiteWarnings:
-                warnings.append( warningModule.context("%s" % suite.moniker, suiteWarnings) )
+                warnings.append( warningModule.Context("%s" % suite.moniker, suiteWarnings) )
 
-        result = warningModule.context('PoPs', warnings)
+        result = warningModule.Context('PoPs', warnings)
         result.info = info
         return result
 
@@ -333,7 +340,7 @@ class database( ancestryModule.ancestry ) :
         :return: deep copy of the entire database.
         """
 
-        _database = database( self.name, self.version, parentDatabase = self.parentDatabase, formatVersion = self.format )
+        _database = Database( self.name, self.version, formatVersion = self.format )
         for item in self.__styles : _database.styles.add( item.copy( ) )
             # FIXME, need to add documentation.
         for item in self.__aliases : _database.add( item.copy( ) )
@@ -351,15 +358,16 @@ class database( ancestryModule.ancestry ) :
         """
 
         particle = self[id]
-        if( isinstance( particle, particleModule.alias ) ) : particle = particle.particle
+        if( isinstance( particle, particleModule.Alias ) ) : particle = particle.particle
         return( particle )
 
     def hasAlias( self, id ) :
 
         if id in self.__aliases:
             return True
-        if self.parentDatabase is not None:
-            return self.parentDatabase.link.hasAlias( id )
+        parentDB = self.parentDatabase()
+        if parentDB is not None:
+            return parentDB.hasAlias(id)
         return False
 
     def saveToFile( self, fileName, **kwargs ) :
@@ -373,113 +381,98 @@ class database( ancestryModule.ancestry ) :
         fOut.write( '\n' )
         fOut.close( )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         formatVersion = kwargs.get( 'formatVersion', self.format )
-        if( formatVersion not in formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
-        if( formatVersion == formatVersionModule.version_1_10 ) : formatVersion = '0.1'       # There was no 1.10 for PoPs, it was 0.1. PoPs 0.1 and 2.0 are the same.
+        if formatVersion in (GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4):
+            print('INFO: converting GNDS format from "%s" to "%s".' % (formatVersion, GNDS_formatVersionModule.version_2_0))
+            formatVersion = GNDS_formatVersionModule.version_2_0
+        if( formatVersion not in GNDS_formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
+        kwargs['formatVersion'] = formatVersion
 
         xmlString = [ '%s<%s name="%s" version="%s" format="%s">' % ( indent, self.moniker, self.name, self.version, formatVersion ) ]
-        if( self.parentDatabase is not None ) : xmlString += self.parentDatabase.toXMLList( indent2, **kwargs )
-        xmlString += self.__styles.toXMLList( indent2, **kwargs )
+        # FIXME for v1.10 also print link to parent database?
+        xmlString += self.__styles.toXML_strList( indent2, **kwargs )
 
         if formatVersion == '0.1' and len(self.styles) != 0:
-            xmlString += self.styles.getEvaluatedStyle().documentation.toXMLList( indent2, **kwargs )
+            xmlString += self.styles.getEvaluatedStyle().documentation.toXML_strList( indent2, **kwargs )
         # FIXME: currently both PoPs and PoPs/styles/evaluated have documentation nodes according to GNDS-2.0 specs
-        xmlString += self.__documentation.toXMLList( indent2, **kwargs )
+        xmlString += self.__documentation.toXML_strList( indent2, **kwargs )
 
-        xmlString += self.__aliases.toXMLList( indent2, **kwargs )
-        xmlString += self.__gaugeBosons.toXMLList( indent2, **kwargs )
-        xmlString += self.__leptons.toXMLList( indent2, **kwargs )
-        xmlString += self.__baryons.toXMLList( indent2, **kwargs )
-        xmlString += self.__chemicalElements.toXMLList( indent2, **kwargs )
-        xmlString += self.__unorthodoxes.toXMLList( indent2, **kwargs )
+        xmlString += self.__aliases.toXML_strList( indent2, **kwargs )
+        xmlString += self.__gaugeBosons.toXML_strList( indent2, **kwargs )
+        xmlString += self.__leptons.toXML_strList( indent2, **kwargs )
+        xmlString += self.__baryons.toXML_strList( indent2, **kwargs )
+        xmlString += self.__chemicalElements.toXML_strList( indent2, **kwargs )
+        xmlString += self.__unorthodoxes.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
 
         return( xmlString )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         formatVersion = element.get( 'format' )
         if( formatVersion == '0.1' ) :                             # PoPs 0.1 and 2.0 are the same so allow for now. There was no 1.10 for PoPs.
-            formatVersion = formatVersionModule.version_1_10
+            formatVersion = GNDS_formatVersionModule.version_1_10
         else :
-            if( formatVersion not in formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
+            if( formatVersion not in GNDS_formatVersionModule.allowedPlus ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
 
         self.__format = formatVersion
+        kwargs['formatVersion'] = formatVersion
 
         children = {}
         for child in ( gaugeBosonModule, leptonModule, baryonModule, unorthodoxModule, aliasModule ) :
-            children[child.suite.moniker] = child.suite
+            children[child.Suite.moniker] = child.Suite
 
-        children[chemicalElementsModule.chemicalElements.moniker] = chemicalElementsModule.chemicalElements
+        children[chemicalElementsModule.ChemicalElements.moniker] = chemicalElementsModule.ChemicalElements
 
         for child in element :
             if( child.tag in children ) :
-                children[child.tag].parseXMLNode( getattr( self, child.tag ), child, xPath, linkData )
+                children[child.tag].parseNode(getattr( self, child.tag ), child, xPath, linkData, **kwargs)
             elif( child.tag == self.__styles.moniker ) :
-                self.__styles.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == 'parentDatabase' ) :
-                self.parentDatabase = parentDatabaseModule.parentDatabase.parseXMLNode( child, xPath, linkData )
+                self.__styles.parseNode(child, xPath, linkData, **kwargs)
+            elif( child.tag == 'parentDatabase' and formatVersion == GNDS_formatVersionModule.version_1_10 ) :
+                pass  # ignore
             elif( child.tag == self.documentation.moniker ) :
-                if formatVersion == formatVersionModule.version_1_10 :
-                    self.styles.getEvaluatedStyle().documentation.parseNode( child, xPath, linkData )
+                if formatVersion == GNDS_formatVersionModule.version_1_10 :
+                    self.styles.getEvaluatedStyle().documentation.parseNode(child, xPath, linkData, **kwargs)
                 else:
-                    self.documentation.parseNode( child, xPath, linkData )
+                    self.documentation.parseNode(child, xPath, linkData, **kwargs)
             else :
                 raise ValueError( 'sub-element = "%s" not allowed' % child.tag )
 
         xPath.pop( )
-        return( self )
+
+        return self
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         formatVersion = element.get( 'format' )
         if( formatVersion == '0.1' ) :                             # PoPs 0.1 and 2.0 are the same so allow for now. There was no 1.10 for PoPs.
-            formatVersion = formatVersionModule.version_1_10
+            formatVersion = GNDS_formatVersionModule.version_1_10
         else :
-            if( formatVersion not in formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
+            if( formatVersion not in GNDS_formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
 
         self = cls( element.get( 'name' ), element.get( 'version' ), formatVersion = formatVersion )
-        self.parseXMLNode( element, xPath, linkData )
+        self.parseNode(element, xPath, linkData, **kwargs)
         return( self )
 
-    @classmethod
-    def parseXMLStringAsClass( cls, string ) :  # FIXME move this to PoPs/Test? That's the only place it is used
-
-        from xml.etree import cElementTree
-
-        xPath = []
-        try :
-            element = cElementTree.fromstring( string )
-            return( cls.parseXMLNodeAsClass( element, xPath, {} ) )
-        except Exception :
-            print( "Error encountered at xpath = /%s" % '/'.join( xPath ) )
-            raise
-
     @staticmethod
-    def readFile( fileName ) :
+    def read(fileName, **kwargs):
         """
-        Load a PoPs database from file
-
-        :param fileName: path to the file
-        :return: PoPs.database instance containing all particles in the file
+        Reads in the file name *fileName* and returns a **database** instance.
         """
 
-        from xml.etree import cElementTree
+        return Database.readXML_file(fileName, **kwargs)
 
-        xPath = []
-        try :
-            element = cElementTree.parse( fileName ).getroot( )
-            return( database.parseXMLNodeAsClass( element, xPath, {} ) )
-        except :
-            print( "Error encountered at xpath = /%s" % '/'.join( xPath ) )
-            raise
+def read(fileName, **kwargs):
+    """
+    Reads in the file name *fileName* and returns a **database** instance.
+    """
+
+    return Database.read(fileName)

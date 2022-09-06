@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -30,4 +30,4 @@ class PofX1GivenX2( multiD_XYsModule.XYs2d ) :
 
         if( x1Max is None ) : return( PofX1AtX2.evaluate( x1Min ) )
 
-        return( float( PofX1AtX2.integrate( x1Min, x1Max ) ) )
+        return PofX1AtX2.integrate(x1Min, x1Max)

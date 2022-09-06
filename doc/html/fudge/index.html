@@ -78,7 +78,7 @@ used by python when searching for imported python modules (files). On LLNL’s c
 <p>In general, one should first create a reactionSuite class object (also sometimes called a Protare for
 Projectile + Target + Evaluation). For example the beginning of a fudge session may look like,</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span><span class="s2">&quot;path/to/GNDS/reactionSuite.xml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">ReactionSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="s2">&quot;path/to/GNDS/reactionSuite.xml&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is therefore important to read the documentation on the reactionSuite class.
@@ -113,7 +113,7 @@ used by python when searching for imported python modules (files). On LLNL’s c
 <p>In general, one should first create a reactionSuite class object (also sometimes called a Protare for
 Projectile + Target + Evaluation). For example the beginning of a fudge session may look like,</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span><span class="s2">&quot;path/to/GNDS/reactionSuite.xml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">ReactionSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="s2">&quot;path/to/GNDS/reactionSuite.xml&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is therefore important to read the documentation on the reactionSuite class.
@@ -127,17 +127,17 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="fudge.html">GNDS hierarchy</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="fudge.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="fudge.channelData.html">fudge.channelData package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData.Q">fudge.channelData.Q module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData.base">fudge.channelData.base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData.fissionFragmentData.delayedNeutron">fudge.channelData.fissionFragmentData.delayedNeutron module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData.fissionFragmentData.duration">fudge.channelData.fissionFragmentData.duration module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData.fissionFragmentData.fissionEnergyRelease">fudge.channelData.fissionFragmentData.fissionEnergyRelease module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData.fissionFragmentData.fissionFragmentData">fudge.channelData.fissionFragmentData.fissionFragmentData module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData.fissionFragmentData.incidentEnergy">fudge.channelData.fissionFragmentData.incidentEnergy module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData.fissionFragmentData.productYield">fudge.channelData.fissionFragmentData.productYield module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.channelData.html#module-fudge.channelData">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.outputChannelData.html">fudge.outputChannelData package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData.Q">fudge.outputChannelData.Q module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData.base">fudge.outputChannelData.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData.fissionFragmentData.delayedNeutron">fudge.outputChannelData.fissionFragmentData.delayedNeutron module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData.fissionFragmentData.elapsedTime">fudge.outputChannelData.fissionFragmentData.elapsedTime module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease">fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData.fissionFragmentData.fissionFragmentData">fudge.outputChannelData.fissionFragmentData.fissionFragmentData module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData.fissionFragmentData.incidentEnergy">fudge.outputChannelData.fissionFragmentData.incidentEnergy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData.fissionFragmentData.productYield">fudge.outputChannelData.fissionFragmentData.productYield module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.outputChannelData.html#module-fudge.outputChannelData">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="fudge.covariances.html">fudge.covariances package</a><ul>
@@ -179,7 +179,7 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.makeUnresolvedProbabilityTables">fudge.processing.resonances.makeUnresolvedProbabilityTables module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.processing.resonances.html#fudge-processing-resonances-setup-module">fudge.processing.resonances.setup module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.setup">fudge.processing.resonances.setup module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances">Module contents</a></li>
 </ul>
 </li>
@@ -217,8 +217,8 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.productData.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.productData.html#module-fudge.productData.energyDeposition">fudge.productData.energyDeposition module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.productData.html#module-fudge.productData.momentumDeposition">fudge.productData.momentumDeposition module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.productData.html#module-fudge.productData.averageProductEnergy">fudge.productData.averageProductEnergy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.productData.html#module-fudge.productData.averageProductMomentum">fudge.productData.averageProductMomentum module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.productData.html#module-fudge.productData.multiplicity">fudge.productData.multiplicity module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.productData.html#module-fudge.productData">Module contents</a></li>
 </ul>
@@ -302,7 +302,7 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.makeUnresolvedProbabilityTables">fudge.processing.resonances.makeUnresolvedProbabilityTables module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#fudge-processing-resonances-setup-module">fudge.processing.resonances.setup module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.setup">fudge.processing.resonances.setup module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances">Module contents</a></li>
 </ul>
 </li>
@@ -312,13 +312,6 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.html#module-fudge.processing.miscellaneous">fudge.processing.miscellaneous module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.html#module-fudge.processing.processingInfo">fudge.processing.processingInfo module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.processing.html#module-fudge.processing">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="numericalFunctions.html">C extensions for low-level numerics</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="numericalFunctions.html#specialfunctions-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">specialFunctions</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="numericalFunctions.html#legendre-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Legendre</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="numericalFunctions.html#module-numericalFunctions.lib.pointwiseXY_C"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pointwiseXY_C</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="numericalFunctions.html#pointwisexy-c-pointwisexy-c-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">pointwiseXY_C.pointwiseXY_C</span></code> Class</a></li>
 </ul>
 </li>
 </ul>

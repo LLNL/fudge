@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -44,11 +44,10 @@ parser.add_argument( '--new', action = 'store_true',                            
 parser.add_argument( '-q', action = 'store_true',                               help = 'If present only reads the file and does not print anything. Mainly for debugging.' )
 parser.add_argument( '--dismemberACE', action = 'store_true',                   help = 'If present, and the --cls and --lib are present then the dismemberACE.py command is written for each ZA.' )
 
-args = parser.parse_args( )
-
 priorFileName = ''
 priorFileLines = []
 badFiles = []
+args = None
 
 class Class :
 
@@ -89,105 +88,108 @@ class Class :
             formatOrZA = line.split( )[0].strip( )
             if( formatOrZA[:4] == '2.0.' ) : print( '    %s' % fileName, items[5] )
 
-classes = {}
-Class( classes, 'c', 'continuous-energy neutron', True )
-Class( classes, 'd', 'discrete-reaction neutron', False )
-Class( classes, 'y', 'dosimetry', False )
-Class( classes, 't', 'S(a,b) thermal', False )
-Class( classes, 'p', 'continuous-energy photoatomic', True )
-Class( classes, 'u', 'continuous-energy photonuclear', False )
-Class( classes, 'e', 'continuous-energy electron', False )
-Class( classes, 'm', 'multigroup neutron', False )
-Class( classes, 'g', 'multigroup photon', False )
-Class( classes, 'h', 'proton ?', False )
-Class( classes, 'o', 'deuteron ?', False )
-Class( classes, 'r', 'triton ?', False )
-Class( classes, 's', 'helium3 ?', False )
-Class( classes, 'a', 'alpha ?', False )
+if __name__ == '__main__':
+    args = parser.parse_args( )
 
-classLabelMaximumLength = max( [ len( classes[cls].label ) for cls in classes ] )
-classLabelFormat = '%%-%ds' % ( classLabelMaximumLength + 2 )
+    classes = {}
+    Class( classes, 'c', 'continuous-energy neutron', True )
+    Class( classes, 'd', 'discrete-reaction neutron', False )
+    Class( classes, 'y', 'dosimetry', False )
+    Class( classes, 't', 'S(a,b) thermal', False )
+    Class( classes, 'p', 'continuous-energy photoatomic', True )
+    Class( classes, 'u', 'continuous-energy photonuclear', False )
+    Class( classes, 'e', 'continuous-energy electron', False )
+    Class( classes, 'm', 'multigroup neutron', False )
+    Class( classes, 'g', 'multigroup photon', False )
+    Class( classes, 'h', 'proton ?', False )
+    Class( classes, 'o', 'deuteron ?', False )
+    Class( classes, 'r', 'triton ?', False )
+    Class( classes, 's', 'helium3 ?', False )
+    Class( classes, 'a', 'alpha ?', False )
 
-fIn = open( args.xsdir )
-lines = ''.join( fIn.readlines( ) )
-fIn.close( )
+    classLabelMaximumLength = max( [ len( classes[cls].label ) for cls in classes ] )
+    classLabelFormat = '%%-%ds' % ( classLabelMaximumLength + 2 )
 
-lines = lines.split( '\ndire' )[1].split( '\n' )[1:-1]
+    fIn = open( args.xsdir )
+    lines = ''.join( fIn.readlines( ) )
+    fIn.close( )
 
-fileTypes = {}
-index = 0
-numberOfLines = len( lines )
-while( index < numberOfLines ) :
-    lineIncrement = 1
-    if( lines[index][0] == '#' ) :
-        index += lineIncrement
-        continue
-    try :
-        items = lines[index].split( )
-        if( items[-1].strip( ) == '+' ) :
-            items.pop( -1 )
-            lineIncrement += 1
-            items += lines[index+1].split( )
-    except :
-        print( index )
-        print( lines[index] )
-        raise
+    lines = lines.split( '\ndire' )[1].split( '\n' )[1:-1]
 
-    try :
-        ZA, suffix = items[0].split( '.' )
-        cls = suffix
-        library = ''
-        while( cls[0].isdigit( ) ) :
-            library += cls[0]
-            cls = cls[1:]
-        library = int( library )
-        if( ( len( cls ) > 1 ) and ( cls != 'nc' ) ) : print( lines[index] )
-        if( cls[-1] in classes ) :
-            classes[cls[-1]].add( library, ZA, items )
-        else :
-            print( cls, lines[index] )
-    except :
-        print( lines[index] )
-        raise
+    fileTypes = {}
+    index = 0
+    numberOfLines = len( lines )
+    while( index < numberOfLines ) :
+        lineIncrement = 1
+        if( lines[index][0] == '#' ) :
+            index += lineIncrement
+            continue
+        try :
+            items = lines[index].split( )
+            if( items[-1].strip( ) == '+' ) :
+                items.pop( -1 )
+                lineIncrement += 1
+                items += lines[index+1].split( )
+        except :
+            print( index )
+            print( lines[index] )
+            raise
 
-    index += lineIncrement
-
-if( args.q or args.new ) : sys.exit( 0 )
-
-if( ( args.cls is None ) and ( args.lib == -1 ) and ( args.ZA is None ) ) :
-    for cls in classes :
-        print( '    %2s %s: ' % ( cls, classLabelFormat % ( '[%s]' % classes[cls].label ) ) )
-else :
-    if( args.cls is not None or True ) :
-        clsIDs = [ args.cls ]
-        if( args.cls is None ) : clsIDs = [ cls for cls in list( classes ) ]
-        for clsID in clsIDs :
-            cls = classes[clsID]
-            printItems = []
-            printItems.append( [ '    %2s %s: ' % ( clsID, classLabelFormat % ( '[%s]' % cls.label ) ), None ] )
-            if( ( args.lib == -1 ) and ( args.ZA is None ) ) :
-                for lib in list( sorted( cls.libraries.keys( ) ) ) : print( '        %3s' % lib )
+        try :
+            ZA, suffix = items[0].split( '.' )
+            cls = suffix
+            library = ''
+            while( cls[0].isdigit( ) ) :
+                library += cls[0]
+                cls = cls[1:]
+            library = int( library )
+            if( ( len( cls ) > 1 ) and ( cls != 'nc' ) ) : print( lines[index] )
+            if( cls[-1] in classes ) :
+                classes[cls[-1]].add( library, ZA, items )
             else :
-                libs = [ args.lib ]
-                if( args.lib == -1 ) : libs = [ lib for lib in cls.libraries ]
-                for lib in libs :
-                    if( lib in cls.libraries ) :
-                        library = cls.libraries[lib]
-                        if( args.ZA is None ) :
-                            for ZA in library :
-                                if( args.dismemberACE ) :
-                                    file = library[ZA][2]
-                                    printItems.append(  [ '        ./dismemberACE.py --start %s %s   # %s' % ( library[ZA][5], file, ZA ), None ] )
-                                else :
-                                    printItems.append( [ '        %-3s: %s' % ( ZA, library[ZA] ), None ] )
-                        else :
-                            if( args.ZA in library ) :
-                                file = library[args.ZA][2]
-                                if( file[0] != os.sep ) : file = os.path.join( os.path.dirname( args.xsdir), file )
-                                printItems.append( [ '        ./dismemberACE.py --start %s %s' % ( library[args.ZA][5], file ), library[args.ZA][0] ] )
-            if( len( printItems ) > 1 ) :
-                print( printItems.pop( 0 )[0] )
-                if( printItems[0][1] is None ) :
-                    for printItem, ZA in printItems : print( printItem )
+                print( cls, lines[index] )
+        except :
+            print( lines[index] )
+            raise
+
+        index += lineIncrement
+
+    if( args.q or args.new ) : sys.exit( 0 )
+
+    if( ( args.cls is None ) and ( args.lib == -1 ) and ( args.ZA is None ) ) :
+        for cls in classes :
+            print( '    %2s %s: ' % ( cls, classLabelFormat % ( '[%s]' % classes[cls].label ) ) )
+    else :
+        if( args.cls is not None or True ) :
+            clsIDs = [ args.cls ]
+            if( args.cls is None ) : clsIDs = [ cls for cls in list( classes ) ]
+            for clsID in clsIDs :
+                cls = classes[clsID]
+                printItems = []
+                printItems.append( [ '    %2s %s: ' % ( clsID, classLabelFormat % ( '[%s]' % cls.label ) ), None ] )
+                if( ( args.lib == -1 ) and ( args.ZA is None ) ) :
+                    for lib in list( sorted( cls.libraries.keys( ) ) ) : print( '        %3s' % lib )
                 else :
-                    for printItem, ZA in printItems : print( "%-80s     # %s" % ( printItem, ZA ) )
+                    libs = [ args.lib ]
+                    if( args.lib == -1 ) : libs = [ lib for lib in cls.libraries ]
+                    for lib in libs :
+                        if( lib in cls.libraries ) :
+                            library = cls.libraries[lib]
+                            if( args.ZA is None ) :
+                                for ZA in library :
+                                    if( args.dismemberACE ) :
+                                        file = library[ZA][2]
+                                        printItems.append(  [ '        ./dismemberACE.py --start %s %s   # %s' % ( library[ZA][5], file, ZA ), None ] )
+                                    else :
+                                        printItems.append( [ '        %-3s: %s' % ( ZA, library[ZA] ), None ] )
+                            else :
+                                if( args.ZA in library ) :
+                                    file = library[args.ZA][2]
+                                    if( file[0] != os.sep ) : file = os.path.join( os.path.dirname( args.xsdir), file )
+                                    printItems.append( [ '        ./dismemberACE.py --start %s %s' % ( library[args.ZA][5], file ), library[args.ZA][0] ] )
+                if( len( printItems ) > 1 ) :
+                    print( printItems.pop( 0 )[0] )
+                    if( printItems[0][1] is None ) :
+                        for printItem, ZA in printItems : print( printItem )
+                    else :
+                        for printItem, ZA in printItems : print( "%-80s     # %s" % ( printItem, ZA ) )

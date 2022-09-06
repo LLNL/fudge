@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -17,9 +17,8 @@ import math
 import unittest
 from xData.series1d import LegendreSeries, Legendre
 
-__metaclass__ = type
 
-class testLegendre(unittest.TestCase):
+class TestLegendre(unittest.TestCase):
 
     def test0(self): 
         """Simple test, just check a couple of values for n = 0,1,2"""

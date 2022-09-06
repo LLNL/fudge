@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@ from fudge.reactionData.doubleDifferentialCrossSection.photonScattering import c
 
 
 #
-# coherent.form
+# coherent.Form
 #
 def toENDF6( self, MT, endfMFList, targetInfo ) :
 
@@ -17,4 +17,4 @@ def toENDF6( self, MT, endfMFList, targetInfo ) :
     if( self.anomalousScatteringFactor_realPart is not None ) : self.anomalousScatteringFactor_realPart.data.toENDF6( MT, endfMFList, targetInfo )
     if( self.anomalousScatteringFactor_imaginaryPart is not None ) : self.anomalousScatteringFactor_imaginaryPart.data.toENDF6( MT, endfMFList, targetInfo )
 
-coherentModule.form.toENDF6 = toENDF6
+coherentModule.Form.toENDF6 = toENDF6

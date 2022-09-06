@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,9 +13,7 @@ numeric matrix, etc.
 
 import abc
 
-class covariance:
-
-    __metaclass__ = abc.ABCMeta
+class Covariance(abc.ABC):
 
     @property
     @abc.abstractmethod

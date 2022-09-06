@@ -1,18 +1,20 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from . import base
-from xData.ancestry import ancestry
+from LUPY import ancestry as ancestryModule
+
+from xData import enums as xDataEnumsModule
 from xData import link as linkModule
 from pqu import PQU
 
-__metaclass__ = type
+from . import enums as covarianceEnumsModule
+from . import base
 
-class summedCovariance( ancestry, base.covariance ):
+class SummedCovariance( ancestryModule.AncestryIO, base.Covariance ):
     """ 
     Covariance matrix stored as sum/difference of matrices from other reactions,
     valid over a specified domain.
@@ -27,6 +29,7 @@ class summedCovariance( ancestry, base.covariance ):
     """
 
     moniker = 'sum'
+    keyName = 'label'
 
     def __init__( self, label, domainMin, domainMax, domainUnit='eV', summands=None ):
         """
@@ -36,7 +39,9 @@ class summedCovariance( ancestry, base.covariance ):
         :param domainUnit: unit for domain min/max
         :param summands: list of 'summand' instances
         """
-        ancestry.__init__( self )
+
+        ancestryModule.AncestryIO.__init__( self )
+
         self.label = label
         self.__domainMin = domainMin
         self.__domainMax = domainMax
@@ -72,6 +77,12 @@ class summedCovariance( ancestry, base.covariance ):
     @property
     def domainUnit( self ):
         return self.__domainUnit
+
+    def isSymmetric(self):
+
+        for summand in self.summands:
+            if not summand.link.isSymmetric(): return False
+        return True
 
     def check( self, info ): return []
 
@@ -116,13 +127,13 @@ class summedCovariance( ancestry, base.covariance ):
         Sum the parts to construct the covariance matrix on the domain of self.
         Note: each part must be converted to absolute before summing, since the sum is over different reactions.
 
-        :param label: label attached to the new covarianceMatrix
-        :return: covarianceMatrix instance, on the union grid of all summands over the domain of self.
+        :param label: label attached to the new CovarianceMatrix
+        :return: CovarianceMatrix instance, on the union grid of all summands over the domain of self.
         """
         import numpy
-        from .mixed import mixedForm
-        from .covarianceMatrix import covarianceMatrix
-        from .shortRangeSelfScalingVariance import shortRangeSelfScalingVariance
+        from .mixed import MixedForm
+        from .covarianceMatrix import CovarianceMatrix
+        from .shortRangeSelfScalingVariance import ShortRangeSelfScalingVariance
         from xData import values as valuesModule
         from xData import axes as axesModule
         from xData import xDataArray as arrayModule
@@ -141,10 +152,11 @@ class summedCovariance( ancestry, base.covariance ):
             """
             cm = p.link
 
-            if isinstance(cm, (covarianceMatrix, summedCovariance)):
+            if isinstance(cm, (CovarianceMatrix, SummedCovariance)):
                 cm = cm.toCovarianceMatrix()
-            elif isinstance(cm,mixedForm):
-                newMixed = mixedForm()
+            elif isinstance(cm, MixedForm):
+                newMixed = MixedForm()
+                newMixed.setAncestor(cm.ancestor)
                 for ic, c in enumerate(cm.components):
                     if c.rowBounds() != c.columnBounds():
                         raise ValueError("All components must have their row and column covarianceAxes matching.")
@@ -152,10 +164,10 @@ class summedCovariance( ancestry, base.covariance ):
                         continue    # this part of 'mixed' matrix doesn't contribute to the sum
                     c_copy = c.copy()
                     # prune zero rows/columns covarianceMatrices, just in case
-                    if isinstance(c_copy, covarianceMatrix):
+                    if isinstance(c_copy, CovarianceMatrix):
                         if not c_copy.matrix.array.constructArray().any(): continue  # matrix is all zero
                         c_copy.removeExtraZeros()
-                    elif isinstance(c_copy, mixedForm):
+                    elif isinstance(c_copy, MixedForm):
                         c_copy.makeSafeBounds()
                     newMixed.addComponent(c_copy)
                 cm = newMixed.toCovarianceMatrix()
@@ -163,7 +175,7 @@ class summedCovariance( ancestry, base.covariance ):
             # reduce the domain if necessary to match the summed matrix domain:
             cm = cm.domainSlice( self.rowBounds(), self.columnBounds() )
 
-            if cm.type == 'absolute':
+            if cm.type == covarianceEnumsModule.Type.absolute:
                 return cm
             else:
                 # FIXME: following only works for cross sections/multiplicities, not spectra
@@ -171,21 +183,21 @@ class summedCovariance( ancestry, base.covariance ):
                 return cm.toAbsolute(rowData=meanValue)
 
         # Set up common data using first element in summands
-        summands = [summand for summand in self.summands if not isinstance(summand.link, shortRangeSelfScalingVariance)]
+        summands = [summand for summand in self.summands if not isinstance(summand.link, ShortRangeSelfScalingVariance)]
         firstCovMtx = getAbsoluteMatrix(summands[0])
-        commonRowAxis = firstCovMtx.matrix.axes[2].copy([])
-        if firstCovMtx.matrix.axes[1].style=='link':
-            commonColAxis = firstCovMtx.matrix.axes[2].copy([])
+        commonRowAxis = firstCovMtx.matrix.axes[2].copy()
+        if isinstance(firstCovMtx.matrix.axes[1].values, linkModule.Link):
+            commonColAxis = firstCovMtx.matrix.axes[2].copy()
         else:
-            commonColAxis = firstCovMtx.matrix.axes[1].copy([])
-        commonMatrixAxis = firstCovMtx.matrix.axes[0].copy([])
+            commonColAxis = firstCovMtx.matrix.axes[1].copy()
+        commonMatrixAxis = firstCovMtx.matrix.axes[0].copy()
 
         def add_values(v1,v2):
             # helper function for merging grids
             v=set()
             v.update(v1.values)
             v.update(v2.values)
-            return valuesModule.values(sorted(v))
+            return valuesModule.Values(sorted(v))
 
         # First pass through components is to collect bins to set up the common grid + do assorted checking
         for p in summands[1:]:
@@ -194,7 +206,7 @@ class summedCovariance( ancestry, base.covariance ):
             cc.matrix.axes[1].convertToUnit(commonColAxis.unit)
             cc.matrix.axes[2].convertToUnit(commonRowAxis.unit)
             commonRowAxis.values.values = add_values(commonRowAxis.values, cc.matrix.axes[2].values)
-            if cc.matrix.axes[1].style==axesModule.linkGridToken:
+            if isinstance(cc.matrix.axes[1].values, linkModule.Link):
                 commonColAxis.values.values = add_values(commonColAxis.values, cc.matrix.axes[2].values)
             else:
                 commonColAxis.values.values = add_values(commonColAxis.values, cc.matrix.axes[1].values)
@@ -211,23 +223,23 @@ class summedCovariance( ancestry, base.covariance ):
                     ( commonRowAxis.unit, commonColAxis.unit )
                 ).matrix.array.constructArray()
         
-        # Now create the instance of the resulting covarianceMatrix
-        newAxes = axesModule.axes(
+        # Now create the instance of the resulting CovarianceMatrix
+        newAxes = axesModule.Axes(
             labelsUnits={0: (commonMatrixAxis.label, commonMatrixAxis.unit),
                          1: (commonColAxis.label, commonColAxis.unit),
                          2: (commonRowAxis.label, commonRowAxis.unit)})
 
-        newAxes[2] = axesModule.grid(commonRowAxis.label, commonRowAxis.index, commonRowAxis.unit,
-                                 style=axesModule.boundariesGridToken,
+        newAxes[2] = axesModule.Grid(commonRowAxis.label, commonRowAxis.index, commonRowAxis.unit,
+                                 style=xDataEnumsModule.GridStyle.boundaries,
                                  values=commonRowAxis.values)
-        newAxes[1] = axesModule.grid(commonColAxis.label, commonColAxis.index, commonColAxis.unit,
-                                 style=axesModule.linkGridToken,
-                                 values=linkModule.link(link=commonRowAxis.values, relative=True))
-        newAxes[0] = axesModule.axis(commonMatrixAxis.label, commonMatrixAxis.index, commonMatrixAxis.unit)
+        newAxes[1] = axesModule.Grid(commonColAxis.label, commonColAxis.index, commonColAxis.unit,
+                                 style=xDataEnumsModule.GridStyle.boundaries,
+                                 values=linkModule.Link(link=commonRowAxis.values, relative=True))
+        newAxes[0] = axesModule.Axis(commonMatrixAxis.label, commonMatrixAxis.index, commonMatrixAxis.unit)
         trigdata = commonMatrix[numpy.tri(commonMatrix.shape[0])==1.0].tolist()
-        gridded = griddedModule.gridded2d( axes=newAxes,
-            array=arrayModule.full(shape=commonMatrix.shape,data=trigdata,symmetry=arrayModule.symmetryLowerToken) )
-        newCov = covarianceMatrix(label=label, type='absolute', matrix=gridded)
+        gridded = griddedModule.Gridded2d( axes=newAxes,
+            array=arrayModule.Full(shape=commonMatrix.shape,data=trigdata,symmetry=arrayModule.Symmetry.lower) )
+        newCov = CovarianceMatrix(label=label, type=covarianceEnumsModule.Type.absolute, matrix=gridded)
         newCov.setAncestor(self.ancestor)
         return newCov
 
@@ -241,7 +253,7 @@ class summedCovariance( ancestry, base.covariance ):
 
         .. note::   If the column axis is set to 'mirrorOtherAxis', only rowData is needed.
 
-        :returns: a copy of self, but rescaled and with the type set to absoluteToken
+        :returns: a copy of self, but rescaled and with the type set to absolute
         """
         if rowData is None:
             rowData = self.findAttributeInAncestry('rowData').link.toPointwise_withLinearXYs(lowerEps=1e-8)
@@ -259,7 +271,7 @@ class summedCovariance( ancestry, base.covariance ):
 
         .. note::   If the column axis is a link to row axis, only rowData is needed.
 
-        :returns: a copy of self, but rescaled and with the type set to relativeToken
+        :returns: a copy of self, but rescaled and with the type set to relative
         """
         if rowData is None:
             rowData = self.findAttributeInAncestry('rowData').link.toPointwise_withLinearXYs(lowerEps=1e-8)
@@ -267,7 +279,7 @@ class summedCovariance( ancestry, base.covariance ):
             colData = self.findAttributeInAncestry('columnData').link.toPointwise_withLinearXYs(lowerEps=1e-8)
         return self.toCovarianceMatrix().toRelative(rowData=rowData, colData=colData)
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """
 
         :param indent:
@@ -293,7 +305,7 @@ class summedCovariance( ancestry, base.covariance ):
         :return:
         """
         if pointer.link is not None: return pointer.link
-        if 'covarianceSuite' in pointer.path:   return pointer.link.follow( pointer.path, self.getRootAncestor() )
+        if 'covarianceSuite' in pointer.path:   return pointer.link.follow( pointer.path, self.rootAncestor )
         #elif'reactionSuite' in pointer.path:    return link.follow( pointer.path, None )
         else :                                  raise ValueError( "Need reference to root node of "+str( pointer.path ) )
 
@@ -311,22 +323,25 @@ class summedCovariance( ancestry, base.covariance ):
 
         return covar.getUncertaintyVector()
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
+
         label = element.get( "label" )
         lower = float( element.get("domainMin") )
         upper = float( element.get("domainMax") )
-        summed_ = summedCovariance(label=label, domainMin=lower, domainMax=upper, domainUnit=element.get('domainUnit'))
+        summed_ = cls(label=label, domainMin=lower, domainMax=upper, domainUnit=element.get('domainUnit'))
         for summandElement in element:
-            link_ = summand.parseXMLNode( summandElement, xPath, linkData )
+            link_ = Summand.parseNodeUsingClass(summandElement, xPath, linkData, **kwargs)
             linkData['unresolvedLinks'].append( link_ )
             summed_.summands.append( link_ )
+
         xPath.pop()
+
         return summed_
 
-class summand( linkModule.link ):
+class Summand( linkModule.Link ):
     """
     Stores one summand in the summed covariance. Consists of a link, an ENDF MF/MT and a coefficient
     """
@@ -335,7 +350,7 @@ class summand( linkModule.link ):
 
     def __init__( self, link=None, root=None, path=None, label=None, relative=False,
                   ENDF_MFMT=None, coefficient=None ):
-        linkModule.link.__init__(self, link=link, root=root, path=path, label=label, relative=relative)
+        linkModule.Link.__init__(self, link=link, root=root, path=path, label=label, relative=relative)
         self.ENDF_MFMT = ENDF_MFMT
         if coefficient is not None:
             coefficient = float(coefficient)
@@ -347,7 +362,7 @@ class summand( linkModule.link ):
                 return False
         return True
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         attributesStr = ""
         for attr in ('ENDF_MFMT', 'coefficient'):

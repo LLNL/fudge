@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,9 +14,7 @@ Originally designed to store sub-actinide fission and standards cross-sections
 
 from . import base as baseModule
 
-__metaclass__ = type
-
-class incompleteReaction( baseModule.base_reaction ):
+class IncompleteReaction(baseModule.Base_reaction2):
     """
     Similar to the base <reaction> class, except it generally does not contain
     a complete description of products, and cannot be used for transport. It must contain a crossSection

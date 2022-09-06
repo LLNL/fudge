@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,10 +8,10 @@
 import sys
 sys.path.insert( 0, '../../' )
 
-from pqu.PQU import pqu_float, PQU
+from pqu.PQU import PQU_float, PQU
 
-f1 = pqu_float( 1.2, 2, True )
-f2 = pqu_float( 11, 2, True )
+f1 = PQU_float( 1.2, 2, True )
+f2 = PQU_float( 11, 2, True )
 f = f1 * 4
 print(f1, f)
 f = 5 * f1
@@ -25,9 +25,9 @@ f = 5 / f1
 print(f, f.info( significantDigits = 15 ))
 
 print()
-f1 = pqu_float(  1.234567e10, 7, False )
-f2 = pqu_float( -1.234558e10, 6, False )
-f3 = pqu_float( -7123e4, 6, False )
+f1 = PQU_float(  1.234567e10, 7, False )
+f2 = PQU_float( -1.234558e10, 6, False )
+f3 = PQU_float( -7123e4, 6, False )
 print(f1.info( significantDigits = 15 ))
 print(f2.info( significantDigits = 15 ))
 f = f1 + f2

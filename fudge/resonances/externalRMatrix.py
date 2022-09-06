@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,8 +8,8 @@
 import abc
 import numpy
 
-from xData import ancestry as ancestryModule
-from PoPs.quantities.quantity import double
+from LUPY import ancestry as ancestryModule
+from PoPs.quantities import quantity as quantityModule
 
 """
 Defines incident-energy-dependent functions representing the contribution to the resolved region cross section
@@ -18,13 +18,14 @@ The external R-Matrix is added to the R-Matrix diagonal during resonance reconst
 """
 
 
-class externalRMatrix(ancestryModule.ancestry, metaclass=abc.ABCMeta):
+class ExternalRMatrix(ancestryModule.AncestryIO, metaclass=abc.ABCMeta):
     """
     Abstract base class inherited by the Froehner and SAMMY classes.
     """
     moniker = 'externalRMatrix'
 
     def __init__(self, **kwargs):
+
         super().__init__()
         provided_terms = set(kwargs.keys())
         required_terms = {'singularityEnergyBelow', 'singularityEnergyAbove'}
@@ -53,41 +54,44 @@ class externalRMatrix(ancestryModule.ancestry, metaclass=abc.ABCMeta):
             return 0
         return result.float(unit)
 
-    def toXMLList(self, indent='', **kwargs):
+    def toXML_strList(self, indent='', **kwargs):
 
         indent2 = indent + '  '
         xmlString = ['%s<%s type="%s">' % (indent, self.moniker, self.type)]
         for key in self.ancestryMembers:
             term = self.terms.get(key)
             if term is not None:
-                xmlString += term.toXMLList(indent=indent2, **kwargs)
+                xmlString += term.toXML_strList(indent=indent2, **kwargs)
         xmlString[-1] += ('</%s>' % self.moniker)
 
         return xmlString
 
-    @staticmethod
-    def parseXMLNode(element, xPath, linkData, **kwargs):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append(element.tag)
 
-        terms = {term.get("label"): double.parseXMLNodeAsClass(term, xPath, linkData)
+        terms = {term.get("label"): quantityModule.Double.parseNodeUsingClass(term, xPath, linkData, **kwargs)
                  for term in element.findall("double")}
 
         class_ = {
             'Froehner': Froehner,
             'SAMMY': SAMMY
         }[element.get("type")]
-        result = class_(**terms)
+
+        result = class_(**terms)            # FIXME2, this is not using cls.
+
         xPath.pop()
+
         return result
 
 
-class Froehner(externalRMatrix):
+class Froehner(ExternalRMatrix):
     """
     Froehner's external R-Matrix parametrization.
     """
     ancestryMembers = ('averageRadiationWidth', 'constantExternalR', 'poleStrength', 'singularityEnergyBelow',
-               'singularityEnergyAbove')
+                       'singularityEnergyAbove')
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -117,13 +121,14 @@ class Froehner(externalRMatrix):
         imaginaryTerm = (Gamma * I / 4) / (I**2 / 4 - (energies - Ebar)**2)
         return realTerm, imaginaryTerm
 
-class SAMMY(externalRMatrix):
+
+class SAMMY(ExternalRMatrix):
     """
     External R-Matrix parametrization from SAMMY
     """
     ancestryMembers = ('constantExternalR', 'linearExternalR', 'quadraticExternalR',
-               'constantLogarithmicCoefficient', 'linearLogarithmicCoefficient',
-               'singularityEnergyBelow', 'singularityEnergyAbove')
+                       'constantLogarithmicCoefficient', 'linearLogarithmicCoefficient',
+                       'singularityEnergyBelow', 'singularityEnergyAbove')
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

@@ -1,19 +1,20 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import sys
 import os
 import glob
 import argparse
+import pathlib
 
-from LUPY import GNDSType as GNDSTypeModule
+from fudge import enums as enumsModule
 from fudge import map as mapModule
+from fudge import GNDS_file as GNDS_fileModule
 from PoPs import database as PoPsDatabaseModule
 from fudge import suites as suitesModule
 from fudge import reactionSuite as reactionSuiteModule
@@ -36,6 +37,7 @@ This script prints out the following information:
     -) A list of unknown files found in the protare directories.
     -) A list of external files referenced in the protares but not found on the disk system.
     -) A list of non GNDS, HDF5 files found in HDF5 directories.
+    -) A list of map files with missing ris files.
 
 The header for each item above is only printed if the item contains entries.
 
@@ -45,8 +47,8 @@ for reading a reactionSuite will raise an exception that will exit this script.
 Note, here a protare and reactionSuite are synonymous.
 """
 
-parser = argparse.ArgumentParser( description = description, formatter_class = argparse.RawTextHelpFormatter )
-parser.add_argument( 'mapFile', type = str,                 help = 'The path to a GNDS map file.' )
+parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
+parser.add_argument('mapFile', type=pathlib.Path,                 help='The path to a GNDS map file.')
 
 args = parser.parse_args( )
 
@@ -66,50 +68,64 @@ def printSet( prefix, _set, printFunction = simplePrint ) :
     if( len( _list ) > 0 ) :
         print( '%s:' % prefix )
         printFunction( _list )
+
 #
 # Phase 1: Make a list (i.e., set) of all protare directories and protares.
 #
-
-protareDirectories = set( )
-protaresInMap = set( )
-hdf5ExternalFiles = set( )
-hdf5Directories = set( )
-covarianceExternalFiles = set( )
-missingExternalFiles = set( )
-unsupportedExternalFileTypes = set( )
+protareDirectories = set()
+protaresInMap = set()
+hdf5ExternalFiles = set()
+hdf5Directories = set()
+covarianceExternalFiles = set()
+missingExternalFiles = set()
+unsupportedExternalFileTypes = set()
+missingRIS_files = set()
 
 def checkProtare( protareFileName, map, entry ) :
 
     protaresInMap.add( protareFileName )
     protareDirectories.add( os.path.dirname( protareFileName ) )
     if( os.path.exists( protareFileName ) ) :
-        protare = GNDSTypeModule.preview( protareFileName, haltParsingMoniker = suitesModule.externalFiles.moniker )
-        if protare.evaluation != entry.evaluation or protare.interaction != entry.interaction:
+        protare = GNDS_fileModule.preview(protareFileName, haltParsingMoniker = suitesModule.ExternalFiles.moniker)
+        interaction = entry.interaction
+        if isinstance(entry, mapModule.TNSL) and entry.interaction is None:
+            interaction = enumsModule.Interaction.TNSL
+        if protare.evaluation != entry.evaluation or protare.interaction != interaction:
             print('''For map %s''' % map.fileName)
             print('''and for path %s''' % entry.path)
             if protare.evaluation != entry.evaluation:
                 print('''    map's evaluation "%s" does not match protare's evaluation "%s".''' % (entry.evaluation, protare.evaluation))
-            if protare.interaction != entry.interaction:
-                print('''    map's interaction "%s" does not match protare's interaction "%s".''' % (entry.interaction, protare.interaction))
+
+            if protare.interaction != interaction:
+                print('''    map's interaction "%s" does not match protare's interaction "%s".''' % (interaction, protare.interaction))
             print()
         for externalFile in protare.externalFiles :
             realpath = externalFile.realpath( )
             if( os.path.exists( realpath ) ) :
-                name, dummy = GNDSTypeModule.type( realpath )
-                if( name == GNDSTypeModule.HDF5_values ) :
+                name, dummy = GNDS_fileModule.type(realpath)
+                if( name == GNDS_fileModule.HDF5_values) :
                     hdf5ExternalFiles.add( realpath )
                     hdf5Directories.add( os.path.dirname( realpath ) )
-                elif( name == covarianceSuiteModule.covarianceSuite.moniker ) :
+                elif( name == covarianceSuiteModule.CovarianceSuite.moniker ) :
                     covarianceExternalFiles.add( realpath )
                 else :
                     unsupportedExternalFileTypes.add( realpath )
             else :
                 missingExternalFiles.add( ','.join( [ externalFile.path, protareFileName, realpath ] ) )
 
+masterMap = None
+missingTNSL_standardTarget = set()
+
 def checkMap( mapFileName, priorMaps = [] ) :
 
+    global masterMap
+
+    risFile = pathlib.Path(mapFileName).with_suffix('.ris')
+    if not risFile.exists():
+        missingRIS_files.add(str(mapFileName))
+
     try :
-        map = mapModule.Map.readXML( mapFileName )
+        map = mapModule.Map.read(mapFileName)
     except FileNotFoundError :
         print( 'ERROR: map file %s does not exist.' % mapFileName )
         for priorMap in priorMaps : print( '    From map file %s' % priorMap )
@@ -117,18 +133,21 @@ def checkMap( mapFileName, priorMaps = [] ) :
     except :
         raise
 
+    if masterMap is None: masterMap = map
+
     for entry in map :
         if( isinstance( entry, mapModule.Import ) ) :
             checkMap( entry.fileName, [ mapFileName ] + priorMaps )
         else :
             checkProtare( entry.fileName, map, entry )
+            if isinstance(entry, mapModule.TNSL):
+                if masterMap.find(entry.projectile, entry.standardTarget) is None: missingTNSL_standardTarget.add(entry.standardTarget)
 
 checkMap( args.mapFile )
 
 #
 # Phase 2: Analyze all files in the protare directories.
 #
-
 dirsInDirectories = set( )
 mapsInDirectories = set( )
 protaresInDirectories = set( )
@@ -143,16 +162,16 @@ for protareDirectory in protareDirectories :
             dirsInDirectories.add( file )
         else :
             try:
-                name, dummy = GNDSTypeModule.type( file )
+                name, dummy = GNDS_fileModule.type(file)
                 if( name == mapModule.Map.moniker ) :
                     mapsInDirectories.add( file )
-                elif( name == reactionSuiteModule.reactionSuite.moniker ) :
+                elif( name == reactionSuiteModule.ReactionSuite.moniker ) :
                     protaresInDirectories.add( file )
-                elif( name == covarianceSuiteModule.covarianceSuite.moniker ) :
+                elif( name == covarianceSuiteModule.CovarianceSuite.moniker ) :
                     covariancesInDirectories.add( file )
-                elif( name == PoPsDatabaseModule.database.moniker ) :
+                elif( name == PoPsDatabaseModule.Database.moniker ) :
                     popsInDirectories.add( file )
-                elif( name == GNDSTypeModule.HDF5_values ) : 
+                elif(name == GNDS_fileModule.HDF5_values) :
                     pass
                 else :
                     unknownsInDirectories.add( file )
@@ -168,16 +187,18 @@ for hdf5Directory in hdf5Directories :
                 if( os.path.isdir( file ) ) :
                     mapsInDirectories.add( file )
                 else :
-                    name, dummy = GNDSTypeModule.type( file )
-                    if( name != GNDSTypeModule.HDF5_values ) : unknownsInHDF5_directories.add( file )
+                    name, dummy = GNDS_fileModule.type(file)
+                    if( name != GNDS_fileModule.HDF5_values) : unknownsInHDF5_directories.add(file)
             except :
                 unknownsInHDF5_directories.add( file )
 
-printSet( 'Directories in protare directories', dirsInDirectories )
-printSet( 'Protares in protare directories but not in map file', protaresInDirectories.difference( protaresInMap ) )
-printSet( 'Protares in map file but not in protare directories', protaresInMap.difference( protaresInDirectories ) )
-printSet( 'PoPs files in protare directories', popsInDirectories )
-printSet( 'Map files in protare directories', mapsInDirectories )
-printSet( 'Unknown files in protare directories', unknownsInDirectories )
-printSet( 'Missing external files', missingExternalFiles, printFunction = printMissingExternalFile )
-printSet( 'Unknown files in HDF5 directories', unknownsInHDF5_directories )
+printSet('Directories in protare directories', dirsInDirectories)
+printSet('Protares in protare directories but not in map file', protaresInDirectories.difference(protaresInMap))
+printSet('Protares in map file but not in protare directories', protaresInMap.difference(protaresInDirectories))
+printSet('PoPs files in protare directories', popsInDirectories)
+printSet('Map files in protare directories', mapsInDirectories)
+printSet('Unknown files in protare directories', unknownsInDirectories)
+printSet('Missing external files', missingExternalFiles, printFunction = printMissingExternalFile)
+printSet('Unknown files in HDF5 directories', unknownsInHDF5_directories)
+printSet('Missing TNSL standard targets', missingTNSL_standardTarget)
+printSet('Map files with missing RIS files', missingRIS_files)

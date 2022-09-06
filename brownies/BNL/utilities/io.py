@@ -15,7 +15,7 @@ def read_evaluation(endfFile, reconstructResonances=True):
         firstline = evaluationfile.readline()
     if firstline.startswith("<?xml") or firstline.startswith("<reactionSuite "):
         from fudge import reactionSuite
-        return {'reactionSuite': reactionSuite.readXML(endfFile), 'covarianceSuite': None, 'info': {}, 'errors': []}
+        return {'reactionSuite': reactionSuite.ReactionSuite.readXML_file(endfFile), 'covarianceSuite': None, 'info': {}, 'errors': []}
     else:
         from brownies.legacy.converting import endfFileToGNDS
         return endfFileToGNDS.endfFileToGNDS(endfFile, toStdOut=False, skipBadData=True, continuumSpectraFix=True,

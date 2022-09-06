@@ -42,37 +42,48 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 <span class="kn">from</span> <span class="nn">PoPs</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="kn">import</span> <span class="n">specialNuclearParticleID</span> <span class="k">as</span> <span class="n">specialNuclearParticleID_PoPsModule</span>
 
 <span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">This module contains the ReactionProducts class which is used to store a unique list of products for a reaction in a dictionary-like object.</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Category"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.Category">[docs]</a><span class="k">class</span> <span class="nc">Category</span> <span class="p">:</span>
+<div class="viewcode-block" id="Category"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.Category">[docs]</a><span class="k">class</span> <span class="nc">Category</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
 
-    <span class="n">particle</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">intermediate</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">process</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">reaction</span> <span class="o">=</span> <span class="mi">3</span></div>
+    <span class="n">particle</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>            <span class="c1"># A particle that does not have an outputChannel.</span>
+    <span class="n">intermediate</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>        <span class="c1"># A particle with an outputChannel.</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>             <span class="c1"># The process for the reaction.</span></div>
+
+<div class="viewcode-block" id="Mode"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.Mode">[docs]</a><span class="k">class</span> <span class="nc">Mode</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">unique</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">products</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">productsWithPhotons</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">familiar</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">residual</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ReactionProduct"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProduct">[docs]</a><span class="k">class</span> <span class="nc">ReactionProduct</span> <span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_category</span><span class="p">,</span> <span class="n">_value</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__category</span> <span class="o">=</span> <span class="n">_category</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__category</span> <span class="o">=</span> <span class="n">category</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span> <span class="o">=</span> <span class="n">multiplicity</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;c=</span><span class="si">%s</span><span class="s1"> : v=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;category=</span><span class="si">%s</span><span class="s1"> multiplicity=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="p">)</span> <span class="p">)</span>
 
     <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">ReactionProduct</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Other must be a ReactionProduct instance: </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ReactionProduct</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Other must be a ReactionProduct instance: </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">category</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">category</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">multiplicity</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">category</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
@@ -80,14 +91,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__category</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">multiplicity</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="p">)</span>
 
-    <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_value</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="nd">@multiplicity</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">multiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">_value</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span> <span class="o">=</span> <span class="n">multiplicity</span></div>
 
 <div class="viewcode-block" id="ReactionProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts">[docs]</a><span class="k">class</span> <span class="nc">ReactionProducts</span><span class="p">(</span> <span class="nb">dict</span> <span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -107,16 +118,22 @@
             <span class="k">if</span><span class="p">(</span> <span class="n">excludePhotons</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">key</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
             <span class="n">reactionProduct</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">particle</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="n">particles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">value</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">multiplicity</span><span class="p">])</span>
             <span class="k">elif</span><span class="p">(</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">intermediate</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="n">intermediates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">value</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="n">intermediates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">multiplicity</span><span class="p">]</span> <span class="p">)</span>
             <span class="k">elif</span><span class="p">(</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">process</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="n">processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">value</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="n">processes</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">key</span><span class="p">,</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">multiplicity</span><span class="p">])</span>
             <span class="k">else</span> <span class="p">:</span>
-                <span class="n">reaction</span> <span class="o">=</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">reaction</span> <span class="o">=</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">multiplicity</span>
 
-        <span class="n">particles</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">]</span> <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">particles</span> <span class="p">)</span> <span class="p">]</span>
-        <span class="n">intermediates</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">]</span> <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">intermediates</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">particles</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">key</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="p">]</span> <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">particles</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">intermediates</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">key</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="p">]</span> <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">intermediates</span> <span class="p">)</span> <span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">intermediates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>                 <span class="c1"># The following is for some legacy GNDS 1.10 files which have reactions</span>
+            <span class="k">if</span> <span class="n">intermediates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>            <span class="c1"># like &quot;n + (O16 -&gt; O16 + photon) [continuum]&quot; which should have been</span>
+                <span class="n">intermediates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>             <span class="c1"># &quot;n + O16 + photon [continuum]&quot;.</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">intermediates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">intermediates</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">particles</span><span class="p">,</span> <span class="n">intermediates</span><span class="p">,</span> <span class="n">processes</span><span class="p">,</span> <span class="n">reaction</span> <span class="p">)</span></div>
 
@@ -127,7 +144,89 @@
 
         <span class="n">culled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="ow">in</span> <span class="n">culled</span> <span class="p">)</span> <span class="p">:</span> <span class="n">culled</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">culled</span> <span class="p">)</span></div></div>
+        <span class="k">return</span><span class="p">(</span> <span class="n">culled</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReactionProducts.specialReactionLabel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts.specialReactionLabel">[docs]</a>    <span class="k">def</span> <span class="nf">specialReactionLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputMode</span><span class="p">,</span> <span class="n">pops</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">specialNuclearParticleID_PoPsModule</span><span class="o">.</span><span class="n">Mode</span><span class="o">.</span><span class="n">familiar</span><span class="p">,</span> <span class="n">recalled</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the special label for the ReactionProducts that is unique.</span>
+
+<span class="sd">        :param outputMode           A value from the Mode enum.</span>
+<span class="sd">        :param mode:                A value from the special particle id Mode enum.</span>
+<span class="sd">        :param recalled:            For internal use only. Notes that **specialReactionLabel** is called recursively.</span>
+
+<span class="sd">        :return:                    The special label for *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">a_sep</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
+
+            <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">leftToDo</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+                <span class="n">reactionProduct</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">product</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">outputMode</span> <span class="o">!=</span> <span class="n">Mode</span><span class="o">.</span><span class="n">unique</span> <span class="ow">and</span> <span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">intermediate</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span> <span class="o">!=</span> <span class="n">category</span><span class="p">:</span>
+                    <span class="n">leftToDo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">sep</span> <span class="o">=</span> <span class="n">a_sep</span>
+                <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">multiplicity</span>
+                <span class="k">if</span> <span class="n">multiplicity</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">process</span><span class="p">:</span>
+                    <span class="n">multiplicity</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">elif</span> <span class="n">multiplicity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">multiplicity</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+                <span class="n">pid</span> <span class="o">=</span> <span class="n">specialNuclearParticleID_PoPsModule</span><span class="o">.</span><span class="n">specialNuclearParticleID</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">metaStables</span><span class="p">:</span> <span class="n">pid</span> <span class="o">=</span> <span class="n">metaStables</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+                <span class="n">label</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">pid</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">label</span><span class="p">,</span> <span class="n">leftToDo</span>
+
+        <span class="n">metaStables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">pops</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">alias</span><span class="o">.</span><span class="n">isMetaStable</span><span class="p">:</span> <span class="n">metaStables</span><span class="p">[</span><span class="n">alias</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">pops</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">alias</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">recalled</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ReactionProduct</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>                        <span class="c1"># Special check for fission.</span>
+                <span class="k">if</span> <span class="s1">&#39;Fission&#39;</span> <span class="ow">in</span> <span class="n">ReactionProduct</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;f&#39;</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>                                  <span class="c1"># Special check for capture.</span>
+                <span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+                    <span class="n">ids</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span><span class="p">))</span>
+                    <span class="n">reactionProduct</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                    <span class="k">if</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">particle</span> <span class="ow">and</span> <span class="n">reactionProduct</span><span class="o">.</span><span class="n">multiplicity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">specialNuclearParticleID_PoPsModule</span><span class="o">.</span><span class="n">Mode</span><span class="o">.</span><span class="n">familiar</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;g&#39;</span>
+                        <span class="k">return</span> <span class="s1">&#39;photon&#39;</span>
+                    
+        <span class="k">if</span> <span class="n">outputMode</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">familiar</span> <span class="ow">or</span> <span class="n">outputMode</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">residual</span><span class="p">:</span>
+            <span class="n">residualExluded</span> <span class="o">=</span> <span class="n">ReactionProducts</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">category</span> <span class="o">!=</span> <span class="n">Category</span><span class="o">.</span><span class="n">particle</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">residualExluded</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">pid</span><span class="p">])</span>
+            <span class="n">products</span> <span class="o">=</span> <span class="n">specialNuclearParticleID_PoPsModule</span><span class="o">.</span><span class="n">sortLightParticle</span><span class="p">(</span><span class="n">residualExluded</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">products</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">outputMode</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">residual</span><span class="p">:</span> <span class="k">return</span> <span class="n">residual</span>
+            <span class="n">multiplicity</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">residual</span><span class="p">]</span><span class="o">.</span><span class="n">multiplicity</span>
+            <span class="k">if</span> <span class="n">multiplicity</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">residualExluded</span><span class="p">[</span><span class="n">residual</span><span class="p">]</span><span class="o">.</span><span class="n">multiplicity</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">residualExluded</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">residualExluded</span><span class="o">.</span><span class="n">specialReactionLabel</span><span class="p">(</span><span class="n">Mode</span><span class="o">.</span><span class="n">products</span><span class="p">,</span> <span class="n">pops</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">recalled</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">products</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">outputMode</span> <span class="o">!=</span> <span class="n">Mode</span><span class="o">.</span><span class="n">unique</span><span class="p">:</span> <span class="n">products</span> <span class="o">=</span> <span class="n">specialNuclearParticleID_PoPsModule</span><span class="o">.</span><span class="n">sortLightParticle</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outputMode</span> <span class="o">!=</span> <span class="n">Mode</span><span class="o">.</span><span class="n">productsWithPhotons</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">products</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">products</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">label</span><span class="p">,</span> <span class="n">products</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">Category</span><span class="o">.</span><span class="n">particle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outputMode</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">unique</span><span class="p">:</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">products</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;++&#39;</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">Category</span><span class="o">.</span><span class="n">process</span><span class="p">)</span>
+        <span class="n">label</span><span class="p">,</span> <span class="n">products</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">Category</span><span class="o">.</span><span class="n">intermediate</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">label</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

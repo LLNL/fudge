@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,9 +12,9 @@ This module handles a few special case for MF 6 data that are not easily convert
 from fudge.productData.distributions import angular as angularModule
 
 
-class multipleNeutronDistributions :
+class MultipleNeutronDistributions :
     """
-    This class simulates gnds class productData.distributions.energy.weightedFunctionals for MF 6 distributions.
+    This class simulates gnds class productData.distributions.energy.WeightedFunctionals for MF 6 distributions.
     """
 
     def __init__( self ) :
@@ -47,7 +47,7 @@ class multipleNeutronDistributions :
 
 def neutrons( neutronDatas ) :
 
-    weightedFunctionals = multipleNeutronDistributions( )
+    weightedFunctionals = MultipleNeutronDistributions( )
     frame = neutronDatas[0]['frame']
     for neutronData in neutronDatas :
         if( neutronData['multiplicity'] != 1 ) : raise Exception( 'multiplicity = %s != 1 is not currently supported' % neutronData['multiplicity'] )
@@ -57,7 +57,7 @@ def neutrons( neutronDatas ) :
         if( hasattr( energyData, 'toACE' ) ) :
             weightedFunctionals.append( energyData )
             if( angularData is not None ) :
-                if( not( isinstance( angularData, angularModule.isotropic2d ) ) ) :
+                if( not( isinstance( angularData, angularModule.Isotropic2d ) ) ) :
                     raise Exception( 'Only isotropic angular data is currently supported' )
             angularData = None
         else :

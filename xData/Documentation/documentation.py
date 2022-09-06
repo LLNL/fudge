@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,8 @@
 This module contains the GNDS documentation class.
 """
 
-from .. import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
+
 from .. import date as dateModule
 from . import author as authorModule
 from . import contributor as contributorModule
@@ -25,16 +26,16 @@ from . import exforDataSet as exforDataSetModule
 from . import texts as textsModule
 from .. import text as textParentModule
 
-class Documentation(ancestryModule.Ancestry2):
+class Documentation(ancestryModule.AncestryIO):
     """A class representing a GNDS documentation node."""
 
     moniker = 'documentation'
-    ancestryMembers = ( '[authors', '[contributors', '[collaborations', '[dates', 'copyright', '[acknowledgements', '[keywords', 
-            '[relatedItems', 'title', 'abstract', 'body', 'computerCodes', 'experimentalDataSets', 'bibliography', 'endfCompatible' )
+    ancestryMembers = ( 'authors', 'contributors', 'collaborations', 'dates', 'copyright', 'acknowledgements', 'keywords', 
+            'relatedItems', 'title', 'abstract', 'body', 'computerCodes', 'experimentalDataSets', 'bibliography', 'endfCompatible' )
 
     def __init__(self, doi='', version='', publicationDate=None):
 
-        ancestryModule.Ancestry2.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
 
         self.doi = doi
         self.version = version
@@ -205,27 +206,27 @@ class Documentation(ancestryModule.Ancestry2):
 
         return
 
-    def toXMLList(self, indent = '', **kwargs):
+    def toXML_strList(self, indent = '', **kwargs):
 
         showEmptySuites = kwargs.get('showEmptySuites', False)
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent
 
-        XMLList  = self.__authors.toXMLList(indent2, **kwargs)
-        XMLList += self.__contributors.toXMLList(indent2, **kwargs)
-        XMLList += self.__collaborations.toXMLList(indent2, **kwargs)
-        XMLList += self.__dates.toXMLList(indent2, **kwargs)
-        XMLList += self.__copyright.toXMLList(indent2, **kwargs)
-        XMLList += self.__acknowledgements.toXMLList(indent2, **kwargs)
-        XMLList += self.__keywords.toXMLList(indent2, **kwargs)
-        XMLList += self.__relatedItems.toXMLList(indent2, **kwargs)
-        XMLList += self.__title.toXMLList(indent2, **kwargs)
-        XMLList += self.__abstract.toXMLList(indent2, **kwargs)
-        XMLList += self.__body.toXMLList(indent2, **kwargs)
-        XMLList += self.__computerCodes.toXMLList(indent2, **kwargs)
-        XMLList += self.__experimentalDataSets.toXMLList(indent2, **kwargs)
-        XMLList += self.__bibliography.toXMLList(indent2, **kwargs)
-        XMLList += self.__endfCompatible.toXMLList(indent2, **kwargs)
+        XMLList  = self.__authors.toXML_strList(indent2, **kwargs)
+        XMLList += self.__contributors.toXML_strList(indent2, **kwargs)
+        XMLList += self.__collaborations.toXML_strList(indent2, **kwargs)
+        XMLList += self.__dates.toXML_strList(indent2, **kwargs)
+        XMLList += self.__copyright.toXML_strList(indent2, **kwargs)
+        XMLList += self.__acknowledgements.toXML_strList(indent2, **kwargs)
+        XMLList += self.__keywords.toXML_strList(indent2, **kwargs)
+        XMLList += self.__relatedItems.toXML_strList(indent2, **kwargs)
+        XMLList += self.__title.toXML_strList(indent2, **kwargs)
+        XMLList += self.__abstract.toXML_strList(indent2, **kwargs)
+        XMLList += self.__body.toXML_strList(indent2, **kwargs)
+        XMLList += self.__computerCodes.toXML_strList(indent2, **kwargs)
+        XMLList += self.__experimentalDataSets.toXML_strList(indent2, **kwargs)
+        XMLList += self.__bibliography.toXML_strList(indent2, **kwargs)
+        XMLList += self.__endfCompatible.toXML_strList(indent2, **kwargs)
 
         attributes  = '' if self.doi == '' else ' doi="%s"' % self.doi
         attributes += '' if self.version == '' else ' version="%s"' % self.version
@@ -246,11 +247,11 @@ class Documentation(ancestryModule.Ancestry2):
 
         xPath.pop()
 
-    @staticmethod
-    def parseConstructBareNodeInstance(node, xPath, linkData, **kwargs):
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         doi = node.get('doi', '')
         version = node.get('version', '')
         publicationDate = dateModule.Date.parse(node.get('publicationDate', ''))
 
-        return Documentation(doi, version, publicationDate)
+        return cls(doi, version, publicationDate)

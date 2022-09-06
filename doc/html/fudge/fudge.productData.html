@@ -80,138 +80,509 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fudge.productData.energyDeposition">
-<span id="fudge-productdata-energydeposition-module"></span><h2>fudge.productData.energyDeposition module<a class="headerlink" href="#module-fudge.productData.energyDeposition" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-fudge.productData.averageProductEnergy">
+<span id="fudge-productdata-averageproductenergy-module"></span><h2>fudge.productData.averageProductEnergy module<a class="headerlink" href="#module-fudge.productData.averageProductEnergy" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="fudge.productData.energyDeposition.XYs1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.energyDeposition.</code><code class="sig-name descname">XYs1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#XYs1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.XYs1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.energyDeposition.baseEnergyDepositionForm" title="fudge.productData.energyDeposition.baseEnergyDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.energyDeposition.baseEnergyDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.XYs.XYs1d</span></code></p>
-<dl class="py method">
-<dt id="fudge.productData.energyDeposition.XYs1d.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#XYs1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.XYs1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.productData.averageProductEnergy.BaseEnergyDepositionForm">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductEnergy.</code><code class="sig-name descname">BaseEnergyDepositionForm</code><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#BaseEnergyDepositionForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.BaseEnergyDepositionForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.Form" title="fudge.abstractClasses.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.Form</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.productData.averageProductEnergy.BaseEnergyDepositionForm.keyName">
+<code class="sig-name descname">keyName</code><em class="property"> = 'label'</em><a class="headerlink" href="#fudge.productData.averageProductEnergy.BaseEnergyDepositionForm.keyName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="fudge.productData.energyDeposition.baseEnergyDepositionForm">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.energyDeposition.</code><code class="sig-name descname">baseEnergyDepositionForm</code><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#baseEnergyDepositionForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.baseEnergyDepositionForm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.form" title="fudge.abstractClasses.form"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.form</span></code></a></p>
+<dt id="fudge.productData.averageProductEnergy.Component">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductEnergy.</code><code class="sig-name descname">Component</code><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#Component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.Component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.Component" title="fudge.abstractClasses.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.Component</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.productData.averageProductEnergy.Component.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'averageProductEnergy'</em><a class="headerlink" href="#fudge.productData.averageProductEnergy.Component.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
-<dt id="fudge.productData.energyDeposition.component">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.energyDeposition.</code><code class="sig-name descname">component</code><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.component" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.component" title="fudge.abstractClasses.component"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.component</span></code></a></p>
-<dl class="py attribute">
-<dt id="fudge.productData.energyDeposition.component.moniker">
-<code class="sig-name descname">moniker</code><em class="property"> = 'averageProductEnergy'</em><a class="headerlink" href="#fudge.productData.energyDeposition.component.moniker" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.productData.averageProductEnergy.Gridded1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductEnergy.</code><code class="sig-name descname">Gridded1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axes</span></em>, <em class="sig-param"><span class="n">array</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#Gridded1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.Gridded1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.averageProductEnergy.BaseEnergyDepositionForm" title="fudge.productData.averageProductEnergy.BaseEnergyDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.averageProductEnergy.BaseEnergyDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.gridded.Gridded1d</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.averageProductEnergy.Regions1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductEnergy.</code><code class="sig-name descname">Regions1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#Regions1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.Regions1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.averageProductEnergy.BaseEnergyDepositionForm" title="fudge.productData.averageProductEnergy.BaseEnergyDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.averageProductEnergy.BaseEnergyDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.regions.Regions1d</span></code></p>
+<dl class="py method">
+<dt id="fudge.productData.averageProductEnergy.Regions1d.allowedSubElements">
+<em class="property">static </em><code class="sig-name descname">allowedSubElements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#Regions1d.allowedSubElements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.Regions1d.allowedSubElements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.averageProductEnergy.Regions1d.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#Regions1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.Regions1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.averageProductEnergy.Regions1d.toLinearXYsClass">
+<code class="sig-name descname">toLinearXYsClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#Regions1d.toLinearXYsClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.Regions1d.toLinearXYsClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.averageProductEnergy.XYs1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductEnergy.</code><code class="sig-name descname">XYs1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#XYs1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.XYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.averageProductEnergy.BaseEnergyDepositionForm" title="fudge.productData.averageProductEnergy.BaseEnergyDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.averageProductEnergy.BaseEnergyDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.XYs1d.XYs1d</span></code></p>
+<dl class="py method">
+<dt id="fudge.productData.averageProductEnergy.XYs1d.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#XYs1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.XYs1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="fudge.productData.energyDeposition.defaultAxes">
-<code class="sig-prename descclassname">fudge.productData.energyDeposition.</code><code class="sig-name descname">defaultAxes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energyUnit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.defaultAxes" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.productData.averageProductEnergy.defaultAxes">
+<code class="sig-prename descclassname">fudge.productData.averageProductEnergy.</code><code class="sig-name descname">defaultAxes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energyUnit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductEnergy.html#defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductEnergy.defaultAxes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.energyDeposition.gridded1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.energyDeposition.</code><code class="sig-name descname">gridded1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#gridded1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.gridded1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.energyDeposition.baseEnergyDepositionForm" title="fudge.productData.energyDeposition.baseEnergyDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.energyDeposition.baseEnergyDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.gridded.gridded1d</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.energyDeposition.regions1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.energyDeposition.</code><code class="sig-name descname">regions1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#regions1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.regions1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.energyDeposition.baseEnergyDepositionForm" title="fudge.productData.energyDeposition.baseEnergyDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.energyDeposition.baseEnergyDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.regions.regions1d</span></code></p>
-<dl class="py method">
-<dt id="fudge.productData.energyDeposition.regions1d.allowedSubElements">
-<em class="property">static </em><code class="sig-name descname">allowedSubElements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#regions1d.allowedSubElements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.regions1d.allowedSubElements" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.energyDeposition.regions1d.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#regions1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.regions1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.energyDeposition.regions1d.toLinearXYsClass">
-<code class="sig-name descname">toLinearXYsClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/energyDeposition.html#regions1d.toLinearXYsClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.energyDeposition.regions1d.toLinearXYsClass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
 
 </div>
-<div class="section" id="module-fudge.productData.momentumDeposition">
-<span id="fudge-productdata-momentumdeposition-module"></span><h2>fudge.productData.momentumDeposition module<a class="headerlink" href="#module-fudge.productData.momentumDeposition" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-fudge.productData.averageProductMomentum">
+<span id="fudge-productdata-averageproductmomentum-module"></span><h2>fudge.productData.averageProductMomentum module<a class="headerlink" href="#module-fudge.productData.averageProductMomentum" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="fudge.productData.momentumDeposition.XYs1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.momentumDeposition.</code><code class="sig-name descname">XYs1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#XYs1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.XYs1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.momentumDeposition.baseMomentumDepositionForm" title="fudge.productData.momentumDeposition.baseMomentumDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.momentumDeposition.baseMomentumDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.XYs.XYs1d</span></code></p>
-<dl class="py method">
-<dt id="fudge.productData.momentumDeposition.XYs1d.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#XYs1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.XYs1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.productData.averageProductMomentum.BaseMomentumDepositionForm">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductMomentum.</code><code class="sig-name descname">BaseMomentumDepositionForm</code><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#BaseMomentumDepositionForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.BaseMomentumDepositionForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.Form" title="fudge.abstractClasses.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.Form</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.productData.averageProductMomentum.BaseMomentumDepositionForm.keyName">
+<code class="sig-name descname">keyName</code><em class="property"> = 'label'</em><a class="headerlink" href="#fudge.productData.averageProductMomentum.BaseMomentumDepositionForm.keyName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="fudge.productData.momentumDeposition.baseMomentumDepositionForm">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.momentumDeposition.</code><code class="sig-name descname">baseMomentumDepositionForm</code><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#baseMomentumDepositionForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.baseMomentumDepositionForm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.form" title="fudge.abstractClasses.form"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.form</span></code></a></p>
+<dt id="fudge.productData.averageProductMomentum.Component">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductMomentum.</code><code class="sig-name descname">Component</code><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#Component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.Component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.Component" title="fudge.abstractClasses.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.Component</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.productData.averageProductMomentum.Component.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'averageProductMomentum'</em><a class="headerlink" href="#fudge.productData.averageProductMomentum.Component.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
-<dt id="fudge.productData.momentumDeposition.component">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.momentumDeposition.</code><code class="sig-name descname">component</code><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.component" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.component" title="fudge.abstractClasses.component"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.component</span></code></a></p>
-<dl class="py attribute">
-<dt id="fudge.productData.momentumDeposition.component.moniker">
-<code class="sig-name descname">moniker</code><em class="property"> = 'averageProductMomentum'</em><a class="headerlink" href="#fudge.productData.momentumDeposition.component.moniker" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.productData.averageProductMomentum.Gridded1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductMomentum.</code><code class="sig-name descname">Gridded1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axes</span></em>, <em class="sig-param"><span class="n">array</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#Gridded1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.Gridded1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.averageProductMomentum.BaseMomentumDepositionForm" title="fudge.productData.averageProductMomentum.BaseMomentumDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.averageProductMomentum.BaseMomentumDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.gridded.Gridded1d</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.averageProductMomentum.Regions1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductMomentum.</code><code class="sig-name descname">Regions1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#Regions1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.Regions1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.averageProductMomentum.BaseMomentumDepositionForm" title="fudge.productData.averageProductMomentum.BaseMomentumDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.averageProductMomentum.BaseMomentumDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.regions.Regions1d</span></code></p>
+<dl class="py method">
+<dt id="fudge.productData.averageProductMomentum.Regions1d.allowedSubElements">
+<em class="property">static </em><code class="sig-name descname">allowedSubElements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#Regions1d.allowedSubElements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.Regions1d.allowedSubElements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.averageProductMomentum.Regions1d.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#Regions1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.Regions1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.averageProductMomentum.Regions1d.toLinearXYsClass">
+<code class="sig-name descname">toLinearXYsClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#Regions1d.toLinearXYsClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.Regions1d.toLinearXYsClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.averageProductMomentum.XYs1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.averageProductMomentum.</code><code class="sig-name descname">XYs1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#XYs1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.XYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.averageProductMomentum.BaseMomentumDepositionForm" title="fudge.productData.averageProductMomentum.BaseMomentumDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.averageProductMomentum.BaseMomentumDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.XYs1d.XYs1d</span></code></p>
+<dl class="py method">
+<dt id="fudge.productData.averageProductMomentum.XYs1d.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#XYs1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.XYs1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="fudge.productData.momentumDeposition.defaultAxes">
-<code class="sig-prename descclassname">fudge.productData.momentumDeposition.</code><code class="sig-name descname">defaultAxes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energyUnit</span></em>, <em class="sig-param"><span class="n">momentumUnit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.defaultAxes" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.productData.averageProductMomentum.defaultAxes">
+<code class="sig-prename descclassname">fudge.productData.averageProductMomentum.</code><code class="sig-name descname">defaultAxes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energyUnit</span></em>, <em class="sig-param"><span class="n">momentumUnit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/averageProductMomentum.html#defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.averageProductMomentum.defaultAxes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.momentumDeposition.gridded1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.momentumDeposition.</code><code class="sig-name descname">gridded1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#gridded1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.gridded1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.momentumDeposition.baseMomentumDepositionForm" title="fudge.productData.momentumDeposition.baseMomentumDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.momentumDeposition.baseMomentumDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.gridded.gridded1d</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.momentumDeposition.regions1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.momentumDeposition.</code><code class="sig-name descname">regions1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#regions1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.regions1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.momentumDeposition.baseMomentumDepositionForm" title="fudge.productData.momentumDeposition.baseMomentumDepositionForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.momentumDeposition.baseMomentumDepositionForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.regions.regions1d</span></code></p>
-<dl class="py method">
-<dt id="fudge.productData.momentumDeposition.regions1d.allowedSubElements">
-<em class="property">static </em><code class="sig-name descname">allowedSubElements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#regions1d.allowedSubElements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.regions1d.allowedSubElements" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.momentumDeposition.regions1d.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#regions1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.regions1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.momentumDeposition.regions1d.toLinearXYsClass">
-<code class="sig-name descname">toLinearXYsClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/momentumDeposition.html#regions1d.toLinearXYsClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.momentumDeposition.regions1d.toLinearXYsClass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
 
 </div>
 <div class="section" id="module-fudge.productData.multiplicity">
 <span id="fudge-productdata-multiplicity-module"></span><h2>fudge.productData.multiplicity module<a class="headerlink" href="#module-fudge.productData.multiplicity" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
+<dt id="fudge.productData.multiplicity.BaseMultiplicityForm">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">BaseMultiplicityForm</code><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#BaseMultiplicityForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.Form" title="fudge.abstractClasses.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.Form</span></code></a></p>
+<dl class="py attribute">
+<dt id="fudge.productData.multiplicity.BaseMultiplicityForm.keyName">
+<code class="sig-name descname">keyName</code><em class="property"> = 'label'</em><a class="headerlink" href="#fudge.productData.multiplicity.BaseMultiplicityForm.keyName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.BaseMultiplicityForm.product">
+<em class="property">property </em><code class="sig-name descname">product</code><a class="headerlink" href="#fudge.productData.multiplicity.BaseMultiplicityForm.product" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.Branching1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">Branching1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Branching1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Branching1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a></p>
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Branching1d.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Branching1d.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Branching1d.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Branching1d.fixDomains">
+<code class="sig-name descname">fixDomains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energyMin</span></em>, <em class="sig-param"><span class="n">energyMax</span></em>, <em class="sig-param"><span class="n">domainToFix</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Branching1d.fixDomains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Branching1d.fixDomains" title="Permalink to this definition">¶</a></dt>
+<dd><p>The method does nothing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Branching1d.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.productData.multiplicity.Branching1d.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.productData.multiplicity.Branching1d.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'branching1d'</em><a class="headerlink" href="#fudge.productData.multiplicity.Branching1d.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Branching1d.parseNodeUsingClass">
+<em class="property">classmethod </em><code class="sig-name descname">parseNodeUsingClass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Branching1d.parseNodeUsingClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Branching1d.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Branching1d.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Branching1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Branching1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Branching1d.toXML_strList">
+<code class="sig-name descname">toXML_strList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Branching1d.toXML_strList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Branching1d.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.Component">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">Component</code><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.Component" title="fudge.abstractClasses.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.Component</span></code></a></p>
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Component.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Component.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.domainMax">
+<em class="property">property </em><code class="sig-name descname">domainMax</code><a class="headerlink" href="#fudge.productData.multiplicity.Component.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.domainMin">
+<em class="property">property </em><code class="sig-name descname">domainMin</code><a class="headerlink" href="#fudge.productData.multiplicity.Component.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.productData.multiplicity.Component.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Component.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Component.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.getConstant">
+<code class="sig-name descname">getConstant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Component.getConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Component.getConstant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.getEnergyLimits">
+<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Component.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Component.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.isConstant">
+<code class="sig-name descname">isConstant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Component.isConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Component.isConstant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Component.isSpecified">
+<code class="sig-name descname">isSpecified</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Component.isSpecified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Component.isSpecified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <strong>True</strong> if <em>self</em> has data and if the first is not <strong>Unspecified</strong>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.productData.multiplicity.Component.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'multiplicity'</em><a class="headerlink" href="#fudge.productData.multiplicity.Component.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.Constant1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">Constant1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">domainMin</span></em>, <em class="sig-param"><span class="n">domainMax</span></em>, <em class="sig-param"><span class="n">axes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">outerDomainValue</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Constant1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Constant1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.constant.Constant1d</span></code></p>
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Constant1d.getEnergyLimits">
+<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Constant1d.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Constant1d.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Constant1d.isConstant">
+<code class="sig-name descname">isConstant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Constant1d.isConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Constant1d.isConstant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Constant1d.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Constant1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Constant1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Constant1d.toPointwise_withLinearXYs">
+<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Constant1d.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Constant1d.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns the multiplicity as linear-linear XYs1d data which spans self’s domain.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.Gridded1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">Gridded1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axes</span></em>, <em class="sig-param"><span class="n">array</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Gridded1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Gridded1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.gridded.Gridded1d</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.PartialProduction">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">PartialProduction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#PartialProduction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.PartialProduction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a></p>
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.PartialProduction.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#PartialProduction.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.PartialProduction.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.PartialProduction.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.productData.multiplicity.PartialProduction.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.productData.multiplicity.PartialProduction.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'partialProduction'</em><a class="headerlink" href="#fudge.productData.multiplicity.PartialProduction.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.PartialProduction.parseNodeUsingClass">
+<em class="property">classmethod </em><code class="sig-name descname">parseNodeUsingClass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#PartialProduction.parseNodeUsingClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.PartialProduction.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.PartialProduction.toPointwise_withLinearXYs">
+<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#PartialProduction.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.PartialProduction.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.PartialProduction.toXML_strList">
+<code class="sig-name descname">toXML_strList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#PartialProduction.toXML_strList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.PartialProduction.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.Polynomial1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">Polynomial1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coefficients</span></em>, <em class="sig-param"><span class="n">domainMin</span></em>, <em class="sig-param"><span class="n">domainMax</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Polynomial1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Polynomial1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.series1d.Polynomial1d</span></code></p>
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Polynomial1d.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.productData.multiplicity.Polynomial1d.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Polynomial1d.getEnergyLimits">
+<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Polynomial1d.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Polynomial1d.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Polynomial1d.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Polynomial1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Polynomial1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Polynomial1d.toPointwise_withLinearXYs">
+<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Polynomial1d.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Polynomial1d.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls self’ toPointwiseLinear method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.Reference">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">Reference</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Reference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.link.Link</span></code>, <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a></p>
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Reference.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Reference.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.domainMax">
+<em class="property">property </em><code class="sig-name descname">domainMax</code><a class="headerlink" href="#fudge.productData.multiplicity.Reference.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.domainMin">
+<em class="property">property </em><code class="sig-name descname">domainMin</code><a class="headerlink" href="#fudge.productData.multiplicity.Reference.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.domainUnit">
+<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.productData.multiplicity.Reference.domainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Reference.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Reference.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.fixDomains">
+<code class="sig-name descname">fixDomains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energyMin</span></em>, <em class="sig-param"><span class="n">energyMax</span></em>, <em class="sig-param"><span class="n">domainToFix</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Reference.fixDomains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Reference.fixDomains" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method does nothing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.getEnergyLimits">
+<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Reference.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Reference.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.productData.multiplicity.Reference.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'reference'</em><a class="headerlink" href="#fudge.productData.multiplicity.Reference.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Reference.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Reference.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.reference">
+<em class="property">property </em><code class="sig-name descname">reference</code><a class="headerlink" href="#fudge.productData.multiplicity.Reference.reference" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Reference.toPointwise_withLinearXYs">
+<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Reference.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Reference.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.Regions1d">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">Regions1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Regions1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Regions1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.regions.Regions1d</span></code></p>
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Regions1d.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Regions1d.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Regions1d.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate function at requested domain point. If at discontinuity, return upper region’s value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>domainValue</strong> – </p>
+</dd>
+<dt class="field-even">Return interpolated point at domainValue</dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Regions1d.getEnergyLimits">
+<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Regions1d.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Regions1d.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Regions1d.processMultiGroup">
+<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Regions1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Regions1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Regions1d.toPointwise_withLinearXYs">
+<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Regions1d.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Regions1d.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
+<dd><p>See regionsXYs.toPointwise_withLinearXYs on the use of lowerEps, upperEps.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="fudge.productData.multiplicity.Unspecified">
+<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">Unspecified</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Unspecified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a></p>
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Unspecified.convertUnits">
+<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Unspecified.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Unspecified.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Unspecified.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Unspecified.fixDomains">
+<code class="sig-name descname">fixDomains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">domainMin</span></em>, <em class="sig-param"><span class="n">domainMax</span></em>, <em class="sig-param"><span class="n">fixToDomain</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Unspecified.fixDomains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified.fixDomains" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method does nothing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Unspecified.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="fudge.productData.multiplicity.Unspecified.moniker">
+<code class="sig-name descname">moniker</code><em class="property"> = 'unspecified'</em><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Unspecified.parseNodeUsingClass">
+<em class="property">classmethod </em><code class="sig-name descname">parseNodeUsingClass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Unspecified.parseNodeUsingClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Unspecified.toPointwise_withLinearXYs">
+<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Unspecified.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="fudge.productData.multiplicity.Unspecified.toXML_strList">
+<code class="sig-name descname">toXML_strList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#Unspecified.toXML_strList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.Unspecified.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="fudge.productData.multiplicity.XYs1d">
 <em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">XYs1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#XYs1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.XYs1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.XYs.XYs1d</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.BaseMultiplicityForm" title="fudge.productData.multiplicity.BaseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.BaseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.XYs1d.XYs1d</span></code></p>
 <dl class="py method">
 <dt id="fudge.productData.multiplicity.XYs1d.evaluate">
 <code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#XYs1d.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.XYs1d.evaluate" title="Permalink to this definition">¶</a></dt>
@@ -220,11 +591,6 @@
 <dl class="py method">
 <dt id="fudge.productData.multiplicity.XYs1d.getEnergyLimits">
 <code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#XYs1d.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.XYs1d.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.XYs1d.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#XYs1d.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.XYs1d.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -239,381 +605,15 @@
 
 </dd></dl>
 
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.baseMultiplicityForm">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">baseMultiplicityForm</code><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#baseMultiplicityForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.form" title="fudge.abstractClasses.form"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.form</span></code></a></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.baseMultiplicityForm.product">
-<em class="property">property </em><code class="sig-name descname">product</code><a class="headerlink" href="#fudge.productData.multiplicity.baseMultiplicityForm.product" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.branching1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">branching1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#branching1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.branching1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.branching1d.convertUnits">
-<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#branching1d.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.branching1d.convertUnits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.branching1d.label">
-<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.productData.multiplicity.branching1d.label" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="fudge.productData.multiplicity.branching1d.moniker">
-<code class="sig-name descname">moniker</code><em class="property"> = 'branching1d'</em><a class="headerlink" href="#fudge.productData.multiplicity.branching1d.moniker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.branching1d.parseXMLNode">
-<em class="property">static </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#branching1d.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.branching1d.parseXMLNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.branching1d.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#branching1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.branching1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.branching1d.toXMLList">
-<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#branching1d.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.branching1d.toXMLList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.component">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">component</code><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.component" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fudge.html#fudge.abstractClasses.component" title="fudge.abstractClasses.component"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.abstractClasses.component</span></code></a></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.check">
-<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#component.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.component.check" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.domainMax">
-<em class="property">property </em><code class="sig-name descname">domainMax</code><a class="headerlink" href="#fudge.productData.multiplicity.component.domainMax" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.domainMin">
-<em class="property">property </em><code class="sig-name descname">domainMin</code><a class="headerlink" href="#fudge.productData.multiplicity.component.domainMin" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.domainUnit">
-<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.productData.multiplicity.component.domainUnit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.evaluate">
-<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#component.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.component.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.getConstant">
-<code class="sig-name descname">getConstant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#component.getConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.component.getConstant" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.getEnergyLimits">
-<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#component.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.component.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#component.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.component.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.component.isConstant">
-<code class="sig-name descname">isConstant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#component.isConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.component.isConstant" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="fudge.productData.multiplicity.component.moniker">
-<code class="sig-name descname">moniker</code><em class="property"> = 'multiplicity'</em><a class="headerlink" href="#fudge.productData.multiplicity.component.moniker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.constant1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">constant1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">multiplicity</span></em>, <em class="sig-param"><span class="n">domainMin</span></em>, <em class="sig-param"><span class="n">domainMax</span></em>, <em class="sig-param"><span class="n">axes</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#constant1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.constant1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.constant.constant1d</span></code></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.constant1d.getEnergyLimits">
-<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#constant1d.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.constant1d.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.constant1d.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#constant1d.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.constant1d.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.constant1d.isConstant">
-<code class="sig-name descname">isConstant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#constant1d.isConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.constant1d.isConstant" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.constant1d.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#constant1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.constant1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.constant1d.toPointwise_withLinearXYs">
-<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#constant1d.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.constant1d.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method returns the multiplicity as linear-linear XYs1d data which spans self’s domain.</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py function">
 <dt id="fudge.productData.multiplicity.defaultAxes">
 <code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">defaultAxes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">energyUnit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.defaultAxes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.gridded1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">gridded1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#gridded1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.gridded1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.gridded.gridded1d</span></code></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.gridded1d.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#gridded1d.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.gridded1d.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 <dl class="py function">
-<dt id="fudge.productData.multiplicity.parseXMLNode">
-<code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">multElement</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.productData.multiplicity.parseNodeUsingClass">
+<code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">parseNodeUsingClass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">multElement</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#parseNodeUsingClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Translate an xml &lt;multiplicity&gt; element into fudge.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.partialProduction">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">partialProduction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#partialProduction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.partialProduction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.partialProduction.evaluate">
-<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#partialProduction.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.partialProduction.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.partialProduction.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#partialProduction.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.partialProduction.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.partialProduction.label">
-<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.productData.multiplicity.partialProduction.label" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="fudge.productData.multiplicity.partialProduction.moniker">
-<code class="sig-name descname">moniker</code><em class="property"> = 'partialProduction'</em><a class="headerlink" href="#fudge.productData.multiplicity.partialProduction.moniker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.partialProduction.parseXMLNode">
-<em class="property">static </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#partialProduction.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.partialProduction.parseXMLNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.partialProduction.toPointwise_withLinearXYs">
-<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#partialProduction.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.partialProduction.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.partialProduction.toXMLList">
-<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#partialProduction.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.partialProduction.toXMLList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.polynomial">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">polynomial</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#polynomial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.polynomial" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.series1d.polynomial1d</span></code></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.polynomial.domainUnit">
-<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.productData.multiplicity.polynomial.domainUnit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.polynomial.getEnergyLimits">
-<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#polynomial.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.polynomial.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.polynomial.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#polynomial.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.polynomial.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.polynomial.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#polynomial.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.polynomial.processMultiGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.polynomial.toPointwise_withLinearXYs">
-<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#polynomial.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.polynomial.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls self’ toPointwiseLinear method.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.reference">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">reference</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#reference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.reference" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.link.link</span></code>, <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.convertUnits">
-<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#reference.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.reference.convertUnits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.domainMax">
-<em class="property">property </em><code class="sig-name descname">domainMax</code><a class="headerlink" href="#fudge.productData.multiplicity.reference.domainMax" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.domainMin">
-<em class="property">property </em><code class="sig-name descname">domainMin</code><a class="headerlink" href="#fudge.productData.multiplicity.reference.domainMin" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.domainUnit">
-<em class="property">property </em><code class="sig-name descname">domainUnit</code><a class="headerlink" href="#fudge.productData.multiplicity.reference.domainUnit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.evaluate">
-<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#reference.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.reference.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.getEnergyLimits">
-<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#reference.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.reference.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#reference.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.reference.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="fudge.productData.multiplicity.reference.moniker">
-<code class="sig-name descname">moniker</code><em class="property"> = 'reference'</em><a class="headerlink" href="#fudge.productData.multiplicity.reference.moniker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#reference.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.reference.processMultiGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.reference">
-<em class="property">property </em><code class="sig-name descname">reference</code><a class="headerlink" href="#fudge.productData.multiplicity.reference.reference" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.reference.toPointwise_withLinearXYs">
-<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#reference.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.reference.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.regions1d">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">regions1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#regions1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.regions1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xData.regions.regions1d</span></code></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.regions1d.evaluate">
-<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#regions1d.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.regions1d.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate function at requested domain point. If at discontinuity, return upper region’s value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>domainValue</strong> – </p>
-</dd>
-<dt class="field-even">Return interpolated point at domainValue</dt>
-<dd class="field-even"><p></p></dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.regions1d.getEnergyLimits">
-<code class="sig-name descname">getEnergyLimits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">EMin</span></em>, <em class="sig-param"><span class="n">EMax</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#regions1d.getEnergyLimits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.regions1d.getEnergyLimits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.regions1d.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#regions1d.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.regions1d.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.regions1d.processMultiGroup">
-<code class="sig-name descname">processMultiGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">tempInfo</span></em>, <em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#regions1d.processMultiGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.regions1d.processMultiGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.regions1d.toPointwise_withLinearXYs">
-<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#regions1d.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.regions1d.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
-<dd><p>See regionsXYs.toPointwise_withLinearXYs on the use of lowerEps, upperEps.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="fudge.productData.multiplicity.unspecified">
-<em class="property">class </em><code class="sig-prename descclassname">fudge.productData.multiplicity.</code><code class="sig-name descname">unspecified</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#unspecified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.unspecified" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.productData.multiplicity.baseMultiplicityForm" title="fudge.productData.multiplicity.baseMultiplicityForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">fudge.productData.multiplicity.baseMultiplicityForm</span></code></a></p>
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.unspecified.convertUnits">
-<code class="sig-name descname">convertUnits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unitMap</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#unspecified.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.unspecified.convertUnits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.unspecified.evaluate">
-<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#unspecified.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.unspecified.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.unspecified.getXMLAttribute">
-<code class="sig-name descname">getXMLAttribute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#unspecified.getXMLAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.unspecified.getXMLAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.unspecified.label">
-<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#fudge.productData.multiplicity.unspecified.label" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="fudge.productData.multiplicity.unspecified.moniker">
-<code class="sig-name descname">moniker</code><em class="property"> = 'unspecified'</em><a class="headerlink" href="#fudge.productData.multiplicity.unspecified.moniker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.unspecified.parseXMLNode">
-<em class="property">classmethod </em><code class="sig-name descname">parseXMLNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">xPath</span></em>, <em class="sig-param"><span class="n">linkData</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#unspecified.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.unspecified.parseXMLNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.unspecified.toPointwise_withLinearXYs">
-<code class="sig-name descname">toPointwise_withLinearXYs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#unspecified.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.unspecified.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="fudge.productData.multiplicity.unspecified.toXMLList">
-<code class="sig-name descname">toXMLList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/multiplicity.html#unspecified.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.productData.multiplicity.unspecified.toXMLList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </div>
@@ -637,8 +637,8 @@
 <li><a class="reference internal" href="#">fudge.productData package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-fudge.productData.energyDeposition">fudge.productData.energyDeposition module</a></li>
-<li><a class="reference internal" href="#module-fudge.productData.momentumDeposition">fudge.productData.momentumDeposition module</a></li>
+<li><a class="reference internal" href="#module-fudge.productData.averageProductEnergy">fudge.productData.averageProductEnergy module</a></li>
+<li><a class="reference internal" href="#module-fudge.productData.averageProductMomentum">fudge.productData.averageProductMomentum module</a></li>
 <li><a class="reference internal" href="#module-fudge.productData.multiplicity">fudge.productData.multiplicity module</a></li>
 <li><a class="reference internal" href="#module-fudge.productData">Module contents</a></li>
 </ul>

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,20 +11,19 @@
     """
 import abc
 
+from LUPY import ancestry as ancestryModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+
 from xData import link as linkModule
-from xData import ancestry as ancestryModule
-from xData import formatVersion as formatVersionModule
 
 from fudge import suites as suitesModule
 
-from .base import covariance
-from .covarianceMatrix import covarianceMatrix
-from .mixed import mixedForm
-from .summed import summedCovariance
+from .base import Covariance
+from .covarianceMatrix import CovarianceMatrix
+from .mixed import MixedForm
+from .summed import SummedCovariance
 
-__metaclass__ = type
-
-class covarianceSection(suitesModule.suite):
+class CovarianceSection(suitesModule.Suite):
     """
     A covarianceSuite contains sections, where each section represents either a self-covariance for one quantity,
     or a cross-covariance between two quantities
@@ -35,11 +34,12 @@ class covarianceSection(suitesModule.suite):
     Within each section, covariance data can take multiple forms: :py:class:`covarianceMatrix` is the most common,
     but 'summed', 'mixed' are also possible. 
 
-    section inherits from 'suite', and can contain anything inheriting from the base covariance class.
+    section inherits from 'Suite', and can contain anything inheriting from the base covariance class.
     """
 
     moniker = 'covarianceSection'
-    monikerByFormat = {formatVersionModule.version_1_10: 'section'}
+    monikerByFormat = {GNDS_formatVersionModule.version_1_10: 'section'}
+    keyName = 'label'
 
     def __init__(self, label, rowData=None, columnData=None):
         """
@@ -51,7 +51,7 @@ class covarianceSection(suitesModule.suite):
         :param columnData: xData.link.link pointing to data corresponding to columns of the covariance matrix
         """
 
-        suitesModule.suite.__init__( self, [covariance] )
+        suitesModule.Suite.__init__( self, [Covariance] )
         self.label = label
         self.rowData = rowData
         self.columnData = columnData
@@ -64,13 +64,13 @@ class covarianceSection(suitesModule.suite):
     def evaluated(self):
         """
         Helper method to grab evaluated style
-        FIXME method should be inherited, but abstractClasses.component defines methods that don't make sense for covariances
+        FIXME method should be inherited, but abstractClasses.Component defines methods that don't make sense for covariances
         """
 
-        if not hasattr(self.getRootAncestor(), 'styles'):
+        if not hasattr(self.rootAncestor, 'styles'):
             return self[0]  # For covarianceSection that is not part of a full covarianceSuite.
 
-        evaluated = self.getRootAncestor().styles.getEvaluatedStyle()
+        evaluated = self.rootAncestor.styles.getEvaluatedStyle()
         try:
             return self[evaluated.label]
         except IndexError:
@@ -84,7 +84,7 @@ class covarianceSection(suitesModule.suite):
         for form in self:
             formWarnings = form.check( info )
             if formWarnings:
-                warnings.append( warning.context( "Form '%s':" % form.label, formWarnings ) )
+                warnings.append( warning.Context( "Form '%s':" % form.label, formWarnings ) )
 
         return warnings
     
@@ -100,7 +100,7 @@ class covarianceSection(suitesModule.suite):
         for form in self: warnings += form.fix( **info )
         return warnings
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -112,52 +112,54 @@ class covarianceSection(suitesModule.suite):
             if getattr(self, dataPointer) is not None:
                 xmlString.append( getattr(self, dataPointer).toXML( indent2, **kwargs ) )
         for form in self:
-            xmlString += form.toXMLList( indent2, **kwargs )
+            xmlString += form.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % moniker
         return xmlString
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         """Translate <section> element from xml."""
 
         xPath.append( '%s[@label="%s"]' % (element.tag, element.get('label') ) )
+
         linkData['typeConversion'] = {'domainMin':float, 'domainMax':float}
-        rowData_ = rowData.parseXMLNode( element[0], xPath, linkData )
+        rowData_ = RowData.parseNodeUsingClass(element[0], xPath, linkData, **kwargs)
         columnData_ = None
         if element[1].tag=="columnData":
-            columnData_ = columnData.parseXMLNode( element[1], xPath, linkData )
+            columnData_ = ColumnData.parseNodeUsingClass(element[1], xPath, linkData, **kwargs)
         del linkData['typeConversion']
         section_ = cls( element.get('label'), rowData_, columnData_ )
         start = 2 if (columnData_ is not None) else 1
         for form in element[start:]:
             formClass = {
-                    covarianceMatrix.moniker: covarianceMatrix,
-                    mixedForm.moniker: mixedForm,
-                    summedCovariance.moniker: summedCovariance,
+                    CovarianceMatrix.moniker: CovarianceMatrix,
+                    MixedForm.moniker: MixedForm,
+                    SummedCovariance.moniker: SummedCovariance,
                     }.get( form.tag )
             if formClass is None:
                 raise Exception("encountered unknown covariance matrix form '%s'" % form.tag)
-            section_.add( formClass.parseXMLNode( form, xPath, linkData ) )
+            section_.add(formClass.parseNodeUsingClass(form, xPath, linkData, **kwargs))
+
         xPath.pop()
+
         return section_
 
-class dataLink( linkModule.link ):
+class DataLink( linkModule.Link, abc.ABC ):
     """
-    Base class for rowData and columnData. Both are links but with some additional attributes.
+    Base class for RowData and ColumnData. Both are links but with some additional attributes.
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__( self, link=None, root=None, path=None, label=None, relative=False, ENDF_MFMT=None, dimension=None):
-        linkModule.link.__init__(self, link=link, root=root, path=path, label=label, relative=relative)
+        linkModule.Link.__init__(self, link=link, root=root, path=path, label=label, relative=relative)
         self.ENDF_MFMT = ENDF_MFMT
         if dimension is not None:
             dimension = int(dimension)
         self.dimension = dimension
 
-        self.slices = slices()
+        self.slices = Slices()
 
     def __eq__(self, other):
-        for attr in ('link', 'path', 'root', 'ENDF_MFMT', 'dimension'):
+        for attr in ('linkWithoutUpdating', 'path', 'root', 'ENDF_MFMT', 'dimension'):
             if getattr(self, attr) != getattr(other, attr):
                 return False
         if len(self.slices) != len(other.slices):
@@ -178,11 +180,11 @@ class dataLink( linkModule.link ):
     copy = __deepcopy__
     """
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        if kwargs['formatVersion'] == formatVersionModule.version_1_10:
+        if kwargs['formatVersion'] == GNDS_formatVersionModule.version_1_10:
             attributeStr = ''
             if self.ENDF_MFMT is not None:
                 attributeStr = ' ENDF_MFMT="%s"' % self.ENDF_MFMT
@@ -205,17 +207,17 @@ class dataLink( linkModule.link ):
 
             XMLList = ['%s<%s%s href="%s"%s' % ( indent, self.moniker, attrs, self.build_href( **kwargs ), closeTag )]
             if self.slices:
-                XMLList += self.slices.toXMLList(indent2, **kwargs)
+                XMLList += self.slices.toXML_strList(indent2, **kwargs)
                 XMLList[-1] += "</%s>" % self.moniker
 
         return XMLList
 
     @classmethod
-    def parseXMLNode( cls, linkElement, xPath, linkData ):
+    def parseNodeUsingClass(cls, linkElement, xPath, linkData, **kwargs):
 
         attrs1_10 = None
         if (linkElement.get('L') or linkElement.get('domainMin')
-                and linkData['formatVersion'] == formatVersionModule.version_1_10):
+                and linkData['formatVersion'] == GNDS_formatVersionModule.version_1_10):
             attrs1_10 = {attr: linkElement.attrib.pop(attr) for attr in
                               ('domainMin', 'domainMax', 'L', 'domainUnit') if attr in linkElement.attrib}
             if 'L' in attrs1_10:    # angular distribution covariance
@@ -227,23 +229,23 @@ class dataLink( linkModule.link ):
                 attrs1_10['dimension'] = 2
                 attrs1_10['outerDimension'] = 1
 
-        instance = super(dataLink, cls).parseXMLNode(linkElement, xPath, linkData)
-        if linkElement.find(slices.moniker):
-            instance.slices.parseXMLNode(linkElement.find(slices.moniker), xPath, linkData)
+        instance = super(DataLink, cls).parseNodeUsingClass(linkElement, xPath, linkData, **kwargs)
+        if linkElement.find(Slices.moniker):
+            instance.slices.parseNode(linkElement.find(Slices.moniker), xPath, linkData, **kwargs)
         elif attrs1_10:
             instance.dimension = attrs1_10.pop('outerDimension')
             instance.slices.add(Slice(**attrs1_10))
         return instance
 
-class rowData( dataLink ):
+class RowData( DataLink ):
 
     moniker = 'rowData'
 
-class columnData( dataLink ):
+class ColumnData( DataLink ):
 
     moniker = 'columnData'
 
-class Slice( ancestryModule.ancestry ):
+class Slice(ancestryModule.AncestryIO):
     """
     Used inside covariances for multi-dimensional functions.
     Each Slice fixes a value or range along one dimension of the multi-dimensional function.
@@ -286,7 +288,7 @@ class Slice( ancestryModule.ancestry ):
     @property
     def domainValue(self): return self.__domainValue
 
-    def toXMLList(self, indent = '', **kwargs):
+    def toXML_strList(self, indent = '', **kwargs):
 
         attributesStr = ""
         for attr in ('domainMin', 'domainMax', 'domainValue', 'domainUnit'):
@@ -295,18 +297,18 @@ class Slice( ancestryModule.ancestry ):
         xmlStringList = [ '%s<%s dimension="%d"%s/>' % ( indent, self.moniker, self.__dimension, attributesStr ) ]
         return xmlStringList
 
-    @staticmethod
-    def parseXMLNode( node, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         xPath.append( node.tag )
-        slice_ = Slice(node.get('dimension'), node.get('domainUnit'),
+        slice_ = cls(node.get('dimension'), node.get('domainUnit'),
                        node.get('domainMin'), node.get('domainMax'), node.get('domainValue'))
         xPath.pop( )
         return slice_
 
-class slices( suitesModule.suite ):
+class Slices( suitesModule.Suite ):
 
     moniker = "slices"
 
     def __init__(self):
-        suitesModule.suite.__init__( self, [Slice] )
+        suitesModule.Suite.__init__( self, [Slice] )

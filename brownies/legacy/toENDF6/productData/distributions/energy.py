@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,7 +7,7 @@
 
 from pqu import PQU as PQUModule
 
-from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 from xData import regions as regionsModule
 
 from fudge.productData.distributions import energy as energyModule
@@ -15,7 +15,6 @@ from fudge.productData.distributions import energy as energyModule
 from ... import gndsToENDF6 as gndsToENDF6Module
 from ... import endfFormats as endfFormatsModule
 
-__metaclass__ = type
 #
 # form
 #
@@ -24,7 +23,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     weight = targetInfo['delayedNubarWeight']
     energySubform = self.energySubform
     if( hasattr( energySubform, 'toENDF6' ) ) :
-        if( isinstance( energySubform, ( energyModule.discreteGamma, energyModule.primaryGamma ) ) ) :
+        if( isinstance( energySubform, ( energyModule.DiscreteGamma, energyModule.PrimaryGamma ) ) ) :
             energySubform.toENDF6( flags, targetInfo )
             return
         if( MT in [ 527, 528 ] ) :
@@ -43,7 +42,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     else :
         print( 'WARNING: energy subform "%s" does not have method toENDF6' % energySubform.moniker )
 
-energyModule.form.toENDF6 = toENDF6
+energyModule.Form.toENDF6 = toENDF6
 
 #
 # XYs2d subform
@@ -66,7 +65,7 @@ def toENDF6( self, flags, targetInfo, weight = None, MT = None ) :
                     2 * len( energy ), len( energy ) ) )
             ENDFDataList += endfFormatsModule.endfNdDataList( energy, xUnit = 'eV', yUnit = '1/eV' )
         else :
-            if( isinstance( energy, regionsModule.regions1d ) ) :
+            if( isinstance( energy, regionsModule.Regions1d ) ) :
                 interpolations, data = [], []
                 for region in energy :
                     regionData = region.copyDataToXYs( )
@@ -88,7 +87,7 @@ def toENDF6( self, flags, targetInfo, weight = None, MT = None ) :
 
 energyModule.XYs2d.toENDF6 = toENDF6
 #
-# regions2d subform
+# Regions2d subform
 #
 def toENDF6_oneRegion( self, EInFactor, startingIndex = 0 ) :
 
@@ -121,10 +120,10 @@ def toENDF6( self, flags, targetInfo, weight = None ) :
             ENDFDataList
     return( 1, ENDFDataList )
 
-energyModule.regions2d.toENDF6 = toENDF6
+energyModule.Regions2d.toENDF6 = toENDF6
 
 #
-# functionalBase
+# FunctionalBase
 #
 def toENDF6( self, flags, targetInfo, weight = None ) :
 
@@ -152,30 +151,30 @@ def toENDF6( self, flags, targetInfo, weight = None ) :
         ENDFDataList += endfFormatsModule.toTAB1( parameter2, 'eV', yUnit )
     return( 1, ENDFDataList )
 
-energyModule.functionalBase.toENDF6 = toENDF6
+energyModule.FunctionalBase.toENDF6 = toENDF6
 
 #
 # NBodyPhaseSpace
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
-    mass = self.numberOfProductsMasses.getValueAs( 'amu' ) / targetInfo['massTracker'].neutronMass
+    mass = self.mass.getValueAs( 'amu' ) / targetInfo['massTracker'].neutronMass
     ENDFDataList = [ endfFormatsModule.endfContLine( mass, 0, 0, 0, 0, self.numberOfProducts ) ]
-    gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 6, standardsModule.frames.centerOfMassToken, ENDFDataList )
+    gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 6, xDataEnumsModule.Frame.centerOfMass, ENDFDataList )
 
 energyModule.NBodyPhaseSpace.toENDF6 = toENDF6
 
 #
-# weighted
+# Weighted
 #
 def toENDF6( self, flags, targetInfo ) :
 
     return( self.functional.toENDF6( flags, targetInfo, weight = self.weight )[1] )
 
-energyModule.weighted.toENDF6 = toENDF6
+energyModule.Weighted.toENDF6 = toENDF6
 
 #
-# weightedFunctionals
+# WeightedFunctionals
 #
 def toENDF6( self, flags, targetInfo, weight = None ) :                 # The weight is ignored in this method, only for compatibility with other toENDF6's.
 
@@ -183,4 +182,4 @@ def toENDF6( self, flags, targetInfo, weight = None ) :                 # The we
     for weight in self.weights : ENDFDataList += weight.toENDF6( flags, targetInfo )
     return( len( self.weights ), ENDFDataList )
 
-energyModule.weightedFunctionals.toENDF6 = toENDF6
+energyModule.WeightedFunctionals.toENDF6 = toENDF6

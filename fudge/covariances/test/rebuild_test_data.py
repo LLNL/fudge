@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,10 @@ import sys, os, glob
 binDir = os.path.dirname( os.path.abspath( __file__ ) )
 sys.path.insert(0, os.path.dirname( binDir ) )
 
+from fudge import GNDS_formatVersion
 from brownies.legacy.converting import endfFileToGNDS
+
+formatVersion = GNDS_formatVersion.version_2_0  # GNDS version for writing test files
 
 def process_args():
     # see http://docs.python.org/lib/optparse-tutorial.html
@@ -40,7 +43,7 @@ for inFile in glob.glob('*.endf'):
 
     f = open( outFile, 'w' )
     try:
-        f.write( '\n'.join( x.toXMLList(  ) ) )
+        f.write( '\n'.join( x.toXML_strList(formatVersion=formatVersion) ) )
     except Exception as err:
         sys.stderr.write( 'WARNING: MAIN ENDF WRITE HALTED BECAUSE "'+str(err)+'" for file %s\n'%inFile )
         exit()
@@ -48,7 +51,7 @@ for inFile in glob.glob('*.endf'):
     if c:
         f = open( outCovFile, 'w' )
         try:
-            f.write( '\n'.join( c.toXMLList(  ) ) )
+            f.write( '\n'.join( c.toXML_strList(formatVersion=formatVersion) ) )
         except Exception as err:
             sys.stderr.write( 'WARNING: COVARIANCE ENDF WRITE HALTED BECAUSE  "'+str(err)+'" for file %s\n'%inFile )
             exit()

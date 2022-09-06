@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -234,7 +234,7 @@ class endl1dmath :
         if( xLabel is None ) : xLabel = 'indice'
         if( yLabel is None ) : yLabel = self.yLabel
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
-        f = fudgeFileMisc.fudgeTempFile( )
+        f = fudgeFileMisc.FudgeTempFile( )
         i = 0
         for v in self.data :
             f.write( "%d %14.8e\n" % ( i, v ) )

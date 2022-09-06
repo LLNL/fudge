@@ -38,7 +38,7 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
     - Install FUDGE:
      
-          pip install git+https://github.com/LLNL/fudge.git@5.0.0
+          pip install git+https://github.com/LLNL/fudge.git@6.0.0
 
 
 - Installation by cloning the git repository and building with the unix `make` command: 
@@ -49,9 +49,9 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
     - Clone FUDGE in the current directory: 
      
-          git clone https://github.com/LLNL/fudge.git
-          # or using SSH (requires creating a github account and registering an ssh key):
-          git clone git@github.com:LLNL/fudge.git
+        git clone https://github.com/LLNL/fudge.git
+        # or using SSH (requires creating a github account and registering an ssh key):
+        git clone git@github.com:LLNL/fudge.git
      
     - Build FUDGE:
 
@@ -140,6 +140,12 @@ for reaction in n_H1.reactions:
 crossSection.multiPlot( crossSections, rangeMin = 1e-5, xylog = 3,
         title = 'n + U230', xLabel = 'Neutron energy [eV]', yLabel = 'Cross section [b]' )
 ```
+
+## Note regarding HDF5 support:
+
+**FUDGE** imports the h5py module in some places to read and write HDF5 files. In some circumstances h5py fails to import
+if MPI-related environment variables are set. This issue can cause the Python interpreter to crash. The best fix at the
+moment is to ensure that environment variable `PMI_FD` is not set before running anything requiring h5py.
 
 ## Getting Help:
 

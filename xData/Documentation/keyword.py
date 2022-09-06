@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,8 @@
 This module contains the GNDS documentation child nodes keywords and keywork classes.
 """
 
-from .. import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
+
 from .. import suite as suiteModule
 from .. import text as textModule
 
@@ -17,6 +18,7 @@ class Keyword( textModule.Text ) :
     """A class representing a GNDS documentation/abstract node."""
 
     moniker = 'keyword'
+    keyName = 'type'
 
     def __init__( self, label, type, text ) :
 
@@ -35,17 +37,18 @@ class Keyword( textModule.Text ) :
 
         return ' type="%s"' % self.__type
 
-    @staticmethod
-    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         label = node.get( 'label' )
         type = node.get( 'type' )
 
-        return( Keyword( label, type, None ) )
+        return cls(label, type, None)
 
 class Keywords( suiteModule.Suite ) :
 
     moniker = 'keywords'
+    suiteName = 'type'
 
     def __init__( self ) :
 

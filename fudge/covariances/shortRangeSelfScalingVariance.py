@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,27 +13,32 @@ the size of the variance depends either directly or inversely on the size of the
 These sections only produce a diagonal, no cross-correlations.
 """
 
-from . import tokens, base
+from . import enums as covarianceEnumsModule
+from . import base
 
-from xData import ancestry as ancestryModule
+from LUPY import enums as enumsModule
+from LUPY import ancestry as ancestryModule
+
 from xData import xDataArray as arrayModule
 from xData import gridded as griddedModule
+from xData import link as linkModule
 
 from pqu import PQU
 
-__metaclass__ = type
+class DependenceOnProcessedGroupWidth(enumsModule.Enum):
+    '''Defines enums of processed width dependencies.'''
 
-# define types of processed width dependencies:
-inverseToken = 'inverse'
-directToken = 'direct'
+    inverse = enumsModule.auto()
+    direct = enumsModule.auto()
 
-class shortRangeSelfScalingVariance(ancestryModule.ancestry, base.covariance):
+class ShortRangeSelfScalingVariance(ancestryModule.AncestryIO, base.Covariance):
 
     moniker = 'shortRangeSelfScalingVariance'
 
-    def __init__( self, label, type=tokens.absoluteToken, dependenceOnProcessedGroupWidth=inverseToken, matrix=None ):
+    def __init__(self, label, type=covarianceEnumsModule.Type.absolute, 
+                dependenceOnProcessedGroupWidth=DependenceOnProcessedGroupWidth.inverse, matrix=None):
 
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.__label = label
         self.dependenceOnProcessedGroupWidth = dependenceOnProcessedGroupWidth
         self.type = type
@@ -49,7 +54,8 @@ class shortRangeSelfScalingVariance(ancestryModule.ancestry, base.covariance):
         self.__label = value
 
     def copy(self):
-        raise NotImplementedError("FIXME: this function needed for toCovarianceMatrix() calls")
+        srssv = ShortRangeSelfScalingVariance(self.label, self.type, self.dependenceOnProcessedGroupWidth, self.matrix)
+        return srssv
 
     @property
     def dependenceOnProcessedGroupWidth(self):
@@ -57,9 +63,8 @@ class shortRangeSelfScalingVariance(ancestryModule.ancestry, base.covariance):
 
     @dependenceOnProcessedGroupWidth.setter
     def dependenceOnProcessedGroupWidth(self, value):
-        if value not in (inverseToken, directToken):
-            raise TypeError("Unrecognized dependenceOnProcessedGroupWidth flag '%s'" % value)
-        self.__dependenceOnProcessedGroupWidth = value
+
+        self.__dependenceOnProcessedGroupWidth = DependenceOnProcessedGroupWidth.checkEnumOrString(value)
 
     @property
     def domainUnit( self ):
@@ -75,9 +80,8 @@ class shortRangeSelfScalingVariance(ancestryModule.ancestry, base.covariance):
 
     @type.setter
     def type(self, type):
-        if type not in (tokens.absoluteToken, tokens.relativeToken):
-            raise TypeError("Unrecognized type '%s'" % type)
-        self.__type = type
+
+        self.__type = covarianceEnumsModule.Type.checkEnumOrString(type)
 
     @property
     def matrix(self):
@@ -85,8 +89,8 @@ class shortRangeSelfScalingVariance(ancestryModule.ancestry, base.covariance):
 
     @matrix.setter
     def matrix(self, matrix):
-        if not isinstance(matrix, griddedModule.gridded2d):
-            raise TypeError("Expected gridded2d instance, got '%s'" % type(matrix))
+        if not isinstance(matrix, griddedModule.Gridded2d):
+            raise TypeError("Expected Gridded2d instance, got '%s'" % type(matrix))
         self.__matrix = matrix
         self.__matrix.setAncestor(self)
 
@@ -100,11 +104,11 @@ class shortRangeSelfScalingVariance(ancestryModule.ancestry, base.covariance):
         from fudge import warning
         warnings = []
 
-        if not isinstance( self.matrix.array, arrayModule.diagonal ):
-            warnings.append( warning.invalidShortRangeVarianceData( type(self.matrix.array) ) )
+        if not isinstance( self.matrix.array, arrayModule.Diagonal ):
+            warnings.append( warning.InvalidShortRangeVarianceData( type(self.matrix.array) ) )
         eigenvals = self.matrix.array.constructArray().diagonal()
         if any( eigenvals < 0 ):
-            warnings.append( warning.negativeEigenvalues(negativeCount=(eigenvals < 0).sum(),
+            warnings.append( warning.NegativeEigenvalues(negativeCount=(eigenvals < 0).sum(),
                     worstCase=eigenvals.min(), obj=self) )
         return warnings
 
@@ -121,19 +125,19 @@ class shortRangeSelfScalingVariance(ancestryModule.ancestry, base.covariance):
 
     def columnBounds(self,unit=None):
         """Get the bounds of the column.  If unit is specified, return the bounds in that unit."""
-        if self.matrix.axes[-2].style=='link': return self.rowBounds(unit)
+        if isinstance(self.matrix.axes[-2].values, linkModule.Link): return self.rowBounds(unit)
         factor = 1
         if unit:
             factor = PQU.PQU(1, self.matrix.axes[-1].unit).getValueAs(unit)
         return( self.matrix.axes[-1].values[0] * factor, self.matrix.axes[-1].values[-1] * factor )
 
     def toCovarianceMatrix( self, domain=None ):
-        raise NotImplementedError("Not yet implemented for shortRangeSelfScalingVariance")
+        raise NotImplementedError("Not yet implemented for ShortRangeSelfScalingVariance")
 
     def getUncertaintyVector( self, theData=None, relative=True ):
-        raise NotImplementedError("Not yet implemented for shortRangeSelfScalingVariance")
+        raise NotImplementedError("Not yet implemented for ShortRangeSelfScalingVariance")
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -141,19 +145,19 @@ class shortRangeSelfScalingVariance(ancestryModule.ancestry, base.covariance):
         if self.label is not None: attrs = ' label="%s"' % self.label
         xmlString = [ '%s<%s%s type="%s" dependenceOnProcessedGroupWidth="%s">' %
                       ( indent, self.moniker, attrs, self.type, self.dependenceOnProcessedGroupWidth ) ]
-        xmlString += self.matrix.toXMLList( indent2, **kwargs )
+        xmlString += self.matrix.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
     @classmethod
-    def parseXMLNode(cls, element, xPath, linkData):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         label = element.get('label')
         if label is not None:
             xPath.append( '%s[@label="%s"]' % (element.tag, label))
         else:
             xPath.append( element.tag )
-        matrix_ = griddedModule.gridded2d.parseXMLNode( element.find(griddedModule.gridded2d.moniker), xPath, linkData )
+        matrix_ = griddedModule.Gridded2d.parseNodeUsingClass(element.find(griddedModule.Gridded2d.moniker), xPath, linkData, **kwargs)
         srssv = cls( label = label, type=element.get('type'),
             dependenceOnProcessedGroupWidth=element.get('dependenceOnProcessedGroupWidth'), matrix=matrix_ )
         xPath.pop()

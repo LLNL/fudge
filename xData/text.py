@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,9 +7,8 @@
 
 import sys
 
-from . import ancestry as ancestryModule
-
-__metaclass__ = type
+from LUPY import enums as enumsModule
+from LUPY import ancestry as ancestryModule
 
 def isString( string ) :
     """
@@ -23,33 +22,29 @@ def isString( string ) :
 
     return( string )
 
-class Encoding :
+class Encoding(enumsModule.Enum):
 
-    ascii = 'ascii'
-    utf8 = 'utf8'
+    ascii = enumsModule.auto()
+    utf8 = enumsModule.auto()
 
-    allowed = ( ascii, utf8 )
+class Markup(enumsModule.Enum):
 
-class Markup :
+    none = enumsModule.auto()
+    xml = enumsModule.auto()
+    html = enumsModule.auto()
+    latex = enumsModule.auto()
 
-    none = 'none'
-    xml = 'xml'
-    html = 'html'
-    latex = 'latex'
-
-    allowed = ( none, xml, html, latex )
-
-class Text( ancestryModule.Ancestry2 ) :
+class Text(ancestryModule.AncestryIO):
 
     moniker = 'text'
     # FIX-ME Should add allowed encodings as an argument with default of all. Like encodings = Encoding.allowed. Also should check in body setter.
 
     def __init__( self, text = None, encoding = Encoding.ascii, markup = Markup.none, label = None ) :
 
-        ancestryModule.Ancestry2.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
-        self.encoding = encoding
-        self.markup = markup
+        self.encoding = Encoding.checkEnumOrString(encoding)
+        self.markup = Markup.checkEnumOrString(markup)
 
         if( label is not None ) :
             if( not( isinstance( label, str ) ) ) : raise TypeError( 'Invalid label instance.' )
@@ -78,8 +73,7 @@ class Text( ancestryModule.Ancestry2 ) :
     @encoding.setter
     def encoding( self, value ) :
 
-        if( value not in Encoding.allowed ) : raise TypeError( 'Invalid encoding = "%s"' % encoding[:64] )
-        self.__encoding = value
+        self.__encoding = Encoding.checkEnumOrString(value)
 
     @property
     def markup( self ) :
@@ -89,8 +83,7 @@ class Text( ancestryModule.Ancestry2 ) :
     @markup.setter
     def markup( self, value ) :
 
-        if( value not in Markup.allowed ) : raise TypeError( 'Invalid markup = "%s"' % markup[:64] )
-        self.__markup = value
+        self.__markup = Markup.checkEnumOrString(value)
 
     @property
     def body( self ) :
@@ -98,23 +91,24 @@ class Text( ancestryModule.Ancestry2 ) :
         return( self.__body )
 
     @body.setter
-    def body( self, text ) :
+    def body(self, text):
         """Set the text to *text*, over riding the current text."""
 
         self.__filled = False
         self.__body = ''
 
         text2 = text
-        if( text is None ) : text2 = ''
+        if text is None: text2 = ''
 
-        isString( text2 )
+        isString(text2)
 
-        if( sys.version_info.major == 2 ) :
-            if( self.encoding == Encoding.ascii ) : text2 = text2.decode( 'ascii' )
-        else :
-            if( self.encoding == Encoding.ascii ) : text2.encode( 'ascii' )                   # Test if ascii.
+        if self.encoding == Encoding.ascii:                                 # If encoding is ascii verify text is.
+            if sys.version_info.major == 2:
+                text2 = text2.decode('ascii')
+            else :
+                text2.encode('ascii')
 
-        if( text is not None ) : self.__filled = True
+        if text is not None: self.__filled = True
         self.__body = text2
 
     @property
@@ -145,54 +139,50 @@ class Text( ancestryModule.Ancestry2 ) :
 
         return( '<![CDATA[%s]]>' % self.__body )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
         kwargs['addExtraAttributes'] = self.__filled
-        extraAttributes = self.XML_extraAttributes( **kwargs )
+        extraAttributes = self.XML_extraAttributes(**kwargs)
 
-        if( not( self.__filled ) ) :
-            if( extraAttributes == '' ) : return []
+        if not self.__filled:
+            if extraAttributes == '': return []
             return [ '%s<%s%s/>' % ( indent, self.moniker, extraAttributes ) ]
 
         attributeStr = ''
-        if( self.__label is not None ) : attributeStr += ' label="%s"' % self.__label
-        if( self.__encoding != Encoding.ascii ) : attributeStr += ' encoding="%s"' % self.__encoding
-        if( self.__markup != Markup.none ) : attributeStr += ' markup="%s"' % self.__markup
+        if self.__label is not None: attributeStr += ' label="%s"' % self.__label
+        if self.__encoding != Encoding.ascii: attributeStr += ' encoding="%s"' % self.__encoding
+        if self.__markup != Markup.none: attributeStr += ' markup="%s"' % self.__markup
         attributeStr += extraAttributes
 
-        XMLList = [ '%s<%s%s>%s</%s>' % ( indent, self.moniker, attributeStr, self.bodyToXML_CDATA( **kwargs ), self.moniker ) ]
+        return [ '%s<%s%s>%s</%s>' % ( indent, self.moniker, attributeStr, self.bodyToXML_CDATA(**kwargs), self.moniker ) ]
 
-        return( XMLList )
+    def parseNode(self, node, xPath, linkData, **kwargs):
 
-    def parseNode( self, node, xPath, linkData, **kwargs ) :
+        xPath.append(node.tag)
 
-        xPath.append( node.tag )
+        self.encoding = node.get('encoding', Encoding.ascii)
+        self.markup = node.get('markup', Markup.none)
 
-        self.encoding = node.get( 'encoding', Encoding.ascii )
-        self.markup = node.get( 'markup', Markup.none )
-
-        text = node.find( 'text' )                      # Support pre format '2.0.LLNL_4' parsing for now.
-        if( text is None ) :
-            if( node.text is None ) :
+        text = node.find('text')
+        if text is None:                                # Format >= '2.0.LLNL_4' parsing.
+            if node.text is None:
                 self.body = None
-            elif( len( node.text ) == 0 ) :
+            elif len(node.text) == 0:
                 self.body = None
-            else :
+            else:
                 self.body = node.text
-        else :
-            self.parseNode( text, xPath, linkData, **kwargs )
+        else:                                           # Pre format '2.0.LLNL_4' parsing where the actual text node is a child node named 'text'.
+            self.parseNode(text, xPath, linkData, **kwargs)
 
-        xPath.pop( )
+        xPath.pop()
 
     @classmethod
-    def parseNodeInstanceUsingClass( cls, node, xPath, linkData, **kwargs ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        encoding = node.get( 'encoding', Encoding.ascii )
-        markup = node.get( 'markup', Markup.none )
-        text = node.find( 'text' )
-        if( text is None ) : text = node.text
+        instance = cls()
+        instance.parseNode(node, xPath, linkData, **kwargs)
 
-        return( cls( text, encoding = encoding, markup = markup ) )
+        return instance
 
 def raiseIfNotString( string, name ) :
 

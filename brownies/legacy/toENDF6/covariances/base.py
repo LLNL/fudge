@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,8 +8,8 @@
 import numpy
 
 from xData import xDataArray as arrayModule
-from xData import axes as axesModule
 
+from fudge.covariances import enums as covarianceEnumsModule
 from fudge.covariances import covarianceMatrix as covarianceMatrixModule
 from fudge.core.math import linearAlgebra as linearAlgebraModule
 
@@ -31,14 +31,15 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
             endf.append( endfFormatsModule.endfHeadLine(XMF1,XLFS1,MAT1,MT1,NC,NI) )
     # header for matrix:
     rows,cols = self.matrix.array.shape
-    if isinstance( self.matrix.array, arrayModule.diagonal ):
+    if isinstance( self.matrix.array, arrayModule.Diagonal ):
         LS = 0; LB = 1; NP = len(self.matrix.axes[2].values); NT = 2*NP
-        if self.type=='absolute': LB = 0
+        if self.type == covarianceEnumsModule.Type.absolute:
+            LB = 0
         if 'LB' in conversionFlags:
             LB = int( conversionFlags.split('=')[1] )
         matrixData = list( zip( self.matrix.axes[2].values, list(self.matrix.array.values) + [0] ) )
         matrixData = [val for sublist in matrixData for val in sublist] # flatten
-    elif isinstance( self.matrix.array, arrayModule.full ):
+    elif isinstance( self.matrix.array, arrayModule.Full ):
         LB = 5
         if 'LB' in conversionFlags:
             LB = int( conversionFlags.split('=')[1].split(',')[0] )
@@ -54,13 +55,13 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
                     vals *= -1
             matrixData = list( zip( self.matrix.axes[2].values, list(vals) + [0] ) )
             matrixData = [val for sublist in matrixData for val in sublist] # flatten
-        elif self.matrix.array.symmetry in (arrayModule.symmetryLowerToken, arrayModule.symmetryUpperToken):
+        elif self.matrix.array.symmetry in (arrayModule.Symmetry.lower, arrayModule.Symmetry.upper):
             LS = 1; NT = (rows+1) + rows*(rows+1)/2; NP = rows+1
             arrayData = list( self.matrix.array.values )
-            if self.matrix.array.symmetry == arrayModule.symmetryLowerToken:
+            if self.matrix.array.symmetry == arrayModule.Symmetry.lower:
                 arrayData = linearAlgebraModule.switchSymmetry( arrayData, upperToLower=False )
             matrixData = list(self.matrix.axes[2].values) + arrayData
-        elif self.matrix.axes[1].style == axesModule.linkGridToken:
+        elif self.matrix.axes[1].isLink():
             LS = 0; NT = (rows+1) + rows*cols; NP = rows+1
             matrixData = list(self.matrix.axes[2].values) + list(self.matrix.array.values)
         else:
@@ -81,4 +82,4 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
     endf += endfFormatsModule.endfDataList( matrixData )
     return endf
 
-covarianceMatrixModule.covarianceMatrix.toENDF6 = toENDF6
+covarianceMatrixModule.CovarianceMatrix.toENDF6 = toENDF6

@@ -1,35 +1,33 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
-
-from . import standards as standardsModule
+from . import enums as enumsModule
 from . import base as baseModule
 from . import axes as axesModule
 from . import xDataArray as arrayModule
 
-class gridded( baseModule.xDataFunctional ) :
+class Gridded( baseModule.XDataFunctional ) :
 
-    ancestryMembers = baseModule.xDataFunctional.ancestryMembers + ( 'array', )
+    ancestryMembers = baseModule.XDataFunctional.ancestryMembers + ( 'array', )
 
-    def __init__( self, axes, array, index = None, valueType = standardsModule.types.float64Token, outerDomainValue = None, label = None ) :
+    def __init__( self, axes, array, index = None, valueType = enumsModule.ValueType.float64, outerDomainValue = None, label = None ) :
 
-        for axis in axes :
+        for axis in axes[:self.dimension+1]:
             if( axis.index == 0 ) :
-                if( not( isinstance( axis, axesModule.axis ) ) ) : raise Exception( 'dependent axis must not have a grid' )
+                if( not( isinstance( axis, axesModule.Axis ) ) ) : raise Exception( 'dependent axis must not have a grid' )
             else :
-                if( not( isinstance( axis, axesModule.grid ) ) ) : raise Exception( 'independent axis must have a grid' )
-        if( not( isinstance( array, arrayModule.arrayBase ) ) ) : raise TypeError( 'array not an array instance' )
+                if( not( isinstance( axis, axesModule.Grid ) ) ) : raise Exception( 'independent axis must have a grid' )
+        if( not( isinstance( array, arrayModule.ArrayBase ) ) ) : raise TypeError( 'array not an array instance' )
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
-                outerDomainValue = outerDomainValue, label = label )
+        baseModule.XDataFunctional.__init__(self, axes, index=index, valueType=valueType, outerDomainValue=outerDomainValue, label=label)
 
         if( self.dimension != len( array ) ) : ValueError( 'self.dimension = %d != len( array ) = %d' % 
                 ( self.dimension, len( array ) ) )
+
         self.array = array
         self.array.setAncestor( self )
 
@@ -64,43 +62,63 @@ class gridded( baseModule.xDataFunctional ) :
 
         return( self.axes[index].unit )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        attributeStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
-        if( self.axes is not None ) : XMLList += self.axes.toXMLList( indent2, **kwargs )
-        XMLList += self.array.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
+        attributeStr = baseModule.XDataFunctional.attributesToXMLAttributeStr(self)
+        XML_strList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
+        if self.axes is not None: XML_strList += self.axes.toXML_strList(indent2, **kwargs)
+        XML_strList += self.array.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
+
+        return XML_strList
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData, **kwargs ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath)     # parseBareNodeCommonAttributes adds to xPath.
+        if len(extraAttributes) > 0: raise Exception('Invalid attributes: %s.' % ( ', '.join(list(extraAttributes.keys())) ))
 
-        axes = None
-        if element.find('axes') is not None:
-            axes = axesModule.axes.parseXMLNode( element.find('axes'), xPath, linkData )
-        array = arrayModule.arrayBase.parseXMLNode( element[1], xPath, linkData )
-        index = int( element.get('index') ) if 'index' in list( element.keys( ) ) else None
-        outerDomainValue = float( element.get( 'outerDomainValue' ) ) if 'outerDomainValue' in list( element.keys( ) ) else None
-        Grid = cls( axes = axes, array = array, index = index, outerDomainValue = outerDomainValue, label = element.get( 'label' ) )
-        xPath.pop( )
-        return Grid
+        axes = kwargs.get('axes', None)
+        if node.find('axes') is not None: axes = axesModule.Axes.parseNodeUsingClass(node.find('axes'), xPath, linkData, **kwargs)
 
-class gridded1d( gridded ) :
+        array = arrayModule.ArrayBase.parseNodeUsingClass(node[1], xPath, linkData, **kwargs)
+
+        instance = cls(axes, array, **attributes)
+
+        xPath.pop()
+
+        return instance
+
+class Gridded1d( Gridded ) :
 
     moniker = 'gridded1d'
     dimension = 1
 
-class gridded2d( gridded ) :
+    def constructVector(self):
+        """
+        Generate an xData.vector.Vector object from an xData.gridded.gridded1d instance.
+
+        :returns: instance of xData.vector.Vector.
+        """
+        return self.array.constructVector()
+
+class Gridded2d( Gridded ) :
 
     moniker = 'gridded2d'
     dimension = 2
 
-class gridded3d( gridded ) :
+class Gridded3d( Gridded ) :
 
     moniker = 'gridded3d'
     dimension = 3
+
+    def constructMatrix(self, thirdIndex):
+        """
+        Generate an xData.matrix.Matrix object from an xData.gridded.gridded3d instance.
+
+        :param thirdIndex: Index along the third dimension from which to extract 2d-array.
+        :returns: instance of xData.matrix.Matrix.
+        """
+        return self.array.constructMatrix(thirdIndex)

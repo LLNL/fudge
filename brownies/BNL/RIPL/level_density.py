@@ -1,5 +1,6 @@
 from pqu.PQU import PhysicalQuantityWithUncertainty as PhysicalQuantity
-from xData import axes, XYs
+from xData import axes as axesModule
+from xData import XYs1d as XYs1dModule
 
 cSquared = PhysicalQuantity(1.00000000000000000000, 'c**2')
 hbar = PhysicalQuantity("6.58211928e-16", "eV*s")
@@ -15,7 +16,7 @@ b = PhysicalQuantity('1e-24', 'cm**2')
 #
 # ---------------------------------------------------------------------------------
 
-class LevelDensity(XYs.XYs1d):
+class LevelDensity(XYs1dModule.XYs1d):
 
     def __init__(self, **kw):
         """
@@ -24,9 +25,9 @@ class LevelDensity(XYs.XYs1d):
                    'data' is the the list of (x,y) pairs to initialize the XYs1d that really is self.
         """
         energyUnit = kw.get('energyUnit', 'MeV')
-        self.axes = axes.axes(
+        self.axes = axesModule.Axes(
             labelsUnits={0: ('Level density', '1/' + energyUnit), 1: ('Excitation energy', energyUnit)})
-        XYs.XYs1d.__init__(self, axes=self.axes, data=kw.get('data', []))
+        XYs1dModule.XYs1d.__init__(self, axes=self.axes, data=kw.get('data', []))
 
     def get_mean_level_spacing(self):
         """
@@ -43,7 +44,7 @@ class LevelDensity(XYs.XYs1d):
 
         :return: The total number of levels, integrated over the whole domain of self
         """
-        return int(float(self.integrate().value))
+        return int(self.integrate())
 
     def get_CLD(self, normalize=False):
         """
@@ -88,7 +89,7 @@ class LevelDensity(XYs.XYs1d):
 class NuclearLevelDensity:
 
     def __init__(self, **kw):
-        self.axes = axes.axes(labelsUnits={0: ('Level density', '1/MeV'), 1: ('Excitation energy', 'MeV')})
+        self.axes = axesModule.Axes(labelsUnits={0: ('Level density', '1/MeV'), 1: ('Excitation energy', 'MeV')})
         self.spin_dep_level_density = {1: {}, -1: {}}
         self.associated_quantities = {}
 
@@ -125,8 +126,8 @@ class NuclearLevelDensity:
         if yAxisLabel is None:
             myAxes = self.axes
         else:
-            myAxes = axes.axes(labelsUnits={0: yAxisLabel, 1: ('Excitation energy', 'MeV')})
-        self.associated_quantities[key] = XYs.XYs1d(axes=myAxes, data=data)
+            myAxes = axesModule.Axes(labelsUnits={0: yAxisLabel, 1: ('Excitation energy', 'MeV')})
+        self.associated_quantities[key] = XYs1dModule.XYs1d(axes=myAxes, data=data)
 
     def get_total_level_density_for_parity(self, Pi):
         s = None

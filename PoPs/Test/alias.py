@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,7 +14,7 @@ fIn = open( 'Answers/database.py.out' )
 lines = ''.join( fIn.readlines( ) )
 fIn.close( )
 
-database = databaseModule.database.parseXMLStringAsClass( lines )
+database = databaseModule.Database.parseXMLString(lines)
 
 def checkFor( id ) :
 
@@ -48,8 +48,8 @@ checkFor( 'photon' )
 checkFor( 'gamma' )
 checkFor( 'x-ray' )
 print( 'Now add gamma and x-ray' )
-database.add( aliasModule.particle( 'gamma', 'photon' ) )
-database.add( aliasModule.particle( 'x-ray', 'gamma' ) )
+database.add(aliasModule.Alias('gamma', 'photon'))
+database.add(aliasModule.Alias('x-ray', 'gamma'))
 checkFor( 'photon' )
 checkFor( 'gamma' )
 checkFor( 'x-ray' )
@@ -62,8 +62,8 @@ print( '        mass %s: spin %s: parity %s: charge %s: halflife %s' %
 getID( 'x-ray' )
 
 print( '\n ---- positron ----' )
-database.add( aliasModule.particle( 'positron', 'e-_anti' ) )
-database.add( aliasModule.particle( 'b+', 'e-_anti' ) )
+database.add(aliasModule.Alias('positron', 'e-_anti'))
+database.add(aliasModule.Alias('b+', 'e-_anti'))
 print( database.aliases.toXML( ) )
 
 item = getID( 'e-' )

@@ -1,19 +1,18 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
 
 import string
 import abc
 import inspect
 
-from xData import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
 
-class suite( ancestryModule.ancestry ) :
+class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
     """
     Abstract base class for holding a list of objects that can be indexed by an integer or a string.
     For integer indexing, the indexing is by order in which an object was put into the array or,
@@ -25,8 +24,6 @@ class suite( ancestryModule.ancestry ) :
 
     """
 
-    __metaclass__ = abc.ABCMeta
-
     def __init__( self, allowedClasses, replace = True ) :
         """
         :param allowedClasses: tuple of classes. Only instances of these classes can be added to the suite.
@@ -35,7 +32,7 @@ class suite( ancestryModule.ancestry ) :
             having the same key.
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         __allowedClasses = []
         for i1, cls in enumerate( allowedClasses ) :
@@ -74,7 +71,7 @@ class suite( ancestryModule.ancestry ) :
 
     @property
     def allowedClasses( self ) :
-        """Return the tuple of classes that are allowed in this suite"""
+        """Return the tuple of classes that are allowed in this suite."""
 
         return( self.__allowedClasses )     # No fear, user cannot alter as __allowedClasses is a tuple.
 
@@ -100,7 +97,7 @@ class suite( ancestryModule.ancestry ) :
         if( not( classAllowed ) ) : raise TypeError( 'Invalid class "%s" for suite "%s"' % ( item.__class__, self.moniker ) )
 
         index, replace = self.addIndex( item )
-        item.setAncestor( self, attribute = item.keyName )
+        item.setAncestor(self)
         if( replace ) : del self.__items[index]
         self.__items.insert( index, item )
 
@@ -121,11 +118,12 @@ class suite( ancestryModule.ancestry ) :
         """See documentation in database.check"""
 
         from . import warning as warningModule
+
         warnings = []
         for child in self:
             childWarnings = child.check( info )
             if childWarnings:
-                warnings.append( warningModule.context( '%s: %s' % (child.moniker, str(child)), childWarnings ) )
+                warnings.append( warningModule.Context( '%s: %s' % (child.moniker, str(child)), childWarnings ) )
         return warnings
 
     def convertUnits( self, unitMap ) :
@@ -134,7 +132,7 @@ class suite( ancestryModule.ancestry ) :
         for item in self.__items : item.convertUnits( unitMap )
 
     def remove( self, key ) :
-        """Remove object with specified key from the suite"""
+        """Remove object with specified key from the suite."""
 
         for i1, item in enumerate( self.__items ) :
             if( item.key == key ) :
@@ -150,17 +148,13 @@ class suite( ancestryModule.ancestry ) :
 
         for item in other : self.add( item.copy( ) )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         if( len( self ) == 0 ) : return( [] )
         xmlString = [ '%s<%s>' % ( indent, self.moniker ) ]
-        for item in self : xmlString += item.toXMLList( indent2, **kwargs )
+        for item in self : xmlString += item.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
@@ -201,39 +195,25 @@ class suite( ancestryModule.ancestry ) :
 
         return( item )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append( node.tag )
 
-        for child in element :
+        for child in node:
             parseClass = None
-            for _class in self.__allowedClasses :
-                if( child.tag == _class.moniker ) :
+            for _class in self.__allowedClasses:
+                if child.tag == _class.moniker:
                     parseClass = _class
                     break
-            if( parseClass is None ) :
-                raise TypeError( 'Invalid element "%s" encountered in suite "%s"' % ( child.tag, self.moniker ) )
+            if parseClass is None:
+                raise TypeError( 'Invalid node "%s" encountered in suite "%s"' % ( child.tag, self.moniker ) )
 
-            self.add( parseClass.parseXMLNodeAsClass( child, xPath, linkData ) )
+            self.add(parseClass.parseNodeUsingClass(child, xPath, linkData, **kwargs))
 
         xPath.pop( )
         return( self )
 
-    @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
-
-        return( cls().parseXMLNode( element, xPath, linkData ) )
-
-    @classmethod
-    def parseXMLStringAsClass( cls, string ) :
-
-        from xml.etree import cElementTree
-
-        element = cElementTree.fromstring( string )
-        kwargs = {v[0]:v[1] for v in element.items()}
-        return( cls( **kwargs ).parseXMLNode( element, [], [] ) )
-
-class sortedSuite( suite ) :
+class SortedSuite( Suite ) :
 
     def addIndex( self, item ) :
         """

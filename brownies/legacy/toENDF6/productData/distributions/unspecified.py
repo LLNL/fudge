@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,4 +13,4 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
     gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 0, self.productFrame, [] )
 
-unspecifiedModule.form.toENDF6 = toENDF6
+unspecifiedModule.Form.toENDF6 = toENDF6

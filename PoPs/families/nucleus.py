@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,13 +13,13 @@ For the compound particle formed of a nucleus + electrons, see the `nuclide` mod
 
 from .. import misc as miscModule
 
-from ..groups import misc as chemicalElementMiscModule
+from ..chemicalElements import misc as chemicalElementMiscModule
 
 from ..quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 
 from . import particle as particleModule
 
-class alias( particleModule.alias ) :
+class Alias( particleModule.Alias ) :
 
     moniker = 'nucleusAlias'
 
@@ -48,11 +48,11 @@ class alias( particleModule.alias ) :
 
         return( self.__particle.energy )
 
-class particle( particleModule.particle ) :
+class Particle( particleModule.Particle ) :
 
     moniker = 'nucleus'
     familyOrder = 3
-    alias = alias
+    alias = Alias
 
     def __init__( self, id, index ) :
         """
@@ -60,7 +60,7 @@ class particle( particleModule.particle ) :
         :param index: Nuclear excited level index (int). 0 = ground state, 1 = 1st excited, etc.
         """
 
-        particleModule.particle.__init__( self, id )
+        particleModule.Particle.__init__( self, id )
 
         baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( id )
         if( not( isNucleus ) ) : raise ValueError( 'Invalid nucleus id = "%s"' % id )
@@ -81,7 +81,9 @@ class particle( particleModule.particle ) :
         if( self.familyOrder != other.familyOrder ) : return( False )
         if( self.Z < other.Z ) : return( True )
         if( self.Z != other.Z ) : return( False )
-        return( self.A < other.A )
+        if self.A < other.A: return True
+        if self.A != other.A: return False
+        return self.index < other.index
 
     @property
     def A( self ) :
@@ -116,7 +118,7 @@ class particle( particleModule.particle ) :
     def convertUnits( self, unitMap ) :
         """ See convertUnits documentation in PoPs.database """
 
-        particleModule.particle.convertUnits( self, unitMap )
+        particleModule.Particle.convertUnits( self, unitMap )
         self.__energy.convertUnits( unitMap )
 
     def copy( self ) :
@@ -124,7 +126,7 @@ class particle( particleModule.particle ) :
         :return: deep copy of self
         """
 
-        _particle = particle( self.id, self.index )
+        _particle = Particle( self.id, self.index )
         self.__copyStandardQuantities( _particle )
         for item in self.__energy : _particle.energy.add( item.copy( ) )
         return( _particle )
@@ -144,10 +146,10 @@ class particle( particleModule.particle ) :
     def replicate( self, other ) :
         """
         Copy data from other into self
-        :param other: another nucleus.particle instance
+        :param other: another nucleus.Particle instance
         """
 
-        particleModule.particle.replicate( self, other )
+        particleModule.Particle.replicate( self, other )
         self.__energy.replicate( other.energy )
 
     def extraXMLAttributes( self ) :
@@ -156,17 +158,28 @@ class particle( particleModule.particle ) :
 
     def extraXMLElements( self, indent, **kwargs ) :
 
-        return( self.energy.toXMLList( indent, **kwargs ) )
+        return( self.energy.toXML_strList( indent, **kwargs ) )
 
-    def parseExtraXMLElement( self, element, xPath, linkData ) :
+    def parseExtraXMLElement(self, element, xPath, linkData, **kwarg):
 
-        if( element.tag == nuclearEnergyLevelModule.suite.moniker ) :
-            nuclearEnergyLevelModule.suite.parseXMLNode( self.energy, element, xPath, linkData )
+        if( element.tag == nuclearEnergyLevelModule.Suite.moniker ) :
+            nuclearEnergyLevelModule.Suite.parseNode(self.energy, element, xPath, linkData, **kwarg)
             return( True )
 
         return( False )
 
     def sortCompare( self, other ) :
 
-        if( not( isinstance( other, particle ) ) ) : raise TypeError( 'Invalid other.' )
+        if( not( isinstance( other, Particle ) ) ) : raise TypeError( 'Invalid other.' )
         return( self.index - other.index )
+
+    def particleCompare(self, other):
+        """Compares *self* to particle *other* which can be from an particle family."""
+
+        if self.familyOrder != other.familyOrder:
+            return self.familyOrder - other.familyOrder
+        if self.Z != other.Z:
+            return self.Z - other.Z
+        if self.A != other.A:
+            return self.A - other.A
+        return self.index - other.index

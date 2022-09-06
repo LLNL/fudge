@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@
 This module adds the method toACE to the classes in the fudge.productData.distributions.angularEnergyMC module.
 """
 
-from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 
 from fudge.productData.distributions import angularEnergyMC as angularEnergyMCModule
 
@@ -19,25 +19,25 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
     INTE = -1
     interpolation = self.interpolation
-    if( interpolation == standardsModule.interpolation.flatToken ) :
+    if interpolation == xDataEnumsModule.Interpolation.flat:
         INTE = 1
-    elif( interpolation == standardsModule.interpolation.linlinToken ) :
+    elif interpolation == xDataEnumsModule.Interpolation.linlin:
         INTE = 2
     if( INTE == -1 ) : raise Exception( 'Interpolation "%s" not supported for incident energy' % interpolation )
 
     INTMU = -1
     interpolation = self[0].interpolation
-    if( interpolation == standardsModule.interpolation.flatToken ) :
+    if interpolation == xDataEnumsModule.Interpolation.flat:
         INTMU = 1
-    elif( interpolation == standardsModule.interpolation.linlinToken ) :
+    elif interpolation == xDataEnumsModule.Interpolation.linlin:
         INTMU = 2
     if( INTMU == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % interpolation )
 
     INTEP = -1
     interpolation = self[0][0].interpolation
-    if( interpolation == standardsModule.interpolation.flatToken ) :
+    if interpolation == xDataEnumsModule.Interpolation.flat:
         INTEP = 1
-    elif( interpolation == standardsModule.interpolation.linlinToken ) :
+    elif interpolation == xDataEnumsModule.Interpolation.linlin:
         INTEP = 2
     if( INTEP == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % interpolation )
 

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -15,19 +15,21 @@ from . import abstractClasses as abstractClassesModule
 class Author(abstractClassesModule.AuthorAbstract):
 
     moniker = 'author'
+    keyName = 'name'
 
-    @staticmethod
-    def parseConstructBareNodeInstance(node, xPath, linkData, **kwargs):
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         name = node.get('name')
         orcid = node.get('orcid', '')
         email = node.get('email', '')
 
-        return Author(name, orcid, email)
+        return cls(name, orcid, email)
 
 class Authors(suiteModule.Suite):
 
     moniker = 'authors'
+    suiteName = 'name'
 
     def __init__(self):
 

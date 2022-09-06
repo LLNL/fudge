@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,14 +10,12 @@ This module contains the externalFile class, used to keep track of
 connections between GNDS files.
 """
 
-__metaclass__ = type
-
 import os
 
-import xData.ancestry as ancestryModule
-from LUPY import checksums
+from LUPY import ancestry as ancestryModule
+from LUPY import checksums as checksumsModule
 
-class externalFile( ancestryModule.ancestry ):
+class ExternalFile(ancestryModule.AncestryIO):
     """
     An externalFile contains a unique label,
     and the relative path to another file (unix path representation).
@@ -25,9 +23,9 @@ class externalFile( ancestryModule.ancestry ):
 
     moniker = 'externalFile'
 
-    def __init__(self, label, path, checksum=None, algorithm=checksums.sha1sum.algorithm):
+    def __init__(self, label, path, checksum=None, algorithm=checksumsModule.Sha1sum.algorithm):
 
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.__label = label
         self.path = path
         self.__checksum = checksum
@@ -65,7 +63,7 @@ class externalFile( ancestryModule.ancestry ):
         return( os.path.realpath( path ) )
 
 
-    def toXMLList(self, indent = '', **kwargs) :
+    def toXML_strList(self, indent = '', **kwargs) :
 
         attrs = ""
         if self.checksum:
@@ -73,9 +71,12 @@ class externalFile( ancestryModule.ancestry ):
         return [ '%s<%s label="%s" path="%s"%s/>' % ( indent, self.moniker, self.label, self.path, attrs ) ]
 
     @classmethod
-    def parseXMLNode(cls, element, xPath, linkData):
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append('%s[@label="%s"]' % (element.tag, element.get('label')))
-        ef = cls( element.get('label'), element.get('path'), element.get('checksum'), element.get('algorithm') )
+        xPath.append('%s[@label="%s"]' % (node.tag, node.get('label')))
+
+        ef = cls(node.get('label'), node.get('path'), node.get('checksum'), node.get('algorithm'))
+
         xPath.pop()
+
         return ef

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,12 +8,11 @@
 import math 
 from fudge.core.math import fudgemath
 
-__metaclass__ = type
 
-class equalProbableBinnedData :
+class EqualProbableBinnedData :
 
     def __init__( self, data ) :
-        """Constructor for the equalProbableBinnedData class."""
+        """Constructor for the EqualProbableBinnedData class."""
 
         self.data = data
 
@@ -109,4 +108,4 @@ def equalProbableBins( nBins, xy ) :
     iEnd += 1
     if( iEnd < len( xy ) ) : epbs[-1] = xy[iEnd][0]
 
-    return( equalProbableBinnedData( epbs ) )
+    return( EqualProbableBinnedData( epbs ) )

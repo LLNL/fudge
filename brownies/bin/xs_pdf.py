@@ -1,13 +1,17 @@
 #! /usr/bin/env python
+
 import argparse, math, json, collections
 import numpy as np
 import scipy.special as sp
+
 from brownies.BNL.plot_evaluation import getEXFORSets, generatePlot, getXdXYdYDataSets
 from fudge.processing.resonances.reconstructResonances import URRPDFTable
 from fudge.core.utilities.brb import banner
 from fudge.reactionData.crossSection import XYs1d, upperEps
-from xData import XYs, standards
-import xData.axes as axesModule
+
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
+from xData import axes as axesModule
 from pqu import PQU
 
 from brownies.legacy.endl import misc as miscENDLModule
@@ -341,10 +345,10 @@ def function_to_XYs(func, fpars,
     that can be integrated, grouped, whatever.  We pre-defined a energy grid (in eV) that should work well
     even for pathological "spectra" like the problematic 1/E for the resonance integral.
     """
-    return XYs.XYs1d.createFromFunction(
+    return XYs1dModule.XYs1d.createFromFunction(
         XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex: (rangeName, rangeUnit),
-            XYs.xAxisIndex: (domainName, domainUnit)}),
+            XYs1dModule.yAxisIndex: (rangeName, rangeUnit),
+            XYs1dModule.xAxisIndex: (domainName, domainUnit)}),
         Xs=Egrid,
         func=func,
         parameters=fpars,
@@ -361,14 +365,13 @@ def grouped_values_to_XYs(groupBdries, valueList,
     if len(groupBdries) != len(valueList) + 1:
         raise ValueError("Group boundries and value lists have incompatable lengths: len(bdries)=%i, len(vals)=%i" %
                          (len(groupBdries), len(valueList)))
-    return XYs.XYs1d(
+    return XYs1dModule.XYs1d(
         data=[groupBdries, [valueList[0]] + valueList],
         dataForm="xsandys",
-        interpolation=standards.interpolation.flatToken,
+        interpolation=xDataEnumsModule.Interpolation.flat,
         axes=XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex: (rangeName, rangeUnit),
-            XYs.xAxisIndex: (domainName, domainUnit)}))
-
+            XYs1dModule.yAxisIndex: (rangeName, rangeUnit),
+            XYs1dModule.xAxisIndex: (domainName, domainUnit)}))
 
 def fit_XY_points(_xdata, _ydata, _yerror, form='const', convertToXYs=True):
     # Using LSQR fitting to data
@@ -575,7 +578,7 @@ if __name__ == "__main__":
         endfXS = endfEval.getReaction(args.MT) \
             .crossSection.toPointwise_withLinearXYs(lowerEps=1e-8, upperEps=1e-8) \
             .domainSlice(domainMin=args.Emin * 1e6, domainMax=args.Emax * 1e6)
-        aveEndfXSOverDomain = endfXS.integrate() / PQU.PQU(endfXS.domainMax - endfXS.domainMin, 'eV')
+        aveEndfXSOverDomain = endfXS.integrate() / float(PQU.PQU(endfXS.domainMax - endfXS.domainMin, 'eV'))
         print()
 
     # Get the EXFOR data
@@ -889,16 +892,16 @@ if __name__ == "__main__":
 
         # Spline fit to correlation
         if True:
-            import xData.series1d
+            from xData import series1d as series1dModule
 
-            axes = axesModule.axes()
-            axes[0] = axesModule.axis('R(epsilon)', 0, '')
-            axes[1] = axesModule.axis('epsilon', 1, 'MeV')
+            axes = axesModule.Axes(2)
+            axes[0] = axesModule.Axis('R(epsilon)', 0, '')
+            axes[1] = axesModule.Axis('epsilon', 1, 'MeV')
             nModel = 100  # args.NE
             epsilonMin = 0.0
             epsilonMax = 0.8 * (args.Emax - args.Emin)
             bins = equal_bins(nModel, domainMin=epsilonMin, domainMax=epsilonMax)
-            Rfunc = xData.series1d.linearSpline1d(
+            Rfunc = series1dModule.LinearSpline1d(
                 xdata=bins,
                 ydata=[0.0 for i in range(nModel + 1)],
                 axes=axes)
@@ -983,7 +986,7 @@ if __name__ == "__main__":
         # Plot a slice of the PDF of the cross section
         if args.printXSPDFSlice is not None:
             E = binnedPDF.eBinCenters[args.printXSPDFSlice]
-            print('\n'.join(binnedPDF.pdf_at_energy(gndsRxnMap[args.MT], E).toXMLList()))
+            print('\n'.join(binnedPDF.pdf_at_energy(gndsRxnMap[args.MT], E).toXML_strList()))
 
     # Output the average
     if args.getAveXS:

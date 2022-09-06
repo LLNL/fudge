@@ -1563,22 +1563,24 @@ void Ddvec::dd_vector::chop_histogram( double EMax )
   Ddvec::dd_vector::iterator next_last = last_link;
   if( last_link->x > EMax )
   {
+    bool chop = false;
     --next_last;
-    while( next_last->x > EMax )
+    while( ( next_last->x > EMax ) &&
+	   ( next_last != begin( ) ) )
     {
+      chop = true;
       last_link = next_last;
       --next_last;
     }
     // do we need to chop?
     next_last = last_link;
     ++next_last;  // the new last link
-    if( last_link != end( ) )
+    if( chop )
     {
-      erase( last_link, end( ) );
+      erase( next_last, end( ) );
     }
-    next_last->x = EMax;
   }
-  next_last->y = 0.0;  // set to zero, whether we chop or not
+  last_link->y = 0.0;  // set to zero, whether we chop or not
 }
 // ----------- Ddvec::dd_vector::scale_E ------------
 // Scales the x-component; a kludge to convert ENDF eV to MeV

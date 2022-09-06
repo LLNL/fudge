@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -16,7 +16,7 @@ from fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic im
 from fudge.productData.distributions import angular as angularModule
 
 #
-# CoulombPlusNuclearElastic.form
+# CoulombPlusNuclearElastic.Form
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
@@ -25,7 +25,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     self.data.toENDF6( MT, endfMFList, flags, targetInfo )
     del targetInfo['LIDP'], targetInfo['productFrame']
 
-CPNElasticModule.form.toENDF6 = toENDF6
+CPNElasticModule.Form.toENDF6 = toENDF6
 
 #
 # nuclearAmplitudeExpansion
@@ -66,7 +66,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                                                                 self.imaginaryInterferenceTerm.data[ridx] )
             LTP_oneSubParsing( LTP, LIDP, nuclear, interferenceReal, interferenceImaginary, lineData )
         interpolationFlagsList += [ counts, gndsToENDF6Module.gndsToENDFInterpolationFlag( self.nuclearTerm.data.interpolation ) ]
-    elif( isinstance( self.nuclearTerm.data, angularModule.regions2d ) ) :
+    elif( isinstance( self.nuclearTerm.data, angularModule.Regions2d ) ) :
         for regionIndex, region in enumerate( self.nuclearTerm.data ) :
             interferenceReal, interferenceImaginary = ( self.realInterferenceTerm.data[regionIndex],
                                                         self.imaginaryInterferenceTerm.data[regionIndex] )
@@ -83,7 +83,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     LAW = 5
     gndsToENDF6Module.toENDF6_MF6(MT, endfMFList, flags, targetInfo, LAW, targetInfo['productFrame'], ENDFDataList)
 
-nuclearAmplitudeExpansionModule.nuclearAmplitudeExpansion.toENDF6 = toENDF6
+nuclearAmplitudeExpansionModule.NuclearAmplitudeExpansion.toENDF6 = toENDF6
 
 #
 # nuclearPlusInterference
@@ -102,7 +102,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     LAW = 5
     gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, targetInfo['productFrame'], MF6 )
 
-nuclearPlusInterferenceModule.nuclearPlusInterference.toENDF6 = toENDF6
+nuclearPlusInterferenceModule.NuclearPlusInterference.toENDF6 = toENDF6
 
 #
 # RutherfordScattering (write back as nuclearPlusInterference with 0 cross section / isotropic distribution data)

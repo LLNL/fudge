@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,7 +8,7 @@
 Define some helper methods and some base classes. These are mostly meant for internal use by the PoPs module.
 """
 
-from xData import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
 
 maxLength = 32
 antiSuffix = '_anti'
@@ -64,21 +64,21 @@ def buildParticleFromRawData( cls, ID, mass = None, spin = None, parity = None, 
         if( isinstance( unit, str ) ) : unit = quantityModule.stringToPhysicalUnit( unit )
         return( unit )
 
-    if( issubclass( cls, leptonModule.particle ) ) :
+    if( issubclass( cls, leptonModule.Particle ) ) :
         particle = cls( ID, generation = generation )
-    elif( issubclass( cls, nucleusModule.particle ) ) :
+    elif( issubclass( cls, nucleusModule.Particle ) ) :
         ID = ID[0].lower( ) + ID[1:]
         if( index is None ) : raise ValueError( 'index must be defined for nuclide to be built' )
         particle = cls( ID, index )
-        if( energy is not None ) : particle.energy.add( nuclearEnergyLevelModule.double( label, energy[0], getUnit( energy[1] ) ) )
-    elif( issubclass( cls, nuclideModule.particle ) ) :
+        if( energy is not None ) : particle.energy.add( nuclearEnergyLevelModule.Double( label, energy[0], getUnit( energy[1] ) ) )
+    elif( issubclass( cls, nuclideModule.Particle ) ) :
         particle = cls( ID )
         if( nucleus is not None ) : particle.nucleus.replicate( nucleus )
         if( charge is None ) : charge = ( 0, chargeModule.baseUnit )
         if( len( particle.nucleus.charge ) == 0 ) :
-            particle.nucleus.charge.add( chargeModule.integer( label, particle.Z, chargeModule.baseUnit ) )
-        if( energy is not None ) : particle.nucleus.energy.add( nuclearEnergyLevelModule.double( label, energy[0], getUnit( energy[1] ) ) )
-    elif( issubclass( cls, particleModule.particle ) ) :
+            particle.nucleus.charge.add( chargeModule.Integer( label, particle.Z, chargeModule.baseUnit ) )
+        if( energy is not None ) : particle.nucleus.energy.add( nuclearEnergyLevelModule.Double( label, energy[0], getUnit( energy[1] ) ) )
+    elif( issubclass( cls, particleModule.Particle ) ) :
         particle = cls( ID )
     else :
         raise TypeError( 'Invalid class.' )
@@ -97,13 +97,13 @@ def returnAntiParticleID( particle ) :
 
     return( returnAntiParticleIDFromId( particle.ID ) )
 
-class classWithIDKey( ancestryModule.ancestry ) :   # FIXME should classes below all be declared abstract?
+class ClassWithIDKey(ancestryModule.AncestryIO):   # FIXME should classes below all be declared abstract?
 
     __keyName = 'id'
 
     def __init__( self, id ) :
 
-        ancestryModule.ancestry.__init__( self  )
+        ancestryModule.AncestryIO.__init__(self)
 
         if( not( isinstance( id, str ) ) ) : raise TypeError( 'id not str' )
         self.__id = id
@@ -129,13 +129,13 @@ class classWithIDKey( ancestryModule.ancestry ) :   # FIXME should classes below
 
         return( self.__keyName )
 
-class classWithSymbolKey( ancestryModule.ancestry ) :
+class ClassWithSymbolKey(ancestryModule.AncestryIO):
 
     __keyName = 'symbol'
 
     def __init__( self, symbol ) :
 
-        ancestryModule.ancestry.__init__( self  )
+        ancestryModule.AncestryIO.__init__(self)
 
         if( not( isinstance( symbol, str ) ) ) : raise TypeError( 'symbol not str' )
         self.__symbol = symbol
@@ -161,13 +161,13 @@ class classWithSymbolKey( ancestryModule.ancestry ) :
 
         return( self.__keyName )
 
-class classWithLabelKey( ancestryModule.ancestry ) :
+class ClassWithLabelKey(ancestryModule.AncestryIO):
 
     __keyName = 'label'
 
     def __init__( self, label ) :
 
-        ancestryModule.ancestry.__init__( self  )
+        ancestryModule.AncestryIO.__init__(self)
 
         if( not( isinstance( label, str ) ) ) : raise TypeError( 'label not str' )
         self.__label = label
@@ -176,6 +176,11 @@ class classWithLabelKey( ancestryModule.ancestry ) :
     def label( self ) :
     
         return( self.__label )
+
+    @label.setter
+    def label( self, value ) :
+
+        self.key = value
 
     @property
     def key( self ) :
@@ -193,13 +198,13 @@ class classWithLabelKey( ancestryModule.ancestry ) :
 
         return( self.__keyName )
 
-class classWithIndexKey( ancestryModule.ancestry ) :
+class ClassWithIndexKey(ancestryModule.AncestryIO):
 
     __keyName = 'index'
 
     def __init__( self, index ) :
 
-        ancestryModule.ancestry.__init__( self  )
+        ancestryModule.AncestryIO.__init__(self)
 
         if( not( isinstance( index, str ) ) ) : raise TypeError( 'index not str' )
         self.key = index
@@ -225,13 +230,13 @@ class classWithIndexKey( ancestryModule.ancestry ) :
 
         return( self.__keyName )
 
-class classWithSubshellKey( ancestryModule.ancestry ) :
+class ClassWithSubshellKey( ancestryModule.AncestryIO):
 
     __keyName = 'subshell'
 
     def __init__( self, subshell ) :
 
-        ancestryModule.ancestry.__init__( self  )
+        ancestryModule.AncestryIO.__init__(self)
 
         if( not( isinstance( subshell, str ) ) ) : raise TypeError( 'subshell not str' )
         self.__subshell = subshell

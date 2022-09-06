@@ -43,6 +43,7 @@ Contents
    reporting-bugs
    todo
    thanks
+   The pqu package <pqu/modules.rst>
 
 .. toctree::
    :hidden:

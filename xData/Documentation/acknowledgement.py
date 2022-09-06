@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,12 +11,12 @@ This module contains the GNDS documentation child node endfCompatible class.
 
 from .. import suite as suiteModule
 from .. import text as textModule
-from . import abstractClasses as abstractClassesModule
 
 class Acknowledgement( textModule.Text ) :
     """A class representing a GNDS authors/acknowledgement node."""
 
     moniker = 'acknowledgement'
+    keyName = 'label'
 
     def __init__( self, _label ) :
 
@@ -35,16 +35,17 @@ class Acknowledgement( textModule.Text ) :
 
         return ' label="%s"' % self.__label
 
-    @staticmethod
-    def parseConstructBareNodeInstance( node, xPath, linkData, **kwargs ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         label = node.get( 'label', '' )
 
-        return( Acknowledgement( label ) )
+        return cls(label)
 
 class Acknowledgements( suiteModule.Suite ) :
 
     moniker = 'acknowledgements'
+    suiteName = 'label'
 
     def __init__( self ) :
 

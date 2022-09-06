@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -27,34 +27,34 @@ def toENDL( self ) :
 angularModule.XYs2d.toENDL = toENDL
 
 #
-# isotropic2d
+# Isotropic2d
 #
 def toENDL( self ) :
 
     return( None )
 
-angularModule.isotropic2d.toENDL = toENDL
+angularModule.Isotropic2d.toENDL = toENDL
 
 #
-# recoil
+# Recoil
 #
 def toENDL( self ) :
 
-    outputChannel = self.findClassInAncestry( outputChannelModule.outputChannel )
+    outputChannel = self.findClassInAncestry( outputChannelModule.OutputChannel )
     product = outputChannel.products[0]
     distribution = product.distribution[0].invert( ).toENDL( )
     return( distribution )
 
-angularModule.recoil.toENDL = toENDL
+angularModule.Recoil.toENDL = toENDL
 
 #
-# twoBodyForm
+# TwoBody
 #
 def toENDL( self ) :
 
     return( { 1 : self.angularSubform.toENDL( ) } )
 
-angularModule.twoBodyForm.toENDL = toENDL
+angularModule.TwoBody.toENDL = toENDL
 
 #
 # form
@@ -63,4 +63,4 @@ def toENDL( self ) :
 
     print( self.moniker )
 
-angularModule.form.toENDL = toENDL
+angularModule.Form.toENDL = toENDL

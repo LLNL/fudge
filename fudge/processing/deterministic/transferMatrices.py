@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -15,13 +15,14 @@ from pqu import PQU as PQUModule
 
 from PoPs import IDs as IDsPoPsModule
 
-import fudge as fudgeModule
+from LUPY import locateFudgeBin as locateBinFolderModule
 
-from LUPY import subprocessing, times
+from LUPY import subprocessing as subprocessingModule
+from LUPY import times as timesModule
 
-from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 from xData import axes as axesModule
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 from xData import multiD_XYs as multiD_XYsModule
 from xData import regions as regionsModule
 
@@ -31,18 +32,18 @@ from fudge.productData.distributions import energyAngular as energyAngularModule
 
 from . import specialCases as specialCasesModule
 
-linlin = standardsModule.interpolation.linlinToken
-linlog = standardsModule.interpolation.linlogToken
-loglin = standardsModule.interpolation.loglinToken
-loglog = standardsModule.interpolation.loglogToken
-flat = standardsModule.interpolation.flatToken
+linlin = xDataEnumsModule.Interpolation.linlin
+linlog = xDataEnumsModule.Interpolation.linlog
+loglin = xDataEnumsModule.Interpolation.loglin
+loglog = xDataEnumsModule.Interpolation.loglog
+flat = xDataEnumsModule.Interpolation.flat
 
 GNDS2ProcessingInterpolationQualifiers = {
-    '' : 'direct', 
-    standardsModule.interpolation.unitBaseToken : standardsModule.interpolation.unitBaseToken,
-    standardsModule.interpolation.unitBaseUnscaledToken : standardsModule.interpolation.unitBaseUnscaledToken,
-    standardsModule.interpolation.correspondingPointsToken : 'cumulativepoints',
-    standardsModule.interpolation.correspondingPointsUnscaledToken : 'cumulativepoints-unscaled' }
+    xDataEnumsModule.InterpolationQualifier.none: 'direct', 
+    xDataEnumsModule.InterpolationQualifier.unitBase: xDataEnumsModule.InterpolationQualifier.unitBase,
+    xDataEnumsModule.InterpolationQualifier.unitBaseUnscaled: xDataEnumsModule.InterpolationQualifier.unitBaseUnscaled,
+    xDataEnumsModule.InterpolationQualifier.correspondingPoints: 'cumulativepoints',
+    xDataEnumsModule.InterpolationQualifier.correspondingPointsUnscaled: 'cumulativepoints-unscaled' }
 
 versionStr = "xndfgenTransferMatrix: version 1.0"
 doubleFmt = "%19.12e"
@@ -51,19 +52,7 @@ upperEps = 1e-8
 startOfNewData = "\n# Start data\n"
 startOfNewSubData = "# Start sub data"
 
-transferMatrixExecute = 'merced'
-srcPath = os.path.join(os.path.abspath('./'), transferMatrixExecute)
-if( os.path.exists( srcPath ) ) :
-    transferMatrixExecute = srcPath
-else:
-    srcPath = os.path.join(sys.prefix, 'bin', transferMatrixExecute)
-    if( os.path.exists( srcPath ) ) :
-        transferMatrixExecute = srcPath
-    else :
-        srcPath = os.path.join(os.path.split(os.path.dirname(fudgeModule.__file__))[0], 'bin')
-        transferMatrixExecute = os.path.join( srcPath, transferMatrixExecute )
-
-if not os.path.exists(transferMatrixExecute) : transferMatrixExecute = None
+transferMatrixExecute = locateBinFolderModule.locateMerced()
 
 def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularData, Q, weight = None, comment = None ) :
     """
@@ -72,14 +61,15 @@ def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularD
     calls itself in the two regions and sums the result.
     """
 
-    if( isinstance( angularData, angularModule.isotropic2d ) ) : angularData = angularData.toPointwise_withLinearXYs( )
+    if( isinstance( angularData, angularModule.Isotropic2d ) ) : angularData = angularData.toPointwise_withLinearXYs( )
 
     if( isinstance( angularData, angularModule.XYs2d ) ) :
         TM1, TME = twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, productFrame, comment = comment )
-    elif( isinstance( angularData, angularModule.regions2d ) ) :
+    elif( isinstance( angularData, angularModule.Regions2d ) ) :
+        if len(angularData) == 1: return twoBodyTransferMatrix(style, tempInfo, productFrame, crossSection, angularData[0], Q, weight, comment)
         TM1s, TMEs = [], []
         lowestBound, highestBound = angularData[0].domainMin, angularData[-1].domainMax
-        weightAxes = axesModule.axes( )
+        weightAxes = axesModule.Axes(2)
         for iRegion, region in enumerate( angularData ) :
                 if( iRegion == 0 ) :
                     weightData = [ [ lowestBound, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
@@ -87,8 +77,7 @@ def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularD
                     weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ highestBound, 1 ] ]
                 else :
                     weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
-                _weight = XYsModule.XYs1d( data = weightData, axes = weightAxes,
-                        interpolation = standardsModule.interpolation.flatToken )
+                _weight = XYs1dModule.XYs1d(data=weightData, axes=weightAxes, interpolation=flat)
 
                 tempInfo['workFile'].append( 'r%s' % iRegion )
                 try :
@@ -110,7 +99,7 @@ def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularD
 def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, productFrame, weight = None, comment = None ) :
     """
     Helper function for twoBodyTransferMatrix. This should be called separately for every interpolation 
-    region within a regions2d form.
+    region within a Regions2d form.
     """
 
     reactionSuite = tempInfo['reactionSuite']
@@ -121,7 +110,6 @@ def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, produ
     modifiedProductGroupIndex = 0
     modifiedProductGroup = None
     if reactionSuite.projectile == IDsPoPsModule.photon and tempInfo['productName'] == IDsPoPsModule.neutron:
-        from fudge.processing import group as groupModule
 
         cutoffEnergy = PQUModule.PQU( 1e-9, 'MeV' ).getValueAs(tempInfo['incidentEnergyUnit'])
         productName = tempInfo['productName']
@@ -136,7 +124,7 @@ def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, produ
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
 
-    if( isinstance( angularData, angularModule.recoil ) ) : angularData = angularData.getNumericalDistribution( )
+    if( isinstance( angularData, angularModule.Recoil ) ) : angularData = angularData.getNumericalDistribution( )
 
     s = versionStr + '\n'
     if( isinstance( angularData[0], angularModule.XYs1d ) ) :
@@ -148,7 +136,7 @@ def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, produ
 
     s += "Reaction's Q value: %s\n" % PQUModule.floatToShortestString( ( Q ), 12 )
 
-    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, photonFrame = standardsModule.frames.centerOfMassToken,
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, photonFrame = xDataEnumsModule.Frame.centerOfMass,
             modifiedProductGroup=modifiedProductGroup)
     s += angularToString( angularData, crossSection, weight = weight, twoBody = True )
     TM1, TME = executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'],
@@ -206,12 +194,12 @@ def wholeAtomScattering( style, tempInfo, productFrame, formFactor, realAnomalou
         s1 += '\n'.join( twoDToString( "imaginaryAnomalousFactor", imaginaryAnomalousFactor ) )
     return( executeCommand( logFile, transferMatrixExecute, s1, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
-def comptonScattering( style, tempInfo, productFrame, scatteringFunction, comment = None ) :
+def comptonScattering( style, tempInfo, productFrame, scatteringFactor, comment = None ) :
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
     incidentEnergyUnit = tempInfo['incidentEnergyUnit']
-    waveLengthUnit = scatteringFunction.axes[1].unit
+    waveLengthUnit = scatteringFactor.axes[1].unit
     inverseWaveLengthToEnergyFactor = PQUModule.PQU( 1, 'hplanck * c * %s' % waveLengthUnit ).getValueAs( incidentEnergyUnit )
     electronRadius = PQUModule.PQU( 1, "e**2 / ( 4 * pi * eps0 * me * c**2 )" )
     ThomsonScatteringCrossSection = 8 * math.pi * electronRadius**2 / 3
@@ -223,7 +211,7 @@ def comptonScattering( style, tempInfo, productFrame, scatteringFunction, commen
     s1 += 'Electron mass: %s\n' % PQUModule.floatToShortestString( PQUModule.PQU( 1, "me * c**2" ).getValueAs( incidentEnergyUnit ), 14 )
 
     s1 += commonDataToString( comment, style, tempInfo, None, productFrame )
-    s1 += '\n'.join( twoDToString( "ScatteringFactorData", scatteringFunction ) )
+    s1 += '\n'.join( twoDToString( "ScatteringFactorData", scatteringFactor ) )
     return( executeCommand( logFile, transferMatrixExecute, s1, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def ENDFEMuEpP_TransferMatrix( style, tempInfo, productFrame, crossSection, angularEnergyData, multiplicity, comment = None ) :
@@ -314,28 +302,27 @@ def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, produc
 
     legendreMax = None
     if( angularData.isIsotropic() ) :
-        if( productFrame == standardsModule.frames.labToken ) : legendreMax = 0
+        if productFrame == xDataEnumsModule.Frame.lab: legendreMax = 0
 
     sSpecific = ''
-    if( isinstance( energyData, energyModule.functionalBase ) ) :
+    if( isinstance( energyData, energyModule.FunctionalBase ) ) :
         sProcess, sSpecific, sData = energyFunctionToString( energyData, weight = weight )
         weight = None
-    elif( isinstance( energyData, energyModule.weightedFunctionals ) ) :
+    elif( isinstance( energyData, energyModule.WeightedFunctionals ) ) :
         TM1s, TMEs = [], []
         for weight in energyData :
             TM1, TME = uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angularData, 
-                    weight.functional, multiplicity, comment = comment, weight = weight )
+                    weight.functional, multiplicity, comment = comment, weight = weight.weight )
             TM1s.append( TM1 )
             TMEs.append( TME )
         TM1 = addTMs( TM1s )
         TME = addTMs( TMEs )
         return( TM1, TME )
-    elif( isinstance( energyData, energyModule.regions2d ) ) :
+    elif( isinstance( energyData, energyModule.Regions2d ) ) :
         TM1s, TMEs = [], []
-        axes = axesModule.axes( )
+        axes = axesModule.Axes(2)
         for i1, region in enumerate( energyData ) :
-            weight = XYsModule.XYs1d( data = [ [ region.domainMin, 1. ], [ region.domainMax, 1. ] ], axes = axes,
-                interpolation = standardsModule.interpolation.flatToken )
+            weight = XYs1dModule.XYs1d(data=[[region.domainMin, 1.], [region.domainMax, 1.]], axes=axes, interpolation=flat)
             tempInfo['workFile'].append( 'r%s' % i1 )
             try :
                 TM1, TME = uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angularData,
@@ -349,7 +336,7 @@ def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, produc
         TM1 = addTMs( TM1s )
         TME = addTMs( TMEs )
         return( TM1, TME )
-    elif( isinstance( energyData, energyModule.primaryGamma ) ) :
+    elif( isinstance( energyData, energyModule.PrimaryGamma ) ) :
         return( primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularData, multiplicity = multiplicity, comment = comment ) )
     else :
         if( angularData.isIsotropic() ) :
@@ -445,9 +432,8 @@ def primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularD
     indexEo = min( max( indexEo - 1, 0 ), nProd - 1 )
 
     EMin, EMax = crossSection.domainMin, crossSection.domainMax
-    axes = axesModule.axes( labelsUnits = { 0 : ( 'energy_out', tempInfo['incidentEnergyUnit'] ), 
-                                            1 : ( crossSection.axes[1].label, crossSection.axes[1].unit ) } )
-    Egp = XYsModule.XYs1d( data = [ [ EMin, bindingEnergy + massRatio * EMin ], [ EMax, bindingEnergy + massRatio * EMax ] ], axes = axes )
+    axes = axesModule.Axes(2, labelsUnits = {0: ('energy_out', tempInfo['incidentEnergyUnit']), 1: (crossSection.axes[1].label, crossSection.axes[1].unit)})
+    Egp = XYs1dModule.XYs1d( data = [ [ EMin, bindingEnergy + massRatio * EMin ], [ EMax, bindingEnergy + massRatio * EMax ] ], axes = axes )
 
     for indexEi in range( nProj ) :
         Ei2 = projectileGroupBoundaries[indexEi + 1]
@@ -478,7 +464,7 @@ def NBodyPhaseSpace( style, tempInfo, crossSection, numberOfProducts, mTotal, Q,
     s += "Number of particles: %s\n" % numberOfProducts
     s += "Total mass: %s\n" % PQUModule.floatToShortestString( mTotal, 14 )
     s += "Q value: %s\n" % PQUModule.floatToShortestString( Q, 12 )
-    productFrame = standardsModule.frames.centerOfMassToken
+    productFrame = xDataEnumsModule.Frame.centerOfMass
     s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
@@ -494,7 +480,7 @@ def KalbachMann_TransferMatrix( style, tempInfo, crossSection, particlesData, Ka
     s += "Target's ZA: %s\n" % particlesData['target']['ZA']
     s += "Product's ZA: %s\n" % particlesData['product']['ZA']
     s += "Compound's mass: %s\n" % PQUModule.floatToShortestString( particlesData['compound']['mass'], 14 )
-    productFrame = standardsModule.frames.centerOfMassToken
+    productFrame = xDataEnumsModule.Frame.centerOfMass
     s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity, energy_in_unit = energy_in_unit )
     s += KalbachMannDataToString( KalbachMannData, energy_in_unit )
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
@@ -547,7 +533,7 @@ def executeCommand( logFile, executable, cmd, workDir, workFile, restart, produc
                 # This input has already been successfully run (e.g. by previous processProtare run that timed out).
                 # Ensure variables are initialized:
                 fOut.write("  Reading previously computed results")
-                t0 = times.times( )
+                t0 = timesModule.Times( )
                 status = 0
             else:
                 restart = False
@@ -557,9 +543,9 @@ def executeCommand( logFile, executable, cmd, workDir, workFile, restart, produc
     if not restart:
         with open( fullFileName, 'w' ) as dataFile:
             dataFile.write( cmd )
-        t0 = times.times( )
+        t0 = timesModule.Times( )
         try :
-            status, stdout, stderr = subprocessing.executeCommand( [ executable, '-output', fullFileName + '.out', fullFileName ], 
+            status, stdout, stderr = subprocessingModule.executeCommand( [ executable, '-output', fullFileName + '.out', fullFileName ], 
                 stdout = infoFile, stderr = subprocess.STDOUT )
         except :
             fErr = open( fullFileName + ".err", "w" )
@@ -682,7 +668,7 @@ def parseOutputFile( file, productOffset, firstLine = None ) :
     return( TM1, TME, paras )
 
 def commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = None, energy_in_unit = None, weight = None,
-        photonFrame = standardsModule.frames.labToken, legendreMax = None, modifiedProductGroup = None ) :
+        photonFrame = xDataEnumsModule.Frame.lab, legendreMax = None, modifiedProductGroup = None ) :
 
     reactionSuite = tempInfo['reactionSuite']
     projectileName = reactionSuite.projectile
@@ -751,9 +737,9 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False, 
     weightString = ''
     if( weight is not None ) : weightString = startOfNewData + '\n'.join( twoDToString( "weight", weight, addExtraBlankLine = False ) ) + '\n'
 
-    if( isinstance( angularData, angularModule.isotropic2d ) ) :
+    if( isinstance( angularData, angularModule.Isotropic2d ) ) :
         s = "Angular data: n = 2\n"
-        s += 'Incident energy interpolation: %s %s\n' % ( linlin, GNDS2ProcessingInterpolationQualifiers[""] )
+        s += 'Incident energy interpolation: %s %s\n' % ( linlin, GNDS2ProcessingInterpolationQualifiers[xDataEnumsModule.InterpolationQualifier.none] )
         s += 'Outgoing cosine interpolation: %s\n' % linlin
         for x in [ crossSection.domainMin, crossSection.domainMax ] : s += " %s : n = 2\n   -1 0.5\n   1 0.5\n" % ( doubleFmt % x )
 
@@ -762,8 +748,8 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False, 
             s = "Angular data: n = %s\n" % len( angularData )
 
             interpolationQualifier = angularData.interpolationQualifier
-            if( angularData.interpolationQualifier == '' and not twoBody ) :    # Don't use direct interpolation!
-                interpolationQualifier = standardsModule.interpolation.unitBaseToken
+            if( angularData.interpolationQualifier == xDataEnumsModule.InterpolationQualifier.none and not twoBody ) :    # Don't use direct interpolation!
+                interpolationQualifier = xDataEnumsModule.InterpolationQualifier.unitBase
 
             if( angularData.interpolation not in [ linlin, flat ] ) :
                 _angularData = angularData.copy( )
@@ -792,8 +778,8 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False, 
 
         elif( isinstance( angularData[0], angularModule.Legendre ) ) :
             interpolation = angularData.interpolation
-            if( angularData.interpolationQualifier != '' ) :
-                raise Exception( 'interpolation qualifier = %s is not supported' % angularData.interpolationQualifier )
+            if( angularData.interpolationQualifier != xDataEnumsModule.InterpolationQualifier.none ) :
+                raise Exception( 'interpolation qualifier = "%s" is not supported.' % angularData.interpolationQualifier )
             if( interpolation not in [ linlin, flat ] ) :
                 _angularData = angularData.copy( )
                 _angularData.interpolation = linlin
@@ -833,7 +819,7 @@ def energyFunctionToString( energyData, weight = None ) :
         return( sData )
 
     sData = []
-    if( isinstance( energyData, ( energyModule.simpleMaxwellianFissionSpectrum, energyModule.evaporationSpectrum, energyModule.WattSpectrum ) ) ) :
+    if( isinstance( energyData, ( energyModule.SimpleMaxwellianFission, energyModule.Evaporation, energyModule.Watt ) ) ) :
         sData.append( 'U: %s' % PQUModule.floatToShortestString( energyData.U.getValueAs( energyData.parameter1.data.axes[-1].unit ), 12 ) )
 
     parameter1 = energyData.parameter1.data.toPointwise_withLinearXYs( accuracy = 1e-5, lowerEps = lowerEps, upperEps = upperEps )
@@ -842,27 +828,24 @@ def energyFunctionToString( energyData, weight = None ) :
         parameter2 = energyData.parameter2.data.toPointwise_withLinearXYs( accuracy = 1e-5, lowerEps = lowerEps, upperEps = upperEps )
 
     if( weight is None ) :
-        axes = axesModule.axes( )
-        weight = XYsModule.XYs1d( data = [ [ parameter1.domainMin, 1. ], [ parameter1.domainMax, 1. ] ], axes = axes, 
-                interpolation = standardsModule.interpolation.flatToken )
-    else :
-        weight = weight.weight
+        axes = axesModule.Axes(2)
+        weight = XYs1dModule.XYs1d(data=[[parameter1.domainMin, 1.], [parameter1.domainMax, 1.]], axes=axes, interpolation=flat)
     sData += twoDToString( "weight", weight, addExtraBlankLine = False )
 
-    if( isinstance( energyData, energyModule.generalEvaporationSpectrum ) ) :
+    if( isinstance( energyData, energyModule.GeneralEvaporation ) ) :
         sProcess = 'Process: general evaporation\n'
         sSpecific = ''
         sData += getParameter( parameter1, 'Theta' )
         sData += getParameter( parameter2, 'g' )
-    elif( isinstance( energyData, energyModule.simpleMaxwellianFissionSpectrum ) ) :
+    elif( isinstance( energyData, energyModule.SimpleMaxwellianFission ) ) :
         sProcess = 'Process: Maxwell spectrum\n'
         sSpecific = ''
         sData += getParameter( parameter1, 'Theta' )
-    elif( isinstance( energyData, energyModule.evaporationSpectrum ) ) :
+    elif( isinstance( energyData, energyModule.Evaporation ) ) :
         sProcess = 'Process: Evaporation spectrum\n'
         sSpecific = ''
         sData += getParameter( parameter1, 'Theta' )
-    elif( isinstance( energyData, energyModule.WattSpectrum ) ) :
+    elif( isinstance( energyData, energyModule.Watt ) ) :
         sProcess = 'Process: Watt spectrum\n'
         sSpecific = 'Conserve: number\n'
         sData += getParameter( parameter1, 'a' )
@@ -886,10 +869,10 @@ def EEpPDataToString( EEpPData, changeInterpolationQualifierWarning = False ) :
     s += "EEpPData: n = %d\n" % len( EEpPData )
 
     qualifier = EEpPData.interpolationQualifier
-    if( qualifier == standardsModule.interpolation.noneQualifierToken ) :
-        if( EEpPData.interpolation != standardsModule.interpolation.flatToken ):
+    if qualifier == xDataEnumsModule.InterpolationQualifier.none:
+        if EEpPData.interpolation != flat:
             if( changeInterpolationQualifierWarning ) : print('    WARNING: changing interpolation qualifier from None to unitbase')
-            qualifier = standardsModule.interpolation.unitBaseToken
+            qualifier = xDataEnumsModule.InterpolationQualifier.unitBase
     s += 'Incident energy interpolation: %s %s\n' % ( EEpPData.interpolation, GNDS2ProcessingInterpolationQualifiers[qualifier] )
 
     linearizeXYs = False
@@ -914,8 +897,7 @@ def LEEpPDataToString( LEEpPData ) :
 
     s  = startOfNewData
     s += "LEEpPData: n = %d\n" % len( LEEpPData )
-    s += 'Incident energy interpolation: %s %s\n' % (
-            linlin, GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+    s += 'Incident energy interpolation: %s %s\n' % (linlin, GNDS2ProcessingInterpolationQualifiers[xDataEnumsModule.InterpolationQualifier.unitBase])
     s += 'Outgoing energy interpolation: %s\n' % linlin
     for l_EEpP in LEEpPData :
         s += startOfNewSubData + '\n'
@@ -929,7 +911,8 @@ def LegendreDataToString( LegendreData, changeInterpolationQualifierWarning = Fa
 
 
     qualifier = LegendreData.interpolationQualifier
-    if( qualifier == standardsModule.interpolation.noneQualifierToken ) : qualifier = standardsModule.interpolation.unitBaseToken
+    if qualifier == xDataEnumsModule.InterpolationQualifier.none:
+        qualifier = xDataEnumsModule.InterpolationQualifier.unitBase
     s.append( 'Incident energy interpolation: %s %s' % ( LegendreData.interpolation, GNDS2ProcessingInterpolationQualifiers[qualifier] ) )
 
     interpolation = LegendreData[0].interpolation
@@ -955,15 +938,13 @@ def EMuEpPDataToString( EMuEpPData ) :
     s += "EMuEpPData: n = %d\n" % len( EMuEpPData )
 
     qualifier = EMuEpPData.interpolationQualifier
-    if( qualifier not in [ standardsModule.interpolation.noneQualifierToken, standardsModule.interpolation.unitBaseToken ] ) :
+    if qualifier not in [xDataEnumsModule.InterpolationQualifier.none, xDataEnumsModule.InterpolationQualifier.unitBase]:
         raise Exception( 'interpolation qualifier = %s is not supported' % qualifier )
     if( EMuEpPData.interpolation != linlin ) :
         raise Exception( 'interpolation = "%s" is not supported' % EMuEpPData.interpolation )
-    s += 'Incident energy interpolation: %s %s\n' % ( linlin,
-            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+    s += 'Incident energy interpolation: %s %s\n' % (linlin, GNDS2ProcessingInterpolationQualifiers[xDataEnumsModule.InterpolationQualifier.unitBase])
 
-    s += 'Outgoing cosine interpolation: %s %s\n' % ( linlin, 
-            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+    s += 'Outgoing cosine interpolation: %s %s\n' % (linlin, GNDS2ProcessingInterpolationQualifiers[xDataEnumsModule.InterpolationQualifier.unitBase])
 
     s += 'Outgoing energy interpolation: %s\n' % linlin
 
@@ -980,21 +961,16 @@ def EEpMuPDataToString( EEpMuPData ) :
     s += "EEpMuPData: n = %d\n" % len( EEpMuPData )
 
     qualifier = EEpMuPData.interpolationQualifier
-    if( qualifier not in [ standardsModule.interpolation.noneQualifierToken, standardsModule.interpolation.unitBaseToken ] ) :
-        raise Exception( 'interpolation qualifier = %s is not supported' % qualifier )
-    if( EEpMuPData.interpolation != linlin ) :
-        raise Exception( 'Incident energy interpolation = "%s" is not supported' % EEpMuPData.interpolation )
-    s += 'Incident energy interpolation: %s %s\n' % ( linlin,
-            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+    if qualifier in [xDataEnumsModule.InterpolationQualifier.none, xDataEnumsModule.InterpolationQualifier.correspondingPoints]:
+        print('WARNING: converting interpolation qualifier from "%s" to "%s".' % (qualifier, xDataEnumsModule.InterpolationQualifier.unitBase))
+        qualifier = xDataEnumsModule.InterpolationQualifier.unitBase
+    s += 'Incident energy interpolation: %s %s\n' % ( EEpMuPData.interpolation, qualifier )
 
     outgoingInterpolations = set([xys2d.interpolation for xys2d in EEpMuPData])
-    if outgoingInterpolations != {'lin-lin'}:
-        outgoingInterpolations.remove('lin-lin')
-        raise Exception( 'Outgoing energy interpolation(s) %s not supported' % outgoingInterpolations)
-    s += 'Outgoing energy interpolation: %s %s\n' % ( linlin,
-            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.noneQualifierToken] )
+    if len(outgoingInterpolations) > 1: raise Exception( 'Multiple outgoing energy interpolation(s) %s not supported' % outgoingInterpolations)
+    s += 'Outgoing energy interpolation: %s direct\n' % EEpMuPData[0].interpolation
 
-    s += 'Outgoing cosine interpolation: %s\n' % linlin
+    s += 'Outgoing cosine interpolation: %s\n' % EEpMuPData[0][0].interpolation
 
     for EpMuP in EEpMuPData :
         s += startOfNewSubData + '\n'
@@ -1014,24 +990,22 @@ def KalbachMannDataToString( KalbachMannData, energy_in_unit ) :
     factor = fSubform.domainUnitConversionFactor( energy_in_unit ) # Energies passed to get_transfer must be in energy_in_unit, traditionally MeV.
     _fSubform = multiD_XYsModule.XYs2d( )
     for xys in fSubform :
-        _xys = XYsModule.XYs1d( data = xys.nf_pointwiseXY.scaleOffsetXAndY( xScale = factor, yScale = 1 / factor ), outerDomainValue = factor * xys.outerDomainValue )
+        _xys = XYs1dModule.XYs1d( data = xys.nf_pointwiseXY.scaleOffsetXAndY( xScale = factor, yScale = 1 / factor ), outerDomainValue = factor * xys.outerDomainValue )
         _fSubform.append( _xys )
 
     _rSubform = multiD_XYsModule.XYs2d( )
     for xys in rSubform :
-        _xys = XYsModule.XYs1d( data = xys.nf_pointwiseXY.scaleOffsetXAndY( xScale = factor ), outerDomainValue = factor * xys.outerDomainValue )
+        _xys = XYs1dModule.XYs1d( data = xys.nf_pointwiseXY.scaleOffsetXAndY( xScale = factor ), outerDomainValue = factor * xys.outerDomainValue )
         _rSubform.append( _xys )
 
     s  = startOfNewData
     s += "Kalbach probabilities: n = %s\n" % len( _fSubform )
-    s += "Incident energy interpolation: %s %s\n" % ( linlin,
-            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+    s += "Incident energy interpolation: %s %s\n" % (linlin, GNDS2ProcessingInterpolationQualifiers[xDataEnumsModule.InterpolationQualifier.unitBase])
     s += "Outgoing energy interpolation: %s\n" % fSubform[0].interpolation
     s += threeDListToString( _fSubform )
 
     s += "Kalbach r parameter: n = %s\n" % len( rSubform )
-    s += "Incident energy interpolation: %s %s\n" % ( rSubform.interpolation, 
-            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseUnscaledToken] )
+    s += "Incident energy interpolation: %s %s\n" % (rSubform.interpolation, GNDS2ProcessingInterpolationQualifiers[xDataEnumsModule.InterpolationQualifier.unitBaseUnscaled])
     s += "Outgoing energy interpolation: %s\n" % rSubform[0].interpolation
     s += threeDListToString( _rSubform )
 
@@ -1050,11 +1024,11 @@ def oneDToString( data, factor = 1 ) :
 
 def twoDToString( label, data, addHeader = True, addExtraBlankLine = True ) :
 
-    if( isinstance( data, XYsModule.XYs1d ) ) :
+    if( isinstance( data, XYs1dModule.XYs1d ) ) :
         if( data.interpolation not in [ linlin, flat ] ) :
             data = data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
         interpolationStr = 'Interpolation: %s' % data.interpolation
-    elif( isinstance( data, regionsModule.regions1d ) ) :
+    elif( isinstance( data, regionsModule.Regions1d ) ) :
         data = data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
         interpolationStr = 'Interpolation: %s' % data.interpolation
     else :

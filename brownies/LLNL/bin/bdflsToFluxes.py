@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,7 @@ import os
 import argparse
 
 from brownies.legacy.endl import bdfls as bdflsModule
-from xData import XYs as XYs1dModule
+from xData import XYs1d as XYs1dModule
 
 addFluxExec = os.path.join( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) ) ) ), "bin", "addFlux.py" )
 

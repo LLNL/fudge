@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -33,11 +33,13 @@ Continuum radiation is described by a probability distribution of outgoing energ
     FIXME is it really a probability distribution? Not always normalized...
 """
 
-from xData import ancestry as ancestryModule
+from LUPY import ancestry as ancestryModule
+from LUPY import enums as enumsModule
+
 from xData import axes as axesModule
 from xData import physicalQuantity as physicalQuantityModule
 from xData.uncertainty.physicalQuantity import uncertainty as uncertaintyModule
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 
 from .. import suite as suiteModule
 from .. import misc as miscModule
@@ -53,16 +55,40 @@ protronProduct = "proton"
 discreteElectronProduct = "discrete electron"
 xRayProduct = "x-ray"
 
+class TransitionType(enumsModule.Enum):
+
+    none = ''
+    allowed = 'allowed'
+    firstForbidden = 'first-forbidden'
+    secondForbidden = 'second-forbidden'
+
+    @staticmethod
+    def ENDF_index(transitionType):
+
+        if not isinstance(transitionType, TransitionType):
+            raise TypeError('transitionType must be a TransitionType: got "%s".' % type(transitionType))
+
+        if transitionType == TransitionType.none:
+            return 0
+        if transitionType == TransitionType.allowed:
+            return 1
+        if transitionType == TransitionType.firstForbidden:
+            return 2
+        if transitionType == TransitionType.secondForbidden:
+            return 3
+
+        raise TypeError('This should never happen.')
+
 #
-# FIXME Need a physicalQuantity class that has keyName.
+# FIXME Need a PhysicalQuantity class that has keyName.
 #
-class unitless( physicalQuantityModule.physicalQuantity ) :
+class Unitless( physicalQuantityModule.PhysicalQuantity ) :
 
     keyName = 'label'
 
     def __init__( self, value, label = None ) :
 
-        physicalQuantityModule.physicalQuantity.__init__( self, value, '', label = label )
+        physicalQuantityModule.PhysicalQuantity.__init__( self, value, '', label = label )
 
     def copy( self ) :              # overrides required since this __init__ takes different arguments:
 
@@ -71,7 +97,7 @@ class unitless( physicalQuantityModule.physicalQuantity ) :
         return( cls )
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
@@ -79,71 +105,57 @@ class unitless( physicalQuantityModule.physicalQuantity ) :
         label = element.get( 'label', None )
         _cls = cls( value, label )
         for child in element :
-            if( child.tag == uncertaintyModule.uncertainty.moniker ) :
-                _cls.uncertainty = uncertaintyModule.uncertainty.parseXMLNodeAsClass( child, xPath, linkData )
+            if( child.tag == uncertaintyModule.Uncertainty.moniker ) :
+                _cls.uncertainty = uncertaintyModule.Uncertainty.parseNodeUsingClass(child, xPath, linkData, **kwargs)
 
         xPath.pop( )
         return( _cls )
 
-    @classmethod    # Need parseXMLNodeAsClass to handle internalConversionCoefficients
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
-
-        _cls = cls.parseXMLNode( element, xPath, linkData )
-        return( _cls )
-
-class transitionType :
-
-    allowed = 'allowed'
-    firstForbidden = 'first-forbidden'
-    secondForbidden = 'second-forbidden'
-
-    types = [ allowed, firstForbidden, secondForbidden ]
-
-class intensity( unitless ) :
+class Intensity( Unitless ) :
 
     moniker = 'intensity'
 
-class energy( physicalQuantityModule.physicalQuantity ) :
+class Energy( physicalQuantityModule.PhysicalQuantity ) :
 
     moniker = 'energy'
 
-class shell( unitless ) :
+class Shell(physicalQuantityModule.PhysicalQuantity):
 
     moniker = 'shell'
     total = 'total'
     KShell = 'K'
     LShell = 'L'
 
-class internalConversionCoefficients( suiteModule.suite ) :
+class InternalConversionCoefficients( suiteModule.Suite ) :
 
     moniker = 'internalConversionCoefficients'
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, ( shell, ) )
+        suiteModule.Suite.__init__( self, ( Shell, ) )
 
-class photonEmissionProbabilities( suiteModule.suite ) :
+class PhotonEmissionProbabilities( suiteModule.Suite ) :
 
     moniker = 'photonEmissionProbabilities'
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, ( shell, ) )
+        suiteModule.Suite.__init__( self, ( Shell, ) )
 
-class internalPairFormationCoefficient( unitless ) :
+class InternalPairFormationCoefficient( Unitless ) :
 
     moniker = 'internalPairFormationCoefficient'
 
-class positronEmissionIntensity( unitless ) :
+class PositronEmissionIntensity( Unitless ) :
 
     moniker = 'positronEmissionIntensity'
 
-class discrete( ancestryModule.ancestry ) :
+class Discrete(ancestryModule.AncestryIO):
     """Stores a decay particle emitted with discrete energy"""
 
     moniker = 'discrete'
 
-    def __init__( self, _intensity, _energy, type = None, _internalPairFormationCoefficient = None,
+    def __init__( self, _intensity, _energy, type = TransitionType.none, _internalPairFormationCoefficient = None,
                   _positronEmissionIntensity = None ) :
         """
         :param _intensity: relative intensity for emission of this discrete particle
@@ -155,28 +167,27 @@ class discrete( ancestryModule.ancestry ) :
             Should only be used with electron capture / beta+ decays
         """
 
-        ancestryModule.ancestry.__init__(self)
-        if( not( isinstance( _intensity, intensity ) ) ) : raise TypeError( '_intensity must be an instance of intensity' )
+        ancestryModule.AncestryIO.__init__(self)
+
+        if( not( isinstance( _intensity, Intensity ) ) ) : raise TypeError( '_intensity must be an instance of intensity' )
         self.__intensity = _intensity
 
-        if( not( isinstance( _energy, energy ) ) ) : raise TypeError( '_energy must be an instance of energy' )
+        if( not( isinstance( _energy, Energy ) ) ) : raise TypeError( '_energy must be an instance of Energy' )
         self.__energy = _energy
 
-        if( type is not None ) :
-            if( type not in transitionType.types ) : raise ValueError( 'invalid type' )
-        self.__type = type
+        self.__type = TransitionType.checkEnumOrString(type)
 
-        self.__internalConversionCoefficients = internalConversionCoefficients( )
+        self.__internalConversionCoefficients = InternalConversionCoefficients( )
         self.__internalConversionCoefficients.setAncestor( self )
 
         if( _internalPairFormationCoefficient is not None ) :
-            if( not( isinstance( _internalPairFormationCoefficient, internalPairFormationCoefficient ) ) ) :
-                raise TypeError( '_internalPairFormationCoefficient must be an instance of internalPairFormationCoefficient' )
+            if( not( isinstance( _internalPairFormationCoefficient, InternalPairFormationCoefficient ) ) ) :
+                raise TypeError( '_internalPairFormationCoefficient must be an instance of InternalPairFormationCoefficient' )
         self.__internalPairFormationCoefficient = _internalPairFormationCoefficient
 
         if( _positronEmissionIntensity is not None ) :
-            if( not( isinstance( _positronEmissionIntensity, positronEmissionIntensity ) ) ) :
-                raise TypeError( '_positronEmissionIntensity must be an instance of positronEmissionIntensity' )
+            if( not( isinstance( _positronEmissionIntensity, PositronEmissionIntensity ) ) ) :
+                raise TypeError( '_positronEmissionIntensity must be an instance of PositronEmissionIntensity' )
         self.__positronEmissionIntensity = _positronEmissionIntensity
 
 
@@ -221,49 +232,50 @@ class discrete( ancestryModule.ancestry ) :
         for icc in self.internalConversionCoefficients : _discrete.internalConversionCoefficients.add( icc.copy( ) )
         return _discrete
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         type = ''
-        if( self.type is not None ) : type = ' type="%s"' % self.type
+        if( self.type is not TransitionType.none ) : type = ' type="%s"' % self.type
         XMLStringList = [ '%s<%s%s>' % ( indent, self.moniker, type ) ]
-        XMLStringList += self.__intensity.toXMLList( indent2, **kwargs )
-        XMLStringList += self.__energy.toXMLList( indent2, **kwargs )
-        XMLStringList += self.__internalConversionCoefficients.toXMLList( indent2, **kwargs )
-        if( self.__internalPairFormationCoefficient is not None ) : XMLStringList += self.__internalPairFormationCoefficient.toXMLList( indent2, **kwargs )
-        if( self.__positronEmissionIntensity is not None): XMLStringList += self.__positronEmissionIntensity.toXMLList( indent2, **kwargs )
+        XMLStringList += self.__intensity.toXML_strList( indent2, **kwargs )
+        XMLStringList += self.__energy.toXML_strList( indent2, **kwargs )
+        XMLStringList += self.__internalConversionCoefficients.toXML_strList( indent2, **kwargs )
+        if( self.__internalPairFormationCoefficient is not None ) : XMLStringList += self.__internalPairFormationCoefficient.toXML_strList( indent2, **kwargs )
+        if( self.__positronEmissionIntensity is not None): XMLStringList += self.__positronEmissionIntensity.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
-        kwargs = {'type': element.get('type')}
+
+        kwargs = {'type': element.get('type', TransitionType.none)}
         ICCelement = None
         for child in element :
             found = False
-            for subclass in ( intensity, energy, internalPairFormationCoefficient, positronEmissionIntensity ) :
+            for subclass in ( Intensity, Energy, InternalPairFormationCoefficient, PositronEmissionIntensity ) :
                 if( child.tag == subclass.moniker ) :
-                    kwargs['_'+subclass.moniker] = subclass.parseXMLNode( element.find( subclass.moniker ), xPath, linkData )
+                    kwargs['_'+subclass.moniker] = subclass.parseNodeUsingClass(element.find(subclass.moniker), xPath, linkData, **kwargs)
                     found = True
             if not found:
-                if child.tag == internalConversionCoefficients.moniker:
+                if child.tag == InternalConversionCoefficients.moniker:
                     ICCelement = child
                 else:
                     raise ValueError("Encountered unexpected child element '%s'" % child.tag)
+
         _discrete = cls( **kwargs )
+
         if ICCelement is not None:
-            _discrete.internalConversionCoefficients.parseXMLNode( ICCelement, xPath, linkData )
+            _discrete.internalConversionCoefficients.parseNode(ICCelement, xPath, linkData, **kwargs)
+
         xPath.pop()
+
         return _discrete
 
-class continuum( ancestryModule.ancestry ) :
+class Continuum(ancestryModule.AncestryIO):
     """Describes continuum particle emission"""
 
     moniker = 'continuum'
@@ -273,7 +285,7 @@ class continuum( ancestryModule.ancestry ) :
         :param spectrum: outgoing energy probability distribution
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
         self.__spectrum = spectrum
 
     @property
@@ -293,37 +305,33 @@ class continuum( ancestryModule.ancestry ) :
 
         return( self.__class__( self.__spectrum.copy( ) ) )
 
-    def toXML( self, indent = "", **kwargs ) :
-    
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        XMLStringList += self.__spectrum.toXMLList( indent2, **kwargs )
+        XMLStringList += self.__spectrum.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
-        _spectrum = XYsModule.XYs1d.parseXMLNode( element.find(XYsModule.XYs1d.moniker), xPath, linkData )
-        instance = continuum( _spectrum )
+        _spectrum = XYs1dModule.XYs1d.parseNodeUsingClass(element.find(XYs1dModule.XYs1d.moniker), xPath, linkData, **kwargs)
+        instance = Continuum( _spectrum )
         xPath.pop()
         return instance
 
     @staticmethod
     def defaultAxes( energyUnit ) :
 
-        axes = axesModule.axes( rank = 2 )
-        axes[0] = axesModule.axis( "P(energy_out)", 0, "1/%s" % energyUnit )
-        axes[1] = axesModule.axis( 'energy_out', 1, energyUnit )
+        axes = axesModule.Axes(2)
+        axes[0] = axesModule.Axis( "P(energy_out)", 0, "1/%s" % energyUnit )
+        axes[1] = axesModule.Axis( 'energy_out', 1, energyUnit )
         return( axes )
 
-class spectrum( miscModule.classWithLabelKey ) :
+class Spectrum( miscModule.ClassWithLabelKey ) :
     """
     Contains the outgoing spectrum for one type of decay product.
     """
@@ -336,7 +344,7 @@ class spectrum( miscModule.classWithLabelKey ) :
         :param pid: PoPs particle id (i.e. 'photon')
         """
 
-        miscModule.classWithLabelKey.__init__( self, label )
+        miscModule.ClassWithLabelKey.__init__( self, label )
 
         if( not( isinstance( pid, str ) ) ) : raise TypeError( 'pid not str' )
         self.__pid = pid
@@ -368,7 +376,7 @@ class spectrum( miscModule.classWithLabelKey ) :
         :param emission: 'discrete' or 'continuum' instance
         """
 
-        if( not( isinstance( emission, ( discrete, continuum ) ) ) ) : raise TypeError( 'emission must be instance of discrete or continuum' )
+        if( not( isinstance( emission, ( Discrete, Continuum ) ) ) ) : raise TypeError( 'emission must be instance of Discrete or Continuum' )
         self.__emissions.append( emission )
 
     def convertUnits( self, unitMap ) :
@@ -385,51 +393,50 @@ class spectrum( miscModule.classWithLabelKey ) :
         for __emission in self.__emissions : _spectrum.append( __emission.copy( ) )
         return( _spectrum )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s label="%s" pid="%s">' % ( indent, self.moniker, self.label, self.pid ) ]
-        for _emission in self.__emissions : XMLStringList += _emission.toXMLList( indent2, **kwargs )
+        for _emission in self.__emissions : XMLStringList += _emission.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( "%s[@label='%s']" % (element.tag, element.get('label')) )
+
         for child in element:
-            if( child.tag == discrete.moniker ) :
-                self.append( discrete.parseXMLNode( child, xPath, linkData ) )
-            elif( child.tag == continuum.moniker ) :
-                self.append( continuum.parseXMLNode( child, xPath, linkData ) )
+            if( child.tag == Discrete.moniker ) :
+                self.append(Discrete.parseNodeUsingClass(child, xPath, linkData, **kwargs))
+            elif( child.tag == Continuum.moniker ) :
+                self.append(Continuum.parseNodeUsingClass(child, xPath, linkData, **kwargs))
             else :
                 raise ValueError("Encountered unexpected child element '%s'" % child.tag)
+
         xPath.pop( )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( "%s[@label='%s']" % (element.tag, element.get('label')) )
         _spectrum = cls( element.get('label'), element.get('pid') )
         xPath.pop()
 
-        _spectrum.parseXMLNode( element, xPath, linkData )
+        _spectrum.parseNode(element, xPath, linkData, **kwargs)
+
         return _spectrum
 
-class spectra( suiteModule.suite ) :
+class Spectra( suiteModule.Suite ) :
     """Contains the outgoing spectrum list for a decayMode"""
 
     moniker = 'spectra'
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, ( spectrum, ) )
+        suiteModule.Suite.__init__( self, ( Spectrum, ) )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
@@ -437,7 +444,7 @@ class spectra( suiteModule.suite ) :
 # FIXME, this method is broken. What is product?
 #
         for child in element :
-            _spectrum = spectrum.parseXMLNodeAsClass( child, xPath, linkData )
+            _spectrum = Spectrum.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             self.add( _spectrum )
 
         xPath.pop( )

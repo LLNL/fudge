@@ -1,22 +1,27 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from argparse import ArgumentParser
-from argparse import RawTextHelpFormatter
+import sys
+import argparse
+import pathlib
+
+from LUPY import times as timesModule
+from LUPY import subprocessing as subprocessingModule
 
 from PoPs import IDs as PoPsIDsModule
 from PoPs import alias as PoPsAliasModule
-from PoPs.groups import misc as PoPsGroupsMiscModule
+from PoPs.chemicalElements import misc as PoPsGroupsMiscModule
 
+from fudge import enums as enumsModule
 from fudge import map as mapModule
 from fudge import reactionSuite as reactionSuiteModule
-from LUPY import GNDSType as GNDSTypeModule
+from fudge import GNDS_file as GNDS_fileModule
 
 description = '''
 This module creates a GNDS map file from a list of GNDS files. Required options are '--path', '--library'. The option
@@ -73,25 +78,26 @@ but it is initially put into the user's home directory:
     /path/to/buildMapFile.py neutrons/* -o ~/neutron.map -l lib11 --mapDirectory ./
 '''
 
-interactionChoices = list( reactionSuiteModule.Interaction.allowed ) + [ None ]
-parser = ArgumentParser( description = description, formatter_class = RawTextHelpFormatter )
-parser.add_argument( 'files', type = str, nargs = '*',                              help = 'A list of GNDS and map files to put into a map file.' )
-parser.add_argument( '-o', '-p', '--path', required = True,                         help = 'The path/name of the built map file.' )
-parser.add_argument( '-l', '--library', required = True,                            help = 'The library name to use for the map file.' )
-parser.add_argument( '-i', '--interaction', action = 'store', choices = interactionChoices, default = None,
-                                                                                    help = 'Specifies the interaction type of the GNDS files to map. Currently, only one interaction type can be \nhandled per execution. This options is not needed for GNDS 2.0 and will be deprecated.' )
-parser.add_argument( '--format', action = 'store', choices = mapModule.FormatVersion.allowed, default = mapModule.FormatVersion.default,
-                                                                                    help = 'Specifies the format for the map file.' )
-parser.add_argument( '--standards', action = 'store',                               help = 'Specifies a json file that is a dictionary with TNSL target names as keys, and each with an associated \nvalue of a string "standardTargets" or a list of "standardTargets" and "standardEvaluation".' )
-parser.add_argument( '--ignoreMetaStables', action = 'store_true',                  help = 'If present, meta-stable targets in the "files" argument are ignored. Also see option *--nonMetaStablesMapFile*.' )
-parser.add_argument( '--nonMetaStablesMapFile', action = 'store', default = None,   help = 'If present, the option "--ignoreMetaStables" is ignored and instead, only meta-stable targets are \nincluded in the map file. The next argument should be the non-metastable map file which will be included \nas an "import" node at the beginning of the generated map file.' )
-parser.add_argument( '--skipChecksums', action = 'store_true',                      help = 'If present, *checksums* are not added to the map file.' )
-parser.add_argument( '--mapDirectory', action = 'store', default = None,       help = 'If the outputted map file will not reside in its final location (i.e., directory), then use this option to specify its final location. Typically, one should enter this as "--mapDirectory ./".' )
-parser.add_argument( '-v', '--verbose', action = 'count', default = 0,              help = 'Determines how verbose %(prog)s will be.' )
+interactionChoices = enumsModule.Interaction.allowedStrings()
+parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
+parser.add_argument('files', type=str, nargs='*',                               help='A list of GNDS and map files to put into a map file.')
+parser.add_argument('-o', '-p', '--path', required=True,                        help='The path/name of the built map file.')
+parser.add_argument('-l', '--library', required=True,                           help='The library name to use for the map file.')
+parser.add_argument('-i', '--interaction', action='store', choices=interactionChoices, default=None,
+                                                                                help='Specifies the interaction type of the GNDS files to map. Currently, only one interaction type can be \nhandled per execution. This options is not needed for GNDS 2.0 and will be deprecated.')
+parser.add_argument('--format', action='store', choices=mapModule.FormatVersion.allowed, default=mapModule.FormatVersion.default,
+                                                                                help='Specifies the format for the map file. Default is "%s".' % mapModule.FormatVersion.default)
+parser.add_argument('--standards', action='store',                              help='Specifies a json file that is a dictionary with TNSL target names as keys, and each with an associated \nvalue of a string "standardTargets" or a list of "standardTargets" and "standardEvaluation".')
+parser.add_argument('--ignoreMetaStables', action='store_true',                 help='If present, meta-stable targets in the "files" argument are ignored. Also see option *--nonMetaStablesMapFile*.')
+parser.add_argument('--nonMetaStablesMapFile', action='store', default=None,    help='If present, the option "--ignoreMetaStables" is ignored and instead, only meta-stable targets are \nincluded in the map file. The next argument should be the non-metastable map file which will be included \nas an "import" node at the beginning of the generated map file.')
+parser.add_argument('--skipChecksums', action='store_true',                     help='If present, *checksums* are not added to the map file.')
+parser.add_argument('--skipRIS', action='store_true',                           help='If present, an *ris* is not create for the map file.')
+parser.add_argument('--mapDirectory', action='store', default=None,             help='If the outputted map file will not reside in its final location (i.e., directory), then use this option to specify its final location. Typically, one should enter this as "--mapDirectory ./".')
+parser.add_argument('-v', '--verbose', action='count', default=0,               help='Determines how verbose %(prog)s will be.')
 
-args = parser.parse_args( )
+args = parser.parse_args()
 
-def particleSortIndex( name ) :
+def particleSortIndex(name):
     """
     Returns a tuple of length 5 integers with the following meanings:
 
@@ -117,7 +123,7 @@ def particleSortIndex( name ) :
         +-----------+---------------------------------------------------+
     """
 
-    nuclideName, metaStableLevel = PoPsAliasModule.metaStable.nuclideNameAndMetaStableIndexFromName( name )
+    nuclideName, metaStableLevel = PoPsAliasModule.MetaStable.nuclideNameAndMetaStableIndexFromName(name)
     if( metaStableLevel != 0 ) : name = nuclideName
 
     if( name == PoPsIDsModule.neutron ) :
@@ -128,16 +134,16 @@ def particleSortIndex( name ) :
         return( 2, 0, 0, 0, 0 )
 
     info = PoPsGroupsMiscModule.chemicalElementALevelIDsAndAnti( str( name ) )
-    if( args.verbose > 3 ) : print( '    ', name, info )
+    if args.verbose > 4: print('    ', name, info)
     if( info[1] is None ) : return( 1, 0, 0, 0, 0 )
     return( 0, PoPsGroupsMiscModule.ZFromSymbol[info[1]], info[2], info[3], metaStableLevel )
 
 def interactionSortIndex( interaction ) :
 
-    if( interaction == reactionSuiteModule.Interaction.nuclear ) : return( 0 )
-    if( interaction == reactionSuiteModule.Interaction.TNSL ) : return( 1 )
-    if( interaction == reactionSuiteModule.Interaction.atomic ) : return( 2 )
-    if( interaction == reactionSuiteModule.Interaction.LLNL_TNSL ) : return( 3 )
+    if( interaction == enumsModule.Interaction.nuclear ) : return( 0 )
+    if( interaction == enumsModule.Interaction.TNSL ) : return( 1 )
+    if( interaction == enumsModule.Interaction.atomic ) : return( 2 )
+    if( interaction == enumsModule.Interaction.LLNL_TNSL ) : return( 3 )
     return( 3 )
 
 def sortFiles( files ) :
@@ -145,7 +151,7 @@ def sortFiles( files ) :
     _files = []
 
     for file, data in files :
-        if( args.verbose > 3 ) : print( file, data )
+        if args.verbose > 4: print(file, data)
         interaction = interactionSortIndex( data['interaction'] )
         projectile = particleSortIndex( data['projectile'] )
         target = particleSortIndex( data['target'] )
@@ -172,16 +178,16 @@ type = None
 groups = []
 for file in args.files :
     try :
-        name, data = GNDSTypeModule.type( file )
+        name, data = GNDS_fileModule.type(file)
     except :
-        if( args.verbose > 0 ) : print( '    WARNING: Invalid file "%s".' % file )
+        if args.verbose > 2: print('    WARNING: Invalid file "%s".' % file)
         continue
-    if( name == reactionSuiteModule.reactionSuite.moniker ) :
+    if( name == reactionSuiteModule.ReactionSuite.moniker ) :
         pass
     elif( name == mapModule.Map.moniker ) :
         pass
     else :
-        if( args.verbose > 1 ) : print( name )
+        if args.verbose > 2: print('    WARNING: Ignoring file of type %s.' % name)
         continue
     if( type != name ) :
         if( type is not None ) : groups.append( [ type, files ] )
@@ -203,9 +209,12 @@ for type, files in groups :
             if( ( mode == 'metastables' )     and ( target[-1] == 0 ) ) : continue
             interaction = data['interaction']
             if( interaction is None ) :
-                protare = GNDSTypeModule.preview( file, haltParsingMoniker = None )
+                protare = GNDS_fileModule.preview(file, haltParsingMoniker=None)
                 interaction = protare.interaction
-            if( interaction == reactionSuiteModule.Interaction.TNSL ) :
+            interaction = enumsModule.Interaction.checkEnumOrString(interaction)
+            if interaction == enumsModule.Interaction.legacyTNSL:
+                interaction = enumsModule.Interaction.TNSL
+            if interaction == enumsModule.Interaction.TNSL:
                 try :
                     standardTarget = standards[data['target']][0]
                 except :
@@ -223,13 +232,20 @@ for type, files in groups :
             else :
                 map.append( mapModule.Protare( str( data['projectile'] ), str( data['target'] ), str( data['evaluation'] ), file, interaction ) )
 
-if not args.skipChecksums: map.updateAllChecksums(mapDirectory=args.mapDirectory)
+if not args.skipChecksums:
+    if args.verbose > 0: print('    INFO: Calculating checksums', end='')
+    checksumTime = timesModule.Times()
+    map.updateAllChecksums(mapDirectory=args.mapDirectory)
+    checksumTime = checksumTime.delta()
+    if args.verbose > 0: print(': cpu %.2f s, wall %.2f s, sys %.2f s' % (checksumTime['user'], checksumTime['wall'], checksumTime['sys']))
 
-fOut = open( args.path, 'w' )
-fOut.write( map.toXML( format = args.format ) + '\n' )
-fOut.close( )
+map.saveToFile(args.path, format=args.format)
+
+if not args.skipRIS:
+    RIS_file = pathlib.Path(__file__).parent / 'buildReactionInfoSummary.py'
+    subprocessingModule.executeCommand((sys.executable, RIS_file, args.path), stdout=sys.stdout, stderr=sys.stderr)
 
 if( len( TNSL_missingStandardTargets ) > 0 ) : 
     print( '    WARNING: you still need to update the standard target (and maybe the standard evaluation) for %s TNSL nodes.' % len( TNSL_missingStandardTargets ) )
-    if( args.verbose > 1 ) :
-        for TNSL_missingStandardTarget in TNSL_missingStandardTargets : print( '        Standard target missing for %s' % TNSL_missingStandardTarget )
+    if args.verbose > 1:
+        for TNSL_missingStandardTarget in TNSL_missingStandardTargets : print('        Standard target missing for %s' % TNSL_missingStandardTarget)

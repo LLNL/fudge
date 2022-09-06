@@ -2,7 +2,7 @@
 #
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -22,6 +22,11 @@ PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+
+FUDGE_ROOT_DIR                       = ../..
+NUMERICALFUNCTIONS                   = $(FUDGE_ROOT_DIR)/numericalFunctions/Doc
+CROSSSECTIONSADJUSTEDFORHEATEDTARGET = $(FUDGE_ROOT_DIR)//crossSectionAdjustForHeatedTarget/Doc
+submoduleDocs      = $(NUMERICALFUNCTIONS)/ptwXY.pdf $(CROSSSECTIONSADJUSTEDFORHEATEDTARGET)/crossSectionAdjustForHeatedTarget.pdf
 
 .PHONY: help clean realclean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
 
@@ -55,7 +60,7 @@ clean:
 
 realclean: clean
 
-html:
+html: submoduleDocs
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -169,3 +174,7 @@ doctest:
 install: html
 	rm -rf ../html; cp -r _build/html ..
 	@echo "Installing to _build/html to ../html"
+
+submoduleDocs:
+	cd $(NUMERICALFUNCTIONS); make doc
+	cd $(CROSSSECTIONSADJUSTEDFORHEATEDTARGET); make pdf

@@ -1,11 +1,11 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-#
+# 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import os, glob, shutil
+import os, sys, glob, shutil
 import setuptools
 from setuptools.command.install import install
 from setuptools.command.build_ext import build_ext
@@ -25,7 +25,7 @@ except (ImportError, ModuleNotFoundError):
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
-        # copy C executables Merced/bin/merced and upscatter/bin/calcUpscatterKernel to Python environment bin folder
+        # copy C executables Merced/bin/merced and fudge/processing/deterministic/upscatter/bin/calcUpscatterKernel to Python environment bin folder
         workingFolder = os.getcwd()
         binFolder = os.path.join(sys.prefix, 'bin')
         os.chdir('Merced')
@@ -33,7 +33,7 @@ class CustomInstall(install):
         shutil.copy('bin/merced', binFolder)
         os.chdir(workingFolder)
 
-        os.chdir('upscatter')
+        os.chdir('fudge/processing/deterministic/upscatter')
         subprocess.check_call('make -j', shell=True)
         shutil.copy('bin/calcUpscatterKernel', binFolder)
         os.chdir(workingFolder)
@@ -60,7 +60,7 @@ setup(
     name='fudge',
     #    version = fudge.__version__,\
     version=versionModule.getVersionNumber(),
-    author='Computational Nuclear Physics Group, LLNL',
+    author='Nuclear Data and Theory Group, LLNL',
     author_email='mattoon1@llnl.gov',
     maintainer_email='mattoon1@llnl.gov',
     packages=[
@@ -71,8 +71,8 @@ setup(
         'fudge.core.math.test',
         'fudge.core.utilities',
         'fudge',
-        'fudge.channelData',
-        'fudge.channelData.fissionFragmentData',
+        'fudge.outputChannelData',
+        'fudge.outputChannelData.fissionFragmentData',
         'fudge.covariances',
         'fudge.covariances.test',
         'fudge.productData',
@@ -97,7 +97,7 @@ setup(
         'LUPY'
     ],
     package_dir = {'': '.'},
-    scripts = [x for x in glob.glob('bin/*.py') if 'fudgePipInstallForDevelopers.py' not in x],
+    scripts = glob.glob('bin/*.py'),
     package_data = {
         'fudge.legacy.endl.test': [ 'testdb/ascii/yi01/za001001/y*', 'testdb/ascii/yi01/za001001/*.txt', 'testdb/ascii/yi01/za001001/*xml' ],
         'fudge.processing.resonances.test': ['*.py'],
@@ -114,7 +114,7 @@ setup(
             sources = ['fudge/processing/resonances/getCoulombWavefunctions.c', 'fudge/processing/resonances/coulfg2.c'], ),
     ],
     url = 'https://github.com/llnl/fudge',
-        install_requires=[
+    install_requires=[
         'numpy',
         'crossSectionAdjustForHeatedTarget @ %s/crossSectionAdjustForHeatedTarget#egg=crossSectionAdjustForHeatedTarget' % cwd,
         'numericalFunctions @ %s/numericalFunctions#egg=numericalFunctions' % cwd,
@@ -128,10 +128,3 @@ setup(
     long_description = open( 'README.md' ).read(), requires=['numpy'],
     cmdclass={'install': CustomInstall, 'build_ext': CustomBuildExt}
 )
-
-# Also call the setup.py in externals packages
-# curdir = os.path.realpath( os.curdir )
-# for extension in ('numericalFunctions', 'crossSectionAdjustForHeatedTarget'): #'Merced', 'statusMessageReporting'):
-#     os.chdir( extension )
-#     run_setup('setup.py', ['--quiet','build'])
-#     os.chdir( curdir )

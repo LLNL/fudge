@@ -1,11 +1,9 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-
-__metaclass__ = type
 
 conserveParticle = 'conserveParticle'
 conserveEnergy = 'conserveEnergy'
@@ -16,7 +14,7 @@ from PoPs import IDs as IDsPoPsModule
 from fudge import styles as stylesModule
 from fudge import reactionSuite as reactionSuiteModule
 
-class tempInfo :
+class TempInfo :
 
     def __init__( self ) :
 
@@ -46,15 +44,15 @@ class tempInfo :
 
         return( list( self.dict.keys( ) ) )
 
-class processInfo2 :
+class ProcessInfo2 :
 
     def __init__( self, style, reactionSuite, flux = None, logFile = None, verbosity = 0, verbosityIndentStep = '  ',
             energyAccuracy = 1e-6, momentumAccuracy = 1e-3 ) :
 
-        if( not( isinstance( style, stylesModule.style ) ) ) : raise TypeError( 'invalid style' )
+        if( not( isinstance( style, stylesModule.Style ) ) ) : raise TypeError( 'invalid style' )
         self.__style = style
 
-        if( not( isinstance( reactionSuite, reactionSuiteModule.reactionSuite ) ) ) : raise TypeError( 'invalid reactionSuite' )
+        if( not( isinstance( reactionSuite, reactionSuiteModule.ReactionSuite ) ) ) : raise TypeError( 'invalid reactionSuite' )
         self.__reactionSuite = reactionSuite
 
         self.__flux = flux
@@ -111,11 +109,11 @@ class processInfo2 :
 
     def checkStyle( self, _class ) :
 
-        if( not( issubclass( _class, stylesModule.style ) ) ) : raise TypeError( 'class not a sub-class of style' )
+        if( not( issubclass( _class, stylesModule.Style ) ) ) : raise TypeError( 'class not a sub-class of style' )
         if( isinstance( self.style, _class ) ) : return
         raise TypeError( 'style %s not of style %s' % ( _class.moniker, self.style.moniker ) )
 
-class processInfo :
+class ProcessInfo :
 
     def __init__( self, target, particles = None, flux = None, logFile = None, verbosity = 0 ) :
 
@@ -171,7 +169,7 @@ class processInfo :
         finally:
             self['verbosity'] = verbositySave
 
-class processInfoParticle :
+class ProcessInfoParticle :
 
     def __init__( self, name, groups, lMax, conservationFlag = conserveParticle ) :
 
@@ -186,7 +184,7 @@ class processInfoParticle :
         s += str( self.groups )
         return( s )
 
-class processInfoLLNL( processInfo ) :
+class ProcessInfoLLNL( ProcessInfo ) :
 
     def __init__( self, target, groups = None, flux = None, LLNL_Pn = True, lMax = 3, logFile = None, verbosity = 0 ) :
 
@@ -197,8 +195,8 @@ class processInfoLLNL( processInfo ) :
             conservationFlag = conserveParticleAndEnergy
             if( particle == 'n' ) : conservationFlag = conserveParticle
             if( particle == IDsPoPsModule.photon ) : conservationFlag = conserveEnergy
-            particles[particle] = processInfoParticle( particle, groups[particle], lMax_, conservationFlag )
-        processInfo.__init__( self, target, particles, flux = flux, logFile = logFile, verbosity = verbosity )
+            particles[particle] = ProcessInfoParticle( particle, groups[particle], lMax_, conservationFlag )
+        ProcessInfo.__init__( self, target, particles, flux = flux, logFile = logFile, verbosity = verbosity )
         self['workDir'] = 'xndfgen.work'
         styles = []
         if( LLNL_Pn ) : styles.append( 'LLNL_Pn' )

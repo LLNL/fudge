@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,17 +9,18 @@
 This module defines the nuclides class, which stores the list of nuclides produced by fission.
 Together with yields.
 """
-from xData import ancestry as ancestryModule
 
-class nuclides( ancestryModule.ancestry ) :
+from LUPY import ancestry as ancestryModule
+
+class Nuclides(ancestryModule.AncestryIO):
 
     moniker = 'nuclides'
         
     def __init__( self, _nuclides ) :
     
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
-        if( not( isinstance( _nuclides, nuclides ) ) ) :
+        if( not( isinstance( _nuclides, Nuclides ) ) ) :
             if( not( isinstance( _nuclides, ( list, tuple ) ) ) ) : raise TypeError( 'Nuclides must be a list or tuple.' )
         self.__nuclides = tuple( nuclide for nuclide in _nuclides )
 
@@ -38,7 +39,7 @@ class nuclides( ancestryModule.ancestry ) :
 
     def __eq__( self, other ) :
 
-        if( not( isinstance( other, ( list, tuple, nuclides ) ) ) ) : return( False )
+        if( not( isinstance( other, ( list, tuple, Nuclides ) ) ) ) : return( False )
         if( len( self ) != len( other ) ) : return( False )
         for i1, nuclide in enumerate( self.__nuclides ) :
             if( nuclide != other[i1] ) : return( False )
@@ -53,27 +54,29 @@ class nuclides( ancestryModule.ancestry ) :
 
         return( self.__nuclides )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
     
+        if len(self) == 0:
+            return []
+
         XMLString = '%s<%s> ' % ( indent, self.moniker )
         XMLString += ' '.join( [ nuclide for nuclide in self.__nuclides ] )
         XMLString += '</%s>' % self.moniker
 
         return( [ XMLString ] )
 
-    def parseXMLNode( self, element, xPath, linkData ):
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append(element.tag)
         self.__nuclides = tuple( element.text.strip().split() )
         xPath.pop()
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append(element.tag)
         self = cls([])
         xPath.pop()
-        self.parseXMLNode(element, xPath, linkData)
+        self.parseNode(element, xPath, linkData, **kwargs)
 
         return self
-
