@@ -34,7 +34,7 @@ from fudge import abstractClasses as abstractClassesModule
 from fudge import styles as stylesModule
 
 from . import URR_probabilityTables as URR_probabilityTablesModule
-from fudge.covariances import enums as covarianceEnumsModule 
+from fudge.covariances import enums as covarianceEnumsModule
 
 lowerEps = 1e-8
 upperEps = 1e-8
@@ -1199,11 +1199,12 @@ class Component( abstractClassesModule.Component ) :
 
         # Convolve spectrum and self to get mean value
         meanValue = ptwise.integrateTwoFunctions(f2,domainMin,domainMax)
+        meanValue = PQUModule.PQU(meanValue, ptwise.axes[0].unit)
 
         # Normalize the mean if we're averaging
         if normalize and meanValue.value != 0.0:
             norm = f2.integrate(domainMin,domainMax)
-            if norm.value == 0.0: raise ValueError('zero norm (%s) while integrating function with %s '%(str(norm),str(self.ancestor.ancestor)))
+            if norm == 0.0: raise ValueError('zero norm (%s) while integrating function with %s '%(str(norm),str(self.ancestor.ancestor)))
             meanValue = meanValue/norm
 
         # We might be done
