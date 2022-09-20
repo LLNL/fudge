@@ -740,7 +740,7 @@ def getChannelDataTable(rs, metricMenu, title="Channels", doURR=False, verbose=F
     icol = 0
 
     def addColumn(columns, icol, key, unit=None):
-        columns[key] = xData.table.columnHeader(icol, key, unit=unit)
+        columns[key] = tableModule.columnHeader(icol, key, unit=unit)
         icol += 1
 
     def updateColumnsAndRow(columns, row, icol, key, val, unit=None):
@@ -935,7 +935,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
     icol = 0
 
     def addColumn(columns, icol, key, unit=None):
-        columns[key] = xData.table.columnHeader(icol, key, unit=unit)
+        columns[key] = tableModule.ColumnHeader(icol, key, unit=unit)
         icol += 1
 
     def updateColumnsAndRow(columns, row, icol, key, val, unit=None):
@@ -952,7 +952,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
 
         # Get rid of all reactions that are not plain reactions or sums of reactions
         # (e.g. no fission components of production stuff)
-        if not isinstance(r, (fudge.reactions.reaction.reaction, fudge.sums.crossSectionSum)):
+        if not isinstance(r, (fudge.reactions.reaction.Reaction, fudge.sums.CrossSectionSum)):
             continue
 
         # Keep only the MT's we actually want to test
