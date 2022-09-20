@@ -40,7 +40,7 @@ def read_evaluation(inFile, skipBadData=True, verbose=False, reconstructResonanc
         raise IOError("File named " + inFile + " doesn't exist!")
     if open(inFile).readline().startswith("<?xml"):
         from fudge import reactionSuite
-        return {'reactionSuite': reactionSuite.readXML(inFile), 'covarianceSuite': None, 'info': {}, 'errors': []}
+        return {'reactionSuite': reactionSuite.ReactionSuite.readXML_file(inFile), 'covarianceSuite': None, 'info': {}, 'errors': []}
     else:
         from brownies.legacy.converting import endfFileToGNDS
         return endfFileToGNDS.endfFileToGNDS(inFile, toStdOut=verbose, skipBadData=skipBadData,
@@ -76,7 +76,7 @@ def get_rrr(reactionSuite, verbose=False, warnOnly=False, multipleSScheme='ENDF'
     resCls = resReconstructModule.getResonanceReconstructionClass(reactionSuite.resonances.resolved.evaluated)
     rrr = resCls(reactionSuite.resonances.resolved.evaluated, enableAngDists=False, verbose=verbose)
     if (isinstance(rrr, resReconstructModule.RMatrixLimitedcrossSection) and
-            (rrr.RR.approximation == fudge.resonances.resolved.RMatrix.ReichMooreToken)):
+            (rrr.RR.approximation == fudge.resonances.resolved.RMatrix.Approximation.ReichMoore)):
         rrr.setResonanceParametersByChannel(useReichMooreApproximation=True, warnOnly=warnOnly,
                                             multipleSScheme=multipleSScheme)
     else:

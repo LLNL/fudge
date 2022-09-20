@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,9 +13,8 @@ from xData import multiD_XYs as multiD_XYsModule
 from . import base as baseModule
 from . import energy as energyModule
 
-__metaclass__ = type
 
-class xs_pdf_cdf1d( xs_pdf_cdfModule.xs_pdf_cdf1d ) :
+class Xs_pdf_cdf1d( xs_pdf_cdfModule.Xs_pdf_cdf1d ) :
 
     pass
 
@@ -28,7 +27,7 @@ class XYs2d( multiD_XYsModule.XYs2d ) :
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( xs_pdf_cdf1d, ) )
+        return( ( Xs_pdf_cdf1d, ) )
 
 class XYs3d( multiD_XYsModule.XYs3d ) :
 
@@ -41,12 +40,14 @@ class XYs3d( multiD_XYsModule.XYs3d ) :
 
         return( ( XYs2d, ) )
 
-class subform( baseModule.subform ) :
+class Subform( baseModule.Subform ) :
     """Abstract base class for energyAngular subforms."""
+
+    moniker = 'dummy'                   # This is not used but added to stop lylint from reporting.
 
     def __init__( self, data ) :
 
-        baseModule.subform.__init__( self )
+        baseModule.Subform.__init__( self )
         if( not( isinstance( data, self.allowedSubElements ) ) ) : raise TypeError( 'Invalid instance: %s' % type( data ) )
         self.data = data
         self.data.setAncestor( self )
@@ -56,60 +57,58 @@ class subform( baseModule.subform ) :
 
         self.data.convertUnits( unitMap )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        XMLStringList += self.data.toXMLList( indent2, **kwargs )
+        XMLStringList += self.data.toXML_strList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
-class energy( subform ) :
+class Energy( Subform ) :
 
     moniker = 'energy'
     allowedSubElements = ( energyModule.XYs2d, )
     ancestryMembers = ( 'energy', )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
-        subformElement = element[0]
-        subformClass = {    energyModule.XYs2d.moniker       : energyModule.XYs2d,
-                        }.get( subformElement.tag )
+        subformElement = node[0]
+        subformClass = {energyModule.XYs2d.moniker: energyModule.XYs2d}.get(subformElement.tag)
         if( subformClass is None ) : raise Exception( 'unknown energy subform "%s"' % subformElement.tag )
-        energySubform = subformClass.parseXMLNode( subformElement, xPath, linkData )
+        energySubform = subformClass.parseNodeUsingClass(subformElement, xPath, linkData, **kwargs)
 
-        _energy = energy ( energySubform )
+        _energy = cls(energySubform)
 
         xPath.pop( )
         return( _energy )
 
-class energyAngular( subform ) :
+class EnergyAngular( Subform ) :
 
     moniker = 'energyAngular'
     allowedSubElements = ( XYs3d, )
     ancestryMembers = ( 'energyAngular', )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
-        subformElement = element[0]
-        subformClass = {    XYs3d.moniker       : XYs3d,
-                        }.get( subformElement.tag )
+        subformElement = node[0]
+        subformClass = {XYs3d.moniker: XYs3d}.get(subformElement.tag)
         if( subformClass is None ) : raise Exception( 'unknown energyAngular subform "%s"' % subformElement.tag )
-        energyAngularSubform = subformClass.parseXMLNode( subformElement, xPath, linkData )
+        energyAngularSubform = subformClass.parseNodeUsingClass(subformElement, xPath, linkData, **kwargs)
 
-        _energyAngular = energyAngular( energyAngularSubform )
+        _energyAngular = cls(energyAngularSubform)
 
         xPath.pop( )
         return( _energyAngular )
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'energyAngularMC'
     subformAttributes = ( 'energy', 'energyAngular' )
@@ -117,9 +116,9 @@ class form( baseModule.form ) :
 
     def __init__( self, label, productFrame, _energy, _energyAngular ) :
 
-        if( not( isinstance( _energy, energy ) ) ) : raise TypeError( 'Invalid instance: %s' % type( _energy ) )
-        if( not( isinstance( _energyAngular, energyAngular ) ) ) : raise TypeError( 'Invalid instance: %s' % type( _energyAngular ) )
-        baseModule.form.__init__( self, label, productFrame, ( _energy, _energyAngular ) )
+        if( not( isinstance( _energy, Energy ) ) ) : raise TypeError( 'Invalid instance: %s' % type( _energy ) )
+        if( not( isinstance( _energyAngular, EnergyAngular ) ) ) : raise TypeError( 'Invalid instance: %s' % type( _energyAngular ) )
+        baseModule.Form.__init__( self, label, productFrame, ( _energy, _energyAngular ) )
 
     @property
     def domainMin( self ) :
@@ -131,23 +130,23 @@ class form( baseModule.form ) :
 
         return( self.energy.data.domainMax )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
-        """Translate <energyAngularMC> element from xml."""
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """Translate a GNDS energyAngularMC node."""
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
         _energy = None
         _energyAngular = None
-        for child in element :
-            if( child.tag == energy.moniker ) :
-                _energy = energy.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == energyAngular.moniker ) :
-                _energyAngular = energyAngular.parseXMLNode( child, xPath, linkData )
+        for child in node:
+            if( child.tag == Energy.moniker ) :
+                _energy = Energy.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            elif( child.tag == EnergyAngular.moniker ) :
+                _energyAngular = EnergyAngular.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             else :
                 raise TypeError( "Encountered unknown yAngular subform: %s" % child.tag )
 
-        energyAngularMC = form( element.get( "label" ), element.get( "productFrame" ), _energy, _energyAngular )
+        energyAngularMC = cls(node.get("label"), node.get("productFrame"), _energy, _energyAngular)
 
         xPath.pop( )
         return( energyAngularMC )

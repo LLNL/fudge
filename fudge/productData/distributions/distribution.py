@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,7 +10,9 @@
 from PoPs import IDs as IDsPoPsModule
 
 from fudge import abstractClasses as abstractClassesModule
+from fudge import styles as stylesModule
 from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 
 from . import angular as angularModule
 from . import energy as energyModule
@@ -30,23 +32,21 @@ from . import branching3d as branching3dModule
 
 # probably missing stuff from photonScattering.py.
 
-__metaclass__ = type
-
-class component( abstractClassesModule.component ) :
+class Component( abstractClassesModule.Component ) :
 
     moniker = 'distribution'
 
     def __init__( self ) :
 
-        abstractClassesModule.component.__init__( self, ( angularModule.form, angularModule.twoBodyForm,
-                KalbachMannModule.form,
-                energyAngularModule.form, energyAngularMCModule.form,
-                angularEnergyModule.form, angularEnergyMCModule.form,
+        abstractClassesModule.Component.__init__( self, ( angularModule.Form, angularModule.TwoBody,
+                KalbachMannModule.Form,
+                energyAngularModule.Form, energyAngularMCModule.Form,
+                angularEnergyModule.Form, angularEnergyMCModule.Form,
                 LLNL_angularEnergyModule.LLNLAngularEnergyForm,
-                uncorrelatedModule.form, LegendreModule.form, referenceModule.form,
-                referenceModule.CoulombPlusNuclearElastic, referenceModule.thermalNeutronScatteringLaw,
-                photonScatteringModule.coherentPhotonScattering.form, photonScatteringModule.incoherentPhotonScattering.form, 
-                multiGroupModule.form, unspecifiedModule.form, branching3dModule.form ) )
+                uncorrelatedModule.Form, LegendreModule.Form, referenceModule.Form,
+                referenceModule.CoulombPlusNuclearElastic, referenceModule.ThermalNeutronScatteringLaw,
+                photonScatteringModule.CoherentPhotonScattering.Form, photonScatteringModule.IncoherentPhotonScattering.Form, 
+                multiGroupModule.Form, unspecifiedModule.Form, branching3dModule.Form ) )
 
     def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
         """Returns the energy spectrum in the lab frame for the specified incident energy."""
@@ -54,8 +54,9 @@ class component( abstractClassesModule.component ) :
         styleLabel = kwargs.get( 'styleLabel', self.evaluated.label )
         form = self[styleLabel]
         if( hasattr( form, 'energySpectrumAtEnergy' ) ) :
-            if( frame == standardsModule.frames.centerOfMassToken ) :
-                if( form.productFrame == standardsModule.frames.labToken ) : form = None
+            if frame == xDataEnumsModule.Frame.centerOfMass:
+                if form.productFrame == xDataEnumsModule.Frame.lab:
+                    form = None
         else :
             form = None
 
@@ -73,7 +74,7 @@ class component( abstractClassesModule.component ) :
     def getSpectrumAtEnergy( self, energy ) :
         """This method is deprecated, use energySpectrumAtEnergy instead. Returns the energy spectrum for self at projectile energy."""
 
-        return( self.energySpectrumAtEnergy( energy, standardsModule.frames.labToken ) )
+        return self.energySpectrumAtEnergy(energy, xDataEnumsModule.Frame.lab)
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
@@ -87,57 +88,59 @@ class component( abstractClassesModule.component ) :
         warnings = []
 
         for form in self:
+            if not isinstance(self.rootAncestor.styles[form.label], stylesModule.Evaluated):
+                continue
 
             if info['isTwoBody']:
-                if( form.productFrame != standardsModule.frames.centerOfMassToken ) :
-                    warnings.append( warning.wrong2BodyFrame( form ) )
+                if form.productFrame != xDataEnumsModule.Frame.centerOfMass:
+                    warnings.append( warning.Wrong2BodyFrame( form ) )
 
-                if form.moniker not in (angularModule.twoBodyForm.moniker,
-                                        referenceModule.form.moniker,
+                if form.moniker not in (angularModule.TwoBody.moniker,
+                                        referenceModule.Form.moniker,
                                         referenceModule.CoulombPlusNuclearElastic.moniker,
-                                        unspecifiedModule.form.moniker):
-                    warnings.append( warning.wrongDistributionComponent( form.moniker, '2-body' ) )
+                                        unspecifiedModule.Form.moniker):
+                    warnings.append( warning.WrongDistributionComponent( form.moniker, '2-body' ) )
             else:
-                if form.moniker in (angularModule.twoBodyForm.moniker,
-                                    angularModule.form.moniker,
-                                    energyModule.form.moniker):
-                    warnings.append( warning.wrongDistributionComponent( form.moniker, 'N-body' ) )
+                if form.moniker in (angularModule.TwoBody.moniker,
+                                    angularModule.Form.moniker,
+                                    energyModule.Form.moniker):
+                    warnings.append( warning.WrongDistributionComponent( form.moniker, 'N-body' ) )
 
             def checkSubform( subform, contextMessage ):
                 distributionErrors = []
                 if hasattr(subform, 'domainMin') and (subform.domainMin, subform.domainMax) != info['crossSectionDomain']:
                     domain = (subform.domainMin, subform.domainMax)
                     # For gamma products, domainMin should be >= cross section start, upper bounds should match.
-                    if( self.ancestor.id == IDsPoPsModule.photon ) :
+                    if( self.ancestor.pid == IDsPoPsModule.photon ) :
                         startRatio = subform.domainMin / info['crossSectionDomain'][0]
                         endRatio = subform.domainMax / info['crossSectionDomain'][1]
-                        if (startRatio < 1-standardsModule.floats.epsilon or endRatio < 1-standardsModule.floats.epsilon
-                                or endRatio > 1+standardsModule.floats.epsilon):
-                            distributionErrors.append( warning.domain_mismatch(
+                        if (startRatio < 1-standardsModule.Floats.epsilon or endRatio < 1-standardsModule.Floats.epsilon
+                                or endRatio > 1+standardsModule.Floats.epsilon):
+                            distributionErrors.append( warning.Domain_mismatch(
                                     *(domain + info['crossSectionDomain']), obj=subform ) )
                     # For all other products, check lower and upper edges: only warn if they disagree by > eps
                     else:
                         for e1,e2 in zip(domain, info['crossSectionDomain']):
                             ratio = e1 / e2
-                            if (ratio < 1-standardsModule.floats.epsilon or ratio > 1+standardsModule.floats.epsilon):
-                                distributionErrors.append( warning.domain_mismatch(
+                            if (ratio < 1-standardsModule.Floats.epsilon or ratio > 1+standardsModule.Floats.epsilon):
+                                distributionErrors.append( warning.Domain_mismatch(
                                         *(domain + info['crossSectionDomain']), obj=subform ) )
                                 break
-                    if not hasattr(subform,'check'):
-                        distributionErrors.append( warning.NotImplemented(subform.moniker, subform ) )
-                        if info['failOnException']:
-                            raise NotImplementedError("Checking distribution form '%s'" % subform.moniker)
+                if not hasattr(subform, 'check'):
+                    distributionErrors.append(warning.NotImplemented(subform.moniker, subform))
+                    if info['failOnException']:
+                        raise NotImplementedError("Checking distribution form '%s'" % subform.moniker)
                 else:
                     distributionErrors += subform.check( info )
                 if distributionErrors:
-                    warnings.append( warning.context( contextMessage + " - %s:" % subform.moniker, distributionErrors) )
+                    warnings.append( warning.Context( contextMessage + " - %s:" % subform.moniker, distributionErrors) )
 
-            if isinstance(form, uncorrelatedModule.form):
+            if isinstance(form, uncorrelatedModule.Form):
                 for subformName in ('angularSubform','energySubform'):
                     subform = getattr(form, subformName ).data
                     checkSubform( subform, 'uncorrelated - ' + subformName.replace('Subform','') )
 
-            elif isinstance(form, KalbachMannModule.form):
+            elif isinstance(form, KalbachMannModule.Form):
                 checkSubform( form, form.moniker )
 
             else:
@@ -170,7 +173,7 @@ class component( abstractClassesModule.component ) :
             for entity in self:
                 if entity.moniker == entityName:
                     return entity
-        return abstractClassesModule.component.findEntity( self, entityName, attribute, value )
+        return abstractClassesModule.Component.findEntity( self, entityName, attribute, value )
 
     def hasData( self ) :
         """
@@ -178,20 +181,32 @@ class component( abstractClassesModule.component ) :
         """
 
         for form in self :
-            if( not( isinstance( form, unspecifiedModule.form ) ) ) : return( True )
+            if( not( isinstance( form, unspecifiedModule.Form ) ) ) : return( True )
         return( False )
 
-    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = standardsModule.frames.productToken, LegendreOrder = 0 ) :
+    def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.product, LegendreOrder = 0 ) :
 
         if( len( self ) > 0 ) :
             form = self[0]
-#            if( form.productFrame == standardsModule.frames.centerOfMassToken ) : return( 0.0 )
+#            if( form.productFrame == xDataEnumsModule.Frame.centerOfMass: return( 0.0 )
             if( hasattr( form, 'integrate' ) ) :
                 return( form.integrate( reaction_suite, energyIn, energyOut = energyOut, muOut = muOut, phiOut = phiOut, frame = frame, LegendreOrder = LegendreOrder ) )
             else :
                 print( 'missing integrate', type( form ) )
 
         return( 0.0 )
+
+    def isSpecified(self):
+        '''
+        Returns **True** if *self* has data and if the first is not **Unspecified**.
+        '''
+
+        if len(self) == 0:
+            return False
+        if isinstance(self[0], unspecifiedModule.Form):
+            return False
+
+        return True
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
 

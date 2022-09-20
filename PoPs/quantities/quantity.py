@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -21,15 +21,11 @@ from .. import suite as suiteModule
 
 from xData.uncertainty.physicalQuantity import uncertainty as uncertaintyModule
 
-__metaclass__ = type
-
-class quantity( miscModule.classWithLabelKey ) :
+class Quantity( miscModule.ClassWithLabelKey, abc.ABC ) :
     """
     This class is used to represent a physical quantity (e.g., mass, spin or halflife).
     A quantity has required members label, value and unit and optional members documentation and uncertainty.
     """
-
-    __metaclass__ = abc.ABCMeta
 
     moniker = 'quantity'
     __valueType = None
@@ -43,7 +39,7 @@ class quantity( miscModule.classWithLabelKey ) :
         :param documentation: documentation specific to this quantity
         """
 
-        miscModule.classWithLabelKey.__init__( self, label )
+        miscModule.ClassWithLabelKey.__init__( self, label )
 
         self.value = value
 
@@ -97,7 +93,7 @@ class quantity( miscModule.classWithLabelKey ) :
     def uncertainty( self, _uncertainty ) :
 
         if( _uncertainty is not None ) :
-            if( not( isinstance( _uncertainty, uncertaintyModule.uncertainty ) ) ) : raise TypeError( 'Invalid uncertainty instance.' )
+            if( not( isinstance( _uncertainty, uncertaintyModule.Uncertainty ) ) ) : raise TypeError( 'Invalid uncertainty instance.' )
 
         self.__uncertainty = _uncertainty
         if( self.__uncertainty is not None ) : self.__uncertainty.setAncestor( self )
@@ -124,11 +120,7 @@ class quantity( miscModule.classWithLabelKey ) :
         if( self.__uncertainty is not None ) : _quantity.uncertainty = self.__uncertainty.copy( )
         return( _quantity )
 
-    def toXML( self, indent = '', **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs )  ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
         indent3 = indent2 + kwargs.get( 'incrementalIndent', '  ' )
@@ -145,7 +137,7 @@ class quantity( miscModule.classWithLabelKey ) :
             if( self.documentation != '' ) :
                 XMLStringList.append( '%s<documentation>' % indent2 )
                 XMLStringList.append( '%s%s</documentation>' % ( indent3, self.documentation ) )
-            if( self.uncertainty is not None ) : XMLStringList += self.uncertainty.toXMLList( indent = indent2, **kwargs )
+            if( self.uncertainty is not None ) : XMLStringList += self.uncertainty.toXML_strList( indent = indent2, **kwargs )
             XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
@@ -153,14 +145,14 @@ class quantity( miscModule.classWithLabelKey ) :
 
         return( "%s" % self.value )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         documentation = ''
         for child in element :
             if( child.tag == 'uncertainty' ) :
-                self.uncertainty = uncertaintyModule.uncertainty.parseXMLNodeAsClass( child, xPath, linkData )
+                self.uncertainty = uncertaintyModule.Uncertainty.parseNodeUsingClass(child, xPath, linkData, **kwargs)
 #            elif( child.tag 'documentation' ) :
 #                if( child.tag == 'documentation' ) : documentation = child.findtext( )
             else :
@@ -170,7 +162,7 @@ class quantity( miscModule.classWithLabelKey ) :
         return( self )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( '%s[@label="%s"]' % ( element.tag, element.get( 'label' ) ) )
 
@@ -184,22 +176,16 @@ class quantity( miscModule.classWithLabelKey ) :
         self = cls( element.get('label'), value, unit )
         xPath.pop()
 
-        self.parseXMLNode( element, xPath, linkData )
+        self.parseNode(element, xPath, linkData, **kwargs)
 
         return( self )
-
-    @classmethod
-    def parseXMLStringAsClass( cls, string ) :
-
-        from xml.etree import cElementTree
-        return( cls.parseXMLNodeAsClass( cElementTree.fromstring( string ), [], [] ) )
 
     @classmethod
     def toValueType( cls, value ) :
 
         return( cls.__valueType( value ) )
 
-class string( quantity ) :
+class String( Quantity ) :
     """
     This is an abstract base class for string quantities.
     """
@@ -217,12 +203,10 @@ class string( quantity ) :
 
         return( cls.__valueType( value ) )
 
-class number( quantity ) :
+class Number( Quantity, abc.ABC ) :
     """
     This is an abstract base class for numberic quantities. This class adds the pqu and float methods.
     """
-
-    __metaclass__ = abc.ABCMeta
 
     def pqu( self, unit = None ) :
         """
@@ -241,7 +225,7 @@ class number( quantity ) :
         if( not( isinstance( unit, ( str, PQUModule.PhysicalUnit ) ) ) ) : raise TypeError( 'unit argument must be a str or a PQU.PhysicalUnit.' )
         return( float( self.pqu( unit ) ) )
 
-class integer( number ) :
+class Integer( Number ) :
     """
     This class is used to represent a (physical) quantity whose value must be an integer.
     """
@@ -259,7 +243,7 @@ class integer( number ) :
 
         return( cls.__valueType( value ) )
 
-class double( number ) :
+class Double( Number ) :
     """
     This class is used to represent a (physical) quantity whose value must be a float.
     """
@@ -270,7 +254,7 @@ class double( number ) :
     def __init__( self, label, value, unit, documentation = '' ) :
 
         if( isinstance( value, ( int, fractions.Fraction ) ) ) : value = self.valueType( value )
-        number.__init__( self, label, value, unit, documentation = documentation )
+        Number.__init__( self, label, value, unit, documentation = documentation )
 
     @property
     def valueType( self ) :
@@ -294,7 +278,7 @@ class double( number ) :
 
         return( cls.__valueType( value ) )
 
-class fraction( number ) :
+class Fraction( Number ) :
     """
     This class is used to represent a (physical) quantity whose value must be a rational number
     (e.g., a fraction like 1/2, 3, 5/6).
@@ -306,7 +290,7 @@ class fraction( number ) :
     def __init__( self, label, value, unit, documentation = '' ) :
 
         if( isinstance( value, ( int, str ) ) ) : value = self.valueType( value )
-        number.__init__( self, label, value, unit, documentation = documentation )
+        Number.__init__( self, label, value, unit, documentation = documentation )
 
     @property
     def valueType( self ) :
@@ -318,22 +302,18 @@ class fraction( number ) :
 
         return( cls.__valueType( value ) )
 
-class suite( suiteModule.suite ) :
-
-    __metaclass__ = abc.ABCMeta
+class Suite( suiteModule.Suite, abc.ABC ) :
 
     _allowedClasses = []
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, self._allowedClasses )
+        suiteModule.Suite.__init__( self, self._allowedClasses )
 
-class numberSuite( suite ) :
+class NumberSuite( Suite, abc.ABC ) :
     """
     This is an abstract base class for a number suite. This class adds the pqu and float methods.
     """
-
-    __metaclass__ = abc.ABCMeta
 
     def pqu( self, unit = None ) :
         """

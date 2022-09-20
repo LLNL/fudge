@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,9 +12,9 @@ from PoPs import alias as aliasModule
 from PoPs.families import gaugeBoson as gaugeBosonModule
 from PoPs.families import baryon as baryonModule
 from PoPs.families import nucleus as nucleusModule
-from PoPs.groups import chemicalElement as chemicalElementModule
+from PoPs.chemicalElements import chemicalElement as chemicalElementModule
 
-pops = databaseModule.database( 'LLNL', '0.0.1' )
+pops = databaseModule.Database( 'LLNL', '0.0.1' )
 
 element = cElementTree.parse( 'pops.xml' )
 element = element.getroot( )
@@ -22,23 +22,23 @@ element = element.getroot( )
 def aliases( element ) :
 
     for child in element :
-        _alias = aliasModule.particle( child.get( 'id' ), child.get( 'pid' ) )
+        _alias = aliasModule.Alias(child.get('id'), child.get('pid'))
         pops.add( _alias )
 
 def gaugeBosons( element ) :
 
     for child in element :
-        pops.add( gaugeBosonModule.particle.parseXMLNodeAsClass( child , [], [] ) )
+        pops.add(gaugeBosonModule.Particle.parseNodeUsingClass(child , [], []))
     
 def baryons( element ) :
 
     for child in element :
-        pops.add( baryonModule.particle.parseXMLNodeAsClass( child , [], [] ) )
+        pops.add baryonModule.Particle.parseNodeUsingClass(child , [], [ ))
  
 def chemicalElements( element ) :
 
     for child in element :
-        pops.add( chemicalElementModule.suite.parseXMLNodeAsClass( child, [], [] ) )
+        pops.add chemicalElementModule.Suite.parseNodeUsingClass(child, [], []))
  
 for child in element :
     if( child.tag == 'aliases' ) :
@@ -55,14 +55,14 @@ for chemicalElement in pops.chemicalElements :
         for level in isotope :
             nucleusName = level.id
             nucleusName = nucleusName[0].lower( ) + nucleusName[1:]
-            nucleus = nucleusModule.particle( nucleusName, '0' )
+            nucleus = nucleusModule.Particle( nucleusName, '0' )
             level.nucleus = nucleus
 
 fOut = open( 'p.xml', 'w' )
 fOut.write( pops.toXML( ) + '\n' )
 fOut.close( )
 
-pops2 = databaseModule.database.readFile( 'p.xml' )
+pops2 = databaseModule.read( 'p.xml' )
 fOut = open( 'p2.xml', 'w' )
 fOut.write( pops2.toXML( ) + '\n' )
 fOut.close( )

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,16 +9,17 @@
 Coherent and incoherent photon scattering forms.
 """
 
+from xData import enums as xDataEnumsModule
 from xData import link as linkModule
 
 from . import base as baseModule
 
-class baseForm( baseModule.form, linkModule.link ) :
+class BaseForm( baseModule.Form, linkModule.Link ) :
 
     def __init__( self, link = None, root = None, path = None, relative = False, label = None ) :
 
-        linkModule.link.__init__( self, link = link, root = root, path = path, relative = relative, label = label )
-        baseModule.form.__init__( self, label, None, [] )
+        linkModule.Link.__init__( self, link = link, root = root, path = path, relative = relative, label = label )
+        baseModule.Form.__init__( self, label, xDataEnumsModule.Frame.none, [] )
 
     @property
     def productFrame( self ) :
@@ -33,6 +34,11 @@ class baseForm( baseModule.form, linkModule.link ) :
 
         return( self.link.calculateAverageProductData( style, indent, **kwargs ) )
 
+    def fixDomains(self, domainMin, domainMax, fixToDomain):
+        """This method does nothing."""
+
+        return 0
+
     def processMC_cdf( self, style, tempInfo, indent ) :
 
         return( self.link.processMC_cdf( style, tempInfo, indent ) )
@@ -41,18 +47,18 @@ class baseForm( baseModule.form, linkModule.link ) :
 
         return( self.link.processMultiGroup( style, tempInfo, indent ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
-        return( linkModule.link.toXMLList( self, indent = indent, **kwargs ) )
+        return( linkModule.Link.toXML_strList( self, indent = indent, **kwargs ) )
 
-class coherentPhotonScattering :
+class CoherentPhotonScattering :
 
-    class form( baseForm ) :
+    class Form(BaseForm):
 
         moniker = 'coherentPhotonScattering'
 
-class incoherentPhotonScattering :
+class IncoherentPhotonScattering :
 
-    class form( baseForm ) :
+    class Form(BaseForm):
 
         moniker = 'incoherentPhotonScattering'

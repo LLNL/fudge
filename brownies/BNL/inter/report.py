@@ -1,7 +1,7 @@
 from fudge.core.utilities.brb import banner, winged_banner
-from fudge.physicalQuantity import temperature
+from fudge import physicalQuantity as physicalQuantityModule
 from fudge.vis.matplotlib import plot2d
-from xData.table import blank
+from xData import table as tableModule
 from brownies.BNL.inter.datatables import *
 from brownies.BNL.inter.metrics import *
 from brownies.BNL.utilities.html import *
@@ -157,7 +157,7 @@ class ComplexEncoder(json.JSONEncoder):
             return tuple(obj)
         if isinstance(obj, PQU.PQU):
             return str(obj)
-        if isinstance(obj, temperature):
+        if isinstance(obj, physicalQuantityModule.Temperature):
             return str(obj)
         if isinstance(obj, DataTable):
             return '\n'.join(obj.toStringList())
@@ -255,7 +255,7 @@ def getEvaluationReport(rs, title=None, saveDoc=False, **otherArgs):
     :param saveDoc:
     :return:
     """
-    endfDoc = rs.documentation.endfCompatible.body.split('\n')
+    endfDoc = rs.styles.getEvaluatedStyle().documentation.endfCompatible.body.split('\n')
     globalMetadata = Report(title=title)
     globalMetadata['Authors'] = endfDoc[0][33:].strip()
     globalMetadata['Lab'] = endfDoc[0][11:22].strip()
@@ -271,9 +271,9 @@ def getEvaluationReport(rs, title=None, saveDoc=False, **otherArgs):
     if hasattr(rs, 'attributes'):
         globalMetadata['Attributes'] = rs.attributes
     if saveDoc:
-        globalMetadata['ENDF documentation'] = rs.documentation.toXMLList()
+        globalMetadata['ENDF documentation'] = rs.styles.getEvaluatedStyle().documentation.toXMLList()
     globalMetadata['Projectile frame'] = rs.projectileFrame
-    globalMetadata['Temperature'] = rs.styles['eval'].temperature
+    globalMetadata['Temperature'] = rs.styles.getEvaluatedStyle().temperature
     globalMetadata['GNDS version'] = rs.formatVersion
     return globalMetadata
 
@@ -450,17 +450,17 @@ def getParticlePairsReport(rs, title="Particle Pairs", **otherArgs):
             else:
                 particle = rs.getParticle(p)
             rep[pp][p] = {}
-            if isinstance(particle, PoPs.families.baryon.particle):
+            if isinstance(particle, PoPs.families.baryon.Particle):
                 rep[pp][p]["Mass (amu)"] = particle.mass.float('amu')
                 rep[pp][p]["Spin (hbar)"] = particle.spin.float('hbar')
                 rep[pp][p]["Parity"] = '+' if str(particle.parity[0]) == "1 " else '-'
                 rep[pp][p]["Charge (e)"] = particle.charge.float('e')
-            elif isinstance(particle, PoPs.families.gaugeBoson.particle):
+            elif isinstance(particle, PoPs.families.gaugeBoson.Particle):
                 rep[pp][p]["Mass (amu)"] = particle.mass.float('amu')
                 rep[pp][p]["Spin (hbar)"] = particle.spin.float('hbar')
                 rep[pp][p]["Parity"] = '+' if str(particle.parity[0]) == "1 " else '-'
                 rep[pp][p]["Charge (e)"] = particle.charge.float('e')
-            elif isinstance(particle, PoPs.families.nuclide.particle):
+            elif isinstance(particle, PoPs.families.nuclide.Particle):
                 try:
                     rep[pp][p]["Mass (amu)"] = particle.mass.float('amu')
                 except (KeyError, IndexError):
@@ -987,7 +987,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 RI = computeRI(r.crossSection, useCovariance=useCovariance, Ecut=otherArgs.get('RI_Ecut', None))
                 updateColumnsAndRow(columnHeaders, row, icol, 'RI', RI, RI.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # 14 MeV Point
         if hasattr(metricMenu, 'fourteen') and metricMenu.fourteen:
@@ -1026,7 +1026,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 xsRT = computeRoomTempCS(r.crossSection, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "2200 m/s", xsRT, xsRT.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # Westcott factor
         if hasattr(metricMenu, 'Westcott') and metricMenu.Westcott:
@@ -1039,7 +1039,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                     westcott = computeWestcottFactor(r.crossSection, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "Westcott factor", westcott, westcott.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # Godiva spectrum average
         if hasattr(metricMenu, 'Godiva') and metricMenu.Godiva:
@@ -1047,7 +1047,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 x = computeGodivaSpectrumAve(r.crossSection, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "Godiva", x, x.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # Jezebel spectrum average
         if hasattr(metricMenu, 'Jezebel') and metricMenu.Jezebel:
@@ -1055,7 +1055,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 x = computeJezebelSpectrumAve(r.crossSection, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "Jezebel", x, x.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # BigTen spectrum average
         if hasattr(metricMenu, 'BigTen') and metricMenu.BigTen:
@@ -1063,7 +1063,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 x = computeBigTenSpectrumAve(r.crossSection, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "BigTen", x, x.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # FUND-IPPE spectrum average
         if hasattr(metricMenu, 'FUNDIPPE') and metricMenu.FUNDIPPE:
@@ -1072,7 +1072,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 x = computeFUNDIPPESpectrumAve(r.crossSection, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "FUND-IPPE", x, x.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # 252Cf spectrum average (using analytic approximation from INTER)
         if hasattr(metricMenu, 'CfSpectAnalytic') and metricMenu.CfSpectAnalytic:
@@ -1080,7 +1080,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 x = computeCf252SpectrumAveAnalytic(r.crossSection, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "252Cf (analytic)", x, x.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # 252Cf spectrum average
         if hasattr(metricMenu, 'CfSpectENDF') and metricMenu.CfSpectENDF:
@@ -1088,7 +1088,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 x = computeCf252SpectrumAve(r.crossSection, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "252Cf", x, x.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # MACS
         if hasattr(metricMenu, 'MACS') and metricMenu.MACS:
@@ -1100,11 +1100,10 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
             else:
                 kT = PQU.PQU(30., 'keV')
             if EThreshold / 10 < kT.getValueAs('eV'):
-                x = computeMACS(r.crossSection, T=kT, useCovariance=useCovariance)
-                updateColumnsAndRow(columnHeaders, row, icol, "MACS(%s)" % str(kT), x.getValueAs('mb'),
-                                    'mb')  # preferred unit for MACS is mb
+                x = computeMACS(r.crossSection, T=kT, useCovariance=useCovariance).inUnitsOf('mb')  # pref. unit is mb
+                updateColumnsAndRow(columnHeaders, row, icol, "MACS(%s)" % str(kT), x, 'mb')
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         # ARR
         if hasattr(metricMenu, 'ARR') and metricMenu.ARR:
@@ -1119,7 +1118,7 @@ def getReactionDataTable(rs, metricMenu, title="Reactions", MTList=[], useCovari
                 x = computeAstrophysicalReactionRate(r.crossSection, T=kT, useCovariance=useCovariance)
                 updateColumnsAndRow(columnHeaders, row, icol, "ARR(%s)" % str(kT), x, x.unit)
             else:
-                row.append(blank())
+                row.append(tableModule.Blank())
 
         data.append(row)
 

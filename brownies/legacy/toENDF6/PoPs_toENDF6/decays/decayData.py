@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -55,8 +55,8 @@ def toENDF6( self, MT, endfMFList, flags, info, verbosityIndent = '' ) :
         for spectrum in decayMode.spectra:
             discretes, continuums = [],[]
             for emission in spectrum:
-                if isinstance(emission, spectrumModule.discrete): discretes.append(emission)
-                elif isinstance(emission, spectrumModule.continuum): continuums.append(emission)
+                if isinstance(emission, spectrumModule.Discrete): discretes.append(emission)
+                elif isinstance(emission, spectrumModule.Continuum): continuums.append(emission)
                 else:
                     raise NotImplementedError("Unknown emission mode %s" % emission.moniker)
 
@@ -77,9 +77,7 @@ def toENDF6( self, MT, endfMFList, flags, info, verbosityIndent = '' ) :
                 if discrete.energy.uncertainty is not None:
                     dER = discrete.energy.uncertainty.form.value.float('eV')
 
-                TYPE = 0
-                if discrete.type is not None:
-                    TYPE = spectrumModule.transitionType.types.index( discrete.type ) + 1
+                TYPE = spectrumModule.TransitionType.ENDF_index(discrete.type)
 
                 RI = discrete.intensity.value
                 dRI = 0
@@ -124,4 +122,4 @@ def toENDF6( self, MT, endfMFList, flags, info, verbosityIndent = '' ) :
     endfMFList[8][457].append( endfFormatsModule.endfSENDLineNumber() )
 
 
-decayDataModule.decayData.toENDF6 = toENDF6
+decayDataModule.DecayData.toENDF6 = toENDF6

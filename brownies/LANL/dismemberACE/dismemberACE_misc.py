@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -50,7 +50,7 @@ def get8Integers( line ) :
 
     return( values )
 
-class listBase1 :
+class ListBase1 :
 
         def __init__( self, values ) : self.values = values
         def __len__( self ) : return( len( self.values ) )

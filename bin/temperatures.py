@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,9 +13,9 @@ description = """Prints the file name, the temperature unit and the list of eval
 from argparse import ArgumentParser
 
 from pqu import PQU as PQUModule
-from fudge import reactionSuite as reactionSuiteModule
+from fudge import enums as enumsModule
+from fudge import GNDS_file as GNDS_fileModule
 from fudge import styles as stylesModule
-from LUPY import GNDSType as GNDSTypeModule
 
 temperatureUnitDefault = "K"
 
@@ -27,7 +27,7 @@ args = parser.parse_args( )
 
 TNSL_dataOrder = [ 'incoherent-inelastic', 'coherent-elastic', 'incoherent-elastic' ]
 
-heatedProcessedStyles = sorted( [ [ style.sortOrderIndex, style.moniker ] for style in stylesModule.styles.heatedProcessedStyles( ) ] )
+heatedProcessedStyles = sorted( [ [ style.sortOrderIndex, style.moniker ] for style in stylesModule.Styles.heatedProcessedStyles( ) ] )
 heatedProcessedStyles = [ moniker for sortOrderIndex, moniker in heatedProcessedStyles ]
 
 columnWidth = 24
@@ -35,7 +35,7 @@ labelFormat = '%%%ds' % columnWidth
 temperatureFormat = '%.4g'
 for file in args.files :
     try :
-        reactionSuite = GNDSTypeModule.preview( file )
+        reactionSuite = GNDS_fileModule.preview(file)
     except :
         print( '******** File is not a GNDS "reactionSuite" file: "%s"' % file )
         continue
@@ -43,7 +43,8 @@ for file in args.files :
     print( file )
     UnitAndTemperatures = [ 'K', [] ]
 
-    if( reactionSuite.interaction == reactionSuiteModule.Interaction.TNSL ) :
+    if( reactionSuite.interaction == enumsModule.Interaction.TNSL ) :
+        reactionSuite = GNDS_fileModule.read(file, lazyParsing=True)
         allTemperatures = reactionSuite.thermalNeutronScatteringLawTemperatures( )
         for name in TNSL_dataOrder :
             if( name in allTemperatures ) :
@@ -69,13 +70,13 @@ for file in args.files :
                 sepChar = ', '
             print( )
 
-    temperatureInfos = reactionSuite.styles.temperatures( unit = args.temperatureUnit )
-    if( len( temperatureInfos ) > 0 ) :
-        print( labelFormat % ( 'temperature [%s]' % args.temperatureUnit ), end = '' )
-        for heatedProcessedStyle in heatedProcessedStyles : print( heatedProcessedStyle.center( columnWidth ), end = '' )
-        print( )
-        print( '   ', ( ( len( heatedProcessedStyles ) + 1 ) * columnWidth - 2 ) * '-' )
-        for temperature, labels in temperatureInfos  :
-            print( labelFormat % ( temperatureFormat % temperature ), end = '' )
-            for moniker in heatedProcessedStyles : print( labels[moniker].center( columnWidth ), end = '' )
-            print( )
+    temperatureInfos = reactionSuite.styles.temperatures(unit=args.temperatureUnit)
+    if len(temperatureInfos) > 0:
+        print(labelFormat % ('temperature [%s]' % args.temperatureUnit), end='')
+        for heatedProcessedStyle in heatedProcessedStyles : print(heatedProcessedStyle.center(columnWidth), end = '')
+        print()
+        print('   ', ((len( heatedProcessedStyles ) + 1) * columnWidth - 2) * '-')
+        for temperatureInfo in temperatureInfos:
+            print(labelFormat % (temperatureFormat % temperatureInfo.temperature ), end='')
+            for moniker in heatedProcessedStyles: print(getattr(temperatureInfo, moniker).center(columnWidth), end='')
+            print()

@@ -1,35 +1,32 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-
-__metaclass__ = type
 
 import abc
 import math
 
 from pqu import PQU as PQUModule
 
-from . import formatVersion as formatVersionModule
-from . import XYs as XYsModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+
+from . import enums as enumsModule
+from . import XYs1d as XYs1dModule
 from . import series1d as series1dModule
-from . import standards as standardsModule
 from . import base as baseModule
-from . import axes as axesModule
-from . import uncertainties as uncertaintiesModule
 
 domainEpsilon = 1e-15
 
-class regions( baseModule.xDataFunctional ) :
-    """Abstract base class for regions."""
+class Regions( baseModule.XDataFunctional ) :
+    """Abstract base class for Regions."""
 
-    ancestryMembers = baseModule.xDataFunctional.ancestryMembers + ( '[regions', )
+    ancestryMembers = baseModule.XDataFunctional.ancestryMembers                # See note in multiD_XYs.py about setting ancestryMembers.
 
-    def __init__( self, axes = None, index = None, valueType = standardsModule.types.float64Token, outerDomainValue = None, label = None ) :
+    def __init__( self, axes = None, index = None, valueType = enumsModule.ValueType.float64, outerDomainValue = None, label = None ) :
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType, outerDomainValue = outerDomainValue, label = label )
+        baseModule.XDataFunctional.__init__(self, axes, index=index, valueType=valueType, outerDomainValue=outerDomainValue, label=label)
         self.__regions = []
 
     def __len__( self ) :
@@ -50,7 +47,7 @@ class regions( baseModule.xDataFunctional ) :
     def __setitem__( self, index, region ) :
         """
         Set region (the right-hand-side) to the :math:`{i-1}^{th}` region of self. Region must be an instance of 
-        base.xDataFunctional with the same dimension as self.
+        base.XDataFunctional with the same dimension as self.
         If :math:`i > 0`, the following must also be met:
         
             - all the prior regions must already exists,
@@ -195,7 +192,7 @@ class regions( baseModule.xDataFunctional ) :
         if( unitTo is None ) : return( 1. )
         return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
-    def domainSlice( self, domainMin = None, domainMax = None, fill = 1, dullEps = 0. ) :
+    def domainSlice(self, domainMin=None, domainMax=None, fill=1, dullEps=0.0, **kwargs):
         """
         Returns a new instance with self sliced between ``domainMin`` and ``domainMax``.
         Result may be a regions container, or it may be XYs, multiD_XYs, etc.
@@ -217,7 +214,7 @@ class regions( baseModule.xDataFunctional ) :
         for ridx2, region in enumerate( self ) :
             if( region.domainMax >= domainMax ) : break
 
-        if ridx1 == ridx2:  # only one region left after slicing, return as XYs or multiD_XYs
+        if ridx1 == ridx2:  # only one region left after slicing, return as XYs1d or multiD_XYs
             return self[ridx1].domainSlice( domainMin=domainMin, domainMax=domainMax, fill=fill, dullEps=dullEps )
         else:
             newRegions = self.__class__( axes = self.axes, index = self.index, valueType = self.valueType, outerDomainValue = self.outerDomainValue, label = self.label )
@@ -228,6 +225,31 @@ class regions( baseModule.xDataFunctional ) :
                 domainMin=self[ridx2].domainMin, domainMax=domainMax, fill=fill, dullEps=dullEps ) )
 
             return newRegions
+
+    def fixDomains(self, domainMin, domainMax, fixToDomain):
+        """
+        Sets domain minimum and maximum per the arguments.
+        """
+
+        OldDomainMin = self.domainMin
+        OldDomainMax = self.domainMax
+
+        if fixToDomain == enumsModule.FixDomain.lower:
+            regions1 = self.domainSlice(domainMin = domainMin, fill = True)
+        elif fixToDomain == enumsModule.FixDomain.upper:
+            regions1 = self.domainSlice(domainMax = domainMax, fill = True)
+        else:
+            regions1 = self.domainSlice(domainMin = domainMin, domainMax = domainMax, fill = True)
+
+        self.__regions = []
+        if isinstance(regions1, Regions):
+           for index, region in enumerate(regions1): self[index] = region
+        else:
+            if len(regions1) == 0: return 1             # Caller beware.
+            self[0] = regions1
+
+        if OldDomainMin == self.domainMin and OldDomainMax == self.domainMax: return 0
+        return 1
 
     def rangeUnitConversionFactor( self, unitTo ) :
 
@@ -270,14 +292,14 @@ class regions( baseModule.xDataFunctional ) :
         :param limits: dictionary containing limits for each independent axis (keyed by axis label or index).
         If an independent axis is missing from the dictionary, integrate over the entire domain of that axis.
 
-        :return: float or PQU
+        :return: float
         """
 
         from . import multiD_XYs as multiD_XYsModule
 
         integral = 0
         for region in self:
-            if( isinstance( region, ( XYsModule.XYs1d, series1dModule.series ) ) ) :
+            if( isinstance( region, ( XYs1dModule.XYs1d, series1dModule.Series1d ) ) ) :
                 Min, Max = None, None
                 if self.axes[-1].label in limits:
                     Min, Max = limits.pop( self.axes[-1].label )
@@ -285,7 +307,7 @@ class regions( baseModule.xDataFunctional ) :
                     Min, Max = limits.pop( self.axes[-1].index )
 
                 integral += region.integrate( domainMin = Min, domainMax = Max )
-            elif isinstance( region, multiD_XYsModule.XYsnd ):
+            elif isinstance( region, multiD_XYs1dModule.XYsnd ):
                 integral += region.integrate( **limits )
             else:
                 raise TypeError( "Unsupported class for integration: %s" % type( region ) )
@@ -294,71 +316,63 @@ class regions( baseModule.xDataFunctional ) :
     def toString( self ) :
 
         s1 = ''
-        for i1, region in enumerate( self ) : s1 += 'region %s\n' % i1 + region.toString( )
+        for i1, region in enumerate( self ) : s1 += '# region %s\n' % i1 + region.toString( )
         return( s1 )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        formatVersion = kwargs.get( 'formatVersion', formatVersionModule.default )
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        indent3 = indent2 + kwargs.get( 'incrementalIndent', '  ' )
-        if( formatVersion == formatVersionModule.version_1_10 ) : indent3 = indent2
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+        indent3 = indent2 + kwargs.get('incrementalIndent', '  ')
+        if formatVersion == GNDS_formatVersionModule.version_1_10: indent3 = indent2
 
-        attributeStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
-        if self.isPrimaryXData( ) :
-            if( self.axes is not None ) : XMLList += self.axes.toXMLList( indent2, **kwargs )
+        attributeStr = baseModule.XDataFunctional.attributesToXMLAttributeStr(self)
+        XML_strList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
+        if self.isPrimaryXData():
+            if self.axes is not None: XML_strList += self.axes.toXML_strList(indent2, **kwargs)
 
-        if( formatVersion != formatVersionModule.version_1_10 ) : XMLList.append( '%s<%s>' % ( indent2, self.functionNdsName ) )
-        for region in self.__regions : XMLList += region.toXMLList( indent3, **kwargs )
-        if( formatVersion != formatVersionModule.version_1_10 ) : XMLList[-1] += "</%s>" % self.functionNdsName
+        if formatVersion != GNDS_formatVersionModule.version_1_10: XML_strList.append('%s<%s>' % ( indent2, self.functionNdsName ))
+        for region in self.__regions: XML_strList += region.toXML_strList(indent3, **kwargs)
+        if formatVersion != GNDS_formatVersionModule.version_1_10: XML_strList[-1] += "</%s>" % self.functionNdsName
 
-        if( self.uncertainty ) : XMLList += self.uncertainty.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
+        if self.uncertainty: XML_strList += self.uncertainty.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
+
+        return XML_strList
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData, axes = None, **kwargs ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath)     # parseBareNodeCommonAttributes adds to xPath.
+        if len(extraAttributes) > 0: raise Exception('Invalid attributes: %s.' % ( ', '.join(list(extraAttributes.keys())) ))
 
-        index = int( element.get( 'index' ) ) if 'index' in list( element.keys( ) ) else None
-        outerDomainValue = float( element.get( 'outerDomainValue' ) ) if 'outerDomainValue' in list( element.keys( ) ) else None
-        label = element.get( 'label', None )
+        regions1 = cls(**attributes)
 
-        regions = cls( axes = axes, index = index, outerDomainValue = outerDomainValue, label = label )
+        extraNodes = baseModule.XDataFunctional.parseNodeStandardChildren(regions1, node, xPath, linkData, **kwargs)
 
-        functionElements = []                       # This support GNDS 1.10 and 2.0
-        functions = element.find( regions.functionNdsName )
-        if( functions is not None ) :
-            for child in functions : functionElements.append( child )
+        if len(extraNodes) > 0:                                                     # The next few line support GNDS 1.10 and 2.0.
+            for index, extraNode in enumerate(extraNodes):
+                if extraNode.tag == regions1.functionNdsName: break
+            if extraNode.tag == regions1.functionNdsName: extraNodes = extraNodes.pop(index)
 
-        for child in element :
-            if( child.tag == 'axes' ) :
-                regions.axes = axesModule.axes.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == 'uncertainty' ) :
-                regions.uncertainty = uncertaintiesModule.uncertainty.parseXMLNode( child, xPath, linkData )
-            elif( child.tag == regions.functionNdsName ) :
-                continue
-            else :
-                if( functions is not None ) : raise Expeption( 'Unsupported child name = "%s".' % child.tag )
-                functionElements.append( child )
-
-        allowedSubElements = cls.allowedSubElements( )
-        for child in functionElements :
-            subElementClass = None
-            for subElement in allowedSubElements :
-                if( subElement.moniker == child.tag ) :
-                    subElementClass = subElement
+        if 'axes' not in kwargs: kwargs['axes'] = regions1.axes
+        allowedSubElements = cls.allowedSubElements()
+        for child in extraNodes:
+            childClass = None
+            for allowedChildClass in allowedSubElements:
+                if allowedChildClass.moniker == child.tag:
+                    childClass = allowedChildClass
                     break
-            if( subElementClass is None ) : raise TypeError( 'unknown sub-element "%s" in element "%s"' % ( child.tag, cls.moniker ) )
-            regions.append( subElementClass.parseXMLNode( child, xPath, linkData, axes = regions.axes, **kwargs ) )
+            if childClass is None: raise TypeError('Invalid child "%s" for node "%s"' % (child.tag, cls.moniker))
+            xdata = childClass.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            regions1.append(xdata)
 
-        xPath.pop( )
-        return regions
+        xPath.pop()
 
-class regions1d( regions ) :
+        return regions1
+
+class Regions1d( Regions ) :
 
     moniker = 'regions1d'
     dimension = 1
@@ -385,11 +399,11 @@ class regions1d( regions ) :
 
         self2 = self.copy( )
         other2 = other.copy( )
-        if( isinstance( other2, XYsModule.XYs1d ) ) :
+        if( isinstance( other2, XYs1dModule.XYs1d ) ) :
             temp = self.__class__( )
             temp.append( other2 )
             other2 = temp 
-        elif( not( isinstance( other2, regions ) ) ) :
+        elif( not( isinstance( other2, Regions ) ) ) :
             raise NotImplementedError( 'object of instance "%s" not implemented' % other2.__class__ )
 
         if(   self2.domainMin < other2.domainMin ) :
@@ -465,10 +479,18 @@ class regions1d( regions ) :
         for region in copy : region *= factor
         return( copy )
 
+    def toPointwiseLinear( self, **kwargs ) :
+        """
+        Returns a new instance, converted to lin-lin interpolation with added points to maintain desired accuracy.
+        For more details see toPointwise_withLinearXYs.
+        """
+
+        return( self.toPointwise_withLinearXYs( **kwargs ) )
+
     def toPointwise_withLinearXYs( self, **kwargs ) :
         """
-        Converts the regions of self into a single ``XYs.XYs1d`` instance that has 'lin-lin' interpolation. At the
-        boundary between two abutting regions, the x-values are the same, which is not allowed for an ``XYs.XYs1d`` instance.
+        Converts the regions of self into a single ``XYs1d.XYs1d`` instance that has 'lin-lin' interpolation. At the
+        boundary between two abutting regions, the x-values are the same, which is not allowed for an ``XYs1d.XYs1d`` instance.
 
         Optional (key-word) arguments:
         :param accuracy: indicates desired accuracy. Controls how many points are added when switching interpolation
@@ -479,7 +501,7 @@ class regions1d( regions ) :
         if :math:`x_l < 0`) and the :math:`y` value is interpolated at :math:`x`. If :math:`x` is less than the x-value of the point below :math:`(x_l, y_l)`
         and ``removeOverAdjustedPoints`` is True then the point :math:`(x_l, y_l)` is removed; otherwise, a raise is executed. Similarly
         for upperEps and the point :math:`(x_u, y_u)`.
-        :param cls: class to return. Defaults to xData.regions.regions1d
+        :param cls: class to return. Defaults to xData.regions.Regions1d
         """
 
         def getAdjustedX( x, eps ) :
@@ -495,7 +517,7 @@ class regions1d( regions ) :
         pointwiseClass = self.toLinearXYsClass( )
         if( len( self.regions ) == 0 ) : return( pointwiseClass( data = [], axes = self.axes ) )
 
-        arguments = self.getArguments( kwargs, { 'accuracy' : XYsModule.defaultAccuracy, 'lowerEps' : 0, 'upperEps' : 0, 
+        arguments = self.getArguments( kwargs, { 'accuracy' : XYs1dModule.defaultAccuracy, 'lowerEps' : 0, 'upperEps' : 0, 
                 'removeOverAdjustedPoints' : False, 'axes' : None } )
         accuracy = arguments['accuracy']
         lowerEps = arguments['lowerEps']
@@ -509,10 +531,10 @@ class regions1d( regions ) :
 
         xys = []
         for iRegion, region in enumerate( self.regions ) :
-            _region = region.changeInterpolation( standardsModule.interpolation.linlinToken, accuracy, 
-                    lowerEps = 2 * lowerEps, upperEps = 2 * upperEps )
+            _region = region.changeInterpolation(enumsModule.Interpolation.linlin, accuracy, lowerEps = 2 * lowerEps, upperEps = 2 * upperEps )
             _region = _region.copyDataToXYs( )
-            if( iRegion > 0 ) :
+            if len(_region) < 2: continue
+            if iRegion > 0 and len(xys) > 0:
                 x12, y12 = xys[-1]
                 x21, y21 = _region[0]
                 if( y12 == y21 ) :              # Remove first point of region as it is the same as the last point.
@@ -527,7 +549,7 @@ class regions1d( regions ) :
                             else :
                                 raise ValueError( 'Adjustment at %s makes new x = %s >= prior x = %s; eps = %s' % ( x12, x, x11, lowerEps ) )
                         else :
-                            xys[-1] = [ x, XYsModule.pointwiseXY_C.interpolatePoint( standardsModule.interpolation.linlinToken, x, x11, y11, x12, y12 ) ]
+                            xys[-1] = [x, XYs1dModule.pointwiseXY_C.interpolatePoint(str(enumsModule.Interpolation.linlin), x, x11, y11, x12, y12)]
                     if( upperEps != 0. ) :
                         x22, y22 = _region[1]
                         x = getAdjustedX( x21, upperEps )
@@ -537,21 +559,21 @@ class regions1d( regions ) :
                             else :
                                 raise ValueError( 'Adjustment at %s makes new x = %s >= next x = %s; eps = %s' % ( x21, x, x22, upperEps ) )
                         else :
-                            _region[0] = [ x, XYsModule.pointwiseXY_C.interpolatePoint( standardsModule.interpolation.linlinToken, x, x21, y21, x22, y22 ) ]
+                            _region[0] = [x, XYs1dModule.pointwiseXY_C.interpolatePoint(str(enumsModule.Interpolation.linlin), x, x21, y21, x22, y22)]
             xys += _region
         pointwise = pointwiseClass( data = xys, axes = self.axes, outerDomainValue = self.outerDomainValue ) # FIXME - need more work to insure all parameters are set properly.
         return( pointwise )
 
     def toLinearXYsClass( self ) :
 
-        return( XYsModule.XYs1d )
+        return( XYs1dModule.XYs1d )
 
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( XYsModule.XYs1d, series1dModule.series ) )
+        return( ( XYs1dModule.XYs1d, series1dModule.Series1d ) )
 
-class regionsMultiD( regions ) :
+class RegionsMultiD( Regions ) :
 
     def getBoundingSubFunctions( self, domainValue ) :
 
@@ -560,14 +582,14 @@ class regionsMultiD( regions ) :
 
         return( self.regions[-1].getBoundingSubFunctions( domainValue ) )  # Domain value is above the last region. Let the last region determine what to do.
 
-class regions2d( regionsMultiD ) :
+class Regions2d( RegionsMultiD ) :
 
     moniker = 'regions2d'
     dimension = 2
 
     def toLinearXYsClass( self ) :
 
-        return( regions )
+        return( Regions )
 
     @staticmethod
     def allowedSubElements( ) :
@@ -576,14 +598,14 @@ class regions2d( regionsMultiD ) :
 
         return( ( multiD_XYsModule.XYs2d, ) )
 
-class regions3d( regionsMultiD ) :
+class Regions3d( RegionsMultiD ) :
 
     moniker = 'regions3d'
     dimension = 3
 
     def toLinearXYsClass( self ) :
 
-        return( regions )
+        return( Regions )
 
     @staticmethod
     def allowedSubElements( ) :

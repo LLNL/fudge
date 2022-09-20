@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -27,7 +27,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     else :
         print( 'WARNING: energyAngular subform "%s" has no toENDF6 method' % subform.moniker )
 
-energyAngularModule.form.toENDF6 = toENDF6
+energyAngularModule.Form.toENDF6 = toENDF6
 
 #
 # XYs3d
@@ -61,18 +61,32 @@ def toENDF6( self, flags, targetInfo ) :
         LAW = 1
         LANG = 1
     elif( isinstance( self[0][0], energyAngularModule.XYs1d ) ) :
+        muInterpolation0 = gndsToENDF6Module.gndsToENDFInterpolationFlag(self[0][0].interpolation)
         for energyIn in self :
             EpInterpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( energyIn.interpolation, energyIn.interpolationQualifier )
             if( EpInterpolation != EpInterpolation0 ) : raise 'hell - fix me'
             data = []
-            NAp = 2 * len( energyIn[0] )
+            NAp = 2 * max([len(energy_p) for energy_p in energyIn])
             data = []
             for energy_p in energyIn :
                 if( not( isinstance( energy_p, energyAngularModule.XYs1d ) ) ) : raise 'hell - fix me'
-                NA = 2 * len( energy_p )
-                if( NA != NAp ) : raise Exception( 'These data cannot be converted to ENDF6' )
+                muInterpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag(energy_p.interpolation)
+                if muInterpolation != muInterpolation0:
+                    raise Exception("Inconsistent P(mu | E, E') interpolation not supported by ENDF-6")
                 energy_p = energy_p.convertAxisToUnit( 0, '1/eV' )
-                f0 = float( energy_p.integrate( ) )
+                NA = 2 * len( energy_p )
+                while NA != NAp:
+                    delta = 0.0
+                    for index, muP in enumerate(energy_p):      # Find the widest gap and put a point in the middle of it.
+                        mu2 = muP[0]
+                        if index != 0:
+                            if mu2 - mu1 > delta:
+                                delta = mu2 - mu1
+                                mu = 0.5 * (mu1 + mu2)
+                        mu1 = mu2
+                    energy_p.setValue(mu, energy_p.evaluate(mu))
+                    NA += 2
+                f0 = energy_p.integrate()
                 data += [ energy_p.outerDomainValue * energyPFactor, f0 ]
                 if( f0 == 0 ) :                 # Special case for when f0 == 0 in the ENDF file.
                     for mu, f1 in energy_p :
@@ -84,7 +98,7 @@ def toENDF6( self, flags, targetInfo ) :
                         data.append( f1 )
             ENDFDataList.append( endfFormatsModule.endfContLine( 0, energyIn.outerDomainValue * energyInFactor, 0, NA, len( data ), len( energyIn ) ) )
             ENDFDataList += endfFormatsModule.endfDataList( data )
-        LANG = 12
+        LANG = 10 + muInterpolation0
         LAW = 1
     ENDFDataList.insert( 0, endfFormatsModule.endfContLine( 0, 0, LANG, LEP, 1, len( self ) ) )
     return( LAW, ENDFDataList )

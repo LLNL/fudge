@@ -1,11 +1,11 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from fudge.covariances.mixed import mixedForm as mixedFormModule
+from fudge.covariances import mixed as mixedModule
 
 from .. import endfFormats as endfFormatsModule
 
@@ -24,4 +24,4 @@ def toENDF6(self, flags, targetInfo):
         endf += cov.toENDF6(flags, targetInfo, inCovarianceGroup=True)
     return endf
 
-mixedFormModule.toENDF6 = toENDF6
+mixedModule.MixedForm.toENDF6 = toENDF6

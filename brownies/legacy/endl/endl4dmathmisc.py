@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -92,7 +92,7 @@ def plot3dFrom4d( data, i, options, xyzlog = 0 ) :
     """For internal use only."""
 
     ly_etal = data[i][1]
-    f = fudgeFileMisc.fudgeTempFile( )
+    f = fudgeFileMisc.FudgeTempFile( )
     for y_etal in ly_etal :
         y = "%15.7e" % y_etal[0]
         for etal in y_etal[1] : f.write( "%s %14.6e %14.6e\n" % ( y, etal[0], etal[1] ) )

@@ -1,9 +1,9 @@
 <PoPs name="test" version="1.2.3" format="0.1">
   <aliases>
     <metaStable id="Am242_m1" pid="Am242_e2" metaStableIndex="1"/>
-    <particle id="electron" pid="e-"/>
-    <particle id="e+" pid="e-_anti"/>
-    <particle id="positron" pid="e-_anti"/></aliases>
+    <alias id="electron" pid="e-"/>
+    <alias id="e+" pid="e-_anti"/>
+    <alias id="positron" pid="e-_anti"/></aliases>
   <gaugeBosons>
     <gaugeBoson id="photon">
       <mass>
@@ -220,11 +220,11 @@
 <PoPs name="test" version="1.2.3" format="0.1">
   <aliases>
     <metaStable id="Am242_m1" pid="Am242_e2" metaStableIndex="1"/>
-    <particle id="electron" pid="e-"/>
-    <particle id="e+" pid="e-_anti"/>
-    <particle id="positron" pid="e-_anti"/>
-    <particle id="d" pid="h2"/>
-    <particle id="t" pid="h3"/></aliases>
+    <alias id="electron" pid="e-"/>
+    <alias id="e+" pid="e-_anti"/>
+    <alias id="positron" pid="e-_anti"/>
+    <alias id="d" pid="h2"/>
+    <alias id="t" pid="h3"/></aliases>
   <gaugeBosons>
     <gaugeBoson id="photon">
       <mass>

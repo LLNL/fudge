@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,8 +14,8 @@ merced:
 	mv ../Merced/bin/merced .
 
 upscatter: 
-	cd ../upscatter; $(MAKE)
-	mv ../upscatter/bin/calcUpscatterKernel .
+	cd ../fudge/processing/deterministic/upscatter; $(MAKE)
+	mv ../fudge/processing/deterministic/upscatter/bin/calcUpscatterKernel .
 
 check:
 

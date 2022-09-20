@@ -1,12 +1,13 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
+from fudge import product as productModule
 from fudge.productData.distributions import distribution as distributionModule
 
 from ... import endfFormats as endfFormatsModule
@@ -33,6 +34,10 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
             print("\nError encountered while writing distribution %s to ENDF-6:" % self.toXLink())
             raise
     else :
-        print( 'WARNING: Distribution, no toENDF6 for class = %s' % form.__class__ )
+        product = self.findClassInAncestry(productModule.Product)
+        if form is None:
+            print( 'WARNING: found no distribution of style "%s" for product "%s"' % (targetInfo['style'], product.toXLink()))
+        else:
+            print( 'WARNING: unsupported distribution (type %s) for product "%s"' % (form.__class__, product.toXLink()) )
 
-distributionModule.component.toENDF6 = toENDF6
+distributionModule.Component.toENDF6 = toENDF6

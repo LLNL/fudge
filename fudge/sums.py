@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,20 +9,20 @@
 This module contains the 'sum', 'summand' and 'Summands' classes
 """
 
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+from LUPY import ancestry as ancestryModule
+
 from xData import link as linkModule
-from xData import ancestry as ancestryModule
-from xData import formatVersion as formatVersionModule
 
 from fudge import warning as warningModule
 from fudge import suites as suitesModule
 
 from fudge.reactionData import crossSection as crossSectionModule
-from fudge.channelData import Q as QModule
+from fudge.outputChannelData import Q as QModule
 from fudge.productData import multiplicity as multiplicityModule
 
-__metaclass__ = type
 
-class sums( ancestryModule.ancestry ):
+class Sums(ancestryModule.AncestryIO_bare):
     """
     Contains all summed quantities. Currently supports summed cross sections and multiplicities,
     could extend to other types of sums later.
@@ -34,12 +34,12 @@ class sums( ancestryModule.ancestry ):
 
     def __init__(self):
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
-        self.__crossSectionSums = suitesModule.crossSectionSums( )
+        self.__crossSectionSums = suitesModule.CrossSectionSums( )
         self.__crossSectionSums.setAncestor( self )
 
-        self.__multiplicitySums = suitesModule.multiplicitySums( )
+        self.__multiplicitySums = suitesModule.MultiplicitySums( )
         self.__multiplicitySums.setAncestor( self )
 
     @property
@@ -66,6 +66,16 @@ class sums( ancestryModule.ancestry ):
 
         for ancestryMember in self.ancestryMembers : item = getattr( self, ancestryMember ).findLinks( links )
 
+    def fixDomains(self, labels, energyMax):
+        """
+        Calls the **fixDomains** for the **crossSectionSums** and **multiplicitySums** members.
+        """
+
+        numberOfFixes  = self.__crossSectionSums.fixDomains(labels, 0.0, energyMax)
+        numberOfFixes += self.__multiplicitySums.fixDomains(labels, 0.0, energyMax)
+
+        return numberOfFixes
+
     def removeStyles( self, styleLabels ) :
         """
         Removes all forms whose label matches one of the labels in removeStyles.
@@ -74,36 +84,39 @@ class sums( ancestryModule.ancestry ):
         self.__crossSectionSums.removeStyles( styleLabels )
         self.__multiplicitySums.removeStyles( styleLabels )
 
-    def toXMLList(self, indent='', **kwargs):
+    def toXML_strList(self, indent='', **kwargs):
 
         if not any([getattr(self,val) for val in self.ancestryMembers]): return []
         indent2 = indent + kwargs.get('incrementalIndent','  ')
         xml = ['%s<%s>' % (indent, self.moniker)]
         for child in self.ancestryMembers:
             val = getattr(self,child)
-            if val: xml += val.toXMLList(indent2, **kwargs)
+            if val: xml += val.toXML_strList(indent2, **kwargs)
         xml[-1] += '</%s>' % self.moniker
         return xml
 
-    def parseXMLNode( self, element, xPath, linkData ):
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
+
         for child in element:
             if child.tag in self.ancestryMembers:
-                getattr(self, child.tag).parseXMLNode( child, xPath, linkData )
-            elif linkData['format'] == formatVersionModule.version_1_10 and child.tag in self.legacyMemberNameMapping:
-                getattr(self, self.legacyMemberNameMapping[child.tag]).parseXMLNode( child, xPath, linkData )
+                getattr(self, child.tag).parseNode(child, xPath, linkData, **kwargs)
+            elif linkData['format'] in [ GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_3 ] and child.tag in self.legacyMemberNameMapping:
+                getattr(self, self.legacyMemberNameMapping[child.tag]).parseNode(child, xPath, linkData, **kwargs)
             else:
                 print("Warning: unexpected child '%s' in sums" % child.tag)
+
         xPath.pop()
 
-class crossSectionSum( ancestryModule.ancestry ):
+class CrossSectionSum( ancestryModule.AncestryIO ):
     """
     Stores a summed quantity (cross section, multiplicity, etc.) along with the list of what's being summed over
     """
 
     moniker = 'crossSectionSum'
     ancestryMembers = ( 'summands', 'Q', 'crossSection' )
+    keyName = 'label'
 
     def __init__( self, label, ENDF_MT ):
         """
@@ -113,7 +126,7 @@ class crossSectionSum( ancestryModule.ancestry ):
         :return:
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
         self.label = label
         self.ENDF_MT = int( ENDF_MT )
@@ -121,10 +134,10 @@ class crossSectionSum( ancestryModule.ancestry ):
         self.__summands = Summands( )
         self.__summands.setAncestor( self )
 
-        self.__Q = QModule.component( )
+        self.__Q = QModule.Component( )
         self.__Q.setAncestor( self )
 
-        self.__crossSection = crossSectionModule.component( )
+        self.__crossSection = crossSectionModule.Component( )
         self.__crossSection.setAncestor( self )
 
     def __str__( self ):
@@ -154,6 +167,16 @@ class crossSectionSum( ancestryModule.ancestry ):
     def findLinks( self, links ) :
 
         for ancestryMember in self.ancestryMembers : item = getattr( self, ancestryMember ).findLinks( links )
+
+    def fixDomains(self, labels, energyMin, energyMax):
+        """
+        Calls the **fixDomains** method on the **Q** and **crossSection** members.
+        """
+
+        numberOfFixes  = self.__Q.fixDomains(labels, energyMin, energyMax)
+        numberOfFixes += self.__crossSection.fixDomains(labels, energyMin, energyMax)
+
+        return numberOfFixes
 
     def heatCrossSection( self, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.001, heatAllPoints = False,
         doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True, setThresholdToZero = False, verbose = 0 ) :
@@ -212,7 +235,7 @@ class crossSectionSum( ancestryModule.ancestry ):
             correctXsec = self.__crossSection.toPointwise_withLinearXYs(lowerEps=1e-8, upperEps=1e-8)
         summedXsec = self.sumSummands(label=label)
         if correctXsec.domain() != summedXsec.domain():
-            raise warningModule.summedCrossSectionDomainMismatch( obj=self )
+            raise warningModule.SummedCrossSectionDomainMismatch( obj=self )
         scaleFactor=correctXsec/summedXsec
 
         for s in self.__summands:
@@ -253,16 +276,16 @@ class crossSectionSum( ancestryModule.ancestry ):
         else:
             quotedXsec = self.__crossSection.toPointwise_withLinearXYs(lowerEps=1e-8, upperEps=1e-8)
         if sums.domain() != quotedXsec.domain():
-            warnings.append( warningModule.summedCrossSectionDomainMismatch( obj=self ) )
+            warnings.append( warningModule.SummedCrossSectionDomainMismatch( obj=self ) )
         else:
             diff = quotedXsec - sums
             diff.nf_pointwiseXY.setSafeDivide(True)
             relativeDiff = abs( diff ) / quotedXsec
             try:    # FIXME instead of try/catch, should really compare relativeDiff.rangeMax with 'inf'
                 if relativeDiff.rangeMax > info['crossSectionMaxDiff']:
-                    warnings.append( warningModule.summedCrossSectionMismatch( relativeDiff.rangeMax * 100, obj=self ) )
+                    warnings.append( warningModule.SummedCrossSectionMismatch( relativeDiff.rangeMax * 100, obj=self ) )
             except TypeError:
-                warnings.append( warningModule.summedCrossSectionZeroDivision( obj=self ) )
+                warnings.append( warningModule.SummedCrossSectionZeroDivision( obj=self ) )
 
         return warnings
 
@@ -270,41 +293,44 @@ class crossSectionSum( ancestryModule.ancestry ):
 
         return self.label
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlString = [ '%s<%s label="%s" ENDF_MT="%s">' % ( indent, self.moniker, self.label, self.ENDF_MT ) ]
-        xmlString += self.__summands.toXMLList( indent2, **kwargs )
-        xmlString += self.__Q.toXMLList( indent2, **kwargs )
-        xmlString += self.__crossSection.toXMLList( indent2, **kwargs )
+        xmlString += self.__summands.toXML_strList( indent2, **kwargs )
+        xmlString += self.__Q.toXML_strList( indent2, **kwargs )
+        xmlString += self.__crossSection.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( '%s[@label="%s"]' % (element.tag, element.get('label')) )
+        xPath.append('%s[@label="%s"]' % (node.tag, node.get('label')))
 
-        for child in element:
-            if( child.tag not in ( Summands.moniker, QModule.component.moniker, crossSectionModule.component.moniker ) ) :
-                raise TypeError( 'Unexpected element "%s" encountered' % child.tag )
+        sums = cls(node.get('label'), int(node.get('ENDF_MT')))
 
-        sums = crossSectionSum( element.get( 'label' ), int( element.get( 'ENDF_MT' ) ) )
-        sums.__summands.parseXMLNode( element.find( Summands.moniker ), xPath, linkData )
-        sums.__crossSection.parseXMLNode( element.find( crossSectionModule.component.moniker ), xPath, linkData )
-        sums.__Q.parseXMLNode( element.find( QModule.component.moniker ), xPath, linkData )
+        for child in node:
+            if child.tag not in ( Summands.moniker, QModule.Component.moniker, crossSectionModule.Component.moniker ):
+                raise TypeError( 'Unexpected child node "%s" encountered' % child.tag )
+
+        sums.__summands.parseNode(node.find(Summands.moniker ), xPath, linkData, **kwargs)
+        sums.__crossSection.parseNode(node.find(crossSectionModule.Component.moniker ), xPath, linkData, **kwargs)
+        sums.__Q.parseNode(node.find(QModule.Component.moniker ), xPath, linkData, **kwargs)
 
         xPath.pop()
+
         return sums
 
-class multiplicitySum( ancestryModule.ancestry ):
+class MultiplicitySum( ancestryModule.AncestryIO ):
     """
     Stores a summed multiplicity along with the list of what's being summed over
     """
 
     moniker = 'multiplicitySum'
     ancestryMembers = ( 'summands', 'multiplicity' )
+    keyName = 'label'
 
     def __init__( self, label, ENDF_MT ):
         """
@@ -315,7 +341,7 @@ class multiplicitySum( ancestryModule.ancestry ):
         :return:
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
         self.label = label
 
         self.ENDF_MT = int( ENDF_MT )
@@ -323,7 +349,7 @@ class multiplicitySum( ancestryModule.ancestry ):
         self.__summands = Summands( )
         self.__summands.setAncestor( self )
 
-        self.__multiplicity = multiplicityModule.component( )
+        self.__multiplicity = multiplicityModule.Component( )
         self.__multiplicity.setAncestor( self )
 
     def __str__( self ):
@@ -348,16 +374,23 @@ class multiplicitySum( ancestryModule.ancestry ):
 
         for ancestryMember in self.ancestryMembers : item = getattr( self, ancestryMember ).findLinks( links )
 
+    def fixDomains(self, labels, energyMin, energyMax):
+        """
+        Calls the **fixDomains** for the **multiplicity** member.
+        """
+
+        return self.__multiplicity.fixDomains(labels, energyMin, energyMax)
+
     def check( self, info ) :
 
         warnings = []
 
         if self.__multiplicity.isConstant() and self.__multiplicity.getConstant() < 1:
-            warnings.append( warningModule.negativeMultiplicity( self.getConstant(), self ) )
+            warnings.append( warningModule.NegativeMultiplicity( self.getConstant(), self ) )
         else:   # energy-dependent mult.
             for form in self.__multiplicity :
                 if hasattr(form, 'rangeMin') and form.rangeMin < 0:
-                    warnings.append( warningModule.negativeMultiplicity( form.rangeMin, obj=form ) )
+                    warnings.append( warningModule.NegativeMultiplicity( form.rangeMin, obj=form ) )
 
         # does multiplicity equal the sum over its summand multiplicities?
         sums = self.__summands[0].link.toPointwise_withLinearXYs(lowerEps=1e-8, upperEps=1e-8)
@@ -367,16 +400,16 @@ class multiplicitySum( ancestryModule.ancestry ):
             sums += current
         quotedXsec = self.__multiplicity.toPointwise_withLinearXYs(lowerEps=1e-8, upperEps=1e-8)
         if sums.domain() != quotedXsec.domain():
-            warnings.append( warningModule.summedMultiplicityDomainMismatch( obj=self ) )
+            warnings.append( warningModule.SummedMultiplicityDomainMismatch( obj=self ) )
         else:
             diff = quotedXsec - sums
             diff.nf_pointwiseXY.setSafeDivide(True)
             relativeDiff = abs( diff ) / quotedXsec
             try:    # FIXME instead of try/catch, should really compare relativeDiff.rangeMax with 'inf'
                 if relativeDiff.rangeMax > info['multiplicityMaxDiff']:
-                    warnings.append( warningModule.summedMultiplicityMismatch( relativeDiff.rangeMax * 100, obj=self ) )
+                    warnings.append( warningModule.SummedMultiplicityMismatch( relativeDiff.rangeMax * 100, obj=self ) )
             except TypeError:
-                warnings.append( warningModule.summedMultiplicityZeroDivision( obj=self ) )
+                warnings.append( warningModule.SummedMultiplicityZeroDivision( obj=self ) )
 
         return warnings
 
@@ -395,50 +428,50 @@ class multiplicitySum( ancestryModule.ancestry ):
 
         self.__multiplicity.removeStyles( styleLabels )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         attrStr = ""
         xmlString = [ '%s<%s label="%s" ENDF_MT="%s"%s>' % ( indent, self.moniker, self.label, self.ENDF_MT, attrStr ) ]
-        xmlString += self.__summands.toXMLList( indent2, **kwargs )
-        xmlString += self.__multiplicity.toXMLList( indent2, **kwargs )
+        xmlString += self.__summands.toXML_strList( indent2, **kwargs )
+        xmlString += self.__multiplicity.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( '%s[@label="%s"]' % (element.tag, element.get('label')) )
+        xPath.append( '%s[@label="%s"]' % (node.tag, node.get('label')) )
 
-        for key in element.keys( ) :
+        for key in node.keys( ) :
             if( key == 'ENDF_MT' ) :
-                MT = int( element.get( key ) )
+                MT = int( node.get( key ) )
             elif( key == 'label' ) :
-                label = element.get( key )
+                label = node.get( key )
             else:
                 raise ValueError( 'Unsupported attribute "%s"' % key )
 
-        summands = None
-        for child in element:
-            if( child.tag not in ( Summands.moniker, multiplicityModule.component.moniker ) ) :
-                raise TypeError( 'Unexpected element "%s" encountered' % child.tag )
+        sums = MultiplicitySum( label, MT )
 
-        sums = multiplicitySum( label, MT )
-        sums.__summands.parseXMLNode( element.find( Summands.moniker ), xPath, linkData )
-        sums.__multiplicity.parseXMLNode( element.find( multiplicityModule.component.moniker ), xPath, linkData )
+        for child in node:
+            if( child.tag not in ( Summands.moniker, multiplicityModule.Component.moniker ) ) :
+                raise TypeError( 'Unexpected child node "%s" encountered' % child.tag )
+
+        sums.__summands.parseNode(node.find(Summands.moniker), xPath, linkData, **kwargs)
+        sums.__multiplicity.parseNode(node.find(multiplicityModule.Component.moniker), xPath, linkData, **kwargs)
 
         xPath.pop()
+
         return sums
 
-class Summands( ancestryModule.ancestry ):
+class Summands(ancestryModule.AncestryIO_base):
 
     moniker = 'summands'
-    ancestryMembers = ( '', )
 
     def __init__( self ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
         self.__summands = []
 
     def __getitem__(self, index):
@@ -449,9 +482,14 @@ class Summands( ancestryModule.ancestry ):
 
         return len( self.__summands )
 
+    @property
+    def summands(self):
+
+        return self.__summands
+
     def append( self, item ) :
 
-#        if( not( isinstance( iter, ( add, subtract ) ) ) ) : raise TypeError( 'Invalid item to add: type = %s.' % type( item ) )
+#        if( not( isinstance( iter, ( Add, ) ) ) ) : raise TypeError( 'Invalid item to add: type = %s.' % type( item ) )
 
         self.__summands.append( item )
         item.setAncestor( self )
@@ -459,7 +497,7 @@ class Summands( ancestryModule.ancestry ):
     def findLinks( self, links ) :
 
         for item in self :
-            if( isinstance( item, ( linkModule.link, linkModule.link2 ) ) ) : links.append( [ item, item.link, item.path ] )
+            if( isinstance( item, ( linkModule.Link, linkModule.Link2 ) ) ) : links.append( [ item, item.link, item.path ] )
 
     def index( self, item ) :
         """Returns the index of item in self."""
@@ -471,7 +509,7 @@ class Summands( ancestryModule.ancestry ):
 
         return( self.__summands.pop( index ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         xmlList = ['%s<%s>' % (indent, self.moniker)]
         for summand in self.__summands :
@@ -479,24 +517,19 @@ class Summands( ancestryModule.ancestry ):
         xmlList[-1] += '</%s>' % self.moniker
         return xmlList
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         for child in element :
-            if child.tag == add.moniker :
-                self.append( add.parseXMLNode( child, xPath, linkData ) )
-            elif child.tag == subtract.moniker :
-                self.append( subtract.parseXMLNode( child, xPath, linkData ) )
+            if child.tag == Add.moniker :
+                self.append(Add.parseNodeUsingClass(child, xPath, linkData, **kwargs))
+            else:
+                raise TypeError('Unsupported child node "%s" of node "%s".' % (child.tag, self.moniker))
 
         xPath.pop( )
 
-class add( linkModule.link ):
+class Add( linkModule.Link ):
     """Link representing one of the quantities that is added to the sum."""
 
     moniker = 'add'
-
-class subtract( linkModule.link ):
-    """Link representing one of the quantities that is subtracted from the sum."""
-
-    moniker = 'subtract'

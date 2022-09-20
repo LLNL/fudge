@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -24,7 +24,7 @@ import math
 from fudge.core.utilities import fudgeFileMisc, fudgeExceptions
 from fudge.vis.gnuplot import plotbase
 from LUPY import subprocessing
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 
 from brownies.legacy.endl import fudgemisc
 
@@ -851,8 +851,8 @@ class endl2dmath :
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ) )
         xMax = min( xMax, self.xMax( ) )
-        self_ = XYsModule.XYs1d( self.data, axes = XYsModule.XYs1d.defaultAxes( ) )
-        return( float( self_.integrate( xMin, xMax ) ) )
+        self_ = XYs1dModule.XYs1d( self.data, axes = XYs1dModule.XYs1d.defaultAxes( ) )
+        return self_.integrate(xMin, xMax)
 
     def integrateTwoFunctions( self, other, xMin = None, xMax = None ) :
         """Returns the integral of self and other from xMin to xMax."""
@@ -862,8 +862,8 @@ class endl2dmath :
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ), other.xMin( ) )
         xMax = min( xMax, self.xMax( ), other.xMax( ) )
-        self_ = XYsModule.XYs1d( self.data, axes = XYsModule.XYs1d.defaultAxes( ) )
-        other_ = XYsModule.XYs1d( other.data, axes = XYsModule.XYs1d.defaultAxes( ) )
+        self_ = XYs1dModule.XYs1d( self.data, axes = XYs1dModule.XYs1d.defaultAxes( ) )
+        other_ = XYs1dModule.XYs1d( other.data, axes = XYs1dModule.XYs1d.defaultAxes( ) )
         return( self_.integrateTwoFunctions( other_, xMin, xMax ) )
 
     def integrateThreeFunctions( self, other1, other2, xMin = None, xMax = None ) :
@@ -875,9 +875,9 @@ class endl2dmath :
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ), other1.xMin( ), other1.xMin( ) )
         xMax = min( xMax, self.xMax( ), other1.xMax( ), other2.xMax( ) )
-        self_ = XYsModule.XYs1d( self.data, axes = XYsModule.XYs1d.defaultAxes( ) )
-        other1_ = XYsModule.XYs1d( other1.data, axes = XYsModule.XYs1d.defaultAxes( ) )
-        other2_ = XYsModule.XYs1d( other2.data, axes = XYsModule.XYs1d.defaultAxes( ) )
+        self_ = XYs1dModule.XYs1d( self.data, axes = XYs1dModule.XYs1d.defaultAxes( ) )
+        other1_ = XYs1dModule.XYs1d( other1.data, axes = XYs1dModule.XYs1d.defaultAxes( ) )
+        other2_ = XYs1dModule.XYs1d( other2.data, axes = XYs1dModule.XYs1d.defaultAxes( ) )
         return( self_.integrateThreeFunctions( other1_, other2_, xMin, xMax ) )
 
     def union( self, other, xDomainUnionOnly = False ) :
@@ -1056,7 +1056,7 @@ class endl2dmath :
         if ( xLabel is None ) and not( self.xLabel is None ) : xLabel = self.xLabel
         if ( yLabel is None ) and not( self.yLabel is None ) : yLabel = self.yLabel
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
-        f = fudgeFileMisc.fudgeTempFile( )
+        f = fudgeFileMisc.FudgeTempFile( )
         for p in self.data : f.write( "%15.7e %14.6e\n" % ( p[0], p[1] ) )
         f.close( )
         p = os.path.join( __file__.split( 'fudge/legacy/' )[0], "fudge", "vis", "gnuplot", "endl2dplot.py" )
@@ -1432,7 +1432,7 @@ class endl2dmath :
         """
 
         linear = self.toInterpolation( 0, accuracy )
-        linearXYs = XYsModule.XYs1d( linear.data, axes = XYsModule.XYs1d.defaultAxes( ) )
+        linearXYs = XYs1dModule.XYs1d( linear.data, axes = XYs1dModule.XYs1d.defaultAxes( ) )
         if( cls is not None ) : linearXYs = cls.returnAsClass( linearXYs )
         return( linearXYs )
 

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,15 +8,13 @@
 import sys
 import datetime
 
-__metaclass__ = type
+from LUPY import enums as enumsModule
 
-class Resolution :
+class Resolution(enumsModule.Enum):
 
-    date = 'date'
-    time = 'time'
-    undefined = 'undefined'
-
-    allowed = ( date, time, undefined )
+    date = enumsModule.auto()
+    time = enumsModule.auto()
+    undefined = enumsModule.auto()
 
 class Date :
     """
@@ -29,8 +27,7 @@ class Date :
 
     def __init__( self, _datetime = None, resolution = Resolution.date, UTC = False ) :
 
-        if( resolution not in Resolution.allowed ) : raise TypeError( 'Invalid resolution instance.' )
-        self.__resolution = resolution
+        self.__resolution = Resolution.checkEnumOrString(resolution)
 
         self.__datetime = None
         if( resolution == Resolution.undefined ) : return

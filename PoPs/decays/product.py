@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,7 +12,7 @@ This module contains the decay product classes.
 from .. import misc as miscModule
 from .. import suite as suiteModule
 
-class product( miscModule.classWithLabelKey ) :
+class Product( miscModule.ClassWithLabelKey ) :
 
     moniker = 'product'
 
@@ -22,7 +22,7 @@ class product( miscModule.classWithLabelKey ) :
         :param pid: PoPs id for the emitted particle
         """
 
-        miscModule.classWithLabelKey.__init__( self, label )
+        miscModule.ClassWithLabelKey.__init__( self, label )
 
         if( not( isinstance( label, str ) ) ) : raise TypeError( 'label not str' )
         self.__label = label
@@ -43,16 +43,12 @@ class product( miscModule.classWithLabelKey ) :
 
         return( self.__class__( self.label, self.pid ) )
 
-    def toXML( self, indent = "", **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         XMLStringList = [ '%s<%s label="%s" pid="%s"/>' % ( indent, self.moniker, self.label, self.pid ) ]
         return( XMLStringList )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
@@ -60,30 +56,30 @@ class product( miscModule.classWithLabelKey ) :
         return( self )
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
         self = cls( element.get('label'), element.get('pid') )
         xPath.pop( )
 
-        self.parseXMLNode( element, xPath, linkData )
+        self.parseNode(element, xPath, linkData, **kwargs)
         return( self )
 
-class suite( suiteModule.suite ) :
+class Suite( suiteModule.Suite ) :
 
     moniker = 'products'
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, ( product, ) )
+        suiteModule.Suite.__init__( self, ( Product, ) )
 
-    def parseXMLNode( self, element, xPath, linkData ) :
+    def parseNode(self, element, xPath, linkData, **kwargs):
 
         if( element is None ) : return
         xPath.append( element.tag )
 
         for child in element :
-            self.add( product.parseXMLNodeAsClass( child, xPath, linkData ) )
+            self.add(Product.parseNodeUsingClass(child, xPath, linkData, **kwargs))
 
         xPath.pop( )
         return( self )

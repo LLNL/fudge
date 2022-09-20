@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,20 +12,22 @@ from pqu import PQU as PQUModule
 
 from numericalFunctions import pointwiseXY as pointwiseXYClass
 
-from PoPs.groups import chemicalElement as chemicalElementPoPsModule
+from PoPs.chemicalElements import chemicalElement as chemicalElementPoPsModule
 
-from xData import ancestry as ancestryModule
-from xData import standards as standardsModule
+from LUPY import ancestry as ancestryModule
+
+from xData import enums as xDataEnumsModule
 from xData import base as xDataBaseModule
 from xData import axes as axesModule
 from xData import link as linkModule
 from xData import values as valuesModule
 from xData import Ys1d as Ys1dModule
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 from xData import uncertainties as uncertaintiesModule
 from xData import regions as regionsModule
 from xData import gridded as griddedModule
 
+from fudge import enums as enumsModule
 from fudge.processing import group as groupModule
 
 from fudge import abstractClasses as abstractClassesModule
@@ -33,39 +35,44 @@ from fudge import styles as stylesModule
 
 from . import URR_probabilityTables as URR_probabilityTablesModule
 
-__metaclass__ = type
 
 lowerEps = 1e-8
 upperEps = 1e-8
 
 def defaultAxes( energyUnit ) :
 
-    axes = axesModule.axes( rank = 2 )
-    axes[0] = axesModule.axis( component.moniker, 0, 'b' )
-    axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
+    axes = axesModule.Axes(2)
+    axes[0] = axesModule.Axis( Component.moniker, 0, 'b' )
+    axes[1] = axesModule.Axis( 'energy_in', 1, energyUnit )
     return( axes )
 
 #
 # crossSection forms.
 #
-class baseCrossSectionForm( abstractClassesModule.form ) :
+class BaseCrossSectionForm( abstractClassesModule.Form ) :
 
-    pass
+    keyName = 'label'
 
-class Ys1d( baseCrossSectionForm, Ys1dModule.Ys1d ) :
+class Ys1d( BaseCrossSectionForm, Ys1dModule.Ys1d ) :
+
+    def __init__( self, **kwargs ) :
+
+        BaseCrossSectionForm.__init__(self)
+        Ys1dModule.Ys1d.__init__(self, **kwargs)
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
         if( 'cls' not in kwargs ) : kwargs['cls'] = XYs1d
         return( Ys1dModule.Ys1d.toPointwise_withLinearXYs( self, **kwargs ) )
 
-class XYs1d( baseCrossSectionForm, XYsModule.XYs1d ) :
+class XYs1d( BaseCrossSectionForm, XYs1dModule.XYs1d ) :
 
     mutableYUnit = False
 
     def __init__( self, **kwargs ) :
 
-        XYsModule.XYs1d.__init__( self, **kwargs )
+        BaseCrossSectionForm.__init__(self)
+        XYs1dModule.XYs1d.__init__( self, **kwargs )
 
     def changeInterpolation( self, interpolation, accuracy, lowerEps = 0, upperEps = 0, cls = None ) :
 
@@ -89,19 +96,31 @@ class XYs1d( baseCrossSectionForm, XYsModule.XYs1d ) :
             return( math.pow( x1 * y1, 1 - alpha ) * math.pow( x2 * y2, alpha ) / x )
 
         if( cls is None ) : cls = XYs1d 
-        if( self.interpolation == standardsModule.interpolation.chargedParticleToken ) :
-            if( interpolation != standardsModule.interpolation.linlinToken ) : raise TypeError( 'Only "%s" interpolation for conversion from %s' %
-                    ( standardsModule.interpolation.linlinToken, self.interpolation ) )
+        if self.interpolation == xDataEnumsModule.Interpolation.chargedParticle:
+            if interpolation != xDataEnumsModule.Interpolation.linlin:
+                raise TypeError('Only "%s" interpolation for conversion from %s' % (xDataEnumsModule.Interpolation.linlin, self.interpolation))
             temp = self.cloneToInterpolation( interpolation )
             parameters = [ temp, 0, [ None, None, None, None, None, None ] ]
             return( temp.applyFunction( func, parameters, accuracy = accuracy, biSectionMax = -1, checkForRoots = False ) )
 
-        return( XYsModule.XYs1d.changeInterpolation( self, interpolation, accuracy, lowerEps = lowerEps,
+        return( XYs1dModule.XYs1d.changeInterpolation( self, interpolation, accuracy, lowerEps = lowerEps,
                 upperEps = upperEps, cls = cls ) )
+
+    def effectiveThreshold(self):
+        """
+        Some reactions have a cross section with multiple zero values at their beginning. In such a case, the effective threshold is the point
+        before the first non-zero cross section value. Otherwise, it is the energy of the first point.
+        """
+
+        for index, [x, y] in enumerate(self):
+            if y != 0: break
+
+        if index > 0: index -= 1
+        return self[index][0]
 
     def evaluate( self, xValue ) :
 
-        if( self.interpolation == standardsModule.interpolation.chargedParticleToken ) :
+        if self.interpolation == xDataEnumsModule.Interpolation.chargedParticle:
             if( xValue > self.domainMax ) :
                 raise Exception( 'Evaluation of "%s" intepolation not support above domain' % self.interpolation )
             elif( xValue < self.domainMin ) :
@@ -118,7 +137,7 @@ class XYs1d( baseCrossSectionForm, XYsModule.XYs1d ) :
             alpha = ( fValue - f1 ) / ( f2 - f1 )
             return( math.pow( x1 * y1, 1.0 - alpha ) * math.pow( x2 * y2, alpha ) / xValue )
 
-        return( XYsModule.XYs1d.evaluate( self, xValue ) )
+        return( XYs1dModule.XYs1d.evaluate( self, xValue ) )
 
     def heat( self, currentTemperature, newTemperature, massRatio, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.001, 
                 heatAllPoints = False, doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True,
@@ -179,21 +198,21 @@ class XYs1d( baseCrossSectionForm, XYsModule.XYs1d ) :
 
         def styleFilter( style ) :
 
-            if( isinstance( style, stylesModule.griddedCrossSection ) ) : return( False )
+            if( isinstance( style, stylesModule.GriddedCrossSection ) ) : return( False )
             return( True )
 
         if( tempInfo['verbosity'] > 2 ) : print( '%sMulti-grouping XYs1d cross section' % indent )
 
         crossSectionGrouped = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, self, styleFilter = styleFilter )
-        return( groupModule.toMultiGroup1d( gridded1d, style, tempInfo, self.axes, crossSectionGrouped, zeroPerTNSL = tempInfo['zeroPerTNSL'] ) )
+        return( groupModule.toMultiGroup1d( Gridded1d, style, tempInfo, self.axes, crossSectionGrouped, zeroPerTNSL = tempInfo['zeroPerTNSL'] ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        ptw = XYsModule.XYs1d.toPointwise_withLinearXYs( self, cls = XYs1d, hh = True, **kwargs )
+        ptw = XYs1dModule.XYs1d.toPointwise_withLinearXYs( self, cls = XYs1d, hh = True, **kwargs )
         ptw.label = self.label
         return( ptw )
 
-    def toXMLList( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
 
         def dataToString( self, dummy, indent = '', **kwargs ) :
 
@@ -228,9 +247,9 @@ class XYs1d( baseCrossSectionForm, XYsModule.XYs1d ) :
 
         kwargs['dataToString'] = dataToString
         kwargs['dataToStringParent'] = None
-        return( XYsModule.XYs1d.toXMLList( self, indent, **kwargs ) )
+        return( XYs1dModule.XYs1d.toXML_strList( self, indent, **kwargs ) )
 
-class regions1d( baseCrossSectionForm, regionsModule.regions1d ) :
+class Regions1d( BaseCrossSectionForm, regionsModule.Regions1d ) :
     """
     This class stores a cross section in two or more regions, which may have different interpolations.
     Each region must contain at least two points. Each pair of adjacent regions must overlap at exactly one point.
@@ -238,7 +257,23 @@ class regions1d( baseCrossSectionForm, regionsModule.regions1d ) :
 
     def __init__( self, **kwargs ) :
 
-        regionsModule.regions1d.__init__( self, **kwargs )
+        BaseCrossSectionForm.__init__(self)
+        regionsModule.Regions1d.__init__( self, **kwargs )
+
+    def effectiveThreshold(self):
+        """
+        Some reactions have a cross section with multiple zero values at their beginning. In such a case, the effective threshold is the point
+        before the first non-zero cross section value. Otherwise, it is the energy of the first point.
+        """
+
+        for region in self:
+            if isinstance(region, XYs1d):
+                if region.rangeMax != 0.0:
+                    return region.effectiveThreshold()
+            else:
+                raise TypeError('Region of type "%s" not supported.' % type(region))
+
+        return self[-1].domainMax
 
     def processMultiGroup( self, style, tempInfo, indent ) :
 
@@ -251,48 +286,47 @@ class regions1d( baseCrossSectionForm, regionsModule.regions1d ) :
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, **kwargs )
+        xys = regionsModule.Regions1d.toPointwise_withLinearXYs( self, **kwargs )
         return( XYs1d( data = xys, axes = xys.axes ) )
 
-    def ysMappedToXs( self, cls, grid, label = None ) :
+    def ysMappedToXs(self, cls, grid, label=None):
 
         start = 0
         allYs = []
-        for i1, region in enumerate( self ) :
-            offset, Ys = pointwiseXYClass.ysMappedToXs( region, grid.values )
-            if( i1 == 0 ) :
+        for i1, region in enumerate(self):
+            offset, Ys = pointwiseXYClass.ysMappedToXs(region, grid.values)
+            if i1 == 0:
                 allYs = Ys
                 start = offset
-            else :
+            else:
                 allYs += Ys[1:]
 
-        allYs += ( len( grid.values ) - ( start + len( allYs ) ) ) * [ 0.0 ]
+        allYs += (len(grid.values) - (start + len(allYs))) * [0.0]
 
-        Ys1d = cls( valuesModule.values( allYs, start = start ), axes = self.axes.copy( ), label = label )
-        Ys1d.axes[1] = linkModule.link2( grid.moniker, instance = grid, keyName = 'index', keyValue = 1 )
-        return( Ys1d )
+        ys1d = cls(Ys=valuesModule.Values(allYs, start=start), axes=self.axes.copy(), label=label)
+        ys1d.axes[1] = linkModule.Link2(grid.moniker, instance=grid)
+        return ys1d
 
     @staticmethod
     def allowedSubElements( ) :
 
         return( ( XYs1d, ) )
 
-class gridded1d( baseCrossSectionForm, griddedModule.gridded1d ) :
+class Gridded1d(BaseCrossSectionForm, griddedModule.Gridded1d):
 
-    def __init__( self, **kwargs ) :
+    def __init__(self, axes, array, **kwargs):
 
-        griddedModule.gridded1d.__init__( self, **kwargs )
+        BaseCrossSectionForm.__init__(self)
+        griddedModule.Gridded1d.__init__(self, axes, array, **kwargs)
 
-class resonanceLink( linkModule.link ) :
+class ResonanceLink( linkModule.Link ) :
 
     moniker = 'resonances'
 
-class backgroundTerm( ancestryModule.ancestry ):
-
-    __metaclass__ = abc.ABCMeta
+class BackgroundTerm( ancestryModule.AncestryIO, abc.ABC ):
 
     def __init__(self, data):
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.__data = data
         self.__data.setAncestor( self )
 
@@ -310,56 +344,68 @@ class backgroundTerm( ancestryModule.ancestry ):
 
     @property
     def regions1d(self):
-        if isinstance(self.__data, regions1d): return self.__data
+        if isinstance(self.__data, Regions1d): return self.__data
         raise KeyError("No regions1d data found in the %s background section" % self.moniker)
 
     def convertUnits(self, unitMap):
         self.data.convertUnits(unitMap)
 
-    def toXMLList( self, indent="", **kwargs ):
+    def fixDomains(self, energyMin, energyMax, ancestorReference):
+        """
+        Calls the **fixDomains** for the **data** member.
+        """
+
+        counter = self.data.fixDomains(energyMin, energyMax, xDataEnumsModule.FixDomain.upper)
+
+        return counter
+
+    def toXML_strList( self, indent="", **kwargs ):
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
         xml = ['%s<%s>' % (indent, self.moniker)]
-        xml += self.data.toXMLList(indent2, **kwargs)
+        xml += self.data.toXML_strList(indent2, **kwargs)
         xml[-1] += '</%s>' % self.moniker
         return xml
 
     @classmethod
-    def parseXMLNode(cls, element, xPath, linkData):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
+
         child = element[0]
         if child.tag == XYs1d.moniker:
-            data = XYs1d.parseXMLNode(child, xPath, linkData)
-        elif child.tag == regions1d.moniker:
-            data = regions1d.parseXMLNode(child, xPath, linkData)
+            data = XYs1d.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+        elif child.tag == Regions1d.moniker:
+            data = Regions1d.parseNodeUsingClass(child, xPath, linkData, **kwargs)
         else:
             raise ValueError("Encountered unexpected element '%s' in %s" % (child.tag, element.tag))
 
         background_ = cls(data)
+
         xPath.pop()
+
         return background_
 
-class resolvedRegion( backgroundTerm ):
+class ResolvedRegion( BackgroundTerm ):
 
     moniker = 'resolvedRegion'
 
-class unresolvedRegion( backgroundTerm ):
+class UnresolvedRegion( BackgroundTerm ):
 
     moniker = 'unresolvedRegion'
 
-class fastRegion( backgroundTerm ):
+class FastRegion( BackgroundTerm ):
 
     moniker = 'fastRegion'
 
-class background( ancestryModule.ancestry ):
+class Background( ancestryModule.AncestryIO ):
 
     moniker = 'background'
     ancestryMembers = ('resolvedRegion', 'unresolvedRegion', 'fastRegion')
 
     def __init__(self, resolvedRegion=None, unresolvedRegion=None, fastRegion=None):
 
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.resolvedRegion = resolvedRegion
         self.unresolvedRegion = unresolvedRegion
         self.fastRegion = fastRegion
@@ -374,7 +420,7 @@ class background( ancestryModule.ancestry ):
 
     @resolvedRegion.setter
     def resolvedRegion(self, data):
-        if isinstance(data, resolvedRegion):
+        if isinstance(data, ResolvedRegion):
             data.setAncestor(self)
         elif data is not None:
             raise TypeError("Expected resolvedRegion instance, got %s instead" % type(data))
@@ -386,7 +432,7 @@ class background( ancestryModule.ancestry ):
 
     @unresolvedRegion.setter
     def unresolvedRegion( self, data ):
-        if isinstance(data, unresolvedRegion):
+        if isinstance(data, UnresolvedRegion):
             data.setAncestor(self)
         elif data is not None:
             raise TypeError("Expected unresolvedRegion instance, got %s instead" % type(data))
@@ -398,7 +444,7 @@ class background( ancestryModule.ancestry ):
 
     @fastRegion.setter
     def fastRegion( self, data ):
-        if isinstance(data, fastRegion):
+        if isinstance(data, FastRegion):
             data.setAncestor(self)
         elif data is not None:
             raise TypeError("Expected fastRegion instance, got %s instead" % type(data))
@@ -431,13 +477,32 @@ class background( ancestryModule.ancestry ):
             if term_ is not None:
                 term_.convertUnits(unitMap)
 
+    def fixDomains(self, energyMin, energyMax):
+        """
+        Calls the **fixDomains** for the *fastRegion* member.
+        """
+
+        counter = 0
+        if self.__resolvedRegion is not None:
+            counter += self.__resolvedRegion.fixDomains(energyMin, energyMax, self.__resolvedRegion)
+        if self.__unresolvedRegion is not None:
+            counter += self.__unresolvedRegion.fixDomains(energyMin, energyMax, self.__unresolvedRegion)
+            if len(self.__unresolvedRegion.data) == 0:
+                self.__unresolvedRegion = None
+        if self.__fastRegion is not None:
+            counter += self.__fastRegion.fixDomains(energyMin, energyMax, self.__fastRegion)
+            if len(self.__fastRegion.data) == 0:
+                self.__fastRegion = None
+
+        return counter
+
     def toRegions( self ):
         """
-        Merge all background terms into a single regions1d
+        Merge all background terms into a single Regions1d
         :return:
         """
 
-        regions = regions1d()
+        regions = Regions1d()
         axes = None
         for term in (self.resolvedRegion, self.unresolvedRegion, self.fastRegion):
             if term is None: continue
@@ -449,7 +514,7 @@ class background( ancestryModule.ancestry ):
 
             if isinstance(term.data, XYs1d):
                 regions.append(term.data.copy())
-            elif isinstance(term.data, regions1d):
+            elif isinstance(term.data, Regions1d):
                 for region in term.data:
                     regions.append(region.copy())
         regions.axes = axes
@@ -458,40 +523,44 @@ class background( ancestryModule.ancestry ):
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
         regions = self.toRegions()
-        xys = regionsModule.regions1d.toPointwise_withLinearXYs( regions, **kwargs )
+        xys = regionsModule.Regions1d.toPointwise_withLinearXYs( regions, **kwargs )
+        XYs1d( data = xys, axes = regions.axes )
         return( XYs1d( data = xys, axes = regions.axes ) )
 
-    def toXMLList( self, indent="", **kwargs ):
+    def toXML_strList( self, indent="", **kwargs ):
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
         xml = ['%s<%s>' % (indent, self.moniker)]
         for child in (self.resolvedRegion, self.unresolvedRegion, self.fastRegion):
             if child is not None:
-                xml += child.toXMLList(indent2, **kwargs)
+                xml += child.toXML_strList(indent2, **kwargs)
         xml[-1] += '</%s>' % self.moniker
         return xml
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append(element.tag)
+
         resolved = unresolved = fast = None
         for child in element:
-            if child.tag == resolvedRegion.moniker:
-                resolved = resolvedRegion.parseXMLNode(child, xPath, linkData)
-            elif child.tag == unresolvedRegion.moniker:
-                unresolved = unresolvedRegion.parseXMLNode(child, xPath, linkData)
-            elif child.tag == fastRegion.moniker:
-                fast = fastRegion.parseXMLNode(child, xPath, linkData)
+            if child.tag == ResolvedRegion.moniker:
+                resolved = ResolvedRegion.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            elif child.tag == UnresolvedRegion.moniker:
+                unresolved = UnresolvedRegion.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            elif child.tag == FastRegion.moniker:
+                fast = FastRegion.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             else:
                 raise ValueError("Encountered unexpected element '%s' in %s" % (child.tag, element.tag))
 
         background_ = cls(resolved, unresolved, fast)
+
         xPath.pop()
+
         return background_
 
 
-class resonancesWithBackground( baseCrossSectionForm ) :
+class ResonancesWithBackground( BaseCrossSectionForm ) :
     """
     This class stores cross sections that include resonances along with a background contribution.
     Contains a link to the resonances, and the 'background' which consists of up to three terms:
@@ -505,7 +574,7 @@ class resonancesWithBackground( baseCrossSectionForm ) :
 
     def __init__( self, label, resonances, background, uncertainty=None ) :
 
-        baseCrossSectionForm.__init__( self )
+        BaseCrossSectionForm.__init__( self )
 
         if not isinstance( label, str ): raise TypeError( 'label must be a string' )
         self.__label = label
@@ -519,8 +588,8 @@ class resonancesWithBackground( baseCrossSectionForm ) :
 
     @resonances.setter
     def resonances(self, value):
-        if not isinstance(value, resonanceLink):
-            raise TypeError("Expected resonancLink instance, got %s instead" % type(value))
+        if not isinstance(value, ResonanceLink):
+            raise TypeError("Expected ResonanceLink instance, got %s instead" % type(value))
         self.__resonances = value
         self.__resonances.setAncestor(self)
 
@@ -529,7 +598,7 @@ class resonancesWithBackground( baseCrossSectionForm ) :
 
     @background.setter
     def background(self, value):
-        if not isinstance(value, background):
+        if not isinstance(value, Background):
             raise TypeError("Expected background instance, got %s instead" % type(value))
         self.__background = value
         self.__background.setAncestor(self)
@@ -540,7 +609,7 @@ class resonancesWithBackground( baseCrossSectionForm ) :
 
     @uncertainty.setter
     def uncertainty(self, data):
-        if isinstance(data, uncertaintiesModule.uncertainty):
+        if isinstance(data, uncertaintiesModule.Uncertainty):
             data.setAncestor(self)
         elif data is not None:
             raise TypeError("Expected uncertainty instance, got %s insteand" % type(data))
@@ -580,49 +649,61 @@ class resonancesWithBackground( baseCrossSectionForm ) :
 
         return( self.ancestor.processMultiGroup( style, tempInfo, indent ) )
 
+    def fixDomains(self, energyMin, energyMax, domainToFix):
+        """
+        Calls the **fixDomains** for the *background* member.
+        """
+
+        return self.background.fixDomains(energyMin, energyMax)
+
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        _component = self.findClassInAncestry( component )
-        reconstructed = _component.getStyleOfClass( stylesModule.crossSectionReconstructed )
+        _component = self.findClassInAncestry( Component )
+        reconstructed = _component.getStyleOfClass( stylesModule.CrossSectionReconstructed )
         if( reconstructed is self ) : reconstructed = None                  # Happens when there is no reconstructed data, probably because reconstruction failed.
         if( reconstructed is not None ) :
             return( reconstructed.toPointwise_withLinearXYs( **kwargs ) )     # Return a copy.
         raise Exception( 'resonancesWithBackground cross section has not been reconstructed via reactionSuite.reconstructResonances: %s' % self.toXLink( ) )
 
-    def toXMLList( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlList = [ '%s<%s label="%s">' % ( indent, self.moniker, self.label ) ]
         xmlList.append( self.resonances.toXML( indent2, **kwargs ) )
-        xmlList += self.background.toXMLList( indent2, **kwargs )
+        xmlList += self.background.toXML_strList( indent2, **kwargs )
         if self.uncertainty is not None:
-            xmlList += self.uncertainty.toXMLList( indent2, **kwargs )
+            xmlList += self.uncertainty.toXML_strList( indent2, **kwargs )
         xmlList[-1] += '</%s>' % self.moniker
         return( xmlList )
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
-        link = resonanceLink.parseXMLNode( element.find(resonanceLink.moniker), xPath, linkData )
-        background_ = background.parseXMLNode( element.find(background.moniker), xPath, linkData )
-        uncertainty = element.find(uncertaintiesModule.uncertainty.moniker)
-        if uncertainty is not None:
-            uncertainty = uncertaintiesModule.uncertainty.parseXMLNode(uncertainty, xPath, linkData)
+
+        link = ResonanceLink.parseNodeUsingClass(element.find(ResonanceLink.moniker), xPath, linkData, **kwargs)
+        background_ = Background.parseNodeUsingClass(element.find(Background.moniker), xPath, linkData, **kwargs)
+        uncertainty = None
+        uncertaintyNode = element.find(uncertaintiesModule.Uncertainty.moniker)
+        if uncertaintyNode is not None:
+            uncertainty = uncertaintiesModule.Uncertainty()
+            uncertainty.parseNode(uncertaintyNode, xPath, linkData, **kwargs)
         resWithBack = cls( element.get( 'label' ), link, background_, uncertainty )
+
         xPath.pop()
+
         return resWithBack
     
-class reference( linkModule.link, baseCrossSectionForm ) :
+class Reference( linkModule.Link, BaseCrossSectionForm ) :
     """This cross section form consists of a reference to another cross section."""
 
     moniker = 'reference'
 
     def __init__( self, link = None, root = None, path = None, label = None, relative = False ) :
 
-        linkModule.link.__init__(self, link = link, root = root, path = path, label = label, relative = relative )
-        baseCrossSectionForm.__init__( self )
+        linkModule.Link.__init__(self, link = link, root = root, path = path, label = label, relative = relative )
+        BaseCrossSectionForm.__init__( self )
 
     @property
     def crossSection( self ) :
@@ -650,13 +731,18 @@ class reference( linkModule.link, baseCrossSectionForm ) :
 
         pass
 
+    def fixDomains(self, labels, energyMin, energyMax):
+        """This method does nothing."""
+
+        return 0
+
     def getReference( self ) :
 
         return( self.crossSection )
 
     def setReference( self, crossSection ) :    # FIXME delete? Not used + broken (self.crossSection has no setter)
 
-        if( not( isinstance( crossSection, (component, None.__class__) ) ) ) :
+        if( not( isinstance( crossSection, (Component, None.__class__) ) ) ) :
             raise TypeError( 'crossSection argument must be a cross section component not type %s' % type( crossSection ) )
         self.crossSection = crossSection
 
@@ -677,28 +763,29 @@ class reference( linkModule.link, baseCrossSectionForm ) :
 
         from fudge import warning
         warnings = []
-        if self.getRootAncestor() != self.getReference().getRootAncestor():
-            warnings.append( warning.badCrossSectionReference() )
+        if self.rootAncestor != self.getReference().rootAncestor:
+            warnings.append( warning.BadCrossSectionReference() )
         return warnings
 
-class CoulombPlusNuclearElastic( reference ) :
+class CoulombPlusNuclearElastic( Reference ) :
     """Special type of link to doubleDifferentialCrossSection/chargedParticleElastic."""
 
     moniker = "CoulombPlusNuclearElastic"
 
-class thermalNeutronScatteringLaw1d( reference ) :
+class ThermalNeutronScatteringLaw1d( Reference ) :
     """Special type of link to doubleDifferentialCrossSection/thermalNeutronScatteringLaw."""
 
     moniker = 'thermalNeutronScatteringLaw1d'
 
-class URR_probabilityTables1d( baseCrossSectionForm, xDataBaseModule.xDataFunctional ) :
+class URR_probabilityTables1d( BaseCrossSectionForm, xDataBaseModule.XDataFunctional ) :
 
     moniker = 'URR_probabilityTables1d'
+    dimension = 1
 
     def __init__( self, label, URR_probabilityTables ) :
 
-        baseCrossSectionForm.__init__( self )
-        xDataBaseModule.xDataFunctional.__init__( self, self.moniker, None, label = label )
+        BaseCrossSectionForm.__init__( self )
+        xDataBaseModule.XDataFunctional.__init__(self, axes=None, label=label)
 
         if( not isinstance( URR_probabilityTables, URR_probabilityTablesModule.XYs2d ) ) : raise TypeError( 'Invalid URR probability tables instance.' )
         self.__data = URR_probabilityTables
@@ -716,32 +803,33 @@ class URR_probabilityTables1d( baseCrossSectionForm, xDataBaseModule.xDataFuncti
 
         self.__data.convertUnits( unitMap )
 
-    def toXMLList( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
     
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlList = [ '%s<%s label="%s">' % ( indent, self.moniker, self.label ) ]
-        xmlList += self.__data.toXMLList( indent = indent2, **kwargs )
+        xmlList += self.__data.toXML_strList( indent = indent2, **kwargs )
         xmlList[-1] += '</%s>' % self.moniker
 
         return( xmlList )
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         items = {}
         for child in element :
-            for cls in [ URR_probabilityTablesModule.XYs2d ] :
-                if( child.tag == cls.moniker ) :
-                    items[child.tag] = cls.parseXMLNode( child, xPath, linkData )
+            for cls2 in [ URR_probabilityTablesModule.XYs2d ] :
+                if( child.tag == cls2.moniker ) :
+                    items[child.tag] = cls2.parseNodeUsingClass(child, xPath, linkData, **kwargs)
                     break
 
         function2d = items[list(items.keys())[0]]
-        URR_probability_tables1d = URR_probabilityTables1d( element.get( 'label' ), function2d )
+        URR_probability_tables1d = cls( element.get( 'label' ), function2d )
 
         xPath.pop( )
+
         return( URR_probability_tables1d )
 
 def chargeParticle_changeInterpolationSubFunction( threshold, x, x1, y1, x2, y2 ) :
@@ -754,14 +842,14 @@ def chargeParticle_changeInterpolationSubFunction( threshold, x, x1, y1, x2, y2 
 #
 # crossSection component
 #
-class component( abstractClassesModule.component ) :
+class Component( abstractClassesModule.Component ) :
 
     moniker = 'crossSection'
 
     def __init__( self ) :
 
-        abstractClassesModule.component.__init__( self,
-                ( Ys1d, XYs1d, regions1d, gridded1d, resonancesWithBackground, reference, URR_probabilityTables1d, CoulombPlusNuclearElastic, thermalNeutronScatteringLaw1d ) )
+        abstractClassesModule.Component.__init__( self,
+                ( Ys1d, XYs1d, Regions1d, Gridded1d, ResonancesWithBackground, Reference, URR_probabilityTables1d, CoulombPlusNuclearElastic, ThermalNeutronScatteringLaw1d ) )
 
     def domainUnitConversionFactor( self, unitTo ) :
 
@@ -796,6 +884,21 @@ class component( abstractClassesModule.component ) :
             diffResults.append( 'Cross section thresholds differ', 'relative error = %.6e: %.12e vs %.12e %s' % 
                     ( relativeError, crossSection1.domainMin, crossSection2.domainMin, crossSection1.domainUnit ), self.toXLink( ), other.toXLink( ) )
 
+    def effectiveThreshold(self):
+        """
+        Some reactions have a cross section with multiple zero values at their beginning. In such a case, the effective threshold is the point
+        before the first non-zero cross section value. If an effective threshold cannot be determined, then domainMin is returned.
+        """
+
+        evaluated = self.evaluated
+        if hasattr(evaluated, 'effectiveThreshold'):
+            try:
+                return evaluated.effectiveThreshold()
+            except:
+                pass
+
+        return self.domainMin
+
     def hasLinearForm( self ) :
 
         for form in self :
@@ -814,7 +917,7 @@ class component( abstractClassesModule.component ) :
 
         styles = self.findAttributeInAncestry( 'styles' )
         currentstyle = styles[style.derivedFrom]
-        if( not( isinstance( currentstyle, ( stylesModule.evaluated, stylesModule.heated ) ) ) ) :
+        if( not( isinstance( currentstyle, ( stylesModule.Evaluated, stylesModule.Heated ) ) ) ) :
             TypeError( 'Form to heat is not heatable form: its style moniker is "%s"' % style.label )
         currentTemperature = PQUModule.PQU( currentstyle.temperature.getValueAs( 'K' ), 'K' ) * PQUModule.PQU( '1 k' )
         currentTemperature = currentTemperature.getValueAs( self.domainUnit )
@@ -822,7 +925,7 @@ class component( abstractClassesModule.component ) :
         newTemperature = PQUModule.PQU( style.temperature.getValueAs( 'K' ), 'K' ) * PQUModule.PQU( '1 k' )
         newTemperature = newTemperature.getValueAs( self.domainUnit )
 
-        reactionSuite = self.getRootAncestor( )
+        reactionSuite = self.rootAncestor
         projectile = reactionSuite.PoPs[reactionSuite.projectile]
         projectileMass = projectile.getMass( 'amu' )
 
@@ -832,7 +935,7 @@ class component( abstractClassesModule.component ) :
 
         if( projectileMass == 0.0 ) :
             massRatio = 0.0
-        elif( isinstance( target, chemicalElementPoPsModule.chemicalElement ) ) :
+        elif( isinstance( target, chemicalElementPoPsModule.ChemicalElement ) ) :
             massRatio = 0.0
         else :
             massRatio = target.getMass( 'amu' ) / projectileMass
@@ -860,7 +963,6 @@ class component( abstractClassesModule.component ) :
         """
 
         from fudge import warning
-        from fudge.reactions import base as reactionsBaseModule
 
         warnings = []
 
@@ -878,13 +980,13 @@ class component( abstractClassesModule.component ) :
                 # otherwise, cross section threshold must agree with Q-value:
                 if thresh.value>0:
                     if abs(thresh-lower) > PQUModule.PQU( info['dThreshold'] ):
-                        warnings.append( warning.threshold_mismatch( lower, thresh, self ) )
+                        warnings.append( warning.Threshold_mismatch( lower, thresh, self ) )
                 elif lower != PQUModule.PQU(info['crossSectionEnergyMin']):
                     # ignore 2nd,3rd,4th-chance fission (they have Q>0 but are still threshold reactions):
                     parent = self.ancestor
                     if( not hasattr( parent, 'outputChannel' ) or \
-                            ( parent.fissionGenre in (None, reactionsBaseModule.FissionGenre.total, reactionsBaseModule.FissionGenre.firstChance))) :
-                        warnings.append( warning.threshold_mismatch( lower, PQUModule.PQU( info['crossSectionEnergyMin'] ), self ) )
+                            ( parent.fissionGenre in (enumsModule.FissionGenre.none, enumsModule.FissionGenre.total, enumsModule.FissionGenre.firstChance))) :
+                        warnings.append( warning.Threshold_mismatch( lower, PQUModule.PQU( info['crossSectionEnergyMin'] ), self ) )
             else:
                 # charged-particle reaction generally doesn't 'turn on' right at threshold due to Coulomb barrier.
                 # In this case, just ensure the cross section stays zero until at or above threshold:
@@ -893,11 +995,11 @@ class component( abstractClassesModule.component ) :
 
         # cross section must extend up to limit (usually 20 MeV):
         if upper < PQUModule.PQU( info['crossSectionEnergyMax'] ):
-            warnings.append( warning.gapInCrossSection( upper, PQUModule.PQU( info['crossSectionEnergyMax'] ),
+            warnings.append( warning.GapInCrossSection( upper, PQUModule.PQU( info['crossSectionEnergyMax'] ),
                 self ) )
 
         evaluatedCrossSection = self.evaluated
-        if( isinstance( evaluatedCrossSection, resonancesWithBackground ) ) :
+        if( isinstance( evaluatedCrossSection, ResonancesWithBackground ) ) :
             # ensure no gaps between resonance and background:
             resonances = info['reactionSuite'].resonances
             if resonances.resolved is not None:
@@ -906,11 +1008,11 @@ class component( abstractClassesModule.component ) :
                 resDomainMax = resonances.unresolved.domainMax
             bckDomainMin = evaluatedCrossSection.background.domainMin
             if bckDomainMin > resDomainMax:
-                warnings.append( warning.gapInCrossSection(resDomainMax,bckDomainMin, self ) )
+                warnings.append( warning.GapInCrossSection(resDomainMax,bckDomainMin, self ) )
             linearCrossSection = self[info['reconstructedStyleName']]
 
-        elif( isinstance( evaluatedCrossSection, reference )
-            and isinstance( evaluatedCrossSection.link, resonancesWithBackground ) ) :
+        elif( isinstance( evaluatedCrossSection, Reference )
+            and isinstance( evaluatedCrossSection.link, ResonancesWithBackground ) ) :
                 linearCrossSection = evaluatedCrossSection.link.ancestor[info['reconstructedStyleName']]
 
         elif isinstance( evaluatedCrossSection, CoulombPlusNuclearElastic ) :
@@ -929,11 +1031,11 @@ class component( abstractClassesModule.component ) :
         if( linearCrossSection.rangeMin < 0 ) :
             for i,(en,xsc) in enumerate(linearCrossSection):
                 if xsc < 0:
-                    warnings.append( warning.negativeCrossSection( PQUModule.PQU(en, linearCrossSection.axes[-1].unit), i, self ) )
+                    warnings.append( warning.NegativeCrossSection( PQUModule.PQU(en, linearCrossSection.axes[-1].unit), i, self ) )
 
         if thresh.value>0:
             if linearCrossSection[0][1] != 0:
-                warnings.append( warning.nonZero_crossSection_at_threshold( linearCrossSection[0][1], self ) )
+                warnings.append( warning.NonZero_crossSection_at_threshold( linearCrossSection[0][1], self ) )
 
         return warnings
 
@@ -941,7 +1043,7 @@ class component( abstractClassesModule.component ) :
 
         for form in self :
             if( form.moniker == entityName ) : return( form )
-        return ancestryModule.ancestry.findEntity( self, entityName, attribute, value )
+        return ancestryModule.Ancestry.findEntity( self, entityName, attribute, value )
 
     def evaluate( self, energyIn ) :
 
@@ -998,8 +1100,8 @@ class component( abstractClassesModule.component ) :
 #                else: return PQUModule.PQU( meanValue, unit = ptwise.rangeUnit() )
 #            else: return PQUModule.PQU( meanValue, unit = ptwise.rangeUnit() )
 #        else:
-#            if covariance is not( isinstance( covariance, covModule.covarianceMatrix ) ):
-#                raise TypeError( 'covariance must be of type covarianceMatrix, got %s'%str(type(covariance)))
+#            if covariance is not( isinstance( covariance, covModule.CovarianceMatrix ) ):
+#                raise TypeError( 'covariance must be of type CovarianceMatrix, got %s'%str(type(covariance)))
 
 #        # Compute uncertainty on convolution given mean value and covariance.
 #        try:
@@ -1027,8 +1129,8 @@ class component( abstractClassesModule.component ) :
                 elif covarianceSuite is not None:
                     covariance = self.evaluated.uncertainty.data.follow(startNode=covarianceSuite)
         else:
-            if covariance is not( isinstance( covariance, covModule.covarianceMatrix ) ):
-                raise TypeError( 'covariance must be of type covarianceMatrix, got %s'%str(type(covariance)))
+            if covariance is not( isinstance( covariance, covModule.CovarianceMatrix ) ):
+                raise TypeError( 'covariance must be of type CovarianceMatrix, got %s'%str(type(covariance)))
 
         return covariance
 
@@ -1078,7 +1180,7 @@ class component( abstractClassesModule.component ) :
 
         """
         # Check that the inputs are of the correct type
-        if not isinstance( f2, XYsModule.XYs1d ): raise TypeError( "spectrum must be an XYs1d instance")
+        if not isinstance( f2, XYs1dModule.XYs1d ): raise TypeError( "spectrum must be an XYs1d instance")
 
         # Convert the cross section toXYs1d 
         ptwise = self.hasLinearForm()
@@ -1151,28 +1253,7 @@ class component( abstractClassesModule.component ) :
 
         crossSection = style.findFormMatchingDerivedStyle( self )
         ys = crossSection.ysMappedToXs( Ys1d, style.grid, label = style.label, extendToEnd = True )
-        if( isPhotoAtomic ) : ys.interpolation = standardsModule.interpolation.loglogToken
+        if isPhotoAtomic:
+            ys.interpolation = xDataEnumsModule.Interpolation.loglog
         if( ( isPhotoAtomic ) and ( ys.Ys.start > 0 ) ) : ys.Ys.values[0] = 1e-10
         self.add( ys )
-
-def parseXMLNode( crossSectionElement, xPath, linkData ):
-    """
-    Reads an xml <crossSection> element into fudge, including all cross section forms (XYs1d, regions1d, etc.)
-    contained inside the crossSection.
-    """
-
-    xPath.append( crossSectionElement.tag )
-    crossSectionComponent = component( )
-
-    allowedClasses = {}
-    for cls in { Ys1d, XYs1d, regions1d, gridded1d, reference, CoulombPlusNuclearElastic, thermalNeutronScatteringLaw1d, resonancesWithBackground, URR_probabilityTables1d } :
-        allowedClasses[cls.moniker] = cls
-
-    for form in crossSectionElement :
-        formClass = allowedClasses.get( form.tag )
-        if( formClass is None ) : raise Exception( "unknown cross section form: %s" % form.tag )
-        newForm = formClass.parseXMLNode( form, xPath = xPath, linkData = linkData )
-        crossSectionComponent.add( newForm )
-
-    xPath.pop( )
-    return( crossSectionComponent )

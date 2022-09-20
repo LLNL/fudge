@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -221,7 +221,7 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
 
         outputStr = '\n'.join( outputStr )
 
-        inputFile = fudgeFileMisc.fudgeTempFile( dir = workDir )
+        inputFile = fudgeFileMisc.FudgeTempFile( dir = workDir )
         inputFile.write( outputStr )
 
         inputName = inputFile.getName( )

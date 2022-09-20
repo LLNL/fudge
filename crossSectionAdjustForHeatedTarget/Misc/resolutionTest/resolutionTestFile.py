@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -78,7 +78,6 @@ for i in range( len( datas1 ) ) :
     d.trim( )
     xMin = max( data1.xMin( ), data2.xMin( ) )
     xMax = min( data1.xMax( ), data2.xMax( ) )
-    from fudge.core.utilities import brb
     d = d.domainSlice( xMin = xMin, xMax = xMax )
     r = d / data2
     yMax1 = data1.yMax( ) * 1e-10

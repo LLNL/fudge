@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,8 +7,8 @@
 
 from pqu import PQU as PQUModule
 
-from xData import standards as standardsModule
-from xData import XYs as XYsModule
+from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
 from xData import multiD_XYs as multiD_XYsModule
 from xData import regions as regionsModule
 from xData import series1d as series1dModule
@@ -35,7 +35,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
         frame = self.productFrame
         if( frame is None ) : frame = self.ancestor.productFrame  # Happens for uncorrelated distribution.
         if( isinstance( angularSubform, multiD_XYsModule.XYs2d ) ) :
-            if( isinstance( angularSubform[0], XYsModule.XYs1d ) ) :
+            if( isinstance( angularSubform[0], XYs1dModule.XYs1d ) ) :
                 LI, LTT, MF4 = toAngularPointwise( angularSubform, targetInfo, not( doMF4AsMF6 ) )
             elif( isinstance( angularSubform[0], series1dModule.LegendreSeries ) ) :
                 interpolation, numberOfPoints, LI, LTT, NM, MF4Sub = toAngularLegendre( angularSubform, targetInfo, not( doMF4AsMF6 ) )
@@ -44,7 +44,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 MF4 += MF4Sub
             else :
                 raise 'hell - fix me'
-        elif( isinstance( angularSubform, regionsModule.regions2d ) ) :
+        elif( isinstance( angularSubform, regionsModule.Regions2d ) ) :
             LTT, MF4, numberOfPoints, LegendreInterpolations, LegendreData  = None, [], 0, [], []
             for ridx, region in enumerate(angularSubform) :
                 targetInfo['skipFirstEnergy'] = False
@@ -62,7 +62,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                         numberOfPoints += numberOfPointsSub
                         NM = max(NM,NMtmp)
                         LegendreInterpolations += [ numberOfPoints, interpolation ]
-                    elif( isinstance( region[0], XYsModule.XYs1d ) ) :
+                    elif( isinstance( region[0], XYs1dModule.XYs1d ) ) :
                         LI, LTTSub, MF4Sub = toAngularPointwise( region, targetInfo, not( doMF4AsMF6 ) )
                     else :
                         raise 'hell - fix me'
@@ -83,12 +83,12 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
             ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, len( angularSubform ) ) ]
             ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( angularSubform ), interpolation ] )
             LI = 0
-        elif( isinstance( angularSubform, angularModule.recoil ) ) :
+        elif( isinstance( angularSubform, angularModule.Recoil ) ) :
             if not targetInfo['doMF4AsMF6']:
                 return      # recoil partners only get written to file 6
             LI, LTT, MF4 = angularSubform.toENDF6( flags, targetInfo )
             MF = 6
-        elif( isinstance( angularSubform, angularModule.isotropic2d ) ) :
+        elif( isinstance( angularSubform, angularModule.Isotropic2d ) ) :
             LI, LTT, MF4 = angularSubform.toENDF6( flags, targetInfo )
             MF = 4
             if( doMF4AsMF6 ) : MF = 6
@@ -106,7 +106,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 raise Exception( 'LTT = %s needs a LAW' % LTT )
             gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF4 )
         else :
-            LCT = { standardsModule.frames.labToken : 1, standardsModule.frames.centerOfMassToken : 2 }[frame]
+            LCT = {xDataEnumsModule.Frame.lab: 1, xDataEnumsModule.Frame.centerOfMass: 2}[frame]
             if( MT not in endfMFList[MF] ) : endfMFList[MF][MT] = []
             if LTT != 3: NM = 0
             endfMFList[MF][MT] += [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, LTT, 0, 0 ),
@@ -114,8 +114,8 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     else :
         print( 'WARNING: subform %s does not have method toENDF6 for form %s' % ( targetInfo['style'], self.moniker ) )
 
-angularModule.form.toENDF6 = toENDF6
-angularModule.twoBodyForm.toENDF6 = toENDF6
+angularModule.Form.toENDF6 = toENDF6
+angularModule.TwoBody.toENDF6 = toENDF6
 
 def toAngularPointwise( angularSubform, targetInfo, insertSENDL ) :
 
@@ -169,25 +169,25 @@ def toENDF6( self, flags, targetInfo ) :
     if( not( targetInfo['doMF4AsMF6'] ) ) : ENDFDataList.append( endfFormatsModule.endfSENDLineNumber( ) )
     return( 1, 0, ENDFDataList )
 
-angularModule.isotropic2d.toENDF6 = toENDF6
+angularModule.Isotropic2d.toENDF6 = toENDF6
 
 #
-# forward
+# Forward
 #
 def toENDF6( self, flags, targetInfo ) :
 
     return( 1, 0, [] )
 
-angularModule.forward.toENDF6 = toENDF6
+angularModule.Forward.toENDF6 = toENDF6
 
 #
-# recoil
+# Recoil
 #
 def toENDF6( self, flags, targetInfo ) :
 
     return( 1, 4, [] )
 
-angularModule.recoil.toENDF6 = toENDF6
+angularModule.Recoil.toENDF6 = toENDF6
 
 #
 #XYs2d 
@@ -199,7 +199,7 @@ def toENDF6( self, flags, targetInfo ) :
     ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( self ), interpolation ] )
     EInFactor = PQUModule.PQU( 1, self.axes[-1].unit ).getValueAs( 'eV' )
     for energy_in in self : 
-        if( isinstance( energy_in, XYsModule.XYs1d ) ) :
+        if( isinstance( energy_in, XYs1dModule.XYs1d ) ) :
             ENDFDataList += gndsToENDF6Module.angularPointwiseEnergy2ENDF6( energy_in, targetInfo, EInFactor )
         elif( isinstance( energy_in, series1dModule.LegendreSeries ) ) :
             ENDFDataList += gndsToENDF6Module.angularLegendreEnergy2ENDF6( energy_in, targetInfo, EInFactor )
@@ -211,10 +211,10 @@ def toENDF6( self, flags, targetInfo ) :
 angularModule.XYs2d.toENDF6 = toENDF6
 
 #
-# regions2d
+# Regions2d
 #
 def toENDF6( self, flags, targetInfo ) :
 
     raise 'hell - not implemented'
 
-angularModule.regions2d.toENDF6 = toENDF6
+angularModule.Regions2d.toENDF6 = toENDF6

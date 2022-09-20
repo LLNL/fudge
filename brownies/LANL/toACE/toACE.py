@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,6 +13,8 @@ This module creates an ACE file from a GNDS file that has been processed for Mon
 
 __doc__ = description
 
+import pathlib
+
 from fudge import reactionSuite as reactionSuiteModule
 from fudge import styles as stylesModule
 
@@ -22,6 +24,7 @@ from brownies.LANL.toACE import production
 from brownies.LANL.toACE import channels
 from brownies.LANL.toACE import product
 from brownies.LANL.toACE import multiplicity
+from brownies.LANL.toACE import angularEnergy
 from brownies.LANL.toACE import energy
 from brownies.LANL.toACE import energyAngular
 from brownies.LANL.toACE import KalbachMann
@@ -40,16 +43,23 @@ parser.add_argument( 'output', type = str,                                      
 
 args = parser.parse_args( )
 
-gnds = reactionSuiteModule.readXML( args.gnds )
-if( args.style is None ) :
+gnds = reactionSuiteModule.ReactionSuite.readXML_file(args.gnds)
+if args.style is None:
     styleOptions = []
     for style in gnds.styles :
-        if( isinstance( style, stylesModule.griddedCrossSection ) ) : styleOptions.append( style.label )
-    if( len( styleOptions ) == 0 ) : raise Exception( 'GNDS file does not contain Monte Carlo processed data.' )
-    if( len( styleOptions )  > 2 ) :
+        if isinstance( style, stylesModule.GriddedCrossSection ): styleOptions.append( style.label )
+    if len( styleOptions ) == 0: raise Exception( 'GNDS file does not contain Monte Carlo processed data.' )
+    if len( styleOptions )  > 1:
+        print( '    %16s | Temperature (%s)' % ("Style", gnds.styles[styleOptions[0]].temperature.unit))
         for style in styleOptions : print( '    %16s | %g' % ( style, gnds.styles[style].temperature ) )
-        raise Exception( 'GNDS file does not contain multiple Monte Carlo processed data.' )
+        raise Exception( 'GNDS file contains multiple Monte Carlo processed data. Please select one of the above styles using option "-s"' )
     args.style = styleOptions[0]
-if( args.style not in gnds.styles ) : raise Exception( 'GNDS file does not contain style "%s".' % args.style )
+if args.style not in gnds.styles: raise Exception( 'GNDS file does not contain style "%s".' % args.style )
+if not isinstance(gnds.styles[args.style], stylesModule.GriddedCrossSection):
+    raise Exception("Selected style must be an instance of 'GriddedCrossSection', not %s" % type(gnds.styles[args.style]))
+
+path = pathlib.Path(args.output)
+if not path.parent.exists():
+    path.parent.mkdir(parents=True)
 
 gnds.toACE( args, args.style, args.output, args.ID, addAnnotation = args.annotate, verbose = args.verbose )

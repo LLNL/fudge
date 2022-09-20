@@ -67,7 +67,7 @@ Since libraries are often developed independent of one another, they often use t
 represent different exceptions\footnote{For example, one library may define the code 3 to be an error opening a file while another library
 may define the code 3 to be a divide-by-zero error.} which is why the libraryID is needed. That is,
 the equivalent of \textit{errno} is the combination libraryID:code. 
-To insure that each library's libraryID is unique, libraryIDs
+To ensure that each library's libraryID is unique, libraryIDs
 must be obtained from the function \textbf{smr\_registerLibrary}.
 
 The \textbf{statusMessageReporting} package defines two C struct's (\textbf{typedef statusMessageReporting} 

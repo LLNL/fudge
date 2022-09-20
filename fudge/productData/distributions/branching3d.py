@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,24 +7,21 @@
 
 """This module contains the 'branching3d' form for distribution."""
 
-from xData import standards as standardsModule
-
 from PoPs import IDs as IDsPoPsModule
 
+from xData import enums as xDataEnumsModule
 from fudge.processing import group as groupModule
 
 from . import base as baseModule
 
-__metaclass__ = type
-
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'branching3d'
     subformAttributes = [ ]
 
-    def __init__( self, label, productFrame = standardsModule.frames.labToken ) :
+    def __init__(self, label, productFrame=xDataEnumsModule.Frame.lab):
 
-        baseModule.form.__init__( self, label, productFrame, [] )
+        baseModule.Form.__init__( self, label, productFrame, [] )
 
     def convertUnits( self, unitMap ) :
         "See documentation for reactionSuite.convertUnits."
@@ -45,6 +42,13 @@ class form( baseModule.form ) :
         momentumData = [ [ [ domainMin, 0.0 ], [ domainMax, 0.0 ] ] ]           # Assumes isotropic scattering.
 
         return( [ energyData, momentumData ] )
+
+    def fixDomains(self, energyMin, energyMax, domainToFix):
+        """
+        The method does nothing.
+        """
+
+        return 0
 
     def processMC_cdf( self, style, tempInfo, indent ) :
 
@@ -84,7 +88,7 @@ class form( baseModule.form ) :
 
         PoPs = tempInfo['reactionSuite'].PoPs
         multiplicity = self.ancestor.ancestor.multiplicity[self.label]
-        nuclide = PoPs[self.product.parentProduct.id]
+        nuclide = PoPs[self.product.parentProduct.pid]
 
         gammas = {}
         processDecayModesSetup( nuclide, 1.0, gammas )
@@ -92,6 +96,8 @@ class form( baseModule.form ) :
         TM_1s = []
         TM_Es = []
         multipliticyAxes = multiplicityModule.defaultAxes( tempInfo['incidentEnergyUnit'] )
+        if len(gammas) == 0:                # Kludge to handle case where there no gamma is emitted.
+            gammas[0.0] = 0.0
         for gammaEnergy in gammas :
             branchingRatio = gammas[gammaEnergy]
             multiplicity = multiplicityModule.XYs1d( data = [ [ domainMin, branchingRatio ], [ domainMax, branchingRatio ] ], axes = multipliticyAxes )
@@ -105,7 +111,7 @@ class form( baseModule.form ) :
 
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -117,12 +123,12 @@ class form( baseModule.form ) :
 
         return( xmlString )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
-        _form = form( element.get( 'label' ), productFrame = element.get( 'productFrame' ) )
+        _form = cls( element.get( 'label' ), productFrame = element.get( 'productFrame' ) )
 
         xPath.pop( )
         return( _form )

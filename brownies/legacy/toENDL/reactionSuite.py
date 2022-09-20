@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,16 +9,20 @@ import os
 
 from pqu import PQU as PQUModule
 
+from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
 from PoPs import IDs as IDsPoPsModule
-from PoPs.groups import misc as miscGroupsPoPsModule
-from PoPs.groups import chemicalElement as chemicalElementPoPsModule
+from PoPs.chemicalElements import misc as miscGroupsPoPsModule
+from PoPs.chemicalElements import chemicalElement as chemicalElementPoPsModule
 from PoPs.decays import misc as miscDecaysPoPsModule
 from PoPs.families import nuclide as nuclideModule
 
+from fudge import enums as enumsModule
+from fudge import styles as stylesModule
 from fudge import outputChannel as outputChannelModule
 from fudge import reactionSuite as reactionSuiteModule
 from fudge.reactionData import crossSection as crossSectionModule
-from fudge.channelData import Q as QModule
+from fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic import CoulombPlusNuclearElastic as CoulombPlusNuclearElasticModule
+from fudge.outputChannelData import Q as QModule
 from fudge.productData import multiplicity as multiplicityModule
 from fudge.productData.distributions import energy as energyModule
 from fudge.productData.distributions import uncorrelated as uncorrelatedModule
@@ -26,7 +30,9 @@ from fudge.productData.distributions import reference as referenceModule
 
 from brownies.legacy.endl import fudgeParameters
 from brownies.legacy.endl import endlZA as endlZAClass
+from brownies.legacy.endl import endl2 as endl2Module
 from brownies.legacy.endl import endlmisc as endlmiscModule
+from ..converting import endf_endl
 
 fudgeParameters.VerboseMode = 0
 
@@ -40,11 +46,68 @@ def getENDLFile( endlZA, yo, C, S, I ) :
         return( files[0] )
     return( endlZA.addFile( yo, C, I, S, halflife = None, printWarnings = False ) )
 
+def processCoulombElastic(reactionSuite, reaction, endlZA, yi, temperature, muCutoff=0.94, accuracy=1e-3):
+
+    def yoEqualYiOutput(yo, CValue, angualarData):
+        """For internal use."""
+
+        if yo > 1:
+            I1File = getENDLFile(endlZA, yo+10, CValue, 0, 1)
+            recoil = []
+            for energyIn, POfMu in angualarData:
+                POfMuRecoil = list(reversed([[-x if x != 0.0 else x, y] for x, y in POfMu]))
+                recoil.append([energyIn, POfMuRecoil])
+            I1File.addData(recoil, Q=0.0, X1=0.0, temperature=temperature, X4=0.0)
+
+    particle = reactionSuite.PoPs[reaction.outputChannel.products[1].pid]
+    if isinstance(particle, nuclideModule.Alias): particle = reactionSuite.PoPs[particle.pid]
+    residualZA = miscGroupsPoPsModule.ZA(particle)
+    try:
+        yo = endl2Module.ZAToYo(residualZA)
+    except:
+        yo = 0
+
+    muCutoffStyle = stylesModule.CoulombPlusNuclearElasticMuCutoff('C9', 'dummy', muCutoff)
+    for doubleDifferentialCrossSection in reaction.doubleDifferentialCrossSection:
+        if isinstance(doubleDifferentialCrossSection, CoulombPlusNuclearElasticModule.Form):
+            crossSection, angular = doubleDifferentialCrossSection.processCoulombPlusNuclearMuCutoff(muCutoffStyle, excludeRutherfordScattering=True)
+            if crossSection is not None:
+                crossSectionData = [[x, y] for x, y in crossSection]
+                I0File = getENDLFile(endlZA, 0, 9, 0, 0)
+                I0File.addData(crossSectionData, Q=0.0, X1=0.0, temperature=temperature, X4=0.0)
+
+                angualarData = []
+                for xys1d in angular:
+                    POfMu = [[x, y] for x, y in xys1d]
+                    if POfMu[0][0] > -1.0: POfMu.insert(0, [-1.0, 0])
+                    if POfMu[-1][0] < 1.0: POfMu.append([1.0, 0])
+                    if POfMu[-3][1] == 0.0: POfMu.pop(-2)
+                    angualarData.append([xys1d.outerDomainValue, POfMu])
+                I1File = getENDLFile(endlZA, yi, 9, 0, 1)
+                I1File.addData(angualarData, Q=0.0, X1=0.0, temperature=temperature, X4=0.0)
+
+                yoEqualYiOutput(yo, 9, angualarData)
+
+            crossSection = doubleDifferentialCrossSection.RutherfordScattering.crossSectionVersusEnergy(muCutoff, accuracy=accuracy)
+            I0File = getENDLFile(endlZA, 0, 8, 0, 0)
+            crossSectionData = [[x, y] for x, y in crossSection]
+            I0File.addData(crossSectionData, Q=0.0, X1=0.0, temperature=temperature, X4=0.0)
+
+            dSigma_dMu = doubleDifferentialCrossSection.RutherfordScattering.dSigma_dMuVersusEnergy(muCutoff, accuracy=accuracy)
+            angualarData = []
+            for xys1d in dSigma_dMu:
+                xys1d = xys1d.normalize()
+                POfMu = [[x, y] for x, y in xys1d]
+                angualarData.append([xys1d.outerDomainValue, POfMu])
+            I1File = getENDLFile(endlZA, yi, 8, 0, 1)
+            I1File.addData(angualarData, Q=0.0, X1=0.0, temperature=temperature, X4=0.0)
+            yoEqualYiOutput(yo, 8, angualarData)
+
 def processC55S3Photons( reactionSuite, multiplicity, crossSection, C55S3Photons, photonBranchingDatas ) :
 
-    initial_pid = multiplicity.product.parentProduct.id
+    initial_pid = multiplicity.product.parentProduct.pid
     final_pid = 'FIX ME'
-    isotope = reactionSuite.PoPs[multiplicity.product.parentProduct.id].isotope
+    isotope = reactionSuite.PoPs[multiplicity.product.parentProduct.pid].isotope
     photonBranchingData = photonBranchingDatas[isotope.symbol]
     processC55S3Photons2( initial_pid, final_pid, 1.0, crossSection, C55S3Photons, photonBranchingData )
 
@@ -65,7 +128,7 @@ def processOutputChannel( reactionSuite, outputChannel, yos, endlZA, temperature
     residual = None
     if( C != 15 ) :
         for superProduct in superProducts :
-            if( superProduct.id != IDsPoPsModule.photon ) : residual = superProduct 
+            if( superProduct.pid != IDsPoPsModule.photon ) : residual = superProduct 
 
     superProducts += list( outputChannel.fissionFragmentData.delayedNeutrons )
 
@@ -82,27 +145,29 @@ def processOutputChannel( reactionSuite, outputChannel, yos, endlZA, temperature
                 
             _S = S
             _X1 = X1
-            if( ( C == 15 ) and ( product.id == IDsPoPsModule.neutron ) ) :
+            if( ( C == 15 ) and ( product.pid == IDsPoPsModule.neutron ) ) :
                 if( superProduct.moniker == 'delayedNeutron' ) :
                     _S = 7
                     _X1 = PQUModule.PQU( superProduct.rate[0].value, superProduct.rate[0].unit ).getValueAs( '1/s' )
-            particle = reactionSuite.PoPs[product.id]
-            if( isinstance( particle, nuclideModule.alias ) ) : particle = reactionSuite.PoPs[particle.pid]
-            if( isinstance( particle, chemicalElementPoPsModule.chemicalElement ) ) : continue
+            particle = reactionSuite.PoPs[product.pid]
+            if( isinstance( particle, nuclideModule.Alias ) ) : particle = reactionSuite.PoPs[particle.pid]
+            if( isinstance( particle, chemicalElementPoPsModule.ChemicalElement ) ) : continue
+            nuclearLevelIndex = 0
+            if isinstance( particle, nuclideModule.Particle): nuclearLevelIndex = particle.index
             productZA = miscGroupsPoPsModule.ZA( particle )
-            if( productZA < 2005 ) :
-                productID = product.id
+            if productZA < 2005 and nuclearLevelIndex == 0:
+                productID = product.pid
                 if( productID == IDsPoPsModule.photon ) : productID = 'gamma'
-                yo = endlmiscModule.incidentParticleTags( productID )[0]
+                yo = endl2Module.ZAToYo(productZA)
                 if( _S != 7 ) :
                     if( ( C != 15 ) and ( superProduct is residual ) and ( multiplicityIndex == multiplicityCount ) ) : yo += 10
                     if( yo in yos ) :
                         print( 'WARNNIG: yo %s already exists: skipping.' % yo )
                         continue
                     yos.append( yo )
-                if( outputChannel.genre != outputChannelModule.Genre.twoBody ) :
+                if outputChannel.genre != enumsModule.Genre.twoBody:
                     multiplicity = product.multiplicity.toENDL( )
-                    if( isinstance( multiplicity, multiplicityModule.branching1d ) ) :
+                    if( isinstance( multiplicity, multiplicityModule.Branching1d ) ) :
                         processC55S3Photons( reactionSuite, multiplicity, crossSection, C55S3Photons, photonBranchingDatas )
                     elif( multiplicity is not None ) :
                         I = 9
@@ -110,7 +175,7 @@ def processOutputChannel( reactionSuite, outputChannel, yos, endlZA, temperature
                         file = getENDLFile( endlZA, yo, C, _S, I )
                         data = file.addData( multiplicity, Q = Q, X1 = _X1, temperature = temperature )
                 if( _S == 7 ) :
-                    if( isinstance( product.distribution[0], referenceModule.form ) ) :
+                    if( isinstance( product.distribution[0], referenceModule.Form ) ) :
                         distributionData = None
                     else :
                         distributionData = product.distribution.toENDL( )
@@ -140,11 +205,11 @@ def toENDL( self, directory, verbose = 0 ) :
         ZA = int( self.target[-5:] )
     else :
         target = self.PoPs[self.target]
-        if( isinstance( target, chemicalElementPoPsModule.chemicalElement ) ) :
+        if( isinstance( target, chemicalElementPoPsModule.ChemicalElement ) ) :
             ZA = 1000 * target.Z
         else :
             ZA = miscGroupsPoPsModule.ZA( target )
-        if( isinstance( target, nuclideModule.alias ) ) : suffix = 'm'
+        if( isinstance( target, nuclideModule.Alias ) ) : suffix = 'm'
 
     endlZA = endlZAClass( ZA, yi, workDir = directory, suffix = suffix )
 
@@ -165,37 +230,50 @@ def toENDL( self, directory, verbose = 0 ) :
     if( yi == 1 ) : totalCrossSection = crossSectionModule.XYs1d( data = [], axes = crossSectionModule.defaultAxes( energyUnit ) )
     for reaction in self.reactions :
         ENDF_MT = reaction.ENDF_MT
+        if ENDF_MT == 2 and yi in [2, 3, 4, 5, 6] and self.target != IDsPoPsModule.neutron:
+            processCoulombElastic(self, reaction, endlZA, yi, temperature)
+            continue
         if( verbose > 0 ) : print( '% 5s ' % ENDF_MT, end = '' )
+        outputChannel = reaction.outputChannel
         if( ENDF_MT < 0 ) :
             if( ENDF_MT == -49 ) :
                 CS_ENDF_MT = { 'MT' : ENDF_MT, 'C' : -ENDF_MT, 'S' : 0 }
+            elif ENDF_MT == -20:
+                CS_ENDF_MT = {'MT': ENDF_MT, 'C': 21, 'S': 0}
+                if outputChannel.genre == enumsModule.Genre.twoBody:
+                    CS_ENDF_MT['S'] = 1
+            elif ENDF_MT == -30:
+                CS_ENDF_MT = {'MT': ENDF_MT, 'C': 30, 'S': 0}
+                if outputChannel.genre == enumsModule.Genre.twoBody:
+                    CS_ENDF_MT['S'] = 1
             elif( ENDF_MT not in specialMTs ) :
                 print( 'ERROR, conversion of MT = %s to C, S currently not supported -- skipping this reaction.' % ENDF_MT )
                 continue
-            if( ENDF_MT < -999 ) :
+            elif( ENDF_MT < -999 ) :
                 CS_ENDF_MT = { 'MT' : ENDF_MT, 'C' : 46, 'S' : 0 }
             else :
                 CS_ENDF_MT = { 'MT' : ENDF_MT, 'C' : -ENDF_MT, 'S' : 0 }
-        else :
-            C, S = endf_endl.getCSFromMT( MT )
-            if( self.outputChannel.genre == outputChannelModule.Genre.twoBody ) :
-                residual = self.PoPs[self.outputChannel[1].id]
-                if( isinstance( residual, nuclideModule.particle ) ) :
-                    if( residual.nucleus.energy[0].value > 0.0 ) : S = 1
+        else:
+            C, S = endf_endl.getCSFromMT( ENDF_MT )
+            if outputChannel.genre == enumsModule.Genre.twoBody:
+                residual = self.PoPs[outputChannel[1].pid]
+                if isinstance(residual, nuclideModule.Particle) and ENDF_MT != 2: S = 1
+            if ENDF_MT in (600, 601):
+                if (yi == 3 and ZA == 4007) or (yi == 3 and ZA == 4007):
+                    C = 48
+            CS_ENDF_MT = { 'C' : C, 'S' : S, 'MT' : ENDF_MT }
 
-
-            CS_ENDF_MT = { 'C' : C, 'S' : S, 'MT' : MT }
         MT = CS_ENDF_MT['MT']
         C = CS_ENDF_MT['C']
         S = CS_ENDF_MT['S']
         if( MT == 2 ) : S = 0                       # Special case for meta-stables for which CS_ENDF_MT['S'] is 1.
-        outputChannel = reaction.outputChannel
         if( outputChannel.process is not None ) :
             if( outputChannel.process == 'ENDL:S2' ) : S = 2
+        pid = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(outputChannel.products[0].pid, specialNuclearParticleIDPoPsModule.Mode.nuclide)
         if( MT == 20 ) :
-            if( outputChannel.products[0].id == "H1" ) : C = 21
+            if pid == "H1": C = 21
         elif( MT == 32 ) :
-            if( outputChannel.products[0].id == "H2" ) : C, S = 35, 1
+            if pid == "H2": C, S = 35, 1
 
         if( C == 15 ) :
             Q = 0.0
@@ -208,9 +286,9 @@ def toENDL( self, directory, verbose = 0 ) :
         else :
             Q = reaction.thresholdQAs( energyUnit )
         X1 = 0.0
-        if( outputChannel.genre == outputChannelModule.Genre.twoBody ) :
-            residual = self.PoPs[outputChannel[1].id]
-            if( isinstance( residual, nuclideModule.particle ) ) : X1 = residual.nucleus.energy[0].value
+        if outputChannel.genre == enumsModule.Genre.twoBody:
+            residual = self.PoPs[outputChannel[1].pid]
+            if( isinstance( residual, nuclideModule.Particle ) ) : X1 = residual.nucleus.energy[0].value
         if( verbose > 0 ) : print( '   %-56s % 2d %1d %-8s % 10g % 10g %4s' % ( reaction, C, S, outputChannel.genre, Q, X1, MT ) )
 
         if( C < 1 ) :
@@ -220,7 +298,7 @@ def toENDL( self, directory, verbose = 0 ) :
         crossSectionData = None
         if( C in [ 71, 72, 73, 74 ] ) :
             crossSection = reaction.crossSection[0]
-            if( isinstance( crossSection, crossSectionModule.regions1d ) ) :
+            if( isinstance( crossSection, crossSectionModule.Regions1d ) ) :
                 crossSectionData = []
                 for regionIndex, region in enumerate( crossSection ) :
                     if( regionIndex > 0 ) :
@@ -232,8 +310,8 @@ def toENDL( self, directory, verbose = 0 ) :
         file = getENDLFile( endlZA, 0, C, S, 0 )
         X4 = 0.0
         if( C == 46 ) :
-            residual = self.PoPs[outputChannel[1].id]
-            if( isinstance( residual, nuclideModule.particle ) ) : X4 = residual.nucleus.energy[0].pqu( ).getValueAs( "MeV" )
+            residual = self.PoPs[outputChannel[1].pid]
+            if( isinstance( residual, nuclideModule.Particle ) ) : X4 = residual.nucleus.energy[0].pqu( ).getValueAs( "MeV" )
         data = file.addData( crossSectionData, Q = Q, X1 = X1, temperature = temperature, X4 = X4 )
 
         if( totalCrossSection is not None ) :
@@ -267,10 +345,10 @@ def toENDL( self, directory, verbose = 0 ) :
                 crossSection = [ [ x, y * crossSectionC55.evaluate( x ) ] for x, y in multiplicity ]
                 crossSection = crossSectionModule.XYs1d( data = crossSection, axes = crossSectionModule.defaultAxes( energyUnit ) )
                 distribution = product.distribution[0]
-                if( isinstance( distribution, uncorrelatedModule.form ) ) :
+                if( isinstance( distribution, uncorrelatedModule.Form ) ) :
                     energy = distribution.energySubform.data
                     angular = distribution.angularSubform.data
-                    if( isinstance( energy, energyModule.discreteGamma ) ) :
+                    if( isinstance( energy, energyModule.DiscreteGamma ) ) :
                         C55S3Photons[energy.value] = { 'crossSection' : crossSection, 'angular' : angular, 'domainMin' : energy.domainMin, 'domainMax' : energy.domainMax }
                     elif( isinstance( energy, energyModule.XYs2d ) ) :
                         C55S0Photon.append( [ crossSection, distribution.toENDL( ) ] )
@@ -316,13 +394,23 @@ def toENDL( self, directory, verbose = 0 ) :
     for data in endlZA.findDatas( ) : data.setFormat( 15 )
 
     endlZA.source = endlZA.workDir
-    if( len( self.documentation.body.body ) > 0 ) :
-        endlZA.setDocumentation( self.documentation.body.body )
-    else :
-        endlZA.setDocumentation( self.documentation.endfCompatible.body )
 
-    endlZA.save( )
+    sep = ''
+    documentation = ''
+    for style in self.styles:
+        if isinstance(style, stylesModule.Evaluated):
+            documentation += sep + style.documentation.body.body
+            if len(documentation) > 0: sep = '\n'
+    if len(documentation) == 0:
+        sep = ''
+        for style in self.styles:
+            if isinstance(style, stylesModule.Evaluated):
+                documentation += sep + style.documentation.endfCompatible.body
+                sep = '\n'
+    endlZA.setDocumentation(documentation)
 
-    return( endlZA )
+    endlZA.save()
 
-reactionSuiteModule.reactionSuite.toENDL = toENDL
+    return endlZA
+
+reactionSuiteModule.ReactionSuite.toENDL = toENDL

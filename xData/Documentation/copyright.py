@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -40,12 +40,12 @@ class Copyright( textModule.Text ) :
 
         return ' href="%s"' % self.href
 
-    def parseNode( self, node, xPath, linkData, **kwargs ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
         """
         Parses a copyright node.
         """
 
-        textModule.Text.parseNode( self, node, xPath, linkData, **kwargs )
+        textModule.Text.parseNode(self, node, xPath, linkData, **kwargs)
         xPath.append( node.tag )
 
         self.__href = node.get( 'href', '' )

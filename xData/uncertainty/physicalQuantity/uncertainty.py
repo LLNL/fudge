@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,25 +13,24 @@ import sys
 import abc
 import fractions
 
+from LUPY import ancestry as ancestryModule
 from pqu import PQU as PQUModule
 
-from ... import ancestry as ancestryModule
-
-class base( ancestryModule.ancestry ) :
+class Base(ancestryModule.AncestryIO):
 
     def __init__( self ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
-class uncertainty( ancestryModule.ancestry ) :
+class Uncertainty(ancestryModule.AncestryIO):
 
     moniker = "uncertainty"
 
     def __init__( self, form ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
-        if( not( isinstance( form, base ) ) ) : raise TypeError( "Invalid uncertainty form." )
+        if( not( isinstance( form, Base ) ) ) : raise TypeError( "Invalid uncertainty form." )
         self.__form = form
         self.__form.setAncestor( self )
 
@@ -48,39 +47,35 @@ class uncertainty( ancestryModule.ancestry ) :
 
         self.__form.parentConvertingUnits( factors )
 
-    def toXML( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        return( '\n'.join( self.toXMLList( indent, **kwargs )  ) )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-    def toXMLList( self, indent = '', **kwargs ) :
+        XML_strList = [ '%s<%s>' % ( indent, self.moniker ) ]
+        XML_strList += self.__form.toXML_strList(indent = indent2, **kwargs)
+        XML_strList[-1] += "</%s>" % self.moniker
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-
-        XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        XMLStringList += self.__form.toXMLList( indent = indent2, **kwargs )
-        XMLStringList[-1] += "</%s>" % self.moniker
-
-        return( XMLStringList )
+        return XML_strList
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
         from . import standard as standardModule
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
-        child = element[0]
-        if( child.tag == standardModule.standard.moniker ) :
-            form = standardModule.standard.parseXMLNodeAsClass( child, xPath, linkData )
-        else :
-            raise Exception( 'Invalid child element = "%s".' % child.tag )
+        child = node[0]
+        if child.tag == standardModule.Standard.moniker:
+            form = standardModule.Standard.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+        else:
+            raise Exception( 'Invalid child node = "%s".' % child.tag )
 
-        _uncertainty = uncertainty( form )
+        uncertainty1 = Uncertainty(form)
 
         xPath.pop( )
-        return( _uncertainty )
+        return uncertainty1
 
-class quantity( ancestryModule.ancestry ) :
+class Quantity(ancestryModule.AncestryIO):
 
     absolute = 'absolute'
     relative = 'relative'
@@ -89,7 +84,7 @@ class quantity( ancestryModule.ancestry ) :
 
     def __init__( self, value, relation = absolute ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
         self.value = value
 
@@ -121,46 +116,34 @@ class quantity( ancestryModule.ancestry ) :
 
         return( self.__class__( self.value, self.relation ) )
 
-    def toXML( self, indent = '', **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs )  ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         relation = ''
         if( self.relation != self.absolute ) : relation = ' relation="%s"' % self.relation
 
-        XMLStringList = [ '%s<%s value="%s"%s/>' % ( indent, self.moniker, self.value, relation ) ]
-
-        return( XMLStringList )
+        return [ '%s<%s value="%s"%s/>' % ( indent, self.moniker, self.value, relation ) ]
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
         attributes = ( 'value', 'relation' )
-        for attributeName in element.attrib :
-            if( attributeName not in attributes ) : raise ValueError( 'attribute = "%s" not allowed' % attributeName )
+        for attributeName in node.attrib:
+            if attributeName not in attributes: raise ValueError('Attribute = "%s" not allowed.' % attributeName)
 
-        value = cls.toValueType( element.attrib['value'] )
-        self = cls( value, element.get( 'relation', quantity.absolute ) )
+        value = cls.toValueType(node.attrib['value'])
+        instance = cls(value, node.get('relation', Quantity.absolute))
 
         xPath.pop()
-        return( self )
 
-    @classmethod
-    def parseXMLStringAsClass( cls, string ) :
+        return instance
 
-        from xml.etree import cElementTree
-        return( cls.parseXMLNodeAsClass( cElementTree.fromstring( string ), [], [] ) )
-
-    @classmethod
     def toValueType( cls, value ) :
 
         return( cls.__valueType( value ) )
 
-class number( quantity ) :
+class Number( Quantity ) :
     """
     This is an abstract base class for number quantities. This class adds the pqu and float methods.
     """
@@ -187,7 +170,7 @@ class number( quantity ) :
         if( not( isinstance( unit, ( str, PQUModule.PhysicalUnit ) ) ) ) : raise TypeError( 'unit argument must be a str or a PQU.PhysicalUnit.' )
         return( float( self.pqu( unit ) ) )
 
-class double( number ) :
+class Double( Number ) :
     """
     This class is used to represent a (uncertainty) quantity whose value must be a float.
     """
@@ -195,10 +178,10 @@ class double( number ) :
     moniker = 'double'
     __valueType = float
 
-    def __init__( self, value, relation = quantity.absolute ) :
+    def __init__( self, value, relation = Quantity.absolute ) :
 
         if( isinstance( value, ( int, fractions.Fraction ) ) ) : value = self.valueType( value )
-        number.__init__( self, value, relation )
+        Number.__init__( self, value, relation )
 
     @property
     def valueType( self ) :

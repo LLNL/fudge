@@ -1,19 +1,18 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
-
 import math
+
+from LUPY import ancestry as ancestryModule
 
 from pqu import PQU as PQUModule
 
 from PoPs import IDs as IDsPoPsModule
 
-from xData import ancestry as ancestryModule
 from xData import axes as axesModule
 from xData import gridded as griddedModule
 
@@ -21,18 +20,14 @@ from . import group as groupModule
 
 from . import miscellaneous as miscellaneousModule
 
-class gridded1d( griddedModule.gridded1d ) :
-
-    def __init__( self, **kwargs ) :
-
-        griddedModule.gridded1d.__init__( self, **kwargs )
+class Gridded1d( griddedModule.Gridded1d ) :
 
     def convertUnits( self, unitMap ) :
 
         if( 'sh' in self.axes[0].unit ) : return
-        griddedModule.gridded1d.convertUnits( self, unitMap )
+        griddedModule.Gridded1d.convertUnits( self, unitMap )
 
-class inverseSpeed( ancestryModule.ancestry ) :
+class InverseSpeed( ancestryModule.AncestryIO ) :
     """
     This class stores the inverse speed.
     """
@@ -41,7 +36,9 @@ class inverseSpeed( ancestryModule.ancestry ) :
 
     def __init__( self, data ) :
 
-        if( not( isinstance( data, ( gridded1d, ) ) ) ) : raise TypeError( 'Invalid flux data.' )
+        ancestryModule.AncestryIO.__init__(self)
+
+        if( not( isinstance( data, ( Gridded1d, ) ) ) ) : raise TypeError( 'Invalid flux data.' )
         self.data = data
         self.data.setAncestor( self )
 
@@ -49,32 +46,29 @@ class inverseSpeed( ancestryModule.ancestry ) :
 
         self.data.convertUnits( unitMap )
 
-    def toXML( self, indent = '', **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        xmlStringList += self.data.toXMLList( indent2, **kwargs )
+        xmlStringList += self.data.toXML_strList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
 
         for child in element :
-            if( child.tag == gridded1d.moniker ) :
-                data = gridded1d.parseXMLNode( child, xPath, linkData )
+            if( child.tag == Gridded1d.moniker ) :
+                data = Gridded1d.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             else :
                 raise 'Unsupported tag = "%s"' % child.tag
-        _inverseSpeed = inverseSpeed( data )
+        _inverseSpeed = cls( data )
 
         xPath.pop( )
+
         return( _inverseSpeed )
 
 def multiGroupInverseSpeed( style, tempInfo ) :
@@ -98,13 +92,11 @@ def multiGroupInverseSpeed( style, tempInfo ) :
                 upperRatio = groupBoundaries[i1+1] / projectileMass
                 upperInverseSpeedValue = math.sqrt( upperRatio * ( 2.0 + upperRatio ) )
                 inverseSpeed = ( upperInverseSpeedValue - lowerInverseSpeedValue ) / ( upperRatio - lowerRatio ) / speedOfLight_m_mus
-                if( i1 == 0 ) : print( '    ', groupBoundaries[i1+1], upperRatio, upperInverseSpeedValue, inverseSpeed, speedOfLight_m_mus )
                 inverseSpeeds.append( inverseSpeed )
                 lowerRatio = upperRatio
                 lowerInverseSpeedValue = upperInverseSpeedValue
         else:
             const = 2. / ( 3. * math.sqrt( 2 ) * speedOfLight_m_mus )
-            const *= math.sqrt( float( PQUModule.PQU( 1, 'MeV' ).convertToUnit( _groupBoundaries.unit ) ) )
             const *= math.sqrt( projectileMass )                    # Mass is in energy unit / c^2.
 
             E1 = groupBoundaries[0]
@@ -128,7 +120,7 @@ def multiGroupInverseSpeed( style, tempInfo ) :
                 inverseSpeeds.append( inverseSpeed )
                 E1 = E2
 
-    axes = axesModule.axes( rank = 2 )
-    axes[0] = axesModule.axis( label = "inverse speed", unit = "mus/m", index = 0 )     # 'mus/m', which is a standard, is the same as 'sh/cm'.
+    axes = axesModule.Axes(2)
+    axes[0] = axesModule.Axis( label = "inverse speed", unit = "mus/m", index = 0 )     # 'mus/m', which is a standard, is the same as 'sh/cm'.
     axes[1] = flux.axes[1]
-    return( groupModule.toMultiGroup1d( gridded1d, style, tempInfo, axes, inverseSpeeds, addLabel = False, zeroPerTNSL = False ) )
+    return( groupModule.toMultiGroup1d( Gridded1d, style, tempInfo, axes, inverseSpeeds, addLabel = False, zeroPerTNSL = False ) )

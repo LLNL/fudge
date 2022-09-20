@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,74 +11,77 @@ Defines classes used in both resolved and unresolved regions
 
 import fractions
 
+from LUPY import ancestry as ancestryModule
+
 from fudge import suites as suitesModule
-from fudge.channelData import Q as QModule
+from fudge.outputChannelData import Q as QModule
 from pqu import PQU as PQUModule
-from .scatteringRadius import scatteringRadius, hardSphereRadius
+from .scatteringRadius import ScatteringRadius, HardSphereRadius
 
-from xData import ancestry as ancestryModule, table as tableModule, link as linkModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 
-__metaclass__ = type
+from xData import table as tableModule
+from xData import link as linkModule
 
-class spin( fractions.Fraction ):
+
+class Spin(fractions.Fraction):
     """
     Store spins for a collection of resonances. Check denominator (must be integer or half-integer)
     """
 
-    def __new__( cls, *args ):
+    def __new__(cls, *args):
         self = fractions.Fraction.__new__(cls, *args)
-        if self.denominator not in (1,2):
+        if self.denominator not in (1, 2):
             raise ValueError("Illegal spin '%s': must be integer or half-integer" % self)
         return self
 
     @property
-    def value( self ):
-
+    def value(self):
         return float(self)
 
-class parity:
+
+class Parity:
     """
     Store parity for a collection of resonances. Allowed values for the parity are +1 or -1.
     """
 
     def __init__(self, parity):
         self.value = int(parity)
-        if self.value not in (1,-1):
+        if self.value not in (1, -1):
             raise ValueError("%d is not a legal value for parity!" % self.value)
 
     def __str__(self):
-
         return str(self.value)
 
     def __int__(self):
-
         return self.value
 
-    def __copy__( self ) :
+    def __copy__(self):
+        return Parity(self.value)
 
-        return( parity( self.value ) )
 
-class resonanceReactions( suitesModule.suite ):
+class ResonanceReactions(suitesModule.Suite):
     """
     Stores a list of resonanceReaction
     """
 
     moniker = 'resonanceReactions'
 
-    def __init__( self ) :
+    def __init__(self):
 
-        suitesModule.suite.__init__( self, [resonanceReaction])
+        suitesModule.Suite.__init__(self, [ResonanceReaction])
 
-    def check( self, info ):
+    def check(self, info):
         from fudge import warning
         warnings = []
         for c in self:
             warningList = c.check(info)
             if warningList:
-                warnings.append(warning.context(str(c.moniker)+' '+str(c.label),warningList))
+                warnings.append(warning.Context(str(c.moniker) + ' ' + str(c.label), warningList))
         return warnings
 
-class resonanceReaction( ancestryModule.ancestry):
+
+class ResonanceReaction(ancestryModule.AncestryIO):
     """
     Describes one reaction channel that opens up in the resonance region. In an R-Matrix section,
     all open reaction channels should be described in the list of resonanceReaction elements
@@ -86,34 +89,32 @@ class resonanceReaction( ancestryModule.ancestry):
 
     moniker = 'resonanceReaction'
 
-    fission = 'fission'                 # special tokens to support fission reactions
+    fission = 'fission'  # special tokens to support fission reactions
     fissionProduct = 'fissionProduct'
 
-    def __init__( self, label, reactionLink, ejectile, Q=None, scatteringRadius=None, hardSphereRadius=None,
-                  computePenetrability=True, computeShiftFactor=False, eliminated=False):
+    def __init__(self, label, link, ejectile, Q=None, scatteringRadius=None, hardSphereRadius=None,
+                 boundaryConditionValue=None, eliminated=False):
         """
         :param label: unique label for this reaction
-        :param reactionLink: href pointing to corresponding reaction in reactionSuite/reactions
+        :param link: href pointing to corresponding reaction in reactionSuite/reactions
         :param ejectile: id for the light particle emitted by this reaction
         :param Q: optional, overloads the linked reaction Q-value
         :param scatteringRadius: optional, overrides resonances.scatteringRadius
         :param hardSphereRadius: optional, overrides resonances.scatteringRadius
-        :param computePenetrability: boolean, default=True. If False, use P=1
-        :param computeShiftFactor: boolean, default=False
+        :param boundaryConditionValue: optional, set numeric value of boundary condition
         :param eliminated: boolean, default=False
         """
 
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.label = label
-        self.reactionLink = reactionLink
+        self.__link = link
+        self.__link.setAncestor(self)
         self.__ejectile = ejectile
         self.__residual = None
         self.Q = Q
         self.scatteringRadius = scatteringRadius
         self.hardSphereRadius = hardSphereRadius
-        if( hardSphereRadius is not None ) : self.hardSphereRadius.setAncestor( self )
-        self.computePenetrability = computePenetrability
-        self.computeShiftFactor = computeShiftFactor
+        self.boundaryConditionValue = boundaryConditionValue
         self.eliminated = eliminated
 
     @property
@@ -123,98 +124,162 @@ class resonanceReaction( ancestryModule.ancestry):
     @property
     def residual(self):
         if self.__residual is None:
-            if self.ejectile == resonanceReaction.fission: return resonanceReaction.fissionProduct
+            if self.ejectile == ResonanceReaction.fission: return ResonanceReaction.fissionProduct
 
-            products = set([p.pid for p in self.reactionLink.link.outputChannel.products])
-            products.remove( self.ejectile )
+            products = set([p.pid for p in self.link.link.outputChannel.products])
+            products.remove(self.ejectile)
             if len(products) != 1: raise ValueError("Cannot compute resonanceReaction residual!")
             self.__residual = products.pop()
         return self.__residual
 
     @property
+    def link(self):
+        return self.__link
+
+    @property
+    def Q(self):
+        return self.__Q
+
+    def getQ(self):
+        """ Return Q-value, referring to linked reaction if no Q defined locally. """
+        if self.__Q is not None:
+            return self.__Q
+        else:
+            reaction = self.link.link
+            return reaction.outputChannel.Q
+
+    @Q.setter
+    def Q(self, value):
+        """Can be set to None or to a Q.Component instance."""
+        if value is not None:
+            if not isinstance(value, QModule.Component):
+                raise TypeError("ResonanceReaction Q value can't be set to type '%s'" % type(value))
+            value.setAncestor(self)
+        self.__Q = value
+
+    @property
     def scatteringRadius(self):
+
+        return self.__scatteringRadius
+
+    def getScatteringRadius(self):
+        """Return ScatteringRadius, looking up ancestry if necessary"""
         if self.__scatteringRadius is not None:
             return self.__scatteringRadius
         else:
-            from .resonances import resonances
-            return self.findClassInAncestry(resonances).scatteringRadius
+            from .resonances import Resonances
+            return self.findClassInAncestry(Resonances).getScatteringRadius()
 
     @scatteringRadius.setter
     def scatteringRadius(self, value):
-        """Can be set to None or to a scatteringRadius instance."""
+        """Can be set to None or to a ScatteringRadius instance."""
 
-        self.__scatteringRadius = value
         if value is not None:
-            if not isinstance(value, scatteringRadius):
+            if not isinstance(value, ScatteringRadius):
                 raise TypeError("Scattering radius can't be set to type '%s'" % type(value))
-            self.__scatteringRadius.setAncestor(self)
+            value.setAncestor(self)
+        self.__scatteringRadius = value
 
-    def check( self, info ):
+    @property
+    def hardSphereRadius(self):
+
+        return self.__hardSphereRadius
+
+    def getHardSphereRadius(self):
+        """Return HardSphereRadius, looking up ancestry if necessary. If no HardSphereRadius is defined, return ScatteringRadius instead"""
+        if self.__hardSphereRadius is not None:
+            return self.__hardSphereRadius
+        else:
+            from .resonances import Resonances
+            return self.findClassInAncestry(Resonances).getHardSphereRadius()
+
+    @hardSphereRadius.setter
+    def hardSphereRadius(self, value):
+        """Can be set to None or to a hardSphereRadius instance."""
+
+        if value is not None:
+            if not isinstance(value, HardSphereRadius):
+                raise TypeError("Hard sphere radius can't be set to type '%s'" % type(value))
+            value.setAncestor(self)
+        self.__hardSphereRadius = value
+
+    def check(self, info):
         from fudge import warning
         warnings = []
 
         # check the reaction link
         theLinkTarget = None
         try:
-            theLinkTarget = self.reactionLink.follow(self.getRootAncestor())
-            if theLinkTarget is None: warnings.append(warning.unresolvedLink(self.reactionLink))
+            theLinkTarget = self.link.follow(self.rootAncestor)
+            if theLinkTarget is None: warnings.append(warning.UnresolvedLink(self.link))
         except:
-            warnings.append(warning.unresolvedLink(self.reactionLink))
+            warnings.append(warning.UnresolvedLink(self.link))
 
         # check the radii
         for thing in [self.scatteringRadius, self.hardSphereRadius]:
-            if thing is  None: continue
+            if thing is None: continue
             warningList = thing.check(info)
             if warningList:
-                warnings.append(warning.context(thing.moniker,warningList))
+                warnings.append(warning.Context(thing.moniker, warningList))
         return warnings
 
-    def convertUnits( self, unitMap ):
-        for child in ('Q','scatteringRadius','hardSphereRadius'):
-            if getattr(self,child) is not None:
-                getattr(self,child).convertUnits(unitMap)
+    def convertUnits(self, unitMap):
+        for child in ('Q', 'scatteringRadius', 'hardSphereRadius'):
+            if getattr(self, child) is not None:
+                getattr(self, child).convertUnits(unitMap)
 
-    def isFission( self ):
+    def isFission(self):
 
-        return self.reactionLink.link.isFission()
+        return self.link.link.isFission()
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent+'  '
+        indent2 = indent + '  '
         attrstring = ''
         if self.ejectile is not None: attrstring += ' ejectile="%s"' % self.ejectile
-        if not self.computePenetrability: attrstring += ' computePenetrability="false"'
-        if self.computeShiftFactor: attrstring += ' computeShiftFactor="true"'
+        if kwargs.get('formatVersion') == GNDS_formatVersionModule.version_1_10:
+            if self.eliminated or self.isFission():
+                attrstring += ' calculatePenetrability="false"'
+        if self.boundaryConditionValue is not None:
+            attrstring += ' boundaryConditionValue="%r"' % self.boundaryConditionValue
         if self.eliminated: attrstring += ' eliminated="true"'
-        xmlString = ['%s<%s label="%s"%s>' % (indent, self.moniker, self.label, attrstring) ]
-        xmlString += self.reactionLink.toXMLList( indent=indent2, **kwargs )
-        if self.Q is not None: xmlString += self.Q.toXMLList( indent=indent2, **kwargs )
-        if self.__scatteringRadius is not None: xmlString += self.__scatteringRadius.toXMLList( indent=indent2, **kwargs)
-        if self.hardSphereRadius is not None: xmlString += self.hardSphereRadius.toXMLList( indent=indent2, **kwargs)
+        xmlString = ['%s<%s label="%s"%s>' % (indent, self.moniker, self.label, attrstring)]
+        xmlString += self.link.toXML_strList(indent=indent2, **kwargs)
+        if self.Q is not None: xmlString += self.Q.toXML_strList(indent=indent2, **kwargs)
+        if self.__scatteringRadius is not None:
+            xmlString += self.__scatteringRadius.toXML_strList(indent=indent2, **kwargs)
+        if self.hardSphereRadius is not None:
+            xmlString += self.hardSphereRadius.toXML_strList(indent=indent2, **kwargs)
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
-        xPath.append( element.tag )
-        reactionLink = linkModule.link.parseXMLNode( element.find('link'), xPath, linkData )
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        xPath.append(element.tag)
+        reactionLink = linkModule.Link.parseNodeUsingClass(element.find('link'), xPath, linkData, **kwargs)
         Qval, scatRad, hsRad = None, None, None
-        if element.find( QModule.component.moniker ):
-            Qval = QModule.component()      # FIXME suite.parseXMLNode is not a static method
-            Qval.parseXMLNode( element.find( QModule.component.moniker ), xPath, linkData )
-        if element.find( scatteringRadius.moniker ):
-            scatRad = scatteringRadius.parseXMLNode( element.find( scatteringRadius.moniker ), xPath, linkData )
-        if element.find( hardSphereRadius.moniker ):
-            hsRad = hardSphereRadius.parseXMLNode( element.find( hardSphereRadius.moniker), xPath, linkData)
-        tmp = resonanceReaction( element.get('label'), reactionLink=reactionLink, ejectile=element.get('ejectile'),
-                                 Q = Qval, scatteringRadius=scatRad, hardSphereRadius=hsRad,
-                                 computePenetrability=getBool( element.get('computePenetrability','true') ),
-                                 computeShiftFactor=getBool( element.get('computeShiftFactor','false') ),
-                                 eliminated=getBool( element.get('eliminated','false') ) )
+        if element.find(QModule.Component.moniker):
+            Qval = QModule.Component()
+            Qval.parseNode(element.find(QModule.Component.moniker), xPath, linkData, **kwargs)
+        if element.find(ScatteringRadius.moniker):
+            scatRad = ScatteringRadius.parseNodeUsingClass(
+                element.find(ScatteringRadius.moniker), xPath, linkData, **kwargs)
+        if element.find(HardSphereRadius.moniker):
+            hsRad = HardSphereRadius.parseNodeUsingClass(
+                element.find(HardSphereRadius.moniker), xPath, linkData, **kwargs)
+
+        boundaryConditionVal = element.get('boundaryConditionValue')
+        if boundaryConditionVal is not None:
+            boundaryConditionVal = float(boundaryConditionVal)
+
+        tmp = cls(element.get('label'), link=reactionLink, ejectile=element.get('ejectile'),
+                  Q=Qval, scatteringRadius=scatRad, hardSphereRadius=hsRad, boundaryConditionValue=boundaryConditionVal,
+                  eliminated=getBool(element.get('eliminated', 'false')))
         xPath.pop()
         return tmp
 
-class resonanceParameters( ancestryModule.ancestry ):
+
+class ResonanceParameters(ancestryModule.AncestryIO):
     """
     Light-weight wrapper around a table.
     """
@@ -222,61 +287,67 @@ class resonanceParameters( ancestryModule.ancestry ):
     moniker = 'resonanceParameters'
 
     def __init__(self, table):
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.table = table
         self.table.setAncestor(self)
 
-    def check( self, info ):
-        warnings=[]
+    def check(self, info):
+        warnings = []
         return warnings
 
-    def convertUnits( self, unitMap ):
+    def convertUnits(self, unitMap):
+        self.table.convertUnits(unitMap)
 
-        self.table.convertUnits( unitMap )
-
-    def toXMLList(self, indent = '', **kwargs):
-
-        indent2 = indent+'  '
+    def toXML_strList(self, indent='', **kwargs):
+        indent2 = indent + '  '
         xmlList = ['%s<%s>' % (indent, self.moniker)]
-        xmlList += self.table.toXMLList(indent2, **kwargs)
+        xmlList += self.table.toXML_strList(indent2, **kwargs)
         xmlList[-1] += '</%s>' % self.moniker
         return xmlList
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        xPath.append(element.tag)
 
-        xPath.append( element.tag )
-        rps = resonanceParameters( tableModule.table.parseXMLNode(
-            element.find(tableModule.table.moniker), xPath, linkData ) )
+        linkData['conversionTable'] = {'L': int}
+        rps = cls(tableModule.Table.parseNodeUsingClass(
+                  element.find(tableModule.Table.moniker), xPath, linkData, **kwargs))
+        del linkData['conversionTable']
+
         xPath.pop()
         return rps
 
-class energyIntervals(ancestryModule.ancestry):
+
+class EnergyIntervals(ancestryModule.AncestryIO):
     """ Resonance region may be broken up into multiple energy intervals (deprecated) """
 
     moniker = 'energyIntervals'
+    keyName = 'label'
+
     def __init__(self, label):
 
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.label = label
         self.__intervals = []
 
-    def __len__(self): return len(self.__intervals)
+    def __len__(self):
+        return len(self.__intervals)
 
-    def __getitem__(self, item): return self.__intervals[item]
+    def __getitem__(self, item):
+        return self.__intervals[item]
 
     def append(self, item):
         self.__intervals.append(item)
-        item.setAncestor(self, attribute='index')
+        item.setAncestor(self)
 
-    def check( self, info ):
+    def check(self, info):
         from fudge import warning
         warnings = []
         for idx, interval in enumerate(self):
             info['energyIntervalIndex'] = idx
             warningList = interval.check(info)
             if warningList:
-                warnings.append(warning.context('%s[@index="%d"' % (interval.moniker, interval.index) ,warningList))
+                warnings.append(warning.Context('%s[@index="%d"' % (interval.moniker, interval.index), warningList))
         del info['energyIntervalIndex']
         return warnings
 
@@ -290,48 +361,58 @@ class energyIntervals(ancestryModule.ancestry):
             if interval.evaluated.useForSelfShieldingOnly: return True
         return False
 
-    def toXMLList(self, indent='', **kwargs):
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        xmlString = [ '%s<%s label="%s">' % (indent, self.moniker, self.label) ]
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+        xmlString = ['%s<%s label="%s">' % (indent, self.moniker, self.label)]
         for interval in self:
-            xmlString += interval.toXMLList(indent2, **kwargs)
+            xmlString += interval.toXML_strList(indent2, **kwargs)
         xmlString[-1] += '</%s>' % self.moniker
 
         return xmlString
 
     @classmethod
-    def parseXMLNode(cls, element, xPath, linkData):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(element.tag)
         EIs = cls(element.get('label'))
         for child in element:
-            EIs.append( energyInterval.parseXMLNode(child,xPath,linkData) )
+            EIs.append(EnergyInterval.parseNodeUsingClass(child, xPath, linkData, **kwargs))
         xPath.pop()
         return EIs
 
-class energyInterval(ancestryModule.ancestry):
+
+class EnergyInterval(ancestryModule.AncestryIO):
     """ single energy interval, for use inside energyIntervals """
 
     moniker = 'energyInterval'
+    keyName = 'index'
+
+    _requiredAttributes = (
+        ('index', int),
+        ('domainMin', float),
+        ('domainMax', float),
+        ('domainUnit', str)
+    )
+
     def __init__(self, index, data, domainMin, domainMax, domainUnit):
-        ancestryModule.ancestry.__init__(self)
+        ancestryModule.AncestryIO.__init__(self)
         self.index = index
-        data.setAncestor(self)
-        self.evaluated = data
         self.domainMin = domainMin
         self.domainMax = domainMax
         self.domainUnit = domainUnit
+        self.evaluated = data
+        self.evaluated.setAncestor(self)
 
-    def check( self, info ):
+    def check(self, info):
         from fudge import warning
         warnings = []
         warningList = self.evaluated.check(info)
         if warningList:
-            warnings.append(warning.context( self.evaluated.moniker, warningList ))
+            warnings.append(warning.Context(self.evaluated.moniker, warningList))
         return warnings
 
-    def convertUnits( self, unitMap ):
+    def convertUnits(self, unitMap):
 
         if self.domainUnit in unitMap:
             newUnit = unitMap[self.domainUnit]
@@ -341,17 +422,20 @@ class energyInterval(ancestryModule.ancestry):
             self.domainUnit = newUnit
         self.evaluated.convertUnits(unitMap)
 
-    def toString(self, simpleString = False):
-        return ("%s resonances, %s to %s. Contains %i resonances" %
-                (self.evaluated, self.domainMin, self.domainMax, len(self.evaluated) ) )
+    def toString(self, simpleString=False):
+        return ("%s resonances, %s to %s. Contains %d resonances" %
+                (self.evaluated, self.domainMin, self.domainMax, len(self.evaluated)))
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        xmlString = ['%s<%s index="%s" domainMin="%s" domainMax="%s" domainUnit="%s">' % ( indent, self.moniker, self.index, 
-                PQUModule.floatToShortestString( self.domainMin, 12 ), PQUModule.floatToShortestString( self.domainMax, 12 ), self.domainUnit ) ]
-        xmlString += self.evaluated.toXMLList( indent2, **kwargs )
+        xmlString = [
+            '%s<%s index="%s" domainMin="%s" domainMax="%s" domainUnit="%s">' %
+            (indent, self.moniker, self.index,
+             PQUModule.floatToShortestString(self.domainMin, 12), PQUModule.floatToShortestString(self.domainMax, 12),
+             self.domainUnit)]
+        xmlString += self.evaluated.toXML_strList(indent2, **kwargs)
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
@@ -368,52 +452,70 @@ class energyInterval(ancestryModule.ancestry):
         return None
 
     @classmethod
-    def parseXMLNode(cls, element, xPath, linkData):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         from .resolved import BreitWigner, RMatrix
-        from .unresolved import tabulatedWidths
+        from .unresolved import TabulatedWidths
 
         xPath.append('%s[@label="%s"]' % (cls.moniker, element.get('label')))
 
         formClass = {
             BreitWigner.moniker: BreitWigner,
             RMatrix.moniker: RMatrix,
-            tabulatedWidths.moniker: tabulatedWidths,
-        }.get( element[0].tag )
+            TabulatedWidths.moniker: TabulatedWidths,
+        }.get(element[0].tag)
         if formClass is None: raise Exception("unknown unresolved resonance form '%s'!" % element[0].tag)
-        data = formClass.parseXMLNode(element[0], xPath, linkData)
-        EI = cls( data=data, **getAttrs(element) )
+        data = formClass.parseNodeUsingClass(element[0], xPath, linkData, **kwargs)
+        EI = cls(data=data, **getAttrs(element, required=cls._requiredAttributes))
 
         xPath.pop()
         return EI
 
+
 # helper functions for reading in from xml:
-def getBool( value ):
-    return {'true':True, '1':True, 'false':False, '0':False}[value]
+def getBool(value):
+    return {'true': True, '1': True, 'false': False, '0': False}[value]
 
-def floatOrint( value ):
-    if float( value ).is_integer(): return int( value )
-    return float( value )
 
-def getAttrs(element, exclude=(), required=()):
+def floatOrint(value):
+    if float(value).is_integer(): return int(value)
+    return float(value)
+
+
+def getAttrs(element, required=(), optional=(), attributeRenames=()):
     """
-    Convert attributes to proper type (float, bool, int, etc), returning a dictionary.
-    Anything in the 'exclude' list is omitted, anything in the 'required' list is automatically set to False
-    if not present.
-    """
-    conversionTable = {
-            'domainMin':float, 'domainMax':float, 'value':float, 'channelSpin':spin,
-            'calculateChannelRadius':getBool, 'useForSelfShieldingOnly':getBool,
-            'computeShiftFactor':getBool,'computePenetrability':getBool, 'columnIndex':int,
-            'ENDF_MT':int, 'index':int, 'L':int, 'reducedWidthAmplitudes':getBool,
-            'spin':spin, 'parity':parity, 'boundaryConditionValue':float,
-            'supportsAngularReconstruction':getBool,
-            }
-    attrs = dict( element.items() )
-    for key in attrs.keys():
-        if key in exclude: attrs.pop(key)
-        elif key in conversionTable: attrs[key] = conversionTable[key]( attrs[key] )
-    for val in required:
-        if val not in attrs: attrs[val] = False
-    return attrs
+    Parse all attributes, convert to type specified in required / optional lists.
+    Warns if extra attributes encountered.
 
+    :param element: Node instance with attributes to be parsed
+    :param required: list of tuples: (attributeName, Type)
+    :param optional: list of tuples: (attributeName, Type, default)
+    :param attributeRenames: optional list of tuples for GNDS backwards-compatibility: (attributeName, attributeValDict)
+    :return: dictionary of attributes converted to specified type
+    """
+    attrs = dict(element.items())
+    for attrName, attrVals in attributeRenames:
+        if attrName in attrs:
+            oldVal = attrs[attrName]
+            if oldVal in attrVals:
+                attrs[attrName] = attrVals[oldVal]
+    typed = {}
+    for key, Type in required:
+        assert key in attrs, 'Missing required attribute "%s"!' % key
+        val = attrs.pop(key)
+        if Type is bool:
+            val = getBool(val)
+        else:
+            val = Type(val)
+        typed[key] = val
+    for key, Type, default in optional:
+        if key in attrs:
+            val = attrs.pop(key)
+            if Type is bool:
+                val = getBool(val)
+            else:
+                val = Type(val)
+            typed[key] = val
+    if attrs:
+        print("WARNING: encountered unexpected attributes in node %s: %s" % (element.tag, attrs))
+    return typed

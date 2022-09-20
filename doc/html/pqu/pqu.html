@@ -16,7 +16,9 @@
     <script src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Glossary" href="../glossary.html" />
+    <link rel="prev" title="pqu" href="modules.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -27,7 +29,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="../glossary.html" title="Glossary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="pqu"
+             accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">pqu</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pqu package</a></li> 
       </ul>
     </div>  
@@ -95,7 +104,7 @@ significant digits for the speed calculation:</p>
 </pre></div>
 </div>
 <p>As can be seen, the internal speed value is as expected. However, since the PQU class (with the help
-of the pqu_float class) tracks a value’s significant digits, when a PQU instance is printed (via the __str__
+of the PQU_float class) tracks a value’s significant digits, when a PQU instance is printed (via the __str__
 method), only at most ‘significantDigits’ are displayed. The allowed range for ‘significantDigits’ is
 1 to sys.float_info.dig + 1 inclusive. For addition and subtraction, the member ‘order’ is also required and
 is why the following output is the same for both print statements:</p>
@@ -155,8 +164,8 @@ Some examples are (note - these are the same as the last examples, with uncertai
 </pre></div>
 </div>
 <p>The PQU constructor (i.e., its __init__ method) allows various input options for creating an instance (see <a href="#id5"><span class="problematic" id="id6">`PQU`_</span></a>).</p>
-<p>Each PQU has three main members. They are a value stored as a <a class="reference internal" href="#pqu.PQU.pqu_float" title="pqu.PQU.pqu_float"><code class="xref py py-class docutils literal notranslate"><span class="pre">pqu_float</span></code></a> instance, an uncertainty stored
-as a <a class="reference internal" href="#pqu.PQU.pqu_uncertainty" title="pqu.PQU.pqu_uncertainty"><code class="xref py py-class docutils literal notranslate"><span class="pre">pqu_uncertainty</span></code></a> instance and a unit stored as a <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhysicalUnit</span></code></a> instance.</p>
+<p>Each PQU has three main members. They are a value stored as a <a class="reference internal" href="#pqu.PQU.PQU_float" title="pqu.PQU.PQU_float"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU_float</span></code></a> instance, an uncertainty stored
+as a <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU_uncertainty</span></code></a> instance and a unit stored as a <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhysicalUnit</span></code></a> instance.</p>
 </div>
 <div class="section" id="units-and-conversions">
 <h3>Units and conversions<a class="headerlink" href="#units-and-conversions" title="Permalink to this headline">¶</a></h3>
@@ -453,7 +462,7 @@ by its significant digits.</p>
 <div class="section" id="supporting-classes">
 <h3>Supporting classes<a class="headerlink" href="#supporting-classes" title="Permalink to this headline">¶</a></h3>
 <p>In addition to the <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> class, the following classes are a part the the PQU module:
-<a class="reference internal" href="#pqu.PQU.parsers" title="pqu.PQU.parsers"><code class="xref py py-class docutils literal notranslate"><span class="pre">parsers</span></code></a>, <a class="reference internal" href="#pqu.PQU.pqu_float" title="pqu.PQU.pqu_float"><code class="xref py py-class docutils literal notranslate"><span class="pre">pqu_float</span></code></a>, <a class="reference internal" href="#pqu.PQU.pqu_uncertainty" title="pqu.PQU.pqu_uncertainty"><code class="xref py py-class docutils literal notranslate"><span class="pre">pqu_uncertainty</span></code></a>, <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhysicalUnit</span></code></a> and NumberDict.
+<a class="reference internal" href="#pqu.PQU.Parsers" title="pqu.PQU.Parsers"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parsers</span></code></a>, <a class="reference internal" href="#pqu.PQU.PQU_float" title="pqu.PQU.PQU_float"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU_float</span></code></a>, <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU_uncertainty</span></code></a>, <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhysicalUnit</span></code></a> and NumberDict.
 These classes are only intended as helper classes for the PQU class; hence, they have limited functionality and
 are only intended for internal use.</p>
 </div>
@@ -796,7 +805,7 @@ The following illustrates the issue:</p></li>
 <em class="property">class </em><code class="sig-prename descclassname">pqu.PQU.</code><code class="sig-name descname">PQU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uncertainty</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">checkOrder</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class supports a float value with an optional uncertainty and unit. Many basic math operations are supported (e.g., +, -, * /). 
-A PQU is anything that the staticmethod parsers.parsePQUString can parse.</p>
+A PQU is anything that the staticmethod Parsers.parsePQUString can parse.</p>
 <p>In this section the following notations are used:</p>
 <blockquote>
 <div><table class="docutils align-default">
@@ -823,13 +832,13 @@ A PQU is anything that the staticmethod parsers.parsePQUString can parse.</p>
 <td><p>A python float (e.g., 1.23e-12).</p></td>
 </tr>
 <tr class="row-even"><td><p>number</p></td>
-<td><p>Any of the following, int, float, pqu_float, a string representing a float (i.e.,
+<td><p>Any of the following, int, float, PQU_float, a string representing a float (i.e.,
 the python float function must be able to convert the string - e.g., ‘12.3e3’ but
 not ‘12.3 eV’) or any object having a __float__ method (hence, a numpy float
 will work).</p></td>
 </tr>
 <tr class="row-odd"><td><p>uncertainty = number_unc</p></td>
-<td><p>The uncertainty argument must be a valid number or a pqu_uncertainty object.
+<td><p>The uncertainty argument must be a valid number or a PQU_uncertainty object.
 If number, uncertainty is of style ‘+/-‘.</p></td>
 </tr>
 <tr class="row-even"><td><p>unit = string_pu</p></td>
@@ -837,7 +846,7 @@ If number, uncertainty is of style ‘+/-‘.</p></td>
 “1 MeV”) or a PhysicalUnit object.</p></td>
 </tr>
 <tr class="row-odd"><td><p>string</p></td>
-<td><p>String can be anything that the method parsers.parsePQUString is
+<td><p>String can be anything that the method Parsers.parsePQUString is
 capable of parsing (e.g., ‘1.23’, ‘1.23 m’, ‘1.23%’, ‘1.23(12) m’,
 ‘1.23 +/- 0.12m’). If it contains a unit (uncertainty) then the unit
 (uncertainty) argument must be None.</p></td>
@@ -889,10 +898,10 @@ is True (False) self’s uncertainty will be converted to a percent (non-percent
 <dt id="pqu.PQU.PQU.changeUncertaintyStyle">
 <code class="sig-name descname">changeUncertaintyStyle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.changeUncertaintyStyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.changeUncertaintyStyle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Changes self.uncertainty’s style. If style is the same as self.uncertainty’s style nothing is done. If style
-or self.uncertainty’s style is pqu_uncertainty.pqu_uncertaintyStyleNone as raise is executed.</p>
+or self.uncertainty’s style is PQU_uncertainty.pqu_uncertaintyStyleNone as raise is executed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>style</strong> – One of the three pqu_uncertainty styles</p>
+<dd class="field-odd"><p><strong>style</strong> – One of the three PQU_uncertainty styles</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1278,12 +1287,12 @@ PhysicalUnit or PQU.</p>
 <dt id="pqu.PQU.PQU.setPercentFlag">
 <code class="sig-name descname">setPercentFlag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">isPercent</span></em>, <em class="sig-param"><span class="n">scaleValue</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.setPercentFlag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.setPercentFlag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Changes the percent flag only when self is dimensionless and isPercent != self.isPercent( ).
-Otherwise, a raise is executed.  For scaleValue argument see <a class="reference internal" href="#pqu.PQU.pqu_float.setPercentFlag" title="pqu.PQU.pqu_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pqu_float.setPercentFlag()</span></code></a>.</p>
+Otherwise, a raise is executed.  For scaleValue argument see <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>isPercent</strong> – See <a class="reference internal" href="#pqu.PQU.pqu_float.setPercentFlag" title="pqu.PQU.pqu_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pqu_float.setPercentFlag()</span></code></a></p></li>
-<li><p><strong>scaleValue</strong> – See <a class="reference internal" href="#pqu.PQU.pqu_float.setPercentFlag" title="pqu.PQU.pqu_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pqu_float.setPercentFlag()</span></code></a></p></li>
+<li><p><strong>isPercent</strong> – See <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a></p></li>
+<li><p><strong>scaleValue</strong> – See <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -1334,13 +1343,570 @@ this case) and the ‘lb’ and ‘kg’ are all converted to ‘lb’ (or ‘kg
 <dt id="pqu.PQU.PQU.truncate">
 <code class="sig-name descname">truncate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">uncertainty</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.truncate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.truncate" title="Permalink to this definition">¶</a></dt>
 <dd><p>If value is True, calls self.value’s truncate method. If uncertainty is True, calls self.uncertainty’s truncate method.
-See <a class="reference internal" href="#pqu.PQU.pqu_float.truncate" title="pqu.PQU.pqu_float.truncate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pqu_float.truncate()</span></code></a></p>
+See <a class="reference internal" href="#pqu.PQU.PQU_float.truncate" title="pqu.PQU.PQU_float.truncate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.truncate()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> (<cite>bool</cite>) – If True self’s value is truncated</p></li>
 <li><p><strong>uncertainty</strong> (<cite>bool</cite>) – If True self’s uncertainty is truncated</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pqu.PQU.PQU_float">
+<em class="property">class </em><code class="sig-prename descclassname">pqu.PQU.</code><code class="sig-name descname">PQU_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">significantDigits</span></em>, <em class="sig-param"><span class="n">isPercent</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">checkOrder</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is used by PQU and PQU_uncertainty to store more information about a float than
+is provided by the python float class as well as methods to operator on this information. The main members are:</p>
+<ul class="simple">
+<li><p>value              — The python value of the float.</p></li>
+<li><p>significantDigits  — The number of significant digits the value possess as defined by the creator of self.</p></li>
+<li><dl class="simple">
+<dt>order              — An integer that represents the order of the most significant digit of self. </dt><dd><p>Calculated internally equivalent to int( log10( value ) ) and stored for convenience.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>_isPercent         — True if self represents a percent and False otherwise. Note, the value is always stored as</dt><dd><p>the non-percent value (e.g., 1% and 12% are stored as 0.01 and 0.12 respectively).</p>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.calculateOrder">
+<em class="property">static </em><code class="sig-name descname">calculateOrder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.calculateOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.calculateOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the order of value. Value must be convertible to a float. A float’s order is the exponent in the
+representation ‘m * 10**o’ where ‘m’ is the mantissa and ‘o’ is the exponent. For example, 1.234e43 has order 43.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – any object convertible to a float.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>integer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.fixFloatsOrder">
+<em class="property">static </em><code class="sig-name descname">fixFloatsOrder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.fixFloatsOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.fixFloatsOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Many numbers are not represented in IEEE floating point by there true value. For example, ‘1e-12’ is 
+stored as the float 9.9999999999999998e-13. The order of the true value is -12 while the order of the floating 
+point representation is -13.  This function is implemented to help with this issue.  For example, for 
+PQU the string “2.300000000003 (1)” was originally being reprinted as “2.300000000003 (10)” because of this issue.
+To check for this, the value is multiplied by a small (of order sys.float_info.epsilon) factor to see if order 
+changes.  If it does, value is set to the smallest multiplier greater than 1 for which order is changed. 
+The fixed value and its order are returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – any object convertible to a float.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple of float and integer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.getOrder">
+<code class="sig-name descname">getOrder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.getOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.getOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self’s order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>int</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.getSignificantDigits">
+<code class="sig-name descname">getSignificantDigits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.getSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.getSignificantDigits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self’s significant digits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>int</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.getValue">
+<code class="sig-name descname">getValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.getValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self’s value. Equivalent to float( self ).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.info">
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">17</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a detailed string of self. Mainly for debugging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>str</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.isPercent">
+<code class="sig-name descname">isPercent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.isPercent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.isPercent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if self is a percent and False otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>bool</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.setPercentFlag">
+<code class="sig-name descname">setPercentFlag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">isPercent</span></em>, <em class="sig-param"><span class="n">scaleValue</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.setPercentFlag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.setPercentFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>If argument isPercent is True and self is not a percent, self is converted to a percent.
+If argument isPercent is False and self is a percent, self is converted to non-percent.
+Otherwise, a raise is executed.</p>
+<p>If scaleValue is False, the value is not changed; otherwise, value is scale by 0.01 (100)
+if isPercent is True (False).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>isPercent</strong> (<cite>bool</cite>) – </p>
+</dd>
+</dl>
+<p>param scaleValue:
+:type scaleValue: <cite>bool</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.setSignificantDigits">
+<code class="sig-name descname">setSignificantDigits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.setSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.setSignificantDigits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets self’s significant digits to significantDigits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>significantDigits</strong> (<cite>int</cite>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.surmiseSignificantDigits">
+<em class="property">static </em><code class="sig-name descname">surmiseSignificantDigits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.surmiseSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.surmiseSignificantDigits" title="Permalink to this definition">¶</a></dt>
+<dd><p>This factory function returns a PQU_float instance given a float value and set its significantDigits to
+something “reasonable”. The significantDigits are determined by using PQU.floatToShortestString with trimZeros = True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.toString">
+<code class="sig-name descname">toString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trimZeros</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">keepPeriod</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">includePercent</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">favorEFormBy</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.toString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string representation of self (i.e., ‘1.234e6’ or ‘12%’) using function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trimZeros</strong> (<em>bool</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a></p></li>
+<li><p><strong>keepPeriod</strong> (<em>bool</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a></p></li>
+<li><p><strong>favorEFormBy</strong> (<em>int</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a></p></li>
+<li><p><strong>significantDigits</strong> – (<em>int</em> or <em>None</em>) Used to override self’s default significantDigits</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>str</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_float.truncate">
+<code class="sig-name descname">truncate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.truncate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.truncate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts self’s value so that only significantDigits are non-zero. For example, if value is 3.453983207834109
+and significantDigits = 4 then the value is set to 3.454. If significantDigits is None, self’s significantDigits
+is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>significantDigits</strong> (None or <cite>int</cite>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pqu.PQU.PQU_uncertainty">
+<em class="property">class </em><code class="sig-prename descclassname">pqu.PQU.</code><code class="sig-name descname">PQU_uncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uncertaintyStyle</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">isPercent</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">checkOrder</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is used by PQU to store the style of uncertainty and information about its value.
+The members are:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>style — One of the three following uncertainty styles supported by PQU:</dt><dd><ul>
+<li><p>pqu_uncertaintyStyleNone          - No uncertainty was given for the PQU instance.</p></li>
+<li><p>pqu_uncertaintyStylePlusMinus     - The uncertainty was given as ‘+/- value’ (e.g., ‘123 +/- 32’).</p></li>
+<li><p>pqu_uncertaintyStyleParenthesis   - The uncertainty was given as ‘(value)’ (e.g., ‘123(32)’.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>value — The value stored as a PQU_float.</p></li>
+</ul>
+<dl class="py method">
+<dt id="pqu.PQU.PQU_uncertainty.getProperValue">
+<code class="sig-name descname">getProperValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.getProperValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.getProperValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self’s value. If value is a percent, returned result is multiplied by argument v first, where v
+is expected to be the number associated the the percent value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>float</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_uncertainty.getStyle">
+<code class="sig-name descname">getStyle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.getStyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.getStyle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self’s style.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>One of the three uncertainty styles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_uncertainty.info">
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">17</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a detailed string of self. Mainly for debugging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>str</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_uncertainty.isPercent">
+<code class="sig-name descname">isPercent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.isPercent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.isPercent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if self is a percent and False otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>bool</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_uncertainty.isUncertainty">
+<code class="sig-name descname">isUncertainty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.isUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.isUncertainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns False is style is pqu_uncertaintyStyleNone and True otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>bool</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="pqu.PQU.PQU_uncertainty.pqu_uncertaintyStyleNone">
+<code class="sig-name descname">pqu_uncertaintyStyleNone</code><em class="property"> = None</em><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.pqu_uncertaintyStyleNone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pqu.PQU.PQU_uncertainty.pqu_uncertaintyStyleParenthesis">
+<code class="sig-name descname">pqu_uncertaintyStyleParenthesis</code><em class="property"> = 'parenthesis'</em><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.pqu_uncertaintyStyleParenthesis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pqu.PQU.PQU_uncertainty.pqu_uncertaintyStylePlusMinus">
+<code class="sig-name descname">pqu_uncertaintyStylePlusMinus</code><em class="property"> = 'plusMinus'</em><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.pqu_uncertaintyStylePlusMinus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_uncertainty.toString">
+<code class="sig-name descname">toString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">' '</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.toString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string representation of self (i.e., ‘+/- 1.2%’).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> (<em>str</em>) – A prefix for the ‘+/-‘ style</p></li>
+<li><p><strong>significantDigits</strong> – Passed onto method <a class="reference internal" href="#pqu.PQU.PQU_float.toString" title="pqu.PQU.PQU_float.toString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.toString()</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>str</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.PQU_uncertainty.truncate">
+<code class="sig-name descname">truncate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.truncate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.truncate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts self’s value so that only the significant digits are non-zero. This is most useful when a PQU instance is
+calculated from other PQU instance which can create an uncertainty with many non-zero digits. As example, adding two
+PQUs with uncertainties 1.3 and 3.2 each with two significant digits, produces the uncertainty sqrt( 1.3**2 + 3.2**2 ) 
+= 3.453983207834109. This uncertainty also only has two significant digits. After calling truncate the uncertainty
+become 3.5 which is the value that the method toString would return.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pqu.PQU.Parsers">
+<em class="property">class </em><code class="sig-prename descclassname">pqu.PQU.</code><code class="sig-name descname">Parsers</code><a class="reference internal" href="../_modules/pqu/PQU.html#Parsers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.Parsers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p class="rubric">Regular Expression Matching</p>
+<dl class="py method">
+<dt id="pqu.PQU.Parsers.parseFloat">
+<em class="property">static </em><code class="sig-name descname">parseFloat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em>, <em class="sig-param"><span class="n">fullStr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#Parsers.parseFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.Parsers.parseFloat" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method parses the beginning of str1 for a valid float. An arbitrary number of white spaces can exists before the 
+float characters. This method returns a tuple of length 3. The first item of the tuple is the float 
+value returned as a PQU_float instance with significantDigits determined from the string.  The second 
+item is significantDigitsForZero which, if the string represents a 0 value, gives the number of significant 
+digits for the zero; otherwise None is returned. As example, the string ‘000.000’ has 4 significant digits 
+(i.e., it is considered equivalent to the representation ‘0.000’).  The last object is the string of all 
+characters after the last one used for converting the float.  For example, with str1 = ‘   12.345e3ABCD XYS’ 
+the returned tuple is:</p>
+<p>( PQU_float( 1.2345e4, 5 ), None, ‘ABCD XYS’ ).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>str1</strong> – String to parse.</p></li>
+<li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.PQU_float" title="pqu.PQU.PQU_float">PQU_float</a>, integer | None, string )</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.Parsers.parsePQUString">
+<em class="property">static </em><code class="sig-name descname">parsePQUString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#Parsers.parsePQUString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.Parsers.parsePQUString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of PQU_float, 
+unit is an instance of PhysicalUnit and uncertainty is an instance of PQU_uncertainty.</p>
+<p>The string can be one of the following PQU forms. Here, F represents a valid float string, () represents
+the string ‘(#)’ where ‘#’ is a 1 or 2 digit number, +/- represents the string ‘+/- F’, % is itself
+and u is a unit.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 11%" />
+<col style="width: 18%" />
+<col style="width: 10%" />
+<col style="width: 24%" />
+<col style="width: 24%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>Form</p></th>
+<th class="head"><p>Example</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Value - uncertainty</p></th>
+<th class="head"><p>Value + uncertainty</p></th>
+<th class="head"><p>Unit</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>F</p></td>
+<td><p>‘234’</p></td>
+<td><ol class="arabic simple" start="234">
+<li></li>
+</ol>
+</td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>F%</p></td>
+<td><p>‘234%’</p></td>
+<td><p>2.34</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>F u</p></td>
+<td><p>‘234 m’</p></td>
+<td><ol class="arabic simple" start="234">
+<li></li>
+</ol>
+</td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>‘m’</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>F()</p></td>
+<td><p>‘234(5)’</p></td>
+<td><ol class="arabic simple" start="234">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="229">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="239">
+<li></li>
+</ol>
+</td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>F()%</p></td>
+<td><p>‘234(5)%’</p></td>
+<td><p>2.34</p></td>
+<td><p>2.29</p></td>
+<td><p>2.39</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>F() u</p></td>
+<td><p>‘234(5) m’</p></td>
+<td><ol class="arabic simple" start="234">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="229">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="239">
+<li></li>
+</ol>
+</td>
+<td><p>‘m’</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>F +/-</p></td>
+<td><p>‘234 +/- 5’</p></td>
+<td><ol class="arabic simple" start="234">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="229">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="239">
+<li></li>
+</ol>
+</td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>F +/-%</p></td>
+<td><p>‘234 +/- 5%’</p></td>
+<td><ol class="arabic simple" start="234">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="222">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="246">
+<li></li>
+</ol>
+</td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>F +/- u</p></td>
+<td><p>‘234 +/- 5 m’</p></td>
+<td><ol class="arabic simple" start="234">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="229">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="239">
+<li></li>
+</ol>
+</td>
+<td><p>‘m’</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>F +/-% u</p></td>
+<td><p>‘234 +/- 5% m’</p></td>
+<td><ol class="arabic simple" start="234">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="222">
+<li></li>
+</ol>
+</td>
+<td><ol class="arabic simple" start="246">
+<li></li>
+</ol>
+</td>
+<td><p>‘m’</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>(F +/-)%</p></td>
+<td><p>‘(234 +/- 5)%’</p></td>
+<td><p>2.34</p></td>
+<td><p>2.29</p></td>
+<td><p>2.39</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<p>Note 1) 5% of 234 is 11.7 rounded to 12.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>str1</strong> – String to parse.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.PQU_float" title="pqu.PQU.PQU_float">PQU_float</a>, <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit">PhysicalUnit</a>, <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty">PQU_uncertainty</a> )</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.Parsers.parseParenthesisUncertainty">
+<em class="property">static </em><code class="sig-name descname">parseParenthesisUncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em>, <em class="sig-param"><span class="n">fullStr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#Parsers.parseParenthesisUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.Parsers.parseParenthesisUncertainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method parses the beginning of str1 for the sub-string ‘(#)’ where ‘#’ is a 1 or 2 digit
+number.  This method returns a tuple of length 2. The first item of the tuple is the number returned as 
+a PQU_uncertainty of style pqu_uncertaintyStyleParenthesis. Characters after the ‘)’ are returned 
+as the second item. For example, with str1 = ‘(34) ABCD XYS’ the returned tuple is:</p>
+<p>( PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleParenthesis, 34, significantDigits = 2 ), ‘ ABCD XYS’ ).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>str1</strong> – String to parse.</p></li>
+<li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty">PQU_uncertainty</a>, string )</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pqu.PQU.Parsers.parsePlusMinusUncertainty">
+<em class="property">static </em><code class="sig-name descname">parsePlusMinusUncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em>, <em class="sig-param"><span class="n">fullStr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#Parsers.parsePlusMinusUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.Parsers.parsePlusMinusUncertainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method parses the beginning of str1 for the sub-string ‘+/-‘ followed by a float string. An arbitrary number of 
+white spaces can exists before the ‘+/-‘ sub-string and between it and the float string. This method
+returns a tuple of length 2. The first item of the tuple is float value returned as a PQU_uncertainty
+of style pqu_uncertaintyStylePlusMinus. Characters after the last one used for converting the float are 
+returned as the second item. For example, with str1 = ‘ +/-  12. ABCD XYS’ the returned tuple is:</p>
+<p>( PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, 12. ), ‘ ABCD XYS’ )</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>str1</strong> – String to parse.</p></li>
+<li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty">PQU_uncertainty</a>, string )</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1566,563 +2132,6 @@ with the shortest representation is determined.</p></li>
 <dd class="field-even"><p><cite>str</cite></p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py class">
-<dt id="pqu.PQU.parsers">
-<em class="property">class </em><code class="sig-prename descclassname">pqu.PQU.</code><code class="sig-name descname">parsers</code><a class="reference internal" href="../_modules/pqu/PQU.html#parsers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.parsers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p class="rubric">Regular Expression Matching</p>
-<dl class="py method">
-<dt id="pqu.PQU.parsers.parseFloat">
-<em class="property">static </em><code class="sig-name descname">parseFloat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em>, <em class="sig-param"><span class="n">fullStr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#parsers.parseFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.parsers.parseFloat" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method parses the beginning of str1 for a valid float. An arbitrary number of white spaces can exists before the 
-float characters. This method returns a tuple of length 3. The first item of the tuple is the float 
-value returned as a pqu_float instance with significantDigits determined from the string.  The second 
-item is significantDigitsForZero which, if the string represents a 0 value, gives the number of significant 
-digits for the zero; otherwise None is returned. As example, the string ‘000.000’ has 4 significant digits 
-(i.e., it is considered equivalent to the representation ‘0.000’).  The last object is the string of all 
-characters after the last one used for converting the float.  For example, with str1 = ‘   12.345e3ABCD XYS’ 
-the returned tuple is:</p>
-<p>( pqu_float( 1.2345e4, 5 ), None, ‘ABCD XYS’ ).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>str1</strong> – String to parse.</p></li>
-<li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.pqu_float" title="pqu.PQU.pqu_float">pqu_float</a>, integer | None, string )</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.parsers.parsePQUString">
-<em class="property">static </em><code class="sig-name descname">parsePQUString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#parsers.parsePQUString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.parsers.parsePQUString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of pqu_float, 
-unit is an instance of PhysicalUnit and uncertainty is an instance of pqu_uncertainty.</p>
-<p>The string can be one of the following PQU forms. Here, F represents a valid float string, () represents
-the string ‘(#)’ where ‘#’ is a 1 or 2 digit number, +/- represents the string ‘+/- F’, % is itself
-and u is a unit.</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 11%" />
-<col style="width: 18%" />
-<col style="width: 10%" />
-<col style="width: 24%" />
-<col style="width: 24%" />
-<col style="width: 7%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>#</p></th>
-<th class="head"><p>Form</p></th>
-<th class="head"><p>Example</p></th>
-<th class="head"><p>Value</p></th>
-<th class="head"><p>Value - uncertainty</p></th>
-<th class="head"><p>Value + uncertainty</p></th>
-<th class="head"><p>Unit</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>F</p></td>
-<td><p>‘234’</p></td>
-<td><ol class="arabic simple" start="234">
-<li></li>
-</ol>
-</td>
-<td><p>N/A</p></td>
-<td><p>N/A</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>1</p></td>
-<td><p>F%</p></td>
-<td><p>‘234%’</p></td>
-<td><p>2.34</p></td>
-<td><p>N/A</p></td>
-<td><p>N/A</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>2</p></td>
-<td><p>F u</p></td>
-<td><p>‘234 m’</p></td>
-<td><ol class="arabic simple" start="234">
-<li></li>
-</ol>
-</td>
-<td><p>N/A</p></td>
-<td><p>N/A</p></td>
-<td><p>‘m’</p></td>
-</tr>
-<tr class="row-odd"><td><p>3</p></td>
-<td><p>F()</p></td>
-<td><p>‘234(5)’</p></td>
-<td><ol class="arabic simple" start="234">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="229">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="239">
-<li></li>
-</ol>
-</td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>4</p></td>
-<td><p>F()%</p></td>
-<td><p>‘234(5)%’</p></td>
-<td><p>2.34</p></td>
-<td><p>2.29</p></td>
-<td><p>2.39</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>5</p></td>
-<td><p>F() u</p></td>
-<td><p>‘234(5) m’</p></td>
-<td><ol class="arabic simple" start="234">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="229">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="239">
-<li></li>
-</ol>
-</td>
-<td><p>‘m’</p></td>
-</tr>
-<tr class="row-even"><td><p>6</p></td>
-<td><p>F +/-</p></td>
-<td><p>‘234 +/- 5’</p></td>
-<td><ol class="arabic simple" start="234">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="229">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="239">
-<li></li>
-</ol>
-</td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>7</p></td>
-<td><p>F +/-%</p></td>
-<td><p>‘234 +/- 5%’</p></td>
-<td><ol class="arabic simple" start="234">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="222">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="246">
-<li></li>
-</ol>
-</td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>8</p></td>
-<td><p>F +/- u</p></td>
-<td><p>‘234 +/- 5 m’</p></td>
-<td><ol class="arabic simple" start="234">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="229">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="239">
-<li></li>
-</ol>
-</td>
-<td><p>‘m’</p></td>
-</tr>
-<tr class="row-odd"><td><p>9</p></td>
-<td><p>F +/-% u</p></td>
-<td><p>‘234 +/- 5% m’</p></td>
-<td><ol class="arabic simple" start="234">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="222">
-<li></li>
-</ol>
-</td>
-<td><ol class="arabic simple" start="246">
-<li></li>
-</ol>
-</td>
-<td><p>‘m’</p></td>
-</tr>
-<tr class="row-even"><td><p>10</p></td>
-<td><p>(F +/-)%</p></td>
-<td><p>‘(234 +/- 5)%’</p></td>
-<td><p>2.34</p></td>
-<td><p>2.29</p></td>
-<td><p>2.39</p></td>
-<td><p>N/A</p></td>
-</tr>
-</tbody>
-</table>
-<p>Note 1) 5% of 234 is 11.7 rounded to 12.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>str1</strong> – String to parse.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.pqu_float" title="pqu.PQU.pqu_float">pqu_float</a>, <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit">PhysicalUnit</a>, <a class="reference internal" href="#pqu.PQU.pqu_uncertainty" title="pqu.PQU.pqu_uncertainty">pqu_uncertainty</a> )</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.parsers.parseParenthesisUncertainty">
-<em class="property">static </em><code class="sig-name descname">parseParenthesisUncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em>, <em class="sig-param"><span class="n">fullStr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#parsers.parseParenthesisUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.parsers.parseParenthesisUncertainty" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method parses the beginning of str1 for the sub-string ‘(#)’ where ‘#’ is a 1 or 2 digit
-number.  This method returns a tuple of length 2. The first item of the tuple is the number returned as 
-a pqu_uncertainty of style pqu_uncertaintyStyleParenthesis. Characters after the ‘)’ are returned 
-as the second item. For example, with str1 = ‘(34) ABCD XYS’ the returned tuple is:</p>
-<p>( pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleParenthesis, 34, significantDigits = 2 ), ‘ ABCD XYS’ ).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>str1</strong> – String to parse.</p></li>
-<li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.pqu_uncertainty" title="pqu.PQU.pqu_uncertainty">pqu_uncertainty</a>, string )</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.parsers.parsePlusMinusUncertainty">
-<em class="property">static </em><code class="sig-name descname">parsePlusMinusUncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em>, <em class="sig-param"><span class="n">fullStr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#parsers.parsePlusMinusUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.parsers.parsePlusMinusUncertainty" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method parses the beginning of str1 for the sub-string ‘+/-‘ followed by a float string. An arbitrary number of 
-white spaces can exists before the ‘+/-‘ sub-string and between it and the float string. This method
-returns a tuple of length 2. The first item of the tuple is float value returned as a pqu_uncertainty
-of style pqu_uncertaintyStylePlusMinus. Characters after the last one used for converting the float are 
-returned as the second item. For example, with str1 = ‘ +/-  12. ABCD XYS’ the returned tuple is:</p>
-<p>( pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, 12. ), ‘ ABCD XYS’ )</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>str1</strong> – String to parse.</p></li>
-<li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.pqu_uncertainty" title="pqu.PQU.pqu_uncertainty">pqu_uncertainty</a>, string )</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="pqu.PQU.pqu_float">
-<em class="property">class </em><code class="sig-prename descclassname">pqu.PQU.</code><code class="sig-name descname">pqu_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">significantDigits</span></em>, <em class="sig-param"><span class="n">isPercent</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">checkOrder</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class is used by PQU and pqu_uncertainty to store more information about a float than
-is provided by the python float class as well as methods to operator on this information. The main members are:</p>
-<ul class="simple">
-<li><p>value              — The python value of the float.</p></li>
-<li><p>significantDigits  — The number of significant digits the value possess as defined by the creator of self.</p></li>
-<li><dl class="simple">
-<dt>order              — An integer that represents the order of the most significant digit of self. </dt><dd><p>Calculated internally equivalent to int( log10( value ) ) and stored for convenience.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>_isPercent         — True if self represents a percent and False otherwise. Note, the value is always stored as</dt><dd><p>the non-percent value (e.g., 1% and 12% are stored as 0.01 and 0.12 respectively).</p>
-</dd>
-</dl>
-</li>
-</ul>
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.calculateOrder">
-<em class="property">static </em><code class="sig-name descname">calculateOrder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.calculateOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.calculateOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the order of value. Value must be convertible to a float. A float’s order is the exponent in the
-representation ‘m * 10**o’ where ‘m’ is the mantissa and ‘o’ is the exponent. For example, 1.234e43 has order 43.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>value</strong> – any object convertible to a float.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>integer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.fixFloatsOrder">
-<em class="property">static </em><code class="sig-name descname">fixFloatsOrder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.fixFloatsOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.fixFloatsOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Many numbers are not represented in IEEE floating point by there true value. For example, ‘1e-12’ is 
-stored as the float 9.9999999999999998e-13. The order of the true value is -12 while the order of the floating 
-point representation is -13.  This function is implemented to help with this issue.  For example, for 
-PQU the string “2.300000000003 (1)” was originally being reprinted as “2.300000000003 (10)” because of this issue.
-To check for this, the value is multiplied by a small (of order sys.float_info.epsilon) factor to see if order 
-changes.  If it does, value is set to the smallest multiplier greater than 1 for which order is changed. 
-The fixed value and its order are returned.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>value</strong> – any object convertible to a float.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>tuple of float and integer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.getOrder">
-<code class="sig-name descname">getOrder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.getOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.getOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self’s order.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>int</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.getSignificantDigits">
-<code class="sig-name descname">getSignificantDigits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.getSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.getSignificantDigits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self’s significant digits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>int</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.getValue">
-<code class="sig-name descname">getValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.getValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self’s value. Equivalent to float( self ).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.info">
-<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">17</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a detailed string of self. Mainly for debugging.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>str</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.isPercent">
-<code class="sig-name descname">isPercent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.isPercent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.isPercent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns True if self is a percent and False otherwise.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>bool</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.setPercentFlag">
-<code class="sig-name descname">setPercentFlag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">isPercent</span></em>, <em class="sig-param"><span class="n">scaleValue</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.setPercentFlag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.setPercentFlag" title="Permalink to this definition">¶</a></dt>
-<dd><p>If argument isPercent is True and self is not a percent, self is converted to a percent.
-If argument isPercent is False and self is a percent, self is converted to non-percent.
-Otherwise, a raise is executed.</p>
-<p>If scaleValue is False, the value is not changed; otherwise, value is scale by 0.01 (100)
-if isPercent is True (False).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>isPercent</strong> (<cite>bool</cite>) – </p>
-</dd>
-</dl>
-<p>param scaleValue:
-:type scaleValue: <cite>bool</cite></p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.setSignificantDigits">
-<code class="sig-name descname">setSignificantDigits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.setSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.setSignificantDigits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self’s significant digits to significantDigits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>significantDigits</strong> (<cite>int</cite>) – </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.surmiseSignificantDigits">
-<em class="property">static </em><code class="sig-name descname">surmiseSignificantDigits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.surmiseSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.surmiseSignificantDigits" title="Permalink to this definition">¶</a></dt>
-<dd><p>This factory function returns a pqu_float instance given a float value and set its significantDigits to
-something “reasonable”. The significantDigits are determined by using PQU.floatToShortestString with trimZeros = True.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.toString">
-<code class="sig-name descname">toString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trimZeros</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">keepPeriod</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">includePercent</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">favorEFormBy</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string representation of self (i.e., ‘1.234e6’ or ‘12%’) using function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>trimZeros</strong> (<em>bool</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a></p></li>
-<li><p><strong>keepPeriod</strong> (<em>bool</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a></p></li>
-<li><p><strong>favorEFormBy</strong> (<em>int</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a></p></li>
-<li><p><strong>significantDigits</strong> – (<em>int</em> or <em>None</em>) Used to override self’s default significantDigits</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><cite>str</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_float.truncate">
-<code class="sig-name descname">truncate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.truncate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.truncate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adjusts self’s value so that only significantDigits are non-zero. For example, if value is 3.453983207834109
-and significantDigits = 4 then the value is set to 3.454. If significantDigits is None, self’s significantDigits
-is used.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>significantDigits</strong> (None or <cite>int</cite>) – </p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="pqu.PQU.pqu_uncertainty">
-<em class="property">class </em><code class="sig-prename descclassname">pqu.PQU.</code><code class="sig-name descname">pqu_uncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uncertaintyStyle</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">isPercent</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">checkOrder</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class is used by PQU to store the style of uncertainty and information about its value.
-The members are:</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt>style — One of the three following uncertainty styles supported by PQU:</dt><dd><ul>
-<li><p>pqu_uncertaintyStyleNone          - No uncertainty was given for the PQU instance.</p></li>
-<li><p>pqu_uncertaintyStylePlusMinus     - The uncertainty was given as ‘+/- value’ (e.g., ‘123 +/- 32’).</p></li>
-<li><p>pqu_uncertaintyStyleParenthesis   - The uncertainty was given as ‘(value)’ (e.g., ‘123(32)’.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>value — The value stored as a pqu_float.</p></li>
-</ul>
-<dl class="py method">
-<dt id="pqu.PQU.pqu_uncertainty.getProperValue">
-<code class="sig-name descname">getProperValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.getProperValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.getProperValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self’s value. If value is a percent, returned result is multiplied by argument v first, where v
-is expected to be the number associated the the percent value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>float</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_uncertainty.getStyle">
-<code class="sig-name descname">getStyle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.getStyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.getStyle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self’s style.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>One of the three uncertainty styles</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_uncertainty.info">
-<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">17</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a detailed string of self. Mainly for debugging.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>str</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_uncertainty.isPercent">
-<code class="sig-name descname">isPercent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.isPercent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.isPercent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns True if self is a percent and False otherwise.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>bool</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_uncertainty.isUncertainty">
-<code class="sig-name descname">isUncertainty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.isUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.isUncertainty" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns False is style is pqu_uncertaintyStyleNone and True otherwise.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>bool</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="pqu.PQU.pqu_uncertainty.pqu_uncertaintyStyleNone">
-<code class="sig-name descname">pqu_uncertaintyStyleNone</code><em class="property"> = None</em><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.pqu_uncertaintyStyleNone" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="pqu.PQU.pqu_uncertainty.pqu_uncertaintyStyleParenthesis">
-<code class="sig-name descname">pqu_uncertaintyStyleParenthesis</code><em class="property"> = 'parenthesis'</em><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.pqu_uncertaintyStyleParenthesis" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="pqu.PQU.pqu_uncertainty.pqu_uncertaintyStylePlusMinus">
-<code class="sig-name descname">pqu_uncertaintyStylePlusMinus</code><em class="property"> = 'plusMinus'</em><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.pqu_uncertaintyStylePlusMinus" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_uncertainty.toString">
-<code class="sig-name descname">toString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">' '</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string representation of self (i.e., ‘+/- 1.2%’).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<em>str</em>) – A prefix for the ‘+/-‘ style</p></li>
-<li><p><strong>significantDigits</strong> – Passed onto method <a class="reference internal" href="#pqu.PQU.pqu_float.toString" title="pqu.PQU.pqu_float.toString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pqu_float.toString()</span></code></a></p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><cite>str</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pqu.PQU.pqu_uncertainty.truncate">
-<code class="sig-name descname">truncate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.truncate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.truncate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adjusts self’s value so that only the significant digits are non-zero. This is most useful when a PQU instance is
-calculated from other PQU instance which can create an uncertainty with many non-zero digits. As example, adding two
-PQUs with uncertainties 1.3 and 3.2 each with two significant digits, produces the uncertainty sqrt( 1.3**2 + 3.2**2 ) 
-= 3.453983207834109. This uncertainty also only has two significant digits. After calling truncate the uncertainty
-become 3.5 which is the value that the method toString would return.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py function">
@@ -2356,6 +2365,12 @@ unitTo</p></td>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="previous chapter">pqu</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../glossary.html"
+                        title="next chapter">Glossary</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -2386,7 +2401,14 @@ unitTo</p></td>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="../glossary.html" title="Glossary"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="pqu"
+             >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >pqu</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pqu package</a></li> 
       </ul>
     </div>

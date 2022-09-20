@@ -1,18 +1,16 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import os
 import argparse
 
-from LUPY import GNDSType as GNDSTypeModule
-from fudge import warning
-from PoPs import database as databaseModule
+from fudge import warning as warningModule
+from fudge import GNDS_file as GNDS_fileModule
 
 description1 = """Read one or more GNDS files into Fudge and run all physics tests.
     Sample use: python checkGNDS.py n-001_H_001.xml n-001_H_002.xml ...
@@ -31,21 +29,17 @@ if __name__ == '__main__' :
 
     for fileName in args.gnds :
 
-        covariances = []
-        name, dummy = GNDSTypeModule.type( fileName )
-        if( name == databaseModule.database.moniker ) :
-            gnds = GNDSTypeModule.read( fileName )
-        else :
-
-            gnds = GNDSTypeModule.read( fileName )
-            if hasattr(gnds, 'loadCovariances'):
-                covariances = gnds.loadCovariances()
+        gnds = GNDS_fileModule.read(fileName)
 
         warnings = gnds.check( checkEnergyBalance = args.ebalance, failOnException = args.failOnException )
         if args.ebalance:
             print( warnings )
         else:
-            print( warnings.filter( exclude=[warning.energyImbalance] ) )
+            print( warnings.filter( exclude=[warningModule.EnergyImbalance] ) )
+
+        covariances = []
+        if hasattr(gnds, 'loadCovariances'):
+            covariances = gnds.loadCovariances()
 
         for covarianceSuite in covariances:
             print( "\nChecking covariance file %s" % covarianceSuite.sourcePath)

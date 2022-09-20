@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -22,9 +22,9 @@ def readEvaluation(filename, verbose=True, skipBadData=True, continuumSpectraFix
     # Is the file a GNDS file?
     if firstline.startswith("<reactionSuite ") or firstline.startswith("<?xml"):
         import fudge
-        RS = fudge.reactionSuite.readXML(filename)
+        RS = fudge.reactionSuite.ReactionSuite.readXML_file(filename)
         try:
-            CS = fudge.covariances.covarianceSuite.readXML(filename.replace('.gnds.', '.gndsCov.'))
+            CS = fudge.covariances.covarianceSuite.CovarianceSuite.readXML_file(filename.replace('.gnds.', '.gndsCov.'))
         except:
             CS = None
         return {'reactionSuite': RS, 'covarianceSuite': CS, 'errors': []}

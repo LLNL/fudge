@@ -32,15 +32,21 @@ of the Python scripting language and that you are involved in nuclear data enter
 some fashion (so I don't have to define things like "evaluation").
 
 Let's begin with the most important thing.  Make sure fudge is in your PYTHONPATH!  
-You can do this a few different ways:
+You can do this a few different ways, depending on what shell you use.
+
+    * For bash (or ksh, zsh)::
+        $ export PYTHONPATH="/full/path/to/directory/containing/fudge"  # only changes the current terminal session
+        or add that line to .bashrc (or similar)
+
+    * For csh (or tcsh)::
+        $ setenv PYTHONPATH "/full/path/to/directory/containing/fudge"
+        or add that line to .cshrc or .tcshrc
     
-    * Using the bash shell, at the command line do::
-    
-        $ export PYTHONPATH="/full/path/to/directory/containing/fudge"
-        
-    * Add this export directive to your ``.bashrc`` file.
     * Alternatively, you can amend the ``sys.path`` variable to point to the directory 
-      containing the ``fudge`` python module *inside* any python script you write.
+      containing the ``fudge`` python module *inside* any python script you write.::
+      $ import sys
+      $ sys.path.append("/full/path/to/directory/containing/fudge")
+
 
 With that settled, you can start with the section on translating between ENDF and GNDS.
 

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -23,7 +23,7 @@ def intArrayToRecords(intArray):
 
     stringData = ['%9d' % d for d in intArray]
     lines = []
-    while(len(stringData)) :
+    while len(stringData):
         lines.append(''.join(stringData[:8]))
         stringData = stringData[8:]
     return lines
@@ -34,7 +34,7 @@ def XSSToStrings(annotates, XSS, addAnnotation, numberOfEnergiesInGrid):
     annotates.append((len(XSS), ''))
     i2, label = annotates[i3]
     for i1, datum in enumerate(XSS):
-        if( type( datum ) == int ) :
+        if type( datum ) == int:
             record.append( "%20d" % datum )
         else :
             try :
@@ -44,17 +44,17 @@ def XSSToStrings(annotates, XSS, addAnnotation, numberOfEnergiesInGrid):
             except :
                 print( i1, len(XSS), datum, annotates[i3] )
                 raise
-        if( len( record ) == 4 ) :
+        if len( record ) == 4:
             annotate = ''
-            if( i2 <= i1 ) :
+            if i2 <= i1:
                 annotate = ' !'
                 sep = ' '
-                while( i2 <= i1 ) :
+                while i2 <= i1:
                     annotate += sep + label + ' (%s)' % ( i2 - i1 + 3 )
                     sep = ', '
                     i3 += 1
                     i2, label = annotates[i3]
-            if( not addAnnotation ) :   annotate = ''
+            if not addAnnotation:   annotate = ''
             strData.append( ''.join( record ) + annotate )
             record = []
 

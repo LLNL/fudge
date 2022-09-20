@@ -1,38 +1,41 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
+import numpy
 
+from LUPY import enums as LUPY_enumsModule
+
+from . import enums as enumsModule
 from . import values as valuesModule
 from . import base as baseModule
-from . import standards as standardsModule
+from . import vector as vectorModule
+from . import matrix as matrixModule
 
-symmetryNoneToken = 'none'
-symmetryLowerToken = 'lower'
-symmetryUpperToken = 'upper'
-symmetryOptions = ( symmetryNoneToken, symmetryLowerToken, symmetryUpperToken )
+class Symmetry(LUPY_enumsModule.Enum):
 
-permutationPlusToken = '+'
-permutationMinusToken = '-'
-permutationOptions = ( permutationPlusToken, permutationMinusToken )
+    none = LUPY_enumsModule.auto()
+    lower = LUPY_enumsModule.auto()
+    upper = LUPY_enumsModule.auto()
 
-storageRowToken = 'row-major'
-storageColumnToken = 'column-major'
+class Permutation(LUPY_enumsModule.Enum):
 
-class arrayBase( baseModule.xDataCoreMembers ) :
+    plus = '+'
+    minus = '-'
+
+class ArrayBase( baseModule.XDataCoreMembers ) :
 
     moniker = 'array'
 
-    def __init__( self, shape = None, symmetry = None, storageOrder = storageRowToken, 
-                offset = None, permutation = permutationPlusToken,
+    def __init__( self, shape = None, symmetry = None, storageOrder=enumsModule.StorageOrder.rowMajor, 
+                offset = None, permutation = Permutation.plus,
                 index = None, label = None ) :
 
         if( not( isinstance( self.compression, str ) ) ) : raise TypeError( 'compression must be a string' )
-        baseModule.xDataCoreMembers.__init__( self, self.moniker, index = index, label = label )
+        baseModule.XDataCoreMembers.__init__(self, index=index, label=label)
 
         shape = tuple( int( value ) for value in shape )
         if( len( shape ) == 0 ) : raise ValueError( 'shape must contain at least one value' )
@@ -40,21 +43,15 @@ class arrayBase( baseModule.xDataCoreMembers ) :
         self.__shape = shape
         if( self.dimension > 3 ) : raise Exception( 'Currently, dimension = %d > 3 not supported' % len( self ) )
 
-        if( not( isinstance( symmetry, str ) ) ) : raise TypeError( 'symmetry must be a string' )
-        if( symmetry not in symmetryOptions ) :
-                raise ValueError( 'invalid symmetry = "%s"' % symmetry )
-        self.__symmetry = symmetry
-        if( symmetry != symmetryNoneToken ) :
+        self.__symmetry = Symmetry.checkEnumOrString(symmetry)
+        if symmetry != Symmetry.none:
             for length in shape :
                 if( length != shape[0] ) : raise ValueError( 'a symmetrical array must be "square": shape = %s' % shape )
 
-        if( permutation != permutationPlusToken ) : raise TypeError( 'currently, only "%s" permutation is supported' % permutationPlusToken )
-        self.__permutation = permutationPlusToken
+        if permutation != Permutation.plus: raise TypeError('currently, only "%s" permutation is supported' % Permutation.plus)
+        self.__permutation = permutation
 
-        if( not( isinstance( storageOrder, str ) ) ) : raise TypeError( 'storageOrder must be a string' )
-        if( storageOrder not in [ storageRowToken, storageColumnToken ] ) :
-                raise ValueError( 'invalid storageOrder = "%s"' % storageOrder )
-        self.__storageOrder = storageOrder
+        self.__storageOrder = storageOrder = enumsModule.StorageOrder.checkEnumOrString(storageOrder)
 
         if( offset is not None ) :
             offset = [ int( value ) for value in offset ]
@@ -113,89 +110,121 @@ class arrayBase( baseModule.xDataCoreMembers ) :
 
         self.values.offsetScaleValues( offset, scale )
 
+    def constructVector(self, secondIndex=None):
+        """
+        Convert the output of the xData.xDataArray.arrayBase.constructArray() to an instancce of xData.vector.Vector.
+
+        :param secondIndex: Index along the third dimension from which to extract 1d-array.
+        :returns: instance of xData.vector.Vector.
+        """
+
+        if self.dimension == 2:
+            assert secondIndex is not None and isinstance(secondIndex, numpy.int), 'The method constructVector requires the first argument to be an integer.'
+
+            if self.shape[1] <= secondIndex:
+                return vectorModule.Vector()
+
+            else:
+                return vectorModule.Vector(values=self.constructArray()[:, secondIndex])
+
+        elif self.dimension == 1:
+            return vectorModule.Vector(values=self.constructArray())
+
+        else:
+            raise TypeError(f'The method constructVector is only defined for 1D or 2D arrays')
+
+    def constructMatrix(self, thirdIndex=None):
+        """
+        Generate an xData.matrix.Matrix object from an xData.xDataArray.arrayBase instance.
+
+        :param thirdIndex: Index along the third dimension from which to extract 2d-array.
+        :returns: instance of xData.matrix.Matrix.
+        """
+
+        if self.dimension != 3:
+            raise TypeError(f'The method constructMatrix is only defined for 3D arrays')
+
+        assert thirdIndex is not None and isinstance(thirdIndex, numpy.int), 'The method constructMatrix requires the first argument to be an integer.'
+        if self.shape[2] <= thirdIndex:
+            return matrixModule.Matrix()
+
+        else:
+            return matrixModule.Matrix(values=self.constructArray()[:, :, thirdIndex])
+
     def attributesToXMLAttributeStr( self ) :
 
         attributeStr = ' shape="%s"' % ','.join( [ "%d" % length for length in self.shape ] )
-        if( self.compression != full.compression ) : attributeStr += ' compression="%s"' % self.compression
-        if( self.symmetry != symmetryNoneToken ) : attributeStr += ' symmetry="%s"' % self.symmetry
-        if( self.permutation != permutationPlusToken ) : attributeStr += ' permutation="%s"' % self.permutation
-        if( self.offset is not None ) : attributeStr += ' offset="%s"' % ','.join( [ "%d" % offset for offset in self.offset ] )
-        if( self.storageOrder != storageRowToken ) : attributeStr += ' storageOrder="%s"' % self.storageOrder
-        attributeStr += baseModule.xDataCoreMembers.attributesToXMLAttributeStr( self )
+        if self.compression != Full.compression: attributeStr += ' compression="%s"' % self.compression
+        if self.symmetry != Symmetry.none: attributeStr += ' symmetry="%s"' % self.symmetry
+        if self.permutation != Permutation.plus: attributeStr += ' permutation="%s"' % self.permutation
+        if self.offset is not None: attributeStr += ' offset="%s"' % ','.join( [ "%d" % offset for offset in self.offset ] )
+        if self.storageOrder != enumsModule.StorageOrder.rowMajor: attributeStr += ' storageOrder="%s"' % self.storageOrder
+        attributeStr += baseModule.XDataCoreMembers.attributesToXMLAttributeStr( self )
         return( attributeStr )
 
-    def toXML( self, indent = '', **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
-
     @classmethod
-    def parseXMLNode( cls, xDataElement, xPath, linkData, **kwargs ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( xDataElement.tag )
+        xPath.append(node.tag)
 
-        attributes = arrayBase.parseXMLNodeAttributes( xDataElement )
-        compression = attributes.pop( 'compression' )
-        numberOfValues = { full.compression : [ 1 ], diagonal.compression : [ 1, 2 ], flattened.compression : [ 3 ],
-                embedded.compression : [ -1 ] }[compression]
-        if( ( numberOfValues[0] != -1 ) and ( len( xDataElement ) not in numberOfValues ) ) :
-                raise Exception( '%s array expects %s sub-elements: got %d' % ( cls.compression, numberOfValues, len( xDataElement ) ) )
-        shape = attributes.pop( 'shape' )
+        attributes = ArrayBase.parseNodeAttributes(node, **kwargs)
+        compression = attributes.pop('compression')
+        numberOfValues = { Full.compression : [ 1 ], Diagonal.compression : [ 1, 2 ], Flattened.compression : [ 3 ],
+                Embedded.compression : [ -1 ] }[compression]
+        if numberOfValues[0] != -1 and len(node) not in numberOfValues:
+                raise Exception('%s array expects %s sub-elements: got %d' % ( cls.compression, numberOfValues, len(node) ))
+        shape = attributes.pop('shape')
 
         valuesDict = {}
-        if( compression != embedded.compression ) :
-            values = [ valuesModule.values.parseXMLNode( valuesElements, xPath, linkData ) for valuesElements in xDataElement ]
+        if compression != Embedded.compression:
+            values = [ valuesModule.Values.parseNodeUsingClass(valuesElements, xPath, linkData, **kwargs) for valuesElements in node ]
             for value in values :
                 label = value.label
-                if( value.label is None ) : label = 'data'
+                if value.label is None: label = 'data'
                 valuesDict[label] = value
 
-        if( compression == full.compression ) :
-            array1 = full( shape, valuesDict['data'], **attributes )
-        elif( compression == diagonal.compression ) :
-            if( 'startingIndices' not in valuesDict ) : valuesDict['startingIndices'] = None
-            array1 = diagonal( shape, valuesDict['data'], valuesDict['startingIndices'], **attributes )
-        elif( compression == flattened.compression ) :
-            array1 = flattened( shape, valuesDict['data'], valuesDict['starts'], valuesDict['lengths'], **attributes )
-        elif( compression == embedded.compression ) :
-            array1 = embedded( shape, **attributes )
-            for subArrayElement in xDataElement :
-                array2 = arrayBase.parseXMLNode( subArrayElement, xPath, linkData )
-                array1.addArray( array2 )
+        if compression == Full.compression:
+            array1 = Full(shape, valuesDict['data'], **attributes)
+        elif compression == Diagonal.compression:
+            if 'startingIndices' not in valuesDict: valuesDict['startingIndices'] = None
+            array1 = Diagonal(shape, valuesDict['data'], valuesDict['startingIndices'], **attributes)
+        elif compression == Flattened.compression:
+            array1 = Flattened(shape, valuesDict['data'], valuesDict['starts'], valuesDict['lengths'], **attributes)
+        elif compression == Embedded.compression:
+            array1 = Embedded(shape, **attributes)
+            for subArrayElement in node:
+                array2 = ArrayBase.parseNodeUsingClass(subArrayElement, xPath, linkData, **kwargs)
+                array1.addArray(array2)
         else :
-            raise TypeError( 'Unsupported array type = "%s"' % compression )
+            raise TypeError('Unsupported array type = "%s"' % compression)
 
-        xPath.pop( )
-        return( array1 )
+        xPath.pop()
 
-    @classmethod
-    def parseXMLString( cls, XMLString ) :
-
-        from xml.etree import cElementTree
-
-        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ), xPath=[], linkData={} ) )
+        return array1
 
     @staticmethod
-    def parseXMLNodeAttributes( xDataElement ) :
+    def parseNodeAttributes(node, **kwargs):
 
-        attributes = {  'shape'         : ( None, str ),
-                        'symmetry'      : ( symmetryNoneToken, str ),
-                        'permutation'   : ( permutationPlusToken, str ),
-                        'storageOrder'  : ( storageRowToken, str ),
-                        'offset'        : ( None, str ),
-                        'compression'   : ( None, str ),
-                        'index'         : ( None, int ),
-                        'label'         : ( None, str ) }
+        attributes = {  'shape'         : (None, str),
+                        'symmetry'      : (Symmetry.none, str),
+                        'permutation'   : (Permutation.plus, str),
+                        'storageOrder'  : (enumsModule.StorageOrder.rowMajor, str),
+                        'offset'        : (None, str),
+                        'compression'   : (None, str),
+                        'index'         : (None, int),
+                        'label'         : (None, str) }
         attrs = {}
-        for key, item in list( attributes.items( ) ) : attrs[key] = item[0]
+        for key, item in list(attributes.items()): attrs[key] = item[0]
 
-        for key, item in list( xDataElement.items( ) ) :
-            if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
-            attrs[key] = attributes[key][1]( item )
-        if( attrs['shape'] is None ) : raise ValueError( 'shape attribute is missing from array' )
-        attrs['shape'] = attrs['shape'].split( ',' )
-        if( attrs['offset'] is not None ) : attrs['offset'] = attrs['offset'].split( ',' )
-        if( attrs['compression'] is None ) : attrs['compression'] = full.compression
-        return( attrs )
+        for key, item in list(node.items()):
+            if key not in attributes: raise TypeError('Invalid attribute "%s"' % key)
+            attrs[key] = attributes[key][1](item)
+        if attrs['shape'] is None: raise ValueError('shape attribute is missing from array')
+        attrs['shape'] = attrs['shape'].split(',')
+        if attrs['offset'] is not None: attrs['offset'] = attrs['offset'].split(',')
+        if attrs['compression'] is None: attrs['compression'] = Full.compression
+
+        return attrs
 
     @staticmethod
     def indicesToFlatIndices( shape, indices ) :
@@ -228,24 +257,23 @@ class arrayBase( baseModule.xDataCoreMembers ) :
             indices.append( index )
         return( indices )
 
-class full( arrayBase ) :
+class Full( ArrayBase ) :
 
     compression = 'full'
-    ancestryMembers = baseModule.xDataCoreMembers.ancestryMembers + ( 'values', )
+    ancestryMembers = baseModule.XDataCoreMembers.ancestryMembers + ( 'values', )
 
-    def __init__( self, shape = None, data = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken, 
-                offset = None, permutation = permutationPlusToken,
-                index = None, label = None ) :
+    def __init__(self, shape=None, data=None, symmetry=Symmetry.none, storageOrder=enumsModule.StorageOrder.rowMajor, 
+                offset=None, permutation=Permutation.plus, index=None, label=None):
 
-        arrayBase.__init__( self, shape, symmetry = symmetry, storageOrder = storageOrder, 
+        ArrayBase.__init__( self, shape, symmetry = symmetry, storageOrder = storageOrder, 
                 offset = offset, permutation = permutation,
                 index = index, label = label )
 
-        if( not( isinstance( data, valuesModule.values ) ) ) : data = valuesModule.values( data )
+        if( not( isinstance( data, valuesModule.Values ) ) ) : data = valuesModule.Values( data )
 
-        if( symmetry == symmetryNoneToken ) :
+        if symmetry == Symmetry.none:
             size = self.size
-        else :                  # Will be a 'square' array. Checked in arrayBase.
+        else :                  # Will be a 'square' array. Checked in ArrayBase.
             length, size = self.shape[0], 1
             for i1 in range( self.dimension ) : size = size * ( length + i1 ) / ( i1 + 1 )
         if( size != len( data ) ) : raise ValueError( 'shape requires %d values while data has %d values' % ( size, len( data ) ) )
@@ -257,17 +285,17 @@ class full( arrayBase ) :
 
         import numpy
 
-        if( self.symmetry == symmetryNoneToken ) :
+        if self.symmetry == Symmetry.none:
             array1 = numpy.array( [ value for value in self.values ] )
 
         elif len(self.shape) == 2:
             array1 = numpy.zeros( self.shape )
-            if( self.symmetry == symmetryLowerToken ) :
+            if self.symmetry == Symmetry.lower:
                 array1[numpy.tril_indices(self.shape[0])] = list(self.values)
                 il = numpy.tril_indices(self.shape[0], -1)
                 iu = (il[1],il[0])
                 array1[iu] = array1[il]
-            elif( self.symmetry == symmetryUpperToken ) :
+            elif self.symmetry == Symmetry.upper:
                 array1[numpy.triu_indices(self.shape[0])] = list(self.values)
                 iu = numpy.triu_indices(self.shape[0], 1)
                 il = (iu[1],iu[0])
@@ -282,8 +310,8 @@ class full( arrayBase ) :
             indexRange = range( len( self ) )
             indices = dimension * [ 0 ]
             indexChange = dimension - 1
-            mode = ( ( self.symmetry == symmetryUpperToken ) and ( self.storageOrder == storageRowToken ) ) or \
-                     ( self.symmetry == symmetryLowerToken ) and ( self.storageOrder == storageColumnToken )
+            mode = ( ( self.symmetry == Symmetry.upper ) and ( self.storageOrder == enumsModule.StorageOrder.rowMajor ) ) or \
+                     ( self.symmetry == Symmetry.lower ) and ( self.storageOrder == enumsModule.StorageOrder.columnMajor )
             for value in self.values :
                 permutations = itertools.permutations( indices )
                 for permutation in permutations :
@@ -309,48 +337,50 @@ class full( arrayBase ) :
                             indexChange -= 1
                     indices[indexChange] += 1
 
-        order = { storageRowToken : 'C', storageColumnToken : 'F' }[self.storageOrder]
+        order = { enumsModule.StorageOrder.rowMajor : 'C', enumsModule.StorageOrder.columnMajor : 'F' }[self.storageOrder]
         return( array1.reshape( self.shape, order = order ) )
 
     def copy( self ) :
 
-        return( full( self.shape, self.values.copy( ), 
+        return( Full( self.shape, self.values.copy( ), 
                 symmetry = self.symmetry, storageOrder = self.storageOrder, 
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        attributesStr = self.attributesToXMLAttributeStr( )
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
-        XMLList += self.values.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
+        attributesStr = self.attributesToXMLAttributeStr()
+        XML_strList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
+        XML_strList += self.values.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
 
-class diagonal( arrayBase ) :
+        return XML_strList
+
+class Diagonal( ArrayBase ) :
 
     compression = 'diagonal'
-    ancestryMembers = baseModule.xDataCoreMembers.ancestryMembers + ( 'values', )
+    ancestryMembers = baseModule.XDataCoreMembers.ancestryMembers + ( 'values', )
 
-    def __init__( self, shape = None, data = None, startingIndices = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken, 
-                offset = None, permutation = permutationPlusToken,
+    def __init__( self, shape = None, data = None, startingIndices = None, symmetry = Symmetry.none, storageOrder = enumsModule.StorageOrder.rowMajor, 
+                offset = None, permutation = Permutation.plus,
                 index = None, label = None ) :
 
-        arrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder,
+        ArrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder,
                 offset = offset, permutation = permutation,
                 index = index, label = label )
 
         dimension = self.dimension
-        if( not( isinstance( data, valuesModule.values ) ) ) : data = valuesModule.values( data )
+        if( not( isinstance( data, valuesModule.Values ) ) ) : data = valuesModule.Values( data )
         if( startingIndices is None ) :
             self.startingIndicesOriginal = None
             startingIndices = dimension * [ 0 ]
         else :
-            if( not( isinstance( startingIndices, valuesModule.values ) ) ) :
-                startingIndices = valuesModule.values( startingIndices, valueType = standardsModule.types.integer32Token )
-            if( startingIndices.valueType not in [ standardsModule.types.integer32Token ] ) : raise TypeError( 'startingIndices must be a list of integers' )
+            if not isinstance(startingIndices, valuesModule.Values):
+                startingIndices = valuesModule.Values(startingIndices, valueType=enumsModule.ValueType.integer32)
+            if startingIndices.valueType not in [enumsModule.ValueType.integer32]:
+                raise TypeError('startingIndices must be a list of integers.')
             self.startingIndicesOriginal = startingIndices
             self.startingIndicesOriginal.label = 'startingIndices'
 
@@ -390,7 +420,7 @@ class diagonal( arrayBase ) :
             while( moreToDo ) :
                 value = self.values[valuesIndex]
                 valuesIndex += 1
-                if( self.symmetry == symmetryNoneToken ) :
+                if self.symmetry == Symmetry.none:
                     permutations = [ si ]
                 else :
                     permutations = itertools.permutations( si )
@@ -404,52 +434,53 @@ class diagonal( arrayBase ) :
                     si[i1] += 1
                     if( si[i1] >= shape[i1] ) : moreToDo = False
 
-        order = { storageRowToken : 'C', storageColumnToken : 'F' }[self.storageOrder]
+        order = { enumsModule.StorageOrder.rowMajor: 'C', enumsModule.StorageOrder.columnMajor: 'F' }[self.storageOrder]
         return( array1.reshape( self.shape, order = order ) )
 
     def copy( self ) :
 
         startingIndicesOriginal = self.startingIndicesOriginal
         if( startingIndicesOriginal is not None ) : startingIndicesOriginal = self.startingIndicesOriginal.copy( )
-        return( diagonal( self.shape, self.values.copy( ), startingIndicesOriginal, 
+        return( Diagonal( self.shape, self.values.copy( ), startingIndicesOriginal, 
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        attributesStr = self.attributesToXMLAttributeStr( )
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
-        if( self.startingIndicesOriginal is not None ) :
-            XMLList += self.startingIndicesOriginal.toXMLList( indent2, **kwargs )
-        XMLList += self.values.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
+        attributesStr = self.attributesToXMLAttributeStr()
+        XML_strList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
+        if self.startingIndicesOriginal is not None:
+            XML_strList += self.startingIndicesOriginal.toXML_strList(indent2, **kwargs)
+        XML_strList += self.values.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
 
-class flattened( arrayBase ) :
+        return XML_strList
+
+class Flattened( ArrayBase ) :
 
     compression = 'flattened'
-    ancestryMembers = baseModule.xDataCoreMembers.ancestryMembers + ( 'values', 'lengths', 'starts' )
+    ancestryMembers = baseModule.XDataCoreMembers.ancestryMembers + ( 'values', 'lengths', 'starts' )
 
-    def __init__( self, shape = None, data = None, starts = None, lengths = None, symmetry = symmetryNoneToken, 
-                storageOrder = storageRowToken,
-                offset = None, permutation = permutationPlusToken,
+    def __init__( self, shape = None, data = None, starts = None, lengths = None, symmetry = Symmetry.none, 
+                storageOrder = enumsModule.StorageOrder.rowMajor,
+                offset = None, permutation = Permutation.plus,
                 index = None, label = None, 
                 dataToString = None ) :
 
-        arrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder,
+        ArrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder,
                 offset = offset, permutation = permutation,
                 index = index, label = label )
 
         self.dataToString = dataToString
 
-        if( not( isinstance( data, valuesModule.values ) ) ) : data = valuesModule.values( data )
-        if( not( isinstance( starts, valuesModule.values ) ) ) : 
-                starts = valuesModule.values( starts, valueType = standardsModule.types.integer32Token )
-        if( not( isinstance( lengths, valuesModule.values ) ) ) :
-                lengths = valuesModule.values( lengths, valueType = standardsModule.types.integer32Token )
+        if( not( isinstance( data, valuesModule.Values ) ) ) : data = valuesModule.Values( data )
+        if( not( isinstance( starts, valuesModule.Values ) ) ) : 
+                starts = valuesModule.Values(starts, valueType=enumsModule.ValueType.integer32)
+        if( not( isinstance( lengths, valuesModule.Values ) ) ) :
+                lengths = valuesModule.Values(lengths, valueType=enumsModule.ValueType.integer32)
 
         if( len( starts ) != len( lengths ) ) : raise ValueError( 'length of starts = %d must equal length of lengths = %d' %
                 ( len( starts ), len( lengths ) ) )
@@ -492,23 +523,23 @@ class flattened( arrayBase ) :
                 array1[start+i2] = self.values[index]
                 index += 1
 
-        order = { storageRowToken : 'C', storageColumnToken : 'F' }[self.storageOrder]
+        order = { enumsModule.StorageOrder.rowMajor: 'C', enumsModule.StorageOrder.columnMajor: 'F' }[self.storageOrder]
         array1 = array1.reshape( self.shape, order = order )
-        if self.symmetry == symmetryLowerToken:
+        if self.symmetry == Symmetry.lower:
             array1 = numpy.tril(array1) + numpy.tril(array1, -1).T
-        elif self.symmetry == symmetryUpperToken:
+        elif self.symmetry == Symmetry.upper:
             array1 = numpy.triu(array1) + numpy.triu(array1, -1).T
         return array1
 
     def copy( self ) :
 
-        return( flattened( self.shape, self.values.copy( ), self.starts.copy( ), self.lengths.copy( ), 
+        return( Flattened( self.shape, self.values.copy( ), self.starts.copy( ), self.lengths.copy( ), 
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label ) )
 
     @staticmethod
-    def fromNumpyArray( array, symmetry = symmetryNoneToken, nzeroes = 4 ):
+    def fromNumpyArray( array, symmetry = Symmetry.none, nzeroes = 4 ):
         """
         Generate a sparse flattened array that represents an arbitrary numpy array.
         Only supports 'full' or 'lower-symmetric' matrices, with row-major data storage.
@@ -540,9 +571,9 @@ class flattened( arrayBase ) :
                     idx = stop
                 idx += 1
 
-        if symmetry == symmetryNoneToken:
+        if symmetry == Symmetry.none:
             helper( array.flatten() )
-        elif symmetry == symmetryLowerToken:
+        elif symmetry == Symmetry.lower:
             rows, cols = array.shape
             for row in range(rows):
                 dat = array[row][:row+1]
@@ -550,30 +581,29 @@ class flattened( arrayBase ) :
         else:
             raise NotImplementedError("Symmetry = '%s'" % symmetry)
 
-        return flattened(shape=array.shape, data=sparseData, starts=starts, lengths=lengths, symmetry=symmetry)
+        return Flattened(shape=array.shape, data=sparseData, starts=starts, lengths=lengths, symmetry=symmetry)
 
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        attributesStr = self.attributesToXMLAttributeStr( )
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
-        XMLList += self.starts.toXMLList( indent2, **kwargs )
-        XMLList += self.lengths.toXMLList( indent2, **kwargs )
-        XMLList += self.values.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
+        attributesStr = self.attributesToXMLAttributeStr()
+        XML_strList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
+        XML_strList += self.starts.toXML_strList(indent2, **kwargs)
+        XML_strList += self.lengths.toXML_strList(indent2, **kwargs)
+        XML_strList += self.values.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
+        return XML_strList
 
-class embedded( arrayBase ) :
+class Embedded( ArrayBase ) :
 
     compression = 'embedded'
 
-    def __init__( self, shape = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken,
-                offset = None, permutation = permutationPlusToken,
-                index = None, label = None ) :
+    def __init__(self, shape=None, symmetry=Symmetry.none, storageOrder=enumsModule.StorageOrder.rowMajor,
+                offset=None, permutation=Permutation.plus, index=None, label=None):
 
-        arrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder, 
+        ArrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder, 
                 offset = offset, permutation = permutation,
                 index = index, label = label )
 
@@ -581,7 +611,7 @@ class embedded( arrayBase ) :
 
     def addArray( self, array ) :
 
-        if( not( isinstance( array, arrayBase ) ) ) : raise TypeError( 'variable not an array instance' )
+        if( not( isinstance( array, ArrayBase ) ) ) : raise TypeError( 'variable not an array instance' )
         if( self.dimension < array.dimension ) : raise ValueError( 'cannot embedded array into a smaller dimensional array: %s %s' %
                 ( self.dimension, array.dimension ) )
 
@@ -599,7 +629,7 @@ class embedded( arrayBase ) :
 
         import numpy
 
-        order = { storageRowToken : 'C', storageColumnToken : 'F' }[self.storageOrder]
+        order = { enumsModule.StorageOrder.rowMajor: 'C', enumsModule.StorageOrder.columnMajor: 'F' }[self.storageOrder]
         array1 = numpy.zeros( self.shape, order = order )
 
         for array in self.arrays :
@@ -611,7 +641,7 @@ class embedded( arrayBase ) :
 
     def copy( self ) :
 
-        array1 = embedded( self.shape, 
+        array1 = Embedded( self.shape, 
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label )
@@ -623,12 +653,12 @@ class embedded( arrayBase ) :
 
         for subarray in self.arrays: subarray.offsetScaleValues( offset, scale )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        attributesStr = self.attributesToXMLAttributeStr( )
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
-        for array in self.arrays : XMLList += array.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
+        attributesStr = self.attributesToXMLAttributeStr()
+        XML_strList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
+        for array in self.arrays: toXML_strList += array.toXML_strList(indent2, **kwargs)
+        toXML_strList[-1] += '</%s>' % self.moniker
+        return toXML_strList

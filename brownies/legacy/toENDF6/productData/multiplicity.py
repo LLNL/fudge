@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,7 @@ from .. import gndsToENDF6 as gndsToENDF6Module
 from .. import endfFormats as endfFormatsModule
 
 #
-# constant1d
+# Constant1d
 #
 def toENDF6List( self, targetInfo ) :
 
@@ -20,7 +20,7 @@ def toENDF6List( self, targetInfo ) :
     endfMult = endfFormatsModule.endfNdDataList( [ targetInfo['EMin'], self.value, targetInfo['EMax'], self.value ] )
     return( interpolationFlatData, nPoints, endfMult )
 
-multiplicityModule.constant1d.toENDF6List = toENDF6List
+multiplicityModule.Constant1d.toENDF6List = toENDF6List
 
 #
 # XYs1d 
@@ -35,7 +35,7 @@ def toENDF6List( self, targetInfo ) :
 multiplicityModule.XYs1d.toENDF6List = toENDF6List
 
 #
-# regions1d
+# Regions1d
 #
 def toENDF6List( self, targetInfo ) :
 
@@ -54,10 +54,10 @@ def toENDF6List( self, targetInfo ) :
         lastX, lastY = data[-1]
     return( interpolationFlatData, counter, endfFormatsModule.endfDataList( multiplicityFlatData ) )
 
-multiplicityModule.regions1d.toENDF6List = toENDF6List
+multiplicityModule.Regions1d.toENDF6List = toENDF6List
 
 #
-# polynomial
+# Polynomial1d
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
@@ -65,11 +65,11 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     endfMFList[1][MT] += [ endfFormatsModule.endfHeadLine( 0, 0, 0, 0, len( self ), 0 ) ]
     endfMFList[1][MT] += endfFormatsModule.endfDataList( self.coefficients ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
 
-multiplicityModule.polynomial.toENDF6 = toENDF6
+multiplicityModule.Polynomial1d.toENDF6 = toENDF6
 
 def fissionNeutronsToENDF6( MT, multiplicity, endfMFList, flags, targetInfo ) :
 
-    if( isinstance( multiplicity, multiplicityModule.polynomial ) ) :
+    if( isinstance( multiplicity, multiplicityModule.Polynomial1d ) ) :
         multiplicity.toENDF6( MT, endfMFList, flags, targetInfo )
     else :
         interpolation, n1, data = multiplicity.toENDF6List( targetInfo )

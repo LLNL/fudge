@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -42,3 +42,11 @@ neutronAnti = miscModule.returnAntiParticleIDFromId( neutron )
 
 proton = 'p'
 protonAnti = miscModule.returnAntiParticleIDFromId( proton )
+
+# Familiar nuclear particle names.
+familiarPhoton = 'g'
+familiarProton = proton
+familiarDeuteron = 'd'
+familiarTriton = 't'
+familiarHelion = 'h'
+familiarAlpha = 'a'

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,15 +12,16 @@ from fudge.core.math import fudgemath as fudgemathModule
 
 from pqu import PQU as PQUModule
 
-import xData.base as xDataBaseModule
-import xData.axes as axesModule
-import xData.values as valuesModule
-import xData.XYs as XYsModule
-import xData.standards as standardsModule
-import xData.multiD_XYs as multiD_XYsModule
+from xData import enums as xDataEnumsModule
+from xData import base as xDataBaseModule
+from xData import axes as axesModule
+from xData import values as valuesModule
+from xData import XYs1d as XYs1dModule
+from xData import multiD_XYs as multiD_XYsModule
 
+from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
 from PoPs import IDs as IDsPoPsModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
 from . import base as baseModule
 from . import energy as energyModule
@@ -32,20 +33,19 @@ KalbachMann_a_parameters = { IDsPoPsModule.neutron  : { 'M' : 1, 'm' : 0.5, 'I' 
                              'He3'                  : { 'M' : 0, 'm' : 1.0, 'I' : 7.72 }, 'He4' : { 'M' : 0, 'm' : 2.0, 'I' : 28.3 },
                              IDsPoPsModule.photon   : { 'M' : 0, 'm' : 0.0, 'I' : 0.0 } }
 
-__metaclass__ = type
 
-class subform( baseModule.subform ) :
+class Subform( baseModule.Subform ) :
     """Abstract base class for Kalback/Mann subforms."""
 
     ancestryMembers = ( 'data', )
 
     def __init__( self, data ) :
 
-        baseModule.subform.__init__( self )
-        if( ( self.moniker == aSubform.moniker ) and ( data is None ) ) :
+        baseModule.Subform.__init__( self )
+        if( ( self.moniker == ASubform.moniker ) and ( data is None ) ) :
             pass
         else :
-            if( not( isinstance( data, xDataBaseModule.xDataFunctional ) ) ) : raise TypeError( 'invalid data for KalbachMannCoefficient' )
+            if( not( isinstance( data, xDataBaseModule.XDataFunctional ) ) ) : raise TypeError( 'invalid data for KalbachMannCoefficient' )
             if( data.dimension != 2 ) : raise TypeError( 'invalid dimension = %s for KalbachMannCoefficient' % data.dimension )
         self.data = data
         if( data is not None ) : self.data.setAncestor( self )
@@ -61,60 +61,76 @@ class subform( baseModule.subform ) :
         if self.data is not None: newData = self.data.copy( )
         return( self.__class__( newData ) )
 
+    def fixDomains(self, energyMin, energyMax, domainToFix):
+        """
+        Calls the **fixDomains** for the **data** member.
+        """
+
+        if self.data is not None:
+            return self.data.fixDomains(energyMin, energyMax, domainToFix, tweakLower = True)
+
+        return 0
+
     def isEmptyASubform( self ) :
 
-        return( ( self.moniker == aSubform.moniker ) and ( self.data is None ) )
+        return( ( self.moniker == ASubform.moniker ) and ( self.data is None ) )
 
-    def toXMLList( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
 
         if( self.isEmptyASubform( ) ) : return( [] )
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlStringList = [ "%s<%s>" % ( indent, self.moniker ) ]
-        xmlStringList += self.data.toXMLList( indent = indent2, **kwargs )
+        xmlStringList += self.data.toXML_strList( indent = indent2, **kwargs )
         xmlStringList[-1] += "</%s>" % self.moniker
         return( xmlStringList )
 
     @staticmethod
     def defaultAxes( moniker, energyUnit ) :
 
-        axes = axesModule.axes( rank = 3 )
-        axes[2] = axesModule.axis( 'energy_in',  2, energyUnit )
-        axes[1] = axesModule.axis( 'energy_out', 1, energyUnit )
+        axes = axesModule.Axes(3)
+        axes[2] = axesModule.Axis( 'energy_in',  2, energyUnit )
+        axes[1] = axesModule.Axis( 'energy_out', 1, energyUnit )
         if( moniker == 'f' ) :
-            axes[0] = axesModule.axis( moniker, 0, '1/' + energyUnit )
+            axes[0] = axesModule.Axis( moniker, 0, '1/' + energyUnit )
         else :
-            axes[0] = axesModule.axis( moniker, 0, '' )
+            axes[0] = axesModule.Axis( moniker, 0, '' )
         return( axes )
 
-class fSubform( subform ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """This is currently not called but should be."""
+
+        pass
+
+class FSubform( Subform ) :
 
     moniker = 'f'
 
     @staticmethod
     def defaultAxes( energyUnit ) :
 
-        return( subform.defaultAxes( fSubform.moniker, energyUnit ) )
+        return( Subform.defaultAxes( FSubform.moniker, energyUnit ) )
 
-class rSubform( subform ) :
+class RSubform( Subform ) :
 
     moniker = 'r'
 
     @staticmethod
     def defaultAxes( energyUnit ) :
 
-        return( subform.defaultAxes( rSubform.moniker, energyUnit ) )
+        return( Subform.defaultAxes( RSubform.moniker, energyUnit ) )
 
-class aSubform( subform ) :
+class ASubform( Subform ) :
 
     moniker = 'a'
 
     @staticmethod
     def defaultAxes( energyUnit ) :
 
-        return( subform.defaultAxes( aSubform.moniker, energyUnit ) )
+        return( Subform.defaultAxes( ASubform.moniker, energyUnit ) )
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'KalbachMann'
     subformAttributes = ( 'fSubform', 'rSubform', 'aSubform' )
@@ -122,10 +138,10 @@ class form( baseModule.form ) :
 
     def __init__( self, label, productFrame, _fSubform, _rSubform, _aSubform ) :
 
-        if( not( isinstance( _fSubform, fSubform ) ) ) : raise TypeError( 'invalid Kalbach/Mann f data type' )
-        if( not( isinstance( _rSubform, rSubform ) ) ) : raise TypeError( 'invalid Kalbach/Mann r data type' )
-        if( not( isinstance( _aSubform, aSubform ) ) ) : raise TypeError( 'invalid Kalbach/Mann a data type' )
-        baseModule.form.__init__( self, label, productFrame, ( _fSubform, _rSubform, _aSubform ) )
+        if( not( isinstance( _fSubform, FSubform ) ) ) : raise TypeError( 'invalid Kalbach/Mann f data type' )
+        if( not( isinstance( _rSubform, RSubform ) ) ) : raise TypeError( 'invalid Kalbach/Mann r data type' )
+        if( not( isinstance( _aSubform, ASubform ) ) ) : raise TypeError( 'invalid Kalbach/Mann a data type' )
+        baseModule.Form.__init__( self, label, productFrame, ( _fSubform, _rSubform, _aSubform ) )
 
     def convertUnits( self, unitMap ) :
         "See documentation for reactionSuite.convertUnits."
@@ -142,16 +158,22 @@ class form( baseModule.form ) :
         if( not( self.aSubform.isEmptyASubform( ) ) ) :
             raise NotImplementedError("Checking for Kalbach-Mann data with 'a' coefficients")
 
+        domainMins = set([term.data.domainMin for term in (self.rSubform, self.fSubform, self.aSubform)
+                          if term.data is not None])
+        domainMaxes = set([term.data.domainMax for term in (self.rSubform, self.fSubform, self.aSubform)
+                          if term.data is not None])
+        if len(domainMins) != 1 or len(domainMaxes) != 1:
+            warnings.append( warning.KalbachMannDomainMismatch(self) )
         for index, F in enumerate( self.fSubform.data ):    # F is like P(E' | E), must be normalized for each incident energy
             integral = F.integrate()
             if abs(integral - 1.0) > info['normTolerance']:
-                warnings.append( warning.unnormalizedKMDistribution( PQUModule.PQU( F.outerDomainValue, F.axes[-1].unit), index, integral, F ) )
+                warnings.append( warning.UnnormalizedKMDistribution( PQUModule.PQU( F.outerDomainValue, F.axes[-1].unit), index, integral, F ) )
             if F.rangeMin < 0:
-                warnings.append( warning.negativeProbability( PQUModule.PQU( F.outerDomainValue, F.axes[-1].unit), obj=F ) )
+                warnings.append( warning.NegativeProbability( PQUModule.PQU( F.outerDomainValue, F.axes[-1].unit), obj=F ) )
         for R in self.rSubform.data:    # R = pre-compound fraction, must be between 0 and 1
             if R.rangeMin < 0  or  R.rangeMax > 1:
                 badR = R.rangeMin if (0.5-R.rangeMin > R.rangeMax - 0.5) else R.rangeMax
-                warnings.append( warning.valueOutOfRange("Invalid 'r' in KalbachMann distribution at incident energy %s"
+                warnings.append( warning.ValueOutOfRange("Invalid 'r' in KalbachMann distribution at incident energy %s"
                     % PQUModule.PQU( R.outerDomainValue, R.axes[-1].unit), badR, 0, 1, R ) )
 
         return warnings
@@ -187,7 +209,7 @@ class form( baseModule.form ) :
             E_mu = 2. * math.sqrt( self.m1x * Ein ) * _sqrtE_mu_com
             return( multiplicity * ( E_com + Ex_com + E_mu ), multiplicity * math.sqrt( 2. * massx ) * ( math.sqrt( m1x * Ein ) + _sqrtE_mu_com ) )
 
-        class calculateDepositionInfo :
+        class CalculateDepositionInfo :
 
             def __init__( self, KalbackMannSelf, multiplicity, massx, m1x ) :
 
@@ -221,11 +243,11 @@ class form( baseModule.form ) :
         
         m1x = mass1 * massx / ( mass1 + mass2 )**2
 
-        calculationData = calculateDepositionInfo( self, multiplicity, massx, m1x )
+        calculationData = CalculateDepositionInfo( self, multiplicity, massx, m1x )
 
         Es = [ coefficients.outerDomainValue for coefficients in self.fSubform.data ]
         if( EMin < Es[0] ) : EMin = Es[0]           # Fix some data issues.
-        Es = valuesModule.values.sortAndThin( set( Es + multiplicity.domainGrid ), 1e-6 )
+        Es = valuesModule.Values.sortAndThin( set( Es + multiplicity.domainGrid ), 1e-6 )
         while( Es[0] < EMin ) : del Es[0]
         aveEnergy = []
         aveMomentum = []
@@ -270,7 +292,7 @@ class form( baseModule.form ) :
         if( projectileIsPhoton ) : projectileID = IDsPoPsModule.neutron
 
         targetID = self.findAttributeInAncestry( 'target' )
-        productID = self.product.id
+        productID = self.product.pid
         name_a, Z_a, N_a, A_a, AWRa = getParticleData( projectileID )
         name_A, Z_A, N_A, A_A, AWRA = getParticleData( targetID )
         name_b, Z_b, N_b, A_b, AWRb = getParticleData( productID )
@@ -287,14 +309,21 @@ class form( baseModule.form ) :
         except :
             numberOfMasses = 0
         if( numberOfMasses == 0 ) :
-            AWRB = PQUModule.PQU( A_B, 'amu' ).getValueAs( 'MeV/c**2' )
-            if not suppressNoResidualInPoPs:
-                print( f'The residual "{residualID}" is not in reactionSuite.PoPs. Its mass will be estimated from its atomic mass: AWRB = {AWRB:.2f}.' )
+            if A_B == 0:
+                AWRB = AWRa + AWRA - AWRb
+                if not suppressNoResidualInPoPs:
+                    print(f'Residual "{residualID}" is not in PoPs. Its mass is estimated from the other masses: AWRB = {AWRB:.2f} MeV.')
+            else:
+                AWRB = PQUModule.PQU( A_B, 'amu' ).getValueAs( 'MeV/c**2' )
+                if not suppressNoResidualInPoPs:
+                    print(f'Residual "{residualID}" is not in PoPs. Its mass is estimated from its mass number: AWRB = {AWRB:.2f} MeV.')
         else :
             AWRB = residual.getMass( 'MeV/c**2' )
 
-        Ma, Ia = KalbachMann_a_parameters[name_a]['M'], KalbachMann_a_parameters[name_a]['I']
-        mb, Ib = KalbachMann_a_parameters[name_b]['m'], KalbachMann_a_parameters[name_b]['I']
+        name_a_ID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(name_a, specialNuclearParticleIDPoPsModule.Mode.nuclide)
+        Ma, Ia = KalbachMann_a_parameters[name_a_ID]['M'], KalbachMann_a_parameters[name_a_ID]['I']
+        name_b_ID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(name_b, specialNuclearParticleIDPoPsModule.Mode.nuclide)
+        mb, Ib = KalbachMann_a_parameters[name_b_ID]['m'], KalbachMann_a_parameters[name_b_ID]['I']
         Sa = self.calculate_S_ab_MeV( Z_A, N_A, Z_C, N_C, Ia )
         Sb = self.calculate_S_ab_MeV( Z_B, N_B, Z_C, N_C, Ib )
 
@@ -316,7 +345,7 @@ class form( baseModule.form ) :
             X1, X3 = R1 * eb / ea, R3 * eb / ea
             return( X1 * ( C1 + C2 * X1 * X1 ) + C3 * Ma * mb * X3**4 )
 
-        class thicken_a :
+        class Thicken_a :
 
             def __init__( self, calculate_a2, relativeTolerance, absoluteTolerance ) :
 
@@ -331,7 +360,7 @@ class form( baseModule.form ) :
         energy_out_cmMin /= energyFactor
         energy_out_cmMax /= energyFactor
         a = [ [ energy_out_cmMin, calculate_a2( energy_out_cmMin ) ], [ energy_out_cmMax, calculate_a2( energy_out_cmMax ) ] ]
-        a = fudgemathModule.thickenXYList( a, thicken_a( calculate_a2, accuracy, 1e-10 ) )
+        a = fudgemathModule.thickenXYList( a, Thicken_a( calculate_a2, accuracy, 1e-10 ) )
 
         if( projectileIsPhoton ) :
             factor = math.sqrt( energy_in / ( 2.0 * AWRa ) )
@@ -342,12 +371,12 @@ class form( baseModule.form ) :
                     EpA[1] *= factor * min( 4.0, max( 1.0, 9.3 / math.sqrt( EpA[0] ) ) )
 
         for EpA in a : EpA[0] *= energyFactor
-        axes = aSubform.defaultAxes( self.fSubform.data.axes[1].unit )
-        return( XYsModule.XYs1d( data = a, axes = axes, outerDomainValue = energy_in * energyFactor ) )
+        axes = ASubform.defaultAxes( self.fSubform.data.axes[1].unit )
+        return( XYs1dModule.XYs1d( data = a, axes = axes, outerDomainValue = energy_in * energyFactor ) )
 
     def copy( self ) :
 
-        return( form( self.fSubform.copy( ), self.rSubform.copy( ), self.aSubform.copy( ) ) )
+        return( Form( self.label, self.productFrame, self.fSubform.copy( ), self.rSubform.copy( ), self.aSubform.copy( ) ) )
 
     __copy__ = copy
 
@@ -357,19 +386,19 @@ class form( baseModule.form ) :
         return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
     @property
-    def domainMin( self ) :
+    def domainMin(self):
 
-        return( self.product.domainMin )
-
-    @property
-    def domainMax( self ) :
-
-        return( self.product.domainMax )
+        return self.fSubform.data.domainMin
 
     @property
-    def domainUnit( self ) :
+    def domainMax(self):
 
-        return( self.fSubform.data.axes[-1].unit )
+        return self.fSubform.data.domainMax
+
+    @property
+    def domainUnit(self):
+
+        return self.fSubform.data.axes[-1].unit
 
     def muProbability( self, mu, _r, _a ) :
         """
@@ -382,27 +411,39 @@ class form( baseModule.form ) :
 
     def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
 
-        if( frame == standardsModule.frames.centerOfMassToken ) :
+        if frame == xDataEnumsModule.Frame.centerOfMass:
             return( self.fSubform.data.evaluate( energyIn ) )
 
-        xys2d = self.spectrumAtEnergy( energyIn, standardsModule.frames.labToken )
-        data = [ [ xys1d.outerDomainValue, float( xys1d.integrate( ) ) ] for xys1d in xys2d ]
+        xys2d = self.spectrumAtEnergy(energyIn, xDataEnumsModule.Frame.lab)
+        data = [ [ xys1d.outerDomainValue, xys1d.integrate() ] for xys1d in xys2d ]
         return( energyModule.XYs1d( data = data, axes = energyModule.defaultAxes( self.domainUnit ) ) )
+
+    def fixDomains(self, energyMin, energyMax, domainToFix):
+        """
+        Calls the **fixDomains** for the **fSubform**, **rSubform** and **aSubform** members.
+        """
+
+        numberOfFixes  = self.fSubform.fixDomains(energyMin, energyMax, domainToFix)
+        numberOfFixes += self.rSubform.fixDomains(energyMin, energyMax, domainToFix)
+        numberOfFixes += self.aSubform.fixDomains(energyMin, energyMax, domainToFix)
+
+        return numberOfFixes
 
     def spectrum( self, frame, **kwargs ) :
 
-        if( frame != standardsModule.frames.labToken ) : return( self.toPointwise_withLinearXYs( **kwargs ) )
+        if frame != xDataEnumsModule.Frame.lab:
+            return( self.toPointwise_withLinearXYs( **kwargs ) )
 
         energiesIn = self.fSubform.data.domainGrid + self.rSubform.data.domainGrid
         if( not( self.aSubform.isEmptyASubform( ) ) ) : energiesIn += self.aSubform.data.domainGrid
-        energiesIn = valuesModule.values.sortAndThin( energiesIn, rel_tol = 1e-12 )
+        energiesIn = valuesModule.Values.sortAndThin( energiesIn, rel_tol = 1e-12 )
         xys3d = energyAngularModule.XYs3d( axes = energyAngularModule.defaultAxes( self.domainUnit ) )
         for energy in energiesIn : xys3d.append( self.spectrumAtEnergy( energy, frame ) )
         return( xys3d )
 
     def spectrumAtEnergy( self, energyIn, frame, **kwargs ) :
 
-        class energyAngualarAtEnergyCOM :
+        class EnergyAngualarAtEnergyCOM :
 
             def __init__( self, KalbachMannSelf, rAtEnergy, aAtEnergy ) :
 
@@ -437,14 +478,14 @@ class form( baseModule.form ) :
         projectileIsPhoton = self.findAttributeInAncestry( 'projectile' ) == IDsPoPsModule.photon
         fAtEnergy, rAtEnergy, aAtEnergy = self.getFRAatEnergy_asLinearPointwise( energyIn, **kwargs )
 
-        if( frame == standardsModule.frames.centerOfMassToken ) :
+        if frame == xDataEnumsModule.Frame.centerOfMass:
             xys2d = energyAngularModule.XYs2d( outerDomainValue = energyIn )
             fAtEnergyUnion = fAtEnergy.union( rAtEnergy )
             fAtEnergyUnion = fAtEnergyUnion.union( aAtEnergy )
             for EnergyOut, probability in fAtEnergyUnion : xys2d.append( fOfMu( projectileIsPhoton, EnergyOut, probability, rAtEnergy, aAtEnergy ) )
             return( xys2d )
 
-        return( miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, fAtEnergy, energyAngualarAtEnergyCOM( self, rAtEnergy, aAtEnergy ) ) )
+        return( miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, fAtEnergy, EnergyAngualarAtEnergyCOM( self, rAtEnergy, aAtEnergy ) ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
         """
@@ -469,7 +510,7 @@ class form( baseModule.form ) :
                     f_mu.append( [ mu_cm, norm1 * ( math.cosh( _a * mu_cm ) + _r * math.sinh( _a * mu_cm ) ) ] )
             return( energyAngularModule.XYs1d( data = f_mu, outerDomainValue = Ep ) )
 
-        accuracy = xDataBaseModule.getArguments( kwargs, { 'accuracy' : XYsModule.defaultAccuracy } )['accuracy']
+        accuracy = xDataBaseModule.getArguments( kwargs, { 'accuracy' : XYs1dModule.defaultAccuracy } )['accuracy']
         accuracy = min( max( accuracy, 1e-5 ), .2 )
 
         projectileIsPhoton = self.findAttributeInAncestry( 'projectile' ) == IDsPoPsModule.photon
@@ -493,11 +534,12 @@ class form( baseModule.form ) :
 
         epsilon, fra_accuracy = 1e-8, 1e-6
         _f = self.fSubform.data.evaluate( E )
-        f = _f.changeInterpolation( standardsModule.interpolation.linlinToken, XYsModule.defaultAccuracy, lowerEps = epsilon, upperEps = epsilon )
-        if( _f.interpolation == standardsModule.interpolation.flatToken ) : f.setValue( f[-1][0], f[-2][1] )
+        f = _f.changeInterpolation(xDataEnumsModule.Interpolation.linlin, XYs1dModule.defaultAccuracy, lowerEps=epsilon, upperEps=epsilon)
+        if _f.interpolation == xDataEnumsModule.Interpolation.flat:
+            f.setValue( f[-1][0], f[-2][1] )
 
-        r = self.rSubform.data.evaluate( E )
-        r = r.changeInterpolation( standardsModule.interpolation.linlinToken, XYsModule.defaultAccuracy, lowerEps = epsilon, upperEps = epsilon )
+        r = self.rSubform.data.evaluate(E, interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
+        r = r.changeInterpolation(xDataEnumsModule.Interpolation.linlin, XYs1dModule.defaultAccuracy, lowerEps=epsilon, upperEps=epsilon)
 # BRB removed 20/Dec/2017. Do not understand why this logic is here. It is okay for r[-1][1] to be 0.
 #        if( r[-1][1] != 0. ) :
 #            x, y = r[-1]
@@ -509,7 +551,7 @@ class form( baseModule.form ) :
             a = self.calculate_a( E, f.domainMin, f.domainMax, accuracy = fra_accuracy, **kwargs )
         else :
             a = self.aSubform.data.evaluate( E )
-            a = a.changeInterpolation( standardsModule.interpolation.linlinToken, XYsModule.defaultAccuracy, lowerEps = epsilon, upperEps = epsilon )
+            a = a.changeInterpolation(xDataEnumsModule.Interpolation.linlin, XYs1dModule.defaultAccuracy, lowerEps=epsilon, upperEps=epsilon)
         return( f, r, a )
 
     def processMC_cdf( self, style, tempInfo, indent, **kwargs ) :
@@ -517,22 +559,22 @@ class form( baseModule.form ) :
         oldData = self.fSubform.data
         subform = energyModule.XYs2d( axes = oldData.axes, interpolation = oldData.interpolation,
                 interpolationQualifier = oldData.interpolationQualifier )
-        for xys in oldData : subform.append( energyModule.xs_pdf_cdf1d.fromXYs( xys, xys.outerDomainValue ) )
-        _fSubform = fSubform( subform )
+        for xys in oldData : subform.append( energyModule.Xs_pdf_cdf1d.fromXYs( xys, xys.outerDomainValue ) )
+        _fSubform = FSubform( subform )
 
         if( self.aSubform.isEmptyASubform( ) ) :
-            KalbachMann_a_Axes = aSubform.defaultAxes( oldData.domainUnit )
-            _aSubform = multiD_XYsModule.XYs2d( axes = KalbachMann_a_Axes, interpolation = standardsModule.interpolation.linlinToken,
-                interpolationQualifier = standardsModule.interpolation.unitBaseUnscaledToken )
+            KalbachMann_a_Axes = ASubform.defaultAxes( oldData.domainUnit )
+            _aSubform = multiD_XYsModule.XYs2d(axes=KalbachMann_a_Axes, interpolation=xDataEnumsModule.Interpolation.linlin,
+                interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBaseUnscaled)
             suppressNoResidualInPoPs = kwargs.get('suppressNoResidualInPoPs', False)
             for f_xys in oldData :
                 _aSubform.append( self.calculate_a( f_xys.outerDomainValue, f_xys.domainMin, f_xys.domainMax, 
                         suppressNoResidualInPoPs = suppressNoResidualInPoPs, **kwargs ) )
                 suppressNoResidualInPoPs = True
-            _aSubform = aSubform( _aSubform )
+            _aSubform = ASubform( _aSubform )
         else :
             _aSubform = self.aSubform.copy( )               # BRB FIXME, f, a and r need to be on the same energy (E and E') grid.
-        _form = form( style.label, self.productFrame, _fSubform, self.rSubform.copy( ), _aSubform )
+        _form = Form( style.label, self.productFrame, _fSubform, self.rSubform.copy( ), _aSubform )
         return( _form )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
@@ -544,7 +586,7 @@ class form( baseModule.form ) :
         indent2 = indent + tempInfo['incrementalIndent']
         reactionSuite = tempInfo['reactionSuite']
 
-        product = reactionSuite.PoPs[tempInfo['product'].id]
+        product = reactionSuite.PoPs[tempInfo['product'].pid]
         productLabel = tempInfo['productLabel']
 
         energyUnit = tempInfo['incidentEnergyUnit']
@@ -586,27 +628,29 @@ class form( baseModule.form ) :
         tempInfo['masses']['Residual'] = residualMass
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         """Translate <KalbachMann> element from xml."""
 
         xPath.append( element.tag )
         childArrays = {}
         for child in element :
             _subformClass = None
-            for subformClass in ( fSubform, rSubform, aSubform ) :
+            for subformClass in ( FSubform, RSubform, ASubform ) :
                 if subformClass.moniker == child.tag:
                     _subformClass = subformClass
                     break
             if _subformClass is None:
                 raise TypeError("Unexpected element '%s' encountered" % child.tag)
-            if( child.tag == fSubform.moniker ) :
-                xData = energyModule.XYs2d.parseXMLNode( child[0], xPath, linkData )
+            if( child.tag == FSubform.moniker ) :
+                xData = energyModule.XYs2d.parseNodeUsingClass(child[0], xPath, linkData, **kwargs)
             else :
-                xData = multiD_XYsModule.XYs2d.parseXMLNode( child[0], xPath, linkData )
+                xData = multiD_XYsModule.XYs2d.parseNodeUsingClass(child[0], xPath, linkData, **kwargs)
             childArrays[ '_%sSubform' % child.tag ] = _subformClass( xData )
-        if '_aSubform' not in childArrays: childArrays['_aSubform'] = aSubform( None )
-        KM = form( element.get( 'label' ), element.get( 'productFrame' ), **childArrays )
+        if '_aSubform' not in childArrays: childArrays['_aSubform'] = ASubform( None )
+
+        KM = cls( element.get( 'label' ), element.get( 'productFrame' ), **childArrays )
+
         xPath.pop()
         return KM
 

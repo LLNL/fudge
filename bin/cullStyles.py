@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,8 +9,7 @@
 
 import argparse
 
-from LUPY import GNDSType as GNDSTypeModule
-from fudge import reactionSuite as reactionSuiteModule
+from fudge import reactionSuite as reactionSuiteModule, GNDS_file as GNDS_fileModule
 
 description1 = """This module reads a GNDS file and removes (culls) all styles from each component but for a selected style.
 If the selected style is not present for a component, the nearest derived style for the selected style is kept.
@@ -32,10 +31,10 @@ if __name__ == '__main__' :
 
     args = parser.parse_args( )
 
-    name, dummy = GNDSTypeModule.type( args.gnds )
+    name, dummy = GNDS_fileModule.type(args.gnds)
 
-    if( name == reactionSuiteModule.reactionSuite.moniker ) :
-            gnds = GNDSTypeModule.read( args.gnds )
+    if( name == reactionSuiteModule.ReactionSuite.moniker ) :
+            gnds = GNDS_fileModule.read(args.gnds)
     else :
         raise Exception( 'Current only GNDS reactionSuited file is supported: name = %s.' % name )
 

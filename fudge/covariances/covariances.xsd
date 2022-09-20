@@ -15,13 +15,12 @@
   <xs:element name="covarianceSuite">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="styles" type="styles"/>
         <xs:element name="externalFiles" type="externalFiles" minOccurs="0" maxOccurs="1"/>
-        <xs:element name="documentations" type="documentations" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="styles" type="styles"/>
         <xs:element name="covarianceSections" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
-              <xs:element ref="section" maxOccurs="unbounded"/>
+              <xs:element ref="covarianceSection" maxOccurs="unbounded"/>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -37,6 +36,7 @@
       <xs:attribute name="projectile" type="xs:NCName" use="required"/>
       <xs:attribute name="target" type="xs:NCName" use="required"/>
       <xs:attribute name="evaluation" type="xs:string" use="required"/>
+      <xs:attribute name="interaction" type="xs:string" use="required"/>
       <xs:attribute name="format" type="xs:string" use="required"/>
     </xs:complexType>
   </xs:element>
@@ -75,24 +75,13 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="documentations">
-    <xs:sequence>
-      <xs:element name="documentation" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="documentation" mixed="true">
-    <xs:attribute name="name" type="xs:NCName" use="required"/>
-  </xs:complexType>
-
-  <xs:element name="section">
+  <xs:element name="covarianceSection">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="rowData" type="dataLink"/>
         <xs:element name="columnData" type="dataLink" minOccurs="0"/>
         <xs:choice maxOccurs="unbounded">
           <xs:element name="covarianceMatrix" type="covarianceMatrix"/>
-          <xs:element name="shortRangeSelfScalingVariance" type="shortRangeSelfScalingVariance"/>
           <xs:element name="mixed" type="mixed"/>
           <xs:element name="sum" type="sum"/>
         </xs:choice>
@@ -103,18 +92,27 @@
   </xs:element>
 
   <xs:complexType name="dataLink">
-    <xs:attribute name="href" type="xs:string" use="required"/>
+    <xs:sequence>
+      <xs:element name="slices" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="slice" type="slice" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
     <xs:attribute name="ENDF_MFMT" type="xs:string"/>
-    <xs:attribute name="L" type="xs:int"/>
-    <xs:attributeGroup ref="dataLinkDomain"/>
+    <xs:attribute name="dimension" type="xs:int"/>
+    <xs:attribute name="href" type="xs:string" use="required"/>
   </xs:complexType>
 
-  <xs:attributeGroup name="dataLinkDomain">
-    <!-- incident energy domain is required for fission neutron spectrum covariances -->
-    <xs:attribute name="domainMin" type="xs:string"/>
-    <xs:attribute name="domainMax" type="xs:string"/>
+  <xs:complexType name="slice">
+    <xs:attribute name="dimension" type="xs:int" use="required"/>
+    <xs:attribute name="domainMin" type="xs:float"/>
+    <xs:attribute name="domainMax" type="xs:float"/>
+    <xs:attribute name="domainValue" type="xs:float"/>
     <xs:attribute name="domainUnit" type="xs:string"/>
-  </xs:attributeGroup>
+  </xs:complexType>
 
   <xs:complexType name="covarianceMatrix">
     <xs:sequence>

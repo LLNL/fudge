@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,14 +14,18 @@ from brownies.legacy.endl.endlProject import endlProject
 
 fudgeParameters.VerboseMode = False
 
+databaseFolder = os.sep.join(__path__ +  ['test', 'testdb'])
+if not os.path.isdir( databaseFolder ):
+    databaseFolder = os.sep.join([os.path.dirname(__file__)] +  ['testdb'])
+
 class testEndlProject( unittest.TestCase ): 
     
     def testInit( self ):
-        e = endlProject( os.sep.join( __path__ + [ 'test', 'testdb' ] ) )
+        e = endlProject( databaseFolder )
         self.assertEqual( e.ZAList(), [ 'za001001' ] )
 
     def testReadZA( self ): 
-        e = endlProject( os.sep.join( __path__ + [ 'test', 'testdb' ] ) )
+        e = endlProject( databaseFolder )
         self.assertEqual( e.ZAList(), [ 'za001001' ] )
         za = e.readZA( 1001 )
         za.read()

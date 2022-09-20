@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -45,7 +45,7 @@ parser.add_argument('evaluation',   default='', nargs='?',      help='''The eval
 
 args = parser.parse_args( )
 
-mapFile = mapModule.Map.readXML(args.map)
+mapFile = mapModule.Map.readXML_file(args.map)
 
 projectile = args.projectile if args.projectile != '' else None
 target = args.target if args.target != '' else None

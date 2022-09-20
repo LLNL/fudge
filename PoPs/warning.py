@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -23,10 +23,9 @@ Or, for easier searching you may wish to flatten the list (to get warnings alone
 """
 
 # FIXME context class and base warning class are both identical to stuff in fudge.warning. Move to external utility?
-__metaclass__ = type
 
 
-class context:
+class Context:
     """
     Store warnings in context. This class contains location information (reactionSuite, reaction, etc)
     plus a nested list of warnings or other context instances
@@ -54,7 +53,7 @@ class context:
         """
         Filter warning list to only include (or exclude) specific classes of warning. For example:
 
-        >>> newWarnings = warnings.filter( exclude=[warning.discreteLevelsOutOfOrder] )
+        >>> newWarnings = warnings.filter( exclude=[DiscreteLevelsOutOfOrder] )
 
         Note that if both 'include' and 'exclude' lists are provided, exclude is ignored.
         """
@@ -62,7 +61,7 @@ class context:
         if include is None and exclude is None: return self
         newWarningList = []
         for warning in self.warningList:
-            if isinstance(warning, context):
+            if isinstance(warning, Context):
                 newContext = warning.filter(include, exclude)
                 if newContext: newWarningList.append(newContext)
             elif include is not None:
@@ -71,7 +70,7 @@ class context:
             else:  # exclude is not None:
                 if warning.__class__ not in exclude:
                     newWarningList.append(warning)
-        return context(self.message, newWarningList)
+        return Context(self.message, newWarningList)
 
     def flatten( self ):
         """
@@ -85,7 +84,7 @@ class context:
 
         List = []
         for val in self.warningList:
-            if isinstance(val, warning):
+            if isinstance(val, Warning):
                 List.append(val)
             else:
                 List += val.flatten()
@@ -99,7 +98,7 @@ class context:
         return s
 
 
-class warning:  # FIXME make abstract base class?
+class Warning:  # FIXME make abstract base class?
     """
     General warning class. Contains link to problem object,
     xpath in case the object leaves memory,
@@ -126,9 +125,9 @@ class warning:  # FIXME make abstract base class?
 # specific warning classes:
 #
 
-class NotImplemented(warning):
+class NotImplemented(Warning):
     def __init__( self, form, obj=None ):
-        warning.__init__(self, obj)
+        Warning.__init__(self, obj)
         self.form = form
 
     def __str__( self ):
@@ -137,9 +136,9 @@ class NotImplemented(warning):
     def __eq__( self, other ):
         return (self.form == other.form and self.xpath == other.xpath)
 
-class discreteLevelsOutOfOrder( warning ):
+class DiscreteLevelsOutOfOrder( Warning ):
     def __init__(self, lidx, obj=None):
-        warning.__init__(self, obj)
+        Warning.__init__(self, obj)
         self.lidx = lidx
 
     def __str__(self):
@@ -148,9 +147,9 @@ class discreteLevelsOutOfOrder( warning ):
     def __eq__(self, other):
         return (self.lidx == other.lidx)
 
-class unnormalizedDecayProbabilities( warning ):
+class UnnormalizedDecayProbabilities( Warning ):
     def __init__(self, branchingSum, obj=None):
-        warning.__init__(self, obj)
+        Warning.__init__(self, obj)
         self.branchingSum = branchingSum
 
     def __str__(self):
@@ -159,9 +158,9 @@ class unnormalizedDecayProbabilities( warning ):
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.branchingSum == other.branchingSum)
 
-class AliasToNonExistentParticle(warning):
+class AliasToNonExistentParticle(Warning):
     def __init__( self, id, pid, obj=None ):
-        warning.__init__(self, obj)
+        Warning.__init__(self, obj)
         self.id = id
         self.pid = pid
 
@@ -170,4 +169,3 @@ class AliasToNonExistentParticle(warning):
 
     def __eq__(self, other):
         return (self.id == other.id and self.pid == other.pid)
-

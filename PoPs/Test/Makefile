@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,9 +14,11 @@ TARGETS = ids.py quantities.py gaugeBoson.py lepton.py baryon.py nuclearLevel.py
 default:
 
 check:
-	for target in ${TARGETS}; do $(PYTHON) $$target > $$target.out; ./check.com $$target $(CHECKOPTIONS); done
+	rm -rf Outputs
+	mkdir Outputs
+	for target in ${TARGETS}; do $(PYTHON) $$target > Outputs/$$target.out; ./check.com $$target $(CHECKOPTIONS); done
 
 clean:
-	rm -f *.out
+	rm -rf Outputs
 
 realclean: clean

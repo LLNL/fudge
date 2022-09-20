@@ -1,18 +1,18 @@
 #! /usr/bin/env python3
  
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 import os, argparse, sys, datetime, math, copy, glob, json, re
-import LUPY.GNDSType as GNDSTypeModule
-import fudge.reactionSuite as reactionSuiteModule
 
 from LUPY import subprocessing
 
+from fudge import enums as enumsModule
+from fudge import GNDS_file as GNDS_fileModule
 
 """ 
 Create batch scripts for all gnds processing tasks, mcf, ndf, ndf-heated, tdf and create one installable tarball of the resulting library 
@@ -43,6 +43,14 @@ parser = argparse.ArgumentParser( )
 parser.add_argument( "library", type=str,                                                               help = "where to find the gnds files, (full path)" )
 parser.add_argument( "--filelist", type=str, action='append', default = None,                           help = "choose a subset of files for testing, stated as a shell expandable regex. Default = %s"%filelistDefault  )
 parser.add_argument( '-a', '--arguments', default = argumentsDefault,                                   help = 'Arguments to pass through to processProtare.py. Default is %s' % argumentsDefault )
+parser.add_argument( '-f', '--argumentFiles', default = None, action='append',                          help = '''
+    Alernative option to pass argument input files (instead of explicit arguments) to processProtare.py.
+    Input is expected to be in the form "-f projectile=file_path" for each projecile,
+      e.g. "-f n=/usr/gapps/data/nuclear/common/processProtare/processProtare.n.input -f TNSL=/usr/gapps/data/nuclear/common/processProtare/processProtare.TNSL.full.input"''')
+parser.add_argument( '-w', '--writeArgsFile', action='append', default=None,                            help = '''
+    Option to write processProtare.py arguments to a file for record keeping and rerunning processPortare.py
+    Input is expected to be in the form "-w projectile=file_path" for each projectile,
+      e.g. "-w n=processProtare.n.input -w TNSL=processProtare.TNSL.full.input"''')
 
 parser.add_argument( "-n", "--nodes", type=int, default=1,                                              help = "Allow n nodes at once" )
 parser.add_argument( "-nt", "--tasks", type=int, default=8,                                             help = "Allow nt tasks per node" )
@@ -61,7 +69,7 @@ parser.add_argument( "--frontend", action="store_true",                         
 parser.add_argument( "--dryrun", action="store_true", default = False,                                  help = "build scripts but dont submit. for testing. " )
 parser.add_argument( "--query", action="store_true",                                                    help = "dont build scripts. just list files not done. for testing. " )
 parser.add_argument( "--fudgePath", dest="fudgePath", type=str,  default=fudgeDefault,                  help = "what fudge do you want to use? default = %s"%fudgeDefault )
-parser.add_argument("--venvActivateScript", default=None,                                               help="Path to virtual environment activate script")
+parser.add_argument("--venvActivateScript", default=None,                                               help = "Path to virtual environment activate script")
 args = parser.parse_args( )
 
 cwd = os.getcwd()
@@ -75,6 +83,8 @@ try:
 except:
     args.newDir = 'proc'
 args.tag = args.newDir
+
+outputArgs = {}
 
 def main():
       
@@ -126,38 +136,79 @@ def main():
 
     if( args.verbose > 0 ) : print('jobs left : %d'%unFinishedCount)
     if args.query : return 
-    args.filelist.sort()        
+    args.filelist.sort()
+
+    ### remove heating and upscatter from non-neutron arguments
+    if args.argumentFiles is None:
+        useExplicitArgs = True
+        argumentsNonNeutron = args.arguments.split()
+        while '-t' in  argumentsNonNeutron :
+            aInd = argumentsNonNeutron.index('-t')
+            del argumentsNonNeutron[aInd:aInd+2]
+        if '-up' in argumentsNonNeutron: argumentsNonNeutron.remove('-up')
+        argumentsNonNeutron = ' '.join(argumentsNonNeutron)
+
+    else:
+        useExplicitArgs = False
+        argFileDict = {}
+        argFileRegex = re.compile(r'^([^=]+)=([^=]+)$')
+        for singleArgumentFile in args.argumentFiles:
+            assert argFileRegex.match(singleArgumentFile), \
+            'Arguments for the processProtare.py inputfile arguments are expected to be of the form %s!!!' % argFileRegex.pattern
+            projectile, inputFile = argFileRegex.findall(singleArgumentFile)[0]
+            argFileDict[projectile] = inputFile
+
+    if args.writeArgsFile:
+        tempOutputArgs = {}
+        argFileRegex = re.compile(r'^([^=]+)=([^=]+)$')
+        for singleArgumentFile in args.writeArgsFile:
+            assert argFileRegex.match(singleArgumentFile), \
+                'Arguments for the "--writeArgsFile" option are expected to be of the form "-w %s"!!!' % argFileRegex.pattern
+            projectile, argumentFile = argFileRegex.findall(singleArgumentFile)[0]
+            tempOutputArgs[projectile] = [argumentFile]
+
     
     ### split the fileNames List into two different lists for neutrons and non neutrons
     fileListNeutrons = []
     fileListOther = []
     fileListTNSL = []
     fileListLLNL_TNSL = []
+    individualFileArguments = {}
     for filename in args.filelist:
         try : 
-            passedFileName, d = GNDSTypeModule.type( filename )
+            passedFileName, d = GNDS_fileModule.type(filename)
         except : 
             print(filename)
             raise
         if 'projectile' in d :
             if d['projectile'] == 'n': 
                 # Look at interaction type
-                if d['interaction'] == reactionSuiteModule.Interaction.TNSL:
-                    fileListTNSL.append(filename) 
-                elif d['interaction'] == reactionSuiteModule.Interaction.LLNL_TNSL:
-                    fileListLLNL_TNSL.append(filename) 
+                if d['interaction'] == enumsModule.Interaction.TNSL:
+                    fileListTNSL.append(filename)
+                    if args.writeArgsFile and len(tempOutputArgs['TNSL']) == 1:
+                        tempOutputArgs['TNSL'].append(filename)
+                elif d['interaction'] == enumsModule.Interaction.LLNL_TNSL:
+                    fileListLLNL_TNSL.append(filename)
+                    if args.writeArgsFile and len(tempOutputArgs['LLNL_TNSL']) == 1:
+                        tempOutputArgs['LLNL_TNSL'].append(filename)
                 else:
                     fileListNeutrons.append(filename)
+                    if args.writeArgsFile and len(tempOutputArgs['n']) == 1:
+                        tempOutputArgs['n'].append(filename)
             else:
                 fileListOther.append(filename)
+                if args.argumentFiles is not None:
+                    individualFileArguments[filename] = '@%s' % argFileDict[d['projectile']]
+                    if args.writeArgsFile and len(tempOutputArgs[d['projectile']]) == 1:
+                        tempOutputArgs[d['projectile']].append(filename)
+                        individualFileArguments[filename] += ' --printArgsFile %s' % os.path.join(args.library, tempOutputArgs[d['projectile']][0])
+                elif args.writeArgsFile and len(tempOutputArgs[d['projectile']]) == 1:
+                    tempOutputArgs['n'].append(filename)
     
-    ### remove heating and upscatter from non-neutron arguments
-    argumentsNonNeutron = args.arguments.split()
-    while '-t' in  argumentsNonNeutron :
-        aInd = argumentsNonNeutron.index('-t')
-        del argumentsNonNeutron[aInd:aInd+2]
-    if '-up' in argumentsNonNeutron: argumentsNonNeutron.remove('-up')
-    argumentsNonNeutron = ' '.join(argumentsNonNeutron)
+    if args.writeArgsFile:
+        for values in tempOutputArgs.values():
+            if len(values) == 2:
+                outputArgs[values[1]] = values[0]
             
     os.chdir(cwd)
 
@@ -173,21 +224,53 @@ def main():
     batsublines.append('#!/bin/env bash \n' )
     batsublines.append('### %s \n'%recordString)
 
+    def neutronOrTNSLArgs(_projectileAlias, _filelist):
+        if args.writeArgsFile:
+            if tempOutputArgs[_projectileAlias][1] in _filelist:
+                _useIndividualFileArguments = True
+                for _filename in _filelist:
+                    individualFileArguments[_filename] = args.arguments if useExplicitArgs else "@%s" % argFileDict[_projectileAlias]
+                    if _filename == tempOutputArgs[_projectileAlias][1]:
+                        individualFileArguments[_filename] += ' --printArgsFile %s' % os.path.join(args.library, tempOutputArgs[_projectileAlias][0])
+
+                _arguments = None
+
+            else:
+                _useIndividualFileArguments = False
+                _arguments = args.arguments if useExplicitArgs else "@%s" % argFileDict[_projectileAlias]
+
+        else:
+            _useIndividualFileArguments = False
+            _arguments = args.arguments if useExplicitArgs else "@%s" % argFileDict[_projectileAlias]
+
+        return _useIndividualFileArguments, _arguments
+
+
     #print('non-neutron list: ',len(fileListOther),fileListOther)
     for listNumber,filelist in enumerate([fileListNeutrons, fileListTNSL, fileListLLNL_TNSL, fileListOther]) :
+        if len(filelist) == 0:
+            continue
         
-        if listNumber==0: 
-            arguments = args.arguments
+        if listNumber==0:
             batchNamePrefix = 'neutron'
+            useIndividualFileArguments, arguments = neutronOrTNSLArgs('n', filelist)
+
         elif listNumber==1:
-            arguments = args.arguments
             batchNamePrefix = 'TNSL'
+            useIndividualFileArguments, arguments = neutronOrTNSLArgs('TNSL', filelist)
+
         elif listNumber==2:
-            arguments = argumentsNonNeutron
             batchNamePrefix = 'LLNL_TNSL'
+            useIndividualFileArguments, arguments = neutronOrTNSLArgs('LLNL_TNSL', filelist)
+
         else:
-            arguments = argumentsNonNeutron
             batchNamePrefix = 'other'
+            if useExplicitArgs:
+                useIndividualFileArguments = False
+                arguments = argumentsNonNeutron
+            else:
+                useIndividualFileArguments = True
+                arguments = None
 
         batchListDict = {}
         batchNames = []
@@ -223,8 +306,20 @@ def main():
             
         ### write the individual batch files and store the names
         for batchNum,batchName in enumerate(batchListDict.keys()) :
-            
-            batchNames.append( getSeparateBatch(batchListDict[batchName],arguments,batchName) )
+            if useIndividualFileArguments:
+                batchFolder = os.path.split(batsubname)[0]
+                if not os.path.isdir(batchFolder):
+                    os.mkdir(batchFolder)
+
+                argumentsJSON = ('%s/%s.json' % (batchFolder, batchName), individualFileArguments)
+                # fileObject = open(argumentsJSON, 'w')
+                # json.dump(individualFileArguments, fileObject)
+                # fileObject.close()
+
+            else:
+                argumentsJSON = None
+
+            batchNames.append( getSeparateBatch(batchListDict[batchName],arguments,batchName,argumentsJSON) )
             #print(batchNames[-1])
             
         ### now stripe the chain submissions    
@@ -247,7 +342,7 @@ def main():
     else:
         print('submit to batch with ==> source %s'%batsubname)
 
-def getSeparateBatch(filenames,arguments,batchName):
+def getSeparateBatch(filenames,arguments,batchName,argumentsJSON=None):
     thisnodes,thispart,thishours,thisprocs = args.numnodes,args.partition,args.numhours,args.cores
     workstrj = '%s_%s_%s_n%d'%(os.path.basename(args.library),os.path.basename(batchName),thispart,thisnodes)
     if( args.verbose > 0 ) : print('writing batch file %s' % workstrj)
@@ -280,6 +375,7 @@ def getSeparateBatch(filenames,arguments,batchName):
     if not args.frontend : jout.write( 'echo $PWD \n' )
     jout.write( 'echo "starting job : " ; date \n' )
     filelist = []
+    jsonArgumentDictionary = {}
     for filename in filenames:
         fileBase = os.path.basename(filename)
         filePath = '%s/%s/working_%s/wkdr_%s'%(args.library,os.path.dirname(filename),args.tag,fileBase)
@@ -287,16 +383,30 @@ def getSeparateBatch(filenames,arguments,batchName):
         jout.write( 'cp %s/%s  %s/ \n'%(args.library,filename,filePath) )
         filelist.append( '%s/%s'%(filePath,fileBase) )
 
+        if argumentsJSON is not None:
+            jsonArgumentDictionary[filelist[-1]] = argumentsJSON[1][filename]
+
     # FIXME hard-coding time limits for now, should compute from walltime.  Also, timeout may not be installed on all systems:
-    jout.write( 'timeout -k 86100s 85800s %s %s %s %s -p %s -c --options "%s  > runLog_%s.txt 2>&1"   \n' %
-                (pythonCommand, os.path.join(fudgeBinPath, 'multiprocessGeneral.py'), 
-                 os.path.join(fudgeBinPath, 'processProtare.py'),
-                 ' '.join(filelist), pythonCommand, ''.join(arguments), args.tag) )
+    if argumentsJSON is None:
+        jout.write( 'timeout -k 86100s 85800s %s %s %s %s -p %s -c --options "%s  > runLog_%s.txt 2>&1"   \n' %
+                    (pythonCommand, os.path.join(fudgeBinPath, 'multiprocessGeneral.py'),
+                     os.path.join(fudgeBinPath, 'processProtare.py'),
+                     ' '.join(filelist), pythonCommand, ''.join(arguments), args.tag) )
+    else:
+        with open(argumentsJSON[0], 'w') as fileObject:
+            json.dump(jsonArgumentDictionary, fileObject)
+
+        jout.write( 'timeout -k 86100s 85800s %s %s %s %s -p %s -c --optionsJSON %s --options "  > runLog_%s.txt 2>&1"   \n' %
+                    (pythonCommand, os.path.join(fudgeBinPath, 'multiprocessGeneral.py'),
+                     os.path.join(fudgeBinPath, 'processProtare.py'),
+                     ' '.join(filelist), pythonCommand, argumentsJSON[0], args.tag) )
 
     for filename in filenames:
         fileBase = os.path.basename(filename)
         filePath = '%s/%s/working_%s/wkdr_%s'%(args.library,os.path.dirname(filename),args.tag,fileBase)
-        jout.write( 'ln %s/%s %s/%s/  \n'%(filePath,fileBase.replace('.xml','.%s.xml'%args.tag),args.library,args.newDir) )
+        filetype = fileBase.split('.')[-1]
+        processedFileName = fileBase[:-len(filetype)] + '%s.%s' % (args.tag, filetype)
+        jout.write('ln %s/%s %s/%s/  \n' % (filePath, processedFileName, args.library, args.newDir))
     
     jout.close()
     return thisname

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -60,8 +60,6 @@ else :
 import Gnuplot
 from fudge.core.utilities import fudgeFileMisc
 
-__metaclass__ = type
-
 DoDelete = 0
 
 filesToPlot = 0
@@ -97,7 +95,7 @@ if( len( sys.argv ) > 1 ) :
             nE += 1
             if ( lE is not None ) :
                 f.close( )
-            f = fudgeFileMisc.fudgeTempFile( )
+            f = fudgeFileMisc.FudgeTempFile( )
             Enfs.append( ( Ei, f, Gnuplot.File( f.getName( ) ) ) )
             lE = Ei
             lx = None

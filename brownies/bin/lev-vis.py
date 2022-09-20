@@ -5,7 +5,7 @@ import os
 import argparse
 import brownies.BNL.RIPL.level_density as LD
 import brownies.BNL.RIPL.level_scheme as LS
-from PoPs.groups.misc import symbolFromZ as elementSymbolFromZ
+from PoPs.chemicalElements .misc import symbolFromZ as elementSymbolFromZ
 import numpy as np
 import matplotlib.pyplot as plt
 HOME=os.environ['HOME']

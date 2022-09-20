@@ -63,7 +63,7 @@ def readEvaluation(filename, targ=None, proj=None, verbose=True, skipBadData=Tru
             ampx_za, bounds = ampx.readEvaluation(filename, str(targ), str(proj))
             return [
                 ampx2fudge.convertAmpxNuclideToFudgeReactionSuite(ampx_za, bounds),
-                fudge.covariances.covarianceSuite.covarianceSuite(None, None, None)]
+                fudge.covariances.covarianceSuite.CovarianceSuite(None, None, None)]
         except ImportError:
             print("WARNING: Could not load AMPX module.  Is it in your path?")
 
@@ -72,12 +72,13 @@ def readEvaluation(filename, targ=None, proj=None, verbose=True, skipBadData=Tru
 
         # Is the file a GNDS file?
         if firstline.startswith("<?xml") or firstline.startswith("<reactionSuite "):
-            import fudge
-            RS = fudge.reactionSuite.readXML(filename)
+            import GNDS_file
+            RS = GNDS_file.read(filename)
             try:
-                CS = fudge.covariances.covarianceSuite.readXML(filename.replace('.gnds.', '.gndsCov.'))
+                CS = GNDS_file.read(filename.replace('.gnds.', '.gndsCov.'))
             except:
-                CS = fudge.covariances.covarianceSuite.covarianceSuite(None, None, None)
+                from fudge.covariances import covarianceSuite
+                CS = covarianceSuite.CovarianceSuite(None, None, None)
             return [RS, CS]
 
         # Maybe its an ENDF file?

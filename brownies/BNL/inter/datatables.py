@@ -1,8 +1,8 @@
 import pqu.PQU as PQUModule
-import xData.table
 import json
 import csv
 
+from xData import table as tableModule
 
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -20,11 +20,11 @@ class ComplexEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class DataTable(xData.table.table):
+class DataTable(tableModule.Table):
 
     def __init__(self, columns=None, rows=None, data=None):
 
-        xData.table.table.__init__(self, columns=columns, data=data)
+        tableModule.Table.__init__(self, columns=columns, data=data)
         self.rows = rows
         if self.rows and len(self.rows) != self.nRows:
             raise ValueError("Data is the wrong shape for a table with %i rows!" % self.nRows)
@@ -53,14 +53,14 @@ class DataTable(xData.table.table):
 
         # If not row labels, revert to base class behavior
         if not self.rows:
-            return xData.table.table.toStringList(self, indent=indent, kwargs=kwargs)
+            return tableModule.Table.toStringList(self, indent=indent, kwargs=kwargs)
 
         addHeader = kwargs.get('addHeader', True)
         addHeaderUnits = kwargs.get('addHeaderUnits', True)
         outline = kwargs.get('outline', False)
         columnWidths = [0] * (self.nColumns + 1)
         for col in range(self.nColumns):
-            columnDat = [row[col] for row in self.data if not isinstance(row[col], xData.table.blank)]
+            columnDat = [row[col] for row in self.data if not isinstance(row[col], tableModule.Blank)]
             asStrings = list(map(PQUModule.toShortestString, columnDat))
             columnWidths[col + 1] = max(list(map(len, asStrings)))
         columnWidths[0] = max(list(map(len, self.rows)))
@@ -100,7 +100,7 @@ class DataTable(xData.table.table):
         template = ['%s' % (indent + ' ')] + ['%%%is' % l for l in columnWidths]
 
         def toString(val):
-            if isinstance(val, xData.table.blank):
+            if isinstance(val, tableModule.Blank):
                 return str(val)
             if isinstance(val, str):
                 return val

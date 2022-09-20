@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,23 +10,23 @@ import numpy
 from distutils.core import setup, Extension
 
 # find numpy include path:
-numpyPath = os.path.split( numpy.__file__ )[0]
-numpyPath = os.path.join( numpyPath, 'core/include/numpy' )
+numpyPath = os.path.split(numpy.__file__)[0]
+numpyPath = os.path.join(numpyPath, 'core/include/numpy')
 
-getBreitWignerSums = Extension( '_getBreitWignerSums',
-        sources = ['getBreitWignerSums.c'],
-        include_dirs = [ './', numpyPath ] )
+getBreitWignerSums = Extension('_getBreitWignerSums',
+        sources=['getBreitWignerSums.c'],
+        include_dirs=['./', numpyPath])
 
-getScatteringMatrices = Extension( '_getScatteringMatrices',
-        sources = ['getScatteringMatrices.c'],
-        include_dirs = [ './', numpyPath ] )
+getScatteringMatrices = Extension('_getScatteringMatrices',
+        sources=['getScatteringMatrices.c'],
+        include_dirs=['./', numpyPath])
 
-getCoulombWavefunctions = Extension( '_getCoulombWavefunctions',
+getCoulombWavefunctions = Extension('_getCoulombWavefunctions',
         sources = ['getCoulombWavefunctions.c','coulfg2.c'],
-        include_dirs = [ './', numpyPath ] )
+        include_dirs = ['./', numpyPath])
 
-setup(name='extensions',
-        version='1.0',
-        description = 'Extensions (written in c) for better performance in reconstructing resonances',
-        ext_modules=[ getBreitWignerSums, getScatteringMatrices, getCoulombWavefunctions ] )
-
+if __name__ == '__main__':
+    setup(name='extensions',
+            version='1.0',
+            description='Extensions (written in c) for better performance in reconstructing resonances',
+            ext_modules=[getBreitWignerSums, getScatteringMatrices, getCoulombWavefunctions])

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,14 +8,16 @@
 """Energy distribution classes."""
 
 import math
+
+from LUPY import ancestry as ancestryModule
+
 from pqu import PQU as PQUModule
 from fudge.core.utilities import brb
-import xData.ancestry as ancestryModule
 
-from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 from xData import base as xDataBaseModule
 from xData import axes as axesModule
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 from xData import xs_pdf_cdf as xs_pdf_cdfModule
 from xData import multiD_XYs as multiD_XYsModule
 from xData import regions as regionsModule
@@ -26,29 +28,27 @@ from . import base as baseModule
 from . import probabilities as probabilitiesModule
 from . import miscellaneous as miscellaneousModule
 
-__metaclass__ = type
-
 def defaultAxes( energyUnit ) :
 
-    axes = axesModule.axes( rank = 3 )
-    axes[2] = axesModule.axis( 'energy_in',  2, energyUnit )
-    axes[1] = axesModule.axis( 'energy_out', 1, energyUnit )
-    axes[0] = axesModule.axis( 'P(energy_out|energy_in)', 0, '1/' + energyUnit )
+    axes = axesModule.Axes(3)
+    axes[2] = axesModule.Axis( 'energy_in',  2, energyUnit )
+    axes[1] = axesModule.Axis( 'energy_out', 1, energyUnit )
+    axes[0] = axesModule.Axis( 'P(energy_out|energy_in)', 0, '1/' + energyUnit )
     return( axes )
 
-class XYs1d( XYsModule.XYs1d ) :
+class XYs1d( XYs1dModule.XYs1d ) :
 
     def averageEnergy( self ) :
 
-        allowedInterpolations = [ standardsModule.interpolation.linlinToken, standardsModule.interpolation.flatToken ]
-        xys = self.changeInterpolationIfNeeded( allowedInterpolations, XYsModule.defaultAccuracy )
+        allowedInterpolations = [xDataEnumsModule.Interpolation.linlin, xDataEnumsModule.Interpolation.flat]
+        xys = self.changeInterpolationIfNeeded( allowedInterpolations, XYs1dModule.defaultAccuracy )
         return( xys.integrateWithWeight_x( ) )
 
     def toLinearXYsClass( self ) :
 
         return( XYs1d )
 
-class regions1d( regionsModule.regions1d ) :
+class Regions1d( regionsModule.Regions1d ) :
 
     def averageEnergy( self ) :
 
@@ -71,27 +71,26 @@ class regions1d( regionsModule.regions1d ) :
 
         return( XYs1d, )
 
-class xs_pdf_cdf1d( xs_pdf_cdfModule.xs_pdf_cdf1d ) :
+class Xs_pdf_cdf1d( xs_pdf_cdfModule.Xs_pdf_cdf1d ) :
 
     def toLinearXYsClass( self ) :
 
         return( XYs1d )
 
-class subform( baseModule.subform ) :
+class Subform( baseModule.Subform ) :
     """Abstract base class for energy forms."""
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
 
         return( None )
 
-class discretePrimaryGamma( subform ) :
+class DiscretePrimaryGamma( Subform ) :
 
     dimension = 2
-    ancestryMembers = ( '', )
 
     def __init__( self, value, domainMin, domainMax, axes = None ) :
 
-        subform.__init__( self )
+        Subform.__init__( self )
 
         if( isinstance( value, int ) ) : value = float( value )
         if( not( isinstance( value, float ) ) ) : raise TypeError( 'value must be a float.' )
@@ -108,7 +107,7 @@ class discretePrimaryGamma( subform ) :
         if( axes is None ) :
             self.__axes = None
         else :
-            if( not( isinstance( axes, axesModule.axes ) ) ) : raise TypeError( 'axes is not an axes instance' )
+            if( not( isinstance( axes, axesModule.Axes ) ) ) : raise TypeError( 'axes is not an axes instance' )
             if( len( axes ) <= self.dimension ) : raise Exception( 'len( axes ) = %d != ( self.dimension + 1 ) = %d' % ( len( axes ), ( self.dimension + 1 ) ) )
             self.__axes = axes.copy( )
             self.__axes.setAncestor( self )
@@ -158,41 +157,73 @@ class discretePrimaryGamma( subform ) :
         height = 2.0 / ( energy2 - energy1 )
         return( XYs1d( data = [ [ energy1, 0.0 ], [ photonEnergy, height ], [ energy2, 0.0 ] ], axes = defaultAxes( self.domainUnit ) ) )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def fixDomains(self, domainMin, domainMax, fixToDomain):
+        """
+        Sets *domainMin* and *domainMax* per the arguments.
+        """
+
+        OldDomainMin = self.domainMin
+        OldDomainMax = self.domainMax
+
+        domainMin = max(domainMin, self.domainMin)
+        domainMax = min(domainMax, self.domainMax)
+        if fixToDomain == xDataEnumsModule.FixDomain.lower:
+            if domainMin > self.__domainMin: self.__domainMin = domainMin
+        elif fixToDomain == xDataEnumsModule.FixDomain.upper:
+            self.__domainMax = domainMax
+        else:
+            self.__domainMin = domainMin
+            self.__domainMax = domainMax
+
+        if OldDomainMin == self.domainMin and OldDomainMax == self.domainMax: return 0
+        return 1
+
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        XMLStringList = [ '%s<%s value="%s" domainMin="%s" domainMax="%s"' % ( indent, self.moniker, PQUModule.floatToShortestString( self.value, 12 ), 
-                PQUModule.floatToShortestString( self.__domainMin, 12 ), PQUModule.floatToShortestString( self.__domainMax, 12 ) ) ]
+        extraAttribute = ''
+        if isinstance(self, PrimaryGamma):
+            if self.finalState is not None:
+                extraAttribute = ' finalState="%s"' % self.finalState
+
+        XMLStringList = ['%s<%s value="%s" domainMin="%s" domainMax="%s"%s' % (indent, self.moniker, PQUModule.floatToShortestString(self.value, 12), 
+                PQUModule.floatToShortestString(self.__domainMin, 12), PQUModule.floatToShortestString(self.__domainMax, 12), extraAttribute)]
+
         if( self.axes is None ) : 
             XMLStringList[-1] += '/>'
         else :
             XMLStringList[-1] += '>'
-            XMLStringList += self.axes.toXMLList( indent = indent2, **kwargs )
+            XMLStringList += self.axes.toXML_strList( indent=indent2, **kwargs )
             XMLStringList[-1] += '</%s>' % self.moniker
-        return( XMLStringList )
+
+        return XMLStringList
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        value = float( element.get( 'value' ) )
-        domainMin = float( element.get( 'domainMin' ) )
-        domainMax = float( element.get( 'domainMax' ) )
+        value = float(node.get('value'))
+        domainMin = float(node.get('domainMin'))
+        domainMax = float(node.get('domainMax'))
+        finalState = node.get('finalState', None)
 
         axes = None
-        for child in element :
-            if( child.tag == axesModule.axes.moniker ) :
-                axes = axesModule.axes.parseXMLNode( child, xPath, linkData )
+        for child in node:
+            if( child.tag == axesModule.Axes.moniker ) :
+                axes = axesModule.Axes.parseNodeUsingClass(child, xPath, linkData, **kwargs)
             else :
-                raise Exception( 'Invalid sub-element with tag = "%s"' % child.tag )
-        
-        return( cls( value, domainMin, domainMax, axes = axes ) )
+                raise Exception('Invalid child node with tag = "%s"' % child.tag)
+
+        if issubclass(cls, PrimaryGamma):
+            return cls(value, domainMin, domainMax, axes=axes, finalState=finalState)
+        else:
+            return cls(value, domainMin, domainMax, axes=axes)
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
         return( [ EMin, EMax ] )
 
-class discreteGamma( discretePrimaryGamma ) :
+class DiscreteGamma( DiscretePrimaryGamma ) :
 
     moniker = 'discreteGamma'
 
@@ -201,7 +232,7 @@ class discreteGamma( discretePrimaryGamma ) :
         from fudge import warning
 
         warnings = []
-        if( self.value <= 0 ) : warnings.append( warning.negativeDiscreteGammaEnergy() )
+        if( self.value <= 0 ) : warnings.append( warning.NegativeDiscreteGammaEnergy() )
         return( warnings )
 
     def averageEp( self, E ) :
@@ -220,14 +251,32 @@ class discreteGamma( discretePrimaryGamma ) :
 
         return( 0.0 )
 
-class primaryGamma( discretePrimaryGamma ) :
+class PrimaryGamma(DiscretePrimaryGamma):
 
     moniker = 'primaryGamma'
 
-    def __init__( self, value, domainMin, domainMax, axes = None ) :
+    def __init__(self, value, domainMin, domainMax, axes=None, finalState=None):
+        """Constructor.
 
-        discretePrimaryGamma.__init__( self, value, domainMin, domainMax, axes = axes )
+        :param value:           The neutron binding energy.
+        :param domainMin:       The minimum projectile energy that the primary photon is emitted.
+        :param domainMax:       The maximum projectile energy that the primary photon is emitted.
+        :param axes:            The axes for *self*.
+        :param finalState:      The nuclear state the compound is in after the primary photon (gamma) is emitted.
+        """
+
+        DiscretePrimaryGamma.__init__(self, value, domainMin, domainMax, axes=axes)
         self.__massRatio = None     # In ENDF lingo this is AWR / ( AWR + 1 ).
+
+        if not isinstance(finalState, (str, type(None))):
+            raise TypeError('Invalid finalState type: got "%s".' % type(finalState))
+        self.__finalState = finalState
+
+    @property
+    def finalState(self):
+        """Returns the finalState."""
+
+        return self.__finalState
 
     @property
     def massRatio( self ) :
@@ -241,14 +290,13 @@ class primaryGamma( discretePrimaryGamma ) :
         from fudge import warning
 
         warnings = []
-# BRB6 hardwired
         Qvalue = self.findAttributeInAncestry('getQ')('eV')
         if isinstance( self.value, PQUModule.PQU ) :
             testValue = self.value.getValueAs( 'eV' )
         else:
             testValue = self.value
         if testValue > Qvalue:
-            warnings.append( warning.primaryGammaEnergyTooLarge( self.value,
+            warnings.append( warning.PrimaryGammaEnergyTooLarge( self.value,
                             100 * testValue / Qvalue ) )
         return warnings
 
@@ -269,7 +317,7 @@ class primaryGamma( discretePrimaryGamma ) :
 
         return( 0.0 )
 
-class XYs2d( subform, probabilitiesModule.PofX1GivenX2 ) :
+class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
 
     def __init__( self, **kwargs ):
         """
@@ -282,12 +330,12 @@ class XYs2d( subform, probabilitiesModule.PofX1GivenX2 ) :
         """
 
         probabilitiesModule.PofX1GivenX2.__init__( self, **kwargs )
-        subform.__init__( self )
+        Subform.__init__( self )
 
-    def evaluate( self, domainValue, extrapolation = standardsModule.noExtrapolationToken, epsilon = 0 ) :
+    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, epsilon = 0 ) :
 
-        return( probabilitiesModule.PofX1GivenX2.evaluate( self, domainValue, extrapolation = extrapolation, epsilon = epsilon, 
-                interpolationQualifier = standardsModule.interpolation.unitBaseToken ) )
+        return probabilitiesModule.PofX1GivenX2.evaluate(self, domainValue, extrapolation = extrapolation, epsilon = epsilon, 
+                interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
 
     def getAtEnergy( self, energy ) :
         """This method is deprecated, use getSpectrumAtEnergy."""
@@ -297,8 +345,8 @@ class XYs2d( subform, probabilitiesModule.PofX1GivenX2 ) :
     def energySpectrumAtEnergy( self, energy ) :
         """Returns the energy spectrum in the lab frame for the specified incident energy."""
 
-        spectrum = self.evaluate( energy, extrapolation = standardsModule.flatExtrapolationToken )
-        if( isinstance( spectrum, regions1d ) ) : spectrum = spectrum.toPointwise_withLinearXYs( lowerEps = 1e-6, upperEps = 1e-6 )
+        spectrum = self.evaluate(energy, extrapolation=xDataEnumsModule.Extrapolation.flat)
+        if( isinstance( spectrum, Regions1d ) ) : spectrum = spectrum.toPointwise_withLinearXYs( lowerEps = 1e-6, upperEps = 1e-6 )
         return( spectrum )
 
     def getSpectrumAtEnergy( self, energy ) :
@@ -339,16 +387,16 @@ class XYs2d( subform, probabilitiesModule.PofX1GivenX2 ) :
 
         warnings = []
 
-        if self.interpolation == standardsModule.interpolation.flatToken:
-            warnings.append( warning.flatIncidentEnergyInterpolation( ) )
+        if self.interpolation == xDataEnumsModule.Interpolation.flat:
+            warnings.append( warning.FlatIncidentEnergyInterpolation( ) )
 
         for idx in range(len(self)):
             integral = self[idx].integrate()
             if abs(integral - 1.0) > info['normTolerance']:
-                warnings.append( warning.unnormalizedDistribution( PQUModule.PQU( self[idx].outerDomainValue, self.axes[-1].unit ), idx, integral, self[idx] ) )
+                warnings.append( warning.UnnormalizedDistribution( PQUModule.PQU( self[idx].outerDomainValue, self.axes[-1].unit ), idx, integral, self[idx] ) )
 
             if( self[idx].rangeMin < 0.0 ) :
-                warnings.append( warning.negativeProbability( PQUModule.PQU( self[idx].outerDomainValue, self.axes[-1].unit ),
+                warnings.append( warning.NegativeProbability( PQUModule.PQU( self[idx].outerDomainValue, self.axes[-1].unit ),
                     value=self[idx].rangeMin, obj=self[idx] ) )
 
         return warnings
@@ -366,28 +414,28 @@ class XYs2d( subform, probabilitiesModule.PofX1GivenX2 ) :
         linear = self
         for xys in self :
             if( isinstance( xys, XYs1d ) ) :
-                if( xys.interpolation not in [ standardsModule.interpolation.linlinToken, standardsModule.interpolation.flatToken ] ) :
-                    linear = self.toPointwise_withLinearXYs( accuracy = XYsModule.defaultAccuracy, upperEps = 1e-8 )
+                if xys.interpolation not in [xDataEnumsModule.Interpolation.linlin, xDataEnumsModule.Interpolation.flat]:
+                    linear = self.toPointwise_withLinearXYs( accuracy = XYs1dModule.defaultAccuracy, upperEps = 1e-8 )
                     break
             else :
-                linear = self.toPointwise_withLinearXYs( accuracy = XYsModule.defaultAccuracy, upperEps = 1e-8 )
+                linear = self.toPointwise_withLinearXYs( accuracy = XYs1dModule.defaultAccuracy, upperEps = 1e-8 )
                 break
         subform = XYs2d( axes = self.axes, interpolation = self.interpolation, 
                 interpolationQualifier = self.interpolationQualifier )
-        for xys in linear : subform.append( xs_pdf_cdf1d.fromXYs( xys, xys.outerDomainValue ) )
+        for xys in linear : subform.append( Xs_pdf_cdf1d.fromXYs( xys, xys.outerDomainValue ) )
         return( subform )
 
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( XYs1d, regions1d, xs_pdf_cdf1d ) )
+        return( ( XYs1d, Regions1d, Xs_pdf_cdf1d ) )
 
-class regions2d( subform, regionsModule.regions2d ) :
+class Regions2d( Subform, regionsModule.Regions2d ) :
 
     def __init__( self, **kwargs ):
 
-        regionsModule.regions2d.__init__( self, **kwargs )
-        subform.__init__( self )
+        regionsModule.Regions2d.__init__( self, **kwargs )
+        Subform.__init__( self )
 
     def check( self, info ) :
 
@@ -397,16 +445,16 @@ class regions2d( subform, regionsModule.regions2d ) :
         for idx, region in enumerate( self ):
             regionWarnings = region.check( info )
             if regionWarnings:
-                warnings.append( warning.context("Region %d:" % idx, regionWarnings) )
+                warnings.append( warning.Context("Region %d:" % idx, regionWarnings) )
         return warnings
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        return( regionsModule.regions2d.toPointwise_withLinearXYs( self, cls = XYs2d, **kwargs ) )
+        return( regionsModule.Regions2d.toPointwise_withLinearXYs( self, cls = XYs2d, **kwargs ) )
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
 
-        _regions2d = regions2d( axes = self.axes )
+        _regions2d = Regions2d( axes = self.axes )
         for region in self : _regions2d.append( region.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
         return( _regions2d )
 
@@ -415,13 +463,13 @@ class regions2d( subform, regionsModule.regions2d ) :
 
         return( ( XYs2d, ) )
 
-class energyFunctionalData( ancestryModule.ancestry ) :
+class EnergyFunctionalData( ancestryModule.AncestryIO ) :
 
     ancestryMembers = ( 'data', )
 
     def __init__( self, data ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
         self.data = data
         self.data.setAncestor( self )
 
@@ -436,54 +484,54 @@ class energyFunctionalData( ancestryModule.ancestry ) :
 
     __copy__ = copy
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         xml = ['%s<%s>' % (indent, self.moniker)]
-        xml += self.data.toXMLList( indent + '  ', **kwargs )
+        xml += self.data.toXML_strList( indent + '  ', **kwargs )
         xml[-1] += '</%s>' % self.moniker
         return xml
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ):
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         xPath.append( element.tag )
         subClass = {
-            XYs1d.moniker           : XYsModule.XYs1d,
-            regions1d.moniker       : regionsModule.regions1d,
-            xs_pdf_cdf1d.moniker    : xs_pdf_cdfModule.xs_pdf_cdf1d
+            XYs1d.moniker           : XYs1dModule.XYs1d,
+            Regions1d.moniker       : regionsModule.Regions1d,
+            Xs_pdf_cdf1d.moniker    : xs_pdf_cdfModule.Xs_pdf_cdf1d
         }.get( element[0].tag )
         if( subClass is None ) : raise Exception( "encountered unknown energy functional subform: %s" % element[0].tag )
-        EFD = cls( subClass.parseXMLNode( element[0], xPath, linkData ) )
+        EFD = cls(subClass.parseNodeUsingClass(element[0], xPath, linkData, **kwargs))
         xPath.pop()
         return EFD
 
-class a( energyFunctionalData ) :
+class A( EnergyFunctionalData ) :
 
     moniker = 'a'
 
-class b( energyFunctionalData ) :
+class B( EnergyFunctionalData ) :
 
     moniker = 'b'
 
-class theta( energyFunctionalData ) :
+class Theta( EnergyFunctionalData ) :
 
     moniker = 'theta'
 
-class g( energyFunctionalData ) :
+class G( EnergyFunctionalData ) :
 
     moniker = 'g'
 
-class T_M( energyFunctionalData ) :
+class T_M( EnergyFunctionalData ) :
 
     moniker = 'T_M'
 
-class functionalBase( subform ) :
+class FunctionalBase( Subform ) :
 
     ancestryMembers = ( 'parameter1', 'parameter2' )
 
     def __init__( self, LF, U, parameter1, parameter2 = None ) :
 
-        subform.__init__( self )
+        Subform.__init__( self )
 
         if( U is not None ) :
             if( not( isinstance( U, physicalQuantityModule.U ) ) ) : raise TypeError( 'Invalid U type' )
@@ -506,11 +554,11 @@ class functionalBase( subform ) :
     def copy( self ):
 
         U = self.U
-        if( U is not None ) : U = self.U.copy( )
-        if( self.parameter2 is None ) :
-            return self.__class__( U, self.parameter1.copy( ) )
+        if U is not None: U = self.U.copy()
+        if self.parameter2 is None:
+            return self.__class__(U, self.parameter1.copy())
         else :
-            return self.__class__( U, self.parameter1.copy( ), self.parameter2.copy( ) )
+            return self.__class__(U, self.parameter1.copy(), self.parameter2.copy())
 
     __copy__ = copy
 
@@ -520,7 +568,7 @@ class functionalBase( subform ) :
 
         warnings = []
         if( ( self.domainMin - self.U.value ) < 0 ) :
-            warnings.append( warning.energyDistributionBadU( self ) )
+            warnings.append( warning.EnergyDistributionBadU( self ) )
         return( warnings )
 
     @property
@@ -533,9 +581,14 @@ class functionalBase( subform ) :
 
         return( self.parameter1.data.domainMax )
 
+    @property
+    def domainUnit(self):
+
+        return self.parameter1.data.axes[0].unit
+
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
-        if( isinstance( self.parameter1.data, regionsModule.regions1d ) ) :
+        if( isinstance( self.parameter1.data, regionsModule.Regions1d ) ) :
             Es = []
             for region in self.parameter1.data :
                 Es = Es[:-1] + [ E for E, p in region ]
@@ -547,29 +600,39 @@ class functionalBase( subform ) :
             if( EMax > Es[-1] ) : Es.append( EMax )
         return( Es )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def fixDomains(self, energyMin, energyMax, domainToFix):
+        """
+        Calls the **fixDomains** for the **parameter1** member and if *self* is a **Watt** spectrum the **parameter2** member.
+        """
+
+        numberOfFixes = self.parameter1.data.fixDomains(energyMin, energyMax, domainToFix)
+        if isinstance(self, Watt): numberOfFixes += self.parameter2.data.fixDomains(energyMin, energyMax, domainToFix)
+
+        return numberOfFixes
+
+    def toXML_strList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlString = [ self.XMLStartTagString( indent = indent ) ]
         if( self.LF == 12 ) : 
-            xmlString += self.EFL.toXMLList( indent2, **kwargs )
-            xmlString += self.EFH.toXMLList( indent2, **kwargs )
+            xmlString += self.EFL.toXML_strList( indent2, **kwargs )
+            xmlString += self.EFH.toXML_strList( indent2, **kwargs )
         else :
-            xmlString += self.U.toXMLList( indent2, **kwargs )
-        xmlString += self.parameter1.toXMLList( indent2, **kwargs )
-        if( not( self.parameter2 is None ) ) : xmlString += self.parameter2.toXMLList( indent2, **kwargs )
+            xmlString += self.U.toXML_strList( indent2, **kwargs )
+        xmlString += self.parameter1.toXML_strList( indent2, **kwargs )
+        if self.parameter2 is not None: xmlString += self.parameter2.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-class generalEvaporationSpectrum( functionalBase ) :
+class GeneralEvaporation( FunctionalBase ) :
 
     moniker = 'generalEvaporation'
 
     def __init__( self, U, thetas, gs ) :
 
-        functionalBase.__init__( self, 5, U, thetas, gs )
+        FunctionalBase.__init__( self, 5, U, thetas, gs )
 
     def convertUnits( self, unitMap ) :
         """
@@ -591,6 +654,13 @@ class generalEvaporationSpectrum( functionalBase ) :
 
         return( math.sqrt( self.parameter1.data.evaluate( E ) ) * self.parameter2.data ).integrateWithWeight_sqrt_x( )
 
+    def energySpectrumAtEnergy( self, energyIn ) :
+
+        theta = self.parameter1.data.evaluate(energyIn)
+        spectrum = self.parameter2.data.toPointwise_withLinearXYs( accuracy = 1e-5, lowerEps = 1e-6, upperEps = 1e-6 )
+        spectrum = spectrum.nf_pointwiseXY.scaleOffsetXAndY(xScale = theta, yScale = 1.0 / theta )
+        return( XYs1d( spectrum, axes = defaultAxes( energyUnit = self.domainUnit ) ) )
+
     def isLinear( self, qualifierOk = False, flatIsOk = False ) :
         """
         Returns the results of isLinear called on the axes of g(E'|E).
@@ -600,9 +670,9 @@ class generalEvaporationSpectrum( functionalBase ) :
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
 
-        _gs = g( xs_pdf_cdf1d.fromXYs( self.parameter2.data ) )
+        _gs = G( Xs_pdf_cdf1d.fromXYs( self.parameter2.data ) )
         _gs.data.axes = self.parameter2.data.axes.copy()
-        _form = generalEvaporationSpectrum( self.U, thetas = self.parameter1.copy( ), gs = _gs )
+        _form = GeneralEvaporation( self.U, thetas = self.parameter1.copy( ), gs = _gs )
         return( _form )
 
     def toPointwise_withLinearXYs( self, **kwargs  ) :
@@ -617,19 +687,19 @@ class generalEvaporationSpectrum( functionalBase ) :
             pwl.append( data )
         return( pwl )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         """Translate <generalEvaporation> element from xml."""
 
         xPath.append( element.tag )
-        theta_ = theta.parseXMLNode( element.find(theta.moniker), xPath, linkData )
-        g_ = g.parseXMLNode( element.find(g.moniker), xPath, linkData )
-        U = physicalQuantityModule.U.parseXMLNode( element.find( 'U' ), xPath, linkData )
-        GES = generalEvaporationSpectrum( U, theta_, g_ )
+        theta_ = Theta.parseNodeUsingClass(element.find(Theta.moniker), xPath, linkData, **kwargs)
+        g_ = G.parseNodeUsingClass(element.find(G.moniker), xPath, linkData, **kwargs)
+        U = physicalQuantityModule.U.parseNodeUsingClass(element.find( 'U' ), xPath, linkData, **kwargs)
+        GES = cls( U, theta_, g_ )
         xPath.pop()
         return GES
 
-class simpleMaxwellianFissionSpectrum1d :       # FIXME, needs units
+class SimpleMaxwellianFission1d:       # FIXME, needs units
 
     def __init__( self, energy, theta, U ) :
 
@@ -666,18 +736,13 @@ class simpleMaxwellianFissionSpectrum1d :       # FIXME, needs units
 
         return( ( self.evaluateIndefiniteIntegral( energyMax ) - self.evaluateIndefiniteIntegral( energyMin ) ) / self.norm )
 
-class simpleMaxwellianFissionSpectrum( functionalBase ) :
+class SimpleMaxwellianFission( FunctionalBase ) :
 
     moniker = 'simpleMaxwellianFission'
 
     def __init__( self, U, thetas ) :
 
-        functionalBase.__init__( self, 7, U, thetas )
-
-    @property
-    def domainUnit( self ) :
-
-        return( str( self.U.unit ) )
+        FunctionalBase.__init__( self, 7, U, thetas )
 
     @property
     def theta( self ) :
@@ -711,12 +776,12 @@ class simpleMaxwellianFissionSpectrum( functionalBase ) :
             return( self.evaluate( energyOut ) )
 
         spectrum1 = self.evaluate( energyIn )
-        spectrum2 = XYsModule.pointwiseXY_C.createFromFunction( [ 0.0, energyIn - self.U.value ], A, spectrum1, 1e-3, 12 )
+        spectrum2 = XYs1dModule.pointwiseXY_C.createFromFunction( [ 0.0, energyIn - self.U.value ], A, spectrum1, 1e-3, 12 )
         return( XYs1d( spectrum2, axes = defaultAxes( energyUnit = self.domainUnit ) ) )
 
     def evaluate( self, energy ) :
 
-        return( simpleMaxwellianFissionSpectrum1d( energy, self.theta.data.evaluate( energy ), self.U.value ) )
+        return( SimpleMaxwellianFission1d( energy, self.theta.data.evaluate( energy ), self.U.value ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
@@ -724,20 +789,20 @@ class simpleMaxwellianFissionSpectrum( functionalBase ) :
 
             return( math.sqrt( x ) * math.exp( -x / self.p1 ) )
 
-        ef = energyFunctionalDataToPointwise( self, evaluateAtX )
+        ef = EnergyFunctionalDataToPointwise( self, evaluateAtX )
         return( ef.toPointwise_withLinearXYs( **kwargs ) )
 
-    @staticmethod
-    def parseXMLNode( MFelement, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, MFelement, xPath, linkData, **kwargs):
 
         xPath.append( MFelement.tag )
-        theta_ = theta.parseXMLNode( MFelement.find(theta.moniker), xPath, linkData )
-        U = physicalQuantityModule.U.parseXMLNode( MFelement.find( 'U' ), xPath, linkData )
-        SMF = simpleMaxwellianFissionSpectrum( U, theta_ )
+        theta_ = Theta.parseNodeUsingClass(MFelement.find(Theta.moniker), xPath, linkData, **kwargs)
+        U = physicalQuantityModule.U.parseNodeUsingClass(MFelement.find( 'U' ), xPath, linkData, **kwargs)
+        SMF = cls( U, theta_ )
         xPath.pop()
         return SMF
 
-class evaporationSpectrum1d :       # FIXME, needs units
+class Evaporation1d:       # FIXME, needs units
 
     def __init__( self, energy, theta, U ) :
 
@@ -773,18 +838,13 @@ class evaporationSpectrum1d :       # FIXME, needs units
 
         return( integral )
 
-class evaporationSpectrum( functionalBase ) :
+class Evaporation( FunctionalBase ) :
 
     moniker = 'evaporation'
 
     def __init__( self, U, thetas ) :
 
-        functionalBase.__init__( self, 9, U, thetas )
-
-    @property
-    def domainUnit( self ) :
-
-        return( str( self.U.unit ) )
+        FunctionalBase.__init__( self, 9, U, thetas )
 
     @property
     def theta( self ) :
@@ -793,7 +853,7 @@ class evaporationSpectrum( functionalBase ) :
 
     def averageEp( self, E ) :
 
-        if( isinstance( self.parameter1.data, regionsModule.regions1d ) ) :
+        if( isinstance( self.parameter1.data, regionsModule.Regions1d ) ) :
             for region in self.parameter1.data :
                 if( E <= region[-1][0] ) : break
             theta = region.evaluate( E )
@@ -806,7 +866,7 @@ class evaporationSpectrum( functionalBase ) :
 
     def evaluate( self, energy ) :
 
-        return( evaporationSpectrum1d( energy, self.theta.data.evaluate( energy ), self.U.value ) )
+        return( Evaporation1d( energy, self.theta.data.evaluate( energy ), self.U.value ) )
 
     def energySpectrumAtEnergy( self, energyIn ) :
 
@@ -815,7 +875,7 @@ class evaporationSpectrum( functionalBase ) :
             return( self.evaluate( energyOut ) )
 
         spectrum1 = self.evaluate( energyIn )
-        spectrum2 = XYsModule.pointwiseXY_C.createFromFunction( [ 0.0, energyIn - self.U.value ], A, spectrum1, 1e-3, 12 )
+        spectrum2 = XYs1dModule.pointwiseXY_C.createFromFunction( [ 0.0, energyIn - self.U.value ], A, spectrum1, 1e-3, 12 )
         return( XYs1d( spectrum2, axes = defaultAxes( energyUnit = self.domainUnit ) ) )
 
     def sqrtEp_AverageAtE( self, E ) :
@@ -833,26 +893,26 @@ class evaporationSpectrum( functionalBase ) :
 
             return( x * math.exp( -x / self.p1 ) )
 
-        ef = energyFunctionalDataToPointwise( self, evaluateAtX )
+        ef = EnergyFunctionalDataToPointwise( self, evaluateAtX )
         return( ef.toPointwise_withLinearXYs( **kwargs ) )
 
-    @staticmethod
-    def parseXMLNode( evapElement, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, evapElement, xPath, linkData, **kwargs):
 
         xPath.append( evapElement.tag )
-        theta_ = theta.parseXMLNode( evapElement.find(theta.moniker), xPath, linkData )
-        U = physicalQuantityModule.U.parseXMLNode( evapElement.find( 'U' ), xPath, linkData )
-        ES = evaporationSpectrum( U, theta_ )
+        theta_ = Theta.parseNodeUsingClass(evapElement.find(Theta.moniker), xPath, linkData, **kwargs)
+        U = physicalQuantityModule.U.parseNodeUsingClass(evapElement.find( 'U' ), xPath, linkData, **kwargs)
+        ES = Evaporation( U, theta_ )
         xPath.pop()
         return ES
 
-class WattSpectrum( functionalBase ) :
+class Watt( FunctionalBase ) :
 
     moniker = 'Watt'
 
     def __init__( self, U, a, b ) :
 
-        functionalBase.__init__( self, 11, U, a, b )
+        FunctionalBase.__init__( self, 11, U, a, b )
 
     def averageEp( self, E ) :
 
@@ -873,7 +933,7 @@ class WattSpectrum( functionalBase ) :
 
         return( self.evaluate( energyIn ) )
 
-    def evaluate( self, energyIn, extrapolation = standardsModule.noExtrapolationToken ) :
+    def evaluate(self, energyIn, extrapolation=xDataEnumsModule.Extrapolation.none):
         """Returns an XYs1d instance of self evaluated at the incident energy **energyIn**."""
 
         def A( energyOut, parameters ) :
@@ -924,28 +984,28 @@ class WattSpectrum( functionalBase ) :
 
             return( math.exp( -x / self.p1 ) * math.sinh( math.sqrt( self.p2 * x ) ) )
 
-        ef = energyFunctionalDataToPointwise( self, evaluateAtX )
+        ef = EnergyFunctionalDataToPointwise( self, evaluateAtX )
         return( ef.toPointwise_withLinearXYs( **kwargs ) )
 
-    @staticmethod
-    def parseXMLNode( WattElement, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, WattElement, xPath, linkData, **kwargs):
         """Translate <Watt> element from xml."""
 
         xPath.append( WattElement.tag )
-        _a = a.parseXMLNode( WattElement.find(a.moniker), xPath, linkData )
-        _b = b.parseXMLNode( WattElement.find(b.moniker), xPath, linkData )
-        U = physicalQuantityModule.U.parseXMLNode( WattElement.find( 'U' ), xPath, linkData )
-        WS = WattSpectrum( U, _a, _b )
+        _a = A.parseNodeUsingClass(WattElement.find(A.moniker), xPath, linkData, **kwargs)
+        _b = B.parseNodeUsingClass(WattElement.find(B.moniker), xPath, linkData, **kwargs)
+        U = physicalQuantityModule.U.parseNodeUsingClass(WattElement.find( 'U' ), xPath, linkData, **kwargs)
+        WS = cls( U, _a, _b )
         xPath.pop()
         return WS
 
-class MadlandNix( functionalBase ) :
+class MadlandNix( FunctionalBase ) :
 
     moniker = 'MadlandNix'
 
     def __init__( self, EFL, EFH, Ts ) :
 
-        functionalBase.__init__( self, 12, None, Ts )
+        FunctionalBase.__init__( self, 12, None, Ts )
         self.EFL = EFL
         self.EFH = EFH
 
@@ -973,7 +1033,7 @@ class MadlandNix( functionalBase ) :
     def convertUnits( self, unitMap ) :
         "See documentation for reactionSuite.convertUnits."
 
-        functionalBase.convertUnits( self, unitMap )
+        FunctionalBase.convertUnits( self, unitMap )
         self.EFL.convertUnits( unitMap )
         self.EFH.convertUnits( unitMap )
 
@@ -981,7 +1041,7 @@ class MadlandNix( functionalBase ) :
 
         return( self.evaluate( energyIn ) )
 
-    def evaluate( self, energyIn, extrapolation = standardsModule.noExtrapolationToken ) :
+    def evaluate(self, energyIn, extrapolation=xDataEnumsModule.Extrapolation.none):
         """Returns an XYs1d instance of self evaluated at the incident energy **energyIn**."""
 
         from numericalFunctions import specialFunctions
@@ -1045,30 +1105,29 @@ class MadlandNix( functionalBase ) :
         linear = self.toPointwise_withLinearXYs( )
         return( linear.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
 
-    @staticmethod
-    def parseXMLNode( MNelement, xPath, linkData ):
+    @classmethod
+    def parseNodeUsingClass(cls, MNelement, xPath, linkData, **kwargs):
         """Translate <MadlandNix> element from xml."""
 
         xPath.append( MNelement.tag )
-        tm = T_M.parseXMLNode( MNelement.find(T_M.moniker), xPath, linkData )
-        EFL = physicalQuantityModule.EFL.parseXMLNode( MNelement.find( "EFL" ), xPath, linkData )
-        EFH = physicalQuantityModule.EFH.parseXMLNode( MNelement.find( "EFH" ), xPath, linkData )
-        MN = MadlandNix( EFL, EFH, tm )
+        tm = T_M.parseNodeUsingClass(MNelement.find(T_M.moniker), xPath, linkData, **kwargs)
+        EFL = physicalQuantityModule.EFL.parseNodeUsingClass(MNelement.find( "EFL" ), xPath, linkData, **kwargs)
+        EFH = physicalQuantityModule.EFH.parseNodeUsingClass(MNelement.find( "EFH" ), xPath, linkData, **kwargs)
+        MN = cls( EFL, EFH, tm )
         xPath.pop()
         return MN
 
-class NBodyPhaseSpace( subform ) :
+class NBodyPhaseSpace( Subform ) :
 
     moniker = 'NBodyPhaseSpace'
-    ancestryMembers = ( '', )
 
-    def __init__( self, numberOfProducts, numberOfProductsMasses ) :
+    def __init__( self, numberOfProducts, mass ) :
 
-        subform.__init__( self )
+        Subform.__init__( self )
         self.numberOfProducts = numberOfProducts
-        if( not( isinstance( numberOfProductsMasses, physicalQuantityModule.mass ) ) ) :
-            TypeError( 'numberOfProductsMasses instance must be a physicalQuantityModule.mass' )
-        self.numberOfProductsMasses = numberOfProductsMasses
+        if( not( isinstance( mass, physicalQuantityModule.Mass ) ) ) :
+            TypeError( 'mass instance must be a physicalQuantityModule.Mass' )
+        self.mass = mass 
 
     def convertUnits( self, unitMap ) :
 
@@ -1076,14 +1135,14 @@ class NBodyPhaseSpace( subform ) :
 
     def copy( self ) :
 
-        return NBodyPhaseSpace( self.numberOfProducts, self.numberOfProductsMasses.copy( ) )
+        return NBodyPhaseSpace( self.numberOfProducts, self.mass.copy( ) )
 
     __copy__ = copy
 
     def check( self, info ) :
 
-        #if ( abs( self.numberOfProductsMasses - info['reactionSuite'].products['n'].getMass('amu') * self.numberOfProducts ) >
-        #        self.numberOfProductsMasses * 0.1 ) :    # return warning?
+        #if ( abs( self.mass - info['reactionSuite'].products['n'].getMass('amu') * self.numberOfProducts ) >
+        #        self.mass * 0.1 ) :    # return warning?
 
         return []
 
@@ -1093,19 +1152,24 @@ class NBodyPhaseSpace( subform ) :
         a one-step reaction.
         """
 
-        M = self.numberOfProductsMasses.getValueAs( massUnit )
+        M = self.mass.getValueAs( massUnit )
         Ea = targetMass / ( targetMass + projectileMass ) * E + Q
         return( Ea * ( M - productMass ) / ( M * ( self.numberOfProducts - 1 ) ) )
 
+    def fixDomains(self, labels, energyMin, energyMax):
+        """This method does nothing."""
+
+        return 0
+
     def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        from fudge import product
-        from fudge import reactionSuite
-        from ...reactions import reaction
-        from ... import channels
+        from fudge import product as productModule
+        from fudge import reactionSuite as reactionSuiteModule
+        from ...reactions import reaction as reactionModule
+        from ... import outputChannel as outputChannelModule
         from fudge.core.math import fudgemath
 
-        class tester :
+        class Tester :
 
             def __init__( self, relativeTolerance, absoluteTolerance, n ) :
 
@@ -1122,16 +1186,16 @@ class NBodyPhaseSpace( subform ) :
 
                 self.EMax_i = EMax_i
 
-        p = self.findClassInAncestry( product.product )
-        numberOfProductsMasses, massUnit = self.numberOfProductsMasses.value, self.numberOfProductsMasses.unit
+        p = self.findClassInAncestry( productModule.Product )
+        mass, massUnit = self.mass.value, self.mass.unit
         productMass = p.getMass( massUnit )
 
-        r = self.findClassInAncestry(reaction.reaction)
+        r = self.findClassInAncestry(reactionModule.Reaction)
         EMin = r.domainMin
         EMax = r.domainMax
         energyUnit = r.domainUnit
 
-        reactionSuite = self.findClassInAncestry( reactionSuite.reactionSuite )
+        reactionSuite = self.findClassInAncestry( reactionSuiteModule.reactionSuite )
         projectile = reactionSuite.PoPs[reactionSuite.projectile]
         projectileMass = projectile.mass[0].float( massUnit )
         targetID = reactionSuite.target
@@ -1139,22 +1203,22 @@ class NBodyPhaseSpace( subform ) :
         target = reactionSuite.PoPs[targetID]
         targetMass = target.mass[0].float( massUnit )
 
-        c = self.findClassInAncestry(channels.channel)      # BRB this cannot work.
+        c = self.findClassInAncestry(outputChannelModule.outputChannel)
         Q = c.Q.getConstant( )
 
         axes = defaultAxes( energyUnit )
         pwl = XYs2d( axes=axes )
 
-        accuracy = kwargs.get( 'accuracy', XYsModule.defaultAccuracy )
+        accuracy = kwargs.get( 'accuracy', XYs1dModule.defaultAccuracy )
 
-        t = tester( accuracy, 1e-10, self.numberOfProducts )
+        t = Tester( accuracy, 1e-10, self.numberOfProducts )
         n = 21
         f = math.pow( EMax / EMin, 1. / n )
         E_ins = [ EMin * f**idx for idx in range( n ) ]
         E_ins[-1] = EMax        # Fix possible round off issue.
         for idx, E_in in enumerate( E_ins ) :
             Ea = targetMass / ( targetMass + projectileMass ) * E_in + Q
-            EMax_i = Ea * ( numberOfProductsMasses - productMass ) / numberOfProductsMasses
+            EMax_i = Ea * ( mass - productMass ) / mass
             if( EMax_i < 0 ) : EMax_i = 1e-5                # This is a kludge
             t.setEMax_i( EMax_i )
             t.absoluteTolerance = 1e-10 * t.evaluateAtX( 0.5 * EMax_i )
@@ -1164,24 +1228,24 @@ class NBodyPhaseSpace( subform ) :
             pwl.append( data )
         return( pwl )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlString = [ self.XMLStartTagString( indent = indent, 
                 extraAttributesAsStrings = ' numberOfProducts="%s"' % ( self.numberOfProducts ), emptyTag = False ) ]
-        xmlString += self.numberOfProductsMasses.toXMLList( indent2, **kwargs )
+        xmlString += self.mass.toXML_strList( indent2, **kwargs )
         xmlString[-1] += "</%s>" % self.moniker
         return( xmlString )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
-        mass = physicalQuantityModule.mass.parseXMLNode( element.find( 'mass' ), xPath, linkData )
-        return NBodyPhaseSpace( int( element.get( "numberOfProducts" ) ), mass )
+        mass = physicalQuantityModule.Mass.parseNodeUsingClass(element.find( 'mass' ), xPath, linkData, **kwargs)
+        return cls( int( element.get( "numberOfProducts" ) ), mass )
 
-class weighted1d :
+class Weighted1d :
 
     def __init__( self, weight, functional ) :
 
@@ -1206,7 +1270,7 @@ class weighted1d :
 
         return( self.weight * self.functional.integrate( energyMin, energyMax ) )
 
-class weightedFunctionals1d :
+class WeightedFunctionals1d :
 
     def __init__( self ) :
 
@@ -1238,14 +1302,14 @@ class weightedFunctionals1d :
         for weighted1d in self.weighted1d : value += weighted1d.integrate( energyMin, energyMax )
         return( value )
 
-class weighted( ancestryModule.ancestry ) :
+class Weighted(ancestryModule.AncestryIO):
 
     moniker = 'weighted'
     ancestryMembers = ( 'weight', 'functional' )
 
     def __init__( self, weight, functional ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
 
         self.weight = weight
         self.weight.setAncestor( self )
@@ -1263,7 +1327,7 @@ class weighted( ancestryModule.ancestry ) :
 
     def copy( self ):
 
-        return weighted( self.weight.copy( ), self.functional.copy( ) )
+        return Weighted( self.weight.copy( ), self.functional.copy( ) )
 
     __copy__ = copy
 
@@ -1278,7 +1342,17 @@ class weighted( ancestryModule.ancestry ) :
 
     def evaluate( self, energy ) :
 
-        return( weighted1d( self.weight.evaluate( energy ), self.functional.evaluate( energy ) ) )
+        return( Weighted1d( self.weight.evaluate( energy ), self.functional.evaluate( energy ) ) )
+
+    def fixDomains(self, energyMin, energyMax, domainToFix):
+        """
+        Calls the **fixDomains** for the **weight** and **functional** members.
+        """
+
+        numberOfFixes  = self.weight.fixDomains(energyMin, energyMax, domainToFix)
+        numberOfFixes += self.functional.fixDomains(energyMin, energyMax, domainToFix)
+
+        return  numberOfFixes
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
@@ -1288,25 +1362,47 @@ class weighted( ancestryModule.ancestry ) :
         energyArray.sort( )
         return( energyArray )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlString = [ '%s<%s>' %(  indent, self.moniker ) ]
-        xmlString += self.weight.toXMLList( indent2, **kwargs )
-        xmlString += self.functional.toXMLList( indent2, **kwargs )
+        xmlString += self.weight.toXML_strList( indent2, **kwargs )
+        xmlString += self.functional.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-class weightedFunctionals( subform ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+
+        xPath.append(node.tag)
+
+        weights, functional = node
+        _weight = XYs1dModule.XYs1d.parseNodeUsingClass(weights, xPath, linkData, **kwargs)
+        subformClass = {
+                XYs2d.moniker                   : XYs2d,
+                GeneralEvaporation.moniker      : GeneralEvaporation,
+                Watt.moniker                    : Watt,
+                MadlandNix.moniker              : MadlandNix,
+                SimpleMaxwellianFission.moniker : SimpleMaxwellianFission,
+                Evaporation.moniker             : Evaporation,
+            }.get( functional.tag )
+        functional = subformClass.parseNodeUsingClass(functional, xPath, linkData, **kwargs)
+        instance = Weighted(_weight, functional)
+
+        xPath.pop( )
+
+        return instance
+
+class WeightedFunctionals( Subform ) :
 
     moniker = 'weightedFunctionals'
-    ancestryMembers = ( '[weights', )
+    ancestryMembers = ( 'weights', )
 
     def __init__( self ) :
 
-        subform.__init__( self )
+        Subform.__init__( self )
         self.weights = []
 
     def __len__( self ) :
@@ -1324,7 +1420,7 @@ class weightedFunctionals( subform ) :
 
     def copy( self ) :
 
-        newWF = weightedFunctionals( )
+        newWF = WeightedFunctionals( )
         for weight in self : newWF.addWeight( weight.copy( ) )
         return( newWF )
 
@@ -1332,9 +1428,9 @@ class weightedFunctionals( subform ) :
 
     def addWeight( self, weight ) :
 
-# BRB. either we remove this class (weightedFunctionals) or self.weights should be a suite like object and it should be
+# BRB. either we remove this class (WeightedFunctionals) or self.weights should be a suite like object and it should be
 # the ancestor of weight (i.e., self.weights[-1].setAncestor( self.weights ) and not weight.setAncestor( self ).
-        if( not( isinstance( weight, weighted ) ) ) : raise Exception( 'Invalid weight of type %s' % brb.getType( weight ) )
+        if( not( isinstance( weight, Weighted ) ) ) : raise Exception( 'Invalid weight of type %s' % brb.getType( weight ) )
         self.weights.append( weight )
         weight.setAncestor( self )
 
@@ -1345,7 +1441,7 @@ class weightedFunctionals( subform ) :
         warnings = []
         totalWeight = sum( [w.weight for w in self.weights] )
         if (totalWeight.rangeMin != 1.0) and (totalWeight.rangeMax != 1.0):
-            warnings.append( warning.weightsDontSumToOne( obj=self ) )
+            warnings.append( warning.WeightsDontSumToOne( obj=self ) )
 
         for weight in self:
             warnings += weight.functional.check( info )
@@ -1360,7 +1456,7 @@ class weightedFunctionals( subform ) :
 
     def evaluate( self, energy ) :
 
-        weightedFunctionals1d1 = weightedFunctionals1d( )
+        weightedFunctionals1d1 = WeightedFunctionals1d( )
         for weight in self : weightedFunctionals1d1.append( weight.evaluate( energy ) )
         return( weightedFunctionals1d1 )
 
@@ -1371,6 +1467,16 @@ class weightedFunctionals( subform ) :
             spectrum1 = weight.weight.evaluate( energyIn ) * weight.functional.energySpectrumAtEnergy( energyIn )
             xys1d += spectrum1
         return( xys1d )
+
+    def fixDomains(self, energyMin, energyMax, domainToFix):
+        """
+        Calls the **fixDomains** for each **weight** of *self*.
+        """
+
+        numberOfFixes = 0
+        for weight in self: numberOfFixes += weight.fixDomains(energyMin, energyMax, domainToFix)
+
+        return  numberOfFixes
 
     def sqrtEp_AverageAtE( self, E ) :
         """
@@ -1418,38 +1524,30 @@ class weightedFunctionals( subform ) :
             pwl.append( e )
         return( pwl )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlString = [ self.XMLStartTagString( indent = indent ) ]
-        for _subform in self.weights : xmlString += _subform.toXMLList( indent2, **kwargs )
+        for _subform in self.weights : xmlString += _subform.toXML_strList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-    @staticmethod
-    def parseXMLNode( WFelement, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( WFelement.tag )
-        WF = weightedFunctionals( )
-        for weightSection in WFelement :
-            weights, functional = weightSection
-            _weight = XYsModule.XYs1d.parseXMLNode( weights, xPath, linkData )
-            subformClass = {
-                    XYs2d.moniker                           : XYs2d,
-                    generalEvaporationSpectrum.moniker      : generalEvaporationSpectrum,
-                    WattSpectrum.moniker                    : WattSpectrum,
-                    MadlandNix.moniker                      : MadlandNix,
-                    simpleMaxwellianFissionSpectrum.moniker : simpleMaxwellianFissionSpectrum,
-                    evaporationSpectrum.moniker             : evaporationSpectrum,
-                }.get( functional.tag )
-            functional = subformClass.parseXMLNode( functional, xPath, linkData )
-            WF.addWeight( weighted( _weight, functional ) )
+        xPath.append(node.tag)
+
+        WF = cls()
+
+        for child in node: WF.addWeight(Weighted.parseNodeUsingClass(child, xPath, linkData, **kwargs))
+
         xPath.pop( )
+
         return WF
 
-class energyFunctionalDataToPointwise :
+class EnergyFunctionalDataToPointwise :
 
     def __init__( self, data, evaluateAtX ) :
 
@@ -1460,7 +1558,7 @@ class energyFunctionalDataToPointwise :
 
         from fudge.core.math import fudgemath
 
-        class tester :
+        class Tester :
 
             def __init__( self, relativeTolerance, absoluteTolerance, evaluateAtX ) :
 
@@ -1482,7 +1580,7 @@ class energyFunctionalDataToPointwise :
 
                 self.p2 = p2
 
-        accuracy = xDataBaseModule.getArguments( kwargs, { 'accuracy' : XYsModule.defaultAccuracy } )['accuracy']
+        accuracy = xDataBaseModule.getArguments( kwargs, { 'accuracy' : XYs1dModule.defaultAccuracy } )['accuracy']
 
         parameter1 = self.data.parameter1.data.toPointwise_withLinearXYs( **kwargs )
         axes = defaultAxes( self.data.domainUnit )
@@ -1490,7 +1588,7 @@ class energyFunctionalDataToPointwise :
 # BRB6 hardwired
         one_eV = PQUModule.PQU( '1 eV' ).getValueAs( axes[-1].unit )
 
-        t = tester( accuracy, 1e-10, self.evaluateAtX )
+        t = Tester( accuracy, 1e-10, self.evaluateAtX )
         parameter2 = self.data.parameter2
         if( parameter2 is not None ) : parameter2 = parameter2.data.toPointwise_withLinearXYs( **kwargs )
         for index, E_in_p1 in enumerate( parameter1 ) :
@@ -1522,33 +1620,35 @@ class energyFunctionalDataToPointwise :
             pwl.append( data )
         return( pwl )
 
-class form( baseModule.form ) :
+class Form( baseModule.Form ) :
 
     moniker = 'energy'
     subformAttributes = ( 'energySubform', )
 
     def __init__( self, label, productFrame, energySubform ) :
 
-        if( not( isinstance( energySubform, subform ) ) ) : raise TypeError( 'instance is not an energy subform' )
-        baseModule.form.__init__( self, label, productFrame, ( energySubform, ) )
+        if( not( isinstance( energySubform, Subform ) ) ) : raise TypeError( 'instance is not an energy subform' )
+        baseModule.Form.__init__( self, label, productFrame, ( energySubform, ) )
 
-    @staticmethod
-    def parseXMLNode( energyElement, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, energyElement, xPath, linkData, **kwargs):
         """Translate energy component from xml."""
 
         subformClass = {
-                discreteGamma.moniker :                     discreteGamma,
-                primaryGamma.moniker :                      primaryGamma,
-                XYs2d.moniker :                             XYs2d,
-                regions2d.moniker :                         regions2d,
-                generalEvaporationSpectrum.moniker :        generalEvaporationSpectrum,
-                WattSpectrum.moniker :                      WattSpectrum,
-                MadlandNix.moniker :                        MadlandNix,
-                simpleMaxwellianFissionSpectrum.moniker :   simpleMaxwellianFissionSpectrum,
-                evaporationSpectrum.moniker :               evaporationSpectrum,
-                weightedFunctionals.moniker :               weightedFunctionals,
-                NBodyPhaseSpace.moniker :                   NBodyPhaseSpace,
+                DiscreteGamma.moniker :             DiscreteGamma,
+                PrimaryGamma.moniker :              PrimaryGamma,
+                XYs2d.moniker :                     XYs2d,
+                Regions2d.moniker :                 Regions2d,
+                GeneralEvaporation.moniker :        GeneralEvaporation,
+                Watt.moniker :                      Watt,
+                MadlandNix.moniker :                MadlandNix,
+                SimpleMaxwellianFission.moniker :   SimpleMaxwellianFission,
+                Evaporation.moniker :               Evaporation,
+                WeightedFunctionals.moniker :       WeightedFunctionals,
+                NBodyPhaseSpace.moniker :           NBodyPhaseSpace,
             }.get( energyElement.tag )
         if( subformClass is None ) : raise Exception( "encountered unknown energy subform: %s" % energyElement.tag )
-        energyForm = subformClass.parseXMLNode( energyElement, xPath, linkData )
+
+        energyForm = subformClass.parseNodeUsingClass(energyElement, xPath, linkData, **kwargs)
+
         return( energyForm )

@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,20 +14,19 @@ dbrown, 4/6/2012
 """
 
 import unittest, math
-from fudge.core.math._xData import axes, XYs
-
-__metaclass__ = type
+from xData import axes as axesModule
+from xData import XYs1d as XYs1dModule
 
 class TestXYs( unittest.TestCase ):
 
     def setUp( self ):
-        self.vl1 = axes.axes( )
-        self.vl1[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        self.vl1[1] = axes.axis( 'crossSection', 1, 'b' )
-        self.pXY1 = XYs.XYs( self.vl1, [ [ 1, 0 ], [ 3, 2 ], [ 4, 1 ] ], 1e-3, safeDivide = True )
-        self.pXY2 = XYs.XYs( self.vl1, [ [ 1, 0 ], [ 4, 2 ] ], 1e-3, safeDivide = True )
-        self.pXY3 = XYs.XYs( self.vl1, [ [ 1, 1 ], [ 2, 2 ], [ 4, 3 ], [ 7, 1 ] ], 1e-3, safeDivide = True )
-        self.pXY4 = XYs.XYs( self.vl1, [ [ 1, 0 ], [ 2.5, 2 ], [ 3, 3 ], [ 7, 0 ] ], 1e-3, safeDivide = True )
+        self.vl1 = axesModule.Axes(2)
+        self.vl1[0] = axesModule.Axis( 'energy_in', 0, 'eV', interpolation = axesModule.interpolationXY( axesModule.linearToken, axesModule.linearToken ) )
+        self.vl1[1] = axesModule.Axis( 'crossSection', 1, 'b' )
+        self.pXY1 = XYs1dModule.XYs( s1delf.vl1, [ [ 1, 0 ], [ 3, 2 ], [ 4, 1 ] ], 1e-3, safeDivide = True )
+        self.pXY2 = XYs1dModule.XYs1d( self.vl1, [ [ 1, 0 ], [ 4, 2 ] ], 1e-3, safeDivide = True )
+        self.pXY3 = XYs1dModule.XYs1d( self.vl1, [ [ 1, 1 ], [ 2, 2 ], [ 4, 3 ], [ 7, 1 ] ], 1e-3, safeDivide = True )
+        self.pXY4 = XYs1dModule.XYs1d( self.vl1, [ [ 1, 0 ], [ 2.5, 2 ], [ 3, 3 ], [ 7, 0 ] ], 1e-3, safeDivide = True )
 
     def test_toString( self ):
         self.assertEqual( str( self.pXY1.axes ), 'label="energy_in", index="0", unit="eV", interpolation="lin-lin"\nlabel="crossSection", index="1", unit="b"' )
@@ -48,7 +47,7 @@ class TestXYs( unittest.TestCase ):
     def test_multiplication( self ):
         self.assertEqual( (self.pXY3 * self.pXY4).toString( ), '   1.00000000e+00   0.00000000e+00\n   1.00781250e+00   1.04980469e-02\n   1.01562500e+00   2.11588542e-02\n   1.02206816e+00   3.00735579e-02\n   1.03125000e+00   4.29687500e-02\n   1.03709549e+00   5.12954139e-02\n   1.04408114e+00   6.13657163e-02\n   1.05244883e+00   7.35996147e-02\n   1.06250000e+00   8.85416667e-02\n   1.07406870e+00   1.06073169e-01\n   1.08795603e+00   1.27589728e-01\n   1.10470095e+00   1.54217649e-01\n   1.12500000e+00   1.87500000e-01\n   1.14770917e+00   2.26036232e-01\n   1.16078111e+00   2.48842226e-01\n   1.17518645e+00   2.74502328e-01\n   1.19109494e+00   3.03482953e-01\n   1.20870461e+00   3.36349639e-01\n   1.22824801e+00   3.73793554e-01\n   1.25000000e+00   4.16666667e-01\n   1.27095032e+00   4.59152521e-01\n   1.29406933e+00   5.07394793e-01\n   1.31965712e+00   5.62450392e-01\n   1.34807024e+00   6.25630840e-01\n   1.37973562e+00   6.98579692e-01\n   1.41516893e+00   7.83378888e-01\n   1.45499885e+00   8.82697082e-01\n   1.50000000e+00   1.00000000e+00\n   1.54003277e+00   1.10889089e+00\n   1.58451981e+00   1.23491095e+00\n   1.63418076e+00   1.38182132e+00\n   1.68989795e+00   1.55447617e+00\n   1.75276517e+00   1.75922743e+00\n   1.82415510e+00   2.00451565e+00\n   1.86357392e+00   2.14577844e+00\n   1.90581432e+00   2.30175188e+00\n   1.95117541e+00   2.47454677e+00\n   2.00000000e+00   2.66666667e+00\n   2.10196098e+00   3.01346731e+00\n   2.21748226e+00   3.42313988e+00\n   2.34909690e+00   3.91156878e+00\n   2.50000000e+00   4.50000000e+00\n   2.60245369e+00   5.07399206e+00\n   2.71824584e+00   5.74798335e+00\n   2.84976649e+00   6.54605227e+00\n   3.00000000e+00   7.50000000e+00\n   3.25912355e+00   7.37764929e+00\n   3.51316702e+00   7.20880972e+00\n   3.76058500e+00   6.99784705e+00\n   4.00000000e+00   6.75000000e+00\n   4.15485616e+00   6.18127962e+00\n   4.29691728e+00   5.68064014e+00\n   4.42768594e+00   5.23763536e+00\n   4.54843835e+00   4.84374849e+00\n   4.66026546e+00   4.49197976e+00\n   4.76410537e+00   4.17653339e+00\n   4.86076920e+00   3.89257732e+00\n   4.95096189e+00   3.63605716e+00\n   5.11432055e+00   3.19215308e+00\n   5.25826396e+00   2.82312423e+00\n   5.38598130e+00   2.51304222e+00\n   5.50000000e+00   2.25000000e+00\n   5.57323688e+00   2.08789884e+00\n   5.64127852e+00   1.94210315e+00\n   5.70463912e+00   1.81050056e+00\n   5.76376735e+00   1.69131008e+00\n   5.87085224e+00   1.48434815e+00\n   5.96515308e+00   1.31158927e+00\n   6.04872887e+00   1.16591174e+00\n   6.12322029e+00   1.04195611e+00\n   6.18995084e+00   9.35626686e-01\n   6.25000000e+00   8.43750000e-01\n   6.31750172e+00   7.44775663e-01\n   6.37724661e+00   6.60975937e-01\n   6.43039656e+00   5.89426615e-01\n   6.47789464e+00   5.27876022e-01\n   6.52051432e+00   4.74567518e-01\n   6.55889601e+00   4.28114356e-01\n   6.59357452e+00   3.87409940e-01\n   6.62500000e+00   3.51562500e-01\n   6.65762798e+00   3.15388312e-01\n   6.68694308e+00   2.83795008e-01\n   6.71335759e+00   2.56063742e-01\n   6.73722032e+00   2.31611340e-01\n   6.75882834e+00   2.09960628e-01\n   6.77843624e+00   1.90718071e-01\n   6.81250000e+00   1.58203125e-01\n   6.84294858e+00   1.30121141e-01\n   6.86806595e+00   1.07653833e-01\n   6.88889694e+00   8.94992361e-02\n   6.90625000e+00   7.47070312e-02\n   6.93387829e+00   5.17773231e-02\n   6.95312500e+00   3.62548828e-02\n   6.97656250e+00   1.78527832e-02\n   7.00000000e+00   0.00000000e+00\n' )
         mul = self.pXY3 * self.pXY4
-        mul = XYs.XYs( self.vl1, mul, 1e-3, safeDivide = True )
+        mul = XYs1dModule.XYs1d( self.vl1, mul, 1e-3, safeDivide = True )
         self.assertEqual( mul.toXML( indent = '    ', pairsPerLine = 5 ), '    <XYs length="95">\n      <axes>\n        <axis index="0" label="energy_in" unit="eV" interpolation="lin-lin"/>\n        <axis index="1" label="crossSection" unit="b"/></axes>\n      <data> 1 0 1.0078125 0.010498046875 1.015625 0.0211588541666667 1.02206816450916 0.0300735578586169 1.03125 0.04296875\n             1.03709548541904 0.0512954139433551 1.04408114029402 0.0613657162981952 1.05244883114563 0.0735996147122231 1.0625 0.0885416666666667 1.07406870367714 0.106073168722065\n             1.08795603208456 0.127589727552826 1.10470094808518 0.154217648820148 1.125 0.1875 1.14770917415658 0.226036232382132 1.16078110542007 0.248842225706899\n             1.17518645301135 0.274502328440062 1.19109493916226 0.303482953247579 1.20870461334278 0.336349638631127 1.22824801122864 0.373793554477952 1.25 0.416666666666667\n             1.27095031675892 0.459152521214241 1.29406932593601 0.507394792523285 1.31965711975226 0.562450391947428 1.34807023901482 0.625630840403528 1.37973562459275 0.698579692236791\n             1.41516892756513 0.783378887974281 1.45499885404707 0.882697081641619 1.5 1 1.54003277111879 1.10889088666803 1.5845198074299 1.23491095027706\n             1.63418075605966 1.38182131655475 1.68989794855664 1.55447617063905 1.7527651713035 1.75922743257478 1.82415510296892 2.00451564895817 1.8635739169048 2.14577843581748\n             1.90581432257351 2.30175187940376 1.95117541188947 2.47454676809676 2 2.66666666666667 2.10196098363072 3.01346730689104 2.21748225867393 3.42313988413839\n             2.34909690379139 3.91156877812911 2.5 4.5 2.60245369082114 5.07399205827914 2.71824583655185 5.74798334620742 2.84976648596235 6.54605226749537\n             3 7.5 3.25912355027679 7.37764928828068 3.51316701949486 7.20880972147796 3.76058499822597 6.99784704834286 4 6.75\n             4.1548561593768 6.18127961738546 4.29691728011311 5.68064013519072 4.42768593951169 5.23763535825917 4.54843835433528 4.84374848549568 4.66026546142249 4.49197975943939\n             4.76410536511896 4.17653338530568 4.86076919655937 3.8925773177751 4.95096189432334 3.63605715851499 5.11432055114385 3.19215307856132 5.25826396487047 2.82312423438151\n             5.38598129622604 2.51304221589657 5.5 2.25 5.5732368821658 2.08789883558164 5.64127851613973 1.94210314824692 5.70463912464279 1.810500555221\n             5.76376734554662 1.69131007880846 5.87085224304475 1.48434814623497 5.96515307716505 1.3115892689767 6.04872886591051 1.16591173584307 6.12322028885515 1.04195611429627\n             6.18995084332182 0.935626685626149 6.25 0.84375 6.3175017189294 0.744775662635115 6.3772466086523 0.6609759367283 6.43039656311088 0.589426615324793\n             6.47789464147778 0.527876021590477 6.52051432037161 0.474567518205643 6.55889601109599 0.428114356191523 6.59357452486162 0.387409939774517 6.625 0.3515625\n             6.65762798315705 0.315388311590772 6.68694307998582 0.283795007595014 6.71335759125661 0.256063741802644 6.73722032048298 0.231611339621303 6.75882834186989 0.209960627940196\n             6.77843623876513 0.190718071072424 6.8125 0.158203125 6.84294857787223 0.130121141192002 6.86806595187316 0.107653832622697 6.88889694448429 0.0894992361092431\n             6.90625 0.07470703125 6.93387828955896 0.0517773231266023 6.953125 0.0362548828125 6.9765625 0.017852783203125 7 0</data></XYs>' )
 
     @unittest.skip('appears broken, have to check')
@@ -74,13 +73,13 @@ class TestXYs( unittest.TestCase ):
 
 
     def test_mutualify( self ):
-        axes_ = axes.defaultAxes( 2, 'lin','lin' )
+        axes_ = axesModule.defaultAxes( 2, 'lin','lin' )
         axes_[0].label = 'energy_in'
         axes_[0].unit ='MeV'
         axes_[1].label = 'uncertainty'
         axes_[1].unit = 'MeV'
-        a = XYs.XYs( axes_, list( zip( [0,1,2,3],     [1,2,3,4] ) ), 0.001 )
-        b = XYs.XYs( axes_, list( zip( [0.5,1.5,3.5], [1,2,3] ) ), 0.001 )
+        a = XYs1dModule.XYs1d( axes_, list( zip( [0,1,2,3],     [1,2,3,4] ) ), 0.001 )
+        b = XYs1dModule.XYs1d( axes_, list( zip( [0.5,1.5,3.5], [1,2,3] ) ), 0.001 )
         self.assertEqual( a.copyDataToXYs(), [[0.0, 1.0], [1.0, 2.0], [2.0, 3.0], [3.0, 4.0]] )
         self.assertEqual( b.copyDataToXYs(), [[0.5, 1.0], [1.5, 2.0], [3.5, 3.0]] )
         a, b = a.mutualify( 1e-8, 1e-8, False, b, 1e-8, 1e-8, False )
@@ -89,20 +88,20 @@ class TestXYs( unittest.TestCase ):
         self.assertEqual( ( a * b ).copyDataToXYs(), [[0.0, 0.0], [0.5, 0.0], [0.500000005, 1.5000000125], [0.5458556319526012, 1.6167418188632756], [0.595349486446133, 1.7474652406808733], [0.648926398714355, 1.894495069019915], [0.7071067846209812, 2.0606601817884944], [0.7705034128004505, 2.2494306283378176], [0.8398428423558016, 2.4651002633899743], [0.9159931228479682, 2.713033085376725], [1.0, 3.0], [1.1025994718473635, 3.3696248030891303], [1.2182458365518543, 3.811491673103708], [1.2817594993015167, 4.06554666300195], [1.3495784432855429, 4.345729639509344], [1.42215333199236, 4.6557500976855115], [1.5, 5.0], [1.6114581797470449, 5.368450547094159], [1.7312785769460357, 5.778400265151707], [1.8604214751588872, 6.236321614144236], [2.0, 6.75], [2.2070259373659487, 7.547777134493432], [2.439257393078178, 8.493688752730085], [2.7015298522432905, 9.626809012706588], [2.845791873803546, 10.279401473659355], [2.99999997, 10.9999998575], [3.0, 5.499999958750001], [3.00000003, 0.0], [3.5, 0.0]] )
 
     def test_changeInterpolation( self ):
-        axes_a = axes.defaultAxes( 2, 'lin','flat' )
+        axes_a = axesModule.defaultAxes( 2, 'lin','flat' )
         axes_a[0].label = 'energy_in'
         axes_a[0].unit ='MeV'
         axes_a[1].label = 'uncertainty'
         axes_a[1].unit = 'MeV'
 
-        axes_b = axes.defaultAxes( 2, 'lin','lin' )
+        axes_b = axesModule.defaultAxes( 2, 'lin','lin' )
         axes_b[0].label = 'energy_in'
         axes_b[0].unit ='MeV'
         axes_b[1].label = 'uncertainty'
         axes_b[1].unit = 'MeV'
 
-        a = XYs.XYs( axes_a, list( zip( [0,1,2,3],     [1,2,3,4] ) ), 0.001 )    # what should accuracy be set to?
-        b = XYs.XYs( axes_b, list( zip( [0.5,1.5,3.5], [1,2,4] ) ), 0.001 )    # what should accuracy be set to?
+        a = XYs1dModule.XYs1d( axes_a, list( zip( [0,1,2,3],     [1,2,3,4] ) ), 0.001 )    # what should accuracy be set to?
+        b = XYs1dModule.XYs1d( axes_b, list( zip( [0.5,1.5,3.5], [1,2,4] ) ), 0.001 )    # what should accuracy be set to?
 
         a = a.changeInterpolation('lin','lin',None,1e-8,1e-8)
         self.assertEqual( a.copyDataToXYs(), [[0.0, 1.0], [0.99999999, 1.0], [1.00000001, 2.0], [1.99999998, 2.0], [2.00000002, 3.0], [2.9999999699999997, 3.0], [3.0, 4.0]] )
@@ -129,10 +128,10 @@ class TestXYs( unittest.TestCase ):
         xmin=1e-5
         xmax=20.0
         nx=20
-        axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'junk', 1, 'b' )
-        approxExp = XYs.XYs.createFromFunction( \
+        axes_ = axesModule.Axes( dimension = 2 )
+        axes_[0] = axesModule.Axis( 'energy_in', 0, 'eV', interpolation = axesModule.interpolationXY( axesModule.linearToken, axesModule.linearToken ) )
+        axes_[1] = axesModule.Axis( 'junk', 1, 'b' )
+        approxExp = XYs1dModule.XYs1d.createFromFunction( \
             axes_, \
             Xs=[xmin, xmax],\
             func=myExp, \
@@ -157,10 +156,10 @@ class TestXYs( unittest.TestCase ):
         xmin=1e-5
         xmax=20.0
         nx=20
-        axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'junk', 1, 'b' )
-        approxSine = XYs.XYs.createFromFunction( \
+        axes_ = axesModule.Axes( dimension = 2 )
+        axes_[0] = axesModule.Axis( 'energy_in', 0, 'eV', interpolation = axesModule.interpolationXY( axesModule.linearToken, axesModule.linearToken ) )
+        axes_[1] = axesModule.Axis( 'junk', 1, 'b' )
+        approxSine = XYs1dModule.XYs1d.createFromFunction( \
             axes_, \
             Xs=[xmin, xmax],\
             func=mySine, \
@@ -190,10 +189,10 @@ class TestXYs( unittest.TestCase ):
         xmin=1e-5
         xmax=20.0
         nx=20
-        axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'junk', 1, 'b' )
-        approxLorentz = XYs.XYs.createFromFunction( \
+        axes_ = axesModule.Axes( dimension = 2 )
+        axes_[0] = axesModule.Axis( 'energy_in', 0, 'eV', interpolation = axesModule.interpolationXY( axesModule.linearToken, axesModule.linearToken ) )
+        axes_[1] = axesModule.Axis( 'junk', 1, 'b' )
+        approxLorentz = XYs1dModule.XYs1d.createFromFunction( \
             axes_, \
             Xs=[xmin, xmax],\
             func=myLorentzian, \
@@ -220,10 +219,10 @@ class TestXYs( unittest.TestCase ):
         xmin=1e-5
         xmax=0.001
         nx=20
-        axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'junk', 1, 'b' )
-        approxOneOverE = XYs.XYs.createFromFunction( \
+        axes_ = axesModule.Axes( dimension = 2 )
+        axes_[0] = axesModule.Axis( 'energy_in', 0, 'eV', interpolation = axesModule.interpolationXY( axesModule.linearToken, axesModule.linearToken ) )
+        axes_[1] = axesModule.Axis( 'junk', 1, 'b' )
+        approxOneOverE = XYs1dModule.XYs1d.createFromFunction( \
             axes_, \
             Xs=[xmin, xmax],\
             func=myOneOverE, \
@@ -252,10 +251,10 @@ class TestXYs( unittest.TestCase ):
         xmin=1e-5
         xmax=20.0e6
         nx=23
-        axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'junk', 1, 'b' )
-        approxOneOverE = XYs.XYs.createFromFunction( \
+        axes_ = axesModule.Axes( dimension = 2 )
+        axes_[0] = axesModule.Axis( 'energy_in', 0, 'eV', interpolation = axesModule.interpolationXY( axesModule.linearToken, axesModule.linearToken ) )
+        axes_[1] = axesModule.Axis( 'junk', 1, 'b' )
+        approxOneOverE = XYs1dModule.XYs1d.createFromFunction( \
             axes_, \
             Xs=[xmin, xmax],\
             func=myOneOverE, \
@@ -285,10 +284,10 @@ class TestXYs( unittest.TestCase ):
         def myOneOverE(x, *args): return 1.0/x
         xmin=1e-5
         xmax=20.0e6
-        axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'junk', 1, 'b' )
-        approxOneOverE = XYs.XYs.createFromFunction( \
+        axes_ = axesModule.Axes( dimension = 2 )
+        axes_[0] = axesModule.Axis( 'energy_in', 0, 'eV', interpolation = axesModule.interpolationXY( axesModule.linearToken, axesModule.linearToken ) )
+        axes_[1] = axesModule.Axis( 'junk', 1, 'b' )
+        approxOneOverE = XYs1dModule.XYs1d.createFromFunction( \
             axes_, \
             Xs=[1e-5,1e-4,1e-3,1e-2,1e-1,1.,10.,1e2,1e3,1e4,1e5,1e6,1e7,2e7],\
             func=myOneOverE, \
@@ -298,7 +297,7 @@ class TestXYs( unittest.TestCase ):
             checkForRoots = False, \
             infill = 1, \
             safeDivide = 1 )
-        myConst = XYs.XYs(axes_,[[xmin,1.0],[xmax,1.0]],1e-8)
+        myConst = XYs1dModule.XYs1d(axes_,[[xmin,1.0],[xmax,1.0]],1e-8)
         self.assertAlmostEqual( approxOneOverE.integrateTwoFunctions( myConst, xmin, xmax ), math.log(xmax)-math.log(xmin), 1 )
         self.assertAlmostEqual( myConst.integrateTwoFunctions( approxOneOverE, xmin, xmax ), math.log(xmax)-math.log(xmin), 1 )
 
@@ -318,10 +317,10 @@ class TestXYs( unittest.TestCase ):
         def myOneOverE(x, *args): return 1.0/x
         xmin=1e-5
         xmax=20.0e6
-        axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'junk', 1, 'b' )
-        approxOneOverE = XYs.XYs.createFromFunction( \
+        axes_ = axesModule.Axes( dimension = 2 )
+        axes_[0] = axesModule.Axis( 'energy_in', 0, 'eV', interpolation = axesModule.interpolationXY( axesModule.linearToken, axesModule.linearToken ) )
+        axes_[1] = axesModule.Axis( 'junk', 1, 'b' )
+        approxOneOverE = XYs1dModule.XYs1d.createFromFunction( \
             axes_, \
             Xs=[1e-5,2e7],\
             func=myOneOverE, \
@@ -331,7 +330,7 @@ class TestXYs( unittest.TestCase ):
             checkForRoots = False, \
             infill = 1, \
             safeDivide = 1 )
-        myConst = XYs.XYs(axes_,[[xmin,1.0],[xmax,1.0]],1e-8)
+        myConst = XYs1dModule.XYs1d(axes_,[[xmin,1.0],[xmax,1.0]],1e-8)
         self.assertAlmostEqual( approxOneOverE.integrateTwoFunctions( myConst, xmin, xmax ), math.log(xmax)-math.log(xmin), 1 )
         self.assertAlmostEqual( myConst.integrateTwoFunctions( approxOneOverE, xmin, xmax ), math.log(xmax)-math.log(xmin), 1 )
         

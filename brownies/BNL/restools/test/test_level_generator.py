@@ -35,7 +35,7 @@ class TestLevelGeneration(AssertMixIn):
 
         # Make a level density rho(E) = e^(E/T)
         self.ld = XYs.XYs1d.createFromFunction(
-            axes=axes.axes(rank=2, labelsUnits={0: ('rho(E)', '1/eV'), 1: ("E", "eV")}),
+            axes=axes.axes(2, labelsUnits={0: ('rho(E)', '1/eV'), 1: ("E", "eV")}),
             Xs=[x * self.dE / self.nE for x in range(self.nE)],
             func=lambda x, par: math.exp(x / self.T),
             parameters=None,
@@ -82,7 +82,7 @@ class TestLevelGeneration(AssertMixIn):
         self.assertAlmostEqual(self.ld.evaluate(5e5), math.exp(5e5 / self.T))
 
         # Compute number of levels
-        Ntot = float(self.ld.integrate().value)
+        Ntot = self.ld.integrate()
         self.assertAlmostEqual(Ntot / 1e6, self.T * (math.exp(self.Emax / self.T) - 1.0) / 1e6, 2)
 
     def test_getCLDInverse(self):

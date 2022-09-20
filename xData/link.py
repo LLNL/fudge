@@ -1,16 +1,15 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
+from LUPY import ancestry as ancestryModule
 
 from . import base as baseModule
-from . import ancestry as ancestryModule
 
-class link( baseModule.xDataCoreMembers ) :
+class Link(baseModule.XDataCoreMembers):
     """
     This class contains the path to another element, that could be stored in a different file.
     The 'follow' member function is used to get a pointer to the linked-to element,
@@ -30,9 +29,8 @@ class link( baseModule.xDataCoreMembers ) :
     """
 
     moniker = 'link'
-    ancestryMembers = ( '', )
 
-    def __init__( self, link = None, root = None, path = None, label = None, relative = False ) :
+    def __init__(self, link=None, root=None, path=None, label=None, relative=False):
         """
         Creates a link to another instance.
 
@@ -43,7 +41,8 @@ class link( baseModule.xDataCoreMembers ) :
         :param relative: boolean, whether to use relative link when writing out xPath (default = False)
         """
 
-        baseModule.xDataCoreMembers.__init__( self, self.moniker, index = None, label = label )
+        baseModule.XDataCoreMembers.__init__(self, index=None, label=label)
+
         self.link = link
         self.root = root
         self.path = path
@@ -56,33 +55,68 @@ class link( baseModule.xDataCoreMembers ) :
 
         return( "%s" % self.path )
 
-    def __deepcopy__( self, memodict={} ):
+    def __deepcopy__(self, memo = {}):
 
-        if( self.path == None ) : self.updateXPath( )
-        link_ = self.link
-        if id(link_) in memodict:
-            link_ = memodict[id(link_)]
-        copy_ = self.__class__( link = link_, root = self.root, path = self.path, label = self.label,
-            relative = self.__relative )
-        return( copy_ )
+        if self.path is None: self.updateXPath()
+        theCopy = self.__class__( link = self.__link, root = self.root, path = self.path, label = self.label, relative = self.__relative )
 
-    copy = __deepcopy__
+        return theCopy
+
+    @property
+    def link(self):
+        """
+        Returns *self.__link*. However, if *self.__link* is **None** then **updateLink()** is called before *self.__link* is returned.
+        Also see **linkNoUpdate**.
+        """
+
+        if self.__link is None:
+            self.updateLink()
+
+        return self.__link
+
+    @link.setter
+    def link(self, instance):
+
+        self.__link = instance
+
+    @property
+    def linkWithoutUpdating(self):
+        """
+        This method returns *self.__link* without calling "self.updateLink()" if *self.__link* is None. Also see method **link**.
+        """
+
+        return self.__link
+
+    @property
+    def relative( self ) :
+
+        return( self.__relative )
 
     def build_href( self, **kwargs ) :
         """Builds the href (using "formatVersion" if present in **kwargs) and returns the href. The href will include the root if the root is not None."""
 
-        if( self.link is None ) :           # Should only happen when linking is to another protare's data.
+        if( self.__link is None ) :           # Should only happen when linking is to another protare's data.
             XPath = self.path
             if( self.root is not None ) : XPath = '%s#%s' % ( self.root, XPath )
         else :
             formatVersion = kwargs.get( 'formatVersion' )
             if self.__relative and hasattr(self, 'toRelativeXLink'):
-                XPath = self.toRelativeXLink( self.link, formatVersion = formatVersion )
+                XPath = self.toRelativeXLink( self.__link, formatVersion = formatVersion )
             else:
-                XPath = self.link.toXLink( formatVersion = formatVersion )
+                XPath = self.__link.toXLink( formatVersion = formatVersion )
                 if( self.root is not None ) : XPath = '%s#%s' % ( self.root, XPath )
 
         return( XPath )
+
+    def updateLink(self):
+        """
+        Uses the xpath to set the link.
+        """
+
+        if self.path[0] == '.':
+            self.link = self.follow(self)
+        else:
+            self.link = self.follow(self.rootAncestor)
 
     def updateXPath( self ):
         """Ensure the xPath agrees with the linked-to data."""
@@ -97,42 +131,40 @@ class link( baseModule.xDataCoreMembers ) :
         :param startNode: instance corresponding to the beginning of self.path (must inherit from ancestry)
         :return: class instance pointed to by self.path
         """
+
         return startNode.followXPath( self.path )
 
-    def toXML( self, indent = '' , **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        attributesStr = self.attributesToXMLAttributeStr( )
-        return( [ '%s<%s%s href="%s"/>' % ( indent, self.moniker, attributesStr, self.build_href( **kwargs ) ) ] )
+        attributeStr = self.attributesToXMLAttributeStr()
+        return ['%s<%s%s href="%s"/>' % (indent, self.moniker, attributeStr, self.build_href(**kwargs))]
 
     @classmethod
-    def parseXMLNode( cls, linkElement, xPath, linkData ):
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Parse the xml-represented link back to python. The resulting link points to None,
-        and must be resolved by the calling function.
+        Parse the link. The resulting link points to None, and must be resolved by the calling function.
         Link attributes can be converted to desired type by passing a 'typeConversion' dictionary in linkData
         """
 
-        xPath.append( linkElement.tag )
-        path = linkElement.get('href')
+        xPath.append( node.tag )
+        path = node.get('href')
         if '#' in path: root, path = path.split('#')
         else: root = None
         relative = not path.startswith('/')
         # derived classes may add new (non-xlink) attributes:
-        kwargs = dict( [v for v in list( linkElement.items( ) ) if not v[0].startswith( 'href' )] )
+        kwargs = dict( [v for v in list( node.items( ) ) if not v[0].startswith( 'href' )] )
         for key in kwargs:
             if key in linkData.get('typeConversion',{}):
                 kwargs[key] = linkData['typeConversion'][key](kwargs[key])
-        result = cls( link=None, root=root, path=path, relative=relative, **kwargs )
+        result = cls(link=None, root=root, path=path, relative=relative, **kwargs)
+
         if( 'unresolvedLinks' in linkData ) : linkData['unresolvedLinks'].append( result )
+
         xPath.pop()
 
         return result
 
-class link2( ancestryModule.ancestry ) :
+class Link2(ancestryModule.AncestryIO):
     """
     This class contains an href to another node as a xPath. The href could reference a node in a different file.
     The 'follow' member function is used to get a pointer to the linked-to node,
@@ -153,12 +185,11 @@ class link2( ancestryModule.ancestry ) :
     """
 
     moniker = 'link'
-    ancestryMembers = ( '', )
 
     def __init__( self, moniker, instance = None, root = None, href = None, relative = False, keyName = None, keyValue = None, label = None ) :
 
         self.__moniker = moniker
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__instance = instance      # Pointer to linked instance.
         self.__root = root              # File name where other data is stored, only needed if it's not the current file
@@ -182,22 +213,28 @@ class link2( ancestryModule.ancestry ) :
         return( self.__moniker )
 
     @property
-    def instance( self ) :
+    def instance(self) :
 
-        return( self.__instance )
+        if self.__instance is None:
+            self.updateLink()
+
+        if self.__instance is None:
+            self.updateLink()
+
+        return self.__instance
 
     @instance.setter
-    def instance( self, value ) :
+    def instance(self, value):
 
         self.__instance = value
 
     @property
-    def link( self ) :
+    def link(self):
 
-        return( self.__instance )
+        return self.instance
 
     @link.setter
-    def link( self, value ) :
+    def link(self, value):
 
         self.instance = value
 
@@ -210,6 +247,22 @@ class link2( ancestryModule.ancestry ) :
     def keyValue( self ) :
 
         return( self.__keyValue )
+
+    @property
+    def index(self):
+
+        if self.__keyName == 'index': return int(self.keyValue)
+
+        raise Exception('%s does not have an index member' % self.moniker)
+
+    @index.setter
+    def index(self, value):
+
+        if self.__keyName == 'index':
+            self.__keyValue = int(value)
+            return
+
+        raise Exception('%s does not have an index member' % self.moniker)
 
     @property
     def label( self ) :
@@ -236,19 +289,10 @@ class link2( ancestryModule.ancestry ) :
 
         return( self.__relative )
 
-    def copy( self, *args, **kwargs ) :
-
-        try :
-            if(self.__href is None) : self.updateXPath()
-        except :
-            pass
-        return( link2( self.__moniker, instance = self.__instance, root = self.__root, href = self.__href, keyName = self.__keyName, 
-                keyValue = self.__keyValue, label = self.__label ) )
-
     def build_href( self, **kwargs ) :
         """Builds the href (using "formatVersion" if present in **kwargs) and returns the href. The href will include the root if the root is not None."""
 
-        if( self.link is None ) :           # Should only happen when linking is to another protare's data.
+        if self.__instance is None:                 # Should only happen when linking to another protare's data.
             XPath = self.path
             if( self.root is not None ) : XPath = '%s#%s' % ( self.root, XPath )
         else:
@@ -276,6 +320,16 @@ class link2( ancestryModule.ancestry ) :
         self.__keyName = keyName
         self.__keyValue = keyValue
 
+    def updateLink(self):
+        """
+        Uses the xpath to set the link.
+        """
+
+        if self.path[0] == '.':
+            self.link = self.follow(self)
+        else:
+            self.link = self.follow(self.rootAncestor)
+
     def updateXPath( self ) :
         """
         Ensure the xPath agrees with the linked instance.
@@ -295,29 +349,25 @@ class link2( ancestryModule.ancestry ) :
 
         return( startNode.followXPath( self.__href ) )
 
-    def toXML( self, indent = '' , **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ):
         """
         Pointers show up in the attributes list on an xml element (i.e., <element href="...xpath" anotherAttribute="foo" .../>).
         """
 
         attributes = ''
-        if( ( self.__keyName is not None ) and ( self.__keyValue is not None ) ) : attributes += ' %s="%s"' % ( self.__keyName, self.__keyValue )
-        if( self.__label is not None ) : attributes += ' label="%s"' % self.__label
+        if self.__keyName is not None and self.__keyValue is not None: attributes += ' %s="%s"' % ( self.__keyName, self.__keyValue )
+        if self.__label is not None: attributes += ' label="%s"' % self.__label
 
-        return( [ '%s<%s%s href="%s"/>' % ( indent, self.moniker, attributes, self.build_href( **kwargs ) ) ] )
+        return [ '%s<%s%s href="%s"/>' % ( indent, self.moniker, attributes, self.build_href( **kwargs ) ) ]
 
     @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         Parse the xml-represented link back to python. The resulting link points to None, and must be resolved by the calling function.
         Link attributes can be converted to desired type by passing a 'typeConversion' dictionary in linkData
         """
 
-        xPath.append( element.tag )
+        xPath.append( node.tag )
 
         root = None
         href = None
@@ -325,20 +375,19 @@ class link2( ancestryModule.ancestry ) :
         keyValue = None
         label = None
 
-        for key in list( element.keys( ) ) :
+        for key in list( node.keys( ) ) :
             if( key == 'href' ) :
-                href = element.get( key )
+                href = node.get( key )
             elif( key == 'label' ) :
-                label = element.get( key )
+                label = node.get( key )
             else :
                 if( keyName is not None ) : raise Exception( 'Too many attributes for link: %s' % key )
                 keyName = key
-                keyValue = element.get( key )
+                keyValue = node.get( key )
 
         if( '#' in href ) : root, href = href.split( '#' )
 
-        _link = cls( element.tag, instance = None, root = root, href = href, relative = href[0] == '/', keyName = keyName, keyValue = keyValue,
-            label = label )
+        _link = cls( node.tag, instance = None, root = root, href = href, relative = href[0] != '/', keyName = keyName, keyValue = keyValue, label = label )
 
         if( 'unresolvedLinks' in linkData ) : linkData['unresolvedLinks'].append( _link )
 

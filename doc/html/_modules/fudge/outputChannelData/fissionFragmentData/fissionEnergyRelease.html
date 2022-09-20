@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a special type of Q-value, unique to fission reactions.</span>
+<span class="sd">Fission releases energy several different ways (neutrons, gammas, etc.), and it&#39;s useful to subdivide the Q-value</span>
+<span class="sd">into these different terms.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># FIXME this is really a form of Q-value. Should it be defined in Q.py instead?</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">xDataEnumsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">series1d</span> <span class="k">as</span> <span class="n">series1dModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">gridded</span> <span class="k">as</span> <span class="n">griddedModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">uncertainties</span> <span class="k">as</span> <span class="n">uncertaintiesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">vector</span> <span class="k">as</span> <span class="n">vectorModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
+<span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">transporting</span> <span class="k">as</span> <span class="n">transportingModule</span>
+
+
+<div class="viewcode-block" id="defaultAxes"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.defaultAxes">[docs]</a><span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span> <span class="s1">&#39;energy_out&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span> <span class="s1">&#39;energy_in&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polynomial1d"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.Polynomial1d">[docs]</a><span class="k">class</span> <span class="nc">Polynomial1d</span><span class="p">(</span> <span class="n">series1dModule</span><span class="o">.</span><span class="n">Polynomial1d</span> <span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coefficientUncertainties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">series1dModule</span><span class="o">.</span><span class="n">Polynomial1d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span> <span class="o">=</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="n">domainMax</span><span class="p">,</span>
+                    <span class="n">lowerIndex</span> <span class="o">=</span> <span class="n">lowerIndex</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">coefficientUncertainties</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">uncertaintiesModule</span><span class="o">.</span><span class="n">Uncertainty</span><span class="p">(</span> <span class="n">functional</span> <span class="o">=</span> <span class="n">series1dModule</span><span class="o">.</span><span class="n">Polynomial1d</span><span class="p">(</span> <span class="n">coefficientUncertainties</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Polynomial1d.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.Polynomial1d.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polynomial1d.toLinearXYsClass"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.Polynomial1d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="XYs1d"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.XYs1d">[docs]</a><span class="k">class</span> <span class="nc">XYs1d</span><span class="p">(</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="XYs1d.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.XYs1d.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">miscellaneous</span> <span class="k">as</span> <span class="n">miscellaneousModule</span>
+
+        <span class="n">multiGroup</span> <span class="o">=</span> <span class="n">miscellaneousModule</span><span class="o">.</span><span class="n">groupFunctionCrossSectionAndFlux</span><span class="p">(</span> <span class="n">Gridded1d</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">multiGroup</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">multiGroup</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Gridded1d"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.Gridded1d">[docs]</a><span class="k">class</span> <span class="nc">Gridded1d</span><span class="p">(</span> <span class="n">griddedModule</span><span class="o">.</span><span class="n">Gridded1d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="FissionEnergyReleaseTerm"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm">[docs]</a><span class="k">class</span> <span class="nc">FissionEnergyReleaseTerm</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Base class for all types of fission energy release. &quot;&quot;&quot;</span>
+
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="p">(</span> <span class="n">XYs1d</span><span class="p">,</span> <span class="n">Polynomial1d</span><span class="p">,</span> <span class="n">Gridded1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid class &quot;</span><span class="si">%s</span><span class="s1">&quot; for fissionEnergyReleaseTerm&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">value</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="FissionEnergyReleaseTerm.check"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">linearized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">linearized</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">BadFissionEnergyRelease</span><span class="p">(</span> <span class="n">worstCase</span><span class="o">=</span><span class="n">linearized</span><span class="o">.</span><span class="n">rangeMin</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.1</span> <span class="o">&lt;</span> <span class="n">linearized</span><span class="o">.</span><span class="n">rangeMax</span> <span class="o">/</span> <span class="n">linearized</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">BadFissionEnergyRelease</span><span class="p">(</span> <span class="n">worstCase</span><span class="o">=</span><span class="n">linearized</span><span class="o">.</span><span class="n">rangeMax</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="FissionEnergyReleaseTerm.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="FissionEnergyReleaseTerm.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="FissionEnergyReleaseTerm.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span><span class="s1">&#39;  &#39;</span><span class="p">)</span>
+        <span class="n">xmllist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)]</span>
+        <span class="n">xmllist</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmllist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xmllist</span></div>
+
+<div class="viewcode-block" id="FissionEnergyReleaseTerm.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">dataClass</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">XYs1d</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">XYs1d</span><span class="p">,</span>
+            <span class="n">Polynomial1d</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">Polynomial1d</span><span class="p">,</span>
+            <span class="n">Gridded1d</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">Gridded1d</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dataClass</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">FERT</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">FERT</span></div></div>
+
+<div class="viewcode-block" id="PromptProductKE"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.PromptProductKE">[docs]</a><span class="k">class</span> <span class="nc">PromptProductKE</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;promptProductKE&#39;</span></div>
+
+<div class="viewcode-block" id="PromptNeutronKE"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.PromptNeutronKE">[docs]</a><span class="k">class</span> <span class="nc">PromptNeutronKE</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;promptNeutronKE&#39;</span></div>
+
+<div class="viewcode-block" id="DelayedNeutronKE"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.DelayedNeutronKE">[docs]</a><span class="k">class</span> <span class="nc">DelayedNeutronKE</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;delayedNeutronKE&#39;</span></div>
+
+<div class="viewcode-block" id="PromptGammaEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.PromptGammaEnergy">[docs]</a><span class="k">class</span> <span class="nc">PromptGammaEnergy</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;promptGammaEnergy&#39;</span></div>
+
+<div class="viewcode-block" id="DelayedGammaEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.DelayedGammaEnergy">[docs]</a><span class="k">class</span> <span class="nc">DelayedGammaEnergy</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;delayedGammaEnergy&#39;</span></div>
+
+<div class="viewcode-block" id="DelayedBetaEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.DelayedBetaEnergy">[docs]</a><span class="k">class</span> <span class="nc">DelayedBetaEnergy</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;delayedBetaEnergy&#39;</span></div>
+
+<div class="viewcode-block" id="NeutrinoEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.NeutrinoEnergy">[docs]</a><span class="k">class</span> <span class="nc">NeutrinoEnergy</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;neutrinoEnergy&#39;</span></div>
+
+<div class="viewcode-block" id="NonNeutrinoEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.NonNeutrinoEnergy">[docs]</a><span class="k">class</span> <span class="nc">NonNeutrinoEnergy</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;nonNeutrinoEnergy&#39;</span></div>
+
+<div class="viewcode-block" id="TotalEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.TotalEnergy">[docs]</a><span class="k">class</span> <span class="nc">TotalEnergy</span><span class="p">(</span> <span class="n">FissionEnergyReleaseTerm</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;totalEnergy&#39;</span></div>
+
+<div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Descriptor to ensure ancestry is set when adding energy release terms</span>
+<span class="sd">    to fissionEnergyRelease class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Class</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Class</span> <span class="o">=</span> <span class="n">Class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;__&#39;</span> <span class="o">+</span> <span class="n">Class</span><span class="o">.</span><span class="n">moniker</span>
+
+    <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">owner</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__set__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Class</span> <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Incorrect type: expected </span><span class="si">%s</span><span class="s2">, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Class</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="p">)</span>
+        <span class="n">value</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span> <span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="FissionEnergyRelease"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease">[docs]</a><span class="k">class</span> <span class="nc">FissionEnergyRelease</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Store average energy released to different types of fission products.</span>
+<span class="sd">    (prompt and delayed neutrons, prompt / delayed gammas, betas, neutrinos, etc.)</span>
+<span class="sd">    Each term is currently (when translating from ENDF) stored as a polynomial expansion,</span>
+<span class="sd">    although we expect to also see XYs1d representations in future evaluations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;fissionEnergyRelease&#39;</span>
+
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;promptProductKE&#39;</span><span class="p">,</span>      <span class="s1">&#39;promptNeutronKE&#39;</span><span class="p">,</span>      <span class="s1">&#39;delayedNeutronKE&#39;</span><span class="p">,</span> <span class="s1">&#39;promptGammaEnergy&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;delayedGammaEnergy&#39;</span><span class="p">,</span>   <span class="s1">&#39;delayedBetaEnergy&#39;</span><span class="p">,</span>    <span class="s1">&#39;neutrinoEnergy&#39;</span><span class="p">,</span>   <span class="s1">&#39;nonNeutrinoEnergy&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;totalEnergy&#39;</span> <span class="p">)</span>
+
+    <span class="n">promptProductKE</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">PromptProductKE</span> <span class="p">)</span>
+    <span class="n">promptNeutronKE</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">PromptNeutronKE</span> <span class="p">)</span>
+    <span class="n">delayedNeutronKE</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">DelayedNeutronKE</span> <span class="p">)</span>
+    <span class="n">promptGammaEnergy</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">PromptGammaEnergy</span> <span class="p">)</span>
+    <span class="n">delayedGammaEnergy</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">DelayedGammaEnergy</span> <span class="p">)</span>
+    <span class="n">delayedBetaEnergy</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">DelayedBetaEnergy</span> <span class="p">)</span>
+    <span class="n">neutrinoEnergy</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">NeutrinoEnergy</span> <span class="p">)</span>
+    <span class="n">nonNeutrinoEnergy</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">NonNeutrinoEnergy</span> <span class="p">)</span>
+    <span class="n">totalEnergy</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span> <span class="n">TotalEnergy</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">setattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;fissionEnergyRelease received unexpected argument(s): &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">list</span><span class="p">(</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span> <span class="k">yield</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">term</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="FissionEnergyRelease.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span>
+            <span class="n">fwarnings</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">term</span> <span class="p">)</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="FissionEnergyRelease.check"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span><span class="p">:</span>
+            <span class="n">fwarnings</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">term</span><span class="p">)</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">fwarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">term</span><span class="p">,</span> <span class="n">fwarnings</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="FissionEnergyRelease.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">term</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">term</span> <span class="p">)</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">FissionEnergyRelease</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="FissionEnergyRelease.multiGroupQ"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.multiGroupQ">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the multi-group Q-value.</span>
+
+<span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">vectorModule</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">multiGroupSettings</span><span class="o">.</span><span class="n">delayedNeutrons</span> <span class="o">==</span> <span class="n">transportingModule</span><span class="o">.</span><span class="n">DelayedNeutrons</span><span class="o">.</span><span class="n">on</span><span class="p">:</span>
+            <span class="n">Q</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delayedNeutronKE</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">constructVector</span><span class="p">()</span>
+            <span class="n">Q</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delayedGammaEnergy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">constructVector</span><span class="p">()</span>
+            <span class="n">Q</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delayedBetaEnergy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">constructVector</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">Q</span></div>
+
+<div class="viewcode-block" id="FissionEnergyRelease.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">promptProductKE</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="FissionEnergyRelease.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span><span class="o">+</span><span class="s2">&quot;  &quot;</span>
+        <span class="n">xmlList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)]</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span><span class="p">:</span>
+            <span class="n">xmlList</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">term</span><span class="p">)</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/</span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">xmlList</span></div>
+
+<div class="viewcode-block" id="FissionEnergyRelease.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse &lt;fissionEnergyRelease&gt; node from xml.&quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">childClasses</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="p">[</span> <span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">cls</span> <span class="p">)</span> <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="p">(</span> <span class="n">PromptProductKE</span><span class="p">,</span> <span class="n">PromptNeutronKE</span><span class="p">,</span> <span class="n">DelayedNeutronKE</span><span class="p">,</span> <span class="n">PromptGammaEnergy</span><span class="p">,</span>
+                <span class="n">DelayedGammaEnergy</span><span class="p">,</span> <span class="n">DelayedBetaEnergy</span><span class="p">,</span> <span class="n">NeutrinoEnergy</span><span class="p">,</span> <span class="n">NonNeutrinoEnergy</span><span class="p">,</span> <span class="n">TotalEnergy</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="n">children</span><span class="p">[</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">]</span> <span class="o">=</span> <span class="n">childClasses</span><span class="p">[</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">]</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">fer</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s2">&quot;label&quot;</span> <span class="p">),</span> <span class="o">**</span><span class="n">children</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fer</span></div></div>
+
+<div class="viewcode-block" id="FissionEnergyReleases"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleases">[docs]</a><span class="k">class</span> <span class="nc">FissionEnergyReleases</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Component</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;fissionEnergyReleases&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Component</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span> <span class="n">FissionEnergyRelease</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

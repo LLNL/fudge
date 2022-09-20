@@ -44,42 +44,24 @@
 
 <span class="sd">&quot;&quot;&quot;Base classes for distributions.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">xData.ancestry</span> <span class="k">as</span> <span class="nn">ancestryModule</span>
-<span class="kn">import</span> <span class="nn">xData.standards</span> <span class="k">as</span> <span class="nn">standardsModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">xDataEnumsModule</span>
 
-<span class="kn">from</span> <span class="nn">PoPs.groups</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">chemicalElementMiscPoPsModule</span>
+<span class="kn">from</span> <span class="nn">PoPs.chemicalElements</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">chemicalElementMiscPoPsModule</span>
 
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
 
-<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+<div class="viewcode-block" id="Form"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form">[docs]</a><span class="k">class</span> <span class="nc">Form</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Form</span> <span class="p">)</span> <span class="p">:</span>
 
-<span class="c1">#</span>
-<span class="c1"># Standard genre can only be composited from one of the following standard forms.</span>
-<span class="c1">#</span>
-
-<span class="n">angularTwoBodyGenre</span> <span class="o">=</span> <span class="s1">&#39;angularTwoBody&#39;</span>
-<span class="n">unknownGenre</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
-<span class="n">referenceGenre</span> <span class="o">=</span> <span class="s1">&#39;reference&#39;</span>
-<span class="n">NBodyGenre</span> <span class="o">=</span> <span class="s1">&#39;NBody&#39;</span>
-
-<span class="n">noneFormToken</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span>
-<span class="n">semiPiecewiseFormToken</span> <span class="o">=</span> <span class="s1">&#39;semiPiecewise&#39;</span>
-<span class="n">equalProbableBinsFormToken</span> <span class="o">=</span> <span class="s1">&#39;equalProbableBins&#39;</span>
-<span class="n">LegendrePointwiseFormToken</span> <span class="o">=</span> <span class="s1">&#39;LegendrePointwise&#39;</span>
-<span class="n">LegendrePiecewiseFormToken</span> <span class="o">=</span> <span class="s1">&#39;LegendrePiecewise&#39;</span>
-
-<div class="viewcode-block" id="form"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.form">[docs]</a><span class="k">class</span> <span class="nc">form</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">subForms</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Form</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
-
-        <span class="k">if</span><span class="p">(</span> <span class="n">productFrame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="n">productFrame</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">allowedFrames</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid productFrame = &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">productFrame</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__productFrame</span> <span class="o">=</span> <span class="n">productFrame</span>
+<span class="c1">#        self.productFrame = productFrame                # This does not seem to work, hence the next line.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__productFrame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">productFrame</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">subform_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">subForms</span> <span class="p">)</span> <span class="p">:</span>
             <span class="nb">setattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subformAttributes</span><span class="p">[</span><span class="n">i1</span><span class="p">],</span> <span class="n">subform_</span> <span class="p">)</span>
@@ -103,14 +85,20 @@
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">productModule</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">productModule</span><span class="o">.</span><span class="n">product</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">productModule</span><span class="o">.</span><span class="n">Product</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">productFrame</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__productFrame</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="form.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.form.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="nd">@productFrame</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">productFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the distribution&#39;s product frame.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__productFrame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Form.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;subforms&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
@@ -118,24 +106,24 @@
                 <span class="k">if</span><span class="p">(</span> <span class="n">subform_</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>                    <span class="c1"># FIXME, needed for photo-atomic coherentScattering data with no anomalousScattering subforms.</span>
                 <span class="n">subform_</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="form.findEntity"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.form.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">):</span>
+<div class="viewcode-block" id="Form.findEntity"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find specific subform within the form. Overrides ancestry.findEntity.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">subform_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subforms</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">subform_</span><span class="o">.</span><span class="n">moniker</span> <span class="o">==</span> <span class="n">entityName</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">subform_</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="n">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="k">return</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">Ancestry</span><span class="o">.</span><span class="n">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="form.isTwoBody"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.form.isTwoBody">[docs]</a>    <span class="k">def</span> <span class="nf">isTwoBody</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Form.isTwoBody"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.isTwoBody">[docs]</a>    <span class="k">def</span> <span class="nf">isTwoBody</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="form.isSpecified"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.form.isSpecified">[docs]</a>    <span class="k">def</span> <span class="nf">isSpecified</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Form.isSpecified"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.isSpecified">[docs]</a>    <span class="k">def</span> <span class="nf">isSpecified</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="form.residualMass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.form.residualMass">[docs]</a>    <span class="k">def</span> <span class="nf">residualMass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">,</span> <span class="n">residualZA</span><span class="p">,</span> <span class="n">massUnit</span><span class="p">,</span> <span class="n">compoundMass</span><span class="p">,</span> <span class="n">product</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Form.residualMass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.residualMass">[docs]</a>    <span class="k">def</span> <span class="nf">residualMass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">,</span> <span class="n">residualZA</span><span class="p">,</span> <span class="n">massUnit</span><span class="p">,</span> <span class="n">compoundMass</span><span class="p">,</span> <span class="n">product</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">residual</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">residualSymbol</span> <span class="o">=</span> <span class="n">chemicalElementMiscPoPsModule</span><span class="o">.</span><span class="n">symbolFromZ</span><span class="p">[</span><span class="n">residualZA</span><span class="o">//</span><span class="mi">1000</span><span class="p">]</span>
@@ -152,30 +140,34 @@
         <span class="k">if</span><span class="p">(</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    Could not find residual in particle database: id = &quot;</span><span class="si">%s</span><span class="s1">&quot;, ZA = </span><span class="si">%d</span><span class="s1">, using mass </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">residualID</span><span class="p">,</span> <span class="n">residualZA</span><span class="p">,</span> <span class="n">_residualMass</span><span class="p">,</span> <span class="n">massUnit</span> <span class="p">))</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">_residualMass</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="form.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.form.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Form.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">subforms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="form.toXMLList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.form.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Form.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
         <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; productFrame=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="o">!=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+            <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; productFrame=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span>
+
         <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributeStr</span> <span class="p">)</span> <span class="p">]</span>
-        <span class="k">for</span> <span class="n">subform_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subforms</span> <span class="p">:</span> <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">subform_</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">subform_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subforms</span> <span class="p">:</span> <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">subform_</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
         <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
         <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.subform">[docs]</a><span class="k">class</span> <span class="nc">subform</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Subform">[docs]</a><span class="k">class</span> <span class="nc">Subform</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="subform.XMLStartTagString"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.subform.XMLStartTagString">[docs]</a>    <span class="k">def</span> <span class="nf">XMLStartTagString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">extraAttributesAsStrings</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">emptyTag</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Subform.XMLStartTagString"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Subform.XMLStartTagString">[docs]</a>    <span class="k">def</span> <span class="nf">XMLStartTagString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">extraAttributesAsStrings</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">emptyTag</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">emptyTagStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">emptyTag</span> <span class="p">)</span> <span class="p">:</span> <span class="n">emptyTagStr</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>

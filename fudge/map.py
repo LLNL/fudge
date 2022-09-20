@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,7 +12,7 @@ Example of expected usage:
 
     from fudge import map as mapModule
     file = '/path/to/GIDI/Test/Data/MG_MC/all_maps.map'
-    map = mapModule.Map.readXML( file )                 # Read in a map file.
+    map = mapModule.Map.readXML_file( file )            # Read in a map file.
     m_O16 = map.find( 'n', 'O16' )                      # This gets a reference to a map Protare instance.
     O16 = m_O16.protare( )                              # The creates a FUDGE protare (i.e., reactionSuite instance).
 
@@ -26,10 +26,12 @@ __todo = """
 import os
 import re
 
-from xData import formatVersion as formatVersionModule
-from xData import ancestry as ancestryModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 
+from LUPY import ancestry as ancestryModule
 from LUPY import checksums as checksumsModule
+
+from fudge import enums as enumsModule
 from fudge.core.utilities import guessInteraction as guessInteractionModule
 from fudge import reactionSuite as reactionSuiteModule
 
@@ -37,13 +39,24 @@ class FormatVersion :
 
     version_0_1 = "0.1"
     version_0_2 = "0.2"
-    allowed = ( version_0_1, version_0_2, formatVersionModule.version_2_0_LLNL_4 )
+    allowed = (version_0_1, version_0_2, GNDS_formatVersionModule.version_2_0_LLNL_4, GNDS_formatVersionModule.version_2_0)
     default = version_0_1
 
-class Base( ancestryModule.ancestry ) :
-    """Base class used by all other map related classes. Mainly inherits class ancestryModule.ancestry and defines toXML."""
+    def check(format):
+
+        if format == GNDS_formatVersionModule.version_1_10:
+            format = FormatVersion.version_0_1
+        if format not in FormatVersion.allowed:
+            raise ValueError('Unsupported format "%s".' % format)
+
+        return format
+
+class Base( ancestryModule.AncestryIO ) :
+    """Base class used by all other map related classes. Mainly inherits class ancestryModule.AncestryIO."""
 
     def __init__( self, checksum=None, algorithm=None):
+
+        ancestryModule.AncestryIO.__init__(self)
 
         self.checksum = checksum
         self.algorithm = algorithm
@@ -78,42 +91,6 @@ class Base( ancestryModule.ancestry ) :
             raise ValueError("Unsupported checksum algorithm '%s'." % algorithm_)
         self.__algorithm = algorithm_
 
-    def toXML( self, indent = "", **kwargs ) :
-        """
-        Returns an XML string of self.
-
-        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
-        :param kwargs:          A keyword list passed to self's toXML_list method.
-        """
-
-        return( '\n'.join( self.toXML_list( indent, **kwargs ) ) )
-        
-    def saveToOpenedFile( self, fOut, **kwargs ) :
-        """
-        Saves the contents of self to an already opened python file object (e.g., one returned by the open function).
-
-        :param fOut:            A python file object.
-        :param kwargs:          A keyword list passed to self's toXML method.
-        """
-
-        xmlString = self.toXML( **kwargs )
-        fOut.write( xmlString )
-        fOut.write( '\n' )
-
-    def saveToFile( self, fileName, **kwargs ) :
-        """
-        Saves the contents of self to the specified path (i.e., fileName).
-
-        :param fileName:        The path to save the contents of self to.
-        :param kwargs:          A keyword list passed to self's saveToOpenedFile method.
-        """
-
-        dirname = os.path.dirname( fileName )
-        if( ( len( dirname ) > 0 ) and not( os.path.exists( dirname ) ) ) : os.makedirs( dirname )
-        with open( fileName, "w" ) as fout :
-            fout.write( '<?xml version="1.0" encoding="UTF-8"?>\n' )
-            self.saveToOpenedFile( fout, **kwargs )
-
     def standardXML_attributes( self, checkAncestor = True ) :
         """Returns the XML attribute string for *checksum* and *algorithm*."""
 
@@ -122,8 +99,11 @@ class Base( ancestryModule.ancestry ) :
             attrs += ' checksum="%s"' % self.checksum
 
         algorithm = self.algorithm
-        if checkAncestor and self.algorithm == self.ancestor.algorithm: algorithm = None
-        if algorithm is not None: attrs += ' algorithm="%s"' % algorithm
+        if self.ancestor is not None:
+            if checkAncestor and self.algorithm == self.ancestor.algorithm:
+                algorithm = None
+        if algorithm is not None:
+            attrs += ' algorithm="%s"' % algorithm
             
         return attrs
 
@@ -159,8 +139,7 @@ class Map( Base ) :
         if( path[0] != os.sep ) : fileName = os.path.realpath( os.path.join( parentsDir, path ) )
         self.__fileName = fileName
 
-        if( format not in FormatVersion.allowed ) : raise ValueError( 'Invalid format "%s."' % format )
-        self.__format = format
+        self.__format = FormatVersion.check(format)
 
         self.__entries = []
 
@@ -207,13 +186,26 @@ class Map( Base ) :
 
         return( self.__fileName )
 
-    def updateAllChecksums(self, algorithm=checksumsModule.sha1sum.algorithm, mapDirectory=None):
+    def updateAllChecksums(self, algorithm=checksumsModule.Sha1sum.algorithm, mapDirectory=None):
         """Calls *updateChecksum* on all entries and then updates self's *checksum*."""
 
-        for entry in self: entry.updateChecksum(algorithm, mapDirectory=mapDirectory)
+        import threading
+        from LUPY import parallelprocessing
+        class computeSum(threading.Thread):
+
+            def __init__(self, entry):
+                threading.Thread.__init__(self)
+                self.entry = entry
+
+            def run(self):
+                self.entry.updateChecksum(algorithm, mapDirectory=mapDirectory)
+
+        entries = list(self)
+        parallelprocessing.executeMultiThreaded(entries, runner=computeSum)
+
         self.updateChecksum(algorithm)
 
-    def updateChecksum(self, algorithm=checksumsModule.sha1sum.algorithm):
+    def updateChecksum(self, algorithm=checksumsModule.Sha1sum.algorithm):
         """
         Compute map file checksum: concatenate checksums for all entries into a string and compute the sum
         of that string.
@@ -226,12 +218,22 @@ class Map( Base ) :
         self.algorithm = algorithm
 
     def append( self, entry ) :
-        """Append's the entry to self."""
+        '''Appends the entry to self.'''
 
-        if( not( isinstance( entry, EntryBase ) ) ) : TypeError( "Invalid entry." )
+        if not isinstance(entry, EntryBase):
+            TypeError('Invalid entry.')
 
         self.__entries.append( entry )
         entry.setAncestor( self )
+
+    def insert(self, index, entry):
+        '''Inserts the entry into self at index.'''
+
+        if not isinstance(entry, EntryBase):
+            TypeError('Invalid entry of type "%s".' % type(entry))
+
+        self.__entries.insert(index, entry)
+        entry.setAncestor(self)
 
     def iterate( self ) :
         """Iterates over all protares and TNSLs in self. Dives into import entries."""
@@ -281,7 +283,7 @@ class Map( Base ) :
 
         return( allFound )
 
-    def toXML_list( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
         """
         Returns a list of str instances representing the XML lines of self.
 
@@ -291,48 +293,31 @@ class Map( Base ) :
         :return:                List of str instances representing the XML lines of self.
         """
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        format = kwargs.get( 'format', FormatVersion.default )
-        if( format not in FormatVersion.allowed ) : raise TypeError( 'Invalid format = "%s".' % format )
+        format = FormatVersion.check(kwargs.get('format', kwargs.get('formatVersion', FormatVersion.default)))
 
         attrs = self.standardXML_attributes( False )
 
         XML_list = [ '%s<%s library="%s" format="%s"%s>' % ( indent, self.moniker, self.library, format, attrs ) ]
-        for entry in self.__entries : XML_list += entry.toXML_list( indent2, **kwargs )
+        for entry in self.__entries : XML_list += entry.toXML_strList( indent2, **kwargs )
         XML_list[-1] +=  '</%s>' % self.moniker
 
         return( XML_list )
 
-    @staticmethod
-    def readXML( path ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Reads in a XML map file.
+        Creates a Map instance from an map node.
 
-        :param path:        Path to a map file.
-
-        :return:            Map instance containing all entries from the map file.
-        """
-
-        from xml.etree import cElementTree
-        from LUPY.xmlNode import xmlNode
-
-        node = cElementTree.parse( path ).getroot( )
-        node = xmlNode( node, xmlNode.etree )
-
-        return( Map.parseXML_node( path, node ) )
-
-    @staticmethod
-    def parseXML_node( path, node ) :
-        """
-        Creates a Map instance from an XML map element.
-
-        :param node:        XML element to parse.
+        :param node:        node to parse.
 
         :return:            Map instance.
         """
 
         if( node.tag != Map.moniker ) : raise TypeError( 'Invalid node name "%s" for a map file.' % node.tag )
+
+        sourcePath = kwargs['sourcePath']
 
         format = node.get( 'format', None )
         if( format is None ) : raise ValueError( "Map node does not have 'format' attribute." )
@@ -340,20 +325,28 @@ class Map( Base ) :
         library = node.get( 'library', None )
         if( library is None ) : raise ValueError( "Map node does not have 'library' attribute." )
 
-        map = Map( library, path, checksum=node.get('checksum'), algorithm=node.get('algorithm') )
+        map = Map(library, sourcePath, checksum=node.get('checksum'), algorithm=node.get('algorithm'))
 
-        settings = { 'format' : format }
+        kwargs['format'] = FormatVersion.check(format)
         for child in node :
-            if( child.tag == Import.moniker ) :
-                map.append( Import.parseXML_node( settings, child ) )
-            elif( child.tag == Protare.moniker ) :
-                map.append( Protare.parseXML_node( settings, child ) )
-            elif( child.tag == TNSL.moniker ) :
-                map.append( TNSL.parseXML_node( settings, child ) )
+            if child.tag == Import.moniker:
+                map.append(Import.parseNodeUsingClass(child, xPath, linkData, **kwargs))
+            elif child.tag == Protare.moniker:
+                map.append(Protare.parseNodeUsingClass(child, xPath, linkData, **kwargs))
+            elif child.tag == TNSL.moniker:
+                map.append(TNSL.parseNodeUsingClass(child, xPath, linkData, **kwargs))
             else :
                 raise ValueError( "Invalid child tag '%s' for map file." % child.tag )
 
-        return( map )
+        return map
+
+    @staticmethod
+    def read(fileName, **kwargs):
+        """
+        Reads in the file name *fileName* and returns a **ReactionSuite** instance.
+        """
+
+        return Map.readXML_file(fileName, **kwargs)
 
 class EntryBase( Base ) :
     """Base class for all map entry classes."""
@@ -377,7 +370,7 @@ class EntryBase( Base ) :
         """Returns the absolute path to the file pointed to by the 'path' attribute."""
 
         filename = self.path
-        if( filename != os.sep ) : filename = os.path.join( os.path.dirname( os.path.realpath( self.ancestor.path ) ), filename )
+        if filename[0] != os.sep: filename = os.path.join(os.path.dirname(os.path.realpath(self.ancestor.path)), filename)
         return( filename )
 
     @property
@@ -395,7 +388,7 @@ class EntryBase( Base ) :
         if mapDirectory is None: return self.fileName
         return os.path.join(os.path.realpath(mapDirectory), self.path)
 
-    def updateChecksum(self, algorithm=checksumsModule.sha1sum.algorithm, mapDirectory=None):
+    def updateChecksum(self, algorithm=checksumsModule.Sha1sum.algorithm, mapDirectory=None):
         """
         Compute the checksum of the file specified by *path* member and store it into the *checksum* member.
 
@@ -423,6 +416,15 @@ class Import( EntryBase ) :
         """Returns a simple string representation of self."""
 
         return( '%s with path "%s".' % ( self.moniker, self.path ) )
+
+    @property
+    def derivedPath(self):
+
+        ancestor = self.ancestor
+        if isinstance(ancestor, Map):
+            return os.path.dirname(ancestor.path)
+
+        raise TypeError('Import not an entry of a Map instance.')
 
     @property
     def map( self ) :
@@ -473,12 +475,14 @@ class Import( EntryBase ) :
         """Reads in the map file pointed to by self if not already read in. An import only reads its map file when needed."""
 
         if self.__map is None:
-            self.__map = Map.readXML( self.fileName )
+            mapFilePath = self.path
+            if mapFilePath[0] != os.sep: mapFilePath = os.path.join(self.derivedPath, mapFilePath)
+            self.__map = Map.readXML_file(mapFilePath)
             self.__map.setAncestor( self )
 
         return self.__map
     
-    def toXML_list( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
         """
         Returns a list of str instances representing the XML lines of self.
 
@@ -491,12 +495,11 @@ class Import( EntryBase ) :
         attrs = self.standardXML_attributes( )
         return [ '%s<%s path="%s"%s/>' % ( indent, self.moniker, self.path, attrs ) ]
 
-    @staticmethod
-    def parseXML_node( settings, node ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         Creates an Import instance from an XML import element.
 
-        :param settings:        Information from parent map instances needed to parse the XML element.
         :param node:            XML element to parse.
 
         :return:                Import instance.
@@ -520,9 +523,11 @@ class ProtareBase( EntryBase ) :
         :param evaluation:          Name for the protare's Evaluation.
         :param path:                Path to the protare file.
         :param interaction:         Type of interaction for the data in the protare file (see class reactionSuite.Interaction).
+        :param checksum:            The checksum for the file referenced by *path*.
+        :param algorithm:           The algorithm used to calculate the checksum.
         """
 
-        EntryBase.__init__( self, path, checksum=checksum, algorithm=algorithm)
+        EntryBase.__init__(self, path, checksum=checksum, algorithm=algorithm)
 
         if( not( isinstance( projectile, str ) ) ) : raise TypeError( "Projectile must be a string." )
         self.__projectile = projectile
@@ -533,7 +538,10 @@ class ProtareBase( EntryBase ) :
         if( not( isinstance( evaluation, str ) ) ) : raise TypeError( "Evaluation must be a string." )
         self.__evaluation = evaluation
 
-        if( interaction not in reactionSuiteModule.Interaction.allowed ) : raise ValueError( "Invalid interaction '%s'." % interaction )
+        if isinstance(self, TNSL):
+            interaction = None                      # In GNDS 2.0, TNSL no longer as interaction attribution as it is not needed.
+        else:
+            interaction = enumsModule.Interaction.checkEnumOrString(interaction)
         self.__interaction = interaction
 
         self.__guessedInteraction = False
@@ -558,7 +566,7 @@ class ProtareBase( EntryBase ) :
 
     @property
     def interaction( self ) :
-        """Returns the protare's interaction token."""
+        """Returns the protare's interaction attribute."""
 
         return( self.__interaction )
 
@@ -581,9 +589,17 @@ class ProtareBase( EntryBase ) :
 
         return( self.ancestor.library )
 
+    @property
+    def derivedPath(self):
+
+        ancestor = self.ancestor
+        if self.path[0] == os.sep or not isinstance(ancestor, Base):
+            return self.path
+        return os.path.join(os.path.dirname(ancestor.path), self.path)
+
     def isMatch( self, projectile, target, library = None, evaluation = None ) :
         """
-        Returns True is self matchs projectile, target, library and evaluation, and False otherwise. If an argument has a value of None, 
+        Returns True is self matches projectile, target, library and evaluation, and False otherwise. If an argument has a value of None, 
         that argument is a match.  For example, isMatch( None, "O16", None, None ) will match any entry with a target of "O16".
 
         :param projectile:      The requested projectile's PoPs id to match.
@@ -600,12 +616,17 @@ class ProtareBase( EntryBase ) :
 
         return( False )
 
-    def protare( self ) :
+    def protare(self, verbosity=0, lazyParsing=True):
+        """Call self.read."""
+
+        return self.read(verbosity=verbosity, lazyParsing=lazyParsing)
+
+    def read(self, verbosity=0, lazyParsing=True):
         """
-        Reads in the protare using reactionSuiteModule.readXML and returns the instance.
+        Reads in the protare using ReactionSuite.readXML_file and returns the instance.
         """
 
-        return( reactionSuiteModule.readXML( self.fileName ) )
+        return reactionSuiteModule.ReactionSuite.readXML_file(self.fileName, verbosity=verbosity, lazyParsing=lazyParsing)
 
     def standardXML_attributes(self, checkAncestor=True):
         """Returns the XML attribute string for protare, target, evalution and interaction as well that those
@@ -613,7 +634,10 @@ class ProtareBase( EntryBase ) :
         """
 
         attributeString = ' projectile="%s" target="%s" evaluation="%s" path="%s"' % (self.projectile, self.target, self.evaluation, self.path)
-        if not self.guessedInteraction: attributeString += ' interaction="%s"' % self.interaction
+        if not self.guessedInteraction:
+            if self.interaction is not None:
+                attributeString += ' interaction="%s"' % self.interaction
+
         return attributeString + Base.standardXML_attributes(self, checkAncestor=checkAncestor)
 
     @staticmethod
@@ -626,7 +650,7 @@ class ProtareBase( EntryBase ) :
         """
 
         if( item2 is None ) : return( True )
-        return re.match(item2, item1) is not None
+        return re.fullmatch(item2, item1) is not None
     
 class Protare( ProtareBase ) :
     """The class for a map's protare node."""
@@ -652,7 +676,7 @@ class Protare( ProtareBase ) :
         return( '%s with projectile "%s", target "%s", evaluation "%s", path "%s" and interaction "%s".' % 
             ( self.moniker, self.projectile, self.target, self.evaluation, self.path, self.interaction ) )
 
-    def toXML_list( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
         """
         Returns a list of str instances representing the XML lines of self.
 
@@ -662,17 +686,15 @@ class Protare( ProtareBase ) :
         :return:                List of str instances representing the XML lines of self.
         """
 
-        format = kwargs.get( 'format', FormatVersion.default )
-        if( format not in FormatVersion.allowed ) : raise TypeError( 'Invalid format = "%s".' % format )
+        format = FormatVersion.check(kwargs.get('format', kwargs.get('formatVersion', FormatVersion.default)))
 
         return [ '%s<%s%s/>' % ( indent, self.moniker, self.standardXML_attributes( ) ) ]
 
-    @staticmethod
-    def parseXML_node( settings, node ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         Creates a Protare instance from an XML protare element.
 
-        :param settings:    Information from parent map instances needed to parse the XML element.
         :param node:        XML element to parse.
 
         :return:            A map Protare instance.
@@ -697,7 +719,7 @@ class TNSL( ProtareBase ) :
     moniker = "TNSL"
 
     def __init__( self, projectile, target, evaluation, path, standardTarget, standardEvaluation, 
-            interaction=reactionSuiteModule.Interaction.TNSL, checksum=None, algorithm=None) :
+            interaction=None, checksum=None, algorithm=None) :
         """
         Construtor for a TNSL instance.
 
@@ -709,12 +731,14 @@ class TNSL( ProtareBase ) :
         :param standardEvaluation:      Name for the standard evaluation.
         """
 
-        ProtareBase.__init__( self, projectile, target, evaluation, path, interaction, checksum=checksum, algorithm=algorithm)
+        ProtareBase.__init__( self, projectile, target, evaluation, path, None, checksum=checksum, algorithm=algorithm)
 
-        if( not( isinstance( standardTarget, str ) ) ) : raise TypeError( "Regular target must be a string." )
+        if not isinstance(standardTarget, str):
+            raise TypeError('Standard target must be a string.')
         self.__standardTarget = standardTarget
 
-        if( not( isinstance( standardEvaluation, str ) ) ) : raise TypeError( "Regular evaluation must be a string." )
+        if not isinstance(standardEvaluation, str):
+            raise TypeError('Standard evaluation must be a string, is of type "%s".' % type(standardEvaluation))
         self.__standardEvaluation = standardEvaluation
 
     def __str__( self ) :
@@ -735,7 +759,7 @@ class TNSL( ProtareBase ) :
 
         return( self.__standardEvaluation )
 
-    def toXML_list( self, indent = "", **kwargs ) :
+    def toXML_strList( self, indent = "", **kwargs ) :
         """
         Returns a list of str instances representing the XML lines of self.
 
@@ -745,28 +769,25 @@ class TNSL( ProtareBase ) :
         :return:                List of str instances representing the XML lines of self.
         """
 
-        format = kwargs.get( 'format', FormatVersion.default )
-        attrs = self.standardXML_attributes( )
+        format = FormatVersion.check(kwargs.get('format', kwargs.get('formatVersion', FormatVersion.default)))
+        attrs = self.standardXML_attributes()
 
-        if( format == FormatVersion.version_0_1 ) :
+        if format == FormatVersion.version_0_1:
             indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
             XML_list = [ '%s<%s%s>' % ( indent, self.moniker, attrs ) ]
             XML_list.append( '%s<protare projectile="n" target="%s" evaluation="%s"/></%s>' % 
                     ( indent2, self.standardTarget, self.standardEvaluation, self.moniker ) )
-        elif( format in FormatVersion.allowed ) :
+        else:
             XML_list = [ '%s<%s%s standardTarget="%s" standardEvaluation="%s"/>' %
                     ( indent, self.moniker, attrs, self.standardTarget, self.standardEvaluation ) ]
-        else :
-            raise TypeError( 'Invalid format = "%s".' % format )
 
         return( XML_list )
 
-    @staticmethod
-    def parseXML_node( settings, node ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         Creates a TNSL instance from an XML TNSL element.
 
-        :param settings:    Information from parent map instances needed to parse the XML element.
         :param node:        XML element to parse.
 
         :return:            TNSL instance.
@@ -774,19 +795,23 @@ class TNSL( ProtareBase ) :
 
         if( node.tag != TNSL.moniker ) : raise TypeError( "Invalid node name." )
 
+        format = FormatVersion.check(kwargs.get('format', kwargs.get('formatVersion', FormatVersion.default)))
+
         kwargs = {attr: node.get(attr) for attr in
-                  ('projectile', 'target', 'evaluation', 'path', 'interaction', 'checksum', 'algorithm')}
+                  ('projectile', 'target', 'evaluation', 'path', 'checksum', 'algorithm')}
 
-        if kwargs['interaction'] is None: kwargs['interaction'] = reactionSuiteModule.Interaction.TNSL
-
-        format = settings['format']
-        if( format == FormatVersion.version_0_1 ) :
+        if format == FormatVersion.version_0_1:
             kwargs['standardTarget'] = node[0].get( 'target', None )
             kwargs['standardEvaluation'] = node[0].get( 'evaluation', None )
-        elif( format in FormatVersion.allowed ) :
+        else:
             kwargs['standardTarget'] = node.get( 'standardTarget', None )
             kwargs['standardEvaluation'] = node.get( 'standardEvaluation', None )
-        else :
-            raise TypeError( 'Invalid format = "%s".' % format )
 
         return TNSL( **kwargs )
+
+def read(fileName, **kwargs):
+    """
+    Reads in the file name *fileName* and returns a **database** instance.
+    """
+
+    return Map.read(fileName, **kwargs)

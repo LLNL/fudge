@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,11 +14,11 @@ from . import quantity as quantityModule
 
 baseUnit = quantityModule.stringToPhysicalUnit( 'e' )
 
-class integer( quantityModule.integer ) :
+class Integer( quantityModule.Integer ) :
 
     baseUnit = baseUnit
 
-class suite( quantityModule.numberSuite ) :
+class Suite( quantityModule.NumberSuite ) :
 
     moniker = 'charge'
-    _allowedClasses = [ integer ]
+    _allowedClasses = [ Integer ]

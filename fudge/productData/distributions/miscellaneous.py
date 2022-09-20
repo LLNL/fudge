@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,13 +9,12 @@ import sys
 import math
 
 from xData import axes as axesModule
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
-from fudge.productData import energyDeposition as energyDepositionModule
+from fudge.productData import averageProductEnergy as averageProductEnergyModule
 
-__metaclass__ = type
 
 def energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energySpectrumAtEnergyCOM, energyAngualarAtEnergyCOM, angularIsNormalized = True ) :
     """
@@ -61,7 +60,7 @@ def energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energySpe
 
     product = self.product
     productZA = chemicalElementMiscPoPsModule.ZA( product.particle )
-    productMass = reactionSuite.PoPs[product.id].getMass( massUnit )
+    productMass = reactionSuite.PoPs[product.pid].getMass( massUnit )
 
     residualZA = projectileZA + targetZA - productZA
     residualMass = self.residualMass( reactionSuite.PoPs, residualZA, massUnit, compoundMass, product )
@@ -133,11 +132,11 @@ def energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energySpe
 def calculateDepositionEnergyFromEpP( E, EpP ) :
     "EpP is a list of [ E', P(E') ]"
 
-    axes = axesModule.axes( )
-    axes[0] = axesModule.axis( 'a', 0, EpP.axes[0].unit )
-    axes[1] = axesModule.axis( 'b', 1, EpP.axes[1].unit )
-    Ep = XYsModule.XYs1d( data = [ [ EpP[0][0], EpP[0][0] ], [ EpP[-1][0], EpP[-1][0] ] ], axes = axes )
-    return( float( EpP.integrateTwoFunctions( Ep ) ) )
+    axes = axesModule.Axes(2)
+    axes[0] = axesModule.Axis( 'a', 0, EpP.axes[0].unit )
+    axes[1] = axesModule.Axis( 'b', 1, EpP.axes[1].unit )
+    Ep = XYs1dModule.XYs1d( data = [ [ EpP[0][0], EpP[0][0] ], [ EpP[-1][0], EpP[-1][0] ] ], axes = axes )
+    return EpP.integrateTwoFunctions(Ep)
 
 def calculateDepositionEnergyFromAngular_angularEnergy( label, angular, energy, multiplicity, doingGammaMomentum = False, accuracy = 1e-6 ) :
 
@@ -174,8 +173,8 @@ def calculateDepositionEnergyFromAngular_angularEnergy( label, angular, energy, 
 
     if( doingGammaMomentum ) : return( depEnergy )
 
-    axes = energyDepositionModule.defaultAxes( energyUnit = energyUnit )
-    return( energyDepositionModule.XYs1d( data = depEnergy, axes = axes, label = label ) )
+    axes = averageProductEnergyModule.defaultAxes( energyUnit = energyUnit )
+    return( averageProductEnergyModule.XYs1d( data = depEnergy, axes = axes, label = label ) )
 
 def GaussQuadrature2( function, parameters, a, b ) :
 
@@ -186,7 +185,7 @@ def GaussQuadrature2( function, parameters, a, b ) :
 
 def GnG_adaptiveQuadrature( function, a, b, parameters, quadrature, tolerance, maxEvaluations = 1000 ) :
 
-    class quadratureInfo :
+    class QuadratureInfo :
 
         def __init__( self, function, parameters, quadrature, estimate, maxEvaluations ) :
 
@@ -224,7 +223,7 @@ def GnG_adaptiveQuadrature( function, a, b, parameters, quadrature, tolerance, m
     estimate = 0.5 * ( estimate * 0.2 * ( b - a ) + quadrature( function, parameters, a, b ) )
     if( estimate == 0 ) : estimate = b - a
     if( tolerance < sys.float_info.epsilon ) : tolerance = sys.float_info.epsilon
-    quadInfo = quadratureInfo( function, parameters, quadrature, tolerance * estimate / sys.float_info.epsilon, maxEvaluations )
+    quadInfo = QuadratureInfo( function, parameters, quadrature, tolerance * estimate / sys.float_info.epsilon, maxEvaluations )
     course = quadrature( function, parameters, a, b )
     value = quadInfo.GnG_adaptiveQuadrature_2( course, a, b, 0 )
     r = value / estimate

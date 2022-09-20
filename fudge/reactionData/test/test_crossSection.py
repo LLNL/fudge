@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -16,16 +16,16 @@ dbrown, 12/5/2012
 import unittest
 from fudge.reactionData.crossSection import *
 defaultAccuracy = 0.001
-from xData import XYs
+from xData import XYs1d as XYs1dModule
 
 class TestPointwise( unittest.TestCase ):
 
     def test_basic_stuff(self):
         ptwise_const=XYs1d(axes=XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex : ( 'crossSection', 'b' ),
-            XYs.xAxisIndex : ( 'energy_in', 'eV' ) }), data=[ [1e-5,1.0], [20.0e6,1.0] ] )
+            XYs1dModule.yAxisIndex : ( 'crossSection', 'b' ),
+            XYs1dModule.xAxisIndex : ( 'energy_in', 'eV' ) }), data=[ [1e-5,1.0], [20.0e6,1.0] ] )
         self.assertEqual(ptwise_const.domainUnit, 'eV' )
-        self.assertEqual(ptwise_const.toXMLList(), [
+        self.assertEqual(ptwise_const.toXML_strList(), [
             '<XYs1d>',
             '  <axes>',
             '    <axis index="1" label="energy_in" unit="eV"/>',
@@ -46,8 +46,8 @@ class TestPointwise( unittest.TestCase ):
 
     def test_evaluate(self):
         ptwise_const=XYs1d(axes=XYs1d.defaultAxes(labelsUnits={
-                XYs.yAxisIndex : ( 'crossSection', 'b' ),
-                XYs.xAxisIndex : ( 'energy_in', 'eV' ) }), data=[ [1e-5,1.0], [20.0e6,1.0] ] )
+                XYs1dModule.yAxisIndex : ( 'crossSection', 'b' ),
+                XYs1dModule.xAxisIndex : ( 'energy_in', 'eV' ) }), data=[ [1e-5,1.0], [20.0e6,1.0] ] )
         self.assertEqual(ptwise_const.evaluate( 10.0e6 ), 1.0 )
 
     def test_applyFunction(self):
@@ -66,8 +66,8 @@ class TestPointwise( unittest.TestCase ):
             15.0e6  16.0      1.1253517471925912e-07
         """
         ptwise_linear = XYs1d(axes=XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex: ('crossSection', 'b'),
-            XYs.xAxisIndex: ('energy_in', 'eV')}), data=[[1e-5, 1.0], [20.0e6, 21.0]])
+            XYs1dModule.yAxisIndex: ('crossSection', 'b'),
+            XYs1dModule.xAxisIndex: ('energy_in', 'eV')}), data=[[1e-5, 1.0], [20.0e6, 21.0]])
 
         self.assertAlmostEqual(ptwise_linear.evaluate(15.0e6), 16.0)
 #        self.assertAlmostEqual(ptwise_linear.applyFunction(lambda x, y: math.exp(-x), None).evaluate(15.0e6), math.exp(-16.0))  # This should work, but fails
@@ -81,24 +81,23 @@ class TestCrossSection( unittest.TestCase ):
     def setUp(self):
     
         # A constant (kind of like (n,el))
-        self.xs_const = component()
+        self.xs_const = Component()
         self.ptwise_const=XYs1d(label='eval',axes=XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex : ( 'crossSection', 'b' ),
-            XYs.xAxisIndex : ( 'energy_in', 'eV' ) }),
+            XYs1dModule.yAxisIndex : ( 'crossSection', 'b' ),
+            XYs1dModule.xAxisIndex : ( 'energy_in', 'eV' ) }),
             data=[ [1e-5,1.0], [20.0e6,1.0] ] )
         self.xs_const.add(self.ptwise_const)
 
         # A triangle (kind of like (n,2n), if you squint real hard)
-        self.xs_triangle = component()
+        self.xs_triangle = Component()
         self.ptwise_triangle=XYs1d(label='eval',axes=XYs1d.defaultAxes(labelsUnits={
-            XYs.yAxisIndex : ( 'crossSection', 'b' ),
-            XYs.xAxisIndex : ( 'energy_in', 'eV' ) }),
+            XYs1dModule.yAxisIndex : ( 'crossSection', 'b' ),
+            XYs1dModule.xAxisIndex : ( 'energy_in', 'eV' ) }),
             data=[ [1e6,0.0], [10.0e6,1.0], [20.0e6,0.0] ] )
         self.xs_triangle.add(self.ptwise_triangle)
 
     def test_basic_stuff(self):
-        self.assertTrue( isinstance( self.xs_const, component ) )
-        self.assertEqual( self.xs_const.attribute, None )
+        self.assertTrue( isinstance( self.xs_const, Component ) )
         self.assertEqual( self.xs_const.moniker, 'crossSection' )
         self.assertEqual( self.xs_const.domainUnit, 'eV' )
         
@@ -110,7 +109,7 @@ class TestCrossSection( unittest.TestCase ):
         Tests of traversing up GNDS hierarchy
         """
         self.assertEqual( self.xs_const.ancestor, None )
-        self.assertEqual( self.xs_const.getRootAncestor(), self.xs_const )
+        self.assertEqual( self.xs_const.rootAncestor, self.xs_const )
         self.assertEqual( self.xs_const.ancestor, None )
         self.xs_const.setAncestor( 'fred' )
         self.assertEqual( self.xs_const.ancestor, 'fred' )
@@ -162,7 +161,7 @@ class TestCrossSection( unittest.TestCase ):
 
     def test_xml_output(self):
         self.assertEqual( self.xs_const.toXLink(), '/crossSection' )
-        self.assertEqual( self.xs_const.toXMLList(), [
+        self.assertEqual( self.xs_const.toXML_strList(), [
             '<crossSection>',
             '  <XYs1d label="eval">',
             '    <axes>',

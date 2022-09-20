@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,7 @@ import os
 import copy
 from argparse import ArgumentParser
 
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 
 from brownies.legacy.endl import fudgeParameters
 
@@ -20,14 +20,12 @@ fudgeParameters.VerboseMode = 0
 from brownies.legacy.endl import endlProject as endlProjectClass
 from fudge import reactionSuite as reactionSuiteModule
 
-from fudge.productData.distributions import \
-        angularEnergy as angularEnergyModule, \
-        LLNL_angularEnergy as LLNL_angularEnergyModule
+from fudge.productData.distributions import angularEnergy as angularEnergyModule
+from fudge.productData.distributions import LLNL_angularEnergy as LLNL_angularEnergyModule
 
-from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import \
-        coherentElastic as coherentElasticModule, \
-        incoherentElastic as incoherentElasticModule, \
-        incoherentInelastic as incoherentInelasticModule
+from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import coherentElastic as coherentElasticModule
+from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import incoherentElastic as incoherentElasticModule
+from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import incoherentInelastic as incoherentInelasticModule
 
 description1 = """
 This module converts processed data from a GNDS theramal scattering law file into ENDL and adds it to a base endl ZA directory.
@@ -93,7 +91,7 @@ parser.add_argument( '--onlyTNSL', action = 'store_true',                       
 
 args = parser.parse_args( )
 
-TNSLFile = reactionSuiteModule.readXML( args.TNSLFile )
+TNSLFile = reactionSuiteModule.ReactionSuite.readXML_file( args.TNSLFile )
 #TNSLFile.convertUnits( {'eV':'MeV'} )   # not working right now, onus on user to ensure data are processed in MeV
 
 endlProject = endlProjectClass( database = args.endlDatabase, projectile = 1, readOnly = True )
@@ -128,7 +126,7 @@ def addData( endlZA, X1, temperature, energyMin_MeV, energyMax_MeV, I0Data, I1Da
         if( I1Data[-1][0] < energyMax_MeV ) : I1Data.append( [ energyMax_MeV, copy.copy( I1Data[-1][1] ) ] )
     _I1Data = []
     for energy, PofMu in I1Data :
-        PofMu = XYsModule.XYs1d( PofMu ).normalize( )
+        PofMu = XYs1dModule.XYs1d( PofMu ).normalize( )
         _I1Data.append( [ energy, [ [ P, Mu ] for P, Mu in PofMu ] ] )
 
     endlFile = getEndlFile( endlZA, 1, 11, 1, 1 )
@@ -144,7 +142,7 @@ def addData( endlZA, X1, temperature, energyMin_MeV, energyMax_MeV, I0Data, I1Da
         for energy, PofEprimeMu in I3Data:
             tmp = []
             for mu, PofEprime in PofEprimeMu:
-                PofEprime = XYsModule.XYs1d( PofEprime ).normalize( )
+                PofEprime = XYs1dModule.XYs1d( PofEprime ).normalize( )
                 tmp.append( [ mu, [ [ Ep, P ] for Ep, P in PofEprime ] ] )
             _I3Data.append( [ energy, tmp ] )
 
@@ -170,11 +168,11 @@ for reaction in TNSLFile.reactions:
         continue
     evaluated = reaction.doubleDifferentialCrossSection.evaluated
     TNSLEnergyMax_MeV.append( findMaxEnergy( reaction.crossSection[args.style] ) )
-    if isinstance(evaluated, coherentElasticModule.form):
+    if isinstance(evaluated, coherentElasticModule.Form):
         coherentElastic = reaction
-    elif isinstance(evaluated, incoherentElasticModule.form):
+    elif isinstance(evaluated, incoherentElasticModule.Form):
         incoherentElastic = reaction
-    elif isinstance(evaluated, incoherentInelasticModule.form):
+    elif isinstance(evaluated, incoherentInelasticModule.Form):
         incoherentInelastic = reaction
     else:
         print("WARNING: encountered unknown double-differential cross section form '%s'" % evaluated)
@@ -221,12 +219,12 @@ if incoherentInelastic is not None:
             I1Data.append( [xys1d.outerDomainValue, xys1d.copyDataToXYs()] )
         for xys2d in angularEnergy:
             I3Data.append( [xys2d.outerDomainValue, [[xys1d.outerDomainValue, xys1d.copyDataToXYs()] for xys1d in xys2d]] )
-    elif isinstance(distribution, angularEnergyModule.form):
+    elif isinstance(distribution, angularEnergyModule.Form):
         # produced by newer version of processProtare. Need to renormalize
         angularEnergy = distribution.angularEnergySubform
         for xys2d in angularEnergy:
             I1Data.append( [xys2d.outerDomainValue,
-                [[xys1d.outerDomainValue, float(xys1d.integrate())] for xys1d in xys2d]] )
+                [[xys1d.outerDomainValue, xys1d.integrate()] for xys1d in xys2d]] )
             I3Data.append( [xys2d.outerDomainValue,
                 [[xys1d.outerDomainValue, xys1d.normalize().copyDataToXYs()] for xys1d in xys2d]] )
 

@@ -37,8 +37,8 @@ nucleus      am242_e2
 nuclide      Am242_e3
 nucleus      am242_e3
 metaStable   Am242_m1
-particle     electron
-particle     e+
-particle     positron
-particle     d
-particle     t
+alias        electron
+alias        e+
+alias        positron
+alias        d
+alias        t

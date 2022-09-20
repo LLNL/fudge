@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@
 
 from pqu import PQU as PQUModule
 
-from xData import XYs as XYsModule
+from xData import XYs1d as XYs1dModule
 from xData import regions as regionsModule
 
 useRedsFloatFormat = False
@@ -142,27 +142,32 @@ def endfNdDataList( nDdata, xUnit = 'eV', yUnit = '' ) :
     data = dataListToSupportDimensionlessPQ( nDdata )
     return( endfDataList( data ) )
 
-def dataListToSupportDimensionlessPQ( data ) :
+def dataListToSupportDimensionlessPQ(data):
 
     dataOut = []
-    for d1 in data :
-        if( isinstance( d1, PQUModule.PQU ) and d1.unit.isDimensionless( ) ) :
-            dataOut.append( float( d1 ) )
-        elif( isinstance( d1, list ) ) :
-            for dd in d1 : dataOut.append( float( dd ) )
-        else :
-            dataOut.append( d1 )
-    return( dataOut )
+    for d1 in data:
+        if isinstance(d1, XYs1dModule.XYs1d):
+            dataOut += dataListToSupportDimensionlessPQ(d1)
+        else:
+            if isinstance(d1, PQUModule.PQU) and d1.unit.isDimensionless():
+                dataOut.append(float(d1))
+            elif isinstance(d1, list):
+                for dd in d1:
+                    dataOut.append(float(dd))
+            else:
+                dataOut.append(d1)
+
+    return dataOut
 
 def toTAB1( self, xUnitTo, yUnitTo, C1 = 0, C2 = 0, L1  = 0, L2 = 0 ) :
 
     from .gndsToENDF6 import gndsToENDFInterpolationFlag
 
-    if( isinstance( self, XYsModule.XYs1d ) ) :
+    if( isinstance( self, XYs1dModule.XYs1d ) ) :
         ENDFDataList = [ endfContLine( C1, C2, 0, 0, 1, len( self ) ) ] + \
             endfInterpolationList( [ len( self ), gndsToENDFInterpolationFlag( self.interpolation ) ] )
         ENDFDataList += endfNdDataList( self, xUnit = xUnitTo, yUnit = yUnitTo )
-    elif( isinstance( self, regionsModule.regions1d ) ) :
+    elif( isinstance( self, regionsModule.Regions1d ) ) :
         interpolations, data = [], []
         for region in self :
             subData = region.copyDataToXYs( )

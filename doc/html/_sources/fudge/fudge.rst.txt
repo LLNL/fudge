@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    fudge.channelData
+    fudge.outputChannelData
     fudge.covariances
     fudge.processing
     fudge.productData

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@
 This module adds the method toACE to the classes in the fudge.productData.distributions.energyAngularMC module.
 """
 
-from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 
 from fudge.productData.distributions import energyAngularMC as energyAngularMCModule
 
@@ -22,18 +22,20 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
     INTE = -1
     interpolation = energyData.interpolation
-    if( interpolation == standardsModule.interpolation.flatToken ) :
+    if interpolation == xDataEnumsModule.Interpolation.flat:
         INTE = 1
-    elif( interpolation == standardsModule.interpolation.linlinToken ) :
+    elif interpolation == xDataEnumsModule.Interpolation.linlin:
         INTE = 2
-    if( INTE == -1 ) : raise Exception( 'Interpolation "%s" not supported for incident energy' % interpolation )
-    if( energyData.interpolationQualifier == standardsModule.interpolation.unitBaseToken ) : INTE += 20
+    if INTE == -1:
+        raise Exception('Interpolation "%s" not supported for incident energy' % interpolation)
+    if energyData.interpolationQualifier == xDataEnumsModule.InterpolationQualifier.unitBase:
+        INTE += 20
 
     INTT = -1
     interpolation = energyData[0].interpolation
-    if( interpolation == standardsModule.interpolation.flatToken ) :
+    if interpolation == xDataEnumsModule.Interpolation.flat:
         INTT = 1
-    elif( interpolation == standardsModule.interpolation.linlinToken ) :
+    elif interpolation == xDataEnumsModule.Interpolation.linlin:
         INTT = 2
     if( INTT == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % interpolation )
 
@@ -53,7 +55,7 @@ def toACE( self, label, offset, weight, **kwargs ) :
         for i2, _muData in enumerate( energyAngularData[i1] ) :
             LCs.append( offset_LC )
             mus = _muData.xs.values.values
-            interpolation = { standardsModule.interpolation.flatToken : 1, standardsModule.interpolation.linlinToken : 2 }[_muData.interpolation]
+            interpolation = {xDataEnumsModule.Interpolation.flat: 1, xDataEnumsModule.Interpolation.linlin: 2 }[_muData.interpolation]
             muData = [ interpolation, len( mus ) ] + mus + _muData.pdf.values.values + _muData.cdf.values.values
             offset_LC += len( muData )
             muPData += muData
@@ -61,4 +63,4 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
     return( header + [ 1, NE, INTE, NE ] + e_ins + Ls + EpData )
 
-energyAngularMCModule.form.toACE = toACE
+energyAngularMCModule.Form.toACE = toACE

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -14,28 +14,33 @@ import bisect
 from fudge.core.math.fudgemath import RoundToSigFigs
 
 from pqu import PQU as PQUModule
-from xData  import XYs as XYsModule
 
-from fudge.productData.distributions import angularEnergy as angularEnergyModule, energyAngular as energyAngularModule
+from xData import enums as xDataEnumsModule
+from xData import axes as axesModule
+from xData import gridded as griddedModule
+from xData import XYs1d as XYs1dModule
+
+from fudge.productData.distributions import angularEnergy as angularEnergyModule
+from fudge.productData.distributions import energyAngular as energyAngularModule
 
 from . import base as baseModule
+from . import incoherentInelastic as incoherentInelasticModule
 
 debug = False   # set True to disable multiprocessing
-if sys.version_info.major > 2:
-    import multiprocessing
-    multiprocessing.set_start_method("fork")
+import multiprocessing
+multiprocessing.set_start_method("fork")
 
-class NeedShortCollisionTime( Exception ) :
+class NeedShortCollisionTime( Exception ):
 
     pass
 
-def process( self, style, energyMin, energyMax, temperature, kwargs ) :
+def process( self, style, energyMin, energyMax, temperature, kwargs ):
     """
     Convert S(alpha,beta) into double-differential cross section, store results under associated style
     Uses multiprocessing to parallelize over incident energy unless debug == True.
 
-    @param self: incoherentInelastic.form instance
-    @param style: styles.heated instance
+    @param self: incoherentInelastic.Form instance
+    @param style: styles.Heated instance
     @param energyMin: minimum incident energy for double-differential cross section
     @param energyMax: maximum incident energy "  "
     @param temperature: desired temperature, in units of kwargs["temperatureUnit"]
@@ -50,7 +55,16 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
     order = kwargs.get("TNSL_order", "energy-angle")
     assert order in ("energy-angle", "angle-energy")
 
-    gridded3d = self.S_alpha_beta.gridded3d
+    primaryScatterer = self.getPrimaryScatterer()
+    secondaryAtoms = [atom for atom in self.scatteringAtoms if atom is not primaryScatterer]
+
+    if primaryScatterer.distinctScatteringKernel is not None:
+        raise NotImplementedError("Processing with distinct scattering kernel present")
+    if not isinstance(primaryScatterer.selfScatteringKernel.kernel, griddedModule.Gridded3d):
+        raise NotImplementedError("Processing for self-scattering kernel of type %s" %
+                type(primaryScatterer.selfScatteringKernel.kernel))
+
+    gridded3d = primaryScatterer.selfScatteringKernel.kernel
 
     betas = numpy.array( gridded3d.axes[2].values )
     beta_interpolation = gridded3d.axes[2].interpolation
@@ -117,9 +131,9 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
                 truncatedSab.append( ( beta, sum( zeroes ) ) )
                 Sab_atBeta[ zeroes ] = 1e-90                # In case log-lin or log-log interpolation
 
-            Sab[beta] = XYsModule.XYs1d( list( zip( alphas[nonzero:], Sab_atBeta ) ), interpolation = alpha_interpolation )
+            Sab[beta] = XYs1dModule.XYs1d(list(zip(alphas[nonzero:], Sab_atBeta)), interpolation=alpha_interpolation, axes=axesModule.Axes(2))
         else :
-            Sab[beta] = XYsModule.XYs1d( list( zip( alphas, Sab_arr[betaIndex,:] ) ), interpolation = alpha_interpolation )
+            Sab[beta] = XYs1dModule.XYs1d(list(zip(alphas, Sab_arr[betaIndex,:])), interpolation=alpha_interpolation, axes=axesModule.Axes(2))
 
     if( truncatedSab ) :
         betasWithZeroes, nzeroes = list( zip( *truncatedSab ) )
@@ -137,12 +151,9 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
         N = ( s1 - C ) / a1
         alpha_extrapolation[beta] = ( C, N )
 
-    principalAtom = self.scatteringAtoms[0]
-    secondaryAtoms = list( self.scatteringAtoms )[1:]
-
     neutronMassAMU = self.findAttributeInAncestry('PoPs')['n'].mass.float('amu')
-    principalAWR = principalAtom.mass.value / neutronMassAMU
-    prefactor = principalAtom.numberPerMolecule * principalAtom.boundCrossSection( ) / ( 2.0 * kT )
+    principalAWR = primaryScatterer.mass.value / neutronMassAMU
+    prefactor = primaryScatterer.numberPerMolecule * primaryScatterer.boundAtomCrossSection.getValueAs('b') / ( 2.0 * kT )
 
 #<editor-fold desc="helper functions" defaultstate="collapsed">
     def getS_alpha_beta( alpha, beta ) :
@@ -154,7 +165,7 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
         if alpha <= 0: return 0
 
         if beta > betas[-1] or alpha > alphas[-1]: raise NeedShortCollisionTime()
-        if self.options.asymmetric and beta < betas[0]: raise NeedShortCollisionTime()
+        if self.asymmetric and beta < betas[0]: raise NeedShortCollisionTime()
 
         beta_index = bisect.bisect( betas, beta ) - 1
 
@@ -190,10 +201,10 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
         else :
             S2 = Sab[beta2].evaluate( alpha )
 
-        xys = XYsModule.XYs1d( [ [ beta1, S1 ], [ beta2, S2 ] ], interpolation = beta_interpolation )
+        xys = XYs1dModule.XYs1d([[beta1, S1], [beta2, S2]], interpolation=beta_interpolation, axes=axesModule.Axes(2))
         return xys.evaluate(beta)
 
-    def evaluate( energy, mu, eprime ) :
+    def evaluate(energy, mu, eprime):
         """
         Get double-differential cross section
         :param energy: incident energy
@@ -208,8 +219,8 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
 
         alpha_lookup = alpha
         beta_lookup = beta
-        if( not( self.options.asymmetric ) ) : beta_lookup = abs( beta_lookup )                 # S(-beta) = S(beta)
-        if( self.options.calculatedAtThermal ) :
+        if not self.asymmetric: beta_lookup = abs( beta_lookup )                 # S(-beta) = S(beta)
+        if self.calculatedAtThermal:
             beta_lookup *= temperatureFactor
             alpha_lookup *= temperatureFactor
 
@@ -217,18 +228,19 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
             Sab_term = getS_alpha_beta( alpha_lookup, beta_lookup ) * math.exp( -0.5 * beta )
         except NeedShortCollisionTime :
             SCT = True
-            Sab_term = principalAtom.shortCollisionTime( alpha, beta, temperature )
+            Sab_term = primaryScatterer.shortCollisionTime( alpha, beta, temperature )
 
         result = prefactor * math.sqrt( eprime / energy ) * Sab_term
 
-        for atom in secondaryAtoms :
+        for atom in secondaryAtoms:
             atom_Sab_term = Sab_term
-            if atom.functionalForm == 'SCT':    # this atom only contributes when SCT is used
+            if isinstance(atom.selfScatteringKernel.kernel, incoherentInelasticModule.SCTApproximation):
+                # this atom only contributes when SCT is used
                 if not SCT:
                     atom_Sab_term = 0
                 else:
                     atom_Sab_term = atom.shortCollisionTime( alpha, beta, temperature )
-            result += atom.numberPerMolecule * atom.boundCrossSection( ) / ( 2.0 * kT ) * math.sqrt( eprime / energy ) * atom_Sab_term
+            result += atom.numberPerMolecule * atom.boundAtomCrossSection.getValueAs('b') / ( 2.0 * kT ) * math.sqrt( eprime / energy ) * atom_Sab_term
 
         return( result )
 
@@ -245,7 +257,7 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
         offset = math.log10(PQUModule.PQU(1, 'eV').getValueAs(incidentEnergyUnit))
         eprimes = set(numpy.logspace(offset-9, offset+1, 10*4+1))
         eprimes.update([val for val in betas * kT + energy if val >= 0])
-        if not self.options.asymmetric:
+        if not self.asymmetric:
             eprimes.update([val for val in -betas * kT + energy if val >= 0])
         eprimes.add(0)
         eprimes = sorted(eprimes)
@@ -291,7 +303,7 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
             bisectionTest2D(surface, xMid, yMid, x2, y2, evaluator, epsilon, accuracy, level + 1, max_depth)
 
     # <editor-fold desc="Evaluate angular-energy distribution" defaultstate="collapsed">
-    def get_energy_spectrum_at_mu( energy, mu, eprimes, accuracy = 0.001, epsilon = 1e-6 ) :
+    def get_energy_spectrum_at_mu( energy, mu, eprimes, accuracy = 0.001, epsilon = 1e-6 ):
         """
         Generate appropriate outgoing energy grid at given incident energy / mu, and return spectrum.
 
@@ -327,10 +339,10 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
             for badIndex in badIndices[::-1]:
                 spectrum.pop(badIndex)
 
-        spectrum = angularEnergyModule.XYs1d(data=spectrum, outerDomainValue=mu)
-        return (float(spectrum.integrate()), spectrum)
+        spectrum = angularEnergyModule.XYs1d(data=spectrum, outerDomainValue=mu, axes=axesModule.Axes(2))
+        return spectrum.integrate(), spectrum
 
-    def getAngularEnergyDistribution( energy, distributionAxes, accuracy = 0.001, epsilon = 1e-6, significant_digits = None ) :
+    def getAngularEnergyDistribution( energy, distributionAxes, accuracy = 0.001, epsilon = 1e-6, significant_digits = None ):
         """
         Generate appropriate mu grid at an incident energy, return P(mu) and outgoing energy distribution for each mu
 
@@ -360,7 +372,7 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
             POfEPrime.axes = distributionAxes
             angularEnergy2d.append( POfEPrime )
 
-        integral = float(angularEnergy2d.integrate())
+        integral = angularEnergy2d.integrate()
         # FIXME thin after taking the integral but before normalizing?
         angularEnergy2d.scaleDependent(1/integral, insitu=True)
         return integral, angularEnergy2d
@@ -393,8 +405,8 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
             spectrum.append([x2, y2])
             x1, y1 = x2, y2
 
-        spectrum = energyAngularModule.XYs1d(spectrum, outerDomainValue=eprime)
-        return (float(spectrum.integrate()), spectrum)
+        spectrum = energyAngularModule.XYs1d(spectrum, outerDomainValue=eprime, axes=axesModule.Axes(2))
+        return spectrum.integrate(), spectrum
 
     def getEnergyAngularDistribution(energy, distributionAxes, accuracy=0.01, epsilon=1e-6, significant_digits=None):
         """
@@ -431,7 +443,7 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
             POfMu.axes = distributionAxes
             energyAngular2d.append( POfMu )
 
-        integral = float(energyAngular2d.integrate())
+        integral = energyAngular2d.integrate()
         # FIXME thin after taking the integral but before normalizing?
         energyAngular2d.scaleDependent(1/integral, insitu=True)
         return integral, energyAngular2d
@@ -524,7 +536,6 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
     results = computeAtEnergies(energies)
 
     # add incident energy points as needed (only for cross section):
-    xsc_tolerance = 0.003
     for idx in range(10):
         x,y,spectra = zip(*results)
 
@@ -542,7 +553,7 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
         interpolated[-1] = y[-1]
 
         delt = interpolated / y
-        mask = (delt>1+xsc_tolerance) + (delt<1-xsc_tolerance)
+        mask = (delt>1+tolerance) + (delt<1-tolerance)
 
         badindices = numpy.arange(len(mask))[mask]
         if len(badindices)==0:
@@ -564,31 +575,27 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
 
     if order == "energy-angle":
         energyAngularAxes = energyAngularModule.defaultAxes( kwargs['incidentEnergyUnit'] )
-        energyAngular3d = energyAngularModule.XYs3d( axes = energyAngularAxes,
-                #interpolationQualifier = xDataStandardsModule.interpolation.correspondingPointsToken
-                )
+        energyAngular3d = energyAngularModule.XYs3d(axes=energyAngularAxes, interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
 
         for energy, xsc, doublediff in results:
             crossSection.append( [energy, xsc] )
             if energy in energies:  # keep file size down by only adding energy grid to distribution
                 energyAngular3d.append( doublediff )
 
-        distribution = energyAngularModule.form( style.label, self.productFrame, energyAngular3d )
+        distribution = energyAngularModule.Form( style.label, self.productFrame, energyAngular3d )
     else:
         angularEnergyAxes = angularEnergyModule.defaultAxes( kwargs['incidentEnergyUnit'] )
-        angularEnergy3d = angularEnergyModule.XYs3d( axes = angularEnergyAxes,
-                #interpolationQualifier = xDataStandardsModule.interpolation.correspondingPointsToken
-                )
+        angularEnergy3d = angularEnergyModule.XYs3d(axes=angularEnergyAxes)
 
         for energy, xsc, doublediff in results:
             crossSection.append( [energy, xsc] )
             if energy in energies:  # keep file size down by only adding energy grid to distribution
                 angularEnergy3d.append( doublediff )
 
-        distribution = angularEnergyModule.form( style.label, self.productFrame, angularEnergy3d )
+        distribution = angularEnergyModule.Form( style.label, self.productFrame, angularEnergy3d )
 
 
-    kwargs['multiplicity'] = XYsModule.XYs1d( data = [ [ energies[0], 1.0 ], [ energies[-1], 1.0 ] ] )
+    kwargs['multiplicity'] = XYs1dModule.XYs1d(data=[[energies[0], 1.0], [energies[-1], 1.0]], axes=axesModule.Axes(2))
     kwargs['energyAccuracy'] = kwargs['accuracy']
     kwargs['momentumAccuracy'] = kwargs['accuracy']
     kwargs['projectileMass'] = kwargs['neutronMass']
@@ -600,6 +607,6 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ) :
 
     crossSection, averageProductEnergy, averageProductMomentum = baseModule.processedToForms( style.label, crossSection, averageProductEnergy, averageProductMomentum, kwargs )
 
-    crossSection /= principalAtom.numberPerMolecule     # TNSL cross section is for the whole molecule, but we need it per atom
+    crossSection /= primaryScatterer.numberPerMolecule     # TNSL cross section is for the whole molecule, but we need it per atom
 
     return( crossSection, averageProductEnergy, averageProductMomentum, distribution )

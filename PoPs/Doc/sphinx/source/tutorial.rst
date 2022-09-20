@@ -81,8 +81,8 @@ Now add this new particle to the database. Note that this will also add a chemic
 
 You may recognize Am242_e2 as a metastable state. We can add an alias identifying it as metastable:
 
->>> from PoPs.alias import metaStable
->>> pops.aliases.add( metaStable( id='Am242_m1', pid=Am242_e2.id, metaStableIndex=1) )
+>>> from PoPs.alias import MetaStable
+>>> pops.aliases.add( MetaStable( id='Am242_m1', pid=Am242_e2.id, metaStableIndex=1) )
 
 This gives us two different ways to access the metastable state:
 

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -16,4 +16,4 @@ def toACE( self, temperature, EMin, data, verbose ) :
     MT = self.ENDF_MT
     if( verbose > 1 ) : print( '   %s: MT = %d: Skipping production reaction' % ( str( self ), MT ) )
 
-productionModule.production.toACE = toACE
+productionModule.Production.toACE = toACE

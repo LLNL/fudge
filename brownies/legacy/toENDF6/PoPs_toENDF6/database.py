@@ -1,11 +1,13 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
 from brownies.legacy.toENDF6 import endfFormats as endfFormatsModule
+
+from PoPs import IDs as IDsPoPsModule
 from PoPs import database as databaseModule
 from PoPs.families import nuclide as nuclideModule
 
@@ -23,7 +25,7 @@ def toENDF6( self, style, flags, verbosityIndent = '', useRedsFloatFormat = Fals
 
     if( flags == {} ) : flags['verbosity'] = 0
     info = {}
-    info['massTracker'] = massTrackerModule.massTracker()
+    info['massTracker'] = massTrackerModule.MassTracker()
     info['PoPs'] = self
 
     endfMFList = { 1 : { 451 : [] }, 8 : {}, 28 : {} }
@@ -52,14 +54,14 @@ def toENDF6( self, style, flags, verbosityIndent = '', useRedsFloatFormat = Fals
     else :                                      # Decay or spontanepous fission yield sub-library 
         nuclideID = None
         for key in self.keys():
-            if( isinstance( self[key], nuclideModule.particle ) ) :
+            if( isinstance( self[key], nuclideModule.Particle ) ) :
                 nuclideID = key
                 nucleus = self[nuclideID].nucleus
                 levelEnergy_eV = nucleus.energy.float( 'eV' )
                 LIS = nucleus.index
                 break
-        if( ( nuclideID is None ) and ( list( self.keys( ) ) == [ 'n' ] ) ) :  # neutron is a special case
-            nuclideID = 'n'
+        if( ( nuclideID is None ) and ( list( self.keys( ) ) == [IDsPoPsModule.neutron] ) ) :  # neutron is a special case
+            nuclideID = IDsPoPsModule.neutron
             nucleus = self[nuclideID]
             levelEnergy_eV = LIS = 0
 
@@ -95,7 +97,7 @@ def toENDF6( self, style, flags, verbosityIndent = '', useRedsFloatFormat = Fals
             endfFormatsModule.endfHeadLine( levelEnergy_eV, STA, LIS, info['LISO'], 0, NFOR ),
             endfFormatsModule.endfHeadLine( 0, EMAX, LREL, 0, NSUB, NVER ),
             endfFormatsModule.endfHeadLine( 0, 0, 0, 0, len( endfDoc ), 2 ) ]
-    new_doc = documentationModule.documentation( 'endf', '\n'.join( docHeader + endfDoc ) )
+    new_doc = documentationModule.Documentation( 'endf', '\n'.join( docHeader + endfDoc ) )
     endfMFList[1][451] += endfFormatsModule.toEndfStringList( new_doc )
 
     if( isAtomicRelaxation ) :
@@ -157,4 +159,4 @@ def toENDF6( self, style, flags, verbosityIndent = '', useRedsFloatFormat = Fals
 
     return( endfFormatsModule.endfMFListToFinalFile( endfMFList, MAT, lineNumbers = lineNumbers ) )
 
-databaseModule.database.toENDF6 = toENDF6
+databaseModule.Database.toENDF6 = toENDF6

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -16,4 +16,4 @@ def toACE( self, cdf_style, MTData, MT, verbose ) :
 
     for product in self : product.toACE( cdf_style, MTData, MT, verbose )
 
-outputChannelModule.outputChannel.toACE = toACE
+outputChannelModule.OutputChannel.toACE = toACE

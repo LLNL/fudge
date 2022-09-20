@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -27,4 +27,4 @@ def listImports(mapFile, indent=''):
             subMap = entry.readMap()
             listImports(subMap, indent + '    ')
 
-listImports(mapModule.Map.readXML(args.map))
+listImports(mapModule.Map.readXML_file(args.map))

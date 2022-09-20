@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,6 @@ from fudge import sums as sumsModule
 
 from . import gndsToENDF6 as gndsToENDF6Module
 
-__metaclass__ = type
 
 #
 # summed cross section writing back to ENDF
@@ -33,7 +32,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         level = 0
     crossSection.toENDF6( self.ENDF_MT, endfMFList, targetInfo, level, LR=0 )
 
-sumsModule.crossSectionSum.toENDF6 = toENDF6
+sumsModule.CrossSectionSum.toENDF6 = toENDF6
 
 #
 # summed multiplicities are written back in gndsToENDF6.gammasToENDF6_MF12_13. Just implement do-nothing routine here:
@@ -41,4 +40,4 @@ sumsModule.crossSectionSum.toENDF6 = toENDF6
 def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     pass
 
-sumsModule.multiplicitySum.toENDF6 = toENDF6
+sumsModule.MultiplicitySum.toENDF6 = toENDF6

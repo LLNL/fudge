@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,15 +11,15 @@ This module contains the standard uncertainty class.
 
 from . import uncertainty as uncertaintyModule
 
-class standard( uncertaintyModule.base ) :
+class Standard( uncertaintyModule.Base ) :
 
     moniker = "standard"
 
     def __init__( self, value ) :
 
-        uncertaintyModule.base.__init__( self )
+        uncertaintyModule.Base.__init__( self )
 
-        if( not( isinstance( value, uncertaintyModule.quantity ) ) ) : raise TypeError( 'Invalid quantity for %s uncertainty' % self.moniker )
+        if not isinstance(value, uncertaintyModule.Quantity): raise TypeError( 'Invalid quantity for %s uncertainty' % self.moniker )
         self.__value = value
         self.__value.setAncestor( self )
 
@@ -36,32 +36,29 @@ class standard( uncertaintyModule.base ) :
 
         self.__value.parentConvertingUnits( factors )
 
-    def toXML( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        return( '\n'.join( self.toXMLList( indent, **kwargs )  ) )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-    def toXMLList( self, indent = '', **kwargs ) :
+        XML_strList = [ '%s<%s>' % ( indent, self.moniker ) ]
+        XML_strList += self.value.toXML_strList(indent = indent2, **kwargs)
+        XML_strList[-1] += "</%s>" % self.moniker
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-
-        XMLStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        XMLStringList += self.value.toXMLList( indent = indent2, **kwargs )
-        XMLStringList[-1] += "</%s>" % self.moniker
-
-        return( XMLStringList )
+        return XML_strList
 
     @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(node.tag)
 
-        child = element[0]
-        if( child.tag == uncertaintyModule.double.moniker ) :
-            uncertainty = uncertaintyModule.double.parseXMLNodeAsClass( child, xPath, linkData )
+        child = node[0]
+        if child.tag == uncertaintyModule.Double.moniker:
+            uncertainty = uncertaintyModule.Double.parseNodeUsingClass(child, xPath, linkData, **kwargs)
         else :
-            raise Exception( 'Invalid child element = "%s".' % child.tag )
+            raise Exception('Invalid child node = "%s".' % child.tag)
 
-        _standard = standard( uncertainty )
+        instance = Standard(uncertainty)
 
-        xPath.pop( )
-        return( _standard )
+        xPath.pop()
+
+        return instance

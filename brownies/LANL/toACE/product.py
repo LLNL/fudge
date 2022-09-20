@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,7 +13,8 @@ from PoPs import IDs as IDsPoPsModule
 
 from fudge import product as productModule
 
-from fudge.productData.distributions import unspecified as unspecifiedModule, energyAngularMC as energyAngularMCModule
+from fudge.productData.distributions import unspecified as unspecifiedModule
+from fudge.productData.distributions import energyAngularMC as energyAngularMCModule
 from fudge.productData.distributions import angular as angularModule
 from fudge.productData.distributions import uncorrelated as uncorrelatedModule
 from fudge.productData.distributions import angularEnergyMC as angularEnergyMCModule
@@ -22,19 +23,19 @@ from fudge.productData.distributions import KalbachMann as KalbachMannModule
 
 def toACE( self, cdf_style, MTData, MT, verbose ) :
 
-    if( verbose > 2 ) : print('        %s: label = %s' % (self.id, self.label))
-    if( self.id in [ IDsPoPsModule.neutron, IDsPoPsModule.photon ] ) :
+    if( verbose > 2 ) : print('        %s: label = %s' % (self.pid, self.label))
+    if( self.pid in [ IDsPoPsModule.neutron, IDsPoPsModule.photon ] ) :
         if( self.multiplicity.isConstant( ) ) :
             multiplicity = self.multiplicity.evaluate( 0 )
         else :
             multiplicity = self.multiplicity.evaluated
 
-    if( self.id == IDsPoPsModule.neutron ) :
+    if( self.pid == IDsPoPsModule.neutron ) :
         angularData = None
         energyData = None
         evaluated = self.distribution.evaluated
 
-        if( ( MT == 18 ) and isinstance( evaluated, unspecifiedModule.form ) ) :
+        if( ( MT == 18 ) and isinstance( evaluated, unspecifiedModule.Form ) ) :
             distribution = evaluated
         else :
             try :
@@ -42,17 +43,17 @@ def toACE( self, cdf_style, MTData, MT, verbose ) :
             except :
                 distribution = evaluated
 
-            if( isinstance( distribution, angularModule.twoBodyForm ) ) :
+            if( isinstance( distribution, angularModule.TwoBody ) ) :
                 angularData = distribution.angularSubform
-            elif( isinstance( distribution, uncorrelatedModule.form ) ) :
+            elif( isinstance( distribution, uncorrelatedModule.Form ) ) :
                 angularData = distribution.angularSubform.data
                 energyData = distribution.energySubform.data
-            elif( isinstance( distribution, energyAngularMCModule.form ) ) :
+            elif( isinstance( distribution, energyAngularMCModule.Form ) ) :
                 energyData = distribution
-            elif( isinstance( distribution, angularEnergyMCModule.form ) ) :
+            elif( isinstance( distribution, angularEnergyMCModule.Form ) ) :
                 angularData = distribution.angular.data
                 energyData = distribution.angularEnergy.data
-            elif( isinstance( distribution, KalbachMannModule.form ) ) :
+            elif( isinstance( distribution, KalbachMannModule.Form ) ) :
                 energyData = distribution
             else :
                 raise Exception( 'Unsupported distribution form = %s' % distribution.moniker )
@@ -61,4 +62,4 @@ def toACE( self, cdf_style, MTData, MT, verbose ) :
         MTData[IDsPoPsModule.neutron].append( { 'product' : self, 'frame' : frame, 'multiplicity' : multiplicity, 
             'angularData' : angularData, 'energyData' : energyData } )
 
-productModule.product.toACE = toACE
+productModule.Product.toACE = toACE

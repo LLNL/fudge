@@ -1,383 +1,379 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
-
 import string
 
+from LUPY import ancestry as ancestryModule
+from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 from pqu import PQU as PQUModule
 
-from . import ancestry as ancestryModule
+from . import enums as enumsModule
 from . import link as linkModule
 from . import values as valuesModule
 
-noneGridToken = 'none'
-pointsGridToken = 'points'
-boundariesGridToken = 'boundaries'
-parametersGridToken = 'parameters'
+# only used for GNDS-1.10 and older:
 linkGridToken = 'link'
 
-normalPDF = 'normal'
-lognormalPDF = 'log-normal'
-
-class axis( ancestryModule.ancestry ) :
+class Axis(ancestryModule.AncestryIO):
 
     moniker = 'axis'
-    ancestryMembers = ( '', )
 
-    def __init__( self, label, index, unit ) :
+    def __init__(self, label, index, unit):
         """
-        Returns a new instance of axis.
+        Constructor for the axis class.
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
-        if( not( isinstance( label, str ) ) ) : raise TypeError( 'label = "%s" is not a string' % label )
-        self.__label = label.strip( )
+        if not isinstance(label, str): raise TypeError('label = "%s" is not a string' % label)
+        self.__label = label
 
-        self.__index = int( index )
+        self.index = index
 
         self.unit = unit
 
-    def __str__( self ) :
+    def __str__(self):
+        """Returns a simple string representation of *self*."""
 
-        return( 'label="%s", index="%s", unit="%s"' % ( self.label, self.__index, self.unit ) )
+        return 'label="%s", index="%s", unit="%s"' % ( self.label, self.__index, self.unit )
 
     def __eq__( self, other ) :
 
-# BRB: why is this method defined?
-        return( isinstance( other, axis ) and ( self.label == other.label ) )
+        return isinstance(other, Axis) and self.label == other.label and self.unit == other.unit
 
-    def __ne__( self, other ) :
+    def __ne__(self, other):
 
-        return( not( self.__eq__( other ) ) )
-
-    @property
-    def keyName( self ) :
-
-        return( 'index' )
+        return not self.__eq__(other)
 
     @property
-    def keyValue( self ) :
+    def keyName(self):
 
-        return( self.index )
-
-    def convertUnits( self, unitMap ) :
-
-        unit, factor = PQUModule.convertUnits( self.unit, unitMap )
-        self.unit = unit
-        return( factor )
-
-    def copy( self, unresolvedLinks ) :
-        """Returns a new instance that is a copy of self."""
-
-        return( axis( self.label, self.index, self.unit ) )
-
-    __copy__ = copy
+        return('index')
 
     @property
-    def index( self ) :
+    def keyValue(self):
 
-        return( self.__index )
+        return(self.index)
+
+    @property
+    def index(self):
+
+        return(self.__index)
 
     @index.setter
-    def index( self, value ) :
+    def index(self, value):
 
-        self.__index = value
+        self.__index = int(value)
 
     @property
-    def label( self ) :
+    def label(self):
 
-        return( self.__label )
+        return(self.__label)
 
     @label.setter
-    def label( self, value ) :
+    def label(self, value):
+        """Set the label to *value*."""
 
         self.__label = value
 
     @property
-    def unit( self ) :
+    def unit(self):
 
-        return( self.__unit )
+        return self.__unit
 
     @unit.setter
-    def unit( self, value ) :
+    def unit(self, value):
         """Sets self's unit. Only checks that unit is a string. If unit is None, it is set to an empty string (i.e., '')."""
 
-        if( value is None ) : value = ''
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'unit type "%s" is not a string' % type( value ) )
-        self.__unit = value.strip( )
+        if value is None: value = ''
+        if not isinstance(value, str): raise TypeError('unit type "%s" is not a string' % type(value))
+        self.__unit = value.strip()
 
-    def divideUnit( self, other ) :
+    def convertUnits(self, unitMap):
+
+        unit, factor = PQUModule.convertUnits(self.unit, unitMap)
+        self.unit = unit
+        return factor
+
+    def copy(self):
+        """Returns a new instance that is a copy of self."""
+
+        return Axis(self.label, self.index, self.unit)
+
+    __copy__ = copy
+
+    def divideUnit(self, other):
         """
         Returns the unit obtained by the division of self.unit by other.unit. Other must be an axis based instance.
         """
 
-        pqu = PQUModule.PQU( 1, self.unit ) / PQUModule.PQU( 1, other.unit )
-        return( str( pqu.unit ) )
+        pqu = PQUModule.PQU(1, self.unit) / PQUModule.PQU(1, other.unit)
 
-    def multiplyUnit( self, other ) :
+        return str(pqu.unit)
+
+    def multiplyUnit(self, other):
         """
         Returns the unit obtained by the product of self.unit times other.unit. Other must be an axis based instance.
         """
 
-        pqu = PQUModule.PQU( 1, self.unit ) * PQUModule.PQU( 1, other.unit )
-        return( str( pqu.unit ) )
+        pqu = PQUModule.PQU(1, self.unit) * PQUModule.PQU(1, other.unit)
 
-    def plotLabel( self ) :
+        return str(pqu.unit)
+
+    def plotLabel(self):
 
         label = self.label
-        if( label == '' ) : label = 'unknown'
-        if( self.unit != '' ) : label += ' (%s)' % self.unit
-        return( label )
+        if label == '': label = 'unknown'
+        if self.unit != '': label += ' [%s]' % self.unit
 
-    def toXML( self, indent = '', **kwargs ) :
+        return label
 
-        XMLStr = '%s<%s index="%d" label="%s" unit="%s"/>' % ( indent, self.moniker, self.index, self.label, self.unit )
-        return( XMLStr )
+    def toXML_strList( self, indent = '', **kwargs ) :
 
-    def toXMLList( self, indent = '', **kwargs ) :
+        return [ '%s<%s index="%d" label="%s" unit="%s"/>' % ( indent, self.moniker, self.index, self.label, self.unit ) ]
 
-        return( [ self.toXML( indent = indent, **kwargs ) ] )
-
-    def unitConversionFactor( self, newUnit ) :
+    def unitConversionFactor(self, newUnit):
         """Returns as a float the factor needed to convert self's unit to newUnit. If units are not compatible, a raise is executed."""
 
-        return( PQUModule.PQU( 1., self.unit ).getValueAs( newUnit ) )
+        return PQUModule.PQU(1., self.unit).getValueAs(newUnit)
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    def parseNode(self, node, xPath, linkData, **kwargs):
 
-        xPath.append( '%s[@index="%s"]' % ( axis.moniker, element.get( 'index' ) ) )
+        xPath.append( '%s[@index="%s"]' % ( Axis.moniker, node.get( 'index' ) ) )
 
-        _axis = axis( element.get( 'label' ), element.get( 'index' ), element.get( 'unit' ) )
+        self.label = node.get('label')
+        self.index = node.get('index')
+        self.unit = node.get('unit')
 
         xPath.pop()
-        return( _axis )
 
-class grid( axis ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+
+        axis1 = cls('', 0, '')
+        axis1.parseNode(node, xPath, linkData, **kwargs)
+
+        return axis1
+
+class Grid(Axis):
 
     moniker = 'grid'
     ancestryMembers = ( 'values', )
 
-    def __init__( self, label, index, unit, style, values, uncertainty = None, pdf = normalPDF, interpolation = None ) :
+    def __init__(self, label, index, unit, style, values, interpolation=enumsModule.Interpolation.linlin):
         """
         Returns a new instance of grid.
         """
 
-        axis.__init__( self, label, index, unit )
+        Axis.__init__(self, label, index, unit)
 
-        if( style == linkGridToken ) :
-            if( not isinstance( values , linkModule.link ) ):
-                raise TypeError( "style = 'link' not consistent with grid '%s'" % values.moniker )
-        else :
-            if( style not in [ pointsGridToken, boundariesGridToken, parametersGridToken ] ) :
-                raise ValueError( 'style = %s not supported' % style )
-            if( not( isinstance( values, valuesModule.values ) ) ) : raise TypeError( 'grid not values instance.' )
+        self.__style = enumsModule.GridStyle.checkEnumOrString(style)
+        if self.__style == enumsModule.GridStyle.none:                 # Required for GNDS-1.10 support.
+            if not isinstance(values, linkModule.Link):
+                raise ValueError('style = %s not supported' % style)
 
-        self.__style = style
+        if not isinstance(values, (valuesModule.Values, linkModule.Link)):
+            raise TypeError('Unsupported grid values: %s' % type(values))
         self.__values = values
         self.values.setAncestor( self )
 
-        self.interpolation = interpolation
-
-            # BRB: uncertainty needs work.
-        self.uncertainty = uncertainty
-        if( not( isinstance( pdf, str ) ) ) : raise TypeError( 'pdf must be a string' )
-        self.pdf = pdf
+        self.interpolation = enumsModule.Interpolation.checkEnumOrString(interpolation)
 
     @property
-    def style( self ) :
+    def style(self):
 
-        return( self.__style )
-
-    @property
-    def values( self ) :
-
-        return( self.__values )
+        if self.__style is None and self.isLink():
+            # follow link to determine actual style:
+            self.__style = self.values.link.ancestor.style
+        return self.__style
 
     @property
-    def domainMin( self ) :
+    def values(self):
 
-        return( self.values[0] )
+        return self.__values
 
-    @property
-    def domainMax( self ) :
+    def isLink(self):
 
-        return( self.values[-1] )
-
-    @property
-    def domainUnit( self ) :
-
-        return( self.unit )
-
-    def domainUnitConversionFactor( self, unitTo ) :
-
-        return( self.unitConversionFactor( unitTo ) )
+        return isinstance(self.__values, linkModule.Link)
 
     @property
-    def domainGrid( self ) :
+    def domainMin(self):
 
-        return( [ value for value in self.values ] )
+        return self.values[0]
 
-    def convertToUnit( self, unit ) :
+    @property
+    def domainMax(self):
 
-        factor = self.unitConversionFactor( unit )
+        return self.values[-1]
+
+    @property
+    def domainUnit(self) :
+
+        return self.unit
+
+    def domainUnitConversionFactor(self, unitTo):
+
+        return self.unitConversionFactor(unitTo)
+
+    @property
+    def domainGrid(self):
+
+        return [ value for value in self.values ]
+
+    def convertToUnit(self, unit):
+
+        factor = self.unitConversionFactor(unit)
         self.unit = unit
-        if self.style==linkGridToken: return
-        self.__values = valuesModule.values( [ factor * value for value in self.values ] )
+        if not self.isLink():
+            self.__values = valuesModule.Values([ factor * value for value in self.values ])
 
-    def convertUnits( self, unitMap ) :
+    def convertUnits(self, unitMap):
 
-        factor = axis.convertUnits( self, unitMap )
-        if( factor != 1 ) :
-            if isinstance( self.__values, linkModule.link ):
-                pass
-            else:
-                self.__values.offsetScaleValues( 0, factor )
-        return( factor )
+        factor = Axis.convertUnits(self, unitMap)
+        if factor != 1:
+            if not self.isLink():
+                self.__values.offsetScaleValues(0, factor)
+        return factor
 
-    def copy( self, unresolvedLinks ) :             # FIXME, unresolvedLinks is a kludge until links are handled in a better way.
+    def copy(self):
         """Returns a new grid instance that is a copy of self."""
 
-        _grid = grid( self.label, self.index, self.unit, self.style, self.values.copy( ), uncertainty = self.uncertainty, 
-                pdf = self.pdf, interpolation = self.interpolation )
-        if( isinstance( self.values, linkModule.link ) ) : unresolvedLinks.append( _grid.values )
-        return( _grid )
+        grid1 = Grid(self.label, self.index, self.unit, self.style, self.values.copy(), interpolation=self.interpolation)
+        return grid1
 
     __copy__ = copy
 
-    def getIndexOfValue(self,v):
+    def getIndexOfValue(self, v):
         """
         Get the index of the value in values where x would fit
         :param v:
+
         :return:
         """
-        for ival,val in enumerate(self.values[:-1]):
+
+        for ival, val in enumerate(self.values[:-1]):
             if v >= val and v <= self.values[ival+1]: return ival
+
         return None
 
-    def toXML( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
         attributeStr = ' style="%s"' % self.style
-        if( self.interpolation is not None ) : attributeStr += ' interpolation="%s"' % self.interpolation
-        if( self.uncertainty is not None ) :
-            attributeStr += ' uncertainty="%s"' % self.uncertainty
-            attributeStr += ' pdf="%s"' % self.pdf
-        XMLStrList = [ '%s<%s index="%d" label="%s" unit="%s"%s>' % ( indent, self.moniker, self.index, self.label, self.unit, attributeStr ) ]
-        XMLStrList += self.values.toXMLList( indent2, **kwargs )
-        XMLStrList[-1] += '</%s>' % self.moniker
-        return( XMLStrList )
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
+        if self.isLink() and formatVersion == GNDS_formatVersionModule.version_1_10:
+            attributeStr = ' style="link"'
+        if self.interpolation is not enumsModule.Interpolation.linlin: attributeStr += ' interpolation="%s"' % self.interpolation
+        XML_strList = [ '%s<%s index="%d" label="%s" unit="%s"%s>' % ( indent, self.moniker, self.index, self.label, self.unit, attributeStr ) ]
+        XML_strList += self.values.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+        return XML_strList
 
-        xPath.append( '%s[@index="%s"]' % ( grid.moniker, element.get( 'index' ) ) )
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        moniker = None
-        href = None
-        for key in list( element.keys( ) ) :
+        xPath.append('%s[@index="%s"]' % ( Grid.moniker, node.get('index') ))
+
+        for key in list( node.keys( ) ) :
             if( 'href' == key[-4:] ) :
                 xPath.pop( )
-                return( linkModule.link2.parseXMLNode( element, xPath, linkData ) )
+                return linkModule.Link2.parseNodeUsingClass(node, xPath, linkData, **kwargs)
 
-        style = element.get( 'style' )
-        gridClass = {
-            'link': linkModule.link,
-            'boundaries': valuesModule.values,
-            'parameters': valuesModule.values,
-            'points': valuesModule.values,
-        }.get( style )
-        if( gridClass is None ) : raise Exception( "grid style '%s' not yet supported" % style )
+        style = node.get('style')
+        if style == linkGridToken and linkData['formatVersion'] in (
+                    GNDS_formatVersionModule.version_1_10,
+                    GNDS_formatVersionModule.version_2_0_LLNL_3,
+                    GNDS_formatVersionModule.version_2_0_LLNL_4):
+            # style needs to be same as the linked-to grid.
+            # Set to None for now, look it up later once links are fixed
+            style = enumsModule.GridStyle.none
 
-        gridData = gridClass.parseXMLNode( element[0], xPath, linkData )
-        _grid = grid( element.get( 'label' ), element.get( 'index' ), element.get( 'unit' ), style, gridData,
-                interpolation = element.get( 'interpolation' ) )
+        gridClass = valuesModule.Values
+        if node[0].tag == linkModule.Link.moniker:
+            gridClass = linkModule.Link
 
-        xPath.pop( )
-        return( _grid )
+        gridData = gridClass.parseNodeUsingClass(node[0], xPath, linkData, **kwargs)
+        interpolation=node.get('interpolation', enumsModule.Interpolation.linlin)
+        grid1 = cls(node.get('label'), int(node.get('index')), node.get('unit'), style, gridData, interpolation)
 
-class axes( ancestryModule.ancestry ) :
+        xPath.pop()
+
+        return grid1
+
+class Axes(ancestryModule.AncestryIO):
 
     moniker = 'axes'
-    ancestryMembers = ( '[axes', )
+    ancestryMembers = ( 'axes', )
 
-    def __init__( self, rank = None, labelsUnits = None ) :
+    def __init__(self, size=0, labelsUnits={}):
         """
         Constructor for ``axes`` class. For example::
 
-            _axes = axes( labelsUnits = { 0 : ( 'crossSection' , 'b' ), 1 : ( 'energy_in', 'eV' ) } )
+            _axes = Axes(labelsUnits = { 0: ( 'crossSection' , 'b' ), 1: ( 'energy_in', 'eV' ) })
         """
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
-        if( labelsUnits is None ) : labelsUnits = {}
-        if( rank is None ) :
-            rank = 2
-            if( len( labelsUnits ) > 0 ) : rank = len( labelsUnits )
-        rank = int( rank )
-        if( not( 0 < rank < 26 ) ) : raise Exception( 'rank = %d must be in the range [1, 25]' % rank )
+        size = max(size, len(labelsUnits))
+        self.axes = []                                  # FIXME2, self.axes needs to be a suite instance.
+        if size <= 0: return
 
-        self.axes = []
-        abcsOffset = string.ascii_lowercase.index( 'y' )
-        for index in range( rank ) :
+        if not size < 26: raise Exception('Size = %d must be less than 26.' % size)
+
+        abcsOffset = string.ascii_lowercase.index('y')
+        for index in range(size):
             label, unit = string.ascii_lowercase[abcsOffset-index], ''
-            if( index in labelsUnits ) : label, unit = labelsUnits[index]
-            self.axes.append( axis( label, index, unit ) )
-            self.axes[-1].setAncestor( self, 'index' )
+            if index in labelsUnits: label, unit = labelsUnits[index]
+            self.axes.append(Axis(label, index, unit))
 
-    def __eq__( self, other ) :
+    def __eq__(self, other):
 
-        if( isinstance( other, referenceAxes ) ) : return( other.__eq__( self ) )
-        if( isinstance( other, axes ) and ( len( self ) == len( other ) ) ) :
-            for index, _axis in enumerate( self.axes ) :
-                if( _axis != other[index] ) : return( False )
-            return( True )
-        return( False )
+        if not isinstance(other, Axes): raise ValueError('Other not an Axes instance')
+        if len(self) != len(other): return False
+        for index, _axis in enumerate(self.axes) :
+            if _axis != other[index]: return False
+        return True
 
-    def __ne__( self, other ) :
+    def __ne__(self, other):
 
-        return( not( self.__eq__( other ) ) )
+        return not self.__eq__(other)
 
-    def __len__( self ) :
+    def __len__(self):
 
-        return( len( self.axes ) )
+        return len(self.axes)
 
-    def __getitem__( self, index ) :
+    def __getitem__(self, index):
 
-        return( self.axes[index] )
+        return self.axes[index]
 
-    def __setitem__( self, index, axisOrGrid ) :
+    def __setitem__(self, index, axisOrGrid):
 
-        if( not( isinstance( axisOrGrid, ( axis, grid, linkModule.link2 ) ) ) ) : raise TypeError( 'axisOrGrid is not an instance of axis or grid' )
-        rank = len( self )
-        index = int( index )
-        if( index < 0 ) : index += rank 
-        if( not( 0 <= index < rank ) ) : raise IndexError( "index = %s out of range for self of rank %s" % ( index, rank ) )
-        self.axes[index] = axisOrGrid
+        if not isinstance(axisOrGrid, ( Axis, Grid, linkModule.Link2 )): raise TypeError('axisOrGrid is not an instance of Axis or Grid')
+
+        size = len(self.axes)
+        if index < 0: index += size
+        if index == size:
+            self.axes.append(axisOrGrid)
+        else:
+            if not 0 <= index < size: raise IndexError("index = %s out of range for self of size %s" % ( index, size ))
+            self.axes[index] = axisOrGrid
+
         axisOrGrid.index = index
-        self.axes[index].setAncestor( self, 'index' )
 
-    def __str__( self ) :
+        axisOrGrid.setAncestor(self)
 
-        l = [ str( axis ) for axis in self ]
-        return( '\n'.join( l ) )
+    def __str__(self):
+        """Returned a simple string representation of each **Axes** of *self*."""
 
-    def checkRank( self, rank ) :
+        return '\n'.join([ str(axis) for axis in self ])
 
-        if( len( self ) != rank ) : raise Exception( "self's rank = %s != %s" % ( len( self ), rank ) )
-
-    def convertUnits( self, unitMap ) :
+    def convertUnits(self, unitMap):
         """
         Converts each axis units.
         unitMap is a dictionary of mapping old units to new units (e.g., { 'eV' : 'MeV', 'b' : 'mb' }).
@@ -385,110 +381,49 @@ class axes( ancestryModule.ancestry ) :
 
         factors = []
         for axis in self :
-            if( isinstance( axis, linkModule.link2 ) ) : continue
-            factors.append( axis.convertUnits( unitMap ) )
-        return( factors )
+            if isinstance(axis, linkModule.Link2): continue
+            factors.append(axis.convertUnits(unitMap))
+        return factors
 
-    def copy( self ) :
+    def copy(self):
 
-        unresolvedLinks = []
-        newAxes = axes( rank = len( self ) )
-        for index, axis in enumerate( self ) : newAxes[index] = axis.copy( unresolvedLinks )
-        for object in unresolvedLinks : object.link = object.follow( object )
-        return( newAxes )
+        newAxes = Axes(-1)
+        for index, axis in enumerate(self.axes): newAxes[index] = axis.copy()
+        for index, child in enumerate(newAxes.axes):
+            if isinstance(child, Grid):
+                if isinstance(child.values, linkModule.Link): child.values.link = child.values.follow(child.values)
+
+        return newAxes
 
     __copy__ = copy
 
-    def toXML( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-    def toXMLList( self, indent = '', **kwargs ) :
+        XML_strList = [ '%s<%s>' % ( indent, self.moniker ) ]
+        for index in reversed(range(len(self))):
+            XML_strList += self[index].toXML_strList(indent=indent2, **kwargs)
+        XML_strList [-1] += '</%s>' % self.moniker
+        return XML_strList
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+    def parseNode(self, node, xPath, linkData, **kwargs):       # FIXME2, needed until self.axes is a suite instance.
 
-        XMLList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        xmlAxisStringList = []
-        for axis in self : xmlAxisStringList.append( axis.toXML( indent = indent2, **kwargs ) )
-        XMLList += reversed( xmlAxisStringList )
-        XMLList[-1] += '</%s>' % self.moniker
-        return( XMLList )
+        xPath.append( node.tag )
 
-    @staticmethod
-    def parseXMLNode( axesElement, xPath, linkData ) :
-        """Parse XML element with tag '<axes>'."""
+        self.axes = len(node) * [None]
+        for child in node:
+            childClass = { Axis.moniker: Axis, Grid.moniker: Grid }.get(child.tag)
+            if childClass is None: raise TypeError("Unexpected child node '%s' encountered in axes" % child.tag)
+            childAxis = childClass.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+            self[childAxis.index] = childAxis
 
-        xPath.append( axesElement.tag )
-        if( axesElement.tag == axes.moniker ) :
-            _axes = axes( rank = len( axesElement ) )
-            for child in axesElement :
-                childClass = { axis.moniker : axis, grid.moniker : grid }.get( child.tag )
-                if childClass is None:
-                    raise TypeError("Unexpected child element '%s' encountered in axes" % child.tag)
-                index = child.get( "index" )
-                _axes[index] = childClass.parseXMLNode( child, xPath, linkData )
-        else :
-            raise Exception( 'Invalid tag "%s" for axes' % ( axesElement.tag ) )
         xPath.pop()
-        return( _axes )
 
-    @staticmethod
-    def parseXMLString( axisString, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        from xml.etree import cElementTree
-        return( axes.parseXMLNode( cElementTree.fromstring( axisString ), xPath = xPath, linkData = linkData ) )
+        axes = cls(1)
+        axes.parseNode(node, xPath, linkData, **kwargs)
 
-class referenceAxes( ancestryModule.ancestry ) :
-    """
-    A referenceAxes links to an axes or another referenceAxes instance, although the final link must always be
-    an axes instance. All references to a referenceAxes's axis's are de-referenced to the linked axes or referenceAxes
-    instance.  A referenceAxes does not write its self to an XML file; but, instead, only reside in Python instances.
-
-    Unlike an axes instance, a referenceAxes does not allow one to change members of the linked axes.
-    """
-
-    moniker = 'referenceAxes'
-    ancestryMembers = ( '', )
-
-    def __init__( self, axes ) :
-        """
-        Constructor for ``referenceAxes`` class. For example::
-
-            _axes = referenceAxes( axes )
-        """
-
-        ancestryModule.ancestry.__init__( self )
-
-        self.__axes = axes
-
-    def __getitem__( self, index ) :
-
-        return( self.__axes[index] )
-
-    def __str__( self ) :
-
-        return( self.__axes.__str__( ) )
-
-    def __eq__( self, other ) :
-
-        return( self.__axes.__eq__( other ) )
-
-    def __ne__( self, other ) :
-
-        return( self.__axes.__ne__( other ) )
-
-    def __len__( self ) :
-
-        return( len( self.__axes ) )
-
-    def copy( self, unresolvedLinks ) :
-
-        return( referenceAxes( self.__axes ) )
-
-    def toXML( self, indent = '', **kwargs ) :
-
-        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        return( [] )
+        return axes

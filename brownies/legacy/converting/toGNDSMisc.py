@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,9 +9,10 @@ import sys
 import fractions
 
 from pqu import PQU as PQUModule
-from xData import standards as standardsModule
 
 from PoPs import IDs as IDsPoPsModule
+from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
+from PoPs import alias as PoPsAliasModule
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.quantities import spin as spinModule
@@ -24,14 +25,15 @@ from PoPs.families import lepton as leptonModule
 from PoPs.families import baryon as baryonModule
 from PoPs.families import nuclide as nuclideModule
 from PoPs.families import unorthodox as unorthodoxModule
-from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
+from xData import enums as xDataEnumsModule
 from fudge.core.utilities import brb
 from fudge.core.math import fudgemath
 
 from fudge import product as productModule
 from fudge.productData import multiplicity as multiplicityModule
-from fudge.channelData import Q as QModule
+from fudge.outputChannelData import Q as QModule
 
 from fudge.productData.distributions import unspecified as unspecifiedModule
 
@@ -46,45 +48,45 @@ def ZAToName( ZA ) :
 def addParticleData( particle, info, massValue, spinValue, parityValue, chargeValue, halflifeValue ) :
 
     if( massValue is not None ) :
-        mass = massModule.double( info.PoPsLabel, massValue, quantityModule.stringToPhysicalUnit( 'amu' ) )
+        mass = massModule.Double( info.PoPsLabel, massValue, quantityModule.stringToPhysicalUnit( 'amu' ) )
         particle.mass.add( mass )
 
     if( spinValue is not None ) :
-        spin = spinModule.fraction( info.PoPsLabel, fractions.Fraction( spinValue ), spinModule.baseUnit )
+        spin = spinModule.Fraction( info.PoPsLabel, fractions.Fraction( spinValue ), spinModule.baseUnit )
         particle.spin.add( spin )
 
     if( parityValue is not None ) :
-        parity = parityModule.integer( info.PoPsLabel, parityValue, parityModule.baseUnit )
+        parity = parityModule.Integer( info.PoPsLabel, parityValue, parityModule.baseUnit )
         particle.parity.add( parity )
 
     if( chargeValue is not None ) :
-        charge = chargeModule.integer( info.PoPsLabel, chargeValue, chargeModule.baseUnit )
+        charge = chargeModule.Integer( info.PoPsLabel, chargeValue, chargeModule.baseUnit )
         particle.charge.add( charge )
 
     if( halflifeValue is not None ) :
         if( isinstance( halflifeValue, str ) ) :
-            halflife = halflifeModule.string( info.PoPsLabel, halflifeValue, halflifeModule.baseUnit )
+            halflife = halflifeModule.String( info.PoPsLabel, halflifeValue, halflifeModule.baseUnit )
         else :
-            halflife = halflifeModule.double( info.PoPsLabel, halflifeValue, halflifeModule.baseUnit )
+            halflife = halflifeModule.Double( info.PoPsLabel, halflifeValue, halflifeModule.baseUnit )
         particle.halflife.add( halflife )
 
 def addNucleusInfoForLightNuclei( ZA, nucleus, info ) :
 
     spinValue, parityValue, halflifeValue = None, None, None
     if( ZA == 1001 ) :
-        spinValue, parityValue, halflifeValue = '1/2', 1, 'stable'
+        massValue, spinValue, parityValue, chargeValue, halflifeValue = 1.00727646662, '1/2', 1, 1, 'stable'
     elif( ZA == 1002 ) :
-        spinValue, parityValue, halflifeValue = '1', 1, 'stable'
+        massValue, spinValue, parityValue, chargeValue, halflifeValue = 2.01355321275, '1', 1, 1, 'stable'
     elif( ZA == 1003 ) :
-        spinValue, parityValue, halflifeValue = '1/2', 1, 3.88789e+8
+        massValue, spinValue, parityValue, chargeValue, halflifeValue = 3.01550071621, '1/2', 1, 1, 3.88789e+8
     elif( ZA == 2003 ) :
-        spinValue, parityValue, halflifeValue = '1/2', 1, 'stable'
+        massValue, spinValue, parityValue, chargeValue, halflifeValue = 3.01493224717, '1/2', 1, 2, 'stable'
     elif( ZA == 2004 ) :
-        spinValue, parityValue, halflifeValue = '0', 1, 'stable'
+        massValue, spinValue, parityValue, chargeValue, halflifeValue = 4.0015061791, '0', 1, 2, 'stable'
     else :
         return
 
-    addParticleData( nucleus, info, None, spinValue, parityValue, None, halflifeValue )
+    addParticleData( nucleus, info, massValue, spinValue, parityValue, chargeValue, halflifeValue )
 
 def getPoPsParticle( info, ZA, name = None, levelIndex = None, level = 0., levelUnit = 'MeV' ) :
 
@@ -94,31 +96,31 @@ def getPoPsParticle( info, ZA, name = None, levelIndex = None, level = 0., level
 
     particle = None
 
-    if( ZA in[ 0, 17 ] ) : ZA = 7
+    if( ZA in [ 0, 17 ] ) : ZA = 7
     if( name is not None ) :
         pass
     elif( ZA == 1 ) :
-        particle = baryonModule.particle( 'n' )
+        particle = baryonModule.Particle(IDsPoPsModule.neutron)
         addParticleData( particle, info, 1.00866491574, "1/2", 1, 0, 881.5 )
         name = particle.id
     elif( ZA == 7 ) :
-        particle = gaugeBosonModule.particle( IDsPoPsModule.photon )
+        particle = gaugeBosonModule.Particle( IDsPoPsModule.photon )
         addParticleData( particle, info, 0.0, "1", 1, 0, halflifeModule.STABLE )
         name = particle.id
     elif( ZA == 8 ) :
-        particle = leptonModule.particle( 'e-_anti', generation = leptonModule.Generation.electronic )
+        particle = leptonModule.Particle( 'e-_anti', generation = leptonModule.Generation.electronic )
         addParticleData( particle, info, 5.485799090e-4, "1/2", -1, 1, halflifeModule.STABLE )
         name = particle.id
     elif( ZA == 9 ) :
-        particle = leptonModule.particle( 'e-', generation = leptonModule.Generation.electronic )
+        particle = leptonModule.Particle( 'e-', generation = leptonModule.Generation.electronic )
         addParticleData( particle, info, 5.485799090e-4, "1/2", 1, -1, halflifeModule.STABLE )
         name = particle.id
     elif( ZA in [ 99120, 99125 ] ) :
         name = ZAToName( ZA )
-        particle = unorthodoxModule.particle( name )
-        mass = massModule.double( info.PoPsLabel, 117.5, quantityModule.stringToPhysicalUnit( 'amu' ) )
+        particle = unorthodoxModule.Particle( name )
+        mass = massModule.Double( info.PoPsLabel, 117.5, quantityModule.stringToPhysicalUnit( 'amu' ) )
         particle.mass.add( mass )
-        charge = chargeModule.integer( info.PoPsLabel, 46, quantityModule.stringToPhysicalUnit( 'e' ) )
+        charge = chargeModule.Integer( info.PoPsLabel, 46, chargeModule.baseUnit )
         particle.charge.add( charge )
     else :
         name = ZAToName( ZA )
@@ -126,7 +128,7 @@ def getPoPsParticle( info, ZA, name = None, levelIndex = None, level = 0., level
             levelIndex = 0
             level = 0.
         if( level < 0. ) : raise Exception( 'Negative value = %s for continuum is not allowed' % level )
-        level = PQUModule.PQU( PQUModule.pqu_float.surmiseSignificantDigits( level ), levelUnit )
+        level = PQUModule.PQU( PQUModule.PQU_float.surmiseSignificantDigits( level ), levelUnit )
         name = chemicalElementMiscPoPsModule.nuclideIDFromIsotopeSymbolAndIndex( name, levelIndex )
 
     if( ( particle is None ) and ( name not in info.PoPs ) ) :
@@ -135,14 +137,14 @@ def getPoPsParticle( info, ZA, name = None, levelIndex = None, level = 0., level
             baseName = name.split('_')[0]                           # Always need to add ground state before excited level.
             if( 'FissionProduct' in name ) : baseName = name.split('_')[0]
 
-            particle = nuclideModule.particle( name )
-            charge = chargeModule.integer( info.PoPsLabel, 0, chargeModule.baseUnit )
+            particle = nuclideModule.Particle( name )
+            charge = chargeModule.Integer( info.PoPsLabel, 0, chargeModule.baseUnit )
             particle.charge.add( charge )
 
-            energy = nuclearEnergyLevelModule.double( info.PoPsLabel, float( level ), level.unit )
+            energy = nuclearEnergyLevelModule.Double( info.PoPsLabel, float( level ), level.unit )
             particle.nucleus.energy.add( energy )
 
-            charge = chargeModule.integer( info.PoPsLabel, ZA // 1000, chargeModule.baseUnit )
+            charge = chargeModule.Integer( info.PoPsLabel, ZA // 1000, chargeModule.baseUnit )
             particle.nucleus.charge.add( charge )
             addNucleusInfoForLightNuclei( ZA, particle.nucleus, info )
         else :
@@ -150,8 +152,21 @@ def getPoPsParticle( info, ZA, name = None, levelIndex = None, level = 0., level
     else :
         if( particle is None ) : particle = info.PoPs[name]
 
-    if( name not in info.PoPs ) : info.PoPs.add( particle )
-    return( particle )
+    if name not in info.PoPs:
+        info.PoPs.add(particle)
+        if name != IDsPoPsModule.photon:
+            familiarID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(name, specialNuclearParticleIDPoPsModule.Mode.familiar)
+            if familiarID != name:
+                nucleusID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(name, specialNuclearParticleIDPoPsModule.Mode.nucleus)
+                if familiarID not in info.PoPs:
+                    if familiarID == IDsPoPsModule.proton:
+                        proton = baryonModule.Particle(IDsPoPsModule.proton)
+                        addNucleusInfoForLightNuclei(1001, proton, info)
+                        info.PoPs.add(proton)
+                    else:
+                        info.PoPs.add(PoPsAliasModule.Alias(familiarID, nucleusID))
+
+    return particle
 
 def getTypeName( info, ZA, name = None, levelIndex = None, level = 0., levelUnit = 'MeV' ) :
     """
@@ -161,7 +176,7 @@ def getTypeName( info, ZA, name = None, levelIndex = None, level = 0., levelUnit
 
     return( getPoPsParticle( info, ZA, name, levelIndex, level, levelUnit ) )
 
-def newGNDSParticle( info, particle, crossSection, multiplicity = 1, outputChannel = None ) :
+def newGNDSParticle(info, particle, crossSection, multiplicity=1, outputChannel=None):
     """
     The arguments to this function must match those of product.product excluding self and label.
     """
@@ -169,10 +184,11 @@ def newGNDSParticle( info, particle, crossSection, multiplicity = 1, outputChann
     name = particle
     if( not( isinstance( particle, str ) ) ) : name = particle.id
     if( name in info.PoPs.aliases ) : name = info.PoPs.aliases[name].pid
-    product = productModule.product( id = name, label = name, outputChannel = outputChannel )
+    if name != IDsPoPsModule.photon: name = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(name, info.specialNuclearParticleID)
+    product = productModule.Product(name, label=name, outputChannel=outputChannel)
     if( isinstance( multiplicity, ( int, float ) ) ) :
         axes = multiplicityModule.defaultAxes( crossSection.domainUnit )
-        multiplicity = multiplicityModule.constant1d( multiplicity, crossSection.domainMin,
+        multiplicity = multiplicityModule.Constant1d( multiplicity, crossSection.domainMin,
                 crossSection.domainMax, axes = axes, label = info.style )
     product.multiplicity.add( multiplicity )
     return( product )
@@ -205,19 +221,20 @@ def getTypeNameENDF( info, ZA, undefinedLevelInfo ) :
             undefinedLevelInfo['count'] += 1
             if( undefinedLevelInfo['count'] > 1 ) :
                 if( undefinedLevelInfo['level'] > 0. ) :
-                    raise Exception( "undefinedLevelInfo['count'] > 1 for ZA = %s" % ZA )
+                    raise Exception("undefinedLevelInfo['count'] > 1 for ZA = %s: %s" % (ZA, undefinedLevelInfo))
             else:
                 levelIndex, level = undefinedLevelInfo['levelIndex'], undefinedLevelInfo['level']
     return( getTypeNameGamma( info, ZA, level = level, levelIndex = levelIndex ) )
 
-class infos :
+class Infos:
 
     def __init__( self, formatVersion, style ) :
 
         self.formatVersion = formatVersion
         self.style = style
-        self.massTracker = massTrackerModule.massTracker()
+        self.massTracker = massTrackerModule.MassTracker()
         self.__logs = None
+        self.resonanceReconstructionFailed = ''
 
     @property
     def logs(self): return self.__logs
@@ -232,9 +249,9 @@ class infos :
 def returnConstantQ( style, Q, crossSection ) :
 
     axes = QModule.defaultAxes( crossSection.domainUnit )
-    return( QModule.constant1d( Q, crossSection.domainMin, crossSection.domainMax, axes = axes, label = style ) )
+    return( QModule.Constant1d( Q, crossSection.domainMin, crossSection.domainMax, axes = axes, label = style ) )
 
-def addUnspecifiedDistributions( info, outputChannel, frame = None ) :
+def addUnspecifiedDistributions(info, outputChannel, frame=xDataEnumsModule.Frame.none) :
     """
     For products with no distribution, assign an unspecified distribution.
     Interim products before breakup get an 'implicitProduct' conversion flag (so they aren't written back to ENDF-6),
@@ -242,14 +259,15 @@ def addUnspecifiedDistributions( info, outputChannel, frame = None ) :
     Others are explicit, to ensure that the product (plus mass) appears in resulting ENDF file.
     """
 
-    if( outputChannel is None ) : return
+    if outputChannel is None:
+        return
     firstProductId = outputChannel[0].pid
-    for product in outputChannel :
-        if( len( product.distribution ) == 0 ) :
-            product.distribution.add(unspecifiedModule.form(info.style, productFrame=frame))
-            if product.outputChannel or firstProductId=='n':
+    for product in outputChannel:
+        if len(product.distribution) == 0:
+            product.distribution.add(unspecifiedModule.Form(info.style, productFrame=frame))
+            if product.outputChannel or firstProductId == IDsPoPsModule.neutron:
                 info.ENDFconversionFlags.add( product, 'implicitProduct' )
         else :
-            if( frame is None ) : frame = product.distribution[info.style].productFrame
-        addUnspecifiedDistributions( info, product.outputChannel, frame = standardsModule.frames.labToken )
-
+            if frame == xDataEnumsModule.Frame.none:
+                frame = product.distribution[info.style].productFrame
+        addUnspecifiedDistributions(info, product.outputChannel, frame=xDataEnumsModule.Frame.lab)

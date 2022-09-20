@@ -22,12 +22,12 @@ Now add gamma and x-ray
  ---- positron ----
 <aliases>
   <metaStable id="Am242_m1" pid="Am242_e2" metaStableIndex="1"/>
-  <particle id="electron" pid="e-"/>
-  <particle id="e+" pid="e-_anti"/>
-  <particle id="positron" pid="e-_anti"/>
-  <particle id="gamma" pid="photon"/>
-  <particle id="x-ray" pid="gamma"/>
-  <particle id="b+" pid="e-_anti"/></aliases>
+  <alias id="electron" pid="e-"/>
+  <alias id="e+" pid="e-_anti"/>
+  <alias id="positron" pid="e-_anti"/>
+  <alias id="gamma" pid="photon"/>
+  <alias id="x-ray" pid="gamma"/>
+  <alias id="b+" pid="e-_anti"/></aliases>
     e-: e- --> None
         mass 5.4857990907e-4 amu: spin 0.5 hbar: parity 1.: charge -1. e: halflife stable: isAnti False
     e-_anti: e-_anti --> None

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,18 +9,16 @@
 This module contains the documentation class.
 """
 
-__metaclass__ = type
+from LUPY import ancestry as ancestryModule
 
-import xData.ancestry as ancestryModule
-
-class documentation( ancestryModule.ancestry ) :
+class Documentation( ancestryModule.AncestryIO ) :
     """For storing descriptive information, either about the reactionSuite or about an individual reaction. """
 
     moniker = 'documentation'
 
     def __init__( self, name, documentation ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
         self.name = name
         self.documentation = documentation
 
@@ -32,17 +30,17 @@ class documentation( ancestryModule.ancestry ) :
 
         return( self.documentation.split( '\n' ) )
     
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
         
         xmlString = [ '%s<%s name="%s"><![CDATA[' % ( indent, self.moniker, self.name ) ]
         xmlString.append( self.documentation )
         xmlString[-1] += ']]></%s>' % self.moniker
         return( xmlString )
 
-    @staticmethod
-    def parseXMLNode(element, xPath, linkData):
+    @classmethod
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         """ translate <documentation> element from XML: """
         xPath.append( element.tag )
-        doc_ = documentation( element.get('name'), element.text.lstrip('\n') )
+        doc_ = Documentation( element.get('name'), element.text.lstrip('\n') )
         xPath.pop()
         return doc_

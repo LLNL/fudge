@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,21 +10,21 @@ Wrapper for xml parsers (Etree, DOM, etc), in case we need to support multiple p
 python's xml.etree.  This is only for reading (not writing) xml; creating new elements should happen within fudge
 """
 
-__metaclass__ = type
 
+class XML_node:
 
-class xmlNode:
     etree = 'etree'
     dom = 'dom'
     allowedParsers = (etree, dom)
 
     def __init__(self, parsedXMLNode, parser):
         """Keep track of which parser is used ('etree','dom', etc). """
-        if parser not in xmlNode.allowedParsers:
+
+        if parser not in XML_node.allowedParsers:
             raise Exception("%s xml parser not supported" % parser)
         self.data = parsedXMLNode
         self.parser = parser
-        if self.parser == xmlNode.etree:
+        if self.parser == XML_node.etree:
             self.text = self.data.text
             self.tail = self.data.tail
             self.tag = self.data.tag
@@ -38,54 +38,54 @@ class xmlNode:
 
     def __getitem__(self, index):
         """Return one or more child elements. The index could be a slice."""
-        if self.parser == xmlNode.etree:
+        if self.parser == XML_node.etree:
             if isinstance(index, slice):
                 # can't slice an iterator, must call getchildren() first:
-                return [xmlNode(a, self.parser) for a in list(self.data)[index]]
-            return xmlNode(self.data[index], self.parser)
+                return [XML_node(a, self.parser) for a in list(self.data)[index]]
+            return XML_node(self.data[index], self.parser)
 
     @property
     def attrib(self):
         """Access node attributes as dictionary"""
-        if self.parser == xmlNode.etree:
+        if self.parser == XML_node.etree:
             return self.data.attrib
 
     def get(self, attribute, defaultValue=None):
         """Returns the value of the specified attribute. If the attribute is not present, returns defaultValue."""
-        if self.parser == xmlNode.etree:
+        if self.parser == XML_node.etree:
             return self.data.get(attribute, defaultValue)
 
     def keys(self):
         """Returns the name of all attributes in this element, as a list."""
-        if self.parser == xmlNode.etree:
+        if self.parser == XML_node.etree:
             return list(self.data.keys())
 
     def items(self):
         """Returns the name and value of all attributes in this element, as a list of tuples."""
-        if self.parser == xmlNode.etree:
+        if self.parser == XML_node.etree:
             return list(self.data.items())
 
     def getchildren(self):
         """Returns a list of all child elements."""
-        if self.parser == xmlNode.etree:
-            return [xmlNode(a, self.parser) for a in self.data.getchildren()]
+        if self.parser == XML_node.etree:
+            return [XML_node(a, self.parser) for a in self.data.getchildren()]
 
     def find(self, path):
         """Searches for child elements matching the path, and returns the first match."""
-        if self.parser == xmlNode.etree:
+        if self.parser == XML_node.etree:
             findResult = self.data.find(path)
             if findResult is None:
                 return
-            return xmlNode(findResult, self.parser)
+            return XML_node(findResult, self.parser)
 
     def findall(self, path):
         """Searches for child elements matching the path, and returns all matches."""
-        if self.parser == xmlNode.etree:
-            return [xmlNode(a, self.parser) for a in self.data.findall(path)]
+        if self.parser == XML_node.etree:
+            return [XML_node(a, self.parser) for a in self.data.findall(path)]
 
     def xpath(self, xpath):
         """Searches for child elements matching the xpath, and returns all matches."""
-        if self.parser == xmlNode.etree:
+        if self.parser == XML_node.etree:
             # etree doesn't currently have native support for xpath.
             # Make my own, using regex for xpath expressions like "reaction[@label='2']":
             import re

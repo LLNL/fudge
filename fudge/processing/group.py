@@ -1,21 +1,23 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
+import numpy
 
-from xData import ancestry as ancestryModule
-from xData import standards as standardsModule
+from LUPY import ancestry as ancestryModule
+
+from xData import enums as xDataEnumsModule
 from xData import axes as axesModule
 from xData import values as valuesModule
 from xData import xDataArray as arrayModule
 
+from fudge import enums as enumsModule
 from fudge import suites as suitesModule
 
-class group( ancestryModule.ancestry ) :
+class Group( ancestryModule.AncestryIO ) :
     """
     This class stores the multi-group information.
     """
@@ -24,11 +26,11 @@ class group( ancestryModule.ancestry ) :
 
     def __init__( self, label, boundaries ) :
 
-        ancestryModule.ancestry.__init__( self )
+        ancestryModule.AncestryIO.__init__( self )
         if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must only be a string instance.' )
         self.__label = label
 
-        if( not( isinstance( boundaries, axesModule.grid ) ) ) : raise TypeError( 'Group boundaries must only be a grid instance.' )
+        if( not( isinstance( boundaries, axesModule.Grid ) ) ) : raise TypeError( 'Group boundaries must only be a grid instance.' )
         if list(boundaries.values) != sorted(boundaries.values):
             raise ValueError( 'Group boundaries must be sorted in increasing order!' )
         self.__boundaries = boundaries
@@ -45,7 +47,7 @@ class group( ancestryModule.ancestry ) :
 
     def copy( self ) :
 
-        return( group( self.label, self.boundaries.copy( [] ) ) )
+        return Group(self.label, self.boundaries.copy())
 
     __copy__ = copy
 
@@ -56,22 +58,25 @@ class group( ancestryModule.ancestry ) :
 
         self.__boundaries.convertUnits( unitMap )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlStringList = [ '%s<%s label="%s">' % ( indent, self.moniker, self.label ) ]
-        xmlStringList += self.boundaries.toXMLList( indent2, **kwargs )
+        xmlStringList += self.boundaries.toXML_strList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
-        boundaries = axesModule.grid.parseXMLNode( element.find('grid'), xPath, linkData )
+        xPath.append(node.tag)
+
+        boundaries = axesModule.Grid.parseNodeUsingClass(node.find('grid'), xPath, linkData, **kwargs)
+
         xPath.pop()
-        return group( element.get( 'label' ), boundaries )
+
+        return cls(node.get( 'label' ), boundaries)
 
 def toMultiGroup1d( cls, style, tempInfo, _axes, data, addLabel = True, zeroPerTNSL = True ) :
     """
@@ -82,13 +87,13 @@ def toMultiGroup1d( cls, style, tempInfo, _axes, data, addLabel = True, zeroPerT
 
     reactionSuite = tempInfo['reactionSuite']
 
-    axes = axesModule.axes( rank = 2 )
-    axes[0] = axesModule.axis( _axes[0].label, 0, _axes[0].unit )
+    axes = axesModule.Axes(2)
+    axes[0] = axesModule.Axis( _axes[0].label, 0, _axes[0].unit )
     energyInGrid = style.transportables[reactionSuite.projectile].group.boundaries.values.copy( )
-    axes[1] = axesModule.grid( _axes[1].label, 1, _axes[1].unit, axesModule.boundariesGridToken, energyInGrid )
+    axes[1] = axesModule.Grid( _axes[1].label, 1, _axes[1].unit, xDataEnumsModule.GridStyle.boundaries, energyInGrid )
     shape = [ len( data ) ]
     if( zeroPerTNSL ) : data[tempInfo['maximumProjectileGroupIndex']] = 0.0     # For TNSL data as data ends in middle of this group.
-    data = valuesModule.values( data )
+    data = valuesModule.Values( data )
     for start, datum in enumerate( data ) :
         if( datum != 0 ) : break
     end = 0
@@ -99,9 +104,9 @@ def toMultiGroup1d( cls, style, tempInfo, _axes, data, addLabel = True, zeroPerT
     else :
         end += 1
     data = data[start:end]
-    starts = valuesModule.values( [ start ], valueType = standardsModule.types.integer32Token )
-    lengths = valuesModule.values( [ len( data ) ], valueType = standardsModule.types.integer32Token )
-    flattened = arrayModule.flattened( shape = shape, data = data, starts = starts, lengths = lengths )
+    starts = valuesModule.Values([start], valueType=xDataEnumsModule.ValueType.integer32)
+    lengths = valuesModule.Values([len(data)], valueType=xDataEnumsModule.ValueType.integer32)
+    flattened = arrayModule.Flattened( shape = shape, data = data, starts = starts, lengths = lengths )
     label = None
     if( addLabel ) : label = style.label
     return( cls( label = label, axes = axes, array = flattened ) )
@@ -119,23 +124,33 @@ def TMs2Form( style, tempInfo, TM_1, TM_E, productName = None ) :
 
 # BRB hardwired.
     crossSectionUnit = 'b'                          # ?????? 'b' should not be hardwired.
-    axes = axesModule.axes( rank = 4 )
-    axes[0] = axesModule.axis( 'C_l(energy_in,energy_out)', 0, crossSectionUnit )
+    axes = axesModule.Axes(4)
+    axes[0] = axesModule.Axis( 'C_l(energy_in,energy_out)', 0, crossSectionUnit )
     lMaxPlus1 = len( TM_1[0][0] )
-    lGrid = valuesModule.values( [ i1 for i1 in range( lMaxPlus1 ) ], valueType = standardsModule.types.integer32Token )
-    axes[1] = axesModule.grid( 'l',                         1,         '', axesModule.parametersGridToken, lGrid )
+    lGrid = valuesModule.Values([i1 for i1 in range(lMaxPlus1)], valueType=xDataEnumsModule.ValueType.integer32)
+    axes[1] = axesModule.Grid( 'l',                         1,         '', xDataEnumsModule.GridStyle.parameters, lGrid )
     energyOutGrid = style.transportables[productName].group.boundaries.values.copy( )
-    axes[2] = axesModule.grid( 'energy_out',                2, energyUnit, axesModule.boundariesGridToken, energyOutGrid )
+    axes[2] = axesModule.Grid( 'energy_out',                2, energyUnit, xDataEnumsModule.GridStyle.boundaries, energyOutGrid )
     energyInGrid = style.transportables[reactionSuite.projectile].group.boundaries.values.copy( )
-    axes[3] = axesModule.grid( 'energy_in',                 3, energyUnit, axesModule.boundariesGridToken, energyInGrid )
-    if( conserve == transportablesModule.conserve.number ) :
+    axes[3] = axesModule.Grid( 'energy_in',                 3, energyUnit, xDataEnumsModule.GridStyle.boundaries, energyInGrid )
+    if conserve == enumsModule.Conserve.number:
         TM = TM_1
-    else :
-        raise NotImplementedError( 'Need to implement' )
+    else:
+        raise NotImplementedError('Need to implement')
 
-    n1 = len( TM )
-    n2 = len( TM[0] )
-    n3 = len( TM[0][0] )
+    n1 = len(TM)
+    n2 = len(TM[0])
+    n3 = len(TM[0][0])
+
+    if isinstance(TM, (list, tuple, numpy.ndarray)):
+        TM_array3d = {}
+        for i1 in range(n1):
+            TM_array2d = {}
+            for i2 in range(n2):
+                TM_array2d[i2] = list(TM[i1,i2])
+            TM_array3d[i1] = TM_array2d
+        TM = TM_array3d
+
     data, starts, lengths = [], [], []
     if( tempInfo['zeroPerTNSL'] ) :
         maximumProjectileGroupIndex = tempInfo['maximumProjectileGroupIndex']
@@ -160,18 +175,41 @@ def TMs2Form( style, tempInfo, TM_1, TM_E, productName = None ) :
             starts.append( start )
             lengths.append( length )
     shape = [ n1, n2, n3 ]
-    data = valuesModule.values( data )
-    starts = valuesModule.values( starts, valueType = standardsModule.types.integer32Token )
-    lengths = valuesModule.values( lengths, valueType = standardsModule.types.integer32Token )
-    flattened = arrayModule.flattened( shape = shape, data = data, starts = starts, lengths = lengths, 
-            dataToString = multiGroupModule.gridded3d.dataToString )
-    gridded3d = multiGroupModule.gridded3d( axes = axes, array = flattened )
-    return( multiGroupModule.form( style.label, standardsModule.frames.labToken, gridded3d ) )
+    data = valuesModule.Values( data )
+    starts = valuesModule.Values(starts, valueType=xDataEnumsModule.ValueType.integer32)
+    lengths = valuesModule.Values(lengths, valueType=xDataEnumsModule.ValueType.integer32)
+    flattened = arrayModule.Flattened( shape = shape, data = data, starts = starts, lengths = lengths, 
+            dataToString = multiGroupModule.Gridded3d.dataToString )
+    gridded3d = multiGroupModule.Gridded3d( axes = axes, array = flattened )
+    return( multiGroupModule.Form( style.label, xDataEnumsModule.Frame.lab, gridded3d ) )
 
-class groups( suitesModule.suite ) :
+class Groups( suitesModule.Suite ) :
 
     moniker = 'groups'
 
     def __init__( self ) :
 
-        suitesModule.suite.__init__( self, [ group ] )
+        suitesModule.Suite.__init__( self, [ Group ] )
+
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+
+        instance = cls()
+        instance.parseNode(node, xPath, linkData, **kwargs)
+
+        return instance
+
+    @staticmethod
+    def read(fileName, **kwargs):
+        """
+        Reads in the file name *fileName* and returns a **Groups** instance.
+        """
+
+        return Groups.readXML_file(fileName, **kwargs)
+
+def read(fileName, **kwargs):
+    """
+    Reads in the file name *fileName* and returns a **Groups** instance.
+    """
+
+    return Groups.read(fileName, **kwargs)

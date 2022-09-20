@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -16,17 +16,18 @@ fine-grained reactions for compatibility with ENDF-6
 """
 import argparse
 
-from fudge import reactionSuite as reactionSuiteModule, product as productModule
+from xData import enums as xDataEnumsModule
+
+from fudge import enums as enumsModule
+from fudge import reactionSuite as reactionSuiteModule
+from fudge import product as productModule
 from fudge import outputChannel as outputChannelModule
-from fudge.reactions import base as reactionsBaseModule
 from fudge.reactions import reaction as reactionModule
 from fudge.reactionData import crossSection as crossSectionModule
-from fudge.productData import distributions as distributionsModule, multiplicity as multiplicityModule
+from fudge.productData import multiplicity as multiplicityModule
+from fudge.productData import distributions as distributionsModule
 
 from PoPs import IDs as PoPsIDsModule
-
-from xData import standards as standardsModule
-
 
 parser = argparse.ArgumentParser(description)
 parser.add_argument("input", help="reactionSuite to read and sum")
@@ -88,8 +89,8 @@ def removeSums( ReactionSuite, reactionList, newTotal ):
 
     reactionListIds = list(map(id, reactionList))
     sumsToRemove = []
-    for crossSectionSum in ReactionSuite.sums.crossSectionSums:
-        reactionsInSum = [summand.link.findClassInAncestry(reactionModule.reaction)
+    for crossSectionSum in ReactionSuite.sums.CrossSectionSums:
+        reactionsInSum = [summand.link.findClassInAncestry(reactionModule.Reaction)
                 for summand in crossSectionSum.summands]
         reactionsInSumIds = list(map(id, reactionsInSum))
 
@@ -107,7 +108,7 @@ def removeSums( ReactionSuite, reactionList, newTotal ):
                 # this sum is no longer necessary, now present in ReactionSuite.reactions
                 sumsToRemove.append( crossSectionSum )
             else:
-                newSummand = sumsModule.add( newTotal )
+                newSummand = sumsModule.Add( newTotal )
                 crossSectionSum.summands.summandList.append( newSummand )
 
         elif intersection < set(reactionListIds):
@@ -174,7 +175,7 @@ def sumCapture( ReactionSuite, info ):
     Q = max([(reac.outputChannel.Q.getConstantAs(info['energyUnit']), reac.outputChannel.Q.evaluated)
         for reac in captureReacs])
 
-    newCapture = reactionModule.reaction( outputChannelModule.Genre.NBody, ENDF_MT = 102 )
+    newCapture = reactionModule.Reaction(enumsModule.Genre.NBody, ENDF_MT=102)
     newCapture.crossSection.add( crossSection )
     newCapture.outputChannel.Q.add( Q[1] )
 
@@ -191,7 +192,7 @@ def sumCapture( ReactionSuite, info ):
         xsc = reaction.crossSection.toPointwise_withLinearXYs()
         multiplicityFactor = xsc / crossSection
 
-        if reaction.outputChannel.genre == outputChannelModule.Genre.twoBody:
+        if reaction.outputChannel.genre == enumsModule.Genre.twoBody:
             # primary gamma, often followed by cascade of discrete gammas
 
             photon = reaction.outputChannel.getProductWithName(photonId)
@@ -205,14 +206,14 @@ def sumCapture( ReactionSuite, info ):
 
             # change distribution from 2-body to uncorrelated primaryGamma
             primaryGammaValue = reaction.outputChannel.Q.getConstantAs( info['energyUnit'] )
-            angularDist = distributionsModule.angular.isotropic2d()
-            energyDist = distributionsModule.energy.primaryGamma( primaryGammaValue,
+            angularDist = distributionsModule.angular.Isotropic2d()
+            energyDist = distributionsModule.energy.PrimaryGamma( primaryGammaValue,
                     xsc.domainMin, xsc.domainMax,
                     axes = info['energySpectrumAxes'] )
-            newDistribution = distributionsModule.uncorrelated.form(
-                    info['style'], standardsModule.frames.labToken,
-                    distributionsModule.uncorrelated.angularSubform( angularDist ),
-                    distributionsModule.uncorrelated.energySubform( energyDist ) )
+            newDistribution = distributionsModule.uncorrelated.Form(
+                    info['style'], xDataEnumsModule.Frame.lab,
+                    distributionsModule.uncorrelated.AngularSubform( angularDist ),
+                    distributionsModule.uncorrelated.EnergySubform( energyDist ) )
             photon.distribution.clear()
             photon.distribution.add( newDistribution )
 
@@ -221,17 +222,17 @@ def sumCapture( ReactionSuite, info ):
             if residual.outputChannel:  # also have cascade of discrete gammas
                 photon = residual.outputChannel.getProductWithName(photonId)
                 distribution = photon.distribution.evaluated
-                if isinstance(distribution, distributionsModule.branching3d.form):
+                if isinstance(distribution, distributionsModule.branching3d.Form):
 
                     # FIXME: the same discrete gamma currently gets split into multiple products,
                     # for example it may appear both in the gamma cascade from 1st and 2nd excited states.
                     # Those should be combined together into a single product.
 
                     discretes = gammaCascade( ReactionSuite.PoPs,
-                            photon.parentProduct.id )
+                            photon.parentProduct.pid )
 
                     for energy, probability in discretes.items():
-                        newDiscrete = productModule.product( photonId )
+                        newDiscrete = productModule.Product(photonId)
 
                         newMultiplicity = multiplicityModule.XYs1d(
                                 label=info['style'],
@@ -240,14 +241,14 @@ def sumCapture( ReactionSuite, info ):
                         )
                         newDiscrete.multiplicity.add(newMultiplicity)
 
-                        angularDist = distributionsModule.angular.isotropic2d()
-                        energyDist = distributionsModule.energy.discreteGamma( energy,
+                        angularDist = distributionsModule.angular.Isotropic2d()
+                        energyDist = distributionsModule.energy.DiscreteGamma( energy,
                                 xsc.domainMin, xsc.domainMax,
                                 axes = info['energySpectrumAxes'] )
-                        newDistribution = distributionsModule.uncorrelated.form(
-                                info['style'], standardsModule.frames.labToken,
-                                distributionsModule.uncorrelated.angularSubform( angularDist ),
-                                distributionsModule.uncorrelated.energySubform( energyDist ) )
+                        newDistribution = distributionsModule.uncorrelated.Form(
+                                info['style'], xDataEnumsModule.Frame.lab,
+                                distributionsModule.uncorrelated.AngularSubform( angularDist ),
+                                distributionsModule.uncorrelated.EnergySubform( energyDist ) )
                         newDiscrete.distribution.add( newDistribution )
 
                         discreteGammas.append( newDiscrete )
@@ -306,15 +307,14 @@ def sumFission( ReactionSuite, info ):
     Q = max([(reac.outputChannel.Q.getConstantAs(info['energyUnit']), reac.outputChannel.Q.evaluated)
         for reac in fissionReacs])
 
-    newFission = reactionModule.reaction( outputChannelModule.Genre.NBody, ENDF_MT = 18,
-                                          fissionGenre=reactionsBaseModule.FissionGenre.total )
+    newFission = reactionModule.Reaction(enumsModule.Genre.NBody, ENDF_MT = 18, fissionGenre=enumsModule.FissionGenre.total)
     newFission.crossSection.add( crossSection )
     newFission.outputChannel.Q.add( Q[1] )
 
     # add dummy neutron and gamma products. Hauser-Feshbach codes don't model fission output, so
     # need to obtain that information from somewhere else
 
-    neutron = productModule.product( neutronId )
+    neutron = productModule.Product(neutronId)
 
     # place-holder for nubar
     nubar = multiplicityModule.XYs1d(
@@ -324,16 +324,16 @@ def sumFission( ReactionSuite, info ):
     )
     neutron.multiplicity.add(nubar)
 
-    angularDist = distributionsModule.angular.isotropic2d()
+    angularDist = distributionsModule.angular.Isotropic2d()
     energyDist = distributionsModule.energy.XYs2d(axes=info['energySpectrumAxes'])
     for energy in (crossSection.domainMin, crossSection.domainMax):
         energyDist.append( distributionsModule.energy.XYs1d(outerDomainValue=energy,
             data=[[1e-5, 2e+5], [2e-5, 0]] ) )
 
-    newDistribution = distributionsModule.uncorrelated.form(
-            info['style'], standardsModule.frames.labToken,
-            distributionsModule.uncorrelated.angularSubform( angularDist ),
-            distributionsModule.uncorrelated.energySubform( energyDist ) )
+    newDistribution = distributionsModule.uncorrelated.Form(
+            info['style'], xDataEnumsModule.Frame.lab,
+            distributionsModule.uncorrelated.AngularSubform( angularDist ),
+            distributionsModule.uncorrelated.EnergySubform( energyDist ) )
     neutron.distribution.add( newDistribution )
 
     newFission.outputChannel.products.uniqueLabel( neutron )
@@ -359,7 +359,7 @@ def sumMT5( ReactionSuite, info ):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    RS = reactionSuiteModule.readXML( args.input )
+    RS = reactionSuiteModule.ReactionSuite.readXML_file( args.input )
     info = {
             'style': RS.styles.getEvaluatedStyle().label,
             'energyUnit': RS.domainUnit,

@@ -4,16 +4,15 @@ import argparse
 from pqu import PQU
 from brownies.legacy.converting import endfFileToGNDS
 from fudge.core.utilities.brb import winged_banner
-from fudge.productData.distributions import XYs2d, regions2d, Legendre
+from fudge.productData.distributions import XYs2d, Regions2d, Legendre
 from fudge.productData.distributions import XYs1d as angularXYs1d
-from xData import XYs, axes
+from xData import XYs1d as XYs1dModule
+from xData import axes as axesModule
 import numpy.polynomial.legendre as legendreModule
 
 ENABLEANGDISTS = True
 TOOMANYENERGIES = 5000
 FIRSTLINE = " $Rev:: 700      $  $Date:: 2016-01-13#$                             1 0  0    0"
-
-evaluationENDFFile = '/Users/davidbrown/Desktop/cielo_iron.trunk/Fe56-CIELO/Full/CIELO-Iron.endf'
 
 
 def get_sad(theRxnSuite, _styleLabel, _MT, outgoingParticle='n'):
@@ -55,7 +54,7 @@ def Legendre_fit_to_xy_data(_xys, Lmax):
 
 def pack_datatable(_sad, Lmax=None, Emax=None):
     from brownies.BNL.inter.datatables import DataTable
-    from xData.table import columnHeader
+    from xData import table as tableModule
 
     if Lmax is None:
         Lmax = 100
@@ -84,7 +83,7 @@ def pack_datatable(_sad, Lmax=None, Emax=None):
     data = []
     egrid = []
     Llist = []
-    if isinstance(_sad, regions2d):
+    if isinstance(_sad, Regions2d):
         for iregion, region in enumerate(_sad):
             _Llist, _egrid, _data = __do_a_region(region)
             egrid += _egrid
@@ -94,7 +93,7 @@ def pack_datatable(_sad, Lmax=None, Emax=None):
                     Llist.append(L)
     elif isinstance(_sad, XYs2d):
         Llist, egrid, data = __do_a_region(_sad)
-    cols = [columnHeader(0, "E", 'eV')]+[columnHeader(L+1, 'L=%i' % L, "") for L in range(0, Lmax+1)]
+    cols = [tableModule.ColumnHeader(0, "E", 'eV')] + [tableModule.ColumnHeader(L+1, 'L=%i' % L, "") for L in range(0, Lmax+1)]
     return DataTable(data=data, columns=cols)
 
 
@@ -136,7 +135,7 @@ def get_LegendreMoments(theAngDist, defaultLmax=30, verbose=False):
         print("L=1 moment:", theLegMoments[1])
 
     # Construct the axes for all the XY's we'll need below
-    coeffAxes = axes.axes()
+    coeffAxes = axesModule.Axes(2)
     coeffAxes[0] = theAngDist.axes[0]
     coeffAxes[1] = theAngDist.axes[-1]
 
@@ -156,7 +155,7 @@ def get_LegendreMoments(theAngDist, defaultLmax=30, verbose=False):
         pass
 
     # Convert them to XYs
-    return {L: XYs.XYs1d(data=theLegMoments[L], axes=coeffAxes) for L in theLegMoments}
+    return {L: XYs1dModule.XYs1d(data=theLegMoments[L], axes=coeffAxes) for L in theLegMoments}
 
 
 def smooth_pointwise(theAngDist, weight_by_xs=None, egrid=None, NE=TOOMANYENERGIES):
@@ -245,7 +244,7 @@ def smooth_angular_distribution(theRxnSuite, styleLabel, MT, outgoingParticle='n
         .outputChannel \
         .getProductWithName(outgoingParticle) \
         .distribution[styleLabel].subforms[0]
-    if isinstance(theAngDist, regions2d):
+    if isinstance(theAngDist, Regions2d):
         for iregion, region in enumerate(theAngDist):
             if len(region) > NE:
                 print('Smooth region', iregion, 'it has', len(region), 'points')
@@ -270,8 +269,8 @@ def smooth_angular_distribution(theRxnSuite, styleLabel, MT, outgoingParticle='n
 def parse_args():
     """Process command line options"""
     parser = argparse.ArgumentParser(description='Reconstruct the angular distributions from an ENDF file')
-    parser.add_argument('-i', dest='inFile', type=str, default=evaluationENDFFile,
-                        help='Input ENDF file (Default: "%s")' % evaluationENDFFile)
+    parser.add_argument('-i', dest='inFile', type=str,
+                        help='Input ENDF file')
     parser.add_argument('-v', dest='verbose', default=False, action='store_true',
                         help='Enable verbose output (Default: False)')
     parser.add_argument('--makeEvalStyle', default=False, action='store_true',

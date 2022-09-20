@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -16,15 +16,15 @@ In the future, may also be used for 'thermal scattering law' particles.
 
 from . import particle as particleModule
 
-class alias( particleModule.alias ) :
+class Alias( particleModule.Alias ) :
 
     moniker = 'unorthodoxAlias'
 
-class particle( particleModule.particle ) :
+class Particle( particleModule.Particle ) :
 
     moniker = 'unorthodox'
     familyOrder = 5
-    alias = alias
+    alias = Alias
 
     def __lt__( self, other ) :
 
@@ -32,7 +32,7 @@ class particle( particleModule.particle ) :
         if( self.familyOrder != other.familyOrder ) : return( False )
         return( self.id < other.id )
 
-class suite( particleModule.suite ) :
+class Suite( particleModule.Suite ) :
 
     moniker = 'unorthodoxes'
-    particle = particle
+    particle = Particle

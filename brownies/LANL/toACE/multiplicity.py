@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,13 +9,13 @@
 This module adds the method toACE to the classes in the fudge.productData.multiplicity module.
 """
 
-from xData import standards as standardsModule
+from xData import enums as xDataEnumsModule
 
 from fudge.productData import multiplicity as multiplicityModule
 
 
 #
-#   polynomial multiplicity.
+#   Polynomial1d multiplicity.
 #
 def toACE( self ) :
 
@@ -25,7 +25,7 @@ def toACE( self ) :
         coefficients.append( coefficient / factor )
     return( [ 1, len( self ) ] + coefficients )
 
-multiplicityModule.polynomial.toACE = toACE
+multiplicityModule.Polynomial1d.toACE = toACE
 
 #
 #   XYs1d multiplicity.
@@ -33,9 +33,9 @@ multiplicityModule.polynomial.toACE = toACE
 def toACE( self ) :
 
     interpolation = 0
-    if( self.interpolation == standardsModule.interpolation.flatToken ) :
+    if self.interpolation == xDataEnumsModule.Interpolation.flat:
         interpolation = 1
-    elif( self.interpolation == standardsModule.interpolation.linlinToken ) :
+    elif self.interpolation == xDataEnumsModule.Interpolation.linlin:
         interpolation = 2
     if( interpolation == 0 ) : raise Exception( 'Interpolation "%s" not supported' % self.interpolation )
 

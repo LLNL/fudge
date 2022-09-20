@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,50 +9,48 @@
 This module contains the Ys1d class. 
 """
 
-__metaclass__ = type
-
 from pqu import PQU as PQUModule
 
-from . import standards as standardsModule
+from . import enums as enumsModule
 from . import base as baseModule
 from . import axes as axesModule
 from . import values as valuesModule
-from . import XYs as XYsModule
+from . import XYs1d as XYs1dModule
 
-class Ys1d( baseModule.xDataFunctional ) :
+class Ys1d( baseModule.XDataFunctional ):
 
     moniker = 'Ys1d'
     dimension = 1
 
-    ancestryMembers = ( 'Ys', )
+    ancestryMembers = ('Ys',)
 
-    def __init__( self, Ys, interpolation = standardsModule.interpolation.linlinToken, axes = None,
-            index = None, valueType = standardsModule.types.float64Token, outerDomainValue = None, label = None ) :
+    def __init__(self, Ys=None, interpolation=enumsModule.Interpolation.linlin, axes=None,
+            index=None, valueType=enumsModule.ValueType.float64, outerDomainValue=None, label=None) :
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
-                outerDomainValue = outerDomainValue, label = label )
+        baseModule.XDataFunctional.__init__(self, axes, index=index, valueType=valueType, outerDomainValue=outerDomainValue, label=label)
 
-        if( not( isinstance( interpolation, str ) ) ) : raise TypeError( 'interpolation must be a string' )
-        self.interpolation = interpolation
+        self.interpolation = enumsModule.Interpolation.checkEnumOrString(interpolation)
 
-        if( not( isinstance( Ys, valuesModule.values ) ) ) : raise TypeError( 'Ys must be an instance of values.values.' )
+        if Ys is None:
+            Ys = valuesModule.Values([])
+        if not isinstance(Ys, valuesModule.Values): raise TypeError('Ys must be an instance of values.values.')
         self.__Ys = Ys
-        self.__Ys.setAncestor( self )
+        self.__Ys.setAncestor(self)
 
-    def __len__( self ) :
+    def __len__(self):
 
-        return( len( self.__Ys ) )
+        return len(self.__Ys)
 
-    def __getitem__( self, index ) :
+    def __getitem__(self, index):
 
-        return( self.__Ys[index] )
+        return self.__Ys[index]
 
-    def __add__( self, other ) :
+    def __add__(self, other):
 
-        if( len( self.__Ys ) == 0 ) : return( other.copy( ) )
-        if( self.Ys.size != other.Ys.size ) : raise Exception( 'self.Ys.size = %d != other.Ys.size = %d' % ( self.Ys.size, other.Ys.size ) )
+        if len(self.__Ys) == 0: return other.copy( )
+        if self.Ys.length != other.Ys.length: raise Exception( 'self.Ys.length = %d != other.Ys.length = %d' % ( self.Ys.length, other.Ys.length ) )
 
-        if( self.__Ys.start <= other.Ys.start ) :
+        if self.__Ys.start <= other.Ys.start:
             ys1d_1 = self.copy( )
             ys1d_2 = other
         else :
@@ -64,14 +62,14 @@ class Ys1d( baseModule.xDataFunctional ) :
         for i1, y2 in enumerate( ys1d_2.Ys ) : values[i1+offset] += y2
         ys1d_1.Ys.values = values
 
-        return( ys1d_1 )
+        return ys1d_1
 
     @property
-    def Ys( self ) :
+    def Ys( self ):
 
-        return( self.__Ys )
+        return self.__Ys
 
-    def convertUnits( self, unitMap ) :
+    def convertUnits( self, unitMap ):
         """
         unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
         """
@@ -82,123 +80,114 @@ class Ys1d( baseModule.xDataFunctional ) :
             self.__Ys.values = [ yFactor * value for value in self.__Ys ]
         self.fixValuePerUnitChange( factors )
 
-    def copy( self ) :
+    def copy(self):
 
         axes = self.axes
-        if( axes is not None ) : axes = axes.copy( )
-        Ys = self.__class__( self.__Ys.copy( ), interpolation = self.interpolation, axes = axes, 
-                index = self.index, outerDomainValue = self.outerDomainValue, label = self.label )
-        return( Ys )
+        if axes is not None: axes = axes.copy()
+        Ys = self.__class__(Ys=self.__Ys.copy(), interpolation=self.interpolation, axes=axes, 
+                index=self.index, outerDomainValue=self.outerDomainValue, label=self.label)
+
+        return Ys
 
     __copy__ = copy
 
-    def evaluate( self, domainValue, extrapolation = standardsModule.noExtrapolationToken, epsilon = 0 ) :
+    def evaluate(self, domainValue, extrapolation=enumsModule.Extrapolation.none, epsilon=0):
 
         pass
 
     @property
-    def domainMin( self ) :
+    def domainMin( self ):
 
-        return( self.axes[1].domainMin )
-
-    @property
-    def domainMax( self ) :
-
-        return( self.axes[1].domainMax )
+        return self.axes[1].domainMin
 
     @property
-    def domainUnit( self ) :
+    def domainMax( self ):
 
-        return( self.axes[1].domainUnit )
-
-    def domainUnitConversionFactor( self, unitTo ) :
-
-        return( self.axes[1].domainUnitConversionFactor )
+        return self.axes[1].domainMax
 
     @property
-    def domainGrid( self ) :
+    def domainUnit( self ):
 
-        return( self.axes[1].domainGrid )
+        return self.axes[1].domainUnit
 
-    @property
-    def rangeMin( self ) :
+    def domainUnitConversionFactor( self, unitTo ):
 
-        return( min( self.__Ys.values ) )
-
-    @property
-    def rangeMax( self ) :
-
-        return( max( self.__Ys.values ) )
+        return self.axes[1].domainUnitConversionFactor
 
     @property
-    def rangeUnit( self ) :
+    def domainGrid( self ):
 
-        return( self.getAxisUnitSafely( 0 ) )
+        return self.axes[1].domainGrid
 
-    def rangeUnitConversionFactor( self, unitTo ) :
+    @property
+    def rangeMin( self ):
 
-        if( unitTo is None ) : return( 1. )
-        return( PQUModule.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
+        return min( self.__Ys.values )
 
-    def toPointwise_withLinearXYs( self, **kwargs ) :
+    @property
+    def rangeMax( self ):
 
-        cls = kwargs.pop( 'cls', XYsModule.XYs1d )
+        return max( self.__Ys.values )
+
+    @property
+    def rangeUnit( self ):
+
+        return self.getAxisUnitSafely( 0 )
+
+    def rangeUnitConversionFactor( self, unitTo ):
+
+        if unitTo is None: return 1.
+        return PQUModule.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo )
+
+    def toPointwise_withLinearXYs( self, **kwargs ):
+
+        cls = kwargs.pop( 'cls', XYs1dModule.XYs1d )
 
         xys = [ self.domainGrid[self.__Ys.start:self.__Ys.end], self.__Ys ]
-        return( cls( data = xys, dataForm = 'xsandys', interpolation = self.interpolation, axes = self.axes, index = self.index,
-                    valueType = self.valueType, outerDomainValue = self.outerDomainValue, label = self.label ) )
+        return cls( data = xys, dataForm = 'xsandys', interpolation = self.interpolation, axes = self.axes, index = self.index,
+                    valueType = self.valueType, outerDomainValue = self.outerDomainValue, label = self.label )
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        outline = kwargs.get( 'outline', False )
-        if( len( self ) < 6 ) : outline = False
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+        outline = kwargs.get('outline', False)
+        if len(self) < 6: outline = False
 
-        attributeStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
-        if( self.interpolation != standardsModule.interpolation.linlinToken ) :
+        attributeStr = baseModule.XDataFunctional.attributesToXMLAttributeStr(self)
+        if self.interpolation != enumsModule.Interpolation.linlin:
             attributeStr += ' interpolation="%s"' % self.interpolation
 
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ] 
-        if( self.isPrimaryXData( ) ) :
-            if( self.axes is not None ) : XMLList += self.axes.toXMLList( indent2 )
-        XMLList += self.__Ys.toXMLList( indent2, **kwargs )
-        XMLList[-1] += '</%s>' % self.moniker
+        XML_strList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ] 
+        if self.isPrimaryXData() and self.axes is not None: XML_strList += self.axes.toXML_strList(indent2)
+        XML_strList += self.__Ys.toXML_strList(indent2, **kwargs)
+        XML_strList[-1] += '</%s>' % self.moniker
 
-        return( XMLList )
+        return XML_strList
 
     @classmethod
-    def parseXMLNode( cls, xDataElement, xPath, linkData, axes = None ) :
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         Translates XML Ys1d into a Ys1d instance.
         """
 
-        xmlAttr = False
-        for attrName in ( 'label', 'outerDomainValue' ) :
-            if xDataElement.get(attrName) is not None:
-                xmlAttr = True
-                xPath.append( '%s[@%s="%s"]' % (xDataElement.tag, attrName, xDataElement.get(attrName) ) )
-                break
-        if( not xmlAttr ) : xPath.append( xDataElement.tag )
+        attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath, True) # parseBareNodeCommonAttributes adds to xPath.
+        if len(extraAttributes) > 0: raise Exception('Invalid attributes: %s.' % ( ', '.join(list(extraAttributes.keys())) ))
 
-        attrs = {      'interpolation' : standardsModule.interpolation.linlinToken, 'label' : None, 'index' : None, 'outerDomainValue' : None  }
-        attributes = { 'interpolation' : str,                                       'label' : str,  'index' : int,  'outerDomainValue' : float }
-        for key, item in list( xDataElement.items( ) ) :
-            if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
-            attrs[key] = attributes[key]( item )
+        values = None
+        for child in node:
+            if child.tag == 'values': values = valuesModule.Values.parseNodeUsingClass(child, xPath, linkData, **kwargs)
+        if values is None: raise Exception('No "values" child node found.')
 
-        axes = None
-        for subElement in xDataElement :
-            if( subElement.tag == axesModule.axes.moniker ) :
-                axes = axesModule.axes.parseXMLNode( subElement, xPath, linkData )
-            elif( subElement.tag == valuesModule.values.moniker ) :
-                Ys = valuesModule.values.parseXMLNode( subElement, xPath, linkData )
-            else :
-                raise TypeError( 'sub-element "%s" not valid' % subElement.tag )
+        ys1d = cls(Ys=values, **attributes)
 
-        ys1d = cls( Ys, axes = axes, **attrs )
+        extraNodes = baseModule.XDataFunctional.parseNodeStandardChildren(ys1d, node, xPath, linkData, **kwargs)
+        if len(extraNodes) == 1: values = extraNodes.pop()
 
-        xPath.pop( )
-        return( ys1d )
+        if len(extraNodes) > 0: raise Exception('Invalid nodes: %s.' % (', '.join([extraNode.tag for extraNode in extraNodes])))
+
+        xPath.pop()                             # Per comment above, parseBareNodeCommonAttributes adds to xPath.
+
+        return ys1d
 
     @staticmethod
     def defaultAxes( labelsUnits = None ) :
@@ -208,4 +197,4 @@ class Ys1d( baseModule.xDataFunctional ) :
         :return: new axes instance
         """
 
-        return( axesModule.axes( rank = 2, labelsUnits = labelsUnits ) )
+        return axesModule.Axes(2, labelsUnits = labelsUnits)

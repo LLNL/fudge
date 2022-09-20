@@ -1,26 +1,38 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-__metaclass__ = type
-
+from . import enums as enumsModule
+from LUPY import ancestry as ancestryModule
 from pqu import PQU as PQUModule
 
-from . import ancestry as ancestryModule
-
-class table( ancestryModule.ancestry ):
+class Table(ancestryModule.AncestryIO):
 
     moniker = 'table'
 
-    def __init__( self, columns = None, data = None ):
-        ancestryModule.ancestry.__init__( self )
+    def __init__(self, columns=None, data=None, storageOrder=enumsModule.StorageOrder.rowMajor):
+
+        ancestryModule.AncestryIO.__init__(self)
+
+        storageOrder = enumsModule.StorageOrder.checkEnumOrString(storageOrder)
+        if storageOrder != enumsModule.StorageOrder.rowMajor:
+            raise ValueError('Currently, only supported value for storageOrder is "%s", got "%s".' % (enumsModule.StorageOrder.rowMajor, storageOrder))
+        self.__storageOrder = storageOrder
+
         self.columns = columns or []
+
         self.data = data or []
         if not all( [len(d)==self.nColumns for d in self.data] ):
             raise ValueError("Data is the wrong shape for a table with %i columns!" % self.nColumns)
+
+    @property
+    def storageOrder(self):
+        """Returns to value of storageOrder."""
+
+        return self.__storageOrder
 
     @property
     def nColumns(self): return len(self.columns)
@@ -47,6 +59,8 @@ class table( ancestryModule.ancestry ):
 
     def addColumn( self, columnHeader, index=None ):
         """ add another column, either at 'index' or at the end of the table """
+        if not isinstance(columnHeader, ColumnHeader):
+            raise TypeError("addColumn requires a ColumnHeader instance but got %s" % type(columnHeader))
         if index:
             self.columns.insert(index, columnHeader)
             [row.insert(index, 0) for row in self.data]
@@ -102,7 +116,7 @@ class table( ancestryModule.ancestry ):
         columnWidths = [0] * self.nColumns
         xml = []
         for col in range(self.nColumns):
-            columnDat = [row[col] for row in self.data if not isinstance(row[col], blank)]
+            columnDat = [row[col] for row in self.data if not isinstance(row[col], Blank)]
             asStrings = list( map( PQUModule.toShortestString, columnDat ) )
             columnWidths[col] = max( list( map( len, asStrings ) ) )
 
@@ -137,7 +151,7 @@ class table( ancestryModule.ancestry ):
         template = ['%s' % (indent + ' ')] + ['%%%is' % l for l in columnWidths]
 
         def toString(val):
-            if isinstance(val, blank): return str(val)
+            if isinstance(val, Blank): return str(val)
             return PQUModule.toShortestString(val)
 
         if outline:
@@ -148,60 +162,74 @@ class table( ancestryModule.ancestry ):
             xml += [('   '.join(template) % tuple( map(toString, dataRow))).rstrip() for dataRow in self.data]
         return xml
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        indent3 = indent2 + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+        indent3 = indent2 + kwargs.get('incrementalIndent', '  ')
         if len(self.data) < 10: outline = False
 
-        xml = ['%s<%s rows="%i" columns="%i">' % (indent,self.moniker,self.nRows,self.nColumns)]
-        xml.append( '%s<columnHeaders>' % (indent2) )
-        for column in self.columns: xml += column.toXMLList( indent3 )
-        xml[-1] += '</columnHeaders>'
+        XML_strList = ['%s<%s rows="%i" columns="%i">' % (indent,self.moniker,self.nRows,self.nColumns)]
+        XML_strList.append('%s<columnHeaders>' % (indent2))
+        for column in self.columns: XML_strList += column.toXML_strList(indent3)
+        XML_strList[-1] += '</columnHeaders>'
 
         if not self.data:
-            xml.append( '%s<data/></%s>' % (indent2, self.moniker) )
-            return xml
+            XML_strList.append('%s<data/></%s>' % (indent2, self.moniker))
+            return XML_strList
 
-        xml.append( '%s<data>' % (indent2) )
-        xml+=self.toStringList(indent=indent3,kwargs=kwargs)
-        xml[-1] += '</data></%s>' % self.moniker
-        return xml
+        XML_strList.append('%s<data>' % (indent2))
+        XML_strList += self.toStringList(indent=indent3, **kwargs)
+        XML_strList[-1] += '</data></%s>' % self.moniker
+
+        return XML_strList
 
     @classmethod
-    def parseXMLNode(cls, element, xPath, linkData):
-        """Read a table element from xml into python. To convert a column or attribute from string to some other type,
-        enter the new type in the conversionTable: {'index':int, 'scatteringRadius':PhysicalQuantityWithUncertainty, etc}. """
+    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Read a table element from xml into python. To convert a column or attribute from string to some other type,
+        enter the new type in the conversionTable: {'index':int, 'scatteringRadius':PhysicalQuantityWithUncertainty, etc}.
+        """
 
-        xPath.append( element.tag )
-        def fixAttributes( items ):
+        xPath.append(element.tag)
+        def fixAttributes(items):
             attrs = dict(items)
             for key in attrs:
+                if key == 'index': attrs[key] = int(attrs[key])
                 if key in conversionTable: attrs[key] = conversionTable[key]( attrs[key] )
             return attrs
 
-        def floatOrBlank( val ):
-            if val=='_': return blank()
-            return float( val )
+        def floatOrBlank(val):
+            if val=='_': return Blank()
+            return float(val)
 
         conversionTable = linkData.get('conversionTable',{})
-        nRows,nColumns = int( element.get('rows') ), int( element.get('columns') )
-        _columns = element.find( 'columnHeaders' )
-        columns = [ columnHeader( **fixAttributes( list( column.items( ) ) ) ) for column in _columns ]
-        data = element.find( 'data' )
+        nRows = int(element.get('rows'))
+        nColumns = int(element.get('columns'))
+        storageOrder = element.get('storageOrder', enumsModule.StorageOrder.rowMajor)
+        if storageOrder != enumsModule.StorageOrder.rowMajor:
+            storageOrder = enumsModule.StorageOrder.fromString(storageOrder)
 
-        if data.text: data = list( map( floatOrBlank, data.text.split( ) ) )
-        else: data = []
+        _columns = element.find('columnHeaders')
+        columns = [ ColumnHeader(**fixAttributes(list(column.items()))) for column in _columns ]
+        data = element.find('data')
+
+        if data.text:
+            data = list(map(floatOrBlank, data.text.split()))
+        else:
+            data = []
         for i in range(len(columns)):
             if columns[i].name in conversionTable:
-                data[i::nColumns] = list( map( conversionTable[columns[i].name], data[i::nColumns] ) )
+                data[i::nColumns] = list(map(conversionTable[columns[i].name], data[i::nColumns]))
         assert len(data) == nRows * nColumns
         data = [data[i*nColumns:(i+1)*nColumns] for i in range(nRows)]
-        Table = cls( columns, data )
-        xPath.pop()
-        return Table
 
-class columnHeader:
+        table = cls(columns, data, storageOrder=storageOrder)
+
+        xPath.pop()
+
+        return table
+
+class ColumnHeader:
     """ defines one column in a table """
 
     def __init__( self, index, name, unit ):
@@ -209,44 +237,22 @@ class columnHeader:
         self.name = name
         self.unit = unit
 
-    def __str__(self): return '%s (%s)'%(self.name,self.unit)
+    def __str__(self):
+        return '%s (%s)'%(self.name,self.unit)
 
-    def toXMLList( self, indent = '', **kwargs ) :
+    def __eq__(self, other):
+        return self.name == other.name and self.unit == other.unit
 
-        xmlStr = '%s<column index="%d" name="%s" unit="%s"/>' % ( indent, self.index, self.name, self.unit )
-        return [xmlStr]
+    def toXML_strList(self, indent='', **kwargs):
 
-class blank:
-    """ Blank table entry, to indicate missing data """
+        return [ '%s<column index="%d" name="%s" unit="%s"/>' % ( indent, self.index, self.name, self.unit ) ]
+
+class Blank:
+    """Blank table entry, to indicate missing data."""
+
     def __init__( self ): pass
     def __str__( self ): return '_'
     def __add__( self, other ): return self
     def __radd__( self, other ): return self
     def __mul__( self, other ): return self
     def __rmul__( self, other ): return self
-
-
-if __name__ == '__main__':
-    """Sample uses for the table class: """
-
-    from xml.etree import cElementTree as parser
-
-    tt = table( columns=[
-        columnHeader( 0, 'energy', 'eV' ),
-        columnHeader( 1, 'spin', '' ),
-        columnHeader( 2, 'neutronWidth', 'eV' ),
-        columnHeader( 3, 'captureWidth', 'eV' ), ] )
-    for dat in ([-1.7, blank(), 3.2, 0.089],
-            [3.4, 0.5, 4.2, 0.072],
-            [5.6, 1.5, 2.76, blank()]):
-        tt.addRow( dat )
-    xmlstring = '\n'.join( tt.toXMLList() )
-    print(xmlstring)
-
-    element = parser.fromstring( xmlstring )
-    tt2 = table.parseXMLNode( element, xPath = [], linkData = {'conversionTable' : {'index':int} } )
-    xmlstring2 = '\n'.join( tt2.toXMLList() )
-    assert xmlstring == xmlstring2
-
-    # extract a column, converting eV -> MeV
-    print(tt2.getColumn('captureWidth', 'MeV'))

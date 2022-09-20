@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -47,7 +47,7 @@ value = 6.14110429447852724e+00, significantDigits = 3, order = 0, isPercent = F
 uncertainty = value = 4.49629906071862956e-02, significantDigits = 1, order = -2, isPercent = False
 
 As can be seen, the internal speed value is as expected. However, since the PQU class (with the help
-of the pqu_float class) tracks a value's significant digits, when a PQU instance is printed (via the __str__
+of the PQU_float class) tracks a value's significant digits, when a PQU instance is printed (via the __str__
 method), only at most 'significantDigits' are displayed. The allowed range for 'significantDigits' is
 1 to sys.float_info.dig + 1 inclusive. For addition and subtraction, the member 'order' is also required and
 is why the following output is the same for both print statements:
@@ -108,8 +108,8 @@ uncertainty = value = 1.99999999999999991e-06, significantDigits = 1, order = -6
 
 The PQU constructor (i.e., its __init__ method) allows various input options for creating an instance (see `PQU`_).
 
-Each PQU has three main members. They are a value stored as a :py:class:`pqu_float` instance, an uncertainty stored
-as a :py:class:`pqu_uncertainty` instance and a unit stored as a :py:class:`PhysicalUnit` instance.
+Each PQU has three main members. They are a value stored as a :py:class:`PQU_float` instance, an uncertainty stored
+as a :py:class:`PQU_uncertainty` instance and a unit stored as a :py:class:`PhysicalUnit` instance.
 
 ------------------------------------------------------------------------------------------
 Units and conversions
@@ -391,7 +391,7 @@ The PQU class has methods for the following arithmetic operations. Unless stated
 Supporting classes
 ------------------------------------------------------------------------------------------
 In addition to the :py:class:`PQU` class, the following classes are a part the the PQU module:
-:py:class:`parsers`, :py:class:`pqu_float`, :py:class:`pqu_uncertainty`, :py:class:`PhysicalUnit` and NumberDict.
+:py:class:`Parsers`, :py:class:`PQU_float`, :py:class:`PQU_uncertainty`, :py:class:`PhysicalUnit` and NumberDict.
 These classes are only intended as helper classes for the PQU class; hence, they have limited functionality and
 are only intended for internal use.
 
@@ -515,7 +515,6 @@ __version__ = '%s.%s.%s' % ( MAJORVERSION, MINORVERSION, PATCHVERSION )
 
 maxSignificantDigits = sys.float_info.dig
 
-__metaclass__ = type
 
 def compare( value1, value2, epsilonFactor = 0 ) :
     """
@@ -733,9 +732,9 @@ def floatToShortestString( value, significantDigits = 15, trimZeros = True, keep
 
 toShortestString = floatToShortestString    # For legacy use. Deprecated: last date 1-April-2014 (no joke).
 
-class pqu_float :
+class PQU_float :
     """
-    This class is used by PQU and pqu_uncertainty to store more information about a float than
+    This class is used by PQU and PQU_uncertainty to store more information about a float than
     is provided by the python float class as well as methods to operator on this information. The main members are:
 
     - value              --- The python value of the float.
@@ -748,7 +747,7 @@ class pqu_float :
 
     def __init__( self, value, significantDigits, isPercent = False, checkOrder = True ) :
         """
-        Returns a new pqu_float instance with value, significantDigits and isPercent. Order is calculated from value.
+        Returns a new PQU_float instance with value, significantDigits and isPercent. Order is calculated from value.
         If argument checkOrder is True, staticmethod self.fixFloatsOrder is called and its returned value and order
         are used.
         """
@@ -799,24 +798,24 @@ class pqu_float :
 
     def __abs__( self ) :
 
-        return( pqu_float( abs( self.value ), self.significantDigits, self._isPercent, checkOrder = False ) )
+        return( PQU_float( abs( self.value ), self.significantDigits, self._isPercent, checkOrder = False ) )
 
     def __neg__( self ) :
 
-        return( pqu_float( -self.value, self.significantDigits, self._isPercent, checkOrder = False ) )
+        return( PQU_float( -self.value, self.significantDigits, self._isPercent, checkOrder = False ) )
 
     def __add__( self, other ) :
 
         if( isinstance( other, PQU ) ) : return( other.__radd__( self ) )
         if( self._isPercent ) : raise Exception( 'Addition of per cent is not allowed (defined)' )
         significantOrder = self.order - self.significantDigits
-        if( isinstance( other, pqu_float ) ) :
+        if( isinstance( other, PQU_float ) ) :
             if( other._isPercent ) : raise Exception( 'Addition of per cent is not allowed (defined)' )
             value = other.value
             significantOrder = max( significantOrder, other.order - other.significantDigits )
         else :
             value = float( other )
-        pqu_f = pqu_float( value + self.value, significantOrder, False )
+        pqu_f = PQU_float( value + self.value, significantOrder, False )
         significantOrder = pqu_f.order - significantOrder
         pqu_f.setSignificantDigits( significantOrder )
         return( pqu_f )
@@ -831,7 +830,7 @@ class pqu_float :
     def __sub__( self, other ) :
 
         if( isinstance( other, PQU ) ) : return( other.__rsub__( self ) )
-        if( isinstance( other, pqu_float ) ) :
+        if( isinstance( other, PQU_float ) ) :
             other_ = -other
         else :
             other_ = -float( other )
@@ -850,11 +849,11 @@ class pqu_float :
 
         if( isinstance( other, PQU ) ) : return( other.__rmul__( self ) )
         significantDigits = self.significantDigits
-        if( isinstance( other, pqu_float ) ) :
+        if( isinstance( other, PQU_float ) ) :
             value, significantDigits = other.value, min( self.significantDigits, other.significantDigits )
         else :
             value = float( other )
-        return( pqu_float( value * self.value, significantDigits, False ) )
+        return( PQU_float( value * self.value, significantDigits, False ) )
 
     __rmul__ = __mul__
 
@@ -867,16 +866,16 @@ class pqu_float :
 
         if( isinstance( other, PQU ) ) : return( other.__rtruediv__( self ) )
         significantDigits = self.significantDigits
-        if( isinstance( other, pqu_float ) ) :
+        if( isinstance( other, PQU_float ) ) :
             value, significantDigits = other.value, min( self.significantDigits, other.significantDigits )
         else :
             value = float( other )
-        return( pqu_float( self.value / value, significantDigits, False ) )
+        return( PQU_float( self.value / value, significantDigits, False ) )
 
     def __rtruediv__( self, other ) :
 
         value = float( other )
-        return( pqu_float( value / self.value, self.significantDigits ) )
+        return( PQU_float( value / self.value, self.significantDigits ) )
 
     def __itruediv__( self, other ) :
 
@@ -890,7 +889,7 @@ class pqu_float :
     def __pow__( self, other ) :
 
         power = float( other )
-        return( pqu_float( self.value**power, self.significantDigits ) )
+        return( PQU_float( self.value**power, self.significantDigits ) )
 
     def __float__( self ) :
 
@@ -903,9 +902,9 @@ class pqu_float :
     __nonzero__ = __bool__      # for python 2.x
 
     def _setFrom( self, other ) :
-        """Sets self's members from other. Other must be a pqu_float instance."""
+        """Sets self's members from other. Other must be a PQU_float instance."""
 
-        if( not( isinstance( other, pqu_float ) ) ) : raise TypeError( "other type %s not supported" % type( other ) )
+        if( not( isinstance( other, PQU_float ) ) ) : raise TypeError( "other type %s not supported" % type( other ) )
         self.value = other.value
         self._isPercent = other._isPercent
         self.order = other.order
@@ -1052,12 +1051,12 @@ class pqu_float :
         """
 
         value = float( value )
-        order1 = pqu_float.calculateOrder( value )
-        order2 = pqu_float.calculateOrder( value * ( 1 + 4 * sys.float_info.epsilon ) )
+        order1 = PQU_float.calculateOrder( value )
+        order2 = PQU_float.calculateOrder( value * ( 1 + 4 * sys.float_info.epsilon ) )
         if( order1 != order2 ) :
             for i1 in range( 5 ) :
                 value_ = value * ( 1 + i1 * sys.float_info.epsilon )
-                order2 = pqu_float.calculateOrder( value_ )
+                order2 = PQU_float.calculateOrder( value_ )
                 if( order1 != order2 ) : break
             value = value_
             order1 = order2
@@ -1066,15 +1065,15 @@ class pqu_float :
     @staticmethod
     def surmiseSignificantDigits( value ) :
         """
-        This factory function returns a pqu_float instance given a float value and set its significantDigits to
+        This factory function returns a PQU_float instance given a float value and set its significantDigits to
         something "reasonable". The significantDigits are determined by using PQU.floatToShortestString with trimZeros = True.
         """
 
         value_ = PQU( floatToShortestString( float( value ), trimZeros = True ) )
-        return( pqu_float( value, value_.getSignificantDigits( ) ) )
+        return( PQU_float( value, value_.getSignificantDigits( ) ) )
 
 
-class pqu_uncertainty :
+class PQU_uncertainty :
     """
     This class is used by PQU to store the style of uncertainty and information about its value.
     The members are:
@@ -1084,7 +1083,7 @@ class pqu_uncertainty :
                 - pqu_uncertaintyStylePlusMinus     - The uncertainty was given as '+/- value' (e.g., '123 +/- 32').
                 - pqu_uncertaintyStyleParenthesis   - The uncertainty was given as '(value)' (e.g., '123(32)'.
 
-    * value --- The value stored as a pqu_float.
+    * value --- The value stored as a PQU_float.
     """
 
     pqu_uncertaintyStyleNone = None
@@ -1093,22 +1092,22 @@ class pqu_uncertainty :
 
     def __init__( self, uncertaintyStyle, value = None, significantDigits = 2, isPercent = False, checkOrder = True ) :
         """
-        Constructor method for the pqu_uncertainty class. The arguments value, significantDigits, isPrecent
-        and checkOrder are passed onto pqu_float. significantDigits will be forced to be 1 or 2.
+        Constructor method for the PQU_uncertainty class. The arguments value, significantDigits, isPrecent
+        and checkOrder are passed onto PQU_float. significantDigits will be forced to be 1 or 2.
         """
 
-        if( isPercent and ( uncertaintyStyle != pqu_uncertainty.pqu_uncertaintyStylePlusMinus ) ) :
-            raise Exception( 'percent only supported for style "%s"' % pqu_uncertainty.pqu_uncertaintyStylePlusMinus )
-        if( value == 0. ) : uncertaintyStyle = pqu_uncertainty.pqu_uncertaintyStyleNone
+        if( isPercent and ( uncertaintyStyle != PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) ) :
+            raise Exception( 'percent only supported for style "%s"' % PQU_uncertainty.pqu_uncertaintyStylePlusMinus )
+        if( value == 0. ) : uncertaintyStyle = PQU_uncertainty.pqu_uncertaintyStyleNone
         significantDigits = max( 1, min( 2, int( significantDigits ) ) )
 
         self.style = uncertaintyStyle
-        if( uncertaintyStyle == pqu_uncertainty.pqu_uncertaintyStyleNone ) :
-            self.value = pqu_float( 0., 2, checkOrder = False )
-        elif( uncertaintyStyle == pqu_uncertainty.pqu_uncertaintyStylePlusMinus ) :
-            self.value = pqu_float( abs( value ), significantDigits, isPercent, checkOrder = checkOrder )
-        elif( uncertaintyStyle == pqu_uncertainty.pqu_uncertaintyStyleParenthesis ) :
-            self.value = pqu_float( abs( value ), significantDigits, checkOrder = checkOrder )
+        if( uncertaintyStyle == PQU_uncertainty.pqu_uncertaintyStyleNone ) :
+            self.value = PQU_float( 0., 2, checkOrder = False )
+        elif( uncertaintyStyle == PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) :
+            self.value = PQU_float( abs( value ), significantDigits, isPercent, checkOrder = checkOrder )
+        elif( uncertaintyStyle == PQU_uncertainty.pqu_uncertaintyStyleParenthesis ) :
+            self.value = PQU_float( abs( value ), significantDigits, checkOrder = checkOrder )
         else :
             raise TypeError( 'Invalid uncertainty style "%s"' % uncertaintyStyle )
 
@@ -1128,7 +1127,7 @@ class pqu_uncertainty :
         "For internal use only. Only works if other is a float."
 
         if( not( isinstance( other, float ) ) ) : TypeError( 'Other type = "%s" not supported' % type( other ) )
-        return( pqu_uncertainty( self.style, self.value * other, significantDigits = self.value.significantDigits, isPercent = self.isPercent( ) ) )
+        return( PQU_uncertainty( self.style, self.value * other, significantDigits = self.value.significantDigits, isPercent = self.isPercent( ) ) )
 
     __rmul__ = __mul__
 
@@ -1147,10 +1146,10 @@ class pqu_uncertainty :
         """For internal use."""
 
         if( self.style == style ) : return( True )
-        if( self.style == pqu_uncertainty.pqu_uncertaintyStyleNone ) : return( False )
-        if( style == pqu_uncertainty.pqu_uncertaintyStyleNone ) : return( False )
-        if( ( style != pqu_uncertainty.pqu_uncertaintyStyleParenthesis ) and 
-            ( style != pqu_uncertainty.pqu_uncertaintyStylePlusMinus ) ) : raise TypeError( 'Invalid style "%s"' % style )
+        if( self.style == PQU_uncertainty.pqu_uncertaintyStyleNone ) : return( False )
+        if( style == PQU_uncertainty.pqu_uncertaintyStyleNone ) : return( False )
+        if( ( style != PQU_uncertainty.pqu_uncertaintyStyleParenthesis ) and 
+            ( style != PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) ) : raise TypeError( 'Invalid style "%s"' % style )
         if( checkPercent and self.value.isPercent( ) ) : raise Exception( "Cannot change pqu_uncertaintyStylePlusMinus that is a percent" )
         return( True )
 
@@ -1181,7 +1180,7 @@ class pqu_uncertainty :
         :rtype: `str`
         """
 
-        if( self.style == pqu_uncertainty.pqu_uncertaintyStyleNone ) : return( '' )
+        if( self.style == PQU_uncertainty.pqu_uncertaintyStyleNone ) : return( '' )
         return( self.value.info( significantDigits = significantDigits ) )
 
     def isUncertainty( self ) :
@@ -1190,7 +1189,7 @@ class pqu_uncertainty :
         :rtype: `bool`
         """
 
-        return( self.style != pqu_uncertainty.pqu_uncertaintyStyleNone )
+        return( self.style != PQU_uncertainty.pqu_uncertaintyStyleNone )
 
     def isPercent( self ) :
         """Returns True if self is a percent and False otherwise.
@@ -1198,7 +1197,7 @@ class pqu_uncertainty :
         :rtype: `bool`
         """
 
-        if( self.style == pqu_uncertainty.pqu_uncertaintyStylePlusMinus ) : return( self.value.isPercent( ) )
+        if( self.style == PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) : return( self.value.isPercent( ) )
         return( False )
 
     def toString( self, prefix = ' ', significantDigits = None ) :
@@ -1206,12 +1205,12 @@ class pqu_uncertainty :
         Returns a string representation of self (i.e., '+/- 1.2%').
 
         :param str prefix: A prefix for the '+/-' style
-        :param significantDigits: Passed onto method :py:meth:`pqu_float.toString`
+        :param significantDigits: Passed onto method :py:meth:`PQU_float.toString`
         :rtype: `str`
         """
 
-        if( self.style == pqu_uncertainty.pqu_uncertaintyStyleNone ) : return( '' )
-        if( self.style == pqu_uncertainty.pqu_uncertaintyStylePlusMinus ) :
+        if( self.style == PQU_uncertainty.pqu_uncertaintyStyleNone ) : return( '' )
+        if( self.style == PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) :
             favorEFormBy = 0
             if( self.value.order - self.value.getSignificantDigits( ) == 0 ) : favorEFormBy = 1
             return( '%s+/- %s' % ( prefix, self.value.toString( trimZeros = False, favorEFormBy = favorEFormBy, significantDigits = significantDigits ) ) )
@@ -1231,7 +1230,7 @@ class pqu_uncertainty :
 class PQU :
     """
     This class supports a float value with an optional uncertainty and unit. Many basic math operations are supported (e.g., +, -, * /). 
-    A PQU is anything that the staticmethod parsers.parsePQUString can parse.
+    A PQU is anything that the staticmethod Parsers.parsePQUString can parse.
 
     In this section the following notations are used:
 
@@ -1246,18 +1245,18 @@ class PQU :
         +---------------------------+-----------------------------------------------------------------------------------+
         | float                     | A python float (e.g., 1.23e-12).                                                  |
         +---------------------------+-----------------------------------------------------------------------------------+
-        | number                    | Any of the following, int, float, pqu_float, a string representing a float (i.e., |
+        | number                    | Any of the following, int, float, PQU_float, a string representing a float (i.e., |
         |                           | the python float function must be able to convert the string - e.g., '12.3e3' but |
         |                           | not '12.3 eV') or any object having a __float__ method (hence, a numpy float      |
         |                           | will work).                                                                       |
         +---------------------------+-----------------------------------------------------------------------------------+
-        | uncertainty = number_unc  | The uncertainty argument must be a valid number or a pqu_uncertainty object.      | 
+        | uncertainty = number_unc  | The uncertainty argument must be a valid number or a PQU_uncertainty object.      | 
         |                           | If number, uncertainty is of style '+/-'.                                         |
         +---------------------------+-----------------------------------------------------------------------------------+
         | unit = string_pu          | The unit argument must be a valid unit string (e.g., "MeV", "MeV/m" but not       |
         |                           | "1 MeV") or a PhysicalUnit object.                                                |
         +---------------------------+-----------------------------------------------------------------------------------+
-        | string                    | String can be anything that the method parsers.parsePQUString is                  |
+        | string                    | String can be anything that the method Parsers.parsePQUString is                  |
         |                           | capable of parsing (e.g., '1.23', '1.23 m', '1.23%', '1.23(12) m',                |
         |                           | '1.23 +/- 0.12m'). If it contains a unit (uncertainty) then the unit              |
         |                           | (uncertainty) argument must be None.                                              |
@@ -1295,12 +1294,12 @@ class PQU :
             self.uncertainty = copy.deepcopy( value.uncertainty )
             return
 
-        if( isinstance( uncertainty, pqu_uncertainty ) ) : uncertainty = copy.deepcopy( uncertainty )
+        if( isinstance( uncertainty, PQU_uncertainty ) ) : uncertainty = copy.deepcopy( uncertainty )
         if( isinstance( unit, PhysicalUnit ) ) : unit = copy.deepcopy( unit )
 
         if( isinstance( value, str  ) ) :
-            value, unit_, uncertainty_ = parsers.parsePQUString( value )
-            if( uncertainty_.style != pqu_uncertainty.pqu_uncertaintyStyleNone ) :
+            value, unit_, uncertainty_ = Parsers.parsePQUString( value )
+            if( uncertainty_.style != PQU_uncertainty.pqu_uncertaintyStyleNone ) :
                 if( uncertainty is not None ) :
                     raise Exception( 'uncertainty argument = "%s" must be None when value = "%s" is string with uncertainty.' % ( uncertainty, value ) )
                 uncertainty = uncertainty_
@@ -1309,11 +1308,11 @@ class PQU :
                     raise Exception( 'unit argument = "%s" must be None when value = "%s" is string with unit.' % ( unit, value ) )
             if( len( unit_.symbols ) > 0 ) : unit = unit_
         else :
-            if( isinstance( value, pqu_float ) ) :
+            if( isinstance( value, PQU_float ) ) :
                 value = copy.deepcopy( value )
             else :
                 try :
-                    value = pqu_float( value, maxSignificantDigits + 1, checkOrder = checkOrder )
+                    value = PQU_float( value, maxSignificantDigits + 1, checkOrder = checkOrder )
                 except :
                     raise TypeError( 'Cannot convert value = "%s" to a float.' % ( value, ) )
 
@@ -1321,36 +1320,36 @@ class PQU :
         unit = _findUnit( unit )           # unit can be a PhysicalUnit instance or a string convertible to PhysicalUnit object.
 
         if( uncertainty is None ) :
-            uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleNone )
+            uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleNone )
         else :
-            if( not( isinstance( uncertainty, pqu_uncertainty ) ) ) :
+            if( not( isinstance( uncertainty, PQU_uncertainty ) ) ) :
                 significantDigits, isPercent = 2, False
                 uncertainty_ = uncertainty
                 if( isinstance( uncertainty, str ) ) :
-                    uncertainty_, significantDigitsForZero, str2 = parsers.parseFloat( uncertainty, uncertainty )
+                    uncertainty_, significantDigitsForZero, str2 = Parsers.parseFloat( uncertainty, uncertainty )
                     if( str2[:1] == '%' ) : isPercent, str2 = True, str2[1:]
                     if( len( str2.strip( ) ) > 0 ) : raise Exception( 'Extra characters for uncertainty "%s"' % uncertainty )
-                if( isinstance( uncertainty, pqu_float ) ) :
+                if( isinstance( uncertainty, PQU_float ) ) :
                     significantDigits, isPercent = uncertainty_.getSignificantDigits( ), uncertainty_.isPercent( )
                 try :
                     uncertainty_ = float( uncertainty_ )
                 except :
                     raise TypeError( 'Invalid uncertainty = "%s"' % uncertainty )
                 if( uncertainty_ == 0. ) :
-                    uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleNone )
+                    uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleNone )
                 else :
-                    uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, uncertainty_, 
+                    uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, uncertainty_, 
                         significantDigits = significantDigits, isPercent = isPercent )
-            if( uncertainty.getStyle( ) == pqu_uncertainty.pqu_uncertaintyStylePlusMinus ) :
+            if( uncertainty.getStyle( ) == PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) :
                 uncertaintyLeastOrder = uncertainty.value.getOrder( ) - uncertainty.value.getSignificantDigits( )
                 if( uncertainty.value.isPercent( ) ) :
                     uncertainty_ = uncertainty.value * float( value )
                     uncertaintyLeastOrder = uncertainty_.getOrder( ) - uncertainty_.getSignificantDigits( ) # As uncertainty_ is still %.
                 significantDigits = value.getOrder( ) - uncertaintyLeastOrder
                 value.setSignificantDigits( significantDigits )
-            elif( uncertainty.getStyle( ) == pqu_uncertainty.pqu_uncertaintyStyleParenthesis ) :
-                parenthesisPower = pqu_float.fixFloatsOrder( pow( 10., value.order - value.significantDigits + 1 ) )[0]
-                uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleParenthesis, 
+            elif( uncertainty.getStyle( ) == PQU_uncertainty.pqu_uncertaintyStyleParenthesis ) :
+                parenthesisPower = PQU_float.fixFloatsOrder( pow( 10., value.order - value.significantDigits + 1 ) )[0]
+                uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleParenthesis, 
                     uncertainty.value * parenthesisPower, significantDigits = uncertainty.value.getSignificantDigits( ) )
 
         if( value.isPercent( ) ) :
@@ -1388,8 +1387,8 @@ class PQU :
         value = self.value + ( other.value + offset ) * factor
         uncertaintySelf, uncertaintyOther = self.getUncertaintyValueAs( ), other.getUncertaintyValueAs( ) * factor
         uncertainty = math.sqrt( uncertaintySelf * uncertaintySelf + uncertaintyOther * uncertaintyOther )
-                # Guess at style. If it should be pqu_uncertaintyStyleNone then uncertainty will be 0, which pqu_uncertainty will correct.
-        uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, uncertainty ) 
+                # Guess at style. If it should be pqu_uncertaintyStyleNone then uncertainty will be 0, which PQU_uncertainty will correct.
+        uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, uncertainty ) 
         leastSignificantOrder = value.order - value.significantDigits
         uncertainty.value.setSignificantDigits( uncertainty.value.order - leastSignificantOrder )
         return( PQU( value, self.unit, uncertainty ) )
@@ -1429,7 +1428,7 @@ class PQU :
         uncertainty = math.sqrt( uncertaintySelf2 * uncertaintySelf2 + uncertaintyOther2 * uncertaintyOther2 + 
             extraFactor * uncertaintySelf * uncertaintyOther )
         significantDigits = min( self.uncertainty.value.getSignificantDigits( ), other.uncertainty.value.getSignificantDigits( ) )
-        uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, uncertainty, significantDigits )
+        uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, uncertainty, significantDigits )
 
         return( PQU( self.value * other.value, unit = self.unit * other.unit, uncertainty = uncertainty ) )
 
@@ -1474,9 +1473,9 @@ class PQU :
 
         if( value != 0 ) :  # This is not the correct answer when value is small compared to uncertainty. Needs work?
             uncertainty = ( power * float( valueToPower ) / value ) * self.uncertainty
-            if( uncertainty.getStyle( ) == pqu_uncertainty.pqu_uncertaintyStyleParenthesis ) : 
-                uncertainty.style = pqu_uncertainty.pqu_uncertaintyStylePlusMinus
-        valueToPower = pqu_float( valueToPower, self.value.getSignificantDigits( ) )
+            if( uncertainty.getStyle( ) == PQU_uncertainty.pqu_uncertaintyStyleParenthesis ) : 
+                uncertainty.style = PQU_uncertainty.pqu_uncertaintyStylePlusMinus
+        valueToPower = PQU_float( valueToPower, self.value.getSignificantDigits( ) )
         return( PQU( valueToPower, unit = pow( self.unit, power ), uncertainty = uncertainty ) )
 
     def __float__( self ) :
@@ -1529,9 +1528,9 @@ class PQU :
     def changeUncertaintyStyle( self, style ) :
         """
         Changes self.uncertainty's style. If style is the same as self.uncertainty's style nothing is done. If style
-        or self.uncertainty's style is pqu_uncertainty.pqu_uncertaintyStyleNone as raise is executed.
+        or self.uncertainty's style is PQU_uncertainty.pqu_uncertaintyStyleNone as raise is executed.
 
-        :param style: One of the three pqu_uncertainty styles
+        :param style: One of the three PQU_uncertainty styles
         """
 
         self.uncertainty._okayToChangeUncertaintyStyleTo( style, checkPercent = False )
@@ -1548,17 +1547,17 @@ class PQU :
         """
 
         style = self.uncertainty.getStyle( )
-        if( style != pqu_uncertainty.pqu_uncertaintyStylePlusMinus ) :
+        if( style != PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) :
             raise TypeError( 'Can only change pqu_uncertaintyStylePlusMinus style to percent and not %s' % style )
         toPercent = bool( toPercent )
         if( toPercent != self.uncertainty.isPercent( ) ) :
             if( self.isPercent( ) ) : raise Exception( 'Uncertainty cannot be percent when value is a percent' )
             if( toPercent ) :
                 value = 100 * float( self.uncertainty ) / float( self )
-                self.uncertainty = pqu_uncertainty( style, value, 
+                self.uncertainty = PQU_uncertainty( style, value, 
                     self.uncertainty.value.getSignificantDigits( ), isPercent = True )
             else :
-                self.uncertainty = pqu_uncertainty( style, self.getUncertaintyValueAs( ), self.uncertainty.value.getSignificantDigits( ) )
+                self.uncertainty = PQU_uncertainty( style, self.getUncertaintyValueAs( ), self.uncertainty.value.getSignificantDigits( ) )
 
     def compare( self, other, epsilonFactor = 0 ) :
         """
@@ -1890,10 +1889,10 @@ class PQU :
     def setPercentFlag( self, isPercent, scaleValue = False ) :
         """
         Changes the percent flag only when self is dimensionless and isPercent != self.isPercent( ).
-        Otherwise, a raise is executed.  For scaleValue argument see :py:meth:`pqu_float.setPercentFlag`.
+        Otherwise, a raise is executed.  For scaleValue argument see :py:meth:`PQU_float.setPercentFlag`.
 
-        :param isPercent: See :py:meth:`pqu_float.setPercentFlag`
-        :param scaleValue: See :py:meth:`pqu_float.setPercentFlag`
+        :param isPercent: See :py:meth:`PQU_float.setPercentFlag`
+        :param scaleValue: See :py:meth:`PQU_float.setPercentFlag`
         """
 
         if( not( self.isDimensionless( ) ) ) : raise Exception( 'Can only set/unset percent on a dimensionless PQU: unit = "%s"' % self.unit )
@@ -1927,10 +1926,10 @@ class PQU :
         includePercent, str1, str2 = True, '', ''
         uncertainty = self.uncertainty
         if( self.isPercent( ) ) :
-            if(   self.uncertainty.style == pqu_uncertainty.pqu_uncertaintyStylePlusMinus ) :
+            if(   self.uncertainty.style == PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) :
                 str1, str2, includePercent = '(', ')%', False
                 uncertainty = uncertainty * 100
-            elif( self.uncertainty.style == pqu_uncertainty.pqu_uncertaintyStyleParenthesis ) :
+            elif( self.uncertainty.style == PQU_uncertainty.pqu_uncertaintyStyleParenthesis ) :
                 str2, includePercent = '%', False
 
         str1 += self.value.toString( trimZeros = trimZeros, includePercent = includePercent, significantDigits = significantDigits, keepPeriod = keepPeriod ) \
@@ -1942,7 +1941,7 @@ class PQU :
     def truncate( self, value = False, uncertainty = True ) :
         """
         If value is True, calls self.value's truncate method. If uncertainty is True, calls self.uncertainty's truncate method.
-        See :py:meth:`pqu_float.truncate`
+        See :py:meth:`PQU_float.truncate`
 
         :param value: If True self's value is truncated
         :type value: `bool`
@@ -2009,7 +2008,7 @@ class PQU :
 
 PhysicalQuantityWithUncertainty = PQU           # This is deprecated.
 
-class parsers :
+class Parsers :
     """
     .. rubric:: Regular Expression Matching
     """
@@ -2042,18 +2041,18 @@ class parsers :
         """
         This method parses the beginning of str1 for a valid float. An arbitrary number of white spaces can exists before the 
         float characters. This method returns a tuple of length 3. The first item of the tuple is the float 
-        value returned as a pqu_float instance with significantDigits determined from the string.  The second 
+        value returned as a PQU_float instance with significantDigits determined from the string.  The second 
         item is significantDigitsForZero which, if the string represents a 0 value, gives the number of significant 
         digits for the zero; otherwise None is returned. As example, the string '000.000' has 4 significant digits 
         (i.e., it is considered equivalent to the representation '0.000').  The last object is the string of all 
         characters after the last one used for converting the float.  For example, with str1 = '   12.345e3ABCD XYS' 
         the returned tuple is:
 
-        ( pqu_float( 1.2345e4, 5 ), None, 'ABCD XYS' ).
+        ( PQU_float( 1.2345e4, 5 ), None, 'ABCD XYS' ).
 
         :param str1: String to parse.
         :param fullStr: String which str1 is a part of.
-        :rtype: ( pqu_float, integer | None, string )
+        :rtype: ( PQU_float, integer | None, string )
         """
 
         """
@@ -2074,34 +2073,34 @@ class parsers :
         """
 
         if( not( isinstance( str1, str ) ) ) : raise TypeError( 'Argument must be a string: type = %s' % type( str1 ) )
-        match = parsers._floatingPoint_andAnythingElse_PO.match( str1 )
+        match = Parsers._floatingPoint_andAnythingElse_PO.match( str1 )
         if( match is None ) : raise TypeError( 'String does not start with a float: "%s" of "%s"' % ( str1, fullStr ) )
         groups = match.groups( )
-        value, order, significantDigits, significantDigitsForZero = parsers._parseFloatGroups( groups )
-        return( pqu_float( value, significantDigits, False, checkOrder = False ), significantDigitsForZero, groups[8] )
+        value, order, significantDigits, significantDigitsForZero = Parsers._parseFloatGroups( groups )
+        return( PQU_float( value, significantDigits, False, checkOrder = False ), significantDigitsForZero, groups[8] )
 
     @staticmethod
     def parsePlusMinusUncertainty( str1, fullStr ) :
         """
         This method parses the beginning of str1 for the sub-string '+/-' followed by a float string. An arbitrary number of 
         white spaces can exists before the '+/-' sub-string and between it and the float string. This method
-        returns a tuple of length 2. The first item of the tuple is float value returned as a pqu_uncertainty
+        returns a tuple of length 2. The first item of the tuple is float value returned as a PQU_uncertainty
         of style pqu_uncertaintyStylePlusMinus. Characters after the last one used for converting the float are 
         returned as the second item. For example, with str1 = ' +/-  12. ABCD XYS' the returned tuple is:
 
-        ( pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, 12. ), ' ABCD XYS' )
+        ( PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, 12. ), ' ABCD XYS' )
 
         :param str1: String to parse.
         :param fullStr: String which str1 is a part of.
-        :rtype: ( pqu_uncertainty, string )
+        :rtype: ( PQU_uncertainty, string )
         """
 
         if( not( isinstance( str1, str ) ) ) : raise TypeError( 'Argument must be a string: type = %s' % type( str1 ) )
-        match = parsers._uncertaintyPlusMinus_andAnythingElse_PO.match( str1 )
+        match = Parsers._uncertaintyPlusMinus_andAnythingElse_PO.match( str1 )
         if( match is None ) : raise TypeError( 'String does not match "+/-" with a float: "%s" of "%s"' % ( str1, fullStr ) )
         groups = match.groups( )
-        value, order, significantDigits, significantDigitsForZero = parsers._parseFloatGroups( groups )
-        uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, value, significantDigits, checkOrder = False )
+        value, order, significantDigits, significantDigitsForZero = Parsers._parseFloatGroups( groups )
+        uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, value, significantDigits, checkOrder = False )
         return( uncertainty, groups[8] )
 
     @staticmethod
@@ -2109,22 +2108,22 @@ class parsers :
         """
         This method parses the beginning of str1 for the sub-string '(#)' where '#' is a 1 or 2 digit
         number.  This method returns a tuple of length 2. The first item of the tuple is the number returned as 
-        a pqu_uncertainty of style pqu_uncertaintyStyleParenthesis. Characters after the ')' are returned 
+        a PQU_uncertainty of style pqu_uncertaintyStyleParenthesis. Characters after the ')' are returned 
         as the second item. For example, with str1 = '(34) ABCD XYS' the returned tuple is:
 
-        ( pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleParenthesis, 34, significantDigits = 2 ), ' ABCD XYS' ).
+        ( PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleParenthesis, 34, significantDigits = 2 ), ' ABCD XYS' ).
 
         :param str1: String to parse.
         :param fullStr: String which str1 is a part of.
-        :rtype: ( pqu_uncertainty, string )
+        :rtype: ( PQU_uncertainty, string )
         """
 
         if( not( isinstance( str1, str ) ) ) : raise TypeError( 'Argument must be a string: type = %s' % type( str1 ) )
-        match = parsers._uncertaintyParenthesis_andAnythingElse_PO.match( str1 )
+        match = Parsers._uncertaintyParenthesis_andAnythingElse_PO.match( str1 )
         if( match is None ) : raise TypeError( 'String does not match "(#)" or "(##)" where "#" is a digit: "%s" or "%s"' % 
             ( str1, fullStr ) )
         groups = match.groups( )
-        uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleParenthesis, float( groups[0] ), len( groups[0] ), checkOrder = False )
+        uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleParenthesis, float( groups[0] ), len( groups[0] ), checkOrder = False )
         return( uncertainty, groups[1] )
 
     @staticmethod
@@ -2147,14 +2146,14 @@ class parsers :
                 if( groups[4] is not None ) : mantissa += groups[4]
             significantDigits = len( mantissa.lstrip( '0' ) )
 
-        value, order = pqu_float.fixFloatsOrder( float( groups[0] ) )
+        value, order = PQU_float.fixFloatsOrder( float( groups[0] ) )
         return( value, order, significantDigits, significantDigitsForZero )
 
     @staticmethod
     def parsePQUString( str1 ) :
         """
-        Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of pqu_float, 
-        unit is an instance of PhysicalUnit and uncertainty is an instance of pqu_uncertainty.
+        Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of PQU_float, 
+        unit is an instance of PhysicalUnit and uncertainty is an instance of PQU_uncertainty.
 
         The string can be one of the following PQU forms. Here, F represents a valid float string, () represents
         the string '(#)' where '#' is a 1 or 2 digit number, +/- represents the string '+/- F', % is itself
@@ -2189,31 +2188,31 @@ class parsers :
         Note 1) 5% of 234 is 11.7 rounded to 12.
 
         :param str1: String to parse.
-        :rtype: ( pqu_float, PhysicalUnit, pqu_uncertainty )
+        :rtype: ( PQU_float, PhysicalUnit, PQU_uncertainty )
         """
 
         str2, form10, isPercent = str1.strip( ), False, False
         if( str2[:1] == "(" ) : form10, str2 = True, str2[1:]
-        value, significantDigitsForZero, str2 = parsers.parseFloat( str2, str1 )
+        value, significantDigitsForZero, str2 = Parsers.parseFloat( str2, str1 )
 
         if( form10 ) :
-            uncertainty, str2 = parsers.parsePlusMinusUncertainty( str2, str1 )
+            uncertainty, str2 = Parsers.parsePlusMinusUncertainty( str2, str1 )
             uncertainty.value *= 0.01
             str2 = str2.strip( )
             if( str2 != ')%' ) : raise TypeError( 'input not of the form "(F +/- F)%' )
             isPercent, str2 = True, ''
         else :
-            uncertainty = pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleNone )
+            uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleNone )
             if( str2[:1] == '%' ) :          # The '%' must immediately follow the float string.
                 isPercent, str2 = True, str2[1:]
             else :
                 str2 = str2.strip( )
                 if( str2[:1] == '(' ) :      # Must be '()' style uncertainty.
-                    uncertainty, str2 = parsers.parseParenthesisUncertainty( str2, str1 )
+                    uncertainty, str2 = Parsers.parseParenthesisUncertainty( str2, str1 )
                     if( str2[:1] == '%' ) : isPercent, str2 = True, str2[1:]
                     if( significantDigitsForZero is not None ) : value.setSignificantDigits( significantDigitsForZero + 1 )
                 elif( str2[:1] == '+' ) :    # Must be '+/-' style uncertainty.
-                    uncertainty, str2 = parsers.parsePlusMinusUncertainty( str2, str1 )
+                    uncertainty, str2 = Parsers.parsePlusMinusUncertainty( str2, str1 )
                     if( str2[:1] == '%' ) :          # The '%' must immediately follow the float string.
                         str2 = str2[1:]
                         uncertainty.value.setPercentFlag( True, scaleValue = True )
@@ -2535,7 +2534,7 @@ def _round( x ) :
         x_ = math.floor( x )
     else:
         x_ = math.ceil( x )
-    if( isinstance( x, pqu_float ) ) : x_ = pqu_float( x_, x.getSignificantDigits( ) )
+    if( isinstance( x, PQU_float ) ) : x_ = PQU_float( x_, x.getSignificantDigits( ) )
     return( x_ )
 
 def _getPhysicalUnit( elf ) :

@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -317,7 +317,7 @@ class endl3dmath :
         if ( zLabel is None ) and ( self.zLabel is not None ) : zLabel = self.zLabel
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, zMin = zMin, zMax = zMax, zLabel = zLabel, \
             xrot = xrot, zrot = zrot )
-        f = fudgeFileMisc.fudgeTempFile( )
+        f = fudgeFileMisc.FudgeTempFile( )
         f.write( endl3dmath.__repr__( self ) )
         f.close( )
         p = os.path.join( __file__.split( 'fudge/legacy/' )[0], "fudge", "vis", "gnuplot", "endl3dplot.py" )

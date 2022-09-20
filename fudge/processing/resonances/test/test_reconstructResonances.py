@@ -1,5 +1,5 @@
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,7 +8,10 @@
 import unittest
 import os
 import sys
+
+from pqu import PQU
 from fudge import reactionSuite
+from fudge.resonances.resolved import RMatrix, BoundaryCondition
 from fudge.processing.resonances.reconstructResonances import *
 import fudge.processing.resonances.getCoulombWavefunctions as getCoulombWavefunctions
 
@@ -43,48 +46,48 @@ if not os.path.exists(os.path.join(TEST_DATA_PATH, 'SLBWExample1SRes_testFile.gn
 
 if VERBOSE:
     print('reading SLBWExample1SRes...')
-SLBWExample1SRes = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'SLBWExample1SRes_testFile.gnds.xml')
+SLBWExample1SRes = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'SLBWExample1SRes_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading SLBWExample1PRes...')
-SLBWExample1PRes = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'SLBWExample1PRes_testFile.gnds.xml')
+SLBWExample1PRes = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'SLBWExample1PRes_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading SLBWExample...')
-SLBWExample = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'SLBWExampleFull_testFile.gnds.xml')
+SLBWExample = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'SLBWExampleFull_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading MLBWExample...')
-MLBWExample = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'MLBWExampleFull_testFile.gnds.xml')
+MLBWExample = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'MLBWExampleFull_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading MLBWExample1PRes...')
-MLBWExample1PRes = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'MLBWExample1PRes_testFile.gnds.xml')
+MLBWExample1PRes = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'MLBWExample1PRes_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading MLBWExampleZr90...')
-MLBWExampleZr90 = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'MLBWExampleZr90_testFile.gnds.xml')
+MLBWExampleZr90 = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'MLBWExampleZr90_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading RMExample...')
-RMExample = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'RMExampleFull_testFile.gnds.xml')
+RMExample = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'RMExampleFull_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading RMExampleSmall...')
-RMExampleSmall = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'RMExampleSmall_testFile.gnds.xml')
+RMExampleSmall = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'RMExampleSmall_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading RMLExample...')
-RMLExample = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'RMLExampleFull_testFile.gnds.xml')
+RMLExample = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'RMLExampleFull_testFile.gnds.xml')
 
 if VERBOSE:
     print('reading RMLExampleSmall...')
-RMLExampleSmall = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'RMLExampleSmall_testFile.gnds.xml')
+RMLExampleSmall = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'RMLExampleSmall_testFile.gnds.xml')
 
 if DOFETESTS:
     if VERBOSE:
         print('reading RMLExampleFe...')
-    RMLExampleFe = reactionSuite.readXML(TEST_DATA_PATH+os.sep+'RMLExampleFe_testFile.gnds.xml')
+    RMLExampleFe = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'RMLExampleFe_testFile.gnds.xml')
 
 # ----------------------------------------------------------------------------------
 #
@@ -839,7 +842,7 @@ class TestSLBWClassAndBaseClasses(TestWithIsClose):
         for answer in answers:
             result = self.RRR.getCrossSection(answer[0])
             for k in answer[1]:
-                self.assertAlmostEqual(answer[1][k], result[k][0])
+                self.assertAlmostEqual(answer[1][k], result[k][0], places=3)
 
     def test_getCrossSection1SRes(self):
         """Test thermal & a few other points"""
@@ -1862,7 +1865,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         #print 'RM',result
         answer = {'capture':0.17536290484357434, 'total':2.1313431546619341, 'fission':0., 'elastic':1.9559802498183596}
         for k in answer:
-            self.assertAlmostEqual( answer[k], result[k][0]  )
+            self.assertAlmostEqual(answer[k], result[k][0], places=5)
 
 
 
@@ -1883,7 +1886,7 @@ class TestRMLClassAndBaseClasses(TestWithIsClose):
                          (38202.334010000006, 13.813142300000001, 1.0375000000000001, 1.3300000000000001,
                           6.5323189999999993, 2.6911670000000001, 46.809660000000001, 218.29737, 662.81119999999999,
                           643.18999999999994, 5423.7999999999993, 1609.5999999999999, 622905.38398000004))
-        self.assertEqual(self.RRRSmall.RR.moniker, 'RMatrix')
+        self.assertEqual(self.RRRSmall.RR.moniker, RMatrix.moniker)
         self.assertEqual(self.RRRSmall.targetSpin, 1.5)
         self.assertEqual(str(self.RRRSmall.target), 'Cl35')
         self.assertEqual(str(self.RRRSmall.projectile), 'n')
@@ -1893,8 +1896,8 @@ class TestRMLClassAndBaseClasses(TestWithIsClose):
         self.assertEqual(self.RRRSmall.verbose, False)
 
     def test_RR_memberData(self):
-        self.assertEqual(self.RRRSmall.RR.approximation, 'Reich_Moore')
-        self.assertEqual(self.RRRSmall.RR.boundaryCondition, 'EliminateShiftFunction')
+        self.assertEqual(self.RRRSmall.RR.approximation, RMatrix.Approximation.ReichMoore)
+        self.assertEqual(self.RRRSmall.RR.boundaryCondition, BoundaryCondition.EliminateShiftFunction)
         self.assertEqual(self.RRRSmall.RR.relativisticKinematics, False)
         self.assertEqual(self.RRRSmall.RR.reducedWidthAmplitudes, False)
         #self.assertEqual(self.RRRSmall.RR.calculatePenetrability, True)  # FIXME: why not this one too?
@@ -1912,11 +1915,10 @@ class TestRMLClassAndBaseClasses(TestWithIsClose):
 
     def test_RR_openChannel_memberData(self):
         self.assertEqual(self.RRRSmall.RR.resonanceReactions[1].label, 'n + Cl35')
-        self.assertEqual(str(self.RRRSmall.RR.resonanceReactions[1].reactionLink),
+        self.assertEqual(str(self.RRRSmall.RR.resonanceReactions[1].link),
                          "/reactionSuite/reactions/reaction[@label='n + Cl35']")
-        self.assertEqual(self.RRRSmall.RR.resonanceReactions[1].computeShiftFactor, False)
-        self.assertEqual(self.RRRSmall.RR.resonanceReactions[1].scatteringRadius.getValueAs('fm'), 4.82222)
-        self.assertEqual(self.RRRSmall.RR.resonanceReactions[1].hardSphereRadius.getValueAs('fm'), 4.88875)
+        self.assertEqual(self.RRRSmall.RR.resonanceReactions[1].getScatteringRadius().getValueAs('fm'), 4.82222)
+        self.assertEqual(self.RRRSmall.RR.resonanceReactions[1].getHardSphereRadius().getValueAs('fm'), 4.88875)
         self.assertAlmostEqual(self.RRRSmall.RR.resonanceReactions[0].reactionInfo['Xi'], -8827250.63441, 5)
         self.assertAlmostEqual(self.RRRSmall.RR.resonanceReactions[1].reactionInfo['Xi'], -0.0)
         self.assertAlmostEqual(self.RRRSmall.RR.resonanceReactions[2].reactionInfo['Xi'], -632965.817883407, 6)
@@ -2083,9 +2085,9 @@ class TestRMLClassAndBaseClasses(TestWithIsClose):
         self.assertEqual(self.RRR.eta(Ex=4.0, pA=nCl35[0], pB=nCl35[1]), 0.0)  # neutron has no charge
         self.assertEqual(self.RRR.eta(Ex=4.0, pA=gCl36[0], pB=gCl36[1]),
                          0.0)  # gamma has no charge, but no mass, still should get 0
-        self.assertAlmostEqual(self.RRR.eta(Ex=4.0e4, pA=pSi[0], pB=pSi[1]), 12.644818547132786)
+        self.assertAlmostEqual(self.RRR.eta(Ex=4.0e4, pA=pSi[0], pB=pSi[1]), 12.644818547132786, places=5)
         self.assertAlmostEqual(self.RRR.eta(Ex=4.0, pA=pSi[0], pB=pSi[1]),
-                               1264.4818547132786)  # I checked the number by hand, so it should be OK
+                               1264.4818547132786, places=3)  # I checked the number by hand, so it should be OK
 
         # Code below is for getting a table of etas for the test case
         if False:
@@ -2715,13 +2717,13 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
         self.assertEqual( [ x.L for x in self.Zr90URR.URR.Ls ], [0, 1, 2])
         self.assertEqual( self.Zr90URR.URR.useForSelfShieldingOnly, True)
         self.assertEqual( self.Zr90URR.URR.moniker, 'tabulatedWidths')
-        self.assertEqual( str(self.Zr90URR.URR.scatteringRadius.getValueAs('fm')), '7.16' )
+        self.assertEqual( str(self.Zr90URR.URR.getScatteringRadius().getValueAs('fm')), '7.16' )
         for LSection in self.Zr90URR.URR.Ls:
             for JSection in LSection.Js:
                 self.assertEqual( JSection.widths[0].degreesOfFreedom, 1.0 )
                 self.assertEqual( JSection.widths[1].degreesOfFreedom, 0.0 )
                 self.assertEqual( len(JSection.widths), 2 )
-                #self.assertEqual(''.join(JSection.energyDependentWidths.toXMLList()),
+                #self.assertEqual(''.join(JSection.energyDependentWidths.toXML_strList()),
                 #                 '<table rows="17" columns="4">  <columnHeaders>    <column index="0" name="energy" unit="eV"/>    <column index="1" name="levelSpacing" unit="eV"/>    <column index="2" name="neutronWidth" unit="eV"/>    <column index="3" name="captureWidth" unit="eV"/></columnHeaders>  <data>   <!-- energy | levelSpacing | neutronWidth | captureWidth  -->            2e5        8655.91      0.5280105      0.1416092            3e5       7811.708      0.4765142      0.1476385            4e5       7054.611      0.4303313      0.1538193            5e5       6375.102      0.3888812      0.1601527            6e5       5764.775      0.3516513      0.1666401            7e5       5216.188      0.3181875      0.1732827            8e5       4722.749      0.2880877      0.1800816            9e5       4278.602      0.2609947      0.1870381            1e6       3878.548      0.2365914      0.1941535          1.1e6       3517.969      0.2145961      0.2014288          1.2e6       3192.751      0.1947578      0.2088653          1.3e6       2899.241      0.1768537      0.2164641          1.4e6        2634.18       0.160685      0.2242264          1.5e6        2394.66      0.1460743      0.2321535          1.6e6       2178.092      0.1328636      0.2402462          1.7e6       1982.151      0.1209112       0.248506        1780460       1838.063      0.1121218      0.2552738</data></table>')
                 break
             break
@@ -2756,7 +2758,7 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
         result = self.Zr90URR.getCrossSection(1e+6)
         answer = { 'total':6.6530426032410315, 'elastic':6.648122758610173, 'fission':0.0, 'capture':0.004919844630858361 }
         for k in answer:
-            self.assertTrue( floatsAlmostEqual( answer[k], result[k], epsilon=1e-14 ) )
+            self.assertAlmostEqual( float(answer[k]), float(result[k]), places=5 )
 
     def test_rho(self):
         self.assertEqual( self.Zr90URR.rho(E=0.), 0.0 )

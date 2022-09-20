@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,7 +9,7 @@
 
 import argparse
 
-from PoPs.groups import misc as PoPs_groupsMiscModule
+from PoPs.chemicalElements import misc as PoPs_chemicalElementMiscModule
 
 description = """For each argument entered, which must be an isotope name specified by either its ZA (1000 * Z + A) or its PoPs id,
 this script prints that argument, its ZA and PoPs id."""
@@ -26,10 +26,10 @@ data = []
 for name in args.names :
     if( name[0] in '123456789' ) :
         ZA = int( name )
-        popsId = PoPs_groupsMiscModule.idFromZA( ZA )
+        popsId = PoPs_chemicalElementMiscModule.idFromZA( ZA )
     else :
         popsId = name
-        ZA = PoPs_groupsMiscModule.ZAInfo_fromString( popsId )[2]
+        ZA = PoPs_chemicalElementMiscModule.ZAInfo_fromString( popsId )[2]
 
     width1 = max( width1, len( name ) )
     width3 = max( width3, len( popsId ) )

@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # <<BEGIN-copyright>>
-# Copyright 2021, Lawrence Livermore National Security, LLC.
+# Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,7 +12,7 @@ import random
 from PoPs import database as databaseModule
 from PoPs import alias as aliasModule
 
-from PoPs.groups import misc as chemicalElementMiscModule
+from PoPs.chemicalElements import misc as chemicalElementMiscModule
 
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
@@ -27,10 +27,7 @@ from PoPs.families import lepton as leptonModule
 from PoPs.families import baryon as baryonModule
 from PoPs.families import nuclide as nuclideModule
 
-from PoPs.groups import isotope as isotopeModule
-from PoPs.groups import chemicalElement as chemicalElementModule
-
-database = databaseModule.database( 'test', '1.2.3' )
+database = databaseModule.Database( 'test', '1.2.3' )
 
 def nuclides( Z, A, data ) :
 
@@ -40,40 +37,40 @@ def nuclides( Z, A, data ) :
     for index in keys :
         name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( isotopeID, index )
         nameLower = name[:1].lower( ) + name[1:]
-        level = nuclideModule.particle( name )
+        level = nuclideModule.Particle( name )
         nucleus = level.nucleus
 
         atomicMass, nuclearMass, energy, charge, halflife, spin, parity = data[index]
 
-        energy = nuclearEnergyLevelModule.double( 'base', energy, quantityModule.stringToPhysicalUnit( 'keV' ) )
+        energy = nuclearEnergyLevelModule.Double( 'base', energy, quantityModule.stringToPhysicalUnit( 'keV' ) )
         level.energy.add( energy )
 
         if( atomicMass is not None ) :
-            mass = massModule.double( 'base', atomicMass, quantityModule.stringToPhysicalUnit( 'amu' ) )
+            mass = massModule.Double( 'base', atomicMass, quantityModule.stringToPhysicalUnit( 'amu' ) )
             level.mass.add( mass )
 
         if( nuclearMass is not None ) :
-            mass = massModule.double( 'base', nuclearMass, quantityModule.stringToPhysicalUnit( 'amu' ) )
+            mass = massModule.Double( 'base', nuclearMass, quantityModule.stringToPhysicalUnit( 'amu' ) )
             nucleus.mass.add( mass )
 
         if( charge is not None ) :
-            charge = chargeModule.integer( 'base', charge, quantityModule.stringToPhysicalUnit( 'e' ) )
+            charge = chargeModule.Integer( 'base', charge, quantityModule.stringToPhysicalUnit( 'e' ) )
             nucleus.charge.add( charge )
 
         if( halflife is not None ) :
             if( halflife == 'stable' ) :
-                halflife = halflifeModule.string( 'base', halflife, quantityModule.stringToPhysicalUnit( 's' ) )
+                halflife = halflifeModule.String( 'base', halflife, quantityModule.stringToPhysicalUnit( 's' ) )
             else :
                 time, unit = halflife.split( )
-                halflife = halflifeModule.double( 'base', float( time ), quantityModule.stringToPhysicalUnit( unit ) )
+                halflife = halflifeModule.Double( 'base', float( time ), quantityModule.stringToPhysicalUnit( unit ) )
             nucleus.halflife.add( halflife )
 
         if( spin is not None ) :
-            spin = spinModule.fraction( 'base', spinModule.fraction.toValueType( spin ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
+            spin = spinModule.Fraction( 'base', spinModule.Fraction.toValueType( spin ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
             nucleus.spin.add( spin )
 
         if( parity is not None ) :
-            parity = parityModule.integer( 'base', parity, quantityModule.stringToPhysicalUnit( '' ) )
+            parity = parityModule.Integer( 'base', parity, quantityModule.stringToPhysicalUnit( '' ) )
             nucleus.parity.add( parity )
 
         database.add( level )
@@ -105,23 +102,23 @@ Am242Data = { 0 : [ 242.059549159,      None,        0,   None, '16.02 h',    1,
               2 : [          None,      None,    48.60,   None,  '141 yr',    5,     -1 ],
               3 : [          None,      None,    52.70,   None,      None,    3,     -1 ] }
 nuclides( 95, 242, Am242Data )
-database.add( aliasModule.metaStable( 'Am242_m1', 'Am242_e2', 1 ) )
+database.add(aliasModule.MetaStable('Am242_m1', 'Am242_e2', 1))
 
-photon = gaugeBosonModule.particle( 'photon' )
+photon = gaugeBosonModule.Particle( 'photon' )
 
-mass = massModule.double( 'base', 0, quantityModule.stringToPhysicalUnit( 'amu' ) )
+mass = massModule.Double( 'base', 0, quantityModule.stringToPhysicalUnit( 'amu' ) )
 photon.mass.add( mass )
 
-charge = chargeModule.integer( 'base', 0, quantityModule.stringToPhysicalUnit( 'e' ) )
+charge = chargeModule.Integer( 'base', 0, quantityModule.stringToPhysicalUnit( 'e' ) )
 photon.charge.add( charge )
 
-halflife = halflifeModule.string( 'base', 'stable', quantityModule.stringToPhysicalUnit( 's' ) )
+halflife = halflifeModule.String( 'base', 'stable', quantityModule.stringToPhysicalUnit( 's' ) )
 photon.halflife.add( halflife )
 
-spin = spinModule.fraction( 'base', spinModule.fraction.toValueType( '1' ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
+spin = spinModule.Fraction( 'base', spinModule.Fraction.toValueType( '1' ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
 photon.spin.add( spin )
 
-parity = parityModule.integer( 'base', 1, quantityModule.stringToPhysicalUnit( '' ) )
+parity = parityModule.Integer( 'base', 1, quantityModule.stringToPhysicalUnit( '' ) )
 photon.parity.add( parity )
 
 database.add( photon )
@@ -131,62 +128,62 @@ leptons = [ [ 'e-',      5.48579909070e-4, -1,     'stable', '1/2',  1, 'electro
             [ 'mu',      0.1134289267,     -1, 2.1969811e-6, '1/2',  1, 'muonic' ] ]
 
 for id, mass, charge, halflife, spin, parity, generation in leptons :
-    lepton = leptonModule.particle( id, generation = generation )
+    lepton = leptonModule.Particle( id, generation = generation )
 
-    mass = massModule.double( 'base', mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
+    mass = massModule.Double( 'base', mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
     lepton.mass.add( mass )
 
-    charge = chargeModule.integer( 'base', charge, quantityModule.stringToPhysicalUnit( 'e' ) )
+    charge = chargeModule.Integer( 'base', charge, quantityModule.stringToPhysicalUnit( 'e' ) )
     lepton.charge.add( charge )
 
     if( halflife == 'stable' ) :
-        halflife = halflifeModule.string( 'base', halflife, quantityModule.stringToPhysicalUnit( 's' ) )
+        halflife = halflifeModule.String( 'base', halflife, quantityModule.stringToPhysicalUnit( 's' ) )
     else :
-        halflife = halflifeModule.double( 'base', halflife, quantityModule.stringToPhysicalUnit( 's' ) )
+        halflife = halflifeModule.Double( 'base', halflife, quantityModule.stringToPhysicalUnit( 's' ) )
     lepton.halflife.add( halflife )
 
-    spin = spinModule.fraction( 'base', spinModule.fraction.toValueType( spin ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
+    spin = spinModule.Fraction( 'base', spinModule.Fraction.toValueType( spin ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
     lepton.spin.add( spin )
 
-    parity = parityModule.integer( 'base', parity, quantityModule.stringToPhysicalUnit( '' ) )
+    parity = parityModule.Integer( 'base', parity, quantityModule.stringToPhysicalUnit( '' ) )
     lepton.parity.add( parity )
 
     database.add( lepton )
 
-database.add( aliasModule.particle( 'electron', 'e-' ) )
-database.add( aliasModule.particle( 'e+', 'e-_anti' ) )
-database.add( aliasModule.particle( 'positron', 'e-_anti' ) )
-database.add( aliasModule.particle( 'd', 'h2' ) )
-database.add( aliasModule.particle( 't', 'h3' ) )
+database.add(aliasModule.Alias('electron', 'e-'))
+database.add(aliasModule.Alias('e+', 'e-_anti'))
+database.add(aliasModule.Alias('positron', 'e-_anti'))
+database.add(aliasModule.Alias('d', 'h2'))
+database.add(aliasModule.Alias('t', 'h3'))
 
 baryons = [ [ 'n', 1.00866491588,     0,    881.5, '1/2', 1 ],
             [ 'p', 1.007276466812,    1, 'stable', '1/2', 1 ] ]
 
 for _id, _mass, _charge, _halflife, _spin, _parity in baryons :
     for anti in [ '', '_anti' ] :
-        baryon = baryonModule.particle( _id + anti )
+        baryon = baryonModule.Particle( _id + anti )
 
-        mass = massModule.double( 'base', _mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
+        mass = massModule.Double( 'base', _mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
         baryon.mass.add( mass )
 
-        charge = chargeModule.integer( 'base', _charge, quantityModule.stringToPhysicalUnit( 'e' ) )
+        charge = chargeModule.Integer( 'base', _charge, quantityModule.stringToPhysicalUnit( 'e' ) )
         baryon.charge.add( charge )
 
         if( _halflife == 'stable' ) :
-            halflife = halflifeModule.string( 'base', _halflife, quantityModule.stringToPhysicalUnit( 's' ) )
+            halflife = halflifeModule.String( 'base', _halflife, quantityModule.stringToPhysicalUnit( 's' ) )
         else :
-            halflife = halflifeModule.double( 'base', _halflife, quantityModule.stringToPhysicalUnit( 's' ) )
+            halflife = halflifeModule.Double( 'base', _halflife, quantityModule.stringToPhysicalUnit( 's' ) )
         baryon.halflife.add( halflife )
 
-        spin = spinModule.fraction( 'base', spinModule.fraction.toValueType( _spin ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
+        spin = spinModule.Fraction( 'base', spinModule.Fraction.toValueType( _spin ), quantityModule.stringToPhysicalUnit( 'hbar' ) )
         baryon.spin.add( spin )
 
-        parity = parityModule.integer( 'base', _parity, quantityModule.stringToPhysicalUnit( '' ) )
+        parity = parityModule.Integer( 'base', _parity, quantityModule.stringToPhysicalUnit( '' ) )
         baryon.parity.add( parity )
 
         database.add( baryon )
 
 xmld1 = database.toXML( )
 print( xmld1 )
-database2 = database.parseXMLStringAsClass( xmld1 )
+database2 = database.parseXMLString(xmld1)
 if( xmld1 != database2.toXML( ) ) : raise Exception( 'Fix me.' )

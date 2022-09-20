@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 #def check_is_cross_section( x ):
 #    if not isinstance( x, component ):
-#        raise TypeError( "Not instance of fudge.reactionData.crossSection.component" )
+#        raise TypeError( "Not instance of fudge.reactionData.crossSection.Component" )
 
 
 #def computeReaclibARR(xs, T):
