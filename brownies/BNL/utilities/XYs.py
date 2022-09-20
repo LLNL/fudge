@@ -57,8 +57,7 @@ def grouped_values_to_XYs(groupBdries, valueList,
     curve = XYs1dModule.XYs1d(
         data=[groupBdries, [valueList[0]] + valueList],
         dataForm="xsandys",
-        interpolation=xDataEnumsModule.InterpolationQualifier.flat,
+        interpolation=xDataEnumsModule.Interpolation.flat,
         axes=XYs1d.defaultAxes(labelsUnits={XYs1dModule.yAxisIndex: (rangeName, rangeUnit), XYs1dModule.xAxisIndex: (domainName, domainUnit)}))
 
     return curve
-
