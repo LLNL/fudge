@@ -164,8 +164,10 @@ class ComplexEncoder(json.JSONEncoder):
         if isinstance(obj, datatables.DataTable):
             return obj.to_string()
         # Let the base class default method raise the TypeError
-        return json.JSONEncoder.default(self, obj)
-
+        try:
+            return json.JSONEncoder.default(self, obj)
+        except TypeError:
+            return str(obj)
 
 class Report(collections.OrderedDict):
 
