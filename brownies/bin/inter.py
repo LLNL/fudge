@@ -3,7 +3,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -253,7 +253,7 @@ if __name__ == "__main__":
             if theArgs.reportFormat == 'txt':
                 if isinstance(rep[k], report.Report):
                     repOut = rep[k].text_report()
-                elif isinstance(rep[k], xData.table.table):
+                elif isinstance(rep[k], xData.table.Table):
                     repOut = '\n'.join(rep[k].toStringList())
                 else:
                     repOut = str(rep[k])
