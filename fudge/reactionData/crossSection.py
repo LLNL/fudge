@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -34,7 +34,7 @@ from fudge import abstractClasses as abstractClassesModule
 from fudge import styles as stylesModule
 
 from . import URR_probabilityTables as URR_probabilityTablesModule
-
+from fudge.covariances import enums as covarianceEnumsModule 
 
 lowerEps = 1e-8
 upperEps = 1e-8
@@ -95,7 +95,7 @@ class XYs1d( BaseCrossSectionForm, XYs1dModule.XYs1d ) :
             alpha = ( f - f1 ) / ( f2 - f1 )
             return( math.pow( x1 * y1, 1 - alpha ) * math.pow( x2 * y2, alpha ) / x )
 
-        if( cls is None ) : cls = XYs1d 
+        if( cls is None ) : cls = XYs1d
         if self.interpolation == xDataEnumsModule.Interpolation.chargedParticle:
             if interpolation != xDataEnumsModule.Interpolation.linlin:
                 raise TypeError('Only "%s" interpolation for conversion from %s' % (xDataEnumsModule.Interpolation.linlin, self.interpolation))
@@ -139,13 +139,13 @@ class XYs1d( BaseCrossSectionForm, XYs1dModule.XYs1d ) :
 
         return( XYs1dModule.XYs1d.evaluate( self, xValue ) )
 
-    def heat( self, currentTemperature, newTemperature, massRatio, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.001, 
+    def heat( self, currentTemperature, newTemperature, massRatio, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.001,
                 heatAllPoints = False, doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True,
                 setThresholdToZero = False ) :
         """
-        Returns a linear version of the cross section heated to 'newTemperature'. If the current temperature of the 
+        Returns a linear version of the cross section heated to 'newTemperature'. If the current temperature of the
         cross section, given by 'currentTemperature', is greater than 'newTemperature' a raise is executed.
-        If lowerlimit is None, it is set to 'oneOverV' except when the reaction is determined to be a threshold reaction, 
+        If lowerlimit is None, it is set to 'oneOverV' except when the reaction is determined to be a threshold reaction,
         then it is set to 'threshold'. Any cross section with domainMin greater than 2.5e-4 eV is determined to be a
         threshold reaction. If upperlimit is None it is set to 'constant'.
         If heatBelowThreshold is False, then EMin is set to the larger of EMin and self's domainMin.
@@ -161,16 +161,16 @@ class XYs1d( BaseCrossSectionForm, XYs1dModule.XYs1d ) :
         import types
         if not hasattr(heat, 'crossSectionAdjustForHeatedTarget') and hasattr(heat, 'heat'):
             from crossSectionAdjustForHeatedTarget import heat
-            
+
         if not isinstance(heat.crossSectionAdjustForHeatedTarget, types.BuiltinFunctionType):
             from crossSectionAdjustForHeatedTarget import crossSectionAdjustForHeatedTarget as heat
 
-        assert isinstance(heat.crossSectionAdjustForHeatedTarget, types.BuiltinFunctionType) 
+        assert isinstance(heat.crossSectionAdjustForHeatedTarget, types.BuiltinFunctionType)
 
         dT = newTemperature - currentTemperature
         if( abs( dT ) <= 1e-2 * newTemperature ) : dT = 0.
         if( dT < 0 ) : raise Exception( 'Current temperature "%s" (in energy units) higher than desired temperature "%s"' %
-                ( currentTemperature, newTemperature ) ) 
+                ( currentTemperature, newTemperature ) )
 
         heated = unheated = self
         if( not( unheated.nf_pointwiseXY.isInterpolationLinear( ) ) ) :
@@ -229,7 +229,7 @@ class XYs1d( BaseCrossSectionForm, XYs1dModule.XYs1d ) :
                 if( ( i1 % 2 ) != 0 ) :
                     xString = xFormat % value
                     if( i1 > 1 ) :
-                        if( xString == priorXString ) : 
+                        if( xString == priorXString ) :
                             if( xFormat == maxXFormat ) :
                                 raise ValueError( 'x-value strings identical: "%s" and "%s"' % ( priorXString, xString ) )
                             kwargs['xFormat'] = maxXFormat
@@ -694,7 +694,7 @@ class ResonancesWithBackground( BaseCrossSectionForm ) :
         xPath.pop()
 
         return resWithBack
-    
+
 class Reference( linkModule.Link, BaseCrossSectionForm ) :
     """This cross section form consists of a reference to another cross section."""
 
@@ -804,7 +804,7 @@ class URR_probabilityTables1d( BaseCrossSectionForm, xDataBaseModule.XDataFuncti
         self.__data.convertUnits( unitMap )
 
     def toXML_strList( self, indent = "", **kwargs ) :
-    
+
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlList = [ '%s<%s label="%s">' % ( indent, self.moniker, self.label ) ]
@@ -881,7 +881,7 @@ class Component( abstractClassesModule.Component ) :
         crossSection2 = other.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
         if( abs( crossSection2.domainMin - crossSection1.domainMin ) > threshold_epsilon * ( crossSection1.domainMin + crossSection1.domainMin ) ) :
             relativeError = ( crossSection2.domainMin - crossSection1.domainMin ) / ( crossSection1.domainMin + crossSection1.domainMin )
-            diffResults.append( 'Cross section thresholds differ', 'relative error = %.6e: %.12e vs %.12e %s' % 
+            diffResults.append( 'Cross section thresholds differ', 'relative error = %.6e: %.12e vs %.12e %s' %
                     ( relativeError, crossSection1.domainMin, crossSection2.domainMin, crossSection1.domainUnit ), self.toXLink( ), other.toXLink( ) )
 
     def effectiveThreshold(self):
@@ -906,9 +906,9 @@ class Component( abstractClassesModule.Component ) :
                 if( form.nf_pointwiseXY.isInterpolationLinear( ) ) : return( form )
         return( None )
 
-    def heat( self, style, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.001, 
+    def heat( self, style, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.001,
             heatAllPoints = False, doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True, setThresholdToZero = False,
-            addToSuite = False ) : 
+            addToSuite = False ) :
         """
         Returns the result of self.toPointwise_withLinearXYs( ).heat( ... ). See method crossSection.XYs1d.heat for more information.
         If setThresholdToZero is True and self's cross section at the first point is 0., then the heated cross section's
@@ -941,7 +941,7 @@ class Component( abstractClassesModule.Component ) :
             massRatio = target.getMass( 'amu' ) / projectileMass
 
         linear = self.toLinear( label = style.derivedFrom, accuracy = 1e-5, upperEps = 1e-8 )
-        heated = linear.heat( currentTemperature, newTemperature, massRatio, EMin, lowerlimit, upperlimit, interpolationAccuracy, 
+        heated = linear.heat( currentTemperature, newTemperature, massRatio, EMin, lowerlimit, upperlimit, interpolationAccuracy,
                 heatAllPoints, doNotThin, heatBelowThreshold, heatAllEDomain, setThresholdToZero = setThresholdToZero )
         heated.label = style.label
         if( addToSuite ) : self.add( heated )
@@ -951,7 +951,7 @@ class Component( abstractClassesModule.Component ) :
         """
         Check cross section data for correct threshold, negative cross sections, etc.
         Returns a list of any warnings encountered during checking.
-        
+
         :param dict info:  A Python dictionary containing the parameters that control the cross section checking.
         :keyword boolean CoulombReaction: True if target and projectile are both charged particles, or if two or more products are charged particles.
         :keyword float Q: a parameter of `info`: if Q is positive (and CoulombReaction=False), cross section must start at crossSectionEnergyMin,
@@ -1182,7 +1182,7 @@ class Component( abstractClassesModule.Component ) :
         # Check that the inputs are of the correct type
         if not isinstance( f2, XYs1dModule.XYs1d ): raise TypeError( "spectrum must be an XYs1d instance")
 
-        # Convert the cross section toXYs1d 
+        # Convert the cross section toXYs1d
         ptwise = self.hasLinearForm()
         if ptwise is None: ptwise = self.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
 
@@ -1225,9 +1225,9 @@ class Component( abstractClassesModule.Component ) :
         grid = theCovariance.matrix.axes[-1].values.values
         gridUnit = theCovariance.matrix.axes[-1].unit
         covGroupBdries = list(grid)
-        if theCovariance.type == 'absolute':
+        if theCovariance.type == covarianceEnumsModule.Type.absolute:
             phi = f2.group( covGroupBdries, norm=None )
-        elif theCovariance.type == 'relative':
+        elif theCovariance.type == covarianceEnumsModule.Type.relative:
             phi = f2.group( covGroupBdries, ptwise, norm=None )
         else: raise ValueError( "Unknown covariance type: %s"%str(type(covariance)))
 
