@@ -798,7 +798,7 @@ if __name__ == "__main__":
         for k in rep:
             if isinstance(rep[k], report.Report):
                 repOut = rep[k].text_report()
-            elif isinstance(rep[k], xData.table.table):
+            elif isinstance(rep[k], xData.table.Table):
                 repOut = '\n'.join(rep[k].toStringList())
             else:
                 repOut = str(rep[k])
@@ -1066,7 +1066,7 @@ if __name__ == "__main__":
                 continue
             elif k == 'Main' and not showMeta:
                 continue
-            elif isinstance(rep[k], xData.table.table):
+            elif isinstance(rep[k], xData.table.Table):
                 outFile.write("<H1>%s</H1>" % k)
                 outFile.write(TABLE(rep[k], row_labels=[get_key_from_channel(x) for x in rrr.allChannels]))
             else:
