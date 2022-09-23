@@ -634,7 +634,7 @@ def makeCrossSectionPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=No
 
             # and plot all the rest, they don't get covariances...
             if showparts:
-                if isinstance(thisReaction, fudge.sums.crossSectionSum):
+                if isinstance(thisReaction, fudge.sums.CrossSectionSum):
                     for summand in thisReaction.summands:
                         # FIXME: I shouldn't have to do this, but apparently I need to
                         summand.setAncestor(thisReaction.summands)
