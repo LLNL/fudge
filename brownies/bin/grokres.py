@@ -461,11 +461,11 @@ def plot_fraction_missing(_lsas, num_chunks, chunk_size, _Es, L=None, J=None, sk
             d3errs.append(delta3[1])
     ds = []
     ds.append(PlotDataSet(
-        data=[xs, rhos, xerrs, rhoerrs],
+        data=[xs, rhos, numpy.abs(xerrs), numpy.abs(rhoerrs)],
         _type='scatter_xydxdy', legend='Using $\\rho$'))
     if not skipDelta3:
         ds.append(PlotDataSet(
-            data=[xs, d3s, xerrs, d3errs],
+            data=[xs, d3s, numpy.abs(xerrs), numpy.abs(d3errs)],
             _type='scatter_xydxdy', legend='Using $\\Delta_3$'))
     plot_functions(ds,
                    title='%s missing resonance fraction for L=%i, J=%s' % (title_string, L, J),
