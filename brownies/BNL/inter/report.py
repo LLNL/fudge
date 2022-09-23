@@ -742,7 +742,7 @@ def getChannelDataTable(rs, metricMenu, title="Channels", doURR=False, verbose=F
     icol = 0
 
     def addColumn(columns, icol, key, unit=None):
-        columns[key] = tableModule.columnHeader(icol, key, unit=unit)
+        columns[key] = tableModule.ColumnHeader(icol, key, unit=unit)
         icol += 1
 
     def updateColumnsAndRow(columns, row, icol, key, val, unit=None):
