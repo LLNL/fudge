@@ -142,7 +142,7 @@ class LevelSequenceAnalyzer:
                 theData.append([thisEnergy, theData[-1][1] + 1])
         if domainMax is not None and domainMax > self.levels[-1]:
             theData.append([domainMax, theData[-1][1]])
-        return XYs1dModule.XYs1d(axes=myAxes, data=theData, interpolation=xDataEnumsModule.InterpolationQualifier.flat).domainSlice(
+        return XYs1dModule.XYs1d(axes=myAxes, data=theData, interpolation=xDataEnumsModule.Interpolation.flat).domainSlice(
             domainMin=domainMin, domainMax=domainMax)
 
     def getNNSDist(self, normalizeByMeanLevelSpacing=True, normalizeDistribution=True, numBins=None):
@@ -406,4 +406,3 @@ class LevelSequenceAnalyzer:
         IAEA NDS Report INDC(NDS)-0561 (2009)
         """
         raise NotImplementedError("write me")
-
