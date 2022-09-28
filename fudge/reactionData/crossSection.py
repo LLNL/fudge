@@ -1121,17 +1121,16 @@ class Component( abstractClassesModule.Component ) :
         """
         import fudge.covariances.covarianceMatrix as covModule
 
-        # Get that the covariance goes with the data.
+        # Get the covariance that goes with the data.
         if covariance is None:
             if hasattr(self.evaluated, 'uncertainty') and self.evaluated.uncertainty:
-                if hasattr(self.evaluated.uncertainty.data,'link') and self.evaluated.uncertainty.data.link is not None:
+                if isinstance(self.evaluated.uncertainty.data, linkModule.Link) and self.evaluated.uncertainty.data.linkWithoutUpdating is not None:
                     covariance = self.evaluated.uncertainty.data.link
                 elif covarianceSuite is not None:
-                    covariance = self.evaluated.uncertainty.followXPath(startNode=covarianceSuite)
-                    #covariance = self.evaluated.uncertainty.data.follow(startNode=covarianceSuite)
+                    covariance = self.evaluated.uncertainty.data.follow(startNode=covarianceSuite)
         else:
-            if covariance is not( isinstance( covariance, covModule.CovarianceMatrix ) ):
-                raise TypeError( 'covariance must be of type CovarianceMatrix, got %s'%str(type(covariance)))
+            if not isinstance( covariance, covModule.CovarianceMatrix ):
+                raise TypeError( 'covariance must be of type CovarianceMatrix, got %s' % type(covariance))
 
         return covariance
 
