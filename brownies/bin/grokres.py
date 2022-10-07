@@ -1043,77 +1043,22 @@ if __name__ == "__main__":
                                     title_string=titleString_reaction, scaled=True, legend_loc='lower left',
                                     outfile=spinGroups[LJ]['channels'][c]['filename_widthdist'], clear=True)
 
-        #print(spinGroups)
-        #exit()
-
-        # Setup the output filestream
-        #if theArgs.outFile is not None:
-        #    if theArgs.outFile.endswith('.html'):
-        #        outFile = open(theArgs.outFile, mode='w')
-        #    else:
-        #        outFile = open(theArgs.outFile + '.html', mode='w')
-        #else:
-        #    import io
-        #    outFile = io.StringIO()
-
         # Now do the main part of the report
         showMeta = False
         rep = get_resonance_report(theEvaluation)
         for k in rep:
             if 'URR' in k and len(rep[k]) == 0:
                 rep[k]['warnings']=["No URR in this evaluation"]
-                #outFile.write("<H1>No URR in this evaluation</H1>")
             elif 'RRR' in k and len(rep[k]) == 0:
                 rep[k]['warnings']=["No RRR in this evaluation"]
-                #outFile.write("<H1>No RRR in this evaluation</H1>")
-            #elif len(rep[k]) == 0:
-            #    continue
-            #elif k == 'Main' and not showMeta:
-            #    continue
-            #elif isinstance(rep[k], xData.table.Table):
-            #    rep[k] = rep[k].json_report()
-                #outFile.write("<H1>%s</H1>" % k)
-                #outFile.write(TABLE(rep[k], row_labels=[get_key_from_channel(x) for x in rrr.allChannels]))
             else:
                 continue
-                #outFile.write("<H1>%s</H1>" % k)
-                #outFile.write('\n'.join(rep[k].html_report()))
-            #    rep[k] = rep[k].json_report()
 
         # Spingroup part of the report
-
-        #import os
-
-        #def write_img_if_exists(rep_dict, key):
-        #    if key not in rep_dict:
-        #        return
-        #    imgfile = rep_dict[key]
-        #    if os.path.exists(imgfile):
-        #        outFile.write('<TD>'+IMG(src=imgfile) + '</TD>\n')
-        #    else:
-        #        if False:
-        #            outFile.write("File %s not found" % imgfile)
-
-        #outFile.write('\n\n<DIV id="accordion">\n')
-
         rep['spin_groups'] = collections.OrderedDict()
         for LJ in spinGroups:
             rep['spin_groups'][str(LJ)] = collections.OrderedDict()
             rep['spin_groups'][str(LJ)]['title'] = "Spin Group L=%s, J=%s" % (str(LJ[0]), str(LJ[1]))
-            #outFile.write("\n\n<DIV>")
-            #outFile.write("\n<H1>Spin Group L=%s, J=%s</H1>" % (str(LJ[0]), str(LJ[1])))
-
-            #if spinGroups[LJ]['errors']:
-            #    for err in spinGroups[LJ]['errors']:
-            #        outFile.write('<P> ERROR: ' + err + '</P>')
-            #    continue
-            #if spinGroups[LJ]['warnings']:
-            #    for err in spinGroups[LJ]['warnings']:
-            #        outFile.write('<P>WARNING: ' + err+ '</P>')
-
-            #outFile.write("<BR/>")
-            #outFile.write("\n<DIV>")
-            #outFile.write("\n<H2>Level analysis</H2><BR/>")
 
             rep['spin_groups'][str(LJ)]['secular_variation'] = {
                 'title':"Secular variation of levels",
@@ -1122,15 +1067,6 @@ if __name__ == "__main__":
                     spinGroups[LJ]['level_report'].get('filename_cumlev', None)
                 ]
             }
-
-            #outFile.write('\n<H3>Secular variation of levels</H3>')
-            #outFile.write("\n<TABLE>")
-            #outFile.write("<TR>")
-            #write_img_if_exists(spinGroups[LJ]['level_report'], 'filename_avespacing')
-            #write_img_if_exists(spinGroups[LJ]['level_report'], 'filename_cumlev')
-            #outFile.write("</TR>")
-            #outFile.write("</TABLE>")
-
             rep['spin_groups'][str(LJ)]['local_fluctuations'] = {
                 'title':"Local fluctuations in levels",
                 'plots':[
@@ -1140,31 +1076,12 @@ if __name__ == "__main__":
                     spinGroups[LJ]['level_report'].get('filename_Delta3_by_E', None)
                 ]
             }
-
-            #outFile.write('\n<H3>Local fluctuations in levels</H3>')
-            #outFile.write("\n<TABLE>")
-            #outFile.write("<TR>")
-            #write_img_if_exists(spinGroups[LJ]['level_report'], 'filename_nnsd')
-            #write_img_if_exists(spinGroups[LJ]['level_report'], 'filename_rho')
-            #outFile.write("</TR>")
-            #outFile.write("<TR>")
-            #write_img_if_exists(spinGroups[LJ]['level_report'], 'filename_Delta3')
-            #write_img_if_exists(spinGroups[LJ]['level_report'], 'filename_Delta3_by_E')
-            #outFile.write("</TR>")
-            #outFile.write("</TABLE>")
-
             rep['spin_groups'][str(LJ)]['missing_levels'] = {
                 'title':"Assessment of fraction of missing levels",
                 'plots':[
                     spinGroups[LJ]['level_report'].get('filename_fraction_missing', None)
                 ]
             }
-
-            #outFile.write('\n<H3>Assessment of fraction of missing levels</H3>')
-            #outFile.write("\n<TABLE><TR>")
-            #write_img_if_exists(spinGroups[LJ]['level_report'], 'filename_fraction_missing')
-            #outFile.write("</TR></TABLE>")
-
             rep['spin_groups'][str(LJ)]['channels'] = collections.OrderedDict()
             for c in spinGroups[LJ]['channels']:
                 rep['spin_groups'][str(LJ)]['channels'][str(c)] = collections.OrderedDict()
@@ -1177,32 +1094,6 @@ if __name__ == "__main__":
                     rep['spin_groups'][str(LJ)]['channels'][c]['note'] = \
                         "Note: capture widths likely won't show spread since we probably only know the " + \
                         "average width to any precision and we know there are many many open capture channels."
-
-            #outFile.write('\n<H3>Per channel information</H3>')
-            #outFile.write("\n<UL>")
-            #for c in spinGroups[LJ]['channels']:
-            #    outFile.write("\n<LI>")
-            #    outFile.write("<H4>Details for channel %s</H4>" % get_key_from_channel(c))
-            #    outFile.write("\n<TABLE>")
-            #    outFile.write("<TR>")
-            #    write_img_if_exists(spinGroups[LJ]['channels'][c], 'filename_avewidth')
-            #    write_img_if_exists(spinGroups[LJ]['channels'][c], 'filename_widthdist')
-            #    outFile.write("</TR>")
-            #    outFile.write("</TABLE>")
-            #    if c.eliminated:
-            #        outFile.write(
-            #            "<BR>Note: capture widths likely won't show spread since we probably only know the "
-            #            "average width to any precision and we know there are many many open capture channels.")
-            #    outFile.write("</LI>")
-            #outFile.write("</UL>")
-            #outFile.write("</DIV>")
-            #outFile.write("</DIV>")
-        #outFile.write("\n</DIV>")
-
-        #rep['spin_groups']=spinGroups
-
-        #print(rep)
-        #exit()
 
         if theArgs.outFile is not None:
             if theArgs.outFile.endswith('.json'):
