@@ -3,6 +3,7 @@ from fudge import physicalQuantity as physicalQuantityModule
 from fudge.vis.matplotlib import plot2d
 from xData import table as tableModule
 import xData.enums as enumsModule
+import numpy
 from brownies.BNL.inter.datatables import *
 from brownies.BNL.inter.metrics import *
 from brownies.BNL.utilities.html import *
@@ -166,6 +167,21 @@ class ComplexEncoder(json.JSONEncoder):
             return obj.as_dict()
         if isinstance(obj, enumsModule.Frame):
             return str(obj)
+        if isinstance(obj, numpy.ndarray):
+            return {
+                "_kind_": "ndarray",
+                "_value_": obj.tolist()
+            }
+        if isinstance(obj, numpy.integer):
+            return int(obj)
+        elif isinstance(obj, numpy.floating):
+            return float(obj)
+        elif isinstance(obj, range):
+            value = list(obj)
+            return {
+                "_kind_" : "range",
+                "_value_" : [value[0],value[-1]+1]
+            }
         # Let the base class default method raise the TypeError
         try:
             return json.JSONEncoder.default(self, obj)
