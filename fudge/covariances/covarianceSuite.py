@@ -374,8 +374,11 @@ class CovarianceSuite(ancestryModule.AncestryIO):
 
             if root is None:
                 continue    # FIXME links to other files (i.e. cross-material covariances) currently broken
-            res = link_.follow(root)
-            link_.link = res
+            try:
+                res = link_.follow(root)
+                link_.link = res
+            except ancestryModule.XPathNotFound:
+                print("Warning: link %s could not be resolved!" % link_)
 
         xPath.pop()
 
