@@ -2,6 +2,8 @@ from fudge.core.utilities.brb import banner, winged_banner
 from fudge import physicalQuantity as physicalQuantityModule
 from fudge.vis.matplotlib import plot2d
 from xData import table as tableModule
+import xData.enums as enumsModule
+import numpy
 from brownies.BNL.inter.datatables import *
 from brownies.BNL.inter.metrics import *
 from brownies.BNL.utilities.html import *
@@ -160,13 +162,31 @@ class ComplexEncoder(json.JSONEncoder):
         if isinstance(obj, physicalQuantityModule.Temperature):
             return str(obj)
         if isinstance(obj, DataTable):
-            return '\n'.join(obj.toStringList())
+            return obj.as_dict()
         if isinstance(obj, datatables.DataTable):
-            return obj.to_string()
+            return obj.as_dict()
+        if isinstance(obj, enumsModule.Frame):
+            return str(obj)
+        if isinstance(obj, numpy.ndarray):
+            return {
+                "_kind_": "ndarray",
+                "_value_": obj.tolist()
+            }
+        if isinstance(obj, numpy.integer):
+            return int(obj)
+        elif isinstance(obj, numpy.floating):
+            return float(obj)
+        elif isinstance(obj, range):
+            value = list(obj)
+            return {
+                "_kind_" : "range",
+                "_value_" : [value[0],value[-1]+1]
+            }
         # Let the base class default method raise the TypeError
         try:
             return json.JSONEncoder.default(self, obj)
-        except TypeError:
+        except TypeError as err:
+            print("Encoding TypeError: %s" % err)
             return str(obj)
 
 class Report(collections.OrderedDict):

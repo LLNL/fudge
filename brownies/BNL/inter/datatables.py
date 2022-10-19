@@ -30,7 +30,7 @@ class DataTable(tableModule.Table):
             raise ValueError("Data is the wrong shape for a table with %i rows!" % self.nRows)
 
     def __str__(self):
-        return '\n'.join(self.toXMLList())
+        return '\n'.join(self.toXML_strList())
 
     def hasMatchingRow(self, key, value):
         try:
@@ -133,12 +133,14 @@ class DataTable(tableModule.Table):
         irow = self.rows.index(row[0])
         return self.data[irow][icol]
 
-    def json_report(self):
-        return json.dumps({
+    def as_dict(self):
+        return {
             'units':{self.columns[i].name:self.columns[i].unit for i in range(len(self.columns))},
             "datatable":{
-                row:{self.columns[i].name:self.data[irow][i] for i in range(len(self.columns))} for irow, row in enumerate(self.rows)}},
-            cls=ComplexEncoder)
+                row:{self.columns[i].name:self.data[irow][i] for i in range(len(self.columns))} for irow, row in enumerate(self.rows)}}
+
+    def json_report(self):
+        return json.dumps(self.as_dict(), cls=ComplexEncoder)
 
     def csv_report(self):
         raise Exception("FIXME: Write me")
