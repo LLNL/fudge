@@ -1123,7 +1123,8 @@ class Component( abstractClassesModule.Component ) :
 
         # Get the covariance that goes with the data.
         if covariance is None:
-            if hasattr(self.evaluated, 'uncertainty') and self.evaluated.uncertainty:
+            # FIXME ugly logic here since cross section 'forms' handle uncertainty differently. Need to make them consistent!
+            if hasattr(self.evaluated, 'uncertainty') and self.evaluated.uncertainty is not None and self.evaluated.uncertainty.data is not None:
                 if isinstance(self.evaluated.uncertainty.data, linkModule.Link) and self.evaluated.uncertainty.data.linkWithoutUpdating is not None:
                     covariance = self.evaluated.uncertainty.data.link
                 elif covarianceSuite is not None:
