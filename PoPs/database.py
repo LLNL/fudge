@@ -435,7 +435,8 @@ class Database(ancestryModule.AncestryIO):
                 children[child.tag].parseNode(getattr( self, child.tag ), child, xPath, linkData, **kwargs)
             elif( child.tag == self.__styles.moniker ) :
                 self.__styles.parseNode(child, xPath, linkData, **kwargs)
-            elif( child.tag == 'parentDatabase' and formatVersion == GNDS_formatVersionModule.version_1_10 ) :
+            elif( child.tag == 'parentDatabase' and formatVersion in (GNDS_formatVersionModule.version_1_10,
+                        GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4) ) :
                 pass  # ignore
             elif( child.tag == self.documentation.moniker ) :
                 if formatVersion == GNDS_formatVersionModule.version_1_10 :
@@ -456,7 +457,7 @@ class Database(ancestryModule.AncestryIO):
         if( formatVersion == '0.1' ) :                             # PoPs 0.1 and 2.0 are the same so allow for now. There was no 1.10 for PoPs.
             formatVersion = GNDS_formatVersionModule.version_1_10
         else :
-            if( formatVersion not in GNDS_formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
+            if( formatVersion not in GNDS_formatVersionModule.allowedPlus ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
 
         self = cls( element.get( 'name' ), element.get( 'version' ), formatVersion = formatVersion )
         self.parseNode(element, xPath, linkData, **kwargs)

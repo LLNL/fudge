@@ -1,6 +1,7 @@
 import os
 import json
 import fnmatch
+import random
 import copy
 from fudge.vis.matplotlib import defaultSymbols, nSymbols, defaultColors, nColors, defaultLineStyles, nLineStyles
 
@@ -385,7 +386,10 @@ def getPlotColor(i, defaultScheme=True):
         return defaultColors[i % nColors]
     if type(i) == str and i.startswith('_') and i.endswith('_'):
         return '0.5'
-    return '#' + str(hex(hash(i) % (256 * 256 * 256))).replace('0x', '').zfill(6)
+
+    #hashval = hash(i)   # not deterministic between Python sessions
+    hashval = random.Random(i).randint(0, 256 * 256 * 256)
+    return '#' + str(hex(hashval)).replace('0x', '').zfill(6)
 
 
 def getLineStyle(i): return defaultLineStyles[i % nLineStyles]

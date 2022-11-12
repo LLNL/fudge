@@ -68,15 +68,19 @@ def readEvaluation(filename, targ=None, proj=None, verbose=True, skipBadData=Tru
             print("WARNING: Could not load AMPX module.  Is it in your path?")
 
     else:
-        firstline = open(filename).readline()
+        with open(filename) as fin:
+            firstline = fin.readline()
 
         # Is the file a GNDS file?
         if firstline.startswith("<?xml") or firstline.startswith("<reactionSuite "):
-            import GNDS_file
+            from fudge import GNDS_file
             RS = GNDS_file.read(filename)
-            try:
-                CS = GNDS_file.read(filename.replace('.gnds.', '.gndsCov.'))
-            except:
+            CSlist = RS.loadCovariances()
+            if len(CSlist) > 0:
+                CS = CSlist[0]
+                if len(CSlist) > 1:
+                    print("WARNING: loaded %d covarianceSuites, only using first one for now" % len(CSlist))
+            else:
                 from fudge.covariances import covarianceSuite
                 CS = covarianceSuite.CovarianceSuite(None, None, None)
             return [RS, CS]
