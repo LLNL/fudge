@@ -319,6 +319,8 @@ def getFissionMetricReport(rs, metricMenu, title="Fission metrics", useCovarianc
             rcap = rs.getReaction('capture')
         except KeyError:
             return Report()
+        if rfis is None:
+            return Report()
         fissionReport = Report(title=title)
         # ALF, ratio of thermal capture to fission
         if hasattr(metricMenu, 'ALF') and metricMenu.ALF:
