@@ -4,7 +4,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -1496,6 +1496,7 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
         :return:  a dictionary of results, sorted by channel.
                   Pole strength entries are all PQU's or None if it cannot be computed
         """
+        import numbers
         results = {}
         aves = self.getAverageQuantities(computeUncertainty=computeUncertainty)
         for c in aves:
@@ -1507,7 +1508,10 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
                 Emin=aves[c]['energyGrid'][i]
                 Emax=aves[c]['energyGrid'][i+1]
                 redWidths=self.getReducedWidths(c, Emin=Emin, Emax=Emax)
-                if len(redWidths) == 0: continue
+                if isinstance(redWidths, numbers.Number):  # Why do I need this test?
+                    redWidths = [redWidths]
+                if len(redWidths) == 0:
+                    continue
                 gg=numpy.mean([g*g for g in redWidths])
                 ggUnc=numpy.sqrt(numpy.var([g*g for g in redWidths]))
                 results[c]['sc'].append(PQUModule.PQU(gg, unit='eV', uncertainty=ggUnc)/aves[c]['spacings'][i])
@@ -1577,8 +1581,8 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
             if Emin is not None and ER < Emin: continue
             if Emax is not None and ER > Emax: continue
             ERs.append(ER)
-        reducedWidthList=numpy.sqrt(
-            numpy.abs(self.allChannels[channel][iR])/2.0/self.penetrationFactorByChannel(channel, numpy.array(ERs)))
+            reducedWidthList=numpy.sqrt(
+                numpy.abs(self.allChannels[channel][iR])/2.0/self.penetrationFactorByChannel(channel, ER))
         return reducedWidthList
 
     def getPorterThomasFitToWidths(self, Emin=0.0, Emax=None, verbose=False):
