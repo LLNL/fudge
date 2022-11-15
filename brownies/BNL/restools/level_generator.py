@@ -31,14 +31,16 @@ def getFakeLevelSequence(E0=0.0, aveD=None, numLevels=None, style='goe', BrodyW=
     #   * aveD, E0 and upperBound, compute numLevels = 1+(upperBound - E0)/D
     #   * levelDensity and E0.  Internally getFakeLevelSequence converts this to aveD and numLevels.
     if style != 'goe':
-        if aveD is None and levelDensity is not None:
-            aveD = 1 / levelDensity.evaluate(0.5 * (levelDensity.domainMin + levelDensity.domainMax))
-        else:
-            raise ValueError("Not enough information to determine aveD")
-        if numLevels is None and levelDensity is not None:
-            numLevels = 1+(levelDensity.domainMax - E0)/aveD
-        else:
-            raise ValueError("Not enough information to determine numLevels")
+        if aveD is None:
+            if levelDensity is not None:
+                aveD = 1 / levelDensity.evaluate(0.5 * (levelDensity.domainMin + levelDensity.domainMax))
+            else:
+                raise ValueError("Not enough information to determine aveD")
+        if numLevels is None:
+            if levelDensity is not None:
+                numLevels = 1+(levelDensity.domainMax - E0)/aveD
+            else:
+                raise ValueError("Not enough information to determine numLevels")
 
     # To generate GOE levels, we need basically the same information, but the GOE routine uses the levelDensity
     # instead of the aveD for a more finely tuned reproduction of the fake level scheme.
@@ -241,7 +243,7 @@ def getGOEFakeLevelSequence(E0, totalNumLevels, levelDensity, paddingNumLevels=1
 
     # Because we only have a finite number of levels, the GOE distribution never completely matches the
     # Wigner semi-circle law (encoded in the GOEDistribution class).  The biggest deviations from the semi-circle
-    # law happen on the fringes.  To combat this, we discard paddingNumLevels from either end of the 
+    # law happen on the fringes.  To combat this, we discard paddingNumLevels from either end of the
     # simulated spectrum.  We also have to discard the same region of the semi-circle distribution.
     if paddingNumLevels > 0:
         goeSample = goeSample[paddingNumLevels:-paddingNumLevels]
