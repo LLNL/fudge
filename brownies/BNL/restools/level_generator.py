@@ -311,6 +311,7 @@ def unfoldThenRefoldLevelSequence(
         invFakeCDF.plot()  # title='lookup table')
 
     # We'll add that back using the real level density.  The "refolds" back in the correct secular variation.
+    xList[-1] = 1.0
     result = [offset + invFakeCDF.evaluate(x) for x in xList]
     result.sort()
 
