@@ -47,8 +47,16 @@ if args.list:
         print(c, row, col)
     exit()
 
-# evaluation.reconstructResonances( styleName='reconstructed', accuracy=0.001 )
 made_a_plot = False
+
+for c in covariances.parameterCovariances:
+    if args.MF == 32:
+        c.evaluated.plot(title='(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, args.MT))
+        made_a_plot = True
+        
+    elif args.MF == 30:
+        raise NotImplementedError('(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, args.MT))
+
 for c in covariances.covarianceSections:
     if hasattr(c, 'rowData') and c.rowData.ENDF_MFMT == '%i,%i' % (args.MF, args.MT):
         if args.crossMT is None or \
@@ -62,6 +70,7 @@ for c in covariances.covarianceSections:
                 otherMT = args.MT
             else:
                 otherMT = int(c.columnData.ENDF_MFMT.split(',')[-1])
+
             c2 = c.evaluated.toCovarianceMatrix()
             if args.abs:
                 c2.toAbsolute().plot(title='(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, otherMT))

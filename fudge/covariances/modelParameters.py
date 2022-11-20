@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -167,7 +167,7 @@ class ParameterCovariance( suitesModule.Suite ):
 
 
 class ParameterCovarianceMatrix( abstractClassesModule.Form ):
-    """ 
+    """
     Store covariances (or correlations, depending on 'type') between model parameters
     """
 
@@ -250,14 +250,91 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
 
         #raise NotImplementedError()
         pass
-    
-    def fix( self, **kw ): 
+
+    def fix( self, **kw ):
         '''assemble some useful info, to be handed down to children's fix() functions'''
         info = {}
         info['rowENDF_MFMT'] = None
         info['columnENDF_MFMT'] = None
         info.update( kw )
         return self.matrix.fix( **info )
+
+    def plot( self, title = None, scalelabel = None, xlim=None, ylim=None, xlog=False, ylog=False ):
+        """
+
+        :param title:
+        :param scalelabel:
+        :param xlim:
+        :param ylim:
+        :param xlog:
+        :param ylog:
+        :return:
+        """
+        import matplotlib.pyplot as plt
+        import numpy as np
+        from matplotlib.collections import QuadMesh
+
+        #print(self.parameters)
+        #for p in self.parameters: print(p)
+
+        _array = self.matrix.constructArray()
+
+        def covariance_to_correlation(__matrix):
+            """Convert a covariance matrix to a correlation matrix"""
+            diag = np.sqrt(__matrix.diagonal())
+            corr = __matrix / diag / diag[:, np.newaxis]
+            # now fix diagonal + remove any NaN (from div/0):
+            for i in range(len(corr)):
+                corr[i, i] = 1.0  # must be exactly 1
+            corr[np.isnan(corr)] = 0
+            return corr
+
+        _array = covariance_to_correlation(_array)
+
+        x, y = range(_array.shape[0]+1), range(_array.shape[1]+1)
+        X, Y = np.meshgrid( x, y )
+        XY = np.hstack((X.ravel()[:,np.newaxis], Y.ravel()[:,np.newaxis]))
+
+        ax = plt.subplot(1,1,1)
+        if title is None:
+            title = str( self.toXLink() )
+        plt.suptitle(title)
+
+        qc = QuadMesh(
+            meshWidth=len(x)-1,
+            meshHeight=len(y)-1,
+            coordinates=XY,
+            antialiased=True,
+            shading='flat',
+            transOffset=ax.transData)
+
+        qc.set_array(_array)
+        ax.add_collection(qc, autolim=True)
+
+        if xlim is None:
+            ax.set_xlim( x[0], x[-1] )
+        else:
+            ax.set_xlim( xlim[0], xlim[1] )
+        if ylim is None:
+            ax.set_ylim( y[0], y[-1] )
+        else:
+            ax.set_ylim( ylim[0], ylim[1] )
+        if xlog:
+            ax.set_xscale( 'log' )
+        if ylog:
+            ax.set_yscale( 'log' )
+
+        xlabel = 'row index'
+        ylabel = 'col index'
+
+        ax.set_xlabel( xlabel )
+        ax.set_ylabel( ylabel )
+        cbar = plt.colorbar(qc)
+        if scalelabel is not None:
+            cbar.set_label(scalelabel)
+        else:
+            cbar.set_label(str(self.type)+' correlation' )
+        plt.show()
 
     def toXML_strList( self, indent = '', **kwargs ) :
 
