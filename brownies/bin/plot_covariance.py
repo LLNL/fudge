@@ -3,7 +3,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -38,10 +38,10 @@ except Exception as err:
 if args.list:
     print("\n\nList of covariance data")
     print("=======================")
-    for c in covariances.sections:
-        row = c.rowData.attributes['ENDF_MFMT']
+    for c in covariances.covarianceSections:
+        row = c.rowData.ENDF_MFMT
         if c.columnData is not None:
-            col = c.columnData.attributes['ENDF_MFMT']
+            col = c.columnData.ENDF_MFMT
         else:
             col = row
         print(c, row, col)
@@ -49,10 +49,10 @@ if args.list:
 
 # evaluation.reconstructResonances( styleName='reconstructed', accuracy=0.001 )
 made_a_plot = False
-for c in covariances.sections:
-    if hasattr(c, 'rowData') and c.rowData.attributes['ENDF_MFMT'] == '%i,%i' % (args.MF, args.MT):
+for c in covariances.covarianceSections:
+    if hasattr(c, 'rowData') and c.rowData.ENDF_MFMT == '%i,%i' % (args.MF, args.MT):
         if args.crossMT is None or \
-                (c.columnData is not None and c.columnData.attributes['ENDF_MFMT'] == '%i,%i' % (
+                (c.columnData is not None and c.columnData.ENDF_MFMT == '%i,%i' % (
                 args.MF, args.crossMT)) or \
                 (c.columnData is None and (args.MF, args.MT) == (args.MF, args.crossMT)):
             otherMT = None
@@ -61,9 +61,8 @@ for c in covariances.sections:
             elif c.columnData is None:
                 otherMT = args.MT
             else:
-                otherMT = int(c.columnData.attributes['ENDF_MFMT'].split(',')[-1])
-            c2 = c.toCovarianceMatrix()
-            c2.setAncestor(c)
+                otherMT = int(c.columnData.ENDF_MFMT.split(',')[-1])
+            c2 = c.evaluated.toCovarianceMatrix()
             if args.abs:
                 c2.toAbsolute().plot(title='(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, otherMT))
             elif args.rel:
@@ -72,7 +71,7 @@ for c in covariances.sections:
                 c2.toAbsolute().toCorrelationMatrix().plot(
                     title='(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, otherMT))
             else:
-                c.plot(title='(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, otherMT))
+                c2.plot(title='(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, otherMT))
             made_a_plot = True
 
 if not made_a_plot:
