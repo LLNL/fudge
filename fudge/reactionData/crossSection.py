@@ -1127,7 +1127,8 @@ class Component( abstractClassesModule.Component ) :
                 if isinstance(self.evaluated.uncertainty.data, linkModule.Link) and self.evaluated.uncertainty.data.linkWithoutUpdating is not None:
                     covariance = self.evaluated.uncertainty.data.link
                 elif covarianceSuite is not None:
-                    covariance = self.evaluated.uncertainty.data.follow(startNode=covarianceSuite)
+                    if self.evaluated.uncertainty.data is not None:
+                        covariance = self.evaluated.uncertainty.data.follow(startNode=covarianceSuite)
         else:
             if not isinstance( covariance, covModule.CovarianceMatrix ):
                 raise TypeError( 'covariance must be of type CovarianceMatrix, got %s' % type(covariance))
