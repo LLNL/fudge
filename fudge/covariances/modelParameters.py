@@ -278,7 +278,7 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
         def covariance_to_correlation(__matrix):
             """Convert a covariance matrix to a correlation matrix"""
             diag = np.sqrt(__matrix.diagonal())
-            with np.errstate(divide='ignore'):
+            with np.errstate(divide='ignore', invalid='ignore'):
                 corr = __matrix / diag / diag[:, np.newaxis]
             # now fix diagonal + remove any NaN (from div/0):
             for i in range(len(corr)):
