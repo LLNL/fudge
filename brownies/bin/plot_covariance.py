@@ -53,7 +53,7 @@ for c in covariances.parameterCovariances:
     if args.MF == 32:
         c.evaluated.plot(title='(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, args.MT))
         made_a_plot = True
-        
+
     elif args.MF == 30:
         raise NotImplementedError('(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, args.MT))
 

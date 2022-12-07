@@ -950,7 +950,10 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
 
     def penetrationFactorByChannel(self,c,Ein):
         if c.channelClass in [FISSIONCHANNEL, GAMMACHANNEL]:
-            return numpy.ones(len(Ein))
+            if type(Ein)==numpy.ndarray:
+                return numpy.ones(len(Ein))
+            else:
+                return 1.0
         return self.penetrationFactor(c.l, self.rho(Ein))
 
     def phiByChannel(self,c,Ein):
@@ -1581,8 +1584,8 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
             if Emin is not None and ER < Emin: continue
             if Emax is not None and ER > Emax: continue
             ERs.append(ER)
-            reducedWidthList=numpy.sqrt(
-                numpy.abs(self.allChannels[channel][iR])/2.0/self.penetrationFactorByChannel(channel, ER))
+            reducedWidthList.append(numpy.sqrt(
+                numpy.abs(self.allChannels[channel][iR])/2.0/self.penetrationFactorByChannel(channel, ER)))
         return reducedWidthList
 
     def getPorterThomasFitToWidths(self, Emin=0.0, Emax=None, verbose=False):
