@@ -3,7 +3,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -14,10 +14,11 @@ from numericalFunctions import specialFunctions as nf_sf
 
 def getCoulombWavefunctions(rho, eta, L):
     # .... Check arguments:
-    NE = len(rho)
     for array in (rho,eta):
         if type(array) != numpy.ndarray: raise TypeError("rho and eta must be numpy arrays!")
         if array.dtype != numpy.float64: raise TypeError("rho and eta must be float arrays!")
+    NE = len(rho)
+    for array in (rho,eta):
         if array.shape not in ((NE,), (NE,1)):
             raise TypeError("rho and eta must be 1-d arrays, of the same length!")
     if type(L) is not int: raise TypeError("L must be an integer!")
