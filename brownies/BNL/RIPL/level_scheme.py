@@ -36,7 +36,8 @@ def double_factorial(n):
         stop = 1
     else:
         stop = 0
-    for i in range(n, stop, -2): product *= i
+    for i in range(n, stop, -2):
+        product *= i
     return product
 
 
@@ -65,7 +66,7 @@ def is_transition_allowed(multipolarity, startJ, startPi, stopJ, stopPi):
         return False
     elif multipolarity[0] == "M" and PiTest != pow(-1, multipolarity[1] + 1):
         return False
-    return abs(startJ - stopJ) <= multipolarity[1] and startJ + stopJ >= multipolarity[1]
+    return abs(startJ - stopJ) <= multipolarity[1] <= startJ + stopJ
 
 
 def WeisskopfSingleParticleEstimateBXL(multipolarity, A):
@@ -92,11 +93,11 @@ def WeisskopfSingleParticleEstimateBXL(multipolarity, A):
 def gammaHalflife(multipolarity, BXL, Eg):
     if multipolarity[0] not in ["E", "M"] or type(multipolarity[1]) != int:
         raise ValueError("multipolarity be of form (X,L) where X='E' or 'M' and L is an int")
-    if not isinstance(Eg, PhysicalQuantity): raise TypeError("Eg must be a PhysicalQuantity")
+    if not isinstance(Eg, PhysicalQuantity):
+        raise TypeError("Eg must be a PhysicalQuantity")
     L = multipolarity[1]
-    prefactor = math.log(2) * L * pow(double_factorial(2 * L + 1), 2.0) * hbar * pow(hbarc / Eg,
-                                                                                     2 * L + 1) / 8.0 / math.pi / (
-                        L + 1) / BXL
+    prefactor = math.log(2) * L * pow(double_factorial(2 * L + 1), 2.0) * hbar * \
+                pow(hbarc / Eg, 2 * L + 1) / 8.0 / math.pi / ( L + 1) / BXL
     if multipolarity[0] == 'E':
         return prefactor / e2 / pow(b, L)
     else:
@@ -116,8 +117,10 @@ class nucleus:
 
         - name : GNDS name
         - genre : GNDS genre
-        - attributes : GNDS XML attributes dict.  One of these has key 'JPi' with value of Jpi corresponding to the nucleus' ground state or None
-        - levels : GNDS level dict.  Key is the level index.  Level "0" is the ground state.  getJPi() will evaluate to this if attributes[ 'JPi' ] == None
+        - attributes : GNDS XML attributes dict.  One of these has key 'JPi' with value of Jpi corresponding to the
+                       nucleus' ground state or None
+        - levels : GNDS level dict.  Key is the level index.  Level "0" is the ground state.  getJPi() will evaluate
+                   to this if attributes[ 'JPi' ] == None
 
     Other member data added here::
 
@@ -203,8 +206,9 @@ class nucleus:
         :param keepGoing: if False, throw exception if endfFile not found
         :returns: None
         """
-        if endfFile is None: endfFile = ENDFFILEPATH + os.sep + 'n-%s_%s_%s.endf' % (
-            str(self.Z).zfill(3), elementSymbolFromZ(self.Z), str(self.A - 1).zfill(3))
+        if endfFile is None:
+            endfFile = ENDFFILEPATH + os.sep + 'n-%s_%s_%s.endf' % ( str(self.Z).zfill(3), elementSymbolFromZ(self.Z),
+                                                                     str(self.A - 1).zfill(3))
         if not os.path.exists(endfFile):
             if keepGoing:
                 print('evaluation %s not found' % endfFile)
@@ -292,6 +296,7 @@ class nucleus:
         return all possible EM transitions out of level iStart for a given multipolarity.
         If multipolarity is not given, this routine will do E1, E2 and M1 only
 
+        :param BRmin:
         :param iStart: the level index
         :param multipolarity: request a given multipolarity, as a string e.g. "E2"
         :param BInWeisskopfUnits:
