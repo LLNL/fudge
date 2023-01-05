@@ -7,7 +7,8 @@ from PoPs.chemicalElements.misc import idFromZA as nucleusNameFromZA
 from PoPs.chemicalElements.misc import ZAInfo_fromString
 from brownies.BNL.plot_evaluation.plotio import readEvaluation
 from xData import axes as axesModule
-form xData import XYs1d as XYs1dModule
+from xData import XYs1d as XYs1dModule
+
 
 ENDFFILEPATH = os.environ['HOME'] + "/Sites/endfb71.dev/neutrons"
 
@@ -37,6 +38,7 @@ def double_factorial(n):
     for i in range(n,stop,-2): product *= i
     return product
 
+
 def is_transition_allowed( multipolarity, startJ, startPi, stopJ, stopPi ):
     """
     Test whether a transition of given multipolarity is allowed between the given states' JPi
@@ -64,6 +66,7 @@ def is_transition_allowed( multipolarity, startJ, startPi, stopJ, stopPi ):
         return False
     return abs(startJ-stopJ)<=multipolarity[1] and startJ+stopJ>=multipolarity[1]
 
+
 def WeisskopfSingleParticleEstimateBXL(multipolarity,A):
     """
     Computes Weisskopf's single particle for B(XL)
@@ -83,6 +86,7 @@ def WeisskopfSingleParticleEstimateBXL(multipolarity,A):
         return BXL*pow(x,L)/4.0
     else:
         return BXL*10.0*pow(x,L-1)
+
 
 def gammaHalflife(multipolarity,BXL,Eg):
     if multipolarity[0] not in ["E","M"] or type(multipolarity[1])!=int:
