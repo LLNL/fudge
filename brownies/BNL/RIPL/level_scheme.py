@@ -96,7 +96,7 @@ def gammaHalflife(multipolarity, BXL, Eg):
     L = multipolarity[1]
     prefactor = math.log(2) * L * pow(double_factorial(2 * L + 1), 2.0) * hbar * pow(hbarc / Eg,
                                                                                      2 * L + 1) / 8.0 / math.pi / (
-                            L + 1) / BXL
+                        L + 1) / BXL
     if multipolarity[0] == 'E':
         return prefactor / e2 / pow(b, L)
     else:
@@ -110,7 +110,7 @@ def gammaHalflife(multipolarity, BXL, Eg):
 # ---------------------------------------------------------------------------------
 
 class nucleus:
-    '''
+    """
     Simple nucleus implementation, capturing (I hope) all the common elements from the RIPL, TALYS and GNDS formats.
     Member data from xParticle::
 
@@ -134,14 +134,14 @@ class nucleus:
         - uncResonanceSpacingSWave : dD0  (see below)
         - resonanceSpacingPWave : D1  (see below)
         - uncResonanceSpacingPWave : dD1  (see below)
-    '''
+    """
 
     def __init__(self, **kw):
-        '''
+        """
         Easiest is just to call with GNDS name as sole argument like this:
 
             >>> nucleus( name="C12" )
-        '''
+        """
         self.name = kw['name']
         self.attributes = kw.get('attributes', {})
         self.Z, self.A, self.ZA, lev = ZAInfo_fromString(self.name)
@@ -224,8 +224,10 @@ class nucleus:
             if hasattr(self.endfMap[0], 'resonances'): self.resonances = endfMap[0].resonances
 
     def addResonancesToLevels(self, verbose=False):
-        if self.resonances is None: return
-        if self.resonances.resolved is None: return
+        if self.resonances is None:
+            return
+        if self.resonances.resolved is None:
+            return
 
         # Set up region lists
         if self.resonances.resolved.multipleRegions:
@@ -381,7 +383,7 @@ class nucleus:
                 theData[-1][1] = theData[-1][1] + 1  # Deal with corner case where two levels are degenerate
             else:
                 theData.append([thisEnergy, theData[-1][1] + 1])
-        return XYs1dModule.XYs1d(interpolation='flat', axes=myAxes, data=theData, accuracy=1e-5)
+        return XYs1dModule.XYs1d(interpolation='flat', axes=myAxes, data=theData)
 
     def getLevelSpacingDistribution(self):
         myAxes = axesModule.defaultAxes(dimension=2, independentInterpolation='linear', dependentInterpolation='flat',
@@ -397,11 +399,13 @@ class nucleus:
         return XYs1dModule.XYs(myAxes, data=theData, accuracy=1e-5)
 
     def getLastLevelInCompleteSchemeIndex(self):
-        if self.lastLevelInCompleteScheme == None: raise NotImplementedError()
+        if self.lastLevelInCompleteScheme is None:
+            raise NotImplementedError()
         return self.lastLevelInCompleteScheme
 
     def getLastLevelWithAssignedJPiIndex(self):
-        if self.lastLevelWithAssignedJPi == None: raise NotImplementedError()
+        if self.lastLevelWithAssignedJPi is None:
+            raise NotImplementedError()
         return self.lastLevelWithAssignedJPi
 
     def getJPiList(self):
@@ -447,7 +451,7 @@ class nucleus:
 
     def levelReportMathematica(self, showGammas=False, maxLevelIndex=41, style='other',
                                modifiedLevels=[17, 26, 27, 37, 39]):
-        '''
+        """
         Before cut-n-pasting, do:
                 <<"LevelScheme`"
         or
@@ -457,7 +461,7 @@ class nucleus:
         :param style:
         :param modifiedLevels:
         :return:
-        '''
+        """
 
         def parityTranslator(parity):
             if str(parity) == '+':
@@ -482,7 +486,8 @@ class nucleus:
             parity = parityTranslator(_lev.parity)
             _ilev = int(str(_lev.name).split('_e')[-1])
             return 'Lev[%s,%f,%f,%f,LabL -> LabelJP["%s", %s], Color->%s] ' % (
-            levelKey(_lev.name), _leftHorPos, _rightHorPos, _lev.energy.value * _yScale, spin, parity, getColor(_ilev))
+                levelKey(_lev.name), _leftHorPos, _rightHorPos, _lev.energy.value * _yScale, spin, parity,
+                getColor(_ilev))
 
         def mathematicaCommand(_objects, A, symbol, xmin, xmax, ymin, ymax, fontsize=10, pageSizeX=None,
                                pageSizeY=None):
@@ -538,11 +543,11 @@ Figure[
 
         if style == 'betaDecay':
             # Style setup
-            objects = []
-            objects.append(
-                "SetOptions[Trans, BackgroundT -> Automatic, NudgeT -> 2, Thickness -> 1, FontSize -> %FONTSIZE, OrientationT -> Automatic, FillColor -> LightGray]")
-            objects.append(
-                "    SetOptions[Lev, Thickness -> 2, LabR -> Automatic, WingRiseWidth -> 10, WingTipWidth -> 10, FontSize -> %FONTSIZE, Color -> Black]")
+            objects = [
+                "SetOptions[Trans, BackgroundT -> Automatic, NudgeT -> 2, Thickness -> 1, FontSize -> %FONTSIZE, "
+                "OrientationT -> Automatic, FillColor -> LightGray]",
+                "SetOptions[Lev, Thickness -> 2, LabR -> Automatic, WingRiseWidth -> 10, WingTipWidth -> 10, "
+                "FontSize -> %FONTSIZE, Color -> Black]"]
             maxE = maxEnergy(levs)
             lineWidth = self.getNumberGammas() / 30.
             # Do levels first
@@ -553,14 +558,13 @@ Figure[
                 for ilev, lev in levs[0:maxLevelIndex]:
                     if len(lev.gammas) > 0:  objects.append('            ' + "AutoLevel[%s]" % levelKey(lev.name))
                     for gam in lev.gammas: objects.append('            ' + 'AutoTrans[%s,LabT->"%s",Color->%s]' % (
-                    levelKey(gam.finalLevel), str(gam.energy), getColor(ilev)))
+                        levelKey(gam.finalLevel), str(gam.energy), getColor(ilev)))
             return mathematicaCommand(objects, self.A, self.symbol, 0., lineWidth * 1.3, -0.5, maxE + 0.5)
         else:
-            objects = []
-            objects.append(
-                "SetOptions[Trans, BackgroundT -> Automatic, NudgeT -> 2, Thickness -> 1, FontSize -> %FONTSIZE, OrientationT -> Automatic, ArrowType->ShapeArrow, FillColor -> LightGray]")
-            objects.append(
-                "    SetOptions[Lev, Thickness -> 1, LabR -> Automatic, FontSize -> %FONTSIZE, Color -> Black]")
+            objects = [
+                "SetOptions[Trans, BackgroundT -> Automatic, NudgeT -> 2, Thickness -> 1, FontSize -> %FONTSIZE, "
+                "OrientationT -> Automatic, ArrowType->ShapeArrow, FillColor -> LightGray]",
+                "    SetOptions[Lev, Thickness -> 1, LabR -> Automatic, FontSize -> %FONTSIZE, Color -> Black]"]
             maxE = maxEnergy(levs)
             yScale = 3.0
             xMin = 0.0
@@ -583,13 +587,13 @@ Figure[
                         jPiFinal = jPiAsNumber(gam.finalLevel)
                         gamXStop = jPiFinal * (xGap + xWidth)  # +0.5*sign(jPiFinal)*xWidth
                         objects.append("            Trans[%s,%s,Width->%f,Color->%s]" % (
-                        levelKey(lev.name), levelKey(gam.finalLevel), 2.0 * xWidth * gam.emTransitionProbability,
-                        getColor(ilev)))
+                            levelKey(lev.name), levelKey(gam.finalLevel), 2.0 * xWidth * gam.emTransitionProbability,
+                            getColor(ilev)))
             return mathematicaCommand(objects, self.A, self.symbol, xmin=(xMin - xGap), xmax=(xMax + xGap), ymin=-0.7,
                                       ymax=(maxE + 0.5), pageSizeX=deltaJPi(levs), pageSizeY=yScale * maxE)
 
     def toRIPLFormat(self):
-        '''
+        """
         The format consists of three types of records: (i) identification,
         (ii) level, and (iii) gamma. Each isotope begins with an
         identification record such as the one shown below for the case of
@@ -611,15 +615,15 @@ Figure[
         Sp     : proton separation energy in MeV
 
         The corresponding FORTRAN format is (a5,6i5,2f12.6)
-        '''
+        """
         raise NotImplementedError()
 
     def toTALYSFormat(self):
-        '''
+        """
         Z, A, total number of lines for this isotope, number of levels for this
         isotope, nuclear symbol with the FORTRAN format
             (2i4,2i5,56x,i4,a2)
-        '''
+        """
         raise NotImplementedError()
 
     def __str__(self):
@@ -627,8 +631,9 @@ Figure[
 
 
 class nuclearLevel:
-    '''
-    Simple nucleus level implementation, capturing (I hope) all the common elements from the RIPL, TALYS and GNDS formats.
+    """
+    Simple nucleus level implementation, capturing (I hope) all the common elements from the RIPL, TALYS and GNDS
+    formats.
     Member data from nuclearLevel:
         - name : GNDS name of nuclearLevel (usu. something like C12_e3)
         - energy : level energy as PhysicalQuantity
@@ -637,19 +642,22 @@ class nuclearLevel:
         - attributes : GNDS XML attributes dict.  Two of these keys are 'spin' and 'parity' of JPi
         - groundState : points to xParticle instance
     Other member data added here:
-        - lifetime : level lifetime as PhysicalQuantity.  If < 0.0 s, it is stable.  If == 0.0 s, is not stable or is so short it is unknown (the default).
+        - lifetime : level lifetime as PhysicalQuantity.  If < 0.0 s, it is stable.  If == 0.0 s, is not stable or is
+                     so short it is unknown (the default).
         - decays : list of decays
         - spin : integer or 1/2 integer or None.  We attempt to sync it with the spin entry in the attributes map.
         - parity : either +1, -1 or None. We attempt to sync it with the parity entry in the attributes map.
         - alternateJPiAssignments: free string as one sees in ENSDF e.g "(3/2,5/2,7/2)-"
-        - howJPiDetermined: key stating how assignment made (c=chosen, u=uncertain, n=unique, g=guessed, '' or None=unknown)
-    '''
+        - howJPiDetermined: key stating how assignment made (c=chosen, u=uncertain, n=unique, g=guessed, '' or
+                            None=unknown)
+    """
 
     def __init__(self, **kw):
-        '''
+        """
         Easiest is just to call with GNDS name as sole argument like this:
-            nuclearLevel( name="C12_e2", energy=PhysicalQuantity('1.0','MeV'), spin="1/2", parity=-1, index=2, lifetime=PhysicalQuantity('1.0','s') )
-        '''
+            nuclearLevel( name="C12_e2", energy=PhysicalQuantity('1.0','MeV'), spin="1/2", parity=-1, index=2,
+                          lifetime=PhysicalQuantity('1.0','s') )
+        """
         self.id = kw.get('name')
         self.index = kw.get('index')
         self.energy = kw.get('energy')
@@ -731,14 +739,14 @@ class nuclearLevel:
             self.parity)
         if showGammas and len(self.gammas) > 0:
             result += '\n' \
-                      + 50 * ' ' + (''.join(map( \
-                lambda x: str(x).rjust(20), \
-                ('Energy (MeV)', 'Final Level', 'Pgamma', "Pnon-gamma", "Multipolarity", "T1/2 (nsec)")))) + '\n' \
+                      + 50 * ' ' + (''.join(map(lambda x: str(x).rjust(20),
+                                                ('Energy (MeV)', 'Final Level', 'Pgamma', "Pnon-gamma", "Multipolarity",
+                                                 "T1/2 (nsec)")))) + '\n' \
                       + '\n'.join([g.levelReport() for g in self.gammas])
         return result
 
     def toRIPLFormat(self):
-        '''
+        """
         The identification record is followed by the level record, which in
         turn is followed by the pertinent gamma records if decay of the level
         is known. This combination is repeated for all levels in a given
@@ -792,31 +800,31 @@ class nuclearLevel:
         The corresponding FORTRAN format is::
 
             (i3,1x,f10.6,1x,f5.1,i3,1x,(e10.2),i3,1x,a1,1x,a4,1x,a18,i3,10(1x,a2,1x,f10.4,1x,a7))
-        '''
+        """
         raise NotImplementedError()
 
     def toTALYSFormat(self):
-        '''
+        """
         level number, level energy in MeV, spin, parity, number of gamma-ray branchings,
         lifetime, spin assignment character, parity as- signment character, original
         ENSDF string with the FORTRAN format::
 
             (i4,f11.6,f6.1,3x,i2,i3,19x,e9.3,1x,2a1,a18)
-        '''
+        """
         raise NotImplementedError()
 
 
 class nuclearDecayMode:
-    '''
+    """
     Simple implementation of a light-weight decay mode indicator.  Unused.
-    '''
+    """
 
     def __init__(self, mode=None, probability=0.0):
         self.mode = mode
         self.probability = probability
 
     def toRIPLFormat(self):
-        '''
+        """
         Coding of decay modes. Some minor possibilities, such as
         decay through the emission of Ne-20, are neglected.
 
@@ -840,14 +848,14 @@ class nuclearDecayMode:
                      %B2N    beta- delayed double neutron decay
                     %B+2P    beta+ delayed double proton decay
               ------------------------------------------------------
-        '''
+        """
         raise NotImplementedError()
 
     def toTALYSFormat(self): raise NotImplementedError()
 
 
 class nuclearLevelGamma:
-    '''
+    """
     Nuclear electromagnetic transition.  This usually is a gamma, hence the name.   It may also include internal conversions.
     Since we are ignoring non-electromagnetic decays, the gamma emission probability + the internal conversion probability = 1.0.
 
@@ -866,10 +874,10 @@ class nuclearLevelGamma:
         - emTransitionProbability : the gamma emission probability + the internal conversion probability ( <= 1.0 )
         - internalConversionCoefficient : the internal conversion coefficient ( == internalConversionProbability / gammaEmissionProbability )
         - howBRDetermined : Optional designator to describe how gamma gammaEmissionProbability determined
-    '''
+    """
 
     def __init__(self, **kw):
-        '''
+        """
         If starting from RIPL, initialize like this:
 
             >>> nuclearLevelGamma( energy=PhysicalQuantity("1.322 MeV"), finalLevel="Ni58_e1", Pg=0.96, ICC=0.0 )
@@ -881,7 +889,7 @@ class nuclearLevelGamma:
         If starting from ENDF, initialize like this:
 
             >>> nuclearLevelGamma( energy=PhysicalQuantity("1.322 MeV"), finalLevel="Ni58_e1", probability=GP*TP, nonRadiativeProbability=(1.0-GP)*TP )
-        '''
+        """
         self.setEmissionProbabilities(
             Pg=kw.get('Pg', kw.get('probability')),
             ICC=kw.get('ICC'),
@@ -909,14 +917,14 @@ class nuclearLevelGamma:
         self.gammaEmissionProbability = Pg
         self.internalConversionCoefficient = ICC
         self.emTransitionProbability = Pe
-        self.internalConversionProbability = nonRadiativeProbability  # probably will get overwritten below for consistency
-        if self.emTransitionProbability == None and self.internalConversionCoefficient != None:
+        self.internalConversionProbability = nonRadiativeProbability  # probably will get overwritten below
+        if self.emTransitionProbability is None and self.internalConversionCoefficient is not None:
             self.emTransitionProbability = self.gammaEmissionProbability * (1.0 + self.internalConversionCoefficient)
             self.internalConversionProbability = self.gammaEmissionProbability * self.internalConversionCoefficient
-        elif self.emTransitionProbability != None and self.internalConversionCoefficient == None:
+        elif self.emTransitionProbability is not None and self.internalConversionCoefficient is None:
             self.internalConversionProbability = self.emTransitionProbability - self.gammaEmissionProbability
             self.internalConversionCoefficient = self.internalConversionProbability / self.gammaEmissionProbability
-        elif self.emTransitionProbability == None and self.internalConversionCoefficient == None:
+        elif self.emTransitionProbability is None and self.internalConversionCoefficient is None:
             self.emTransitionProbability = self.gammaEmissionProbability
             self.internalConversionProbability = 0.0
             self.internalConversionCoefficient = 0.0
@@ -980,7 +988,7 @@ class nuclearLevelGamma:
         return result
 
     def toRIPLFormat(self):
-        '''
+        """
         Two typical examples of the gamma records are given below (Nb-94)::
 
                   Nf    Eg[MeV]       Pg          Pe          ICC
@@ -1001,16 +1009,16 @@ class nuclearLevelGamma:
                 ICC   : Internal conversion coefficient of a transition.
 
         The corresponding FORTRAN format is (39x,i4,1x,f10.3,3(1x,e10.3))
-        '''
+        """
         raise NotImplementedError()
 
     def toTALYSFormat(self):
-        '''
+        """
         The number of the level to which the gamma-ray decay takes place and the corresponding
         branching ratio and electron-conversion factor. If a branching ratio has been assigned by
         us, a 'B' is placed in column 58. The FORTRAN format for this line is
             (29x,i3,f10.6,e10.3,5x,a1)
-        '''
+        """
         raise NotImplementedError()
 
 
@@ -1028,7 +1036,7 @@ class ParseError(Exception):
 
 
 def readTALYSLevelScheme(f, verbose=False):
-    '''
+    """
     Read a level scheme from a string "f" (assumed to have been read from a file)
 
     TALYS inputs have this structure:
@@ -1041,7 +1049,7 @@ def readTALYSLevelScheme(f, verbose=False):
                                0  1.000000 2.441E-02
    2   0.827900   4.0    1  1                                             (4+)
                                1  1.000000 3.300E-03
-    '''
+    """
     contentMap = xParticleList()
     lines = f.split('\n')
     while lines:
@@ -1064,11 +1072,11 @@ def readTALYSLevelScheme(f, verbose=False):
                 Sp = myNucleus.Sp.inUnitsOf('MeV/c**2')
             except:
                 Sp = None
-            print("Nucleus:", name, \
-                  "  ZA =", myNucleus.ZA, \
-                  "  mass =", myNucleus.mass, \
-                  "  Sn =", Sn, \
-                  "  Sp =", Sp, \
+            print("Nucleus:", name,
+                  "  ZA =", myNucleus.ZA,
+                  "  mass =", myNucleus.mass,
+                  "  Sn =", Sn,
+                  "  Sp =", Sp,
                   '  numLevels =', numLevels)
 
         # Save the nucleus
@@ -1103,10 +1111,10 @@ def readTALYSLevelScheme(f, verbose=False):
             myLevel = nuclearLevel(name=myNucleus.name + '_e' + str(levelIndex), spin=J, parity=Pi,
                                    alternateJPiAssignments=alternateJPiAssignments, index=levelIndex, energy=eLevel)
             if verbose:
-                print("   ", myLevel, ':', \
-                      '  energy =', myLevel.energy, \
-                      '  JPi =', myLevel.spin, myLevel.parity, \
-                      '  lifetime =', myLevel.lifetime, \
+                print("   ", myLevel, ':',
+                      '  energy =', myLevel.energy,
+                      '  JPi =', myLevel.spin, myLevel.parity,
+                      '  lifetime =', myLevel.lifetime,
                       '  numGammas =', numGammas)
 
             # Save the level in the contentsMap and inform the nucleus about the level
@@ -1127,9 +1135,9 @@ def readTALYSLevelScheme(f, verbose=False):
 
                 myGamma = nuclearLevelGamma(energy=eGamma, finalLevel=finalLevel, Pg=Pe / (1.0 + ICC), ICC=ICC)
                 if verbose:
-                    print("       ", myLevel.name + "->" + myGamma.finalLevel, ':', \
-                          '  energy =', myGamma.energy, \
-                          '  Pg =', myGamma.gammaEmissionProbability, \
+                    print("       ", myLevel.name + "->" + myGamma.finalLevel, ':',
+                          '  energy =', myGamma.energy,
+                          '  Pg =', myGamma.gammaEmissionProbability,
                           '  ICC =', myGamma.internalConversionCoefficient)
 
                 # Save the gamma
@@ -1156,7 +1164,7 @@ def readEMPIRELevelScheme(f, verbose=False, updateMasses=False): return readRIPL
 
 
 def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
-    '''
+    """
     Read a level scheme from a string "f" (assumed to have been read from a file)
 
     EMPIRE and RIPL have the same format (according to Mike Herman).  They have the following structure:
@@ -1170,7 +1178,7 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
                                           1      1.383  0.000E+00  0.000E+00  0.000E+00
   4   1.495460   4.0  1   1.02E-10  1 u                      4+  0
                                           2      0.561  9.971E-01  1.000E+00  2.922E-03
-    '''
+    """
     contentMap = collections.OrderedDict()
     lines = f.split('\n')
     numLines = len(lines)
@@ -1199,11 +1207,11 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
             numLevels = int(line[16:21])  # e.g. 136
             totNumGammas = int(line[21:26])  # e.g. 116
             if verbose:
-                print("Nucleus:", name, \
-                      "  ZA =", myNucleus.ZA, \
-                      "  mass =", myNucleus.mass, \
-                      "  Sn =", myNucleus.Sn, \
-                      "  Sp =", myNucleus.Sp, \
+                print("Nucleus:", name,
+                      "  ZA =", myNucleus.ZA,
+                      "  mass =", myNucleus.mass,
+                      "  Sn =", myNucleus.Sn,
+                      "  Sp =", myNucleus.Sp,
                       '  numLevels =', numLevels)
 
             # Save the nucleus
@@ -1247,10 +1255,10 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
                                        alternateJPiAssignments=alternateJPiAssignments,
                                        index=levelIndex, energy=eLevel, lifetime=lifetime, groundState=myNucleus)
                 if verbose:
-                    print("   ", myLevel, ':', \
-                          '  energy =', myLevel.energy, \
-                          '  JPi =', myLevel.spin, myLevel.parity, \
-                          '  lifetime =', myLevel.lifetime, \
+                    print("   ", myLevel, ':',
+                          '  energy =', myLevel.energy,
+                          '  JPi =', myLevel.spin, myLevel.parity,
+                          '  lifetime =', myLevel.lifetime,
                           '  numGammas =', numGammas)
 
                 # Read in the gammas
@@ -1268,9 +1276,9 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
                                                 finalLevel=myNucleus.levels[indexFinal], Pg=Pg, ICC=ICC, Pe=Pe)
 
                     if verbose:
-                        print("       ", str(myLevel) + "->" + str(myGamma.finalLevel), ':', \
-                              '  energy =', myGamma.energy, \
-                              '  Pg =', myGamma.gammaEmissionProbability, \
+                        print("       ", str(myLevel) + "->" + str(myGamma.finalLevel), ':',
+                              '  energy =', myGamma.energy,
+                              '  Pg =', myGamma.gammaEmissionProbability,
                               '  ICC =', myGamma.internalConversionCoefficient)
 
                     # Save the gamma
@@ -1316,7 +1324,7 @@ def getNucleus(Z, A, pathToRIPLLevelFiles=None, pathToRIPLResonanceFiles=None, p
                verbose=False, updateMasses=True):
     RIPLFile = pathToRIPLLevelFiles + os.sep + 'z' + str(Z).zfill(3) + '.dat'
 
-    # Read in the the entire Z chain
+    # Read in the entire Z chain
     nuclMap = readRIPLLevelScheme(
         ''.join(open(RIPLFile, mode='r').readlines()),
         verbose=verbose, updateMasses=updateMasses)
