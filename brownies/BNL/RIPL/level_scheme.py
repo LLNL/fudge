@@ -9,19 +9,18 @@ from brownies.BNL.plot_evaluation.plotio import readEvaluation
 from xData import axes as axesModule
 from xData import XYs1d as XYs1dModule
 
-
 ENDFFILEPATH = os.environ['HOME'] + "/Sites/endfb71.dev/neutrons"
 
 neutronMass = PhysicalQuantity(masses.massTable[1], 'amu')
 protonMass = PhysicalQuantity(masses.massTable[1001], 'amu')
 quantityDeterminationMap = {'c': 'chosen', None: 'unknown', '': 'unknown', 'u': 'uncertain', 'n': 'unique',
                             'g': 'wild guess'}
-cSquared = PhysicalQuantity(1.00000000000000000000,'c**2')
-hbar = PhysicalQuantity("6.58211928e-16","eV*s")
-hbarc = PhysicalQuantity("197.32697","MeV*fm")
-e2 = PhysicalQuantity("1.43998e-10","keV*cm")
-muN2 = PhysicalQuantity("1.59234e-38","keV*cm**3")
-b = PhysicalQuantity('1e-24','cm**2')
+cSquared = PhysicalQuantity(1.00000000000000000000, 'c**2')
+hbar = PhysicalQuantity("6.58211928e-16", "eV*s")
+hbarc = PhysicalQuantity("197.32697", "MeV*fm")
+e2 = PhysicalQuantity("1.43998e-10", "keV*cm")
+muN2 = PhysicalQuantity("1.59234e-38", "keV*cm**3")
+b = PhysicalQuantity('1e-24', 'cm**2')
 
 
 def double_factorial(n):
@@ -31,15 +30,17 @@ def double_factorial(n):
     :param n: an integer
     :return: n!!
     """
-    if not isinstance(n,int): raise TypeError('n must be an int')
+    if not isinstance(n, int): raise TypeError('n must be an int')
     product = 1
-    if n%2 == 1: stop=1
-    else: stop=0
-    for i in range(n,stop,-2): product *= i
+    if n % 2 == 1:
+        stop = 1
+    else:
+        stop = 0
+    for i in range(n, stop, -2): product *= i
     return product
 
 
-def is_transition_allowed( multipolarity, startJ, startPi, stopJ, stopPi ):
+def is_transition_allowed(multipolarity, startJ, startPi, stopJ, stopPi):
     """
     Test whether a transition of given multipolarity is allowed between the given states' JPi
 
@@ -50,24 +51,24 @@ def is_transition_allowed( multipolarity, startJ, startPi, stopJ, stopPi ):
     :param stopPi: final state parity
     :return: if transition is allow
     """
-    if multipolarity[0] not in ["E","M"] or type(multipolarity[1])!=int:
-        raise ValueError( "multipolarity be of form (X,L) where X='E' or 'M' and L is an int" )
-    if str(startPi)==str(stopPi):
-        PiTest=1
+    if multipolarity[0] not in ["E", "M"] or type(multipolarity[1]) != int:
+        raise ValueError("multipolarity be of form (X,L) where X='E' or 'M' and L is an int")
+    if str(startPi) == str(stopPi):
+        PiTest = 1
     else:
-        PiTest=-1
+        PiTest = -1
     if isinstance(startJ, Spin):
-        startJ=startJ.value
+        startJ = startJ.value
     if isinstance(stopJ, Spin):
-        stopJ=stopJ.value
-    if multipolarity[0] == "E" and PiTest != pow(-1,multipolarity[1]):
+        stopJ = stopJ.value
+    if multipolarity[0] == "E" and PiTest != pow(-1, multipolarity[1]):
         return False
-    elif multipolarity[0] == "M" and PiTest != pow(-1,multipolarity[1]+1):
+    elif multipolarity[0] == "M" and PiTest != pow(-1, multipolarity[1] + 1):
         return False
-    return abs(startJ-stopJ)<=multipolarity[1] and startJ+stopJ>=multipolarity[1]
+    return abs(startJ - stopJ) <= multipolarity[1] and startJ + stopJ >= multipolarity[1]
 
 
-def WeisskopfSingleParticleEstimateBXL(multipolarity,A):
+def WeisskopfSingleParticleEstimateBXL(multipolarity, A):
     """
     Computes Weisskopf's single particle for B(XL)
 
@@ -75,29 +76,31 @@ def WeisskopfSingleParticleEstimateBXL(multipolarity,A):
     :param A: number of nucleons in nucleus in question
     :return: the estimate of B(XL), it is dimensionless
     """
-    if multipolarity[0] not in ["E","M"] or type(multipolarity[1])!=int:
-        raise ValueError( "multipolarity be of form (X,L) where X='E' or 'M' and L is an int" )
-    L=multipolarity[1]
-    R=1.2e-13*pow(A,1./3.) # This is nuclear radius in cm
-    x = R*R/1e-24  # This is R^2/b where b = 10^-24 cm
-    BXL = 3.0/(3.0+L)
-    BXL *= BXL/math.pi
-    if multipolarity[0]=='E':
-        return BXL*pow(x,L)/4.0
+    if multipolarity[0] not in ["E", "M"] or type(multipolarity[1]) != int:
+        raise ValueError("multipolarity be of form (X,L) where X='E' or 'M' and L is an int")
+    L = multipolarity[1]
+    R = 1.2e-13 * pow(A, 1. / 3.)  # This is nuclear radius in cm
+    x = R * R / 1e-24  # This is R^2/b where b = 10^-24 cm
+    BXL = 3.0 / (3.0 + L)
+    BXL *= BXL / math.pi
+    if multipolarity[0] == 'E':
+        return BXL * pow(x, L) / 4.0
     else:
-        return BXL*10.0*pow(x,L-1)
+        return BXL * 10.0 * pow(x, L - 1)
 
 
-def gammaHalflife(multipolarity,BXL,Eg):
-    if multipolarity[0] not in ["E","M"] or type(multipolarity[1])!=int:
-        raise ValueError( "multipolarity be of form (X,L) where X='E' or 'M' and L is an int" )
-    if not isinstance(Eg,PhysicalQuantity): raise TypeError("Eg must be a PhysicalQuantity")
-    L=multipolarity[1]
-    prefactor = math.log(2)*L*pow(double_factorial(2*L+1),2.0)*hbar*pow(hbarc/Eg,2*L+1)/8.0/math.pi/(L+1)/BXL
-    if multipolarity[0]=='E':
-        return prefactor/e2/pow(b,L)
+def gammaHalflife(multipolarity, BXL, Eg):
+    if multipolarity[0] not in ["E", "M"] or type(multipolarity[1]) != int:
+        raise ValueError("multipolarity be of form (X,L) where X='E' or 'M' and L is an int")
+    if not isinstance(Eg, PhysicalQuantity): raise TypeError("Eg must be a PhysicalQuantity")
+    L = multipolarity[1]
+    prefactor = math.log(2) * L * pow(double_factorial(2 * L + 1), 2.0) * hbar * pow(hbarc / Eg,
+                                                                                     2 * L + 1) / 8.0 / math.pi / (
+                            L + 1) / BXL
+    if multipolarity[0] == 'E':
+        return prefactor / e2 / pow(b, L)
     else:
-        return prefactor/muN2/pow(b,L-1)
+        return prefactor / muN2 / pow(b, L - 1)
 
 
 # ---------------------------------------------------------------------------------
@@ -139,10 +142,10 @@ class nucleus:
 
             >>> nucleus( name="C12" )
         '''
-        self.name=kw['name']
-        self.attributes=kw.get('attributes', {})
+        self.name = kw['name']
+        self.attributes = kw.get('attributes', {})
         self.Z, self.A, self.ZA, lev = ZAInfo_fromString(self.name)
-        self.mass=kw.get('mass', None)
+        self.mass = kw.get('mass', None)
         if self.mass is None:
             try:
                 # i don't understand fudge mass setting, it is very confusing
@@ -169,19 +172,19 @@ class nucleus:
         self.resSpacingPWave = kw.get('D1', None)
         self.uncResSpacingPWave = kw.get('dD1', None)
         self.endfMap = {}
-        self.endfFile=None
+        self.endfFile = None
         self.resonances = None
-        self.BInWeisskopfUnits={}
-        self.BInWeisskopfUnits[('E',1)]=kw.get( 'BE1', None )
-        self.BInWeisskopfUnits[('E',2)]=kw.get( 'BE2', None )
-        self.BInWeisskopfUnits[('M',1)]=kw.get( 'BM1', None )
-        self.BInWeisskopfUnits[('E',3)]=kw.get( 'BE3', None )
-        self.BInWeisskopfUnits[('M',2)]=kw.get( 'BM2', None )
-        self.BInWeisskopfUnits[('E',4)]=kw.get( 'BE4', None )
-        self.BInWeisskopfUnits[('M',3)]=kw.get( 'BM3', None )
-        self.BInWeisskopfUnits[('E',5)]=kw.get( 'BE5', None )
-        self.BInWeisskopfUnits[('M',4)]=kw.get( 'BM4', None )
-        self.__levels=[]
+        self.BInWeisskopfUnits = {}
+        self.BInWeisskopfUnits[('E', 1)] = kw.get('BE1', None)
+        self.BInWeisskopfUnits[('E', 2)] = kw.get('BE2', None)
+        self.BInWeisskopfUnits[('M', 1)] = kw.get('BM1', None)
+        self.BInWeisskopfUnits[('E', 3)] = kw.get('BE3', None)
+        self.BInWeisskopfUnits[('M', 2)] = kw.get('BM2', None)
+        self.BInWeisskopfUnits[('E', 4)] = kw.get('BE4', None)
+        self.BInWeisskopfUnits[('M', 3)] = kw.get('BM3', None)
+        self.BInWeisskopfUnits[('E', 5)] = kw.get('BE5', None)
+        self.BInWeisskopfUnits[('M', 4)] = kw.get('BM4', None)
+        self.__levels = []
 
     def addLevel(self, lev):
         self.__levels.append(lev)
@@ -204,8 +207,9 @@ class nucleus:
             str(self.Z).zfill(3), elementSymbolFromZ(self.Z), str(self.A - 1).zfill(3))
         if not os.path.exists(endfFile):
             if keepGoing:
-                print ('evaluation %s not found' % endfFile)
-            else: raise RuntimeWarning('evaluation %s not found' % endfFile)
+                print('evaluation %s not found' % endfFile)
+            else:
+                raise RuntimeWarning('evaluation %s not found' % endfFile)
         else:
             endfMap = readEvaluation(endfFile, verbose=verbose, skipBadData=True)
             proj = endfMap[0].projectile.getZ_A_SuffixAndZA()
@@ -214,7 +218,7 @@ class nucleus:
                 raise ValueError(
                     "target (%s) + projectile (%s) system doesn't form the requested compound system (%s)" % (
                         str(endfMap[0].projectile), str(endfMap[0].target),
-                        str(nucleusNameFromZA(self.Z * 1000 + self.A)) ))
+                        str(nucleusNameFromZA(self.Z * 1000 + self.A))))
             self.endfFile = endfFile
             self.endfMap = endfMap
             if hasattr(self.endfMap[0], 'resonances'): self.resonances = endfMap[0].resonances
@@ -229,41 +233,43 @@ class nucleus:
         else:
             regions = [self.resonances.resolved]
 
-        iLevel=self.getNumberLevels()-1
-        iRes=-1
+        iLevel = self.getNumberLevels() - 1
+        iRes = -1
 
         # Process each region
         for RRidx, RR in enumerate(regions):
-            if RR.nativeData.moniker in [ 'SingleLevel_BreitWigner', 'MultiLevel_BreitWigner', 'Reich_Moore' ]:
+            if RR.nativeData.moniker in ['SingleLevel_BreitWigner', 'MultiLevel_BreitWigner', 'Reich_Moore']:
                 if verbose:
                     pprint.pprint(RR.nativeData.resonanceParameters.data)
                 for level in RR.nativeData.resonanceParameters.data:
                     iLevel += 1
-                    iRes+=1
-                    J = Spin(str(int(abs(level[2])*2.0))+'/2')
-                    if level[2] == 0.0: Pi = Parity(-1)
-                    else: Pi = Parity(+1)
+                    iRes += 1
+                    J = Spin(str(int(abs(level[2]) * 2.0)) + '/2')
+                    if level[2] == 0.0:
+                        Pi = Parity(-1)
+                    else:
+                        Pi = Parity(+1)
                     self.addLevel(
                         nuclearLevel(
-                            name=self.symbol+str(self.A)+'_r%i'%(iRes),
+                            name=self.symbol + str(self.A) + '_r%i' % (iRes),
                             index=iLevel,
-                            energy=(PhysicalQuantity(level[0],'eV')+self.Sn).inUnitsOf('MeV'),
+                            energy=(PhysicalQuantity(level[0], 'eV') + self.Sn).inUnitsOf('MeV'),
                             spin=J,
                             parity=Pi))
             elif RR.nativeData.moniker == 'R_Matrix_Limited':
                 for iSG, SG in enumerate(RR.nativeData.spinGroups):
                     if verbose:
-                        print ("spin group %i (J=%s, Pi=%s)"%(iSG,str(SG.spin),str(SG.parity)))
+                        print("spin group %i (J=%s, Pi=%s)" % (iSG, str(SG.spin), str(SG.parity)))
                     if verbose:
                         pprint.pprint(SG.resonanceParameters.data)
                     for level in SG.resonanceParameters.data:
                         iLevel += 1
-                        iRes+=1
+                        iRes += 1
                         self.addLevel(
                             nuclearLevel(
-                                name=self.symbol+str(self.A)+'_r%i'%(iRes),
+                                name=self.symbol + str(self.A) + '_r%i' % (iRes),
                                 index=iLevel,
-                                energy=(PhysicalQuantity(level[0],'eV')+self.Sn).inUnitsOf('MeV'),
+                                energy=(PhysicalQuantity(level[0], 'eV') + self.Sn).inUnitsOf('MeV'),
                                 spin=SG.spin,
                                 parity=SG.parity))
 
@@ -291,19 +297,21 @@ class nucleus:
                        BR's smaller than 1% will be generated.  Bigger BR's will be rescaled to sum to 1.0
         :return: a list of all possible EM transitions for a given multipolarity
         """
-        #BInWeisskopfUnits.update(self.BInWeisskopfUnits)
+        # BInWeisskopfUnits.update(self.BInWeisskopfUnits)
 
         # Assemble all the multipolarities to consider
-        if multipolarity is not None: multipolarityList = [multipolarity]
-        else: multipolarityList=[('E',1), ('E',2), ('M',1)]#, ('E',3), ('M',2)] # defaults
+        if multipolarity is not None:
+            multipolarityList = [multipolarity]
+        else:
+            multipolarityList = [('E', 1), ('E', 2), ('M', 1)]  # , ('E',3), ('M',2)] # defaults
 
         # A copy of current level to add gammas to
         dummyLevel = copy.copy(self.levels[iStart])
-        dummyLevel.gammas=[]
+        dummyLevel.gammas = []
 
         # Compute all allowed gammas
         for multipolarity in multipolarityList:
-            for i in range(0,iStart):
+            for i in range(0, iStart):
                 if is_transition_allowed(
                         multipolarity,
                         self.levels[iStart].spin,
@@ -312,33 +320,34 @@ class nucleus:
                         self.levels[i].parity):
 
                     # Compute BXL
-                    BXL=BInWeisskopfUnits[multipolarity]*WeisskopfSingleParticleEstimateBXL(multipolarity,self.A)
+                    BXL = BInWeisskopfUnits[multipolarity] * WeisskopfSingleParticleEstimateBXL(multipolarity, self.A)
 
                     # Gamma energy
-                    Eg = self.levels[iStart].energy-self.levels[i].energy
+                    Eg = self.levels[iStart].energy - self.levels[i].energy
 
                     # Compute T1/2 here
-                    Thalf=gammaHalflife(multipolarity,BXL,Eg)
+                    Thalf = gammaHalflife(multipolarity, BXL, Eg)
                     try:
                         Thalf.convertToUnit('ns')
                     except TypeError as err:
-                        raise TypeError( str(multipolarity) )
+                        raise TypeError(str(multipolarity))
 
                     # Create a new gamma instance
-                    g=nuclearLevelGamma(energy=Eg, finalLevel=self.levels[i], halflife=Thalf, multipolarity=multipolarity)
+                    g = nuclearLevelGamma(energy=Eg, finalLevel=self.levels[i], halflife=Thalf,
+                                          multipolarity=multipolarity)
 
                     # Add it to list
                     dummyLevel.addGamma(g)
 
         # Sort the gammas
-        dummyLevel.gammas.sort(cmp=lambda x,y:cmp(y.finalLevel.name,x.finalLevel.name))
+        dummyLevel.gammas.sort(cmp=lambda x, y: cmp(y.finalLevel.name, x.finalLevel.name))
 
         # Fix BRs
-        if len(dummyLevel.gammas)!=0:
-            Gtot = 1.0/dummyLevel.gammas[0].halflife
-            for g in dummyLevel.gammas[1:]: Gtot+=1.0/g.halflife
+        if len(dummyLevel.gammas) != 0:
+            Gtot = 1.0 / dummyLevel.gammas[0].halflife
+            for g in dummyLevel.gammas[1:]: Gtot += 1.0 / g.halflife
             for g in dummyLevel.gammas:
-                g.setEmissionProbabilities(Pg=1.0/(Gtot*g.halflife),ICC=0.0,Pe=0.0,nonRadiativeProbability=0.0)
+                g.setEmissionProbabilities(Pg=1.0 / (Gtot * g.halflife), ICC=0.0, Pe=0.0, nonRadiativeProbability=0.0)
 
         # Filter out gammas with small BR's, then renormalize
         if BRmin is not None:
@@ -349,32 +358,34 @@ class nucleus:
                     newGammas.append(g)
                     BRTotal += g.gammaEmissionProbability
             for g in newGammas:
-                g.gammaEmissionProbability/=BRTotal
+                g.gammaEmissionProbability /= BRTotal
             dummyLevel.gammas = newGammas
-
 
         return dummyLevel
 
     def getCumulativeLevelDistribution(self, J=None, Pi=None):
         myAxes = axesModule.Axes(labelsUnits={0: ('Excitation energy', 'MeV'), 1: ('Number of levels', '')})
         theData = [[0.0, 1.0]]
+
         def JPiMatches(level):
-            Jmatch = J is None or str(level.spin)=='?'
-            Pimatch = Pi is None or str(level.parity)=='?'
+            Jmatch = J is None or str(level.spin) == '?'
+            Pimatch = Pi is None or str(level.parity) == '?'
             if Jmatch or Pimatch: return True
-            return int(float(level.spin)-J)<0.001 and str(level.parity)==Pi
-        levelEnergyList = [float(self.levels[level].energy.inUnitsOf('MeV').value) for level in self.levels if JPiMatches(level)]
+            return int(float(level.spin) - J) < 0.001 and str(level.parity) == Pi
+
+        levelEnergyList = [float(self.levels[level].energy.inUnitsOf('MeV').value) for level in self.levels if
+                           JPiMatches(level)]
         levelEnergyList.sort()
         for thisEnergy in levelEnergyList[1:]:
             if abs(thisEnergy - theData[-1][0]) < 1e-6 * thisEnergy:
                 theData[-1][1] = theData[-1][1] + 1  # Deal with corner case where two levels are degenerate
             else:
                 theData.append([thisEnergy, theData[-1][1] + 1])
-        return XYs1dModule.XYs1d(interpolation='flat',axes=myAxes, data=theData, accuracy=1e-5)
+        return XYs1dModule.XYs1d(interpolation='flat', axes=myAxes, data=theData, accuracy=1e-5)
 
     def getLevelSpacingDistribution(self):
         myAxes = axesModule.defaultAxes(dimension=2, independentInterpolation='linear', dependentInterpolation='flat',
-                                  labelsUnits={0: ( 'Excitation energy', 'MeV' ), 1: ( 'Level spacing, D', 'MeV' )})
+                                        labelsUnits={0: ('Excitation energy', 'MeV'), 1: ('Level spacing, D', 'MeV')})
         theData = []
         levelList = self.levels.keys()
         levelList.sort()
@@ -396,12 +407,12 @@ class nucleus:
     def getJPiList(self):
         result = []
         for x in self.levels.values():
-            theSpin=x.spin
-            theParity=x.parity
-            if type(theSpin)==float:
-                theSpin=Spin(str(int(2.0*x.spin))+'/2')
-            if type(theParity)==int:
-                theParity=parity(x.parity)
+            theSpin = x.spin
+            theParity = x.parity
+            if type(theSpin) == float:
+                theSpin = Spin(str(int(2.0 * x.spin)) + '/2')
+            if type(theParity) == int:
+                theParity = parity(x.parity)
             tmp = (theSpin, theParity)
             if not tmp in result: result.append(tmp)
         result.sort()
@@ -418,23 +429,24 @@ class nucleus:
                ', D1 = ' + str(self.resSpacingPWave) + ' +/- ' + str(self.uncResSpacingPWave)
 
     def levelReport(self, showGammas=False):
-        belowSn=self.Sn is not None
-        belowSp=self.Sp is not None
+        belowSn = self.Sn is not None
+        belowSp = self.Sp is not None
         levs = self.levels
         levs.sort(key=lambda x: x.energy)
-        result =[ "           index         name              E_level     J Pi   Resonance?" ]
-        for ilev,lev in enumerate(levs):
-            if belowSn and lev.energy>=self.Sn:
-                result.append( (8*' ')+' '+(56*"-")+" Sn = "+str(self.Sn) )
-                belowSn=False
-            if belowSp and lev.energy>=self.Sp:
-                result.append( (8*' ')+' '+(56*"-")+" Sp = "+str(self.Sp) )
-                belowSp=False
-            result.append( '            '+str(ilev).rjust(4)+' '+lev.levelReport(showGammas=showGammas))
-            if '_r' in lev.name: result[-1]+='   *'
+        result = ["           index         name              E_level     J Pi   Resonance?"]
+        for ilev, lev in enumerate(levs):
+            if belowSn and lev.energy >= self.Sn:
+                result.append((8 * ' ') + ' ' + (56 * "-") + " Sn = " + str(self.Sn))
+                belowSn = False
+            if belowSp and lev.energy >= self.Sp:
+                result.append((8 * ' ') + ' ' + (56 * "-") + " Sp = " + str(self.Sp))
+                belowSp = False
+            result.append('            ' + str(ilev).rjust(4) + ' ' + lev.levelReport(showGammas=showGammas))
+            if '_r' in lev.name: result[-1] += '   *'
         return '\n'.join(result)
 
-    def levelReportMathematica(self,showGammas=False,maxLevelIndex=41,style='other',modifiedLevels=[17,26,27,37,39]):
+    def levelReportMathematica(self, showGammas=False, maxLevelIndex=41, style='other',
+                               modifiedLevels=[17, 26, 27, 37, 39]):
         '''
         Before cut-n-pasting, do:
                 <<"LevelScheme`"
@@ -446,25 +458,36 @@ class nucleus:
         :param modifiedLevels:
         :return:
         '''
+
         def parityTranslator(parity):
-            if str(parity)=='+': return '+1'
-            elif str(parity)=='-': return '-1'
+            if str(parity) == '+':
+                return '+1'
+            elif str(parity) == '-':
+                return '-1'
             return 'None'
+
         def spinTranslator(spin):
             # FIXME: code logic for use of DiagonalFractionBox[a,b]
             return str(spin)
+
         def getColor(i):
             if i in modifiedLevels: return 'Red'
             return 'Black'
-        def levelKey(name): return str(name).replace('_','')
-        def levelFormatter(_lev,_leftHorPos,_rightHorPos,_yScale=1.0):
-            spin=spinTranslator(_lev.spin)
-            parity=parityTranslator(_lev.parity)
-            _ilev=int(str(_lev.name).split('_e')[-1])
-            return 'Lev[%s,%f,%f,%f,LabL -> LabelJP["%s", %s], Color->%s] ' % ( levelKey(_lev.name), _leftHorPos, _rightHorPos, _lev.energy.value*_yScale, spin, parity,getColor(_ilev) )
-        def mathematicaCommand(_objects,A,symbol,xmin,xmax,ymin,ymax,fontsize=10,pageSizeX=None,pageSizeY=None):
-            if pageSizeX is None: pageSizeX=xmax-xmin
-            if pageSizeY is None: pageSizeY=3*(ymax-ymin)
+
+        def levelKey(name):
+            return str(name).replace('_', '')
+
+        def levelFormatter(_lev, _leftHorPos, _rightHorPos, _yScale=1.0):
+            spin = spinTranslator(_lev.spin)
+            parity = parityTranslator(_lev.parity)
+            _ilev = int(str(_lev.name).split('_e')[-1])
+            return 'Lev[%s,%f,%f,%f,LabL -> LabelJP["%s", %s], Color->%s] ' % (
+            levelKey(_lev.name), _leftHorPos, _rightHorPos, _lev.energy.value * _yScale, spin, parity, getColor(_ilev))
+
+        def mathematicaCommand(_objects, A, symbol, xmin, xmax, ymin, ymax, fontsize=10, pageSizeX=None,
+                               pageSizeY=None):
+            if pageSizeX is None: pageSizeX = xmax - xmin
+            if pageSizeY is None: pageSizeY = 3 * (ymax - ymin)
             return '''Get["LevelScheme`"]
 Figure[
     {
@@ -473,85 +496,97 @@ Figure[
     },
     PlotRange -> {{%XMIN, %XMAX}, {%YMIN, %YMAX}},
     ImageSize -> 72*{%SIZEX, %SIZEY}
-]'''\
-                .replace("%OBJECTLIST",',\n'.join(_objects))\
-                .replace("%FONTSIZE", str(fontsize))\
-                .replace("%XMIN",str(xmin))\
-                .replace("%XMAX",str(xmax))\
-                .replace("%YMIN",str(ymin))\
-                .replace("%YMAX",str(ymax))\
-                .replace("%SIZEX",str(pageSizeX))\
-                .replace("%SIZEY",str(pageSizeY))\
-                .replace("%A",str(A))\
-                .replace("%SYM",symbol)
+]''' \
+                .replace("%OBJECTLIST", ',\n'.join(_objects)) \
+                .replace("%FONTSIZE", str(fontsize)) \
+                .replace("%XMIN", str(xmin)) \
+                .replace("%XMAX", str(xmax)) \
+                .replace("%YMIN", str(ymin)) \
+                .replace("%YMAX", str(ymax)) \
+                .replace("%SIZEX", str(pageSizeX)) \
+                .replace("%SIZEY", str(pageSizeY)) \
+                .replace("%A", str(A)) \
+                .replace("%SYM", symbol)
+
         def jPiAsNumber(_lev):
             try:
                 jPi = float(_lev.spin.value)
             except TypeError:
                 jPi = 0.0
-            if str(_lev.parity) not in ['+','?']:
-                jPi*=-1
+            if str(_lev.parity) not in ['+', '?']:
+                jPi *= -1
             return jPi
+
         def deltaJPi(_levs):
             jPiList = []
-            for _ilev,_lev in _levs: jPiList.append(jPiAsNumber(_lev))
-            return max(jPiList)-min(jPiList)
+            for _ilev, _lev in _levs: jPiList.append(jPiAsNumber(_lev))
+            return max(jPiList) - min(jPiList)
+
         def maxEnergy(_levs):
-            _maxE=0.0
-            for _ilev,_lev in _levs[0:maxLevelIndex]:
-                _maxE=max(_maxE,_lev.energy.value)
+            _maxE = 0.0
+            for _ilev, _lev in _levs[0:maxLevelIndex]:
+                _maxE = max(_maxE, _lev.energy.value)
             return _maxE
+
         def sign(x):
-            if x<0.0: return -1
+            if x < 0.0: return -1
             return +1
 
         # Get a sorted list of levels
         levs = self.levels.items()
-        levs.sort(cmp=lambda x,y: cmp(x[1].energy, y[1].energy))
+        levs.sort(cmp=lambda x, y: cmp(x[1].energy, y[1].energy))
 
-        if style=='betaDecay':
+        if style == 'betaDecay':
             # Style setup
             objects = []
-            objects.append( "SetOptions[Trans, BackgroundT -> Automatic, NudgeT -> 2, Thickness -> 1, FontSize -> %FONTSIZE, OrientationT -> Automatic, FillColor -> LightGray]" )
-            objects.append( "    SetOptions[Lev, Thickness -> 2, LabR -> Automatic, WingRiseWidth -> 10, WingTipWidth -> 10, FontSize -> %FONTSIZE, Color -> Black]" )
+            objects.append(
+                "SetOptions[Trans, BackgroundT -> Automatic, NudgeT -> 2, Thickness -> 1, FontSize -> %FONTSIZE, OrientationT -> Automatic, FillColor -> LightGray]")
+            objects.append(
+                "    SetOptions[Lev, Thickness -> 2, LabR -> Automatic, WingRiseWidth -> 10, WingTipWidth -> 10, FontSize -> %FONTSIZE, Color -> Black]")
             maxE = maxEnergy(levs)
-            lineWidth=self.getNumberGammas()/30.
+            lineWidth = self.getNumberGammas() / 30.
             # Do levels first
-            for ilev,lev in levs[0:maxLevelIndex]: objects.append( '        '+levelFormatter(lev,0.,lineWidth) )
+            for ilev, lev in levs[0:maxLevelIndex]: objects.append('        ' + levelFormatter(lev, 0., lineWidth))
             # Now set up the transitions
             if showGammas:
-                objects.append("        AutoLevelInit[%f, -0.1, -0.1]" % (lineWidth*0.925) )
-                for ilev,lev in levs[0:maxLevelIndex]:
-                    if len(lev.gammas)>0:  objects.append( '            '+"AutoLevel[%s]"% levelKey(lev.name) )
-                    for gam in lev.gammas: objects.append( '            '+'AutoTrans[%s,LabT->"%s",Color->%s]' % ( levelKey(gam.finalLevel), str(gam.energy), getColor(ilev)) )
-            return mathematicaCommand(objects,self.A,self.symbol,0.,lineWidth*1.3,-0.5,maxE+0.5)
+                objects.append("        AutoLevelInit[%f, -0.1, -0.1]" % (lineWidth * 0.925))
+                for ilev, lev in levs[0:maxLevelIndex]:
+                    if len(lev.gammas) > 0:  objects.append('            ' + "AutoLevel[%s]" % levelKey(lev.name))
+                    for gam in lev.gammas: objects.append('            ' + 'AutoTrans[%s,LabT->"%s",Color->%s]' % (
+                    levelKey(gam.finalLevel), str(gam.energy), getColor(ilev)))
+            return mathematicaCommand(objects, self.A, self.symbol, 0., lineWidth * 1.3, -0.5, maxE + 0.5)
         else:
-            objects=[]
-            objects.append( "SetOptions[Trans, BackgroundT -> Automatic, NudgeT -> 2, Thickness -> 1, FontSize -> %FONTSIZE, OrientationT -> Automatic, ArrowType->ShapeArrow, FillColor -> LightGray]" )
-            objects.append( "    SetOptions[Lev, Thickness -> 1, LabR -> Automatic, FontSize -> %FONTSIZE, Color -> Black]" )
+            objects = []
+            objects.append(
+                "SetOptions[Trans, BackgroundT -> Automatic, NudgeT -> 2, Thickness -> 1, FontSize -> %FONTSIZE, OrientationT -> Automatic, ArrowType->ShapeArrow, FillColor -> LightGray]")
+            objects.append(
+                "    SetOptions[Lev, Thickness -> 1, LabR -> Automatic, FontSize -> %FONTSIZE, Color -> Black]")
             maxE = maxEnergy(levs)
-            yScale=3.0
-            xMin=0.0
-            xMax=0.0
-            xGap=0.1
-            xWidth=5.0
+            yScale = 3.0
+            xMin = 0.0
+            xMax = 0.0
+            xGap = 0.1
+            xWidth = 5.0
             # Do levels first
-            for ilev,lev in levs[0:maxLevelIndex]:
-                jPi=jPiAsNumber(lev)
-                x1=jPi*(xGap+xWidth)
-                x2=jPi*(xGap+xWidth)+sign(jPi)*xWidth
-                xStart=min(x1,x2)
-                xStop=max(x1,x2)
-                xMin=min(xMin,xStart)
-                xMax=max(xMax,xStop)
-                objects.append( '        '+levelFormatter(lev,xStart,xStop) )
+            for ilev, lev in levs[0:maxLevelIndex]:
+                jPi = jPiAsNumber(lev)
+                x1 = jPi * (xGap + xWidth)
+                x2 = jPi * (xGap + xWidth) + sign(jPi) * xWidth
+                xStart = min(x1, x2)
+                xStop = max(x1, x2)
+                xMin = min(xMin, xStart)
+                xMax = max(xMax, xStop)
+                objects.append('        ' + levelFormatter(lev, xStart, xStop))
                 if showGammas:
                     for gam in lev.gammas:
-                        gamXStart=xStart #0.5*(xStart+xStop)
-                        jPiFinal=jPiAsNumber(gam.finalLevel)
-                        gamXStop=jPiFinal*(xGap+xWidth) #+0.5*sign(jPiFinal)*xWidth
-                        objects.append("            Trans[%s,%s,Width->%f,Color->%s]"%(levelKey(lev.name),levelKey(gam.finalLevel),2.0*xWidth*gam.emTransitionProbability,getColor(ilev)))
-            return mathematicaCommand( objects, self.A, self.symbol, xmin=(xMin-xGap), xmax=(xMax+xGap), ymin=-0.7, ymax=(maxE+0.5), pageSizeX=deltaJPi(levs), pageSizeY=yScale*maxE )
+                        gamXStart = xStart  # 0.5*(xStart+xStop)
+                        jPiFinal = jPiAsNumber(gam.finalLevel)
+                        gamXStop = jPiFinal * (xGap + xWidth)  # +0.5*sign(jPiFinal)*xWidth
+                        objects.append("            Trans[%s,%s,Width->%f,Color->%s]" % (
+                        levelKey(lev.name), levelKey(gam.finalLevel), 2.0 * xWidth * gam.emTransitionProbability,
+                        getColor(ilev)))
+            return mathematicaCommand(objects, self.A, self.symbol, xmin=(xMin - xGap), xmax=(xMax + xGap), ymin=-0.7,
+                                      ymax=(maxE + 0.5), pageSizeX=deltaJPi(levs), pageSizeY=yScale * maxE)
 
     def toRIPLFormat(self):
         '''
@@ -628,7 +663,7 @@ class nuclearLevel:
         self.attributes['parity'] = self.parity
         self.howJPiDetermined = quantityDeterminationMap[kw.get('howJPiDetermined', None)]
         self.alternateJPiAssignments = kw.get('alternateJPiAssignments', None)
-        self.decayData = kw.get('decayData', []) # also holds gammas I think
+        self.decayData = kw.get('decayData', [])  # also holds gammas I think
         self.__gammas = []
 
     @property
@@ -642,13 +677,16 @@ class nuclearLevel:
     def __str__(self):
         return self.id
 
-    def renormalizeTransitionProbabilities(self): raise NotImplementedError()
+    def renormalizeTransitionProbabilities(self):
+        raise NotImplementedError()
 
-    def getNumberGammas(self): return len(self.gammas)
+    def getNumberGammas(self):
+        return len(self.gammas)
 
-    def getNumberDecays(self): return len(self.decays)
+    def getNumberDecays(self):
+        return len(self.decays)
 
-    def setJPi(self,J,Pi):
+    def setJPi(self, J, Pi):
         """
         Sets spin and parity
 
@@ -659,7 +697,7 @@ class nuclearLevel:
         self.set_spin(J)
         self.set_parity(Pi)
 
-    def set_spin(self,J):
+    def set_spin(self, J):
         """
         Sets spin
 
@@ -667,32 +705,35 @@ class nuclearLevel:
         :return: None
         """
         try:
-            self.spin=Spin(J)
+            self.spin = Spin(J)
         except:
             raise TypeError("J must be a str, float or int")
 
-    def set_parity(self,Pi):
+    def set_parity(self, Pi):
         """
         Sets parity
 
         :param Pi: is the parity and should be either +1 or -1
         :return: None
         """
-        if isinstance(Pi,float):Pi=int(Pi)
-        if Pi not in [1,-1]: raise ValueError("Pi must be +1 or -1")
-        self.parity=Pi
+        if isinstance(Pi, float): Pi = int(Pi)
+        if Pi not in [1, -1]: raise ValueError("Pi must be +1 or -1")
+        self.parity = Pi
 
-    def addGamma(self, g): self.gammas.append(g)
+    def addGamma(self, g):
+        self.gammas.append(g)
 
-    def addDecay(self, d): self.decays.append(d)
+    def addDecay(self, d):
+        self.decays.append(d)
 
-    def levelReport(self,showGammas=False):
-        result = self.name.rjust(12)+' '+str(self.energy).rjust(20)+' '+str(self.spin).rjust(5)+'  '+str(self.parity)
-        if showGammas and len(self.gammas)>0:
+    def levelReport(self, showGammas=False):
+        result = self.name.rjust(12) + ' ' + str(self.energy).rjust(20) + ' ' + str(self.spin).rjust(5) + '  ' + str(
+            self.parity)
+        if showGammas and len(self.gammas) > 0:
             result += '\n' \
-                      + 50*' ' + ( ''.join( map(\
-                            lambda x: str(x).rjust(20),\
-                            ( 'Energy (MeV)', 'Final Level', 'Pgamma', "Pnon-gamma", "Multipolarity", "T1/2 (nsec)") ) ) ) + '\n' \
+                      + 50 * ' ' + (''.join(map( \
+                lambda x: str(x).rjust(20), \
+                ('Energy (MeV)', 'Final Level', 'Pgamma', "Pnon-gamma", "Multipolarity", "T1/2 (nsec)")))) + '\n' \
                       + '\n'.join([g.levelReport() for g in self.gammas])
         return result
 
@@ -827,7 +868,7 @@ class nuclearLevelGamma:
         - howBRDetermined : Optional designator to describe how gamma gammaEmissionProbability determined
     '''
 
-    def __init__( self, **kw ):
+    def __init__(self, **kw):
         '''
         If starting from RIPL, initialize like this:
 
@@ -842,24 +883,24 @@ class nuclearLevelGamma:
             >>> nuclearLevelGamma( energy=PhysicalQuantity("1.322 MeV"), finalLevel="Ni58_e1", probability=GP*TP, nonRadiativeProbability=(1.0-GP)*TP )
         '''
         self.setEmissionProbabilities(
-            Pg=kw.get( 'Pg', kw.get( 'probability' ) ),
-            ICC=kw.get( 'ICC' ),
-            Pe=kw.get( 'Pe' ),
-            nonRadiativeProbability=kw.get( 'nonRadiativeProbability', 0.0 ))
-        self.finalLevel=kw.get('finalLevel')
+            Pg=kw.get('Pg', kw.get('probability')),
+            ICC=kw.get('ICC'),
+            Pe=kw.get('Pe'),
+            nonRadiativeProbability=kw.get('nonRadiativeProbability', 0.0))
+        self.finalLevel = kw.get('finalLevel')
         #                                               angularDistribution=kw.get('angularDistribution', None),
         #                                               probability=self.gammaEmissionProbability,
         #                                               nonRadiativeProbability=self.internalConversionProbability)
 
-        #self.setAncestor(kw.get('startLevel'))
+        # self.setAncestor(kw.get('startLevel'))
 
         # This should really be computed from the levels, not specified here
         self.energy = kw.get('energy')
 
         # Optional designator to describe how gamma Pg determined
-        self.howBRDetermined        = quantityDeterminationMap[ kw.get( 'howBRDetermined', None ) ]
-        self.multipolarity = kw.get( 'multipolarity', (None,None) )
-        self.halflife = kw.get( 'halflife', '?' )
+        self.howBRDetermined = quantityDeterminationMap[kw.get('howBRDetermined', None)]
+        self.multipolarity = kw.get('multipolarity', (None, None))
+        self.halflife = kw.get('halflife', '?')
 
     def setEmissionProbabilities(self, Pg=None, ICC=None, Pe=None, nonRadiativeProbability=None):
         """
@@ -868,9 +909,9 @@ class nuclearLevelGamma:
         self.gammaEmissionProbability = Pg
         self.internalConversionCoefficient = ICC
         self.emTransitionProbability = Pe
-        self.internalConversionProbability = nonRadiativeProbability # probably will get overwritten below for consistency
+        self.internalConversionProbability = nonRadiativeProbability  # probably will get overwritten below for consistency
         if self.emTransitionProbability == None and self.internalConversionCoefficient != None:
-            self.emTransitionProbability = self.gammaEmissionProbability * ( 1.0 + self.internalConversionCoefficient )
+            self.emTransitionProbability = self.gammaEmissionProbability * (1.0 + self.internalConversionCoefficient)
             self.internalConversionProbability = self.gammaEmissionProbability * self.internalConversionCoefficient
         elif self.emTransitionProbability != None and self.internalConversionCoefficient == None:
             self.internalConversionProbability = self.emTransitionProbability - self.gammaEmissionProbability
@@ -887,46 +928,55 @@ class nuclearLevelGamma:
             # should we check the internalConversionCoefficient?
 
         if nonRadiativeProbability is None:
-            self.nonRadiativeProbability = 1.0-self.gammaEmissionProbability
+            self.nonRadiativeProbability = 1.0 - self.gammaEmissionProbability
         else:
             self.nonRadiativeProbability = nonRadiativeProbability
 
         # Some checks:
         if self.emTransitionProbability > 1.0:
-            raise ValueError( "emTransitionProbability > 1.0: " + str(self.emTransitionProbability) )
+            raise ValueError("emTransitionProbability > 1.0: " + str(self.emTransitionProbability))
         if self.gammaEmissionProbability > 1.0:
-            raise ValueError( "gammaEmissionProbability > 1.0: " + str(self.gammaEmissionProbability) )
+            raise ValueError("gammaEmissionProbability > 1.0: " + str(self.gammaEmissionProbability))
         if self.internalConversionProbability > 1.0:
-            raise ValueError( "internalConversionProbability > 1.0: " + str(self.internalConversionProbability) )
+            raise ValueError("internalConversionProbability > 1.0: " + str(self.internalConversionProbability))
 
     def setMultipolarity(self, mode, spinChange):
         """
         sets the multipolarity of a transition
         """
-        if mode not in ["E","M"]:
+        if mode not in ["E", "M"]:
             raise ValueError("Mode must be 'E' or 'M'")
         if not isinstance(spinChange, int):
             raise TypeError("spinChange must be an int")
-        self.multipolarity=(mode, spinChange)
+        self.multipolarity = (mode, spinChange)
 
     def levelReport(self):
         # multipolarity string
-        if self.multipolarity[0] is None: multipolarityString='?'
-        else: multipolarityString=self.multipolarity[0]
-        if self.multipolarity[1] is None: multipolarityString+='?'
-        else:multipolarityString+=str(self.multipolarity[1])
+        if self.multipolarity[0] is None:
+            multipolarityString = '?'
+        else:
+            multipolarityString = self.multipolarity[0]
+        if self.multipolarity[1] is None:
+            multipolarityString += '?'
+        else:
+            multipolarityString += str(self.multipolarity[1])
 
         # gamma energy
-        try: energy=self.getEnergy('MeV')
-        except: energy=self.energy.value
+        try:
+            energy = self.getEnergy('MeV')
+        except:
+            energy = self.energy.value
 
         # halflife
-        try: halflifeString=self.halflife.getValueAs('ns')
-        except: halflifeString=str(self.halflife)
+        try:
+            halflifeString = self.halflife.getValueAs('ns')
+        except:
+            halflifeString = str(self.halflife)
 
-        result = 50*' ' + ( ''.join( map(
+        result = 50 * ' ' + (''.join(map(
             lambda x: str(x).rjust(20),
-            (energy, self.finalLevel, '%15g'%self.gammaEmissionProbability, self.nonRadiativeProbability, multipolarityString, halflifeString) ) ) )
+            (energy, self.finalLevel, '%15g' % self.gammaEmissionProbability, self.nonRadiativeProbability,
+             multipolarityString, halflifeString))))
         return result
 
     def toRIPLFormat(self):
@@ -972,6 +1022,7 @@ class nuclearLevelGamma:
 class ParseError(Exception):
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return repr(self.value)
 
@@ -1013,12 +1064,12 @@ def readTALYSLevelScheme(f, verbose=False):
                 Sp = myNucleus.Sp.inUnitsOf('MeV/c**2')
             except:
                 Sp = None
-            print( "Nucleus:", name, \
-                "  ZA =", myNucleus.ZA, \
-                "  mass =", myNucleus.mass, \
-                "  Sn =", Sn, \
-                "  Sp =", Sp, \
-                '  numLevels =', numLevels)
+            print("Nucleus:", name, \
+                  "  ZA =", myNucleus.ZA, \
+                  "  mass =", myNucleus.mass, \
+                  "  Sn =", Sn, \
+                  "  Sp =", Sp, \
+                  '  numLevels =', numLevels)
 
         # Save the nucleus
         contentMap.addParticle(myNucleus)
@@ -1052,11 +1103,11 @@ def readTALYSLevelScheme(f, verbose=False):
             myLevel = nuclearLevel(name=myNucleus.name + '_e' + str(levelIndex), spin=J, parity=Pi,
                                    alternateJPiAssignments=alternateJPiAssignments, index=levelIndex, energy=eLevel)
             if verbose:
-                print( "   ", myLevel, ':', \
-                    '  energy =', myLevel.energy, \
-                    '  JPi =', myLevel.spin, myLevel.parity, \
-                    '  lifetime =', myLevel.lifetime, \
-                    '  numGammas =', numGammas)
+                print("   ", myLevel, ':', \
+                      '  energy =', myLevel.energy, \
+                      '  JPi =', myLevel.spin, myLevel.parity, \
+                      '  lifetime =', myLevel.lifetime, \
+                      '  numGammas =', numGammas)
 
             # Save the level in the contentsMap and inform the nucleus about the level
             myNucleus.addLevel(myLevel)
@@ -1076,14 +1127,13 @@ def readTALYSLevelScheme(f, verbose=False):
 
                 myGamma = nuclearLevelGamma(energy=eGamma, finalLevel=finalLevel, Pg=Pe / (1.0 + ICC), ICC=ICC)
                 if verbose:
-                    print( "       ", myLevel.name + "->" + myGamma.finalLevel, ':', \
-                        '  energy =', myGamma.energy, \
-                        '  Pg =', myGamma.gammaEmissionProbability, \
-                        '  ICC =', myGamma.internalConversionCoefficient)
+                    print("       ", myLevel.name + "->" + myGamma.finalLevel, ':', \
+                          '  energy =', myGamma.energy, \
+                          '  Pg =', myGamma.gammaEmissionProbability, \
+                          '  ICC =', myGamma.internalConversionCoefficient)
 
                 # Save the gamma
                 myLevel.addGamma(myGamma)
-
 
             # Check if number of gammas found meet our expectations
             if numGammas != myLevel.getNumberGammas():
@@ -1096,7 +1146,7 @@ def readTALYSLevelScheme(f, verbose=False):
                 numLevels) + " != " + str(myNucleus.getNumberLevels()))
 
     if verbose:
-        print( "Processed the following nuclei:", ', '.join(contentMap.keys()))
+        print("Processed the following nuclei:", ', '.join(contentMap.keys()))
 
     return contentMap
 
@@ -1149,12 +1199,12 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
             numLevels = int(line[16:21])  # e.g. 136
             totNumGammas = int(line[21:26])  # e.g. 116
             if verbose:
-                print( "Nucleus:", name, \
-                    "  ZA =", myNucleus.ZA, \
-                    "  mass =", myNucleus.mass, \
-                    "  Sn =", myNucleus.Sn, \
-                    "  Sp =", myNucleus.Sp, \
-                    '  numLevels =', numLevels)
+                print("Nucleus:", name, \
+                      "  ZA =", myNucleus.ZA, \
+                      "  mass =", myNucleus.mass, \
+                      "  Sn =", myNucleus.Sn, \
+                      "  Sp =", myNucleus.Sp, \
+                      '  numLevels =', numLevels)
 
             # Save the nucleus
             contentMap[str(myNucleus)] = myNucleus
@@ -1177,7 +1227,7 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
                 if Pi == 0:
                     Pi = None
                 else:
-                    Pi=Parity(Pi)
+                    Pi = Parity(Pi)
                 howJPiDetermined = line[38:40].strip()
                 alternateJPiAssignments = line[40:64].strip()
 
@@ -1193,14 +1243,15 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
                 decayModeString = line[67:].strip()
 
                 myLevel = nuclearLevel(name=myNucleus.name + '_e' + str(levelIndex), spin=J, parity=Pi,
-                                       howJPiDetermined=howJPiDetermined, alternateJPiAssignments=alternateJPiAssignments,
+                                       howJPiDetermined=howJPiDetermined,
+                                       alternateJPiAssignments=alternateJPiAssignments,
                                        index=levelIndex, energy=eLevel, lifetime=lifetime, groundState=myNucleus)
                 if verbose:
-                    print( "   ", myLevel, ':', \
-                        '  energy =', myLevel.energy, \
-                        '  JPi =', myLevel.spin, myLevel.parity, \
-                        '  lifetime =', myLevel.lifetime, \
-                        '  numGammas =', numGammas)
+                    print("   ", myLevel, ':', \
+                          '  energy =', myLevel.energy, \
+                          '  JPi =', myLevel.spin, myLevel.parity, \
+                          '  lifetime =', myLevel.lifetime, \
+                          '  numGammas =', numGammas)
 
                 # Read in the gammas
                 for iGamma in range(numGammas):
@@ -1213,13 +1264,14 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
                     Pe = float(line[66:77])
                     ICC = float(line[77:88])
 
-                    myGamma = nuclearLevelGamma(energy=eGamma, startLevel=myLevel, finalLevel=myNucleus.levels[indexFinal], Pg=Pg, ICC=ICC, Pe=Pe)
+                    myGamma = nuclearLevelGamma(energy=eGamma, startLevel=myLevel,
+                                                finalLevel=myNucleus.levels[indexFinal], Pg=Pg, ICC=ICC, Pe=Pe)
 
                     if verbose:
-                        print( "       ", str(myLevel) + "->" + str(myGamma.finalLevel), ':', \
-                            '  energy =', myGamma.energy, \
-                            '  Pg =', myGamma.gammaEmissionProbability, \
-                            '  ICC =', myGamma.internalConversionCoefficient)
+                        print("       ", str(myLevel) + "->" + str(myGamma.finalLevel), ':', \
+                              '  energy =', myGamma.energy, \
+                              '  Pg =', myGamma.gammaEmissionProbability, \
+                              '  ICC =', myGamma.internalConversionCoefficient)
 
                     # Save the gamma
                     myLevel.addGamma(myGamma)
@@ -1236,20 +1288,21 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
             if numLevels != myNucleus.getNumberLevels():
                 raise ValueError("number of levels stated in nucleus definition != number of levels found: " + str(
                     numLevels) + " != " + str(myNucleus.getNumberLevels()))
-    except KeyboardInterrupt: exit()
+    except KeyboardInterrupt:
+        exit()
     except Exception as err:
-        badLineNumber = numLines-len(lines)
-        print( "\nException raised while parsing levels:\n%s"% '\n'.join(f.split('\n')[max(0,badLineNumber-5):min(numLines,badLineNumber+5)]))
-        print( '-'*60)
+        badLineNumber = numLines - len(lines)
+        print("\nException raised while parsing levels:\n%s" % '\n'.join(
+            f.split('\n')[max(0, badLineNumber - 5):min(numLines, badLineNumber + 5)]))
+        print('-' * 60)
         traceback.print_exc(file=sys.stdout)
-        print( '-'*60)
-        raise ParseError("Line %i caused an error %s"% (badLineNumber, str(err)))
+        print('-' * 60)
+        raise ParseError("Line %i caused an error %s" % (badLineNumber, str(err)))
 
     if verbose:
-        print ("Processed the following nuclei:", ', '.join(contentMap.keys()))
+        print("Processed the following nuclei:", ', '.join(contentMap.keys()))
 
     return contentMap
-
 
 
 # ---------------------------------------------------------------------------------
@@ -1259,8 +1312,8 @@ def readRIPLLevelScheme(f, verbose=False, updateMasses=False):
 # ---------------------------------------------------------------------------------
 
 
-def getNucleus(Z, A, pathToRIPLLevelFiles=None, pathToRIPLResonanceFiles=None, pathToRIPLLevelDensityFiles=None, verbose=False, updateMasses=True):
-
+def getNucleus(Z, A, pathToRIPLLevelFiles=None, pathToRIPLResonanceFiles=None, pathToRIPLLevelDensityFiles=None,
+               verbose=False, updateMasses=True):
     RIPLFile = pathToRIPLLevelFiles + os.sep + 'z' + str(Z).zfill(3) + '.dat'
 
     # Read in the the entire Z chain
@@ -1269,13 +1322,13 @@ def getNucleus(Z, A, pathToRIPLLevelFiles=None, pathToRIPLResonanceFiles=None, p
         verbose=verbose, updateMasses=updateMasses)
 
     # Pick out the nucleus requested
-    myNucleus=None
+    myNucleus = None
     for nucl in nuclMap:
-        if nuclMap[nucl].A==A:
-            myNucleus=nuclMap[nucl]
+        if nuclMap[nucl].A == A:
+            myNucleus = nuclMap[nucl]
             break
     if myNucleus is None:
-        raise RuntimeError( "Z=%i, A=%i not found in file %s"%(Z, A, RIPLFile))
+        raise RuntimeError("Z=%i, A=%i not found in file %s" % (Z, A, RIPLFile))
 
     # Read in the the entire Z chain
     swaveMap = readRIPLMeanLevelSpacing(
@@ -1310,17 +1363,20 @@ def getNucleus(Z, A, pathToRIPLLevelFiles=None, pathToRIPLResonanceFiles=None, p
         myNucleus.levelDensity = None
     else:
         try:
-            myNucleus.levelDensity = readHFBMLevelDensityTable(''.join(open(hfbFilePrefix + '.tab', mode='r').readlines()),
-                                                       myNucleus.Z, myNucleus.A, verbose=verbose)
+            myNucleus.levelDensity = readHFBMLevelDensityTable(
+                ''.join(open(hfbFilePrefix + '.tab', mode='r').readlines()),
+                myNucleus.Z, myNucleus.A, verbose=verbose)
             if os.path.exists(hfbFilePrefix + '.cor'):
-                corTable = readHFBMLevelDensityCorrections(''.join(open(hfbFilePrefix + '.cor', mode='r').readlines()),verbose=verbose)
-            else: corTable={}
+                corTable = readHFBMLevelDensityCorrections(''.join(open(hfbFilePrefix + '.cor', mode='r').readlines()),
+                                                           verbose=verbose)
+            else:
+                corTable = {}
             try:
-                myNucleus.levelDensity.aTildeCorrection = corTable[( myNucleus.Z, myNucleus.A )][0]
+                myNucleus.levelDensity.aTildeCorrection = corTable[(myNucleus.Z, myNucleus.A)][0]
             except KeyError:
                 myNucleus.levelDensity.aTildeCorrection = 0.0
             try:
-                myNucleus.levelDensity.pairingShiftCorrection = corTable[( myNucleus.Z, myNucleus.A )][1]
+                myNucleus.levelDensity.pairingShiftCorrection = corTable[(myNucleus.Z, myNucleus.A)][1]
             except KeyError:
                 myNucleus.levelDensity.pairingShiftCorrection = 0.0
         except KeyError:
@@ -1338,6 +1394,7 @@ def getNucleus(Z, A, pathToRIPLLevelFiles=None, pathToRIPLResonanceFiles=None, p
 if __name__ == "__main__":
     import unittest
 
+
     # ---------------------------------------------------------------------------------
     #
     #   Unit tests
@@ -1347,7 +1404,8 @@ if __name__ == "__main__":
     class TestNucleus(unittest.TestCase):
 
         def setUp(self):
-            self.a = nucleus(name="C12", mass=PhysicalQuantity(12.0, "amu"), attributes={})  # should be same as next version
+            self.a = nucleus(name="C12", mass=PhysicalQuantity(12.0, "amu"),
+                             attributes={})  # should be same as next version
             self.a = nucleus(name="C12")
 
         def test_init(self):
@@ -1449,7 +1507,7 @@ if __name__ == "__main__":
             self.a = nuclearDecayMode(mode=None, probability=0.0)
 
         def test_init(self):
-            print (self.a)
+            print(self.a)
 
         def test_toRIPLFormat(self): pass
 
@@ -1484,47 +1542,49 @@ if __name__ == "__main__":
         def test_toXMLList(self): pass
 
 
-    class TestMisc( unittest.TestCase ):
+    class TestMisc(unittest.TestCase):
 
         def test_double_factorial(self):
-            self.assertEqual( double_factorial(0), 1 )
-            self.assertEqual( double_factorial(1), 1 )
-            self.assertEqual( double_factorial(2), 2 )
-            self.assertEqual( double_factorial(3), 3 )
-            self.assertEqual( double_factorial(4), 8 )
-            self.assertEqual( double_factorial(9), 945 )
-            self.assertEqual( double_factorial(10), 3840 )
-            self.assertEqual( double_factorial(11), 10395 )
+            self.assertEqual(double_factorial(0), 1)
+            self.assertEqual(double_factorial(1), 1)
+            self.assertEqual(double_factorial(2), 2)
+            self.assertEqual(double_factorial(3), 3)
+            self.assertEqual(double_factorial(4), 8)
+            self.assertEqual(double_factorial(9), 945)
+            self.assertEqual(double_factorial(10), 3840)
+            self.assertEqual(double_factorial(11), 10395)
 
-        def test_is_transition_allowed( self ):
-            self.assertEqual(is_transition_allowed( ("E",1), 2.0, +1, 3.0, -1 ), True  )
-            self.assertEqual(is_transition_allowed( ("E",1), 2.0, +1, 3.0, +1 ), False )
-            self.assertEqual(is_transition_allowed( ("E",1), 7.0, +1, 3.0, -1 ), False )
-            self.assertEqual(is_transition_allowed( ("E",2), 2.0, +1, 0.0, +1 ), True  )
-            self.assertEqual(is_transition_allowed( ("E",2), 2.0, +1, 0.0, -1 ), False )
-            self.assertEqual(is_transition_allowed( ("E",2), 3.0, +1, 0.0, +1 ), False )
-            self.assertEqual(is_transition_allowed( ("M",1), 2.5, +1, 1.5, +1 ), True  )
-            self.assertEqual(is_transition_allowed( ("M",1), 2.5, +1, 1.5, -1 ), False )
-            self.assertEqual(is_transition_allowed( ("M",1), 3.5, +1, 1.5, +1 ), False )
-            self.assertEqual(is_transition_allowed( ("M",2), 2.0, -1, 0.0, +1 ), True  )
-            self.assertEqual(is_transition_allowed( ("E",5), 5.5, -1, 0.5, +1 ), True  )
+        def test_is_transition_allowed(self):
+            self.assertEqual(is_transition_allowed(("E", 1), 2.0, +1, 3.0, -1), True)
+            self.assertEqual(is_transition_allowed(("E", 1), 2.0, +1, 3.0, +1), False)
+            self.assertEqual(is_transition_allowed(("E", 1), 7.0, +1, 3.0, -1), False)
+            self.assertEqual(is_transition_allowed(("E", 2), 2.0, +1, 0.0, +1), True)
+            self.assertEqual(is_transition_allowed(("E", 2), 2.0, +1, 0.0, -1), False)
+            self.assertEqual(is_transition_allowed(("E", 2), 3.0, +1, 0.0, +1), False)
+            self.assertEqual(is_transition_allowed(("M", 1), 2.5, +1, 1.5, +1), True)
+            self.assertEqual(is_transition_allowed(("M", 1), 2.5, +1, 1.5, -1), False)
+            self.assertEqual(is_transition_allowed(("M", 1), 3.5, +1, 1.5, +1), False)
+            self.assertEqual(is_transition_allowed(("M", 2), 2.0, -1, 0.0, +1), True)
+            self.assertEqual(is_transition_allowed(("E", 5), 5.5, -1, 0.5, +1), True)
 
         def test_WeisskopfSingleParticleEstimateBXL(self):
             """
             Answers from NS Memo 1B/1 (82)
             """
-            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('E',1),86),6.446e-4*pow(86.,2./3.),5)
-            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('E',2),86),5.940e-6*pow(86.,4./3.),5)
-            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('M',1),86),1.791,2)
-            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('E',3),86),5.940e-8*86.0*86.0,4)
-            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('M',2),86),1.650e-2*pow(86.,2./3.),4)
+            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('E', 1), 86), 6.446e-4 * pow(86., 2. / 3.), 5)
+            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('E', 2), 86), 5.940e-6 * pow(86., 4. / 3.), 5)
+            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('M', 1), 86), 1.791, 2)
+            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('E', 3), 86), 5.940e-8 * 86.0 * 86.0, 4)
+            self.assertAlmostEqual(WeisskopfSingleParticleEstimateBXL(('M', 2), 86), 1.650e-2 * pow(86., 2. / 3.), 4)
 
         def test_gammaHalflife(self):
             """
             Liz checked these values!
             """
-            self.assertAlmostEqual(gammaHalflife(('E',1),1.0,PhysicalQuantity(1.0,'MeV')).getValueAs('ns'),4.3587980198378215e-09)
-            self.assertAlmostEqual(gammaHalflife(('M',2),1.0,PhysicalQuantity(1.0,'MeV')).getValueAs('ns'),0.5116100181270946)
+            self.assertAlmostEqual(gammaHalflife(('E', 1), 1.0, PhysicalQuantity(1.0, 'MeV')).getValueAs('ns'),
+                                   4.3587980198378215e-09)
+            self.assertAlmostEqual(gammaHalflife(('M', 2), 1.0, PhysicalQuantity(1.0, 'MeV')).getValueAs('ns'),
+                                   0.5116100181270946)
 
 
     # Actually run the tests
