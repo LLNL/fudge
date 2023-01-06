@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -167,7 +167,7 @@ class ParameterCovariance( suitesModule.Suite ):
 
 
 class ParameterCovarianceMatrix( abstractClassesModule.Form ):
-    """ 
+    """
     Store covariances (or correlations, depending on 'type') between model parameters
     """
 
@@ -250,14 +250,48 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
 
         #raise NotImplementedError()
         pass
-    
-    def fix( self, **kw ): 
+
+    def fix( self, **kw ):
         '''assemble some useful info, to be handed down to children's fix() functions'''
         info = {}
         info['rowENDF_MFMT'] = None
         info['columnENDF_MFMT'] = None
         info.update( kw )
         return self.matrix.fix( **info )
+
+    def plot( self, title = None, scalelabel = None, xlim=None, ylim=None, xlog=False, ylog=False ):
+        """
+
+        :param title:
+        :param scalelabel:
+        :param xlim:
+        :param ylim:
+        :param xlog:
+        :param ylog:
+        :return:
+        """
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        _array = self.matrix.constructArray()
+
+        def covariance_to_correlation(__matrix):
+            """Convert a covariance matrix to a correlation matrix"""
+            diag = np.sqrt(__matrix.diagonal())
+            with np.errstate(divide='ignore', invalid='ignore'):
+                corr = __matrix / diag / diag[:, np.newaxis]
+            # now fix diagonal + remove any NaN (from div/0):
+            for i in range(len(corr)):
+                corr[i, i] = 1.0  # must be exactly 1
+            corr[np.isnan(corr)] = 0
+            return corr
+
+        _array = covariance_to_correlation(_array)
+
+        from fudge.vis.matplotlib import plot_matrix
+        plot_matrix.plot_matrix(_array, title=title, xyTitle=('row index', 'column index'),
+                                zRange=(-1,1), colorMap=plot_matrix.generateColorMap())
+        plt.show()
 
     def toXML_strList( self, indent = '', **kwargs ) :
 

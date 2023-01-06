@@ -319,6 +319,8 @@ def getFissionMetricReport(rs, metricMenu, title="Fission metrics", useCovarianc
             rcap = rs.getReaction('capture')
         except KeyError:
             return Report()
+        if rfis is None:
+            return Report()
         fissionReport = Report(title=title)
         # ALF, ratio of thermal capture to fission
         if hasattr(metricMenu, 'ALF') and metricMenu.ALF:
@@ -890,7 +892,11 @@ def getChannelDataTable(rs, metricMenu, title="Channels", doURR=False, verbose=F
             sc = rrr.getPoleStrength(computeUncertainty=True)
             for c in sc:
                 key = get_key_from_channel(c)
-                updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR sc', str(sc[c]['sc'][0]), '')
+                if not sc[c]['sc']:
+                    thisSc = ''
+                else:
+                    thisSc = str(sc[c]['sc'][0])
+                updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR sc', thisSc, '')
 
     nCols = len(list(columnHeaders.values()))
     tmpData = []

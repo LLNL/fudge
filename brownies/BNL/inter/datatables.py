@@ -16,6 +16,8 @@ class ComplexEncoder(json.JSONEncoder):
             return str(obj)
         if isinstance(obj, DataTable):
             return '\n'.join(obj.toStringList())
+        if isinstance(obj, tableModule.Blank):
+            return ''
         # Let the base class default method raise the TypeError
         return json.JSONEncoder.default(self, obj)
 

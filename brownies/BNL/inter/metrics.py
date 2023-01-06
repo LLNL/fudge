@@ -55,7 +55,7 @@ def convolve(funcA, funcB, useCovariance=False, covariance=None, normalize=True)
 
     if funcA.domainMax != funcB.domainMax:
         if funcA.domainMax < funcB.domainMax:
-            funcB.domainSlice(domainMax=funcA.domainMax)
+            funcB = funcB.domainSlice(domainMax=funcA.domainMax)
         else:
             funcB.setValue(1.000001*funcB.domainMax, 0.0)
             funcB.setValue(funcA.domainMax, 0.0)
@@ -97,11 +97,12 @@ def computeRI(xs, Ecut=None, domainMax=None, useCovariance=True, covariance=None
         domainMax = PQU.PQU(min(xs.domainMax, DEFAULTONEOVEREXYs.domainMax), xs.domainUnit)
 
     if Ecut is None:
-        return xs.integrateTwoFunctionsWithUncertainty(DEFAULTONEOVEREXYs,
-                                                       domainMax=domainMax,
-                                                       useCovariance=useCovariance,
-                                                       covariance=covariance,
-                                                       normalize=False)
+        return convolve(xs, DEFAULTONEOVEREXYs, useCovariance=useCovariance, covariance=covariance, normalize=False)
+        #return xs.integrateTwoFunctionsWithUncertainty(DEFAULTONEOVEREXYs,
+        #                                               domainMax=domainMax,
+        #                                               useCovariance=useCovariance,
+        #                                               covariance=covariance,
+        #                                               normalize=False)
 
     Ecut = PQU.PQU(Ecut).getValueAs(xs.domainUnit)
 
@@ -114,11 +115,12 @@ def computeRI(xs, Ecut=None, domainMax=None, useCovariance=True, covariance=None
 
     Egrid = [1e-5, 0.99999 * Ecut] + list(equal_lethargy_bins(5000, domainMin=Ecut))
     oneOverE = function_to_XYs(oneOverEFunc, [], Egrid=Egrid)
-    return xs.integrateTwoFunctionsWithUncertainty(oneOverE,
-                                                   domainMax=domainMax,
-                                                   useCovariance=useCovariance,
-                                                   covariance=covariance,
-                                                   normalize=False)
+    return convolve(xs, oneOverE, useCovariance=useCovariance, covariance=covariance, normalize=False)
+    #return xs.integrateTwoFunctionsWithUncertainty(oneOverE,
+    #                                               domainMax=domainMax,
+    #                                               useCovariance=useCovariance,
+    #                                               covariance=covariance,
+    #                                               normalize=False)
 
 
 def computeMACS(xs, T, a=None, useCovariance=True, covariance=None, normalize=False):
