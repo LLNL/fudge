@@ -369,6 +369,7 @@ def plot_Delta3_by_E(_lsas, num_chunks, chunk_size, _Es, _D3L, L=None, J=None, t
     ygoe = []
     ypoiss = []
     ysho = []
+    _Es = [_EE for _EE in _Es if _EE > 0]
     for ich in range(num_chunks):
         d3 = _lsas[ich].getDysonMehtaDelta3_vs_L()
         try:
@@ -411,9 +412,10 @@ def plot_rho(_lsas, num_chunks, chunk_size, _Es, L=None, J=None, title_string=No
     xs = []
     ys = []
     fail = False
+    _Es = [_EE for _EE in _Es if _EE > 0]
     for ich in range(num_chunks):
         imin = ich * chunk_size
-        imax = min((ich + 1) * chunk_size, len(Es) - 1)
+        imax = min((ich + 1) * chunk_size, len(_Es) - 1)
         try:
             rho = _lsas[ich].get2SpacingCorrelation()
             xs.append(_Es[imin])
@@ -998,16 +1000,17 @@ if __name__ == "__main__":
                      outfile=spinGroups[LJ]['level_report']['filename_rho'], clear=True)
 
             # Delta3 as function of energy
-            if 2 * theArgs.D3L > len(Es):
-                if spinGroups[LJ]['warnings'] is None:
-                    spinGroups[LJ]['warnings'] = []
-                spinGroups[LJ]['warnings'].append(
-                    "Not enough levels to compute Delta3(E), need at least %i, got %i" % (2 * theArgs.D3L, len(Es)))
-            else:
-                spinGroups[LJ]['level_report']['filename_Delta3_by_E'] = get_plot_filename('Delta3_by_E', LJ[0], LJ[1])
-                plot_Delta3_by_E(lsa, nChunks, chunkSize, Es, theArgs.D3L, L=LJ[0], J=LJ[1],
-                                 title_string=titleString_incoming,
-                                 outfile=spinGroups[LJ]['level_report']['filename_Delta3_by_E'], clear=True)
+            if False:  # FIXME: Currently broken
+                if 2 * theArgs.D3L > len(Es):
+                    if spinGroups[LJ]['warnings'] is None:
+                        spinGroups[LJ]['warnings'] = []
+                    spinGroups[LJ]['warnings'].append(
+                        "Not enough levels to compute Delta3(E), need at least %i, got %i" % (2 * theArgs.D3L, len(Es)))
+                else:
+                    spinGroups[LJ]['level_report']['filename_Delta3_by_E'] = get_plot_filename('Delta3_by_E', LJ[0], LJ[1])
+                    plot_Delta3_by_E(lsa, nChunks, chunkSize, Es, theArgs.D3L, L=LJ[0], J=LJ[1],
+                                     title_string=titleString_incoming,
+                                     outfile=spinGroups[LJ]['level_report']['filename_Delta3_by_E'], clear=True)
 
             # Missing fraction
             spinGroups[LJ]['level_report']['filename_fraction_missing'] = get_plot_filename('fraction_missing', LJ[0],
