@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.processing.resonances.reconstructResonances &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.processing.resonances.reconstructResonances &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.resonances.reconstructResonances</a></li> 
       </ul>
@@ -499,7 +499,7 @@
         <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">resonanceForm</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">ReactionSuite</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">neutron</span> <span class="o">=</span> <span class="n">resonanceForm</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">neutronMass_amu</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">neutron</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pqu</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neutronMass_amu</span> <span class="o">=</span> <span class="n">neutron</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">neutronMass_amu</span> <span class="o">=</span> <span class="mf">1.00866491574</span>
 
@@ -507,7 +507,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span>
         <span class="n">projectile</span> <span class="o">=</span> <span class="n">resonanceForm</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">projectileMass_amu</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">projectile</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pqu</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projectileMass_amu</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">projectile</span><span class="p">,</span> <span class="n">nuclidePoPsModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">projectileSpin</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">spin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">else</span><span class="p">:</span>
@@ -519,9 +519,9 @@
         <span class="n">target</span> <span class="o">=</span> <span class="n">resonanceForm</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">target</span><span class="p">,</span> <span class="n">nuclidePoPsModule</span><span class="o">.</span><span class="n">Particle</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">nuclide</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">targetMass_amu</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">targetMass_amu</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
         <span class="k">else</span> <span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">targetMass_amu</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">targetMass_amu</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targetSpin</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">spin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">targetToNeutronMassRatio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetMass_amu</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">neutronMass_amu</span>
@@ -987,7 +987,10 @@
 
 <div class="viewcode-block" id="RRBaseClass.penetrationFactorByChannel"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.penetrationFactorByChannel">[docs]</a>    <span class="k">def</span> <span class="nf">penetrationFactorByChannel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">Ein</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">channelClass</span> <span class="ow">in</span> <span class="p">[</span><span class="n">FISSIONCHANNEL</span><span class="p">,</span> <span class="n">GAMMACHANNEL</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Ein</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">Ein</span><span class="p">)</span><span class="o">==</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Ein</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">1.0</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">penetrationFactor</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="p">(</span><span class="n">Ein</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.phiByChannel"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.phiByChannel">[docs]</a>    <span class="k">def</span> <span class="nf">phiByChannel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">Ein</span><span class="p">):</span>
@@ -1533,6 +1536,7 @@
 <span class="sd">        :return:  a dictionary of results, sorted by channel.</span>
 <span class="sd">                  Pole strength entries are all PQU&#39;s or None if it cannot be computed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">numbers</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">aves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAverageQuantities</span><span class="p">(</span><span class="n">computeUncertainty</span><span class="o">=</span><span class="n">computeUncertainty</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">aves</span><span class="p">:</span>
@@ -1544,7 +1548,10 @@
                 <span class="n">Emin</span><span class="o">=</span><span class="n">aves</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="s1">&#39;energyGrid&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">Emax</span><span class="o">=</span><span class="n">aves</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="s1">&#39;energyGrid&#39;</span><span class="p">][</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">redWidths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getReducedWidths</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">Emin</span><span class="o">=</span><span class="n">Emin</span><span class="p">,</span> <span class="n">Emax</span><span class="o">=</span><span class="n">Emax</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">redWidths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">redWidths</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>  <span class="c1"># Why do I need this test?</span>
+                    <span class="n">redWidths</span> <span class="o">=</span> <span class="p">[</span><span class="n">redWidths</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">redWidths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="n">gg</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">g</span><span class="o">*</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">redWidths</span><span class="p">])</span>
                 <span class="n">ggUnc</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">([</span><span class="n">g</span><span class="o">*</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">redWidths</span><span class="p">]))</span>
                 <span class="n">results</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="s1">&#39;sc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">gg</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="n">uncertainty</span><span class="o">=</span><span class="n">ggUnc</span><span class="p">)</span><span class="o">/</span><span class="n">aves</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="s1">&#39;spacings&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
@@ -1614,8 +1621,8 @@
             <span class="k">if</span> <span class="n">Emin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ER</span> <span class="o">&lt;</span> <span class="n">Emin</span><span class="p">:</span> <span class="k">continue</span>
             <span class="k">if</span> <span class="n">Emax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ER</span> <span class="o">&gt;</span> <span class="n">Emax</span><span class="p">:</span> <span class="k">continue</span>
             <span class="n">ERs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ER</span><span class="p">)</span>
-        <span class="n">reducedWidthList</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allChannels</span><span class="p">[</span><span class="n">channel</span><span class="p">][</span><span class="n">iR</span><span class="p">])</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">penetrationFactorByChannel</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ERs</span><span class="p">)))</span>
+            <span class="n">reducedWidthList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allChannels</span><span class="p">[</span><span class="n">channel</span><span class="p">][</span><span class="n">iR</span><span class="p">])</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">penetrationFactorByChannel</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">ER</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">reducedWidthList</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getPorterThomasFitToWidths"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getPorterThomasFitToWidths">[docs]</a>    <span class="k">def</span> <span class="nf">getPorterThomasFitToWidths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Emin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Emax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -3436,7 +3443,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.resonances.reconstructResonances</a></li> 
       </ul>

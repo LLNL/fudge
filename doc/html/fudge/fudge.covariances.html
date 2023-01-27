@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.covariances package &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>fudge.covariances package &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="fudge.outputChannelData.html" title="fudge.outputChannelData package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.html" accesskey="U">fudge package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.covariances package</a></li> 
@@ -47,12 +48,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="fudge-covariances-package">
+  <section id="fudge-covariances-package">
 <h1>fudge.covariances package<a class="headerlink" href="#fudge-covariances-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-fudge.covariances.base">
+</section>
+<section id="module-fudge.covariances.base">
 <span id="fudge-covariances-base-module"></span><h2>fudge.covariances.base module<a class="headerlink" href="#module-fudge.covariances.base" title="Permalink to this headline">¶</a></h2>
 <p>Abstract base class for ‘standard’ covariance matrices (not including parameter covariances).
 All covariance classes need a label, ability to get row/column bounds, ability to convert to simple
@@ -98,8 +99,8 @@ numeric matrix, etc.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances.covarianceSuite">
+</section>
+<section id="module-fudge.covariances.covarianceSuite">
 <span id="fudge-covariances-covariancesuite-module"></span><h2>fudge.covariances.covarianceSuite module<a class="headerlink" href="#module-fudge.covariances.covarianceSuite" title="Permalink to this headline">¶</a></h2>
 <p>Module with containers for covariances in several different forms</p>
 <dl class="py class">
@@ -133,7 +134,7 @@ of which contains one section of the full covariance matrix.</p>
 <code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#CovarianceSuite.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.CovarianceSuite.check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check all covariance sections, returning a list of warnings.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>checkUncLimits</strong> (<em>bool</em>) – Should we check the uncertainty limits? (default: True)</p></li>
 <li><p><strong>minRelUnc</strong> (<em>float</em>) – Minimum allowable relative uncertainty (default: 0.0)</p></li>
@@ -144,7 +145,7 @@ of which contains one section of the full covariance matrix.</p>
 <li><p><strong>eigenvalueAbsoluteTolerance</strong> (<em>float</em>) – Warn if smallest eigenvalue &lt; this value (default: 1e-14)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="fudge.html#fudge.warning.Context" title="fudge.warning.Context">warning.Context</a></p>
 </dd>
 </dl>
@@ -194,7 +195,7 @@ of which contains one section of the full covariance matrix.</p>
 <code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#CovarianceSuite.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.CovarianceSuite.fix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply basic fixes to a covariance</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>removeNegativeEVs</strong> (<em>bool</em>) – Should we remove eigenspaces corresponding to negative eigenvalues? (Default: True)</p></li>
 <li><p><strong>removeSmallEVs</strong> (<em>bool</em>) – Should we remove eigenspaces corresponding to small eigenvalues? (Default: False)</p></li>
@@ -289,8 +290,8 @@ of which contains one section of the full covariance matrix.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances.distributions">
+</section>
+<section id="module-fudge.covariances.distributions">
 <span id="fudge-covariances-distributions-module"></span><h2>fudge.covariances.distributions module<a class="headerlink" href="#module-fudge.covariances.distributions" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="fudge.covariances.distributions.LegendreLValue">
@@ -398,8 +399,8 @@ between a pair of L-values</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances.mixed">
+</section>
+<section id="module-fudge.covariances.mixed">
 <span id="fudge-covariances-mixed-module"></span><h2>fudge.covariances.mixed module<a class="headerlink" href="#module-fudge.covariances.mixed" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="fudge.covariances.mixed.MixedForm">
@@ -411,7 +412,7 @@ In general, the energy bounds for these matrices can overlap (unlike Regions1d c
 <dt id="fudge.covariances.mixed.MixedForm.addComponent">
 <code class="sig-name descname">addComponent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">covariance</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#MixedForm.addComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.MixedForm.addComponent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>covariance</strong> – an instance of covariance (or inherited class)</p>
 </dd>
 </dl>
@@ -459,13 +460,13 @@ Otherwise, take unit from the first sub-matrix.</p>
 <dt id="fudge.covariances.mixed.MixedForm.getMatchingComponent">
 <code class="sig-name descname">getMatchingComponent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rowBounds</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">columnBounds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#MixedForm.getMatchingComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.MixedForm.getMatchingComponent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rowBounds</strong> – </p></li>
 <li><p><strong>columnBounds</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -476,7 +477,7 @@ Otherwise, take unit from the first sub-matrix.</p>
 <code class="sig-name descname">getUncertaintyVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#MixedForm.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.mixed.MixedForm.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combines all subsections into single uncertainty vector, converting to relative if requested.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>an XYs1d instance</p>
 </dd>
 </dl>
@@ -537,7 +538,7 @@ Otherwise, take unit from first sub-matrix.</p>
 <dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and columnData
 to convert self into an absolute covariance matrix.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</p></li>
 <li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “column direction”</p></li>
@@ -547,9 +548,9 @@ to convert self into an absolute covariance matrix.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If the column axis is set to ‘mirrorOtherAxis’, only rowData is needed.</p>
-</div>
+</aside>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a copy of self, but rescaled and with the type set to absolute</p>
 </dd>
 </dl>
@@ -567,7 +568,7 @@ to convert self into an absolute covariance matrix.</p>
 <dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and columnData
 to convert self into a relative covariance matrix.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</p></li>
 <li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “column direction”</p></li>
@@ -577,9 +578,9 @@ to convert self into a relative covariance matrix.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If the column axis is a link to row axis, only rowData is needed.</p>
-</div>
+</aside>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a copy of self, but rescaled and with the type set to relative</p>
 </dd>
 </dl>
@@ -593,8 +594,8 @@ to convert self into a relative covariance matrix.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances.modelParameters">
+</section>
+<section id="module-fudge.covariances.modelParameters">
 <span id="fudge-covariances-modelparameters-module"></span><h2>fudge.covariances.modelParameters module<a class="headerlink" href="#module-fudge.covariances.modelParameters" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="fudge.covariances.modelParameters.AverageParameterCovariance">
@@ -697,6 +698,26 @@ FIXME method should be inherited, but abstractClasses.Component defines methods 
 </dd></dl>
 
 <dl class="py method">
+<dt id="fudge.covariances.modelParameters.ParameterCovarianceMatrix.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalelabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlog</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ylog</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#ParameterCovarianceMatrix.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.ParameterCovarianceMatrix.plot" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – </p></li>
+<li><p><strong>scalelabel</strong> – </p></li>
+<li><p><strong>xlim</strong> – </p></li>
+<li><p><strong>ylim</strong> – </p></li>
+<li><p><strong>xlog</strong> – </p></li>
+<li><p><strong>ylog</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="fudge.covariances.modelParameters.ParameterCovarianceMatrix.toXML_strList">
 <code class="sig-name descname">toXML_strList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#ParameterCovarianceMatrix.toXML_strList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.modelParameters.ParameterCovarianceMatrix.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
@@ -748,8 +769,8 @@ a parameterLink pointing to the table, with
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances.covarianceSection">
+</section>
+<section id="module-fudge.covariances.covarianceSection">
 <span id="fudge-covariances-covariancesection-module"></span><h2>fudge.covariances.covarianceSection module<a class="headerlink" href="#module-fudge.covariances.covarianceSection" title="Permalink to this headline">¶</a></h2>
 <p>A covarianceSuite is organized into sections, where each section contains either
 - a covariance matrix for a single reaction quantity (cross section, multiplicity, etc), or
@@ -926,8 +947,8 @@ Each Slice fixes a value or range along one dimension of the multi-dimensional f
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances.shortRangeSelfScalingVariance">
+</section>
+<section id="module-fudge.covariances.shortRangeSelfScalingVariance">
 <span id="fudge-covariances-shortrangeselfscalingvariance-module"></span><h2>fudge.covariances.shortRangeSelfScalingVariance module<a class="headerlink" href="#module-fudge.covariances.shortRangeSelfScalingVariance" title="Permalink to this headline">¶</a></h2>
 <p>Some evaluations use short-range self-scaling variance components  (ENDF LB=8 or 9)
 to represent part or all of the uncertainty.
@@ -977,7 +998,7 @@ These sections only produce a diagonal, no cross-correlations.</p>
 <code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#ShortRangeSelfScalingVariance.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses deepcopy to make a copy of self.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>copy of self</p>
 </dd>
 </dl>
@@ -1053,8 +1074,8 @@ These sections only produce a diagonal, no cross-correlations.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances.covarianceMatrix">
+</section>
+<section id="module-fudge.covariances.covarianceMatrix">
 <span id="fudge-covariances-covariancematrix-module"></span><h2>fudge.covariances.covarianceMatrix module<a class="headerlink" href="#module-fudge.covariances.covarianceMatrix" title="Permalink to this headline">¶</a></h2>
 <p>Base classes for covariances: matrix, axes.</p>
 <dl class="py class">
@@ -1067,10 +1088,8 @@ Matrix data is stored in an <code class="xref py py-class docutils literal notra
 <dl class="py method">
 <dt id="fudge.covariances.covarianceMatrix.CovarianceMatrix.check">
 <code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#CovarianceMatrix.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.CovarianceMatrix.check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if uncertainty in the bounds passed into the checker.  
-Requires specification of the data (“theData”) if the covariance is not relative.
-I was not creative when I coded this, so it will fail when theData.getValue( x )
-doesn’t exist or is a function of more than one value.</p>
+<dd><p>Check if relative uncertainty is in the bounds passed into the checker,
+and checks for negative eigenvalues or other issues.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1096,7 +1115,7 @@ The parameter <code class="docutils literal notranslate"><span class="pre">units
 <code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#CovarianceMatrix.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.CovarianceMatrix.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses deepcopy to make a copy of self.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>copy of self</p>
 </dd>
 </dl>
@@ -1108,14 +1127,14 @@ The parameter <code class="docutils literal notranslate"><span class="pre">units
 <dd><p>Return copy with a revised domain for rows and columns.
 If requested domain extends beyond limits of self, add rows/columns of zeros to the new matrix.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rowDomainBounds</strong> – tuple (domainMin, domainMax)</p></li>
 <li><p><strong>columnDomainBounds</strong> – tuple (domainMin, domainMax). If not supplied, columnDomainBounds = rowDomainBounds</p></li>
 <li><p><strong>label</strong> – string to label the result</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>CovarianceMatrix</p>
 </dd>
 </dl>
@@ -1182,7 +1201,7 @@ Convert relative/absolute if requested (if so, must also pass central values as 
 <code class="sig-name descname">group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupBoundaries</span><span class="o">=</span><span class="default_value">None, None</span></em>, <em class="sig-param"><span class="n">groupUnit</span><span class="o">=</span><span class="default_value">None, None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#CovarianceMatrix.group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.CovarianceMatrix.group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Group the matrix in self</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>groupBoundaries</strong> – a 2 element list containing the group boundaries for the rows
 and columns (respectively) of the covariance to be regrouped
@@ -1192,14 +1211,14 @@ specified for the rows and columns (respectively) of the covariance
 to be regrouped</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the regrouped matrix (an xData.array.full as the array in a gridded2d.matrix)</p>
 </dd>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>We still need to do flux weighting</p>
-</div>
+</aside>
 <p class="rubric">Regrouping Theory</p>
 <p>Given a function <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/>, we write the grouped data using fudge’s <code class="docutils literal notranslate"><span class="pre">flat</span></code> interpolation
 scheme.  We note that we could write this scheme as an expansion over basis functions:</p>
@@ -1293,7 +1312,7 @@ boundaries <img class="math" src="../_images/math/04e094603df9343f34a7250021d199
 <dt id="fudge.covariances.covarianceMatrix.CovarianceMatrix.plot">
 <code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalelabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlog</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ylog</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#CovarianceMatrix.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.CovarianceMatrix.plot" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>title</strong> – </p></li>
 <li><p><strong>scalelabel</strong> – </p></li>
@@ -1303,7 +1322,7 @@ boundaries <img class="math" src="../_images/math/04e094603df9343f34a7250021d199
 <li><p><strong>ylog</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1333,7 +1352,7 @@ boundaries <img class="math" src="../_images/math/04e094603df9343f34a7250021d199
 <dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and colData
 to convert self into an absolute covariance matrix.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”
 if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</p></li>
@@ -1343,7 +1362,7 @@ if it isn’t given, we’ll compute it from the corresponding data in the react
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a copy of self, but rescaled and with the type set to absolute</p>
 </dd>
 </dl>
@@ -1362,7 +1381,7 @@ if it isn’t given, we’ll compute it from the corresponding data in the react
 <dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
 to convert self into a relative covariance matrix.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”
 if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</p></li>
@@ -1376,9 +1395,9 @@ if it isn’t given, we’ll compute it from the corresponding data in the react
 <p>If the column axis is a link, only rowData is needed.
 If neither rowData nor colData are specified, you’d better hope that the covariance is already
 relative because this will throw an error.</p>
-</div>
+</aside>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a copy of self, but rescaled and with the type set to relative</p>
 </dd>
 </dl>
@@ -1388,13 +1407,13 @@ relative because this will throw an error.</p>
 <dt id="fudge.covariances.covarianceMatrix.CovarianceMatrix.toXML_strList">
 <code class="sig-name descname">toXML_strList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceMatrix.html#CovarianceMatrix.toXML_strList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.covarianceMatrix.CovarianceMatrix.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>indent</strong> – </p></li>
 <li><p><strong>kwargs</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1407,8 +1426,8 @@ relative because this will throw an error.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances.summed">
+</section>
+<section id="module-fudge.covariances.summed">
 <span id="fudge-covariances-summed-module"></span><h2>fudge.covariances.summed module<a class="headerlink" href="#module-fudge.covariances.summed" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="fudge.covariances.summed.Summand">
@@ -1482,10 +1501,10 @@ a recursively-defined covariance. Recursion is avoided so long as the domains do
 <code class="sig-name descname">getReferredCovariance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pointer</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#SummedCovariance.getReferredCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.SummedCovariance.getReferredCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>FIXME what’s this for? It’s not used anywhere in FUDGE… should it be removed?</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>pointer</strong> – </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1496,7 +1515,7 @@ a recursively-defined covariance. Recursion is avoided so long as the domains do
 <code class="sig-name descname">getUncertaintyVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theData</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#SummedCovariance.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.SummedCovariance.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combine all subsections into single uncertainty vector, converting to relative if requested.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>an XYs1d instance</p>
 </dd>
 </dl>
@@ -1550,7 +1569,7 @@ a recursively-defined covariance. Recursion is avoided so long as the domains do
 <dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and columnData
 to convert self into an absolute covariance matrix.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</p></li>
 <li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “column direction”</p></li>
@@ -1560,9 +1579,9 @@ to convert self into an absolute covariance matrix.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If the column axis is set to ‘mirrorOtherAxis’, only rowData is needed.</p>
-</div>
+</aside>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a copy of self, but rescaled and with the type set to absolute</p>
 </dd>
 </dl>
@@ -1579,10 +1598,10 @@ to convert self into an absolute covariance matrix.</p>
 <dd><p>Sum the parts to construct the covariance matrix on the domain of self.
 Note: each part must be converted to absolute before summing, since the sum is over different reactions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>label</strong> – label attached to the new CovarianceMatrix</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>CovarianceMatrix instance, on the union grid of all summands over the domain of self.</p>
 </dd>
 </dl>
@@ -1594,7 +1613,7 @@ Note: each part must be converted to absolute before summing, since the sum is o
 <dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and columnData
 to convert self into a relative covariance matrix.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</p></li>
 <li><p><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “column direction”</p></li>
@@ -1604,9 +1623,9 @@ to convert self into a relative covariance matrix.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If the column axis is a link to row axis, only rowData is needed.</p>
-</div>
+</aside>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a copy of self, but rescaled and with the type set to relative</p>
 </dd>
 </dl>
@@ -1616,13 +1635,13 @@ to convert self into a relative covariance matrix.</p>
 <dt id="fudge.covariances.summed.SummedCovariance.toXML_strList">
 <code class="sig-name descname">toXML_strList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#SummedCovariance.toXML_strList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.covariances.summed.SummedCovariance.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>indent</strong> – </p></li>
 <li><p><strong>kwargs</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -1630,11 +1649,11 @@ to convert self into a relative covariance matrix.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-fudge.covariances">
+</section>
+<section id="module-fudge.covariances">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.covariances" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -1706,7 +1725,7 @@ to convert self into a relative covariance matrix.</p>
         <li class="right" >
           <a href="fudge.outputChannelData.html" title="fudge.outputChannelData package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.html" >fudge package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.covariances package</a></li> 

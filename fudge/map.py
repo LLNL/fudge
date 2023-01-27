@@ -10,9 +10,11 @@ This module contains classes for dealing with a map file. A map file creates a l
 
 Example of expected usage:
 
+.. code-block::
+
     from fudge import map as mapModule
     file = '/path/to/GIDI/Test/Data/MG_MC/all_maps.map'
-    map = mapModule.Map.readXML_file( file )            # Read in a map file.
+    map = mapModule.read( file )                        # Read in a map file.
     m_O16 = map.find( 'n', 'O16' )                      # This gets a reference to a map Protare instance.
     O16 = m_O16.protare( )                              # The creates a FUDGE protare (i.e., reactionSuite instance).
 
@@ -26,6 +28,8 @@ __todo = """
 import os
 import re
 
+import pathlib
+
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 
 from LUPY import ancestry as ancestryModule
@@ -35,17 +39,17 @@ from fudge import enums as enumsModule
 from fudge.core.utilities import guessInteraction as guessInteractionModule
 from fudge import reactionSuite as reactionSuiteModule
 
-class FormatVersion :
+class FormatVersion:
 
     version_0_1 = "0.1"
     version_0_2 = "0.2"
-    allowed = (version_0_1, version_0_2, GNDS_formatVersionModule.version_2_0_LLNL_4, GNDS_formatVersionModule.version_2_0)
-    default = version_0_1
+    allowed = (version_0_1, version_0_2, GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_4, GNDS_formatVersionModule.version_2_0)
+    default = GNDS_formatVersionModule.default
 
     def check(format):
 
-        if format == GNDS_formatVersionModule.version_1_10:
-            format = FormatVersion.version_0_1
+        if format == FormatVersion.version_0_1 or format == FormatVersion.version_0_2:
+            format = GNDS_formatVersionModule.version_1_10
         if format not in FormatVersion.allowed:
             raise ValueError('Unsupported format "%s".' % format)
 
@@ -283,6 +287,26 @@ class Map( Base ) :
 
         return( allFound )
 
+    def unrecurseAndSave(self, newFileName) :
+        """
+        Iterate through all entries recursively and save as a flattened map files
+
+        :param newFileName:  New filename to which flattened mapfile will be saved 
+        """
+
+        newInstance = Map(self.library, newFileName, "", self.format, algorithm=self.algorithm)
+        pathList = []
+        for entry in self.iterate():
+            entry.path = pathlib.Path(entry.path).resolve().as_posix()
+            if entry.path not in pathList:
+                newInstance.append(entry)
+                pathList.append(entry.path)
+            else:
+                raise RuntimeError(f'Duplicate ({entry.projectile},{entry.target}) entry in map file {self.path}.') 
+
+        newInstance.updateChecksum()
+        newInstance.saveToFile(newFileName)
+
     def toXML_strList( self, indent = "", **kwargs ) :
         """
         Returns a list of str instances representing the XML lines of self.
@@ -325,7 +349,7 @@ class Map( Base ) :
         library = node.get( 'library', None )
         if( library is None ) : raise ValueError( "Map node does not have 'library' attribute." )
 
-        map = Map(library, sourcePath, checksum=node.get('checksum'), algorithm=node.get('algorithm'))
+        map = Map(library, sourcePath, checksum=node.get('checksum'), algorithm=node.get('algorithm'), format=format)
 
         kwargs['format'] = FormatVersion.check(format)
         for child in node :
@@ -343,7 +367,7 @@ class Map( Base ) :
     @staticmethod
     def read(fileName, **kwargs):
         """
-        Reads in the file name *fileName* and returns a **ReactionSuite** instance.
+        Reads in the file name *fileName* and returns a **Map** instance.
         """
 
         return Map.readXML_file(fileName, **kwargs)
@@ -361,9 +385,7 @@ class EntryBase( Base ) :
         """
 
         Base.__init__( self, checksum=checksum, algorithm=algorithm)
-
-        if( not( isinstance( path, str ) ) ) : raise TypeError( "Path must be a string." )
-        self.__path = path
+        self.path = path
 
     @property
     def fileName( self ) :
@@ -378,6 +400,14 @@ class EntryBase( Base ) :
         """Returns the path of the map file. This may be absolute or relative."""
 
         return( self.__path )
+
+    @path.setter
+    def path(self, path):
+        '''Sets member self.__path to *path*.'''
+
+        if not isinstance(path, str):
+            raise TypeError('Path must be a string.')
+        self.__path = path
 
     def buildFileName(self, mapDirectory=None):
         """This method is designed to aid in building a map file when the map file does not reside in its final resting place.
@@ -772,7 +802,7 @@ class TNSL( ProtareBase ) :
         format = FormatVersion.check(kwargs.get('format', kwargs.get('formatVersion', FormatVersion.default)))
         attrs = self.standardXML_attributes()
 
-        if format == FormatVersion.version_0_1:
+        if format == FormatVersion.version_0_1 or format == GNDS_formatVersionModule.version_1_10:
             indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
             XML_list = [ '%s<%s%s>' % ( indent, self.moniker, attrs ) ]
             XML_list.append( '%s<protare projectile="n" target="%s" evaluation="%s"/></%s>' % 
@@ -785,29 +815,33 @@ class TNSL( ProtareBase ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
-        """
+        '''
         Creates a TNSL instance from an XML TNSL element.
 
-        :param node:        XML element to parse.
+        :param node:            XML element to parse.
+        :param xPath:           Current not used.
+        :param linkData:        Currently not used.
+        :param kwargs:          A keyword list.
 
-        :return:            TNSL instance.
-        """
+        :return:                TNSL instance.
+        '''
 
-        if( node.tag != TNSL.moniker ) : raise TypeError( "Invalid node name." )
+        if node.tag != TNSL.moniker:
+            raise TypeError('Invalid node name.')
 
         format = FormatVersion.check(kwargs.get('format', kwargs.get('formatVersion', FormatVersion.default)))
 
         kwargs = {attr: node.get(attr) for attr in
                   ('projectile', 'target', 'evaluation', 'path', 'checksum', 'algorithm')}
 
-        if format == FormatVersion.version_0_1:
-            kwargs['standardTarget'] = node[0].get( 'target', None )
-            kwargs['standardEvaluation'] = node[0].get( 'evaluation', None )
+        if format == FormatVersion.version_0_1 or format == GNDS_formatVersionModule.version_1_10:
+            kwargs['standardTarget'] = node[0].get('target', None)
+            kwargs['standardEvaluation'] = node[0].get('evaluation', None)
         else:
-            kwargs['standardTarget'] = node.get( 'standardTarget', None )
-            kwargs['standardEvaluation'] = node.get( 'standardEvaluation', None )
+            kwargs['standardTarget'] = node.get('standardTarget', None)
+            kwargs['standardEvaluation'] = node.get('standardEvaluation', None)
 
-        return TNSL( **kwargs )
+        return TNSL(**kwargs)
 
 def read(fileName, **kwargs):
     """

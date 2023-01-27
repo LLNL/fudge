@@ -494,7 +494,7 @@ class RMatrix(ancestryModule.AncestryIO):
 
         renames = ()
         formatVersion = kwargs.get( 'formatVersion', GNDS_formatVersionModule.default )
-        if formatVersion == GNDS_formatVersionModule.version_1_10:
+        if formatVersion in [GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4]:
             renames = (('boundaryCondition',
                        {'S': BoundaryCondition.EliminateShiftFunction,
                         '-L': BoundaryCondition.NegativeOrbitalMomentum}),)
@@ -587,11 +587,23 @@ class Channel(ancestryModule.AncestryIO):
         return self.__hardSphereRadius
 
     def getHardSphereRadius(self):
-        """Return HardSphereRadius, looking up ancestry if necessary. If no HardSphereRadius is defined, return ScatteringRadius instead"""
-        if self.__hardSphereRadius is not None:
-            return self.__hardSphereRadius
+        """
+        Return HardSphereRadius, looking up ancestry if necessary.
+        If no HardSphereRadius is defined, return ScatteringRadius instead.
+        """
+        if self.hardSphereRadius is not None:
+            return self.hardSphereRadius
         else:
-            return self.findClassInAncestry(RMatrix).resonanceReactions[self.resonanceReaction].getHardSphereRadius()
+            resonanceReaction = self.findClassInAncestry(RMatrix).resonanceReactions[self.resonanceReaction]
+            if resonanceReaction.hardSphereRadius is not None:
+                return resonanceReaction.hardSphereRadius
+
+            resonancesHSR = self.findClassInAncestry(Resonances).hardSphereRadius
+            if resonancesHSR is not None:
+                return resonancesHSR
+
+            # no hardSphereRadius found
+            return self.getScatteringRadius()
 
     @hardSphereRadius.setter
     def hardSphereRadius(self, value):
@@ -614,7 +626,7 @@ class Channel(ancestryModule.AncestryIO):
 
         if value is not None:
             if not isinstance(value, externalRMatrixModule.ExternalRMatrix):
-                raise TypeError("External RMatrix can't be set to type '%'" % type(value))
+                raise TypeError("External RMatrix can't be set to type '%s'" % type(value))
             value.setAncestor(self)
         self.__externalRMatrix = value
 
@@ -833,10 +845,11 @@ def _resonance_checker(self, info, things):
         for c in iterateThroughThis:
             if c.eliminated:
                 continue
+            if c.channelClass is rrReconstructModule.GAMMACHANNEL and isinstance(self, BreitWigner):
+                continue
             LMax = max(c.l, LMax)
             if c.reaction not in rxnList:
                 rxnList.append(c.reaction)
-            # FIXME ignore capture for spin parity check unless it's R-Matrix and not an eliminated channel
             if c.channelClass not in [rrReconstructModule.FISSIONCHANNEL, rrReconstructModule.COMPETITIVECHANNEL]:
                 try:
                     spinList = getSList(*rrReconstructor.getParticleSpins(c.reaction))
@@ -859,9 +872,9 @@ def _resonance_checker(self, info, things):
                 # FIXME ignore capture for spin parity check unless it's R-Matrix and not an eliminated channel
                 if 'ission' not in rxn:
                     try:
-                        spinList = getSList(*rrReconstructor.getParticleSpins(c.reaction))
+                        spinList = getSList(*rrReconstructor.getParticleSpins(rxn))
                     except:
-                        warnings.append(warning.UnknownSpinParity(c.reaction))
+                        warnings.append(warning.UnknownSpinParity(rxn))
                         continue
 
                     for S in spinList:

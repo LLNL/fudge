@@ -34,6 +34,7 @@ stylesGroup.add_argument('--writeReconstructed', action='store_true',       help
 parser.add_argument('-v', '--verbose', action='count', default=0,           help='Determines verbosity level, the more the merrier.')
 parser.add_argument('--skipCovariances', action='store_true',               help='If present, any covariance files in are not written.')
 parser.add_argument('--NLIB', type=int, default=-1,                         help='Specifies the NLIB value to set in the output ENDF-6 file.')
+parser.add_argument('--useRedsFloatFormat', action='store_true',            help='''If present, add float are written using Red Cullen's floating point format.''')
 parser.add_argument('gnds',                                                 help='GNDS file to translate.')
 parser.add_argument('output', nargs='?', default=None,                      help='The translated ENDF file.')
 
@@ -42,6 +43,10 @@ if( __name__ == '__main__' ) :
 
     gndsCov = None
     gnds = GNDS_fileModule.read(args.gnds)
+
+    if hasattr(gnds, 'domainUnit') and gnds.domainUnit != 'eV':
+        gnds.convertUnits({gnds.domainUnit: 'eV'})
+
     if not args.skipCovariances:
         if hasattr(gnds, 'loadCovariances'):
             covariances = gnds.loadCovariances()
@@ -67,4 +72,5 @@ if( __name__ == '__main__' ) :
     if output is None:
         output = pathlib.Path(args.gnds).with_suffix('.endf')
     with open(output, 'w') as fout:
-        fout.write(gnds.toENDF6(styleLabel, flags={'verbosity': args.verbose * 10}, covarianceSuite=gndsCov, lineNumbers=args.lineNumbers, NLIB=args.NLIB))
+        fout.write(gnds.toENDF6(styleLabel, flags={'verbosity': args.verbose * 10}, covarianceSuite=gndsCov, lineNumbers=args.lineNumbers, NLIB=args.NLIB,
+                useRedsFloatFormat=args.useRedsFloatFormat))

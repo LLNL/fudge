@@ -26,12 +26,12 @@ fudge scripts that will:
       in a transport code;
 
 I will assume throughout this tutorial that you have correctly installed fudge 
-(see :ref:`installation` if you haven't), the Python scripting language (version 2.7.x or 3.6.x and later)
+(see :ref:`installation` if you haven't), the Python scripting language (version 3.7 and later)
 and the Python extensions numpy and matplotlib.  I will also assume that you have working knowledge
 of the Python scripting language and that you are involved in nuclear data enterprise in 
 some fashion (so I don't have to define things like "evaluation").
 
-Let's begin with the most important thing.  Make sure fudge is in your PYTHONPATH!  
+Let's begin with the most important thing: if you installed FUDGE using the Makefile, make sure fudge is in your PYTHONPATH!
 You can do this a few different ways, depending on what shell you use.
 
     * For bash (or ksh, zsh)::
@@ -48,6 +48,7 @@ You can do this a few different ways, depending on what shell you use.
       $ sys.path.append("/full/path/to/directory/containing/fudge")
 
 
+You can skip this step if you installed using pip, although you may need to activate a Python environment.
 With that settled, you can start with the section on translating between ENDF and GNDS.
 
 .. note::  If you find yourself lost, the Python interpretor has excellent built-in help 

@@ -51,7 +51,11 @@ def processProtare(index, fileName):
     '''
 
     lines = []
-    protare = reactionSuiteModule.read(fileName, lazyParsing=True)
+    try:
+        protare = reactionSuiteModule.read(fileName, lazyParsing=True)
+    except:
+        return '%s___%s in buildReactionInfoSummary.py for file %s' % (index, 'ERROR', fileName)
+
     lines.append('#protare : %s : %s : %s : %s' % (protare.projectile, protare.target, protare.evaluation, protare.domainUnit))
 
     aliases = [[alias.id, protare.PoPs.final(alias.id).id] for alias in protare.PoPs.aliases if alias.isMetaStable()]
@@ -110,7 +114,11 @@ def buildReactionInfoSummary(input, recursive=False, numberOfProcesses=None):
         result = outputQueue.get()
         offset = result.find('___')
         index = int(result[:offset])
-        results[index] = result[offset+3:]
+        data = result[offset+3:]
+        if data[:5] == 'ERROR':
+            print(data)
+            data = ''
+        results[index] = data
 
     input = pathlib.Path(map.path)
     output = input.with_suffix('.ris')

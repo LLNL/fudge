@@ -12,7 +12,7 @@ Separates an ENDF-6 formatted file into separate files by MT, MF, etc. The files
 the second positional argument. The output directory is created anew. Ergo, if the output directory exist, it is first deleted
 and then recreated.
 
-Currently, only MF 3, 4, 6 and 26 are supported for writing to a files.
+Currently, only MF 3, 4, 6, 12, 13 and 26 are supported for writing to a files.
 '''
 
 import pathlib
@@ -21,6 +21,12 @@ import argparse
 
 from brownies.legacy.converting.ENDFToGNDS import endfFileToGNDSMisc
 from brownies.legacy.converting.ENDFToGNDS import endfFileToGNDSMisc as endfFileToGNDSMiscModule
+
+def openFile(path):
+
+    parent = path.parent
+    parent.mkdir(parents=True, exist_ok=True)
+    return path.open('w')
 
 def printlines(fOut, label, index1, index2, MFData):
     '''Writes to *fOut* all lines of *MFData* in the range [*index1*, *index2*]. Adds the string *label* to the end of the first line.'''
@@ -48,7 +54,12 @@ def TAB1(fOut, label, lineIndex, MFData):
     NR, NP = int(NR), int(NP)
     lineIndex += 1 + (NR + 2) // 3
     lineIndex += (NP + 2) // 3
-    printlines(fOut, label, priorIndex, lineIndex, MFData)
+    try:
+        printlines(fOut, label, priorIndex, lineIndex, MFData)
+    except:
+        print(MFData[priorIndex])
+        print(priorIndex, lineIndex)
+        raise
 
     return lineIndex
 
@@ -138,20 +149,23 @@ def LAW8(fOut, lineIndex, MFData):
 
     return TAB1(fOut, '', lineIndex, MFData)
 
-def process(args):
+def process(inputFile, outputDir):
     '''Code that loops over MTs and MFs, writing the MT/MF data to separate files.'''
 
-    header, MAT, MTDatas = endfFileToGNDSMisc.parseENDFByMT_MF(args.inputFile, stripMATMFMTCount=False)
+    outputDir = pathlib.Path(outputDir)
+
+    header, MAT, MTDatas = endfFileToGNDSMisc.parseENDFByMT_MF(str(inputFile), stripMATMFMTCount=False)
     for MT in MTDatas:
         MFDatas = MTDatas[MT]
-        for MF in [3, 4, 6, 26]:
-            filePrefix = 'MT_%.3d.MF_%.3d' % (MT, MF)
+        filePrefixMT = 'MT_%.3d' % MT
+        for MF in [3, 4, 6, 12, 13, 26]:
+            filePrefix = outputDir / filePrefixMT / ('MF_%.3d' % MF)
             if MF in MFDatas:
                 lineIndex = 0
                 MFData = MFDatas[MF]
                 if MF == 3:
-                    fileName = pathlib.Path(outputDir) / filePrefix
-                    with fileName.open('w') as fOut:
+                    fileName = filePrefix
+                    with openFile(fileName) as fOut:
                         TAB1(fOut, '', 1, MFData)
                 elif MF == 4:
                     priorIndex = lineIndex
@@ -160,9 +174,8 @@ def process(args):
                     lineIndex += 2
 
                     LTT = int(LTT)
-                    fileName = '%s.LTT_%s' % (filePrefix, LTT)
-                    fileName = pathlib.Path(outputDir) / fileName
-                    with fileName.open('w') as fOut:
+                    fileName = filePrefix.with_suffix('.LTT_%s' % LTT)
+                    with openFile(fileName) as fOut:
                         printlines(fOut, '', priorIndex, lineIndex, MFData)
 
                         if LTT == 0:
@@ -183,9 +196,8 @@ def process(args):
                         lineIndex, productData, multiplicityRegions = endfFileToGNDSMiscModule.getTAB1Regions(lineIndex, MFData)
                         ZAP, AWP, LIP, LAW, NP = int(productData['C1']), productData['C2'], productData['L1'], int(productData['L2']), productData['NR']
 
-                        fileName = '%s.%s.ZA_%.6d.LAW_%s' % (filePrefix, productIndex, ZAP, LAW)
-                        fileName = pathlib.Path(outputDir) / fileName
-                        with fileName.open('w') as fOut:
+                        fileName = filePrefix.with_suffix('.%s.ZA_%.6d.LAW_%s' % (productIndex, ZAP, LAW))
+                        with openFile(fileName) as fOut:
                             printlines(fOut, '', priorIndex, lineIndex, MFData)
 
                             if LAW == 0:
@@ -209,6 +221,29 @@ def process(args):
 
                         if lineIndex < 0:
                             break
+                elif MF in [12, 13]:
+                    fileName = filePrefix
+                    ZA, AWR, LO, LG, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+                    LO = int(LO)
+                    LG = int(LG)
+                    NK = int(NK)
+
+                    if LO == 2:
+                        with openFile(fileName) as fOut:
+                            LIST(fOut, '', lineIndex, MFData)
+                    else:
+                        with openFile(fileName) as fOut:
+                            printlines(fOut, '', lineIndex, lineIndex + 1, MFData)
+                            lineIndex += 1
+                            if NK == 1:
+                                lineIndex += 1
+                            else:
+                                lineIndex = TAB1(fOut, '', lineIndex, MFData)
+
+                        for index in range(NK):
+                            fileName = filePrefix.with_suffix('.%.3d' % index)
+                            with openFile(fileName) as fOut:
+                                lineIndex = TAB1(fOut, '', lineIndex, MFData)
 
 if __name__ == '__main__':
 
@@ -223,6 +258,6 @@ if __name__ == '__main__':
         if not outputDir.is_dir():
             raise TypeError('Output must be a directory.')
         shutil.rmtree(outputDir)
-    outputDir.mkdir()
+    outputDir.mkdir(parents=True)
 
-    process(args)
+    process(args.inputFile, outputDir)

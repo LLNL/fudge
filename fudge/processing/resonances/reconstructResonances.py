@@ -4,7 +4,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-#
+# 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -462,7 +462,7 @@ class ResonanceReconstructionBaseClass(abc.ABC):
         reactionSuite = resonanceForm.findClassInAncestry(reactionSuiteModule.ReactionSuite)
         try:
             neutron = resonanceForm.PoPs['n']
-            self.neutronMass_amu = float( neutron.mass[0].pqu( 'amu' ) )
+            self.neutronMass_amu = neutron.getMass('amu')
         except KeyError:
             self.neutronMass_amu = 1.00866491574
 
@@ -470,7 +470,7 @@ class ResonanceReconstructionBaseClass(abc.ABC):
 
         self.projectile = reactionSuite.projectile
         projectile = resonanceForm.PoPs[reactionSuite.projectile]
-        self.projectileMass_amu = float( projectile.mass[0].pqu( 'amu' ) )
+        self.projectileMass_amu = projectile.getMass('amu')
         if isinstance(projectile, nuclidePoPsModule.Particle):
             self.projectileSpin = projectile.nucleus.spin[0].value
         else:
@@ -482,9 +482,9 @@ class ResonanceReconstructionBaseClass(abc.ABC):
         target = resonanceForm.PoPs[targetID]
         if( isinstance( target, nuclidePoPsModule.Particle ) ) :
             nuclide = target.ancestor[0]
-            self.targetMass_amu = nuclide.mass[0].float( 'amu' )
+            self.targetMass_amu = nuclide.getMass('amu')
         else :
-            self.targetMass_amu = target.mass[0].float( 'amu' )
+            self.targetMass_amu = target.getMass('amu')
         self.targetSpin = target.nucleus.spin[0].value
 
         self.targetToNeutronMassRatio = self.targetMass_amu / self.neutronMass_amu

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.abstractClasses &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.abstractClasses &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.abstractClasses</a></li> 
       </ul>
@@ -146,19 +146,22 @@
         <span class="k">if</span><span class="p">(</span> <span class="n">style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">]</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Component.processMC_cdf"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.Component.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Component.processMC_cdf"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.Component.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
 
-        <span class="n">addToComponent</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;addToComponent&#39;</span><span class="p">,</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="n">addToComponent</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;addToComponent&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">_form</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
-        <span class="k">try</span> <span class="p">:</span>
-            <span class="n">MonteCarlo_cdf</span> <span class="o">=</span> <span class="n">_form</span><span class="o">.</span><span class="n">processMC_cdf</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>
-        <span class="k">except</span> <span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==== form = </span><span class="si">%s</span><span class="s1"> failed&#39;</span> <span class="o">%</span> <span class="n">_form</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">MonteCarlo_cdf</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">processMC_cdf</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==== form = </span><span class="si">%s</span><span class="s1"> failed&#39;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
             <span class="k">raise</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">addToComponent</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">MonteCarlo_cdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">MonteCarlo_cdf</span> <span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">addToComponent</span> <span class="ow">and</span> <span class="n">MonteCarlo_cdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MonteCarlo_cdf</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MonteCarlo_cdf</span></div>
 
 <div class="viewcode-block" id="Component.processMultiGroup"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.abstractClasses.Component.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -208,8 +211,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method calls the toPointwise_withLinearXYs method for the evaluated style and returns a &quot;lin-lin&quot; pointwise representation of it.</span>
 
-<span class="sd">        @:param lowerEps: lower epsilon for converting discontinuities to monotonic function</span>
-<span class="sd">        @:param upperEps: upper epsilon for converting discontinuities to monotonic function</span>
+<span class="sd">        :param lowerEps: lower epsilon for converting discontinuities to monotonic function</span>
+<span class="sd">        :param upperEps: upper epsilon for converting discontinuities to monotonic function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span>
@@ -340,7 +343,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.abstractClasses</a></li> 
       </ul>

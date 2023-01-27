@@ -60,18 +60,36 @@ class Unresolved(abstractClassesModule.Component):
         return "Unresolved resonances in %s form\n" % self.evaluated.moniker
 
     def check(self, info):
+        """
+        Check that widths and level spacings span full URR domain, and that the energy grid is 'dense enough'.
+        TODO: level spacing upper limit should decrease with increasing target mass
+        TODO: reaction-specific limits on widths
+        """
         from fudge import warning
         warnings = []
         for L in self.evaluated.Ls:
             for J in L.Js:
+                if J.levelSpacing.data.domainMin > self.__domainMin or J.levelSpacing.data.domainMax < self.__domainMax:
+                    warnings.append(warning.URRdomainMismatch(L.L, J.J, J.levelSpacing))
+                if J.levelSpacing.data.rangeMin <= 0 or J.levelSpacing.data.rangeMax > 5e+5:
+                    warnings.append(warning.URRunphysicalLevelSpacing(L.L, J.J, J.levelSpacing))
+
+                for width in J.widths:
+                    if width.data.domainMin > self.__domainMin or width.data.domainMax < self.__domainMax:
+                        warnings.append(warning.URRdomainMismatch(L.L, J.J, width))
+                    if width.data.rangeMin <= 0:
+                        if width.data.rangeMin == 0 and width.resonanceReaction == 'competitive':
+                            continue  # competitive may include threshold reactions
+                        warnings.append(warning.URRunphysicalWidth(L.L, J.J, width.resonanceReaction, width))
+                    if width.data.rangeMax > 1e+4:
+                        warnings.append(warning.URRunphysicalWidth(L.L, J.J, width.resonanceReaction, width))
+
                 elist = J.levelSpacing.data.convertAxisToUnit(1, self.__domainUnit).domainGrid
-                if elist[0] > self.__domainMin or elist[-1] < self.__domainMax:
-                    warnings.append(warning.URRdomainMismatch(L.L, J.J, J))
                 missingPoints = [i1 for i1 in range(1, len(elist)) if elist[i1] > 3 * elist[i1 - 1]]
                 for idx in missingPoints:
-                    warnings.append(warning.URRinsufficientEnergyGrid(L.L, J.J,
-                                                                      PQUModule.PQU(elist[idx - 1], self.__domainUnit),
-                                                                      PQUModule.PQU(elist[idx], self.__domainUnit), J))
+                    warnings.append(warning.URRinsufficientEnergyGrid(
+                        L.L, J.J, PQUModule.PQU(elist[idx - 1], self.__domainUnit),
+                        PQUModule.PQU(elist[idx], self.__domainUnit), J))
         return warnings
 
     def convertUnits(self, unitMap):

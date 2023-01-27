@@ -32,19 +32,19 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
              lineNumbers = True, **kwargs ) :
 
     if self.domainUnit != 'eV':
-        self = self.copy()
+        self = self.parseXMLString(self.toXML(), lazyParsing=True)
         self.convertUnits({ self.domainUnit : 'eV' })
 
     _useRedsFloatFormat = endfFormatsModule.useRedsFloatFormat
     endfFormatsModule.useRedsFloatFormat = useRedsFloatFormat
 
     style = self.styles[styleLabel]
-    if( not( isinstance( style, ( stylesModule.Evaluated, stylesModule.CrossSectionReconstructed ) ) ) ) :
-        raise TypeError( 'Invalid style via label "%s".' % styleLabel )
+    if not isinstance(style, (stylesModule.Evaluated, stylesModule.CrossSectionReconstructed, stylesModule.Heated)):
+        raise TypeError('Invalid style via label "%s".' % styleLabel)
     evaluatedStyle = style
-    while( True ) :
-        if( evaluatedStyle is None ) : raise Exception( 'No evaluated style found via label "%s".' % styleLabel )
-        if( isinstance( evaluatedStyle, stylesModule.Evaluated ) ) : break
+    while True:
+        if evaluatedStyle is None: raise Exception('No evaluated style found via label "%s".' % styleLabel)
+        if isinstance(evaluatedStyle, stylesModule.Evaluated): break
         evaluatedStyle = evaluatedStyle.derivedFromStyle
 
     if( flags == {} ) : flags['verbosity'] = 0
@@ -69,14 +69,10 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
             conversionFlags = ENDFconversionFlagsModule.ENDFconversionFlags.parseXMLString(XML_string)
             for link in conversionFlags.flags:
                 if covarianceSuite and '/covarianceSuite/' in link.path:
-                    link.setAncestor(covarianceSuite)
+                    linkTarget = link.follow(covarianceSuite)
                 else:
-                    link.setAncestor(self)
-                try:
-                    link.updateLink()
-                except:
-                    continue
-                targetInfo['ENDFconversionFlags'][link.link] = link.flags
+                    linkTarget = link.follow(self)
+                targetInfo['ENDFconversionFlags'][linkTarget] = link.flags
 
     if( self.isThermalNeutronScatteringLaw() ) :
         EMAX = self.styles.getEvaluatedStyle().projectileEnergyDomain.max
@@ -102,7 +98,16 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
     targetZ, targetA = divmod( targetZA, 1000 )
 
     targetInfo['massTracker'] = massTrackerModule.MassTracker()
-    for particle in self.PoPs :
+
+    try:
+        neutronMass = PoPs[IDsPoPsModule.neutron].getMass('amu')
+    except:
+        neutronMass = 1.00866491578  # From ENDF102 manual, Appendix H.4
+    targetInfo['massTracker'].addMassAMU(1, neutronMass)
+
+    for particle in self.PoPs:
+        if particle.id == IDsPoPsModule.neutron:            # Already added above.
+            continue
         if( isinstance( particle, ( gaugeBosonPoPsModule.Particle, leptonPoPsModule.Particle, baryonPoPsModule.Particle, nuclidePoPsModule.Particle ) ) ) : 
             ZA = chemicalElementMiscPoPsModule.ZA( particle )
             if( isinstance( particle, nuclidePoPsModule.Particle ) ) :
@@ -273,7 +278,7 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
                 LRP = 1                                                 # Self-shielding only.
                 if( self.resonances.resolved is not None ) : LRP = 2
 
-    temperature = evaluatedStyle.temperature.getValueAs( 'K' )
+    temperature = style.temperature.getValueAs('K')
     library = evaluatedStyle.library
     version = evaluatedStyle.version
     if( library == 'ENDL' ) :           # Additional ENDF meta-data. If the library is unknown, use NLIB = -1
@@ -299,6 +304,8 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
     if self.isThermalNeutronScatteringLaw():
         NSUB = 12
     LDRV = 0
+    if not isinstance(style, stylesModule.Evaluated):
+        LDRV = 1
 
     if kwargs.get('NLIB', -1) != -1: NLIB = kwargs.get('NLIB')
 

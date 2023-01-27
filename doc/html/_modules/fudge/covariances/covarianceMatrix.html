@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.covariances.covarianceMatrix &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.covariances.covarianceMatrix &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.covariances.covarianceMatrix</a></li> 
       </ul>
@@ -458,52 +458,60 @@
 
         <span class="k">return</span> <span class="n">CovarianceMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CovarianceMatrix.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span> 
-        <span class="sd">&quot;&quot;&quot;Check if uncertainty in the bounds passed into the checker.  </span>
-<span class="sd">        Requires specification of the data (&quot;theData&quot;) if the covariance is not relative.</span>
-<span class="sd">        I was not creative when I coded this, so it will fail when theData.getValue( x )</span>
-<span class="sd">        doesn&#39;t exist or is a function of more than one value. &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CovarianceMatrix.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if relative uncertainty is in the bounds passed into the checker,</span>
+<span class="sd">        and checks for negative eigenvalues or other issues.&quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isSymmetric</span><span class="p">()</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;checkUncLimits&#39;</span><span class="p">]:</span>
-            <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span>
-            <span class="n">relative</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">covarianceEnumsModule</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">relative</span>
-            <span class="k">if</span> <span class="n">relative</span><span class="p">:</span>
-                <span class="n">varMin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;minRelUnc&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;minRelUnc&#39;</span><span class="p">]</span>
-                <span class="n">varMax</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;maxRelUnc&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;maxRelUnc&#39;</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">relative</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;theData&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">uncMin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;minRelUnc&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;theData&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span>
-                                <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span>
-                        <span class="n">uncMax</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;maxRelUnc&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;theData&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span>
-                                <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span>
-                        <span class="n">varMin</span> <span class="o">=</span> <span class="n">uncMin</span><span class="o">*</span><span class="n">uncMin</span>
-                        <span class="n">varMax</span> <span class="o">=</span> <span class="n">uncMax</span><span class="o">*</span><span class="n">uncMax</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="c1">#warnings.append( &quot;WARNING: can&#39;t check absolute uncertainties without data to compare to!\n&quot; )</span>
-                        <span class="k">break</span>
-                <span class="k">if</span> <span class="n">varMin</span> <span class="o">&lt;=</span> <span class="n">A</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">varMax</span><span class="p">:</span>
-                    <span class="k">pass</span>                                    <span class="c1"># unc is where is should be</span>
-                <span class="k">elif</span> <span class="n">varMin</span> <span class="o">&gt;=</span> <span class="n">A</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span><span class="n">idx</span><span class="p">]:</span>                  <span class="c1"># uncertainty too small</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">VarianceTooSmall</span><span class="p">(</span> <span class="n">idx</span><span class="p">,</span> <span class="n">A</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>                                       <span class="c1"># uncertainty too big</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">VarianceTooLarge</span><span class="p">(</span> <span class="n">idx</span><span class="p">,</span> <span class="n">A</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">columnData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findAttributeInAncestry</span><span class="p">(</span><span class="s1">&#39;columnData&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">columnData</span> <span class="o">=</span> <span class="kc">None</span>
 
-            <span class="c1"># FIXME: is this the right place for eigenvalue checks? They used to live in fudge.core.math.matrix,</span>
-            <span class="c1"># but that no longer exists</span>
-            <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span> <span class="n">A</span> <span class="p">)</span>
-            <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">]:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">NegativeEigenvalues</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="bp">self</span> <span class="p">))</span>
-            <span class="n">minpos</span><span class="p">,</span> <span class="n">maxpos</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]),</span><span class="nb">max</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">])</span>
-            <span class="c1"># Check that the condition number of the matrix is reasonable</span>
-            <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">minpos</span><span class="o">/</span><span class="n">maxpos</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">]:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">BadEigenvalueRatio</span><span class="p">(</span> <span class="n">minpos</span><span class="o">/</span><span class="n">maxpos</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">columnData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;checkUncLimits&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">warnings</span>
+
+        <span class="c1"># run eigenvalue checks on original matrix, relative or absolute:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span>
+        <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">]:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">NegativeEigenvalues</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="bp">self</span><span class="p">))</span>
+
+        <span class="c1"># Check that the condition number of the matrix is reasonable</span>
+        <span class="c1"># FIXME disabled this warning for now. Better option: add severity to each warning and make this low severity</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        minpos, maxpos = min(vals[vals &gt;= 0]), max(vals[vals &gt;= 0])</span>
+<span class="sd">        if A.size != 1 and minpos / maxpos &lt; info[&#39;eigenvalueRatioTolerance&#39;]:</span>
+<span class="sd">            warnings.append(warning.BadEigenvalueRatio(minpos / maxpos, self))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">covarianceEnumsModule</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">relative</span><span class="p">:</span>
+            <span class="c1"># FIXME next line skips testing PFNS covariances</span>
+            <span class="n">rowData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findAttributeInAncestry</span><span class="p">(</span><span class="s1">&#39;rowData&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rowData</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="s1">&#39;toPointwise_withLinearXYs&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">warnings</span>
+
+        <span class="n">relativeMatrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toRelative</span><span class="p">()</span>
+
+        <span class="n">Arr</span> <span class="o">=</span> <span class="n">relativeMatrix</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span>
+        <span class="n">relativeUncertainty</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Arr</span><span class="o">.</span><span class="n">diagonal</span><span class="p">())</span>
+
+        <span class="n">minUnc</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;minRelUnc&#39;</span><span class="p">]</span>
+        <span class="n">maxUnc</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;maxRelUnc&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">uncert</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">relativeUncertainty</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">minUnc</span> <span class="o">&lt;=</span> <span class="n">uncert</span> <span class="o">&lt;=</span> <span class="n">maxUnc</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># uncertainty where it should be</span>
+            <span class="k">elif</span> <span class="n">uncert</span> <span class="o">&lt;</span> <span class="n">minUnc</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">VarianceTooSmall</span><span class="p">(</span>
+                    <span class="n">idx</span><span class="p">,</span> <span class="n">relativeUncertainty</span><span class="o">=</span><span class="n">uncert</span><span class="p">,</span> <span class="n">absoluteUncertainty</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">VarianceTooLarge</span><span class="p">(</span>
+                    <span class="n">idx</span><span class="p">,</span> <span class="n">relativeUncertainty</span><span class="o">=</span><span class="n">uncert</span><span class="p">,</span> <span class="n">absoluteUncertainty</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">warnings</span></div>
-    
+
 <div class="viewcode-block" id="CovarianceMatrix.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span> 
         <span class="sd">&quot;&quot;&quot;Fix uncertainty using the bounds passed into the fixer.</span>
 <span class="sd">        Requires specification of the data (&quot;theData&quot;) if the covariance is not relative.</span>
@@ -907,7 +915,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.covariances.covarianceMatrix</a></li> 
       </ul>

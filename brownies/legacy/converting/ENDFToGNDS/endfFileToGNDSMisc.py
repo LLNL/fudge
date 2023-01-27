@@ -21,40 +21,48 @@ from xData.Documentation import author as authorModule
 
 FUDGE_EPS = 1e-8
 
-def parseENDFByMT_MF( fileName, stripMATMFMTCount = True, logFile = sys.stderr ) :
+def parseENDFByMT_MF(fileName, stripMATMFMTCount=True, logFile=sys.stderr):
     """This function reads an endf file and creates a python dictionary with the keys being MT
     numbers and the values being the data for the MT key. For each MT, the data are stored in a python
     dictionary with the keys being MF numbers and the values being the data for the MF key."""
 
     MTDatas = {}
-    f = open( fileName )
-    header = f.readline( )[:-1]           # Occasionally, the first line does not have MT or MF values.
+    f = open(fileName)
+    header = f.readline()[:-1]           # Occasionally, the first line does not have MT or MF values.
     line = 0
-    endlLine = f.readline( )
+    endlLine = f.readline()
     secondLine = endlLine
-    while( True ) :
-        if( endlLine == '' ) : break
+    while True:
+        if endlLine == '':
+            break
         line += 1
         try :
-            MF, MT = int( endlLine[70:72] ), int( endlLine[72:75] )
-        except :
-            logFile.write( "%s\n" % line )
+            MF = int(endlLine[70:72])
+            MT = int(endlLine[72:75])
+        except:
+            logFile.write("%s\n" % line)
             raise
-        if( MT not in MTDatas ) : MTDatas[MT] = {}
+        if MT not in MTDatas:
+            MTDatas[MT] = {}
         MTData = MTDatas[MT]
-        if( MF not in MTData ) : MTData[MF] = []
-        if( stripMATMFMTCount ) :
-            MTData[MF].append( endlLine[:66].rstrip( ) )
-        else :
-            MTData[MF].append( endlLine.rstrip( ) )
-        endlLine = f.readline( )
-    f.close( )
+        if MF not in MTData:
+            MTData[MF] = []
+        if stripMATMFMTCount:
+            MTData[MF].append(endlLine[:66].rstrip())
+        else:
+            MTData[MF].append(endlLine.rstrip())
+        endlLine = f.readline()
+    f.close()
+
     try :
-        MAT = int( secondLine[66:70] )
+        MAT = int(secondLine[66:70])
     except ValueError:
-        MAT = int( MTDatas[451][1][6][31:35] )
-    del MTDatas[0]
-    return( header, MAT, MTDatas )
+        MAT = int(MTDatas[451][1][6][31:35])
+
+    if 0 in MTDatas:
+        del MTDatas[0]
+
+    return header, MAT, MTDatas
 
 def ENDFInterpolationToGNDS1d( interpolation ) :
 
@@ -475,7 +483,15 @@ def toEnergyFunctionalData( info, dataLine, MF5Data, LF, moniker, unit, xLabel =
 def completeDocumentation(info, documentation):
 
     documentation.body.body = 'See the endfCompatible section.'
-    date = datesModule.Date(dateModule.Date.parse(info.Date), datesModule.DateType.created)
+    # Save the evaluation date
+    try:
+        date = datesModule.Date(dateModule.Date.parse(info.Date), datesModule.DateType.created)
+    except Exception as e:
+        if not info.ignoreBadDate:
+            info.doRaise.append(str(e))
+        import datetime
+        dateString = datetime.datetime.today().strftime("%Y-%m-%d")
+        date = datesModule.Date(dateModule.Date.parse(dateString), datesModule.DateType.created)
     documentation.dates.add(date)
     documentation.title.body = 'ENDF-6 file form %s version %s translated to GNDS by FUDGE.' % (info.library, info.libraryVersion)
     if '&' in info.author:

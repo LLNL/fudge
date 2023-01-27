@@ -13,6 +13,7 @@ reactionSuite is the top-level class for the GNDS structure.
 import re
 import os
 
+import pathlib
 import numpy
 
 from pqu import PQU as PQUModule
@@ -410,7 +411,8 @@ class ReactionSuite(ancestryModule.AncestryIO):
         """
         Check all data in the reactionSuite, returning a gnds.warning.context object with list of warnings.
 
-        Currently supported options:
+        Currently supported options::
+
             'branchingRatioSumTolerance' 1e-6        # branching ratios must sum to 1 (within this tolerance)
             'dQ'                         '1e-3 MeV'  # tolerance for comparing tabulated / calculated Q values
             'dThreshold'                 '1e-3 MeV'
@@ -428,7 +430,8 @@ class ReactionSuite(ancestryModule.AncestryIO):
             'failOnException'            False       # if True, crash instead of converting exceptions to warnings
             'cleanUpTempFiles'           True        # remove derived data that was produced during checking
 
-        Currently unused options:
+        Currently unused options::
+
             'checkForEnDepData'         False
             'allowZeroE'                False
             'xCloseEps'                 None
@@ -767,8 +770,8 @@ class ReactionSuite(ancestryModule.AncestryIO):
     def getMassRatio( self ) :
 
         if not hasattr( self, '__massRatio' ):
-            M = self.PoPs[self.target].mass[0].float( 'amu' )
-            m = self.PoPs[self.projectile].mass[0].float( 'amu' )
+            M = self.PoPs[self.target].getMass('amu')
+            m = self.PoPs[self.projectile].getMass('amu')
             self.__massRatio = (M / (M+m))
         return self.__massRatio
 
@@ -818,7 +821,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         If 'channel' is an int, then we assume it's an ENDF MT
 
-        Raises 'KeyError' if specified channel can't be found.
+        Returns None if no matching reaction is found.
         """
 
         # If channel is an int, it might be an ENDF MT, so check those first
@@ -829,7 +832,16 @@ class ReactionSuite(ancestryModule.AncestryIO):
             return None
 
         # translate special channel names:
-        if channel == 'elastic': channel = channel_tr = self.elasticReactionLabel( )
+        if channel == 'elastic':
+            channel = channel_tr = self.elasticReactionLabel( )
+
+            # FIXME we're not dealing with metastables or other aliases very well right now, need to rework this.
+            # special treatment to check for elastic reactions with labels like 'n + Am242_m1' (instead of Am242_e2):
+            if self.target in self.PoPs.aliases:
+                metastableElastic = f"{self.projectile} + {self.target}"
+                if metastableElastic in self.reactions:
+                    channel = channel_tr = metastableElastic
+
         elif channel=='capture': channel_tr='z,gamma'
         else: channel_tr = channel
 
@@ -1059,9 +1071,14 @@ class ReactionSuite(ancestryModule.AncestryIO):
         kwargs = {'reactionSuite': self}
         for external in self.externalFiles:
             # TODO submit proposal to include file type attribute in the externalFile GNDS node so we don't need to run GNDS_fileModule.type
+            if not os.path.exists(external.realpath()):
+                print("  WARNING: skipping externalFile '%s' which points to non-existing file %s." %
+                      (external.label, external.realpath()))
+                continue
             gndsType, metadata = GNDS_fileModule.type(external.realpath())
             if gndsType == covarianceSuiteModule.CovarianceSuite.moniker:
-                covariances.append(covarianceSuiteModule.CovarianceSuite.readXML_file(external.realpath(), **kwargs))
+                external.instance = covarianceSuiteModule.CovarianceSuite.readXML_file(external.realpath(), **kwargs)
+                covariances.append(external.instance)
 
         return covariances
 
@@ -1264,7 +1281,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
         Generate multi-group processed data, including cross sections, weighted multiplicities and Q-values and transfer matrices.
         Processed results will be stored as new forms inside the reactionSuite.
 
-        :param style: fudge.gnds.styles.HeatedMultiGroup instance
+        :param style: fudge.styles.HeatedMultiGroup instance
         :param legendreMax: number of Legendre orders to produce in transfer matrices.
         :param verbosity: verbosity level
         :param indent: indentation level for verbose output
@@ -1724,11 +1741,11 @@ class ReactionSuite(ancestryModule.AncestryIO):
         tabulated pointwise cross sections. Resulting pointwise cross sections are stored
         alongside the original 'resonancesWithBackground' data in the reactionSuite.
 
-        @:param style: style - an instance of style CrossSectionReconstructed.
-        @:param accuracy: float - target accuracy during reconstruction. For example, 0.001.
-        @:param thin: boolean - enable/disable thinning after reconstruction (disabling makes summed cross sections consistency checks easier).
-        @:param significantDigits: int - energy grid will only include points that can be exactly represented using specified number of significant digits.
-        @:param verbose: boolean - turn on/off verbosity
+        :param style: style - an instance of style CrossSectionReconstructed.
+        :param accuracy: float - target accuracy during reconstruction. For example, 0.001.
+        :param thin: boolean - enable/disable thinning after reconstruction (disabling makes summed cross sections consistency checks easier).
+        :param significantDigits: int - energy grid will only include points that can be exactly represented using specified number of significant digits.
+        :param verbose: boolean - turn on/off verbosity
         """
 
         if( self.resonances is None ) : return
@@ -1824,11 +1841,11 @@ class ReactionSuite(ancestryModule.AncestryIO):
         tabulated angular distributions (overwriting original values in the resonance region). Resulting pointwise
         angular distributions are stored alongside the original angular distributions in the reactionSuite.
 
-        @:param styleName: string - label for reconstructed distribution style
-        @:param overwrite: boolean - if style already in use for another distribution, overwrite it with the reconstructed distribution
-        @:param accuracy: float - giving target accuracy during reconstruction. For example, 0.001
-        @:param thin: boolean - enable/disable thinning after reconstruction
-        @:param verbose: boolean - turn on/off verbosity
+        :param styleName: string - label for reconstructed distribution style
+        :param overwrite: boolean - if style already in use for another distribution, overwrite it with the reconstructed distribution
+        :param accuracy: float - giving target accuracy during reconstruction. For example, 0.001
+        :param thin: boolean - enable/disable thinning after reconstruction
+        :param verbose: boolean - turn on/off verbosity
         """
 
         if accuracy is not None: raise NotImplementedError("Refining interpolation grid for angular distributions still TBD")
@@ -1873,7 +1890,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
                             interpolationQualifier=region.interpolationQualifier )
                     newregion.append( region.getAtEnergy( reconstructed.domainMax ) )
                     for val in region:
-                        if( val.value <= reconstructed.domainMax ) : continue
+                        if( val.outerDomainValue <= reconstructed.domainMax ) : continue
                         newregion.append( val )
                     merged.append( newregion )
                     idx += 1
@@ -1915,13 +1932,14 @@ class ReactionSuite(ancestryModule.AncestryIO):
                     removeStyleFromComponent( style, dproduct.averageProductMomentum )
         self.styles.remove( style )
 
-    def saveToHybrid( self, xmlName, hdfName=None, minLength=4, flatten=False, compress=False, **kwargs ):
+    def saveToHybrid( self, xmlName, hdfName=None, hdfSubDir='HDF5', minLength=3, flatten=True, compress=False, **kwargs ):
         """
         Save the reactionSuite to a hybrid layout, with the data hierarchy in xml
         but most actual data saved in an associated HDF file
 
         :param xmlName: file name to save.
         :param hdfName: if None, will be the same as xmlName with extension changed to .h5
+        :param hdfSubDir: if not None, the sub-directoty to add to path hdfName.
         :param minLength: minimum number of values before moving a dataset from XML to HDF
             Need to determine best default setting
         :param flatten: if True, GNDS datasets are concatenated into flattened HDF5 datasets
@@ -1931,18 +1949,24 @@ class ReactionSuite(ancestryModule.AncestryIO):
         """
 
         from . import externalFile as externalFileModule
-        from LUPY import checksums
+
         if not HDF5_present:
             raise ImportError("Missing module 'h5py' must be installed to support generating HDF5 files.")
 
-        if hdfName is None:
-            if not xmlName.endswith('.xml'):
-                hdfName = xmlName + '.h5'
-            else:
-                hdfName = xmlName.replace('.xml','.h5')
+        xmlName = pathlib.Path(xmlName)
 
-        dirname = os.path.dirname(hdfName)
-        if len(dirname) > 0 and not os.path.exists(dirname): os.makedirs(dirname)
+        if hdfName is None:
+            hdfName = xmlName
+            if hdfName.suffix != '.xml':
+                hdfName = hdfName.with_suffix(hdfName.suffix + '.xml')
+            hdfName = hdfName.with_suffix('.h5')
+        else:
+            hdfName = pathlib.Path(hdfName)
+        if hdfSubDir is not None:
+            hdfName = hdfName.parent / hdfSubDir / pathlib.Path(hdfName).name
+
+        if not hdfName.parent.exists():
+            hdfName.parent.mkdir(parents=True)
         with h5py.File(hdfName, "w") as h5:
             HDF_opts = {
                 'h5file': h5,
@@ -1956,10 +1980,15 @@ class ReactionSuite(ancestryModule.AncestryIO):
             if compress:
                 HDF_opts['compression'] = {'compression':'gzip', 'shuffle':'true', 'chunks':True}
 
-            # add filler external file, actual checksum computed below
+            checksumAlgorithm = checksumsModule.Sha1sum
             relHdfName = hdfName
-            if relHdfName == os.path.abspath(relHdfName): relHdfName = os.path.basename(relHdfName)
-            self.externalFiles.add(externalFileModule.ExternalFile("HDF", relHdfName, checksum = "deadbeef", algorithm="sha1"))
+            try:
+                relHdfName = pathlib.Path(hdfName).relative_to(xmlName.parent)
+            except:
+                if relHdfName == relHdfName.resolve():
+                    relHdfName = relHdfName.name
+            # add filler external file, actual checksum computed below
+            self.externalFiles.add(externalFileModule.ExternalFile("HDF", str(relHdfName), checksum = "deadbeef", algorithm=checksumAlgorithm.algorithm))
 
             xmlString = self.toXML_strList( HDF_opts = HDF_opts, **kwargs )
 
@@ -1970,14 +1999,14 @@ class ReactionSuite(ancestryModule.AncestryIO):
                 dData = numpy.array( HDF_opts['dData'], dtype=numpy.float64 )
                 h5.create_dataset('dData', data=dData, **HDF_opts['compression'])
 
-        sha1sum = checksumsModule.Sha1sum.from_file(hdfName)
+        sha1sum = checksumAlgorithm.from_file(hdfName)
         for idx, line in enumerate(xmlString):
             if 'externalFile' in line and 'checksum="deadbeef"' in line:
                 xmlString[idx] = line.replace("deadbeef", sha1sum)
                 break
 
-        dirname = os.path.dirname(xmlName)
-        if len(dirname) > 0 and not os.path.exists(dirname): os.makedirs(dirname)
+        if not xmlName.parent.exists():
+            xmlName.parent.mkdir(parents=True)
         with open( xmlName, "w" ) as fout :
             fout.write( '<?xml version="1.0" encoding="UTF-8"?>\n')
             fout.write( '\n'.join( xmlString ) )
@@ -1991,19 +2020,20 @@ class ReactionSuite(ancestryModule.AncestryIO):
         for reaction in self.reactions : reaction.thermalNeutronScatteringLawTemperatures( temperatures )
         return( temperatures )
 
-    def toXML_strList( self, indent = "", **kwargs ) :
+    def toXML_strList(self, indent="", **kwargs):
         """Returns a list of GNDS/XML strings representing self."""
 
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent
         indent3 = indent2 + incrementalIndent
 
-        formatVersion = kwargs.get( 'formatVersion', self.formatVersion )
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
         if formatVersion in (GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4):
             print('INFO: converting GNDS format from "%s" to "%s".' % (formatVersion, GNDS_formatVersionModule.version_2_0))
             formatVersion = GNDS_formatVersionModule.version_2_0
         kwargs['formatVersion'] = formatVersion
-        if( formatVersion not in GNDS_formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
+        if formatVersion not in GNDS_formatVersionModule.allowed:
+            raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
 
         interaction = self.interaction
         if interaction == enumsModule.Interaction.TNSL:
@@ -2012,22 +2042,22 @@ class ReactionSuite(ancestryModule.AncestryIO):
             % (indent, self.moniker, self.projectile, self.target, self.evaluation, formatVersion, self.projectileFrame, interaction)]
 
         xmlString += self.externalFiles.toXML_strList(indent2, **kwargs)
-        xmlString += self.styles.toXML_strList( indent2, **kwargs )
-        xmlString += self.PoPs.toXML_strList( indent2, **kwargs )
+        xmlString += self.styles.toXML_strList(indent2, **kwargs)
+        xmlString += self.PoPs.toXML_strList(indent2, **kwargs)
 
         if self.resonances is not None:
-            xmlString += self.resonances.toXML_strList( indent2, **kwargs )
+            xmlString += self.resonances.toXML_strList(indent2, **kwargs)
 
-        xmlString += self.reactions.toXML_strList( indent2, **kwargs )
-        xmlString += self.orphanProducts.toXML_strList( indent2, **kwargs )
-        xmlString += self.sums.toXML_strList( indent2, **kwargs )
-        xmlString += self.fissionComponents.toXML_strList( indent2, **kwargs )
-        xmlString += self.productions.toXML_strList( indent2, **kwargs )
+        xmlString += self.reactions.toXML_strList(indent2, **kwargs)
+        xmlString += self.orphanProducts.toXML_strList(indent2, **kwargs)
+        xmlString += self.sums.toXML_strList(indent2, **kwargs)
+        xmlString += self.fissionComponents.toXML_strList(indent2, **kwargs)
+        xmlString += self.productions.toXML_strList(indent2, **kwargs)
         xmlString += self.incompleteReactions.toXML_strList(indent2, **kwargs)
         xmlString += self.applicationData.toXML_strList(indent2, **kwargs)
 
-        xmlString.append( '%s</%s>' % ( indent, self.moniker ) )
-        return( xmlString )
+        xmlString.append('%s</%s>' % (indent, self.moniker))
+        return xmlString
 
     def toString( self, indent = '' ) :
         """Returns a string representation of an reactionSuite."""
@@ -2050,9 +2080,10 @@ class ReactionSuite(ancestryModule.AncestryIO):
         numberOfBrokenLinksToPrint = kwargs.get('numberOfBrokenLinksToPrint', 5)
 
         try :
-            sourcePath = kwargs.get( 'sourcePath' )
-            if( not( isinstance( sourcePath, str ) ) ) : sourcePath = sourcePath.name
-            path = os.path.dirname( sourcePath )
+            sourcePath = kwargs.get('sourcePath', './')     # This (i.e., './') may not be the correct default.
+            if not isinstance(sourcePath, str):
+                sourcePath = sourcePath.name
+            path = os.path.dirname(sourcePath)
 
             formatVersion = node.get( 'format' )
             kwargs['formatVersion'] = formatVersion
@@ -2134,7 +2165,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
             try :
                 if quant.path.startswith( '/' + ReactionSuite.moniker ) :
                     quant.link = quant.follow( rs )
-                elif quant.path.startswith( '/covarianceSuite' ) :
+                elif quant.root:
                     rs._externalLinks.append( quant )
                 else:   # relative link
                     quant.link = quant.follow( quant )

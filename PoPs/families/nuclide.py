@@ -146,11 +146,12 @@ class Particle( particleModule.Particle ) :
 
         return( XMLStringList )
 
-    def getMass( self, unit ) :
+    def getMass(self, unit):
 
-        if( len( self.mass ) > 0 ) : return( self.mass[0].float( unit ) )
-        if( self.index == 0 ) : raise Exception( 'Recursion detected as group-state does not have a mass: ID = %s.' % self.id )
-        return( self.ancestor[0].mass[0].float( unit ) + self.energy[0].float( unit + ' * c**2' ) )
+        if len(self.mass) > 0: return self.mass[0].float(unit)
+        if self.index == 0:
+            raise Exception('Recursion detected as ground-state does not have a mass: ID = %s.' % self.id)
+        return self.ancestor[0].mass[0].float(unit) + self.energy[0].float(unit + ' * c**2')
 
     def parseExtraXMLElement(self, element, xPath, linkData, **kwargs):
 

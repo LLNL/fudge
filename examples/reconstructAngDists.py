@@ -86,7 +86,7 @@ if __name__ == "__main__":
                     if x.outerDomainValue > Emax:
                         newDist.append(x)
             elif isinstance(originalDist, angularModule.Regions2d):
-                newRegions = angularModule.Regions2d()
+                newRegions = angularModule.Regions2d(axes=originalDist.axes)
                 newRegions.append(newDist)
                 for region in originalDist:
                     if region.domainMax <= newDist.domainMax:

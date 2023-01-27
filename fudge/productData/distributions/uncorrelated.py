@@ -148,35 +148,54 @@ class Form( baseModule.Form ) :
         aveEnergy, aveMomentum = calculateAverageProductData( self.productFrame, self.angularSubform.data, self.energySubform.data, style, indent, **kwargs )
         return( [ aveEnergy ], [ aveMomentum ] )
 
-    def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
+    def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
+        '''
+        Returns the energy spectrum at projectile energy *energyIn* in frame *frame*. Currently,
+        if frame='lab' and the product is a photon then its data are treated as being in the lab frame.
+        The domain of angular integration can be set with the muMin and muMax keys in *kwargs*. Default angular integration
+        is from -1 to 1.
+        '''
 
-        class AngualarAtEnergyCOM :
+        class AngualarAtEnergyCOM:
 
-            def __init__( self, angular ) :
+            def __init__(self, angular):
 
                 self.angular = angular
 
-            def probabilityCOM( self, energyPrimeCOM, muCOM ) :
+            def probabilityCOM(self, energyPrimeCOM, muCOM):
 
-                return( self.angular.evaluate( muCOM ) )
+                return self.angular.evaluate(muCOM)
 
-        if( self.productFrame == frame ) : return( self.energySubform.data.energySpectrumAtEnergy( energyIn ) )
+        muMin = kwargs.get('muMin', -1.0)
+        muMax = kwargs.get('muMax',  1.0)
+
+        if self.productFrame == frame:
+            energySpectrum = self.energySubform.data.energySpectrumAtEnergy(energyIn)
+            if muMin != -1.0 or muMax != 1.0:
+                energySpectrum *= self.angularSubform.data.evaluate(energyIn).integrate(domainMin=muMin, domainMax=muMax)
+            return energySpectrum
 
         if self.productFrame == xDataEnumsModule.Frame.lab:
-            TypeError( 'Lab to center-of-mass translation not supported.' )
+            TypeError('Lab to center-of-mass translation not supported.')
 
-        if( self.product.pid != IDsPoPsModule.photon ) :
-            energyProbabilityAtEnergy = self.energySubform.data.evaluate( energyIn )
-            angularProbabilityAtEnergy = self.angularSubform.data.evaluate( energyIn )
-            xys2d = miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energyProbabilityAtEnergy, 
-                    AngualarAtEnergyCOM( angularProbabilityAtEnergy ) )
-            data = [ [ xys1d.outerDomainValue, xys1d.integrate() ] for xys1d in xys2d ]
-            return( energyModule.XYs1d( data = data, axes = energyModule.defaultAxes( self.domainUnit ) ) )
-        else :                          # Ignore centerOfMass corrections for photons, for now anyway.
-            return( self.energySubform.data.energySpectrumAtEnergy( energyIn ) )
+        if self.product.pid != IDsPoPsModule.photon:
+            energyProbabilityAtEnergy = self.energySubform.data.evaluate(energyIn)
+            angularProbabilityAtEnergy = self.angularSubform.data.evaluate(energyIn)
+            xys2d = miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy(self, energyIn, energyProbabilityAtEnergy, 
+                    AngualarAtEnergyCOM(angularProbabilityAtEnergy))
+            data = [[xys1d.outerDomainValue, xys1d.integrate(domainMin=muMin, domainMax=muMax)] for xys1d in xys2d]
+            return energyModule.XYs1d(data=data, axes=energyModule.defaultAxes(self.domainUnit))
+        else:                          # Ignore centerOfMass corrections for photons, for now anyway.
+            energySpectrum = self.energySubform.data.energySpectrumAtEnergy(energyIn)
+            if muMin != -1.0 or muMax != 1.0:
+                energySpectrum *= self.angularSubform.data.evaluate(energyIn).integrate(domainMin=muMin, domainMax=muMax)
+            return energySpectrum
 
-    def getSpectrumAtEnergy( self, energy ) :
-        """Returns the energy spectrum for self at projectile energy."""
+    def getSpectrumAtEnergy(self, energy):
+        '''
+        This method is deprecated, please use energySpectrumAtEnergy instead.
+        Returns the energy spectrum for self at projectile energy in the lab frame.
+        '''
 
         return self.energySpectrumAtEnergy(energy, xDataEnumsModule.Frame.lab)
 

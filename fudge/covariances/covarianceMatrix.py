@@ -421,52 +421,60 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
 
         return CovarianceMatrix( self.label, self.type, self.matrix.copy(), self.productFrame )
 
-    def check( self, info ): 
-        """Check if uncertainty in the bounds passed into the checker.  
-        Requires specification of the data ("theData") if the covariance is not relative.
-        I was not creative when I coded this, so it will fail when theData.getValue( x )
-        doesn't exist or is a function of more than one value. """
+    def check(self, info):
+        """Check if relative uncertainty is in the bounds passed into the checker,
+        and checks for negative eigenvalues or other issues."""
 
         from fudge import warning
         warnings = []
 
-        if self.isSymmetric() and info['checkUncLimits']:
-            A = self.matrix.array.constructArray()
-            relative = self.type == covarianceEnumsModule.Type.relative
-            if relative:
-                varMin = info['minRelUnc']*info['minRelUnc']
-                varMax = info['maxRelUnc']*info['maxRelUnc']
-            for idx in range( A.shape[0] ):
-                if not relative:
-                    if info['theData'] is not None:
-                        uncMin = info['minRelUnc'] * info['theData'].getValue(
-                                0.5*(self.axes[2].grid[idx]+self.axes[2].grid[idx+1]) )
-                        uncMax = info['maxRelUnc'] * info['theData'].getValue(
-                                0.5*(self.axes[2].grid[idx]+self.axes[2].grid[idx+1]) )
-                        varMin = uncMin*uncMin
-                        varMax = uncMax*uncMax
-                    else:
-                        #warnings.append( "WARNING: can't check absolute uncertainties without data to compare to!\n" )
-                        break
-                if varMin <= A[idx, idx] <= varMax:
-                    pass                                    # unc is where is should be
-                elif varMin >= A[idx,idx]:                  # uncertainty too small
-                    warnings.append( warning.VarianceTooSmall( idx, A[idx,idx], self ) )
-                else:                                       # uncertainty too big
-                    warnings.append( warning.VarianceTooLarge( idx, A[idx,idx], self ) )
+        try:
+            columnData = self.findAttributeInAncestry('columnData')
+        except:
+            columnData = None
 
-            # FIXME: is this the right place for eigenvalue checks? They used to live in fudge.core.math.matrix,
-            # but that no longer exists
-            vals, vecs = numpy.linalg.eigh( A )
-            if min(vals) < info['negativeEigenTolerance']:
-                warnings.append( warning.NegativeEigenvalues( len(vals[vals<0]), min(vals), self ))
-            minpos, maxpos = min(vals[vals>=0]),max(vals[vals>=0])
-            # Check that the condition number of the matrix is reasonable
-            if A.size != 1 and minpos/maxpos < info['eigenvalueRatioTolerance']:
-                warnings.append( warning.BadEigenvalueRatio( minpos/maxpos, self ) )
+        if columnData is not None or not info['checkUncLimits']:
+            return warnings
+
+        # run eigenvalue checks on original matrix, relative or absolute:
+        A = self.matrix.array.constructArray()
+        vals, vecs = numpy.linalg.eigh(A)
+        if min(vals) < info['negativeEigenTolerance']:
+            warnings.append(warning.NegativeEigenvalues(len(vals[vals < 0]), min(vals), self))
+
+        # Check that the condition number of the matrix is reasonable
+        # FIXME disabled this warning for now. Better option: add severity to each warning and make this low severity
+        """
+        minpos, maxpos = min(vals[vals >= 0]), max(vals[vals >= 0])
+        if A.size != 1 and minpos / maxpos < info['eigenvalueRatioTolerance']:
+            warnings.append(warning.BadEigenvalueRatio(minpos / maxpos, self))
+        """
+
+        if self.type is not covarianceEnumsModule.Type.relative:
+            # FIXME next line skips testing PFNS covariances
+            rowData = self.findAttributeInAncestry('rowData')
+            if not hasattr(rowData.link, 'toPointwise_withLinearXYs'):
+                return warnings
+
+        relativeMatrix = self.toRelative()
+
+        Arr = relativeMatrix.matrix.array.constructArray()
+        relativeUncertainty = numpy.sqrt(Arr.diagonal())
+
+        minUnc = info['minRelUnc']
+        maxUnc = info['maxRelUnc']
+        for idx, uncert in enumerate(relativeUncertainty):
+            if minUnc <= uncert <= maxUnc:
+                pass  # uncertainty where it should be
+            elif uncert < minUnc:
+                warnings.append(warning.VarianceTooSmall(
+                    idx, relativeUncertainty=uncert, absoluteUncertainty=None, obj=self))
+            else:
+                warnings.append(warning.VarianceTooLarge(
+                    idx, relativeUncertainty=uncert, absoluteUncertainty=None, obj=self))
 
         return warnings
-    
+
     def fix( self, **kw ): 
         """Fix uncertainty using the bounds passed into the fixer.
         Requires specification of the data ("theData") if the covariance is not relative.

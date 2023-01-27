@@ -57,7 +57,8 @@ decayParticles = {  0 : IDsPoPsModule.photon,
                     7 : IDsPoPsModule.proton,
                     8 : IDsPoPsModule.electron,
                     9 : IDsPoPsModule.photon,
-                   10 : None }
+                   10 : IDsPoPsModule.electronAntiNeutrino,
+                   11 : IDsPoPsModule.electronNeutrino }
 
 STYPProduct = { 0 : spectrumModule.gammaProduct,
                 1 : spectrumModule.betaMinusProduct,
@@ -65,9 +66,11 @@ STYPProduct = { 0 : spectrumModule.gammaProduct,
                 4 : spectrumModule.alphaProduct,
                 5 : spectrumModule.neutronProduct,
                 6 : spectrumModule.SFProduct,
-                7 : spectrumModule.protronProduct,
+                7 : spectrumModule.protonProduct,
                 8 : spectrumModule.discreteElectronProduct,
-                9 : spectrumModule.xRayProduct }
+                9 : spectrumModule.xRayProduct,
+               10 : spectrumModule.antiNeutrinoProduct,
+               11 : spectrumModule.neutrinoProduct }
 
 def addProductToDecayMode( info, decayMode, decayParticleID, RFS = 0, lastDecayMode = False ) :
 
@@ -210,10 +213,11 @@ def addContinuumSpectrum( decayModes, RTYP_key, decayParticleIndex, regions, cov
         spectrum = spectra[decayParticleLabel]
 
     if( len( regions ) == 1 ) :
-        data = XYs1dModule.XYs1d( regions[0], axes = spectrumModule.Continuum.defaultAxes( energyUnit ) )
+        data = regions[0]
+        data.axes = spectrumModule.Continuum.defaultAxes(energyUnit)
     else :
         print( "len( regions ) > 1" )
-        return
+        raise NotImplementedError("Continuum spectrum with multiple interpolation regions")
     continuum = spectrumModule.Continuum( data )
     spectrum.append( continuum )
 
@@ -348,12 +352,13 @@ def ITYPE_4( MTDatas, info, verbose = 0 ) :
 
                                                     # LCON determines whether continuum spectra given: LCON 0: discrete only, 1: continuous only, 2: both
             for i1 in range( NSP ) :                # Iterate over spectra
-                initialDecay, otherDecays, STYP_key = getRTYP( MT457MF8Data[dataIndex], 11 )
-                dum, STYP, LCON, zero, six, NER = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MT457MF8Data[dataIndex], intIndices = [2, 3, 4, 5])
+                zero, STYP, LCON, LCOV, six, NER = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MT457MF8Data[dataIndex], intIndices = [2, 3, 4, 5])
                 dataIndex += printInfo( verbose, dataIndex, MT457MF8Data )
-                STYP = initialDecay
-                specType = decayType[STYP]
 
+                if zero != 0 or six != 6:
+                    print("    WARNING: unexpected value for spectrum header on line %d of MF8 MT457" % dataIndex)
+
+                # FIXME following values are unused. Could check against spectra and warn if they aren't consistent?
                 FD, dFD, ERave, dERave, FC, dFC = endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(MT457MF8Data[dataIndex]) # FD: discrete normalization, FC: continuum norm., ERave: average decay energy
                 dataIndex += printInfo( verbose, dataIndex, MT457MF8Data )
 

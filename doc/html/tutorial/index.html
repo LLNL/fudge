@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Fudge Tutorial &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>The Fudge Tutorial &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="../gnds.html" title="Generalized Nuclear Data (GNDS)"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">The Fudge Tutorial</a></li> 
       </ul>
     </div>  
@@ -45,14 +46,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="the-fudge-tutorial">
+  <section id="the-fudge-tutorial">
 <h1>The Fudge Tutorial<a class="headerlink" href="#the-fudge-tutorial" title="Permalink to this headline">¶</a></h1>
 <dl class="field-list simple">
-<dt class="field-odd">Release</dt>
-<dd class="field-odd"><p>5.0</p>
+<dt class="field-odd">Release<span class="colon">:</span></dt>
+<dd class="field-odd"><p>6.1</p>
 </dd>
-<dt class="field-even">Date</dt>
-<dd class="field-even"><p>Aug 31, 2022</p>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>Jan 27, 2023</p>
 </dd>
 </dl>
 <p>The Generalized Nuclear Database Structure (GNDS) has been accepted by the international
@@ -75,11 +76,11 @@ in a transport code;</p></li>
 </ul>
 </div></blockquote>
 <p>I will assume throughout this tutorial that you have correctly installed fudge
-(see <a class="reference internal" href="../installation.html#installation"><span class="std std-ref">Installation</span></a> if you haven’t), the Python scripting language (version 2.7.x or 3.6.x and later)
+(see <a class="reference internal" href="../installation.html#installation"><span class="std std-ref">Installation</span></a> if you haven’t), the Python scripting language (version 3.7 and later)
 and the Python extensions numpy and matplotlib.  I will also assume that you have working knowledge
 of the Python scripting language and that you are involved in nuclear data enterprise in
 some fashion (so I don’t have to define things like “evaluation”).</p>
-<p>Let’s begin with the most important thing.  Make sure fudge is in your PYTHONPATH!
+<p>Let’s begin with the most important thing: if you installed FUDGE using the Makefile, make sure fudge is in your PYTHONPATH!
 You can do this a few different ways, depending on what shell you use.</p>
 <blockquote>
 <div><ul class="simple">
@@ -101,14 +102,15 @@ $ import sys
 $ sys.path.append(“/full/path/to/directory/containing/fudge”)</p></li>
 </ul>
 </div></blockquote>
-<p>With that settled, you can start with the section on translating between ENDF and GNDS.</p>
+<p>You can skip this step if you installed using pip, although you may need to activate a Python environment.
+With that settled, you can start with the section on translating between ENDF and GNDS.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If you find yourself lost, the Python interpretor has excellent built-in help
 (just type <code class="docutils literal notranslate"><span class="pre">help(</span> <span class="pre">object</span> <span class="pre">)</span></code> to learn about an object.  Then, of course, there
 is the Fudge Documentation itself which should have been included with your
 Fudge installation in <code class="docutils literal notranslate"><span class="pre">doc/html/index.html</span></code>.</p>
-</div>
+</aside>
 <p><strong>Contents:</strong></p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -120,7 +122,7 @@ Fudge installation in <code class="docutils literal notranslate"><span class="pr
 <li class="toctree-l1"><a class="reference internal" href="other-examples.html">6. Other Fudge Examples</a></li>
 </ul>
 </div>
-</div>
+</section>
 
 
             <div class="clearer"></div>
@@ -174,7 +176,7 @@ Fudge installation in <code class="docutils literal notranslate"><span class="pr
         <li class="right" >
           <a href="../gnds.html" title="Generalized Nuclear Data (GNDS)"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">The Fudge Tutorial</a></li> 
       </ul>
     </div>

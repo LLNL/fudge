@@ -19,6 +19,8 @@ energyUnitDefault = "MeV"
 
 from argparse import ArgumentParser
 
+summaryDocStringFUDGE = '''Adds a multi-group boundary definition (i.e., label and the multi-group boundaries) to a groups file (e.g., groups.xml).'''
+
 description = """Read a list of energy boundaries from a specified file or the command line, and adds it to a multi-group file."""
 
 parser = ArgumentParser( description = description )

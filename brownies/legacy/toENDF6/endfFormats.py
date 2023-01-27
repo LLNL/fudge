@@ -7,6 +7,8 @@
 
 """Routines for writing an ENDF file"""
 
+import math
+
 from pqu import PQU as PQUModule
 
 from xData import XYs1d as XYs1dModule
@@ -14,55 +16,80 @@ from xData import regions as regionsModule
 
 useRedsFloatFormat = False
 
-def floatToFunky( valueIn ) :
+def floatToFunky(valueIn, crossSectionData=False):
 
-    value = float( valueIn )
-    if( ( value != 0.0 ) and ( abs( value ) < 1e-99 ) ) :
-        if( value < 0.0 ) :
+    value = float(valueIn)
+    if value != 0.0 and abs(value) < 1e-99:
+        if value < 0.0:
             s = '%11.4e' % value
-        else :
+        else:
             s = '%12.5e' % value
-        s = s.replace( 'e', '' )
-    elif( useRedsFloatFormat ) :
-        s, floatStr_Orig = floatToFunky2( value )
-    else :
+        s = s.replace('e', '')
+    elif useRedsFloatFormat:
+        s, floatStr_Orig = floatToFunky2(value, crossSectionData=crossSectionData)
+    else:
         s = '%13.6e' % value
-        sValue = float( s )
-        if s[ 11 ] == '0' :
+        sValue = float(s)
+        if s[ 11 ] == '0':
             s = s[:9] + s[10] + s[-1]
-        else :
+        else:
             s = '%12.5e' % value
-            sValue = float( s )
-            s = s.replace( 'e', '' )
-        if( abs( sValue - value ) > abs( 1e-11 * value ) ) :
-            floatStr, floatStr_Orig = floatToFunky2( value )
-            if( float( sValue ) != float( floatStr_Orig ) ) : s = floatStr
-    return( s )
+            sValue = float(s)
+            s = s.replace('e', '')
+        if abs(sValue - value) > abs(1e-11 * value):
+            floatStr, floatStr_Orig = floatToFunky2(value)
+            if float(sValue) != float(floatStr_Orig):
+                s = floatStr
+    return(s)
 
-def floatToFunky2( value ) :
+def floatToFunky2(value, crossSectionData=False):
 
     floatStr = '%13.6e' % value
     floatStr_Orig = floatStr
-    valueStr = '%.12g' % value
-    valueStrLength = len( valueStr )
+
+    useRedsFloatFormatLocal = useRedsFloatFormat
+
+    absValue = abs(value)
+    if useRedsFloatFormatLocal and 1e-1 < absValue < 9.9e7:
+        digit = 8 - int(math.log10(absValue))
+        if crossSectionData and value > 0:
+            digit += 1
+        fmt = '%%.%df' % digit
+        valueStr = fmt % value
+        for index in range(len(valueStr) - 1, 0,  -1):
+            if valueStr[index] != '0':
+                break
+        valueStr = valueStr[:index+1]
+        if valueStr[-1] == '.':
+            valueStr = valueStr[:-1]
+    else:
+        useRedsFloatFormatLocal = False
+        valueStr = '%.12g' % value
+    valueStrLength = len(valueStr)
     eNotInStrValue = 'e' not in valueStr
-    if( useRedsFloatFormat and eNotInStrValue ) : valueStr = valueStr[:10]
     length = 10
-    if( value < 0.0 ) : length = 11                             # Allow for '-' sign.
-    if( ( valueStrLength == length+1 ) and valueStr[:2] == '0.' ) :
+    if useRedsFloatFormatLocal and eNotInStrValue:
+        if crossSectionData:
+            valueStr = valueStr[:11]
+            length = 11
+        else:
+            valueStr = valueStr[:10]
+    if value < 0.0:
+        length = 11                                         # Allow for '-' sign.
+    if valueStrLength == length+1 and valueStr[:2] == '0.':
         valueStr = valueStr[1:]     # some ENDF-VIII evaluations store numbers like '.700842459'
         valueStrLength -= 1
-    if( ( valueStrLength <= length ) and eNotInStrValue ) :
-        floatStr = valueStr.rjust( 11 )
+    if valueStrLength <= length and eNotInStrValue:
+        floatStr = valueStr.rjust(11)
         floatStr_Orig = floatStr
-    elif( floatStr[11] == '0' ) :
+    elif floatStr[11] == '0':
         floatStr = floatStr[:9] + floatStr[10] + floatStr[-1]
-    else :
+    else:
         floatStr = '%12.5e' % value
         floatStr_Orig = floatStr
-        floatStr = floatStr.replace( 'e', '' )
-    return( floatStr, floatStr_Orig )
+        floatStr = floatStr.replace('e', '')
 
+    return floatStr, floatStr_Orig
 
 def endfContLine( C1, C2, L1, L2, N1, N2 ) :
     """This is the basic 'control' line in ENDF."""
@@ -121,21 +148,27 @@ def endfComment( text, MAT, MF, MT, NS ) :
 
     return( '%66s%4d%2d%3d%5d' % ( text, MAT, MF, MT, NS ) )
 
-def endfDataLine( data ) :
+def endfDataLine(data, crossSectionData=False):
     """Makes one ENDF data line."""
 
-    dData = dataListToSupportDimensionlessPQ( data )
+    dData = dataListToSupportDimensionlessPQ(data)
     s = ''
-    for d in dData : s += floatToFunky( d )
-    return ( "%-66s" % ( s ) )
+    evenIndex = True
+    for d in dData:
+        s += floatToFunky(d, crossSectionData=crossSectionData and evenIndex)
+        evenIndex = not evenIndex
 
-def endfDataList( data ) :
+    return "%-66s" % s
+
+def endfDataList(data, crossSectionData=False):
     """Writes the data in ENDF format."""
 
-    dData = dataListToSupportDimensionlessPQ( data )
+    dData = dataListToSupportDimensionlessPQ(data)
     dataOut = []
-    for i1 in range( 0, len( dData ), 6 ): dataOut.append( endfDataLine( dData[i1:i1+6] ) )
-    return( dataOut )
+    for i1 in range(0, len(dData), 6):
+        dataOut.append(endfDataLine(dData[i1:i1+6], crossSectionData=crossSectionData))
+
+    return dataOut
 
 def endfNdDataList( nDdata, xUnit = 'eV', yUnit = '' ) :
 

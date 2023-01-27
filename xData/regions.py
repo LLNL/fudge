@@ -75,11 +75,13 @@ class Regions( baseModule.XDataFunctional ) :
         region.setAncestor( self )
         region.index = index
 
-    def __add__( self, other ) :
+    def __add__(self, other):
 
-        self2, other2 = self.copyToCommonRegions( other )
-        for i1, region in enumerate( self2 ) : self2[i1] = region + other2[i1]
-        return( self2 )
+        self2, other2 = self.copyToCommonRegions(other)
+        for i1, region in enumerate(self2):
+            self2[i1] = region + other2[i1]
+
+        return self2
 
     __radd__ = __add__
 
@@ -138,24 +140,36 @@ class Regions( baseModule.XDataFunctional ) :
 
         return( "function%dds" % self.dimension )
 
-    def append( self, region ) :
+    def append(self, curve):
+        '''
+        Appends *curve* to the end of *self*. If *curve* is a **Regions** instance, then **append** is call for each region in curve.
+        '''
 
-            self[len( self )] = region
+        if isinstance(curve, Regions):
+            for region in curve:
+                self[len(self)] = region.copy()
+        else:
+            self[len(self)] = curve
 
-    def prepend( self, region ) :
-        """
-        Adds region to the beginning of regions.
-        """
+    def prepend(self, curve):
+        '''
+        Prepends *curve* to the beginning of *self*. If *curve* is a **Regions** instance, then **append** is call for each region in curve.
+        '''
 
-        if( not( isinstance( region, self.allowedSubElements( ) ) ) ) : raise TypeError( 'Invalid class for insertion: %s' % region.__class__ )
+        if isinstance(curve, Regions):
+            for index in range(len(curve), 0, -1):
+                self.prepend(curve[index].copy())
+        else:
+            if not isinstance(curve, self.allowedSubElements()):
+                raise TypeError('Invalid class for insertion: %s' % region.__class__)
 
-        if( len( self ) > 0 ) :
-            if( not math.isclose( region.domainMax( ), self[0].domainMin ) ) :
-                raise ValueError( "Prepending region's domainMax %s != first region's domainMin = %s" % ( region.domainMax, self[0].domainMin ) )
+            if len(self) > 0:
+                if not math.isclose(curve.domainMax, self[0].domainMin):
+                    raise ValueError('''Prepending region's domainMax %s != first region's domainMin = %s''' % (region.domainMax, self[0].domainMin))
 
-        self.__regions.insert( 0, region )
-        region.setAncestor( self )
-        region.index = 0
+            self.__regions.insert(0, curve)
+            curve.setAncestor(self)
+            curve.index = 0
 
     def convertUnits( self, unitMap ) :
 
@@ -171,6 +185,17 @@ class Regions( baseModule.XDataFunctional ) :
         newRegions = self.__class__( axes = axes, index = self.index, valueType = self.valueType, outerDomainValue = self.outerDomainValue, label = self.label )
         for child in self : newRegions.append( child.copy( ) )
         return( newRegions )
+
+    def hasData(self):
+        '''
+        Returns True if one of self's regions hasData returns True and False otherwise.
+        '''
+
+        for region in self:
+            if region.hasData():
+                return True
+
+        return False
 
     def splitInTwo( self, domainValue, epsilon = domainEpsilon ) :
         """
@@ -388,82 +413,100 @@ class Regions1d( Regions ) :
 
         return( _regions1d )
 
-    def copyToCommonRegions( self, other, epsilon = domainEpsilon ) :
+    def copyToCommonRegions(self, other, epsilon = domainEpsilon):
         """
         Returns two regions instances that are copies of self and other but with regions added as
         needed so that each has the same number of regions and the region boundaries align.
         """
 
-        if( self.dimension != other.dimension ) : raise ValueError( 'self.dimension = %s not equal to other.dimension = %s' % \
-                ( self.dimension, other.dimension ) )
+        if self.dimension != other.dimension:
+            raise ValueError('self.dimension = %s not equal to other.dimension = %s' % (self.dimension, other.dimension))
 
-        self2 = self.copy( )
-        other2 = other.copy( )
-        if( isinstance( other2, XYs1dModule.XYs1d ) ) :
-            temp = self.__class__( )
-            temp.append( other2 )
+        self2 = self.copy()
+        other2 = other.copy()
+
+        if isinstance(other2, XYs1dModule.XYs1d):
+            temp = self.__class__()
+            temp.append(other2)
             other2 = temp 
-        elif( not( isinstance( other2, Regions ) ) ) :
-            raise NotImplementedError( 'object of instance "%s" not implemented' % other2.__class__ )
+        elif not isinstance(other2, Regions):
+            raise NotImplementedError('object of instance "%s" not implemented' % other2.__class__)
 
-        if(   self2.domainMin < other2.domainMin ) :
-            region1 = other2[0].copy( )
-            region1.setData( [ [ self2.domainMin, 0 ], [ other2.domainMin, 0 ] ] )
-            other2.prepend( region1 )
-        elif( self2.domainMin > other2.domainMin ) :
-            region1 = self2[0].copy( )
-            region1.setData( [ [ other2.domainMin, 0 ], [ self2.domainMin, 0 ] ] )
-            self2.prepend( region1 )
+        if   self2.domainMin < other2.domainMin:
+            region1 = other2[0].copy()
+            region1.setData([[self2.domainMin, 0], [other2.domainMin, 0]])
+            other2.prepend(region1)
+        elif self2.domainMin > other2.domainMin:
+            region1 = self2[0].copy()
+            region1.setData([[other2.domainMin, 0], [self2.domainMin, 0]])
+            self2.prepend(region1)
 
-        if(   self2.domainMax > other2.domainMax ) :
-            region1 = other2[-1].copy( )
-            region1.setData( [ [ other2.domainMax, 0 ], [ self2.domainMax, 0 ] ] )
-            other2.append( region1 )
-        elif( self2.domainMax < other2.domainMax ) :
-            region1 = self2[-1].copy( )
-            region1.setData( [ [ self2.domainMax, 0 ], [ other2.domainMax, 0 ] ] )
-            self2.append( region1 )
+        if   self2.domainMax > other2.domainMax:
+            region1 = other2[-1].copy()
+            region1.setData([[other2.domainMax, 0], [self2.domainMax, 0]])
+            other2.append(region1)
+        elif self2.domainMax < other2.domainMax:
+            region1 = self2[-1].copy()
+            region1.setData([[self2.domainMax, 0], [other2.domainMax, 0]])
+            self2.append(region1)
 
-        boundaries = set( )
-        for region in self2[1:] : boundaries.add( region.domainMin )
-        for region in other2[1:] : boundaries.add( region.domainMin )
-        boundaries = sorted( boundaries )
+        boundaries = set()
+        for region in self2[1:]:
+            boundaries.add(region.domainMin)
+        for region in other2[1:]:
+            boundaries.add(region.domainMin)
+        boundaries = sorted(boundaries)
 
         count = 0
         priorBoundary = None
         boundariesToMove = []
-        for boundary in boundaries :
-            if( priorBoundary is not None ) :
-                if( ( boundary - priorBoundary ) < epsilon * max( abs( boundary ), abs( priorBoundary ) ) ) :
-                    boundariesToMove.append( [ boundary, priorBoundary ] )
+        for boundary in boundaries:
+            if priorBoundary is not None:
+                if (boundary - priorBoundary) < epsilon * max(abs(boundary), abs(priorBoundary)):
+                    boundariesToMove.append([boundary, priorBoundary])
                     boundary = priorBoundary
                     count += 1
-                    if( count > 1 ) : raise ValueError( 'more than one boundary within epsilon = %s of %s' % ( epsilon, priorBoundary ) )
-                else :
+                    if count > 1:
+                        raise ValueError('more than one boundary within epsilon = %s of %s' % (epsilon, priorBoundary))
+                else:
                     count = 0
             priorBoundary = boundary
 
-        for boundary, priorBoundary in boundariesToMove : boundaries.remove( boundary )
+        for boundary, priorBoundary in boundariesToMove:
+            boundaries.remove(boundary)
 
-        def processBoundaries( regions_, boundaries, boundariesToMove ) :
+        def processBoundaries(regions_, boundaries, boundariesToMove):
 
-            for region in regions_ :
+            for region in regions_:
                 domainMin, domainMax = region.domainMin, region.domainMax
-                for boundary, priorBoundary in boundariesToMove :
-                    if(   domainMin == boundary ) :
-                        region.tweakDomain( domainMin = priorBoundary, epsilon = epsilon )
-                    elif( domainMax == boundary ) :
-                        region.tweakDomain( domainMax = priorBoundary, epsilon = epsilon )
+                for boundary, priorBoundary in boundariesToMove:
+                    if   domainMin == boundary:
+                        region.tweakDomain(domainMin = priorBoundary, epsilon = epsilon)
+                    elif domainMax == boundary:
+                        region.tweakDomain(domainMax = priorBoundary, epsilon = epsilon)
 
-            for boundary in boundaries :
-                for region in regions_ :
-                    if( region.domainMin < boundary < region.domainMax ) :
-                        regions_.splitInTwo( boundary, epsilon = epsilon )
+            for boundary in boundaries:
+                for region in regions_:
+                    if region.domainMin < boundary < region.domainMax:
+                        regions_.splitInTwo(boundary, epsilon = epsilon)
                         break
 
-        processBoundaries( self2, boundaries, boundariesToMove )
-        processBoundaries( other2, boundaries, boundariesToMove )
-        return( self2, other2 )
+        if len(boundaries) > 0:
+            processBoundaries(self2, boundaries, boundariesToMove)
+            processBoundaries(other2, boundaries, boundariesToMove)
+
+        return self2, other2
+
+    def copyDataToXsAndYs(self):
+        '''Copies data in regions to a list of xs and ys. Only works if each has  "copyDataToXsAndYs" method.'''
+
+        xs = []
+        ys = []
+        for region in self:
+            subXs, subYs = region.copyDataToXsAndYs()
+            xs += subXs
+            ys += subYs
+        return xs, ys
 
     def normalize( self, insitu = False, dimension = 1 ) :
         """
@@ -572,6 +615,14 @@ class Regions1d( Regions ) :
     def allowedSubElements( ) :
 
         return( ( XYs1dModule.XYs1d, series1dModule.Series1d ) )
+
+    @staticmethod
+    def multiPlot(curve1ds, **kwargs):
+        '''
+        Plots a list of 1d curves on the same plot. Uses each curve's 'plotLabel' as the legend key. Each curve must have a copyDataToXsAndYs method.
+        '''
+
+        XYs1dModule.XYs1d.multiPlot(curve1ds, **kwargs)
 
 class RegionsMultiD( Regions ) :
 

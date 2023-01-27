@@ -12,7 +12,7 @@ from LUPY import subprocessing as subprocessingModule
 from LUPY import times as timesModule
 from fudge.processing.deterministic import transferMatrices as transferMatricesModule
 
-def SnElasticUpScatter( style, tempInfo, comment = None ) :
+def SnElasticUpScatter(style, tempInfo, comment=None):
     """
     Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
     If the distribution is actually made up of two different forms in different energy regions, this function
@@ -22,31 +22,36 @@ def SnElasticUpScatter( style, tempInfo, comment = None ) :
     logFile = tempInfo['logFile']
     workDir = 'upscatter.work'
     
-    if( not os.path.exists(workDir)) : os.mkdir(workDir)
+    if not os.path.exists(workDir):
+        os.mkdir(workDir)
     projectileGroupBoundaries = tempInfo['groupBoundaries']
-    s = '\n'.join(transferMatricesModule.GBToString( 'Projectile', projectileGroupBoundaries, None ).split()[8:])  ### exclude some header stuff we dont want to parse in C
-    dataFile = open( '%s/groupStructure.dat'%workDir, 'w' )
-    dataFile.write( s )
-    dataFile.close( )
+    s = '\n'.join(transferMatricesModule.GBToString('Projectile', projectileGroupBoundaries, None).split()[8:])  ### exclude some header stuff we dont want to parse in C
+    dataFile = open('%s/groupStructure.dat'%workDir, 'w')
+    dataFile.write(s)
+    dataFile.close()
     
     ### run the calcUpscatter code -- ./calcUpscatterKernel 42092 3.1e-8 ==> upscatterEMuEp.out
     cmd = os.path.join(os.path.split(os.path.dirname(fudgeModule.__file__))[0], 'bin', 'calcUpscatterKernel')
-    cmd += '  %s %g %g %g %g %d ' % ( 'groupStructure.dat', tempInfo['targetMassRatio'], tempInfo['temperature'],
-            tempInfo['minEval'], tempInfo['maxEval'], tempInfo['legendreOrder'] )
-    logFile = executeCommand(  cmd, workDir, 'legendre' )
+    cmd += '  %s %g %g %g %g %d ' % ('groupStructure.dat', tempInfo['targetMassRatio'], tempInfo['temperature'],
+            tempInfo['minEval'], tempInfo['maxEval'], tempInfo['legendreOrder'])
+    logFile = executeCommand(cmd, workDir, 'legendre')
     
     ### call the transferMatrix parseOutput on the outfile
-    TM1, TME, paras = transferMatricesModule.parseOutputFile( '%s/upscatterLegendre.out'%workDir, 0, firstLine = "upscatter: version 1 \n")
+    TM1, TME, paras = transferMatricesModule.parseOutputFile('%s/upscatterLegendre.out'%workDir, 0, firstLine = "upscatter: version 1 \n")
     maxG = paras['maxIncidentEnergyGroup']
     
-    if( TM1 is not None ) : negative_l0Counter = checkNegative_l0( TM1, "0", logFile )
-    if( TME is not None ) : negative_l0Counter += checkNegative_l0( TME, "E", logFile )
-    if( negative_l0Counter > 0 ) : print('WARNING: %d negative l=0 elements found in transfer matrix' % negative_l0Counter)
+    if TM1 is not None:
+        negative_l0Counter = checkNegative_l0(TM1, "0", logFile)
+    if TME is not None:
+        negative_l0Counter += checkNegative_l0(TME, "E", logFile)
+    if negative_l0Counter > 0:
+        print('WARNING: %d negative l=0 elements found in transfer matrix' % negative_l0Counter)
     APE = parseAveEnergyOutputFile('%s/AveEnergy.out'%workDir)
 
-    return( TM1, TME, APE, paras['maxIncidentEnergyGroup'] )
+    return TM1, TME, APE, paras['maxIncidentEnergyGroup']
         
-def executeCommand( cmd, workDir, workFile ) :
+def executeCommand(cmd, workDir, workFile):
+
     transferMatrixExecute = cmd.split()[0]
     if( os.path.exists( transferMatrixExecute ) ) :
         srcPath = os.path.abspath( './' )
@@ -58,17 +63,21 @@ def executeCommand( cmd, workDir, workFile ) :
         else :
             srcPath = os.path.join( os.path.dirname( os.path.dirname( fudgeModule.__file__ ) ), 'bin' )
             transferMatrixExecute = os.path.join( srcPath, transferMatrixExecute )
-    
-    cmd = [transferMatrixExecute]+cmd.split()[1:]
 
-    if( not os.path.exists(workDir)) : os.mkdir(workDir)
+    cmd = [transferMatrixExecute] + cmd.split()[1:]
+
+    if not os.path.exists(workDir):
+        os.mkdir(workDir)
+    current_directory = os.getcwd()
     os.chdir(workDir)
-    fullFileName = 'upscatter_%s'%workFile 
+    fullFileName = 'upscatter_%s' % workFile 
     infoFile = '%s.log' % fullFileName
     
     t0 = timesModule.Times( )
     try :
-        #print(cmd)
+        fCmd = open('%s.sh' % workFile, 'w')
+        fCmd.write(' '.join(cmd) + '\n')
+        fCmd.close()
         status, stdout, stderr = subprocessingModule.executeCommand( cmd, stdout = infoFile , stderr = subprocess.STDOUT )
     except :
         fErr = open( fullFileName + ".err", "w" )
@@ -82,8 +91,8 @@ def executeCommand( cmd, workDir, workFile ) :
         raise Exception( 'Upscatter failed for %s %s' % ( cmd, fullFileName ) )
     fOut.close()
     
-    os.chdir('..')
-    return os.path.join(workDir,infoFile)
+    os.chdir(current_directory)
+    return os.path.join(workDir, infoFile)
 
 ### checker for resulting legendre matrices
 def checkNegative_l0( TM_EEpL, weight, infoFile ) :

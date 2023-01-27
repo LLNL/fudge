@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 from LUPY import argumentsForScripts as argumentsForScriptsModule
 
 from PoPs import IDs as PoPsIDsModule
+from PoPs import specialNuclearParticleID as specialNuclearParticleIDModule
 
 from fudge.reactions import base as reactionBaseModule
 from fudge import outputChannel as outputChannelModule
@@ -27,22 +28,33 @@ from fudge.outputChannelData.fissionFragmentData import delayedNeutron as delaye
 
 indentIncrement = '  '
 
+summaryDocStringFUDGE = '''Prints an outlines of the reactions, and their energy domain and products for a GNDS reactionSuite file.'''
+
 description = '''
 Prints each reaction and brief information about each reaction's products. Product information include its id, label, and distribution type and frame.
 If option '--summaryGammas' is present, only a summary of each photon (gamma) for each output channel is printed.
 '''
 
-
-parser = ArgumentParser(description = description)
+parser = ArgumentParser(description=description)
 
 singleProtareArguments = argumentsForScriptsModule.SingleProtareArguments(parser)
 
-parser.add_argument('--summaryGammas', action = 'store_true',              help = 'If present, photons (e.g., gammas) for each output channel are summerized.')
-parser.add_argument('--productPath', action = 'store_true',                help = 'If present, the product path needed by other scripts (e.g., spectrum.py) are included with each product.')
-parser.add_argument('--unspecified', action = 'store_true',                help = 'If present, only information for products with unspecified multiplicities or distributions are printed.')
-parser.add_argument('--doNotShowProducts', action = 'store_true',          help = 'If present, no product data are displayed.')
+parser.add_argument('--summaryGammas', action='store_true',                 help='If present, photons (e.g., gammas) for each output channel are summerized.')
+parser.add_argument('--productPath', action='store_true',                   help='If present, the product path needed by other scripts (e.g., spectrum.py) are included with each product.')
+parser.add_argument('--unspecified', action='store_true',                   help='If present, only information for products with unspecified multiplicities or distributions are printed.')
+parser.add_argument('--doNotShowProducts', action='store_true',             help='If present, no product data are displayed.')
+parser.add_argument('--products', action='append', default=[],              help='Only show reactions with these products in their list. If empty, all reactions are shown.')
+parser.add_argument('--MT', action='append', type=int, default=[],          help='Only show reactions with these MTs. If empty, all reactions are shown.')
 
 args = parser.parse_args()
+onlyReactionsWithTheseProducts = set(args.products)
+additionalProducts = []
+for particle in onlyReactionsWithTheseProducts:
+    additionalProducts.append(specialNuclearParticleIDModule.familiarID(particle))
+    additionalProducts.append(specialNuclearParticleIDModule.nuclideID(particle))
+additionalProducts = set(additionalProducts)
+additionalProducts.discard(None)
+onlyReactionsWithTheseProducts = onlyReactionsWithTheseProducts.union(additionalProducts)
 
 protare = singleProtareArguments.protare(args, verbosity=0, lazyParsing=True)
 
@@ -57,10 +69,11 @@ def PID_label(indent, product):
 
 def delayedNeutronsPeek(self, indent):
 
-    if len(self) > 0: print('%s-- delayedNeutrons --' % indent)
+    if len(self) > 0:
+        print('%s-- delayedNeutrons --' % indent)
     indent2 = indentIncrement + indent
     for delayedNeutron in self:
-        delayedNeutron.product.__peek(indent2, [], delayedNeutronRate = 'label = %-6s rate = %s' % (delayedNeutron.label, delayedNeutron.rate[0]))
+        delayedNeutron.product.__peek(indent2, [], delayedNeutronRate='label = %-6s rate = %s' % (delayedNeutron.label, delayedNeutron.rate[0]))
 
 delayedNeutronModule.DelayedNeutrons.__peek = delayedNeutronsPeek
 
@@ -70,7 +83,7 @@ def fissionFragmentDataPeek(self, indent):
 
 fissionFragmentDataModule.FissionFragmentData.__peek = fissionFragmentDataPeek
 
-def productPeek(self, indent, productPath, doPrint = True, delayedNeutronRate = None):
+def productPeek(self, indent, productPath, doPrint=True, delayedNeutronRate=None):
 
     productPath = productPath + [ self.label ]
 
@@ -92,7 +105,8 @@ def productPeek(self, indent, productPath, doPrint = True, delayedNeutronRate = 
         print('%s missing distribution data present' % PID_label(indent, self))
         return True, distributionInfo
     distributionForm = distribution[0]
-    if isinstance(distributionForm, unspecifiedModule.Form): unspecifiedPresent = True
+    if isinstance(distributionForm, unspecifiedModule.Form):
+        unspecifiedPresent = True
     distributionInfo = '%s (%s)' % (distribution[0].moniker, distribution[0].productFrame)
     if isinstance(distributionForm, uncorrelatedModule.Form) and not args.summaryGammas:
         energy = distributionForm.energySubform.data
@@ -108,9 +122,12 @@ def productPeek(self, indent, productPath, doPrint = True, delayedNeutronRate = 
 
     productPathStr = ''
     if delayedNeutronRate is None:
-        if args.productPath: productPathStr = ' (' + ':'.join(productPath) + ')'
-        if doPrint: print('%s distribution[0] = %s%s%s' % (PID_label(indent, self), distributionInfo, unspecifiedMultiplicity, productPathStr))
-        if self.outputChannel is not None: self.outputChannel.__peek(indent + indentIncrement, productPath)
+        if args.productPath:
+            productPathStr = ' (' + ':'.join(productPath) + ')'
+        if doPrint:
+            print('%s distribution[0] = %s%s%s' % (PID_label(indent, self), distributionInfo, unspecifiedMultiplicity, productPathStr))
+        if self.outputChannel is not None:
+            self.outputChannel.__peek(indent + indentIncrement, productPath)
     else:
         print('%-50s distribution[0] = %s%s' % (indent + delayedNeutronRate, distributionInfo, unspecifiedMultiplicity))
 
@@ -123,7 +140,8 @@ def outputChannelPeek(self, indent, productPath):
     photonsToSummarize = []
     if args.summaryGammas:
         photonsToSummarize = [ product.pid for product in self.products if product.pid == PoPsIDsModule.photon ]
-        if len(photonsToSummarize) == 1: photonsToSummarize = []
+        if len(photonsToSummarize) == 1:
+            photonsToSummarize = []
 
     photonsInfo = {}
     photonMonikers = []
@@ -132,7 +150,8 @@ def outputChannelPeek(self, indent, productPath):
         if product.pid in photonsToSummarize:
             unspecifiedPresent2, distributionInfo = product.__peek(indent, productPath, False)
             unspecifiedPresent = unspecifiedPresent or unspecifiedPresent2
-            if distributionInfo not in photonsInfo: photonsInfo[distributionInfo] = 0
+            if distributionInfo not in photonsInfo:
+                photonsInfo[distributionInfo] = 0
             photonsInfo[distributionInfo] += 1
         else:
             product.__peek(indent, productPath)
@@ -148,6 +167,12 @@ outputChannelModule.OutputChannel.__peek = outputChannelPeek
 
 def reactionPeek(self, prefix, index, indent):
 
+    if len(onlyReactionsWithTheseProducts) > 0:
+        if len(onlyReactionsWithTheseProducts.intersection(self.listOfProducts())) == 0:
+            return
+    if len(args.MT) > 0:
+        if self.ENDF_MT not in args.MT:
+            return
     crossSectionStr = ''
     crossSection = self.crossSection[0]
     if isinstance(crossSection, crossSectionModule.Reference):
@@ -158,7 +183,8 @@ def reactionPeek(self, prefix, index, indent):
             pass
     print('%s%-32s (%4d): domainMin = %s, domainMax = %s %s%s' % (indent, prefix % str(self), index, self.domainMin, self.domainMax, self.domainUnit, crossSectionStr))
     productPath = [str(index)]
-    if not args.doNotShowProducts: self.outputChannel.__peek(indent + indentIncrement, [str(reactionIndex)])
+    if not args.doNotShowProducts:
+        self.outputChannel.__peek(indent + indentIncrement, [str(reactionIndex)])
 
 reactionBaseModule.Base_reaction.__peek = reactionPeek
 

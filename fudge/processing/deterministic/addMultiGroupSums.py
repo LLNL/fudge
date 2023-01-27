@@ -197,16 +197,31 @@ def addMultiGroupSums(self, replace=False):
         productDelayedNeutrons = productModule.Product(IDsModule.neutron, IDsModule.neutron)
         outputChannelDelayedNeutrons.products.add(productDelayedNeutrons)
 
-    elasticReaction = self.reactions[0]
+    for temperatureInfo in self.styles.temperatures():
+        label = temperatureInfo.heatedMultiGroup
+        if label != '':
+            break
+    axesTemplate1d = None
+    axesTemplate3d = None
+    for reaction in self.reactions:
+        if axesTemplate1d is None:
+            try:
+                axesTemplate1d = reaction.crossSection[label].axes
+            except:
+                pass
+        if axesTemplate3d is None:
+            for product in reaction.outputChannel.products:
+                try:
+                    axesTemplate3d = product.distribution[label].multiGroupSubform.axes
+                    break
+                except:
+                    pass
 
     for temperatureInfo in self.styles.temperatures():
 
         label = temperatureInfo.heatedMultiGroup
         if label == '':
             continue
-
-        axesTemplate1d = elasticReaction.crossSection[label].axes
-        axesTemplate3d = elasticReaction.outputChannel.products[0].distribution[label].multiGroupSubform.axes
 
         reactionMultiGrouping(self, totalReaction, MG, MG_upscatter, temperatureInfo, axesTemplate1d, axesTemplate3d)
 

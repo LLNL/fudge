@@ -48,28 +48,28 @@ class Component( abstractClassesModule.Component ) :
                 photonScatteringModule.CoherentPhotonScattering.Form, photonScatteringModule.IncoherentPhotonScattering.Form, 
                 multiGroupModule.Form, unspecifiedModule.Form, branching3dModule.Form ) )
 
-    def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
+    def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
         """Returns the energy spectrum in the lab frame for the specified incident energy."""
 
-        styleLabel = kwargs.get( 'styleLabel', self.evaluated.label )
+        styleLabel = kwargs.get('styleLabel', self.evaluated.label)
         form = self[styleLabel]
-        if( hasattr( form, 'energySpectrumAtEnergy' ) ) :
+        if hasattr(form, 'energySpectrumAtEnergy'):
             if frame == xDataEnumsModule.Frame.centerOfMass:
                 if form.productFrame == xDataEnumsModule.Frame.lab:
                     form = None
-        else :
+        else:
             form = None
 
-        if( form is not None ) :
-            return( form.energySpectrumAtEnergy( energyIn, frame ) )
-        else :
+        if form is not None:
+            return form.energySpectrumAtEnergy(energyIn, frame, **kwargs)
+        else:
             form = self[styleLabel]
-            if( hasattr( form, 'energySpectrumAtEnergy' ) ) :
-                print( '        WARNING: lab to center-of-mass translation not supported.' )
-            else :
-                print( '        WARNING: distribution "%s" does not have energySpectrumAtEnergy method.' % form.moniker )
-            print( '            %s' % self.toXLink( ) )
-            return( energyModule.XYs1d( axes = energyModule.defaultAxes( form.domainUnit ) ) )
+            if hasattr(form, 'energySpectrumAtEnergy'):
+                print('        WARNING: lab to center-of-mass translation not supported.')
+            else:
+                print('        WARNING: distribution "%s" does not have energySpectrumAtEnergy method.' % form.moniker)
+            print('            %s' % self.toXLink())
+            return energyModule.XYs1d(axes=energyModule.defaultAxes(form.domainUnit))
 
     def getSpectrumAtEnergy( self, energy ) :
         """This method is deprecated, use energySpectrumAtEnergy instead. Returns the energy spectrum for self at projectile energy."""

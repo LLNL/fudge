@@ -324,19 +324,25 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         self.__items = []
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        if( self.__href is not None ) : return( [ '%s<%s href="%s"/>' % ( indent, self.moniker, self.__href ) ] )
+        if self.__href is not None:
+            return ['%s<%s href="%s"/>' % (indent, self.moniker, self.__href)]
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        if( len( self ) == 0 ) : return( [] )
         moniker = self.monikerByFormat.get(kwargs.get('formatVersion'), self.moniker)
-        xmlString = [ '%s<%s>' % ( indent, moniker ) ]
-        for item in self: xmlString += item.toXML_strList( indent2, **kwargs )
+        if len(self) == 0:
+            if kwargs.get('showEmptySuites', False):
+                return ['%s<%s/>' % (indent, moniker)]
+            return []
+
+        xmlString = ['%s<%s>' % (indent, moniker)]
+        for item in self:
+            xmlString += item.toXML_strList(indent2, **kwargs)
         xmlString[-1] += '</%s>' % moniker
 
-        return( xmlString )
+        return xmlString
 
     def uniqueLabel( self, item ) :
         """

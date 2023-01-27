@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.productData.distributions.energy &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.productData.distributions.energy &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.productData.distributions.energy</a></li> 
       </ul>
@@ -305,15 +305,21 @@
         <span class="n">DiscretePrimaryGamma</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__massRatio</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># In ENDF lingo this is AWR / ( AWR + 1 ).</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">finalState</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid finalState type: got &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">finalState</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__finalState</span> <span class="o">=</span> <span class="n">finalState</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finalState</span> <span class="o">=</span> <span class="n">finalState</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">finalState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the finalState.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__finalState</span>
+
+    <span class="nd">@finalState</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">finalState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid finalState type: got &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__finalState</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">massRatio</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
@@ -459,8 +465,10 @@
                 <span class="k">break</span>
         <span class="n">subform</span> <span class="o">=</span> <span class="n">XYs2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">,</span> 
                 <span class="n">interpolationQualifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolationQualifier</span> <span class="p">)</span>
-        <span class="k">for</span> <span class="n">xys</span> <span class="ow">in</span> <span class="n">linear</span> <span class="p">:</span> <span class="n">subform</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">Xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span> <span class="n">xys</span><span class="p">,</span> <span class="n">xys</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">subform</span> <span class="p">)</span></div>
+        <span class="k">for</span> <span class="n">xys</span> <span class="ow">in</span> <span class="n">linear</span><span class="p">:</span>
+            <span class="n">subform</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span><span class="n">xys</span><span class="p">,</span> <span class="n">xys</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">thinEpsilon</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">subform</span></div>
 
 <div class="viewcode-block" id="XYs2d.allowedSubElements"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.XYs2d.allowedSubElements">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">allowedSubElements</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
@@ -707,7 +715,7 @@
 
 <div class="viewcode-block" id="GeneralEvaporation.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.GeneralEvaporation.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">_gs</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span> <span class="n">Xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter2</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">_gs</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">Xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter2</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">thinEpsilon</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">))</span>
         <span class="n">_gs</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter2</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">_form</span> <span class="o">=</span> <span class="n">GeneralEvaporation</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">thetas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter1</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="n">gs</span> <span class="o">=</span> <span class="n">_gs</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">_form</span> <span class="p">)</span></div>
@@ -1223,24 +1231,24 @@
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">EMax_i</span> <span class="o">=</span> <span class="n">EMax_i</span>
 
-        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">productModule</span><span class="o">.</span><span class="n">Product</span> <span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">productModule</span><span class="o">.</span><span class="n">Product</span><span class="p">)</span>
         <span class="n">mass</span><span class="p">,</span> <span class="n">massUnit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">unit</span>
-        <span class="n">productMass</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+        <span class="n">productMass</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
 
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">reactionModule</span><span class="o">.</span><span class="n">Reaction</span><span class="p">)</span>
         <span class="n">EMin</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">domainMin</span>
         <span class="n">EMax</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">domainMax</span>
         <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">domainUnit</span>
 
-        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">reactionSuite</span> <span class="p">)</span>
+        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">ReactionSuite</span><span class="p">)</span>
         <span class="n">projectile</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span>
-        <span class="n">projectileMass</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+        <span class="n">projectileMass</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
         <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">targetID</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span> <span class="p">)</span> <span class="p">:</span> <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
+        <span class="k">if</span> <span class="n">targetID</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span> <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span>
-        <span class="n">targetMass</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+        <span class="n">targetMass</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
 
-        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">outputChannelModule</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">outputChannelModule</span><span class="o">.</span><span class="n">OutputChannel</span><span class="p">)</span>
         <span class="n">Q</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">getConstant</span><span class="p">(</span> <span class="p">)</span>
 
         <span class="n">axes</span> <span class="o">=</span> <span class="n">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span>
@@ -1253,7 +1261,7 @@
         <span class="n">f</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span> <span class="n">EMax</span> <span class="o">/</span> <span class="n">EMin</span><span class="p">,</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">n</span> <span class="p">)</span>
         <span class="n">E_ins</span> <span class="o">=</span> <span class="p">[</span> <span class="n">EMin</span> <span class="o">*</span> <span class="n">f</span><span class="o">**</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">]</span>
         <span class="n">E_ins</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">EMax</span>        <span class="c1"># Fix possible round off issue.</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">E_in</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">E_ins</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">E_in</span> <span class="ow">in</span> <span class="n">E_ins</span><span class="p">:</span>
             <span class="n">Ea</span> <span class="o">=</span> <span class="n">targetMass</span> <span class="o">/</span> <span class="p">(</span> <span class="n">targetMass</span> <span class="o">+</span> <span class="n">projectileMass</span> <span class="p">)</span> <span class="o">*</span> <span class="n">E_in</span> <span class="o">+</span> <span class="n">Q</span>
             <span class="n">EMax_i</span> <span class="o">=</span> <span class="n">Ea</span> <span class="o">*</span> <span class="p">(</span> <span class="n">mass</span> <span class="o">-</span> <span class="n">productMass</span> <span class="p">)</span> <span class="o">/</span> <span class="n">mass</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">EMax_i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">EMax_i</span> <span class="o">=</span> <span class="mf">1e-5</span>                <span class="c1"># This is a kludge</span>
@@ -1263,7 +1271,7 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">E_in</span> <span class="p">)</span>
             <span class="n">data</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span> <span class="n">insitu</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
             <span class="n">pwl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">pwl</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">pwl</span></div>
 
 <div class="viewcode-block" id="NBodyPhaseSpace.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.NBodyPhaseSpace.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
@@ -1723,7 +1731,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.productData.distributions.energy</a></li> 
       </ul>

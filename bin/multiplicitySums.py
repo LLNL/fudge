@@ -26,8 +26,12 @@ protare = singleProtareArguments.protare(args)
 
 fissionReaction = protare.getReaction('fission')
 if fissionReaction is not None:
-    MTs = [multiplicitySum.ENDF_MT for multiplicitySum in protare.sums.multiplicitySums]
-    if 455 not in MTs:
+    MTs = {}
+    for multiplicitySum in protare.sums.multiplicitySums:
+        MTs[multiplicitySum.ENDF_MT] = multiplicitySum
+    if 455 in MTs:
+        MultiplicitySum = MTs[455]
+    else:
         delayedNeutronMultiplicity = None
         MultiplicitySum = sumsModule.MultiplicitySum('delayed fission neutron multiplicity', 455)
         for delayedNeutron in fissionReaction.outputChannel.fissionFragmentData.delayedNeutrons:
@@ -40,19 +44,20 @@ if fissionReaction is not None:
         if delayedNeutronMultiplicity is not None:
             MultiplicitySum.multiplicity.add(delayedNeutronMultiplicity)
             protare.sums.multiplicitySums.add(MultiplicitySum)
-            if 452 not in MTs:
-                neutrons = [product for product in fissionReaction.outputChannel.products if product.pid == PoPsIDsModule.neutron]
-                if len(neutrons) != 1:
-                    raise Exception('Number of prompt neutrons not 1 but %s' % len(neutrons))
 
-                MultiplicitySum2 = sumsModule.MultiplicitySum('total fission neutron multiplicity', 452)
-                MultiplicitySum2.summands.summands.append(sumsModule.Add(neutrons[0].multiplicity))
-                MultiplicitySum2.summands.summands.append(sumsModule.Add(MultiplicitySum))
+    if 452 not in MTs:
+        neutrons = [product for product in fissionReaction.outputChannel.products if product.pid == PoPsIDsModule.neutron]
+        if len(neutrons) != 1:
+            raise Exception('Number of prompt neutrons not 1 but %s' % len(neutrons))
 
-                multiplicity = neutrons[0].multiplicity[0] + delayedNeutronMultiplicity
-                multiplicity.label = neutrons[0].multiplicity[0].label
-                MultiplicitySum2.multiplicity.add(multiplicity)
-                protare.sums.multiplicitySums.add(MultiplicitySum2)
+        MultiplicitySum2 = sumsModule.MultiplicitySum('total fission neutron multiplicity', 452)
+        MultiplicitySum2.summands.summands.append(sumsModule.Add(neutrons[0].multiplicity))
+        MultiplicitySum2.summands.summands.append(sumsModule.Add(MultiplicitySum))
+
+        multiplicity = neutrons[0].multiplicity[0] + MultiplicitySum.multiplicity[0]
+        multiplicity.label = neutrons[0].multiplicity[0].label
+        MultiplicitySum2.multiplicity.add(multiplicity)
+        protare.sums.multiplicitySums.add(MultiplicitySum2)
 
 output = args.output
 if output is None:

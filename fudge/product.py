@@ -247,10 +247,12 @@ class Product( ancestryModule.AncestryIO ) :
 
         return numberOfFixes
 
-    def thresholdQAs( self, unit, final = True ) :
+    def thresholdQAs(self, unit, final=True, pops=None):
 
-        if( self.__outputChannel is not None ) : return( self.__outputChannel.thresholdQAs( unit, final = final ) )
-        return( 0. )
+        if self.__outputChannel is not None:
+            return self.__outputChannel.thresholdQAs(unit, final=final, pops=pops)
+
+        return 0.0
 
     def getLevelAsFloat( self, unit, default = 0. ) :
 

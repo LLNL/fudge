@@ -139,9 +139,18 @@ class LLNLPointwise( Subform ) :
         self.axes.convertUnits( unitMap )
         for data in self.data : data.convertUnits( unitMap )
 
-    def energySpectrumAtEnergy( self, energyIn ) :
+    def energySpectrumAtEnergy(self, energyIn, **kwargs):
 
-        return( self.data[0].evaluate( energyIn ) )
+        muMin = kwargs.get('muMin', -1.0)
+        muMax = kwargs.get('muMax',  1.0)
+
+        muFactor = 1.0
+        if muMin != -1.0 and muMax != 1.0:
+            if len(self.data) > 1:
+                raise Exception('Energy spectrum only supported for full mu domain (i.e., -1 to 1) and not (% to %s).' %(muMin, muMax))
+            muFactor = muMax - muMin
+
+        return muFactor * self.data[0].evaluate(energyIn)
 
     def fixDomains(self, domainMin, domainMax, fixToDomain):
         """
@@ -270,11 +279,12 @@ class Form( baseModule.Form ) :
 
         return( self.Legendre.calculateAverageProductData( style, indent = '', **kwargs ) )
 
-    def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
+    def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
 
-        if( frame == xDataEnumsModule.Frame.centerOfMass) : TypeError( 'Lab to center-of-mass translation not supported.' )
+        if frame == xDataEnumsModule.Frame.centerOfMass:
+            raise TypeError('Lab to center-of-mass translation not supported.')
 
-        return( self.Legendre.energySpectrumAtEnergy( energyIn ) )
+        return self.Legendre.energySpectrumAtEnergy(energyIn, **kwargs)
 
     def fixDomains(self, domainMin, domainMax, fixToDomain):
         """

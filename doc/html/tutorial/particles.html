@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4.7. Particles &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>4.7. Particles &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="covariances.html" title="4.6. Covariances"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U"><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.7. </span>Particles</a></li> 
@@ -47,21 +48,26 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="particles">
+  <section id="particles">
 <h1><span class="section-number">4.7. </span>Particles<a class="headerlink" href="#particles" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="nuclei-and-their-properties">
+<section id="nuclei-and-their-properties">
 <h2><span class="section-number">4.7.1. </span>Nuclei and their properties<a class="headerlink" href="#nuclei-and-their-properties" title="Permalink to this headline">¶</a></h2>
 <p>GNDS evaluations store a list of all particles involved in each reaction, including the projectile and target,
 outgoing products and residuals.  Some properties of reaction products (like the multiplicity and distribution data)
 depend on the reaction that produced them.  Other properties (like the mass, spin and parity, charge, etc.) are
 reaction-independent.  These properties are collected in the Properties of Particles (<code class="docutils literal notranslate"><span class="pre">PoPs</span></code>) section of the
 <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code>.</p>
-<p>TBD: expand description of PoPs (it is still changing rapidly to accomodate the ENDF decay sub-library).</p>
-</div>
-<div class="section" id="transportable-particles">
+<p>TBD: expand description of PoPs (it is still changing rapidly to accommodate the ENDF decay sub-library).</p>
+</section>
+<section id="transportable-particles">
 <h2><span class="section-number">4.7.2. </span>Transportable particles<a class="headerlink" href="#transportable-particles" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+<p>When GNDS files are processed, the <code class="docutils literal notranslate"><span class="pre">styles</span></code> section contains a list of the particles that can be transported
+with this data. Current evaluations typically only support transporting neutrons, photons and light charged particles
+(isotopes of Hydrogen and Helium), but GNDS places no limitation on what particles may be transported.
+However, evaluators must ensure that outgoing product multiplicities and distributions are listed for all
+transportable particles so that they are properly tracked in transport applications.</p>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -124,7 +130,7 @@ reaction-independent.  These properties are collected in the Properties of Parti
         <li class="right" >
           <a href="covariances.html" title="4.6. Covariances"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" ><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.7. </span>Particles</a></li> 

@@ -30,6 +30,7 @@ class ExternalFile(ancestryModule.AncestryIO):
         self.path = path
         self.__checksum = checksum
         self.__algorithm = algorithm
+        self.__instance = None
 
     @property
     def label(self):
@@ -53,6 +54,27 @@ class ExternalFile(ancestryModule.AncestryIO):
     def algorithm(self):
         return self.__algorithm
 
+    @property
+    def instance(self):
+        return self.__instance
+
+    @instance.setter
+    def instance(self, value):
+        # For now instance can be set to None or any class instance. Could do more rigorous checking if we add a
+        # 'fileType' attribute to the external file telling what it is (reactionSuite, covarianceSuite), etc.
+        assert isinstance(value, (object, type(None)))
+        self.__instance = value
+
+    def updateChecksum(self, algorithm=checksumsModule.Sha1sum.algorithm):
+        """
+        Recompute checksum from external file, update checksum and algorithm fields.
+        @param algorithm: 'sha1' or 'md5'
+        """
+
+        checker = checksumsModule.checkers[algorithm]
+        self.__checksum = checker.from_file(self.realpath())
+        self.__algorithm = algorithm
+
     def realpath( self ) :
         """Returns the realpath to the external file."""
 
@@ -62,8 +84,7 @@ class ExternalFile(ancestryModule.AncestryIO):
 
         return( os.path.realpath( path ) )
 
-
-    def toXML_strList(self, indent = '', **kwargs) :
+    def toXML_strList(self, indent='', **kwargs):
 
         attrs = ""
         if self.checksum:

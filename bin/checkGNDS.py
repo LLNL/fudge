@@ -12,6 +12,8 @@ import argparse
 from fudge import warning as warningModule
 from fudge import GNDS_file as GNDS_fileModule
 
+summaryDocStringFUDGE = '''Reads GNDS files and runs all of FUDGE physics tests on each.'''
+
 description1 = """Read one or more GNDS files into Fudge and run all physics tests.
     Sample use: python checkGNDS.py n-001_H_001.xml n-001_H_002.xml ...
     If file n-001_H_001-cov.xml (or -covar.xml) exists, covariances will automatically be read and checked.

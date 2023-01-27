@@ -11,6 +11,7 @@ import sys
 import os
 import shutil
 import argparse
+import pathlib
 
 from pqu import PQU as PQUModule
 
@@ -34,7 +35,9 @@ twoBodyCOMResolutionDefault = 1e-2
 reactionCounter = -1
 outputLog = None
 accuracy = 1e-3
-lowerUpperEpsilon = 1e-6
+lowerUpperEpsilon = -1e-7
+
+summaryDocStringFUDGE = '''For the specified projectile energy and product, outputs energy spectra by reaction and also summed spectra.'''
 
 description = '''
     Outputs the energy spectrum for the specified outgoing particle at the specified incident energy from 
@@ -68,10 +71,12 @@ singleProtareArguments = argumentsForScriptsModule.SingleProtareArguments( parse
 parser.add_argument( 'product', type = str,                                                     help = 'Product PoPs id (e.g., n, photon).' )
 parser.add_argument( 'energy', type = float,                                                    help = 'Incident energy in units of "--energyUnit".' )
 parser.add_argument( '--energyUnit', choices = ( 'eV', 'MeV' ), default = energyUnitDefault,    help = 'Energy unit to use. Default is "%s".' % energyUnitDefault )
+parser.add_argument('--muMin', action='store', default=-1, type=float,                          help = 'The outgoing distribution is integrated from muMin to muMax. The default is -1.')
+parser.add_argument('--muMax', action='store', default=1, type=float,                           help = 'The outgoing distribution is integrated from muMin to muMax. The default is 1.')
 parser.add_argument( '--com', action = 'store_true',                                            help = 'Produce the energy spectra in the center-of-mass frame. The default is the lab frame.' )
 parser.add_argument( '--temperature', type = float,                                             help = 'Specifies the temperature of the target material.' )
 parser.add_argument( '--temperatureUnit', type = str, default = temperatureUnitDefault,         help = 'Temperature unit to convert to. Default is "%s".' % temperatureUnitDefault )
-parser.add_argument( '--outputDir', action = 'store',                                           help = 'If present, output energy spectrum for each reaction and total are written to the directory specified by this option.' )
+parser.add_argument( '--outputDir', action = 'store', type=pathlib.Path,                        help = 'If present, output energy spectrum for each reaction and total are written to the directory specified by this option.' )
 parser.add_argument( '--twoBodyCOMResolution', action = 'store', type = float, default = twoBodyCOMResolutionDefault,
                                                                                                 help = 'When option "--com" is present, two-body reaction product a delta function for the outgoing particles. Their pdfs are treated as a triangle with energy width equal to twoBodyCOMResolution * its energy. Default value is %s' % twoBodyCOMResolutionDefault )
 parser.add_argument( '--discreteGammaResolution', action = 'store', type = float, default = discreteGammaResolutionDefault,
@@ -82,10 +87,16 @@ parser.add_argument( '-v', '--verbose', action = 'count', default = 0,          
 parser.add_argument( '--selfCheck', action = 'store_true',                                      help = 'If true, no spectrum is printed to the screen.' )
 
 args = parser.parse_args( )
+outputDir = args.outputDir
 
 frame = xDataEnumsModule.Frame.lab
 if args.com:
     frame = xDataEnumsModule.Frame.centerOfMass
+
+muMin = min(1.0, max(-1, args.muMin))
+muMax = min(1.0, max(-1, args.muMax))
+if muMin >= muMax:
+    raise Exception('muMin = %s must be less than muMax = %s.' % (muMin, muMax))
 
 minimumLogPoint = PQUModule.PQU( 1.e-11, 'MeV' ).getValueAs( args.energyUnit )
 
@@ -100,6 +111,12 @@ productID = { PoPsID_Module.neutron : PoPsID_Module.neutron,
 readTime = timesModule.Times( )
 protare = singleProtareArguments.protare(args, verbosity = args.verbose, lazyParsing = True)
 readTime = readTime.toString( current = False )
+
+if outputDir is not None:
+    outputDir = args.outputDir / ('%s+%s' % (protare.projectile, protare.target))
+    if outputDir.exists():
+        shutil.rmtree(outputDir)
+    outputDir.mkdir(parents=True)
 
 unitConversionTime = None
 if( args.energyUnit != protare.domainUnit ) :
@@ -151,27 +168,29 @@ def discreteGammaSpectrumToPDF( discreteGammaData ) :
             discreteGammaSpectrum += gamma
     return( discreteGammaSpectrum )
 
-def addCurves( curve1, curve2 ) :
+def addCurves(curve1, curve2):
 
-    if( len( curve1 ) > 0 ) :
-        if( curve1.interpolation != curve2.interpolation ) :
+    if len(curve1) > 0:
+        if curve1.interpolation != curve2.interpolation:
             if curve1.interpolation != xDataEnumsModule.Interpolation.linlin:
-                curve1 = curve1.changeInterpolation(xDataEnumsModule.Interpolation.linlin, accuracy, lowerUpperEpsilon, lowerUpperEpsilon)
+                curve1 = curve1.changeInterpolation(xDataEnumsModule.Interpolation.linlin, accuracy, abs(lowerUpperEpsilon), abs(lowerUpperEpsilon))
             if curve2.interpolation != xDataEnumsModule.Interpolation.linlin:
-                curve2 = curve2.changeInterpolation(xDataEnumsModule.Interpolation.linlin, accuracy, lowerUpperEpsilon, lowerUpperEpsilon)
-    if( not( curve1.areDomainsMutual( curve2 ) ) ) : curve1, curve2 = curve1.mutualify( lowerUpperEpsilon, lowerUpperEpsilon, True, curve2, lowerUpperEpsilon, lowerUpperEpsilon, True )
-    return( curve1 + curve2 )
+                curve2 = curve2.changeInterpolation(xDataEnumsModule.Interpolation.linlin, accuracy, abs(lowerUpperEpsilon), abs(lowerUpperEpsilon))
+    if not curve1.areDomainsMutual(curve2):
+        curve1, curve2 = curve1.mutualify(lowerUpperEpsilon, lowerUpperEpsilon, True, curve2, lowerUpperEpsilon, lowerUpperEpsilon, True)
+    return curve1 + curve2
 
 def output( MT, reactionStr, prefix, spectrum, crossSection ) :
 
     def write( curve, suffix, yLabel ) :
 
-        fOut = open( os.path.join( args.outputDir, prefix + '_%.3d.' % MT + suffix ), 'w' )
+        fOut = open( os.path.join( outputDir, prefix + '_%.3d.' % MT + suffix ), 'w' )
         fOut.write( '# reaction = "%s"\n' % reactionStr )
         fOut.write( '# cross section = %.5g\n' % crossSection )
         fOut.write( '# x axes label = "Outgoing %s energy [%s]"\n' % ( args.product, args.energyUnit ) )
         fOut.write( '# y axes label = "%s"\n' % yLabel )
-        if( len( curve ) > 0 ) : fOut.write( curve.toString( ) )
+        if len(curve) > 0:
+            fOut.write( curve.toString(format=" %17.9e %16.8e"))
         fOut.close( )
 
     def addPointForLogPlotting( spectrum ) :
@@ -224,7 +243,8 @@ def productSpectrum( self, pid, energy, parentMultiplicity, spectrum, discreteGa
 
     multiplicityAtEnergy = self.multiplicity.evaluate( energy )
     if specialNuclearParticleIDPoPsModule.sameSpecialNuclearParticle(pid, self.pid) and multiplicityAtEnergy != 0.0:
-        spectrum2 = self.distribution.energySpectrumAtEnergy( energy, frame, twoBodyCOMResolution = args.twoBodyCOMResolution, styleLabel = styleLabel )
+        spectrum2 = self.distribution.energySpectrumAtEnergy(energy, frame, twoBodyCOMResolution=args.twoBodyCOMResolution, 
+                styleLabel=styleLabel, muMin=muMin, muMax=muMax)
         spectrum2 *= multiplicityAtEnergy
         spectrum2 = addCurves( spectrum, spectrum2 )
         spectrum.setData( spectrum2 )
@@ -276,10 +296,10 @@ def reactionSpectrum(self, pid, energy, totalSpectrum, totolDiscreteGammaData, t
                 if( energy not in totolDiscreteGammaData ) : totolDiscreteGammaData[energy] = 0.0
                 totolDiscreteGammaData[energy] += discreteGammaData[energy]
 
-    if( ( args.outputDir is not None ) or args.selfCheck ) :
+    if( ( outputDir is not None ) or args.selfCheck ) :
         if( crossSection > 0.0 ) :
             spectrum2 = addCurves( spectrum, discreteGammaSpectrumToPDF( discreteGammaData ) )
-            if( args.outputDir is not None ) : output( MT, str( self ), '%3.3d' % reactionCounter, spectrum2, crossSection )
+            if( outputDir is not None ) : output( MT, str( self ), '%3.3d' % reactionCounter, spectrum2, crossSection )
             integral = spectrum2.integrate() / crossSection
             for indicies in sums :
                 if( indicies[0] <= MT <= indicies[1] ) :
@@ -290,7 +310,7 @@ def reactionSpectrum(self, pid, energy, totalSpectrum, totolDiscreteGammaData, t
         total = multiplicityAtEnergy
         error = 0.0
         if( ( total + integral ) != 0.0 ) : error = ( total - integral ) / max( total, integral )
-        if args.outputDir is not None: outputLog.write('%5d  %3d  %-40s  %12.5e %12.5e %12.5e %8.1e\n' % ( reactionCounter, MT, reactionString, crossSection, total, integral, error ))
+        if outputDir is not None: outputLog.write('%5d  %3d  %-40s  %12.5e %12.5e %12.5e %8.1e\n' % ( reactionCounter, MT, reactionString, crossSection, total, integral, error ))
         if( abs( error ) > 2e-5 ) :
             if( ( args.verbose > 0 ) or args.selfCheck ) :
                 if( args.verbose == 0 ) : print( '    %-32s' % self, crossSection )
@@ -313,11 +333,8 @@ def getSpectrum(reactions, reactionSuffix):
         totalCrossSection += crossSection
     return( spectrum, discreteGammaData, totalCrossSection )
 
-if( args.outputDir is not None ) :
-    if( os.path.exists( args.outputDir ) ) : shutil.rmtree( args.outputDir )
-    os.makedirs( args.outputDir )
-    
-    outputLog = open( os.path.join( args.outputDir, 'index' ), 'w' )
+if outputDir is not None:
+    outputLog = open(os.path.join(outputDir, 'index'), 'w')
     outputLog.write( 'index   MT  label                                     crossSection  multiplicity    integral    error\n' )
     outputLog.write( '-----------------------------------------------------------------------------------------------------\n' )
 
@@ -358,10 +375,11 @@ if( args.plot ) :
         title = str( protare )
         curves[0].multiPlot( curves, xLabel = xLabel, yLabel = yLabel, title = title, domainMin = minimumLogPoint )
 
-if( args.outputDir is None ) :
-    if( not( args.selfCheck ) ) : print( spectrum.toString( ) )
+if outputDir is None:
+    if not args.selfCheck:
+        print(spectrum.toString())
 else :
-    with open( os.path.join( args.outputDir, 'info.txt' ), 'w' ) as file :
+    with open(os.path.join(outputDir, 'info.txt'), 'w') as file:
         file.write( 'Working directory: %s\n' % os.path.realpath( os.curdir ) )
         file.write( 'Input arguments: %s\n' % ' '.join( sys.argv ) )
         file.write( 'Protare file path: %s\n' % os.path.realpath( protare.sourcePath ) )

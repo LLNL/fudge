@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge Package &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>fudge Package &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -18,7 +19,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge package" href="fudge.html" />
-    <link rel="prev" title="Fudge and GNDS" href="../index.html" /> 
+    <link rel="prev" title="pqu package" href="../pqu/pqu.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -33,9 +34,9 @@
           <a href="fudge.html" title="fudge package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../index.html" title="Fudge and GNDS"
+          <a href="../pqu/pqu.html" title="pqu package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge Package</a></li> 
       </ul>
     </div>  
@@ -45,83 +46,83 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="fudge-package">
+  <section id="fudge-package">
 <h1>fudge Package<a class="headerlink" href="#fudge-package" title="Permalink to this headline">¶</a></h1>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>THE <cite>fudge</cite>, <cite>__doc__</cite>, AND <cite>fudgeParameters</cite> MODULES CORRESPOND TO LEGACY FUDGE</p>
-</div>
-<div class="section" id="id1">
-<h2><a class="reference internal" href="fudge.html#module-fudge" title="fudge"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fudge</span></code></a> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+</aside>
+<section id="fudge-package-1">
+<h2><a class="reference internal" href="fudge.html#module-fudge" title="fudge"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fudge</span></code></a> Package<a class="headerlink" href="#fudge-package-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-fudge.__init__"></span><p>Fudge is a Python package which allows one to view, plot and modify GNDS nuclear data, and also process GNDS
 into forms suitable for Monte Carlo and deterministic transport applications.
 Processed data are stored as additional data ‘forms’ inside a GNDS file. The GIDIplus C++ API can then be used
 to read and sample from the processed GNDS files.</p>
-<div class="section" id="getting-at-fudge-s-python-scripts">
+<section id="getting-at-fudge-s-python-scripts">
 <h3>Getting at fudge’s python scripts.<a class="headerlink" href="#getting-at-fudge-s-python-scripts" title="Permalink to this headline">¶</a></h3>
 <p>To use fudge, one must add the location of the fudge scripts to the PYTHONPATH environment variable. (PYTHONPATH is the environment variable
 used by python when searching for imported python modules (files). On LLNL’s computing system (LC) this would look something like,</p>
-<p>export PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge4/current  OR  PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge4/development</p>
+<p>export PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge/current  OR  PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge/development</p>
 <p>for the bash shell.</p>
 <p>Alternatively, one can add the following lines near the top of a python script (or type them at the prompt)</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;/usr/gapps/fudge4/current&quot;</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;/usr/gapps/fudge/current&quot;</span> <span class="p">)</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">fudgeDefaults</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">NDF_DATABASE_DIR</span> <span class="o">=</span> <span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="n">personal</span><span class="o">/</span><span class="n">database</span><span class="o">/</span><span class="n">processed</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="reading-fudge-s-documentation">
+</section>
+<section id="reading-fudge-s-documentation">
 <h3>Reading fudge’s documentation.<a class="headerlink" href="#reading-fudge-s-documentation" title="Permalink to this headline">¶</a></h3>
 <p>In general, one should first create a reactionSuite class object (also sometimes called a Protare for
 Projectile + Target + Evaluation). For example the beginning of a fudge session may look like,</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">ReactionSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="s2">&quot;path/to/GNDS/reactionSuite.xml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;path/to/GNDS/reactionSuite.xml&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is therefore important to read the documentation on the reactionSuite class.
 For an overview of creating, visualizing and processing GNDS reactionSuites we recommend starting with
 the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
-</div>
-</div>
-<div class="section" id="module-fudge.__doc__">
+</section>
+</section>
+<section id="module-fudge.__doc__">
 <span id="doc-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">__doc__</span></code> Module<a class="headerlink" href="#module-fudge.__doc__" title="Permalink to this headline">¶</a></h2>
 <p>Fudge is a Python package which allows one to view, plot and modify GNDS nuclear data, and also process GNDS
 into forms suitable for Monte Carlo and deterministic transport applications.
 Processed data are stored as additional data ‘forms’ inside a GNDS file. The GIDIplus C++ API can then be used
 to read and sample from the processed GNDS files.</p>
-<div class="section" id="id2">
-<h3>Getting at fudge’s python scripts.<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<section id="getting-at-fudge-s-python-scripts-1">
+<h3>Getting at fudge’s python scripts.<a class="headerlink" href="#getting-at-fudge-s-python-scripts-1" title="Permalink to this headline">¶</a></h3>
 <p>To use fudge, one must add the location of the fudge scripts to the PYTHONPATH environment variable. (PYTHONPATH is the environment variable
 used by python when searching for imported python modules (files). On LLNL’s computing system (LC) this would look something like,</p>
-<p>export PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge4/current  OR  PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge4/development</p>
+<p>export PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge/current  OR  PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge/development</p>
 <p>for the bash shell.</p>
 <p>Alternatively, one can add the following lines near the top of a python script (or type them at the prompt)</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;/usr/gapps/fudge4/current&quot;</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;/usr/gapps/fudge/current&quot;</span> <span class="p">)</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">fudgeDefaults</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">NDF_DATABASE_DIR</span> <span class="o">=</span> <span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="n">personal</span><span class="o">/</span><span class="n">database</span><span class="o">/</span><span class="n">processed</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id3">
-<h3>Reading fudge’s documentation.<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="reading-fudge-s-documentation-1">
+<h3>Reading fudge’s documentation.<a class="headerlink" href="#reading-fudge-s-documentation-1" title="Permalink to this headline">¶</a></h3>
 <p>In general, one should first create a reactionSuite class object (also sometimes called a Protare for
 Projectile + Target + Evaluation). For example the beginning of a fudge session may look like,</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">ReactionSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="s2">&quot;path/to/GNDS/reactionSuite.xml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;path/to/GNDS/reactionSuite.xml&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is therefore important to read the documentation on the reactionSuite class.
 For an overview of creating, visualizing and processing GNDS reactionSuites we recommend starting with
 the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
-</div>
-</div>
-<div class="section" id="subpackages">
+</section>
+</section>
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -316,8 +317,8 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
 </li>
 </ul>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -332,14 +333,14 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
   <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">fudge Package</a><ul>
-<li><a class="reference internal" href="#id1"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fudge</span></code> Package</a><ul>
+<li><a class="reference internal" href="#fudge-package-1"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fudge</span></code> Package</a><ul>
 <li><a class="reference internal" href="#getting-at-fudge-s-python-scripts">Getting at fudge’s python scripts.</a></li>
 <li><a class="reference internal" href="#reading-fudge-s-documentation">Reading fudge’s documentation.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-fudge.__doc__"><code class="xref py py-mod docutils literal notranslate"><span class="pre">__doc__</span></code> Module</a><ul>
-<li><a class="reference internal" href="#id2">Getting at fudge’s python scripts.</a></li>
-<li><a class="reference internal" href="#id3">Reading fudge’s documentation.</a></li>
+<li><a class="reference internal" href="#getting-at-fudge-s-python-scripts-1">Getting at fudge’s python scripts.</a></li>
+<li><a class="reference internal" href="#reading-fudge-s-documentation-1">Reading fudge’s documentation.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
@@ -348,8 +349,8 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../index.html"
-                        title="previous chapter">Fudge and GNDS</a></p>
+  <p class="topless"><a href="../pqu/pqu.html"
+                        title="previous chapter">pqu package</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="fudge.html"
                         title="next chapter">fudge package</a></p>
@@ -387,9 +388,9 @@ the documentation in doc/html/index.html (in particular the GNDS tutorial).</p>
           <a href="fudge.html" title="fudge package"
              >next</a> |</li>
         <li class="right" >
-          <a href="../index.html" title="Fudge and GNDS"
+          <a href="../pqu/pqu.html" title="pqu package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge Package</a></li> 
       </ul>
     </div>

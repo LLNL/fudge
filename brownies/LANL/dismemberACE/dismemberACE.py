@@ -85,7 +85,14 @@ def dismemberACE( fileName ) :
     JXS += dismemberACE_miscModule.get8Integers( lines[10] )
     JXS += dismemberACE_miscModule.get8Integers( lines[11] )
     JXS = dismemberACE_miscModule.ListBase1( JXS )
-    for i1 in range( 1, 32 ) : fOut.write( 'JXS[%2d] = %9d\n' % ( i1, JXS[i1] ) )
+    JXS_sortedByAddress = []
+    for i1 in range(1, 32):
+        name = 'JXS[%2d]' % i1
+        fOut.write('%s = %9d\n' % (name, JXS[i1]))
+        JXS_sortedByAddress.append([JXS[i1], name])
+    fOut.write('\nJXS sorted by address\n')
+    for address, name in sorted(JXS_sortedByAddress):
+        fOut.write('%s = %9d\n' % (name, address))
 
     fOut.close( )
 

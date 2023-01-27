@@ -89,7 +89,7 @@ class Test_covarianceSuite( TestCaseBase ):
           <array shape="8,8" compression="diagonal">
             <values>0 4.84e-10 1.357e-5 9.8057e-6 2.6915e-5 3.3173e-5 3.2769e-5 3.0954e-5</values></array></gridded2d></shortRangeSelfScalingVariance></mixed></covarianceSection>""".split('\n')
         self.maxDiff = None
-        self.assertXMLListsEqual( self.covSuite.covarianceSections[2].toXML_strList(formatVersion=GNDS_formatVersionModule.gnds2_0), answer )
+        self.assertXMLListsEqual(self.covSuite.covarianceSections[2].toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0), answer)
 
     def test__len__(self):
         self.assertEqual( len(self.covSuite.covarianceSections),60)

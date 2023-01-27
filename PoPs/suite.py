@@ -131,6 +131,11 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         for item in self.__items : item.convertUnits( unitMap )
 
+    def keys(self):
+        '''Returns the list of all keys in *self*.'''
+
+        return [item.keyValue for item in self.__items]
+
     def remove( self, key ) :
         """Remove object with specified key from the suite."""
 
@@ -148,15 +153,23 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         for item in other : self.add( item.copy( ) )
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        if( len( self ) == 0 ) : return( [] )
-        xmlString = [ '%s<%s>' % ( indent, self.moniker ) ]
-        for item in self : xmlString += item.toXML_strList( indent2, **kwargs )
-        xmlString[-1] += '</%s>' % self.moniker
-        return( xmlString )
+        xmlString = ['%s<%s>' % (indent, self.moniker)]
+        for item in self :
+            xmlString += item.toXML_strList(indent2, **kwargs)
+
+        if len(xmlString) == 1:
+            if kwargs.get('showEmptySuites', False):
+                xmlString = [xmlString[0][:-1] + '/>']
+            else:
+                xmlString = []
+        else:
+            xmlString[-1] += '</%s>' % self.moniker
+
+        return xmlString
 
     def uniqueLabel( self, item ) :
         """

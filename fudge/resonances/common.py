@@ -186,12 +186,19 @@ class ResonanceReaction(ancestryModule.AncestryIO):
         return self.__hardSphereRadius
 
     def getHardSphereRadius(self):
-        """Return HardSphereRadius, looking up ancestry if necessary. If no HardSphereRadius is defined, return ScatteringRadius instead"""
-        if self.__hardSphereRadius is not None:
-            return self.__hardSphereRadius
+        """
+        Return HardSphereRadius, looking up ancestry if necessary.
+        If no HardSphereRadius is defined, return ScatteringRadius instead
+        """
+        if self.hardSphereRadius is not None:
+            return self.hardSphereRadius
         else:
             from .resonances import Resonances
-            return self.findClassInAncestry(Resonances).getHardSphereRadius()
+            resonancesHSR = self.findClassInAncestry(Resonances).hardSphereRadius
+            if resonancesHSR is not None:
+                return resonancesHSR
+            else:
+                return self.getScatteringRadius()
 
     @hardSphereRadius.setter
     def hardSphereRadius(self, value):

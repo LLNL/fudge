@@ -110,7 +110,7 @@ def executeMultiThreaded(taskList, runner, nThreads=multiprocessing.cpu_count(),
     while True:
         time.sleep(sleepTime)
         for t in active[::-1]:
-            if not t.isAlive():
+            if not t.is_alive():
                 t.join()
                 finished.append(t)
                 active.remove(t)

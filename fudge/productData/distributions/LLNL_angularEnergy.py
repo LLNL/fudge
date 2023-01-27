@@ -238,14 +238,14 @@ class XYs3d( baseModule.Subform, multiD_XYsModule.XYs3d ) :
         angular = angularModule.XYs2d( axes = self.axes )
         for PofEpGivenMu in self :
             data = angularModule.XYs1d( [ [ PofEp.outerDomainValue, PofEp.integrate() ] for PofEp in PofEpGivenMu ] )
-            angular.append( angularModule.Xs_pdf_cdf1d.fromXYs( angularModule.XYs1d( data ), outerDomainValue = PofEpGivenMu.outerDomainValue ) )
+            angular.append(angularModule.Xs_pdf_cdf1d.fromXYs(angularModule.XYs1d(data), outerDomainValue=PofEpGivenMu.outerDomainValue, thinEpsilon=1e-14))
 
         xys3d = angularEnergyMCModule.XYs3d( axes = self.axes )
         for PofEpGivenMu in self :
             xys2d = angularEnergyMCModule.XYs2d( outerDomainValue = PofEpGivenMu.outerDomainValue )
             for PofEp in PofEpGivenMu :
                 _PofEp = PofEp.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
-                xys2d.append( angularEnergyMCModule.Xs_pdf_cdf1d.fromXYs( _PofEp, PofEp.outerDomainValue ) )
+                xys2d.append(angularEnergyMCModule.Xs_pdf_cdf1d.fromXYs(_PofEp, PofEp.outerDomainValue, thinEpsilon=1e-14))
             xys3d.append( xys2d )
 
         return( angularEnergyMCModule.Angular( angular ), angularEnergyMCModule.AngularEnergy( xys3d ) )
@@ -522,31 +522,38 @@ class LLNLAngularEnergyForm( baseModule.Form ) :
         self.angularSubform.convertUnits( unitMap )
         self.angularEnergySubform.convertUnits( unitMap )
 
-    def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
+    def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
+
+        muMin = kwargs.get('muMin', -1.0)
+        muMax = kwargs.get('muMax',  1.0)
 
         if frame == xDataEnumsModule.Frame.centerOfMass:
-            TypeError( 'Lab to center-of-mass translation not supported.' )
+            TypeError('Lab to center-of-mass translation not supported.')
 
-        if( energyIn < self.angularSubform.data[1].outerDomainValue ) :     # My need kludge (see KLUDGE1).
-            if( self.angularSubform.data[0][0][0] != -1 ) : energyIn = self.angularSubform.data[1].outerDomainValue
-        angular = self.angularSubform.data.evaluate( energyIn )
-        energy = self.angularEnergySubform.data.evaluate( energyIn )
+        if energyIn < self.angularSubform.data[1].outerDomainValue:         # May need kludge (see KLUDGE1).
+            if self.angularSubform.data[0][0][0] != -1:
+                energyIn = self.angularSubform.data[1].outerDomainValue
+        angular = self.angularSubform.data.evaluate(energyIn)
+        energy = self.angularEnergySubform.data.evaluate(energyIn)
 
         energePrimes = []
-        for xys1d in energy : energePrimes += xys1d.domainGrid
-        energePrimes = sorted( set( energePrimes ) )
+        for xys1d in energy:
+            energePrimes += xys1d.domainGrid
+        energePrimes = sorted(set(energePrimes))
 
         energePrimeProbabilities = []
-        for energePrime in energePrimes :
+        for energePrime in energePrimes:
             muProbability = []
-            for muIndex, muP in enumerate( angular ) :
+            for muIndex, muP in enumerate(angular):
                 energyAtMu = energy[muIndex]
-                energyProbabilities = energyAtMu.evaluate( energePrime )
-                if( energyProbabilities is None ) : continue
-                muProbability.append( [ muP[0], muP[1] * energyProbabilities ] )
-            energePrimeProbabilities.append([energePrime, XYs1dModule.XYs1d(muProbability).integrate()])
-        xys1d = energyModule.XYs1d( energePrimeProbabilities, axes = energyModule.defaultAxes( energyUnit = self.domainUnit ) )
-        return( xys1d )
+                energyProbabilities = energyAtMu.evaluate(energePrime)
+                if energyProbabilities is None:
+                    continue
+                muProbability.append([muP[0], muP[1] * energyProbabilities])
+            energePrimeProbabilities.append([energePrime, XYs1dModule.XYs1d(muProbability).integrate(domainMin=muMin, domainMax=muMax)])
+        xys1d = energyModule.XYs1d(energePrimeProbabilities, axes=energyModule.defaultAxes(energyUnit=self.domainUnit))
+
+        return xys1d
 
     def fixDomains(self, domainMin, domainMax, fixToDomain):
         """

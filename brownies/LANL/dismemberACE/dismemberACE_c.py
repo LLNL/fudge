@@ -174,6 +174,15 @@ def dismemberACE( args, NXS, JXS, XSS ) :
 
         Ps = dismemberACE_miscModule.getData( 'P(i,j,k) (URR)', XSS, offset, N * 6 * M )
         fOut.write( '\n\n### Probality tables\n' )
-        for pt in Ps : fOut.write( '%20.12e\n' % pt )
+        URR_offset = 0
+        for energyIndex in range(N):
+            enetryStr = ' at energy %s' % energies[energyIndex]
+            for type in ['cumulative probability', 'total', 'elastic', 'fission', 'capture', 'heating']:
+                typeStr = '    # %s%s' % (type, enetryStr)
+                for index in range(M):
+                    fOut.write( '%20.12e%s\n' % (Ps[URR_offset], typeStr))
+                    URR_offset += 1
+                    typeStr = ''
+                enetryStr = ''
 
         fOut.close( )

@@ -70,25 +70,31 @@ def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularD
         TM1s, TMEs = [], []
         lowestBound, highestBound = angularData[0].domainMin, angularData[-1].domainMax
         weightAxes = axesModule.Axes(2)
-        for iRegion, region in enumerate( angularData ) :
-                if( iRegion == 0 ) :
-                    weightData = [ [ lowestBound, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
-                elif( iRegion == len( angularData ) - 1 ) :
-                    weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ highestBound, 1 ] ]
-                else :
-                    weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
-                _weight = XYs1dModule.XYs1d(data=weightData, axes=weightAxes, interpolation=flat)
 
-                tempInfo['workFile'].append( 'r%s' % iRegion )
-                try :
-                    TM1, TME = twoBodyTransferMatrix2( style, tempInfo, crossSection, region, Q,
-                            productFrame, weight = _weight, comment = comment )
-                except :
-                    del tempInfo['workFile'][-1]
-                    raise
+        reactionSuite = tempInfo['reactionSuite']
+        projectileName = reactionSuite.projectile
+        maxGroupEnergy = style.transportables[projectileName].group.boundaries.values[-1]
+        for iRegion, region in enumerate( angularData ) :
+            if region.domainMin >= maxGroupEnergy:
+                break
+            if( iRegion == 0 ) :
+                weightData = [ [ lowestBound, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
+            elif( iRegion == len( angularData ) - 1 ) :
+                weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ highestBound, 1 ] ]
+            else :
+                weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
+            _weight = XYs1dModule.XYs1d(data=weightData, axes=weightAxes, interpolation=flat)
+
+            tempInfo['workFile'].append( 'r%s' % iRegion )
+            try :
+                TM1, TME = twoBodyTransferMatrix2( style, tempInfo, crossSection, region, Q,
+                        productFrame, weight = _weight, comment = comment )
+            except :
                 del tempInfo['workFile'][-1]
-                TM1s.append( TM1 )
-                TMEs.append( TME )
+                raise
+            del tempInfo['workFile'][-1]
+            TM1s.append( TM1 )
+            TMEs.append( TME )
         TM1 = addTMs( TM1s )
         TME = addTMs( TMEs )
     else :
