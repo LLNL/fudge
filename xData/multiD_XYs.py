@@ -590,6 +590,11 @@ class XYsnd( baseModule.XDataFunctional ) :
         if( not( insitu ) ) : multid_xys = self.copy( )
         for functional in multid_xys : functional.scaleDependent( value, insitu = True )
 
+    def toLinearXYsClass(self):
+        '''Returns self.__class__ since that is the linear class for this dimensional data.'''
+
+        return self.__class__
+
     def toPointwiseLinear( self, **kwargs ) :
 
         if self.interpolation not in [enumsModule.Interpolation.flat, enumsModule.Interpolation.linlin]:

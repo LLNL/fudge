@@ -156,10 +156,9 @@ class XYs1d( XYs1dModule.XYs1d ) :
 
         return( XYs1d )
 
-    def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+    def to_xs_pdf_cdf1d(self, style, tempInfo, indent):
 
-        return( Xs_pdf_cdf1d.fromXYs( self, outerDomainValue = self.outerDomainValue ) )
-
+        return Xs_pdf_cdf1d.fromXYs(self, outerDomainValue=self.outerDomainValue, thinEpsilon=1e-14)
 
 class Legendre( series1dModule.LegendreSeries ) :
 
@@ -218,9 +217,9 @@ class Isotropic1d(ancestryModule.AncestryIO):
 
         return( True )
 
-    def integrate( self, muMin, muMax ) :
+    def integrate(self, domainMin, domainMax):
 
-        return( 0.5 * ( muMax - muMin ) )
+        return 0.5 * (domainMax - domainMin)
 
     def LegendreCoefficient( self, LegendreOrder ) :
 
@@ -802,6 +801,18 @@ class TwoBody( baseModule.Form ) :
         baseModule.Form.__init__( self, label, productFrame, ( angularSubform, ) )
 
     @property
+    def data(self):
+        '''Temporary method until I redo all the classes that have a data-like member.'''
+
+        return(self.angularSubform)
+
+    @data.setter
+    def data(self, data):
+        '''Temporary method until I redo all the classes that have a data-like member. Need to check data type.'''
+
+        self.angularSubform = data
+
+    @property
     def domainMin(self):
 
         return self.angularSubform.domainMin
@@ -820,63 +831,91 @@ class TwoBody( baseModule.Form ) :
 
         self.angularSubform.convertUnits( unitMap )
 
-    def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
+    def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
         """Returns the energy spectrum in the lab frame for the specified incident energy."""
 
         from fudge import product as productModule
         from ... import outputChannel as outputChannelModule
 
+        muMin = kwargs.get('muMin', -1.0)
+        muMax = kwargs.get('muMax',  1.0)
+        partialMuDomain = muMin != -1.0 or muMax != 1.0
+
         reactionSuite = self.rootAncestor
         energyUnit = self.angularSubform.domainUnit
         massUnit = energyUnit + '/c**2'
-        projectileMass = reactionSuite.PoPs[reactionSuite.projectile].getMass( massUnit )
-        targetMass = reactionSuite.PoPs[reactionSuite.target].getMass( massUnit )
-        if( ( projectileMass == 0.0 ) or ( targetMass == 0.0 ) ) :
-            print( '    WARNING: skipping unsupported relativistic TwoBody.energySpectrumAtEnergy: projectile mass = %s, target mass = %s' % ( projectileMass, targetMass ) )
-            return( energyModule.XYs1d( axes = energyModule.defaultAxes( energyUnit ) ) )
+        projectileMass = reactionSuite.PoPs[reactionSuite.projectile].getMass(massUnit)
+        targetMass = reactionSuite.PoPs[reactionSuite.target].getMass(massUnit)
+        if projectileMass == 0.0 or targetMass == 0.0:
+            print('    WARNING: skipping unsupported relativistic TwoBody.energySpectrumAtEnergy: projectile mass = %s, target mass = %s' % 
+                    (projectileMass, targetMass))
+            return energyModule.XYs1d(axes=energyModule.defaultAxes(energyUnit))
         product = self.findClassInAncestry(productModule.Product)
         outputChannel = self.findClassInAncestry(outputChannelModule.OutputChannel)
 
-        productMass = reactionSuite.PoPs[outputChannel.products[0].pid].getMass( massUnit )
-        residualMass = reactionSuite.PoPs[outputChannel.products[1].pid].getMass( massUnit )
-        if( ( productMass == 0.0 ) or ( residualMass == 0.0 ) ) :
-            print( '    WARNING: skipping unsupported relativistic TwoBody.energySpectrumAtEnergy: product mass = %s, target mass = %s' % ( productMass, residualMass ) )
-            return( energyModule.XYs1d( axes = energyModule.defaultAxes( energyUnit ) ) )
-        if( outputChannel.products[1] == product ) : productMass, residualMass = residualMass, productMass
+        productMass = reactionSuite.PoPs[outputChannel.products[0].pid].getMass(massUnit)
+        residualMass = reactionSuite.PoPs[outputChannel.products[1].pid].getMass(massUnit)
+        if productMass == 0.0 or residualMass == 0.0:
+            print('    WARNING: skipping unsupported relativistic TwoBody.energySpectrumAtEnergy: product mass = %s, target mass = %s' % 
+                (productMass, residualMass))
+            return energyModule.XYs1d(axes=energyModule.defaultAxes(energyUnit))
+        if outputChannel.products[1] == product:
+            productMass, residualMass = residualMass, productMass
 
-        comKineticEnergy = energyIn * targetMass / ( projectileMass + targetMass ) + projectileMass + targetMass - productMass - residualMass
-        comKineticEnergy *= residualMass / ( productMass + residualMass )
-        if( comKineticEnergy < 0.0 ) : return( energyModule.XYs1d( axes = energyModule.defaultAxes( energyUnit ) ) )
+        comKineticEnergy = energyIn * targetMass / (projectileMass + targetMass) + projectileMass + targetMass - productMass - residualMass
+        comKineticEnergy *= residualMass / (productMass + residualMass)
+        if comKineticEnergy < 0.0:
+            return energyModule.XYs1d(axes=energyModule.defaultAxes(energyUnit))
 
+        PofMu = self.angularSubform.evaluate(energyIn)
         if frame == xDataEnumsModule.Frame.centerOfMass:
-            twoBodyCOMResolution = min( 0.1, max( 1e-6, kwargs.get( 'twoBodyCOMResolution', 1e-2 ) ) )
-            data = [ [ comKineticEnergy * ( 1 - twoBodyCOMResolution ), 0.0 ],
-                     [ comKineticEnergy, 1.0 ], 
-                     [ comKineticEnergy * ( 1 + twoBodyCOMResolution ), 0.0 ] ]
-            return( energyModule.XYs1d( data, axes = energyModule.defaultAxes( energyUnit ) ).normalize( ) )
+            twoBodyCOMResolution = min(0.1, max(1e-6, kwargs.get('twoBodyCOMResolution', 1e-2)))
+            data = [[comKineticEnergy * (1 - twoBodyCOMResolution), 0.0],
+                    [comKineticEnergy, 1.0], 
+                    [comKineticEnergy * (1 + twoBodyCOMResolution), 0.0]]
+            return energyModule.XYs1d(data, axes=energyModule.defaultAxes(energyUnit)).normalize() * PofMu.integrate(domainMin=muMin, domainMax=muMax)
 
-        projectileSpeed = math.sqrt( 2.0 * energyIn / projectileMass )
-        comSpeed = projectileMass / ( projectileMass + targetMass ) * projectileSpeed
+        projectileSpeed = math.sqrt(2.0 * energyIn / projectileMass)
+        comSpeed = projectileMass / (projectileMass + targetMass) * projectileSpeed
 
         comSpeedProductEnergy = 0.5 * productMass * comSpeed * comSpeed
-        productComEnergy = comKineticEnergy * residualMass / ( productMass + residualMass )
-        sqrtEnergiesTimes2 = 2.0 * math.sqrt( comSpeedProductEnergy * productComEnergy )
+        productComEnergy = comKineticEnergy * residualMass / (productMass + residualMass)
+        productCOM_speed = math.sqrt(2.0 * productComEnergy / productMass)
+        sqrtEnergiesTimes2 = 2.0 * math.sqrt(comSpeedProductEnergy * productComEnergy)
 
-        PofMu = self.angularSubform.evaluate( energyIn )
+        mus = self.productMuInCOM_fromProductMusInLab(muMin, muMax, comSpeed, productCOM_speed)
+
+        PofMu = self.angularSubform.evaluate(energyIn)
         PofEnergyPrime = []
         numberOfPoints = 51
-        for muIndex in range( numberOfPoints ) :
-            mu = -1.0 + 2.0 * muIndex / ( numberOfPoints - 1 )
-            if( mu > 0.99999 ) : mu = 1.0
-            if( abs( mu ) < 1e-8 ) : mu = 0.0
-            energyPrime = comSpeedProductEnergy + productComEnergy + mu * sqrtEnergiesTimes2
-            PatMu = PofMu.evaluate( mu )
-            PatE = PatMu / sqrtEnergiesTimes2
-            PofEnergyPrime.append( [ energyPrime, PatE ] )
-        PofEnergyPrime = energyModule.XYs1d( data = PofEnergyPrime, axes = energyModule.defaultAxes( energyUnit ) )
-        PofEnergyPrime.normalize( insitu = True )
+        numberOfPointsMinusOne = numberOfPoints - 1
+        norm = 0.0
+        for index, (mu1, mu2) in enumerate(mus):
+            for muIndex in range(numberOfPoints):
+                mu = (mu1 * (numberOfPointsMinusOne - muIndex) + mu2 * muIndex) / numberOfPointsMinusOne
+                if abs(mu) < 1e-12:
+                    mu = 0.0
+                energyPrime = comSpeedProductEnergy + productComEnergy + mu * sqrtEnergiesTimes2
+                PatMu = PofMu.evaluate(mu)
+                PatE = PatMu / sqrtEnergiesTimes2
+                PofEnergyPrime.append([energyPrime, PatE])
+            if partialMuDomain:
+                norm += PofMu.integrate(domainMin=mu1, domainMax=mu2)
+                if len(mus) > 1:
+                    if index == 0:
+                        firstPofEnergyPrime = energyModule.XYs1d(data=PofEnergyPrime, axes=energyModule.defaultAxes(energyUnit))
+                        PofEnergyPrime = []
+                    else:
+                        PofEnergyPrime = energyModule.XYs1d(data=PofEnergyPrime, axes=energyModule.defaultAxes(energyUnit))
+                        firstPofEnergyPrime, PofEnergyPrime = firstPofEnergyPrime.mutualify(0.0, 1e-6, True, PofEnergyPrime, 1e-6, 0, True)
+                        PofEnergyPrime = firstPofEnergyPrime + PofEnergyPrime
+        PofEnergyPrime = energyModule.XYs1d(data=PofEnergyPrime, axes=energyModule.defaultAxes(energyUnit))
+        if len(PofEnergyPrime) > 0:
+            PofEnergyPrime.normalize(insitu=True)
+            if partialMuDomain:
+                PofEnergyPrime *= norm
 
-        return( PofEnergyPrime )
+        return PofEnergyPrime
 
     def evaluate( self, energy, mu, phi = 0, frame = None ) :
 
@@ -913,17 +952,6 @@ class TwoBody( baseModule.Form ) :
 
         from fudge import product as productModule
         from ... import outputChannel as outputChannelModule
-
-        def product_mu_in_com_from_product_mu_in_lab( mu_prime_lab, com_speed, product_com_speed ) :
-
-            speedRatio = com_speed / product_com_speed
-            factor = speedRatio * ( 1.0 - mu_prime_lab * mu_prime_lab )
-            term_pm = mu_prime_lab * math.sqrt( 1.0 - speedRatio * factor )
-            mu1 = term_pm - factor                      # Solution for mu_prime_lab > com_speed and one solution for mu_prime_lab < com_speed.
-            if( product_com_speed >= com_speed ) : return( mu1 )
-            mu2 = -term_pm - factor                     # Other solution for mu_prime_lab < com_speed (mu2 < mu1).
-
-            return( mu2, mu1 )
 
         def product_mu_in_com_from_final_product_energy_lab( product_energy_prime_lab, product_mass, com_speed, product_com_speed ) :
 
@@ -974,16 +1002,17 @@ class TwoBody( baseModule.Form ) :
             if( product_com_speed <= com_speed ) :
                 mu_lab_max = math.sqrt( com_speed * com_speed - product_com_speed * product_com_speed ) / com_speed     # Maximum mu in lab frame that product can have.
                 if( mu_prime_min >= mu_lab_max ) : return( 0.0 )
-                mu_prime_1, mu_prime_4 = product_mu_in_com_from_product_mu_in_lab( mu_prime_min, com_speed, product_com_speed )
+                mu_prime_1, mu_prime_4 = self.productMuInCOM_fromProductMuInLab( mu_prime_min, com_speed, product_com_speed )
                 if( mu_prime_max < mu_lab_max ) :
-                    mu_prime_2, mu_prime_3 = product_mu_in_com_from_product_mu_in_lab( mu_prime_max, com_speed, product_com_speed )
+                    mu_prime_2, mu_prime_3 = self.productMuInCOM_fromProductMuInLab( mu_prime_max, com_speed, product_com_speed )
                     muLists = [ [ mu_prime_1, mu_prime_2 ], [ mu_prime_3, mu_prime_4 ] ]
                 else :
                     muLists = [ [ mu_prime_1, mu_prime_4 ] ]
             else :
-                mu_prime_1 = product_mu_in_com_from_product_mu_in_lab( mu_prime_min, com_speed, product_com_speed )
+                mu_prime_1, dummy = self.productMuInCOM_fromProductMuInLab( mu_prime_min, com_speed, product_com_speed )
                 mu_prime_2 = None
-                if( mu_prime_max is not None ) : mu_prime_2 = product_mu_in_com_from_product_mu_in_lab( mu_prime_max, com_speed, product_com_speed )
+                if mu_prime_max is not None:
+                    mu_prime_2, dummy = self.productMuInCOM_fromProductMuInLab( mu_prime_max, com_speed, product_com_speed )
                 muLists = [ [ mu_prime_1, mu_prime_2 ] ]
 
         angular_evaluate = 0.0
@@ -1084,6 +1113,72 @@ class TwoBody( baseModule.Form ) :
 
         xPath.pop( )
         return( angularForm )
+
+    @staticmethod
+    def productMuInCOM_fromProductMuInLab(muLab, COM_speed, productCOM_speed):
+        '''
+        This function returns the tuple (mu1, mu2, isTangent) where mu1 and mu2 are the center-of-
+        mass (COM) frame mus for an outgoing particle (product) that correspond to the lab frame mu *muLab*.
+        The interaction is two-body, *COM_speed* is the COM mass speed and *productCOM_speed*
+        is the product's speed in the COM frame.  If *COM_speed* <= productCOM_speed, 
+        there is only one COM mu (mu1) for *muLab*. In this case, the returned tuple is (mu1, None, False).
+
+        Otherwise, there are 0, 1 or 2 solutions as follows. If *muLab* is too large, there is no solution
+        and the tuple (None, None, False) is returned. If *muLab* is tangent to the circle of the product's
+        velolicty in the COM frame then (mu1, None, True) are returned. Otherwise (mu1, mu2, False) is
+        returned with mu1 < mu2.
+        '''
+
+        speedRatio = COM_speed / productCOM_speed
+        factor = speedRatio * (1.0 - muLab * muLab)
+        sqrtArgument = 1.0 - speedRatio * factor
+
+        if speedRatio >= 1 and muLab < 0.0:
+            return None, None, False
+
+        if sqrtArgument <= 0.0:
+            if sqrtArgument < 0.0:                      # No solution.
+                return None, None, False
+            else:                                       # Tangent to productCOM_speed circle in COM frame.
+                return math.sqrt( 1 - 1 / (speedRatio * speedRatio)), None, True
+        term_pm = muLab * math.sqrt(sqrtArgument)
+        mu2 = term_pm - factor                          # Solution for productCOM_speed > COM_speed or one solution for productCOM_speed < COM_speed.
+
+        if productCOM_speed >= COM_speed:
+            return mu2, None, False
+
+        mu1 = -term_pm - factor                         # Other solution for productCOM_speed < COM_speed (mu1 < mu2).
+
+        return mu1, mu2, False
+
+    @staticmethod
+    def productMuInCOM_fromProductMusInLab(muMinLab, muMaxLab, COM_speed, productCOM_speed):
+        '''
+        This function determines all center-of-mass (COM) frame mu domains (i.e., [mu1, mu2] pairs) that lay 
+        between the lab frame mus *muMinLab* and *muMaxLab*. The returned objects is a list that can contain 0, 
+        1 or 2 pairs of mu values. Note if *muMinLab* >= *muMaxLab* an empty list is returned. If 
+        *COM_speed* < *productCOM_speed* the list [[mu1, mu2]] is returned. Otherwise, there are 3 possible solutions:
+        1) no COM mus corresonding to *muMaxLab* (and hence *muMinLab*) in which case an empty list is also returned, 
+        2) only *muMaxLab* has corresonding COM mus and [[mu1, mu2]] is returned where mu1 < mu2 or 3) both *muMinLab*
+        and *muMaxLab* have corresonding COM mus and [[mu1, mu2], [mu3, mu4]] where mu1 < mu2 < mu3 < mu4 is returned.
+        '''
+
+        if muMinLab >= muMaxLab:
+            return []
+
+        mu1, mu2, isTangentMin = TwoBody.productMuInCOM_fromProductMuInLab(muMinLab, COM_speed, productCOM_speed)
+        mu3, mu4, isTangentMax = TwoBody.productMuInCOM_fromProductMuInLab(muMaxLab, COM_speed, productCOM_speed)
+
+        if mu3 is None or isTangentMax:
+            return []
+
+        if mu1 is None or isTangentMin:
+            return [[mu3, mu4]]
+
+        if mu2 is None:
+            return [[mu1, mu3]]
+
+        return [[mu3, mu1], [mu2, mu4]]
 
 def calculateAverageProductData( self, style, indent, **kwargs ) :
     """

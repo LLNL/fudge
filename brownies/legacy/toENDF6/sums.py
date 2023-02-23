@@ -25,11 +25,14 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     targetInfo['Q'] = Q                     # FIXME may need to account for ground state
     crossSection = self.crossSection
     targetInfo['EMin'], targetInfo['EMax'] = crossSection.domainMin, crossSection.domainMax
+    level = 0
     if self.summands:
-        level = min( [ max( [ product.getLevelAsFloat('eV') for product in reaction.link.ancestor.outputChannel ] )
-            for reaction in self.summands ] )
-    else :
-        level = 0
+        try:
+            level = min( [ max( [ product.getLevelAsFloat('eV') for product in reaction.link.ancestor.outputChannel ] )
+                for reaction in self.summands ] )
+        except ValueError:
+            # Shows up when converting files that only contain cross-sections
+            print("WARNING: could not compute final level for summed reaction %s, assuming 0 eV" % self.label)
     crossSection.toENDF6( self.ENDF_MT, endfMFList, targetInfo, level, LR=0 )
 
 sumsModule.CrossSectionSum.toENDF6 = toENDF6

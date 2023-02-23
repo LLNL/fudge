@@ -56,6 +56,7 @@ def process_args( ) :       # see https://docs.python.org/2/howto/argparse.html
     parser.add_argument( "--formatVersion", default = GNDS_formatVersionModule.default, choices = GNDS_formatVersionModule.allowed,
                                                                                                         help = "Specifies the format for the outputted GNDS file. " )
     parser.add_argument('--IDs', choices = ('familiar', 'nucleus', 'nuclide'), default='nuclide',       help='Choose between light charged particle naming conversion: "nuclide" (i.e., H1, H2, H3, He3 and He4), "nucleus" (i.e., h1, h2, h3, he3 and he4), or "familiar" (i.e., p, d, t, h and a).')
+    parser.add_argument('--printMassHistory', action='store_true',                                      help='If present, information on the loading of masses from the ENDF-6 file is printed.')
 
     return parser.parse_args()
 
@@ -111,7 +112,8 @@ rce = endfFileToGNDS.endfFileToGNDS(args.inputFile, singleMTOnly=args.MT, toStdO
                                     verboseWarnings=args.verboseWarnings, verbose=args.verbose, formatVersion=args.formatVersion,
                                     printBadNK14=args.printBadNK14, continuumSpectraFix=args.continuumSpectraFix,
                                     ignoreBadDate=args.ignoreBadDate, acceptBadMF10FissionZAP=args.acceptBadMF10FissionZAP,
-                                    reconstructResonances=not args.skipReconstruction, specialNuclearParticleID=specialNuclearParticleID)
+                                    reconstructResonances=not args.skipReconstruction, specialNuclearParticleID=specialNuclearParticleID,
+                                    printMassHistory=args.printMassHistory)
 
 errs = rce['errors']
 if( 'reactionSuite' in rce ) :

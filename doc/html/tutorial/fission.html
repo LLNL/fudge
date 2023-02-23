@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4.4. Fission &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>4.4. Fission &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="outgoingDistributions.html" title="4.3. Outgoing Distributions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U"><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.4. </span>Fission</a></li> 
@@ -47,7 +48,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="fission">
+  <section id="fission">
 <h1><span class="section-number">4.4. </span>Fission<a class="headerlink" href="#fission" title="Permalink to this headline">¶</a></h1>
 <p>While fission is treated as a single reaction in both ENDF and GNDS, in reality it is composed of many different reactions each of which produces a different set of outgoing particles. Fission poses a special challenge for GNDS since, unlike most other reactions, we cannot explicitly list all the outgoing products. Instead we list average values for outgoing neutrons and gammas, and ignore the fission fragments (except to give the average energy deposited in them).</p>
 <p>A neutron-induced fission channel generally contains several outgoing products:</p>
@@ -57,21 +58,21 @@
 </pre></div>
 </div>
 <p>In each case the multiplicity is generally a function of incident energy.</p>
-<div class="section" id="first-second-third-chance">
+<section id="first-second-third-chance">
 <h2><span class="section-number">4.4.1. </span>First, second, third chance, …<a class="headerlink" href="#first-second-third-chance" title="Permalink to this headline">¶</a></h2>
 <p>For most evaluations in major libraries, total fission (MT=18) contains a full description of the cross section,
 product multiplicities and distributions. Additional fission cross sections like first-chance, 2nd-chance, etc.
 are often also listed, but do not contain any description of outgoing products.
 GNDS (and Fudge) handle these with the <code class="docutils literal notranslate"><span class="pre">fissionComponent</span></code> container, which contains a cross section
 and Q-value but not necessarily a list of products.</p>
-</div>
-<div class="section" id="the-cross-section">
+</section>
+<section id="the-cross-section">
 <h2><span class="section-number">4.4.2. </span>The cross section<a class="headerlink" href="#the-cross-section" title="Permalink to this headline">¶</a></h2>
 <p>Fission cross sections behave like all other reaction cross sections. For non-threshold fissioners,
 part of the cross section is typically described by resonance parameters, so the cross section requires
 reconstruction.</p>
-</div>
-<div class="section" id="nubar">
+</section>
+<section id="nubar">
 <h2><span class="section-number">4.4.3. </span>nubar<a class="headerlink" href="#nubar" title="Permalink to this headline">¶</a></h2>
 <p>The average neutron multiplicity ‘nubar’ is stored as the multiplicity of outgoing fission neutrons.
 Nubar is typically separated into two components: ‘prompt’, for neutrons produced during the fission process,
@@ -80,8 +81,8 @@ Evaluations typically contain multiple delayed fission neutrons, grouped by the 
 the parent fission products.  The ENDF-6 format only supports storing a single delayed nubar, so in GNDS
 we typically see multiple delayed neutrons with multiplicities that link back to the first delayed neutron using
 the <code class="docutils literal notranslate"><span class="pre">reference</span></code> multiplicity class.</p>
-</div>
-<div class="section" id="pfns">
+</section>
+<section id="pfns">
 <h2><span class="section-number">4.4.4. </span>PFNS<a class="headerlink" href="#pfns" title="Permalink to this headline">¶</a></h2>
 <p>The prompt fission neutron spectrum (PFNS) is stored within the <code class="docutils literal notranslate"><span class="pre">distribution</span></code> information for the prompt neutron
 product. All existing evaluations make the assumption that the outgoing angles and energies are uncoupled (or only
@@ -96,21 +97,21 @@ The outgoing energy distribution can be stored in several different ways:</p>
 </ul>
 <p>Some evaluations (notably Th232 in ENDF-VII.1 and ENDF-VIII-beta4) use a double-differential energy-angle distribution
 for the PFNS, with a Legendre expansion given for each combination of incident and outgoing energy.</p>
-</div>
-<div class="section" id="gammas">
+</section>
+<section id="gammas">
 <h2><span class="section-number">4.4.5. </span>Gammas<a class="headerlink" href="#gammas" title="Permalink to this headline">¶</a></h2>
 <p>TBD: expand documentation</p>
-</div>
-<div class="section" id="energy-release">
+</section>
+<section id="energy-release">
 <h2><span class="section-number">4.4.6. </span>Energy release<a class="headerlink" href="#energy-release" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="delayed-neutrons">
+</section>
+<section id="delayed-neutrons">
 <h2><span class="section-number">4.4.7. </span>Delayed neutrons<a class="headerlink" href="#delayed-neutrons" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="fission-product-yields">
+</section>
+<section id="fission-product-yields">
 <h2><span class="section-number">4.4.8. </span>Fission product yields<a class="headerlink" href="#fission-product-yields" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -179,7 +180,7 @@ for the PFNS, with a Legendre expansion given for each combination of incident a
         <li class="right" >
           <a href="outgoingDistributions.html" title="4.3. Outgoing Distributions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" ><span class="section-number">4. </span>Digging deeper in <code class="docutils literal notranslate"><span class="pre">Fudge</span></code></a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.4. </span>Fission</a></li> 

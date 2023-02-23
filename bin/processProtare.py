@@ -14,6 +14,8 @@ import subprocess
 
 import argparse
 
+import fudge
+
 from PoPs import IDs as IDsPoPsModule
 from PoPs.families import nuclide as nuclidePoPsModule
 
@@ -24,6 +26,7 @@ from pqu import PQU as PQUModule
 
 from LUPY import times as timesModule
 from LUPY import locateFudgeBin as locateBinFolderModule
+from LUPY import commandlineArguments as commandlineArgumentsModule
 
 from LUPY import argumentsForScripts as argumentsForScriptsModule
 
@@ -56,6 +59,8 @@ HTprefixDefault = 'heated'
 MGprefixDefault = 'MultiGroup'
 MCprefixDefault = 'MonteCarlo'
 UPprefixDefault = 'UpScatter'
+
+summaryDocStringFUDGE = '''Processes a GNDS reactionSuite file for Monte Carlo and/or deterministic transport at various temperatures.'''
 
 description = """This script processes all data in a GNDS file as requested by input arguments. In addition to entering arguments on the comannd
 line, arguments can also be read from an input file by specifying an input file on the command line. The character '@' must prefix
@@ -113,6 +118,7 @@ parser.add_argument( '--temperatureUnit', type = str, default = temperatureUnitD
 parser.add_argument( '--legendreMax', type = int, default = legendreMaxDefault,                         help = 'Maximum Legendre order for Sn prcessed data. Default is "%s".' % legendreMaxDefault )
 parser.add_argument( '-mg', '--MultiGroup', action = 'store_true',                                      help = 'Flag to turn on multi-group processing.' )
 parser.add_argument( '-up', '--UpScatter', action = 'store_true',                                       help = 'Flag to turn on multi-group upscatter processing.' )
+parser.add_argument( '--skipMultiGroupSums', action='store_true',                                       help = 'If not present, multi-sums are added to the reactionSuite.')
 
 parser.add_argument( '-mc', '--MonteCarlo', action = 'store_true',                                      help = 'Flag to turn on Monte Carlo processing.' )
 
@@ -133,8 +139,6 @@ parser.add_argument( '--restart', action = 'store_true',                        
 
 parser.add_argument( '--preProcessLabel', type = str, default = None,                                   help = 'Label for style to process. If None, proc will pick the latest from the evaluated, and Realization styles.' )
 
-parser.add_argument( '--printArgsFile', type = str, default = None,                                     help = 'File to which input arguments are written.')
-
 parser.add_argument( '--prefixRecon', type = str, default = RCprefixDefault,                            help = 'Prefix for Resonance Reconstruction styles. Default is "%s".' % RCprefixDefault )
 parser.add_argument( '--prefixMuCutoff', type = str, default = muCutoffPrefixDefault,                   help = 'Prefix for Coulomb + nuclear elastic scattering mu cutoff style. Default is "%s".' % muCutoffPrefixDefault )
 parser.add_argument( '--prefixAEP', type = str, default = AEPprefixDefault,                             help = 'Prefix for Average Energy to Product styles. Default is "%s".' % AEPprefixDefault )
@@ -145,47 +149,11 @@ parser.add_argument( '--prefixUpScatter', type = str, default = UPprefixDefault,
 
 args = parser.parse_args( )
 
-# TODO Find a better way to write the command line arguments to file ... the current approach is specific for processProtare.py 
-if args.printArgsFile is not None:
-    parserActions = dict([(x.dest, x) for x in parser._actions])
-    currentArguments = []
-    excludeArguments = ['mapOrProtareFileName', 'outputFile', 'printArgsFile']
-    for arg in vars(args):
-        if arg in excludeArguments:
-            continue
+excludeArguments = ['outputFile', 'verbose']
+positionalArguments, optionalArguments = commandlineArgumentsModule.getArgparseArguments(parser, args, excludeArguments)
 
-        if len(parserActions[arg].option_strings) == 0:
-            currentArguments.append(getattr(args, arg))
-        else:
-            argValue = getattr(args, arg)
-            if isinstance(parserActions[arg].const, bool):
-                if parserActions[arg].default != argValue:
-                    currentArguments.append(parserActions[arg].option_strings[0])
-            elif isinstance(argValue, list):
-                if arg == 'gid':
-                    # for repeated particle definitions ... us the last one
-                    gidIndices = {}
-                    i = 0
-                    for pid_gid in args.gid :
-                        pid, gid = pid_gid.split( '=' )
-                        gidIndices[pid] = i
-                        i += 1
-
-                    for argIndex in sorted(gidIndices.values()):
-                        currentArguments.append('%s %s' % (parserActions[arg].option_strings[0], argValue[argIndex]))
-
-                else:
-                    for singleArg in argValue:
-                        currentArguments.append('%s %s' % (parserActions[arg].option_strings[0], singleArg))
-            elif arg == 'verbose':
-                if argValue > 0:
-                    currentArguments.append(' '.join([parserActions[arg].option_strings[0]] * argValue))
-            else:
-                if argValue is not None:
-                    currentArguments.append('%s %s' % (parserActions[arg].option_strings[0], argValue))
-
-    with open(args.printArgsFile, 'w') as fileObject:
-        fileObject.write('\n'.join(currentArguments))
+if args.exit < 1:
+    sys.exit( 0 )
 
 unitMap = { 'MeV' : args.energyUnit, 'eV' : args.energyUnit }
 
@@ -327,6 +295,10 @@ for temperatureIndex, temperatureValue in enumerate( args.temperatures ) : # Hea
 
     timerHeating = timesModule.Times( )
     heatStyle = stylesModule.Heated( args.prefixHeated + suffix, preLoopStyle.label, temperature, date = dateTimeStr )
+    if temperatureIndex == 0:
+        codeName = os.path.basename(__file__)
+        commandlineArgumentsModule.commandLineArgumentsToDocumentation(codeName, optionalArguments + positionalArguments, heatStyle.documentation)
+
     reactionSuite.styles.add( heatStyle )
     if( isThermalNeutronScatteringLaw ) :
         if( args.verbose > 0 ) : print( '  Processing TNSL' )
@@ -381,6 +353,9 @@ for temperatureIndex, temperatureValue in enumerate( args.temperatures ) : # Hea
             if( temperatureValue > 0.0 ) :
                 reactionSuite.processSnElasticUpScatter( heatUpscatterStyle, args.legendreMax, verbosity = args.verbose - 2 )  # FIXME need logfile arguments in this process call
             logFile.write( '  Upscatter correction\n    %s\n' % timerUp )
+
+if args.MultiGroup and not args.skipMultiGroupSums and reactionSuite.interaction != enumsModule.Interaction.atomic:
+    reactionSuite.addMultiGroupSums(replace=True)
 
 processedFileName = args.outputFile
 if( processedFileName is None ) :

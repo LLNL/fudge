@@ -268,15 +268,21 @@ class PrimaryGamma(DiscretePrimaryGamma):
         DiscretePrimaryGamma.__init__(self, value, domainMin, domainMax, axes=axes)
         self.__massRatio = None     # In ENDF lingo this is AWR / ( AWR + 1 ).
 
-        if not isinstance(finalState, (str, type(None))):
-            raise TypeError('Invalid finalState type: got "%s".' % type(finalState))
-        self.__finalState = finalState
+        self.finalState = finalState
 
     @property
     def finalState(self):
         """Returns the finalState."""
 
         return self.__finalState
+
+    @finalState.setter
+    def finalState(self, value):
+
+        if not isinstance(value, (str, type(None))):
+            raise TypeError('Invalid finalState type: got "%s".' % type(value))
+
+        self.__finalState = value
 
     @property
     def massRatio( self ) :
@@ -422,8 +428,10 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
                 break
         subform = XYs2d( axes = self.axes, interpolation = self.interpolation, 
                 interpolationQualifier = self.interpolationQualifier )
-        for xys in linear : subform.append( Xs_pdf_cdf1d.fromXYs( xys, xys.outerDomainValue ) )
-        return( subform )
+        for xys in linear:
+            subform.append(Xs_pdf_cdf1d.fromXYs(xys, xys.outerDomainValue, thinEpsilon=1e-14))
+
+        return subform
 
     @staticmethod
     def allowedSubElements( ) :
@@ -670,7 +678,7 @@ class GeneralEvaporation( FunctionalBase ) :
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
 
-        _gs = G( Xs_pdf_cdf1d.fromXYs( self.parameter2.data ) )
+        _gs = G(Xs_pdf_cdf1d.fromXYs(self.parameter2.data, thinEpsilon=1e-14))
         _gs.data.axes = self.parameter2.data.axes.copy()
         _form = GeneralEvaporation( self.U, thetas = self.parameter1.copy( ), gs = _gs )
         return( _form )
@@ -1186,24 +1194,24 @@ class NBodyPhaseSpace( Subform ) :
 
                 self.EMax_i = EMax_i
 
-        p = self.findClassInAncestry( productModule.Product )
+        p = self.findClassInAncestry(productModule.Product)
         mass, massUnit = self.mass.value, self.mass.unit
-        productMass = p.getMass( massUnit )
+        productMass = p.getMass(massUnit)
 
         r = self.findClassInAncestry(reactionModule.Reaction)
         EMin = r.domainMin
         EMax = r.domainMax
         energyUnit = r.domainUnit
 
-        reactionSuite = self.findClassInAncestry( reactionSuiteModule.reactionSuite )
+        reactionSuite = self.findClassInAncestry(reactionSuiteModule.ReactionSuite)
         projectile = reactionSuite.PoPs[reactionSuite.projectile]
-        projectileMass = projectile.mass[0].float( massUnit )
+        projectileMass = projectile.getMass(massUnit)
         targetID = reactionSuite.target
-        if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs[targetID].pid
+        if targetID in reactionSuite.PoPs.aliases: targetID = reactionSuite.PoPs[targetID].pid
         target = reactionSuite.PoPs[targetID]
-        targetMass = target.mass[0].float( massUnit )
+        targetMass = target.getMass(massUnit)
 
-        c = self.findClassInAncestry(outputChannelModule.outputChannel)
+        c = self.findClassInAncestry(outputChannelModule.OutputChannel)
         Q = c.Q.getConstant( )
 
         axes = defaultAxes( energyUnit )
@@ -1216,7 +1224,7 @@ class NBodyPhaseSpace( Subform ) :
         f = math.pow( EMax / EMin, 1. / n )
         E_ins = [ EMin * f**idx for idx in range( n ) ]
         E_ins[-1] = EMax        # Fix possible round off issue.
-        for idx, E_in in enumerate( E_ins ) :
+        for E_in in E_ins:
             Ea = targetMass / ( targetMass + projectileMass ) * E_in + Q
             EMax_i = Ea * ( mass - productMass ) / mass
             if( EMax_i < 0 ) : EMax_i = 1e-5                # This is a kludge
@@ -1226,7 +1234,7 @@ class NBodyPhaseSpace( Subform ) :
             data = XYs1d( data, outerDomainValue = E_in )
             data.normalize( insitu = True )
             pwl.append( data )
-        return( pwl )
+        return pwl
 
     def toXML_strList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""

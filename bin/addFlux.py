@@ -17,6 +17,8 @@ energyUnitDefault = "MeV"
 
 from argparse import ArgumentParser
 
+summaryDocStringFUDGE = '''Adds a flux definition (label and f(T,E,mu) data) to a fluxes file (e.g., fluxes.xml).'''
+
 description = """Read a list of energies and fluxes from the specified file and adds it to a flux file. For each energy, the fluxes must be stored as Legendre coefficients"""
 
 parser = ArgumentParser( description = description )

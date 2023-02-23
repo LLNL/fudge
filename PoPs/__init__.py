@@ -5,9 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""
-Top-level __init__ for the PoPs package.
-"""
+from LUPY import checkPythonVerions
 
 POPS_MAJORVERSION = 0
 POPS_MINORVERSION = 1

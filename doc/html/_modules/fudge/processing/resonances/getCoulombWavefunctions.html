@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.processing.resonances.getCoulombWavefunctions &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.processing.resonances.getCoulombWavefunctions &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.resonances.getCoulombWavefunctions</a></li> 
       </ul>
@@ -51,10 +51,11 @@
 
 <div class="viewcode-block" id="getCoulombWavefunctions"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.getCoulombWavefunctions">[docs]</a><span class="k">def</span> <span class="nf">getCoulombWavefunctions</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
     <span class="c1"># .... Check arguments:</span>
-    <span class="n">NE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">eta</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">!=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;rho and eta must be numpy arrays!&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;rho and eta must be float arrays!&quot;</span><span class="p">)</span>
+    <span class="n">NE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">eta</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">((</span><span class="n">NE</span><span class="p">,),</span> <span class="p">(</span><span class="n">NE</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;rho and eta must be 1-d arrays, of the same length!&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;L must be an integer!&quot;</span><span class="p">)</span>
@@ -326,7 +327,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.resonances.getCoulombWavefunctions</a></li> 
       </ul>

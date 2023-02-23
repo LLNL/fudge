@@ -18,7 +18,7 @@ import fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic 
 from .. import gndsToENDF6 as gndsToENDF6Module
 from .. import endfFormats as endfFormatsModule
 
-def toENDF6( self, MT, endfMFList, targetInfo, level, LR ) :
+def toENDF6(self, MT, endfMFList, targetInfo, level, LR):
     """
     Convert self into ENDF format
 
@@ -30,43 +30,45 @@ def toENDF6( self, MT, endfMFList, targetInfo, level, LR ) :
     """
 
     ZA, mass, QI, QM = targetInfo['ZA'], targetInfo['mass'], targetInfo['Q'], targetInfo['QM']
-    if( 'EFL' in targetInfo ) :
+    if 'EFL' in targetInfo:
         QM = QI
         QI = targetInfo['EFL']
-    else :
-        if( QM is None ) :
+    else:
+        if QM is None:
             QM = 0
-            if( MT in ( 2, 5 ) ) :
+            if MT in (2, 5):
                 QM = QI
-            elif( MT == 4 ) :                               # Q should be 0 except for excited-state targets:
+            elif MT == 4:                                       # Q should be 0 except for excited-state targets:
                 reactionSuite = targetInfo['reactionSuite']
                 targetID = reactionSuite.target
-                if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs[targetID].pid
+                if targetID in reactionSuite.PoPs.aliases:
+                    targetID = reactionSuite.PoPs[targetID].pid
                 target = reactionSuite.PoPs[targetID]
-                if( isinstance( target, nuclideModule.Particle ) ) :
-                    if( target.index != 0 ) : QM = QI
-            else :
-                if( targetInfo['reaction'] is not None ) :
+                if isinstance(target, nuclideModule.Particle):
+                    if target.index != 0:
+                        QM = QI
+            else:
+                if targetInfo['reaction'] is not None:
                     if targetInfo['reaction'].outputChannel.genre == enumsModule.Genre.twoBody:
                         QM = QI + level
-                    else :
-                        QM = targetInfo['reaction'].thresholdQAs( 'eV', final = True )
-                else :
+                    else:
+                        QM = targetInfo['reaction'].thresholdQAs('eV', final=True)
+                else:
                     QM = QI
 
-    if( targetInfo['reaction'] is not None ) :
+    if targetInfo['reaction'] is not None:
         fissionEnergyReleases = targetInfo['reaction'].outputChannel.fissionFragmentData.fissionEnergyReleases
-        if( len( fissionEnergyReleases ) > 0 ) :
+        if len(fissionEnergyReleases) > 0:
             QM = fissionEnergyReleases[0].nonNeutrinoEnergy.data.coefficients[0]
             QI = QM
-    interpolationFlatData, crossSectionFlatData = gndsToENDF6Module.getForm( targetInfo['style'], self ).toENDF6Data( MT, endfMFList, targetInfo, level )
-    if( interpolationFlatData is not None ) :
+    interpolationFlatData, crossSectionFlatData = gndsToENDF6Module.getForm(targetInfo['style'], self).toENDF6Data(MT, endfMFList, targetInfo, level)
+    if interpolationFlatData is not None:
         MF = targetInfo['crossSectionMF']
-        endfMFList[MF][MT] = [ endfFormatsModule.endfHeadLine( ZA, mass, 0, 0, 0, 0 ) ]
-        endfMFList[MF][MT].append( endfFormatsModule.endfContLine( QM, QI, 0, LR, len( interpolationFlatData ) / 2, len( crossSectionFlatData ) / 2 ) )
-        endfMFList[MF][MT] += endfFormatsModule.endfInterpolationList( interpolationFlatData )
-        endfMFList[MF][MT] += endfFormatsModule.endfDataList( crossSectionFlatData )
-        endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
+        endfMFList[MF][MT] = [endfFormatsModule.endfHeadLine(ZA, mass, 0, 0, 0, 0)]
+        endfMFList[MF][MT].append(endfFormatsModule.endfContLine(QM, QI, 0, LR, len(interpolationFlatData) / 2, len(crossSectionFlatData) / 2))
+        endfMFList[MF][MT] += endfFormatsModule.endfInterpolationList(interpolationFlatData)
+        endfMFList[MF][MT] += endfFormatsModule.endfDataList(crossSectionFlatData, crossSectionData=True)
+        endfMFList[MF][MT].append(endfFormatsModule.endfSENDLineNumber())
 
 crossSectionModule.Component.toENDF6 = toENDF6
 

@@ -16,14 +16,14 @@ Getting at fudge's python scripts.
 To use fudge, one must add the location of the fudge scripts to the PYTHONPATH environment variable. (PYTHONPATH is the environment variable
 used by python when searching for imported python modules (files). On LLNL's computing system (LC) this would look something like,
 
-export PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge4/current  OR  PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge4/development
+export PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge/current  OR  PYTHONPATH=$PYTHONPATH:/usr/gapps/fudge/development
 
 for the bash shell.
 
 Alternatively, one can add the following lines near the top of a python script (or type them at the prompt)
 
     >>> import sys
-    >>> sys.path.append( "/usr/gapps/fudge4/current" )
+    >>> sys.path.append( "/usr/gapps/fudge/current" )
 
 >>> import fudgeDefaults
 >>> fudgeDefaults.NDF_DATABASE_DIR = /my/personal/database/processed
@@ -34,7 +34,7 @@ In general, one should first create a reactionSuite class object (also sometimes
 Projectile + Target + Evaluation). For example the beginning of a fudge session may look like,
 
     >>> from fudge import reactionSuite
-    >>> RS = reactionSuite.ReactionSuite.readXML_file("path/to/GNDS/reactionSuite.xml")
+    >>> RS = reactionSuite.read("path/to/GNDS/reactionSuite.xml")
 
 It is therefore important to read the documentation on the reactionSuite class.
 For an overview of creating, visualizing and processing GNDS reactionSuites we recommend starting with

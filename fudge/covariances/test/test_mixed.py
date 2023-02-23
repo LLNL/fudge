@@ -203,8 +203,9 @@ class Test_mixed( TestCaseBase ):
 
     def test_toXML_strList_36(self):
         self.maxDiff=None
-        self.assertXMLListsEqual( FeCovariance.covarianceSections[36].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''<section label="H3 + Mn54">
-    <rowData ENDF_MFMT="33,105" href="$reactions#/reactionSuite/reactions/reaction[@label='H3 + Mn54']/crossSection/regions1d[@label='eval']"/>
+        self.assertXMLListsEqual( FeCovariance.covarianceSections[36].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
+        '''<section label="H3 + Mn54 [inclusive]">
+    <rowData ENDF_MFMT="33,105" href="$reactions#/reactionSuite/reactions/reaction[@label='H3 + Mn54 [inclusive]']/crossSection/regions1d[@label='eval']"/>
     <mixed label="eval">
       <covarianceMatrix label="0" type="absolute">
         <gridded2d>

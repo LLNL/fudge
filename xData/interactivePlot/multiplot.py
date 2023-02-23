@@ -28,9 +28,11 @@ from PyQt5.QtGui import QColor, QPalette, QFont, QIntValidator, QDoubleValidator
 from collections import OrderedDict
 
 import re
+import sys
 import numpy
 import warnings
 
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
@@ -432,10 +434,14 @@ class OverallPlotOptions(QWidget):
 
         # X range
         deltaYCoordinate = 35
+        maxSystemFloat = sys.float_info.max
+        maxNumberDigits = 16
         yCoordinate += deltaYCoordinate if plotType == '2d' else deltaYCoordinate + deltaYCoordinateZLabel
         self.xRangeLabel = self.createTextBoxLabel('        x range = ', yCoordinate)
-        self.xRangeLower = self.createTextBox(plotAttributes['xMin'], yCoordinate, 100, self.updateXRange )
-        self.xRangeUpper = self.createTextBox(plotAttributes['xMax'], yCoordinate, 100, self.updateXRange, moveX=205 )
+        self.xRangeLower = self.createTextBox(plotAttributes['xMin'], yCoordinate, 100, self.updateXRange, \
+            setValidator=QDoubleValidator(-maxSystemFloat, maxSystemFloat, maxNumberDigits) )
+        self.xRangeUpper = self.createTextBox(plotAttributes['xMax'], yCoordinate, 100, self.updateXRange, \
+            setValidator=QDoubleValidator(-maxSystemFloat, maxSystemFloat, maxNumberDigits), moveX=205 )
         self.xLog = self.createCheckBox('xlog', 350, yCoordinate, self.axisHandle.get_xscale() == 'log', self.toggleXScale)
         self.xrange = plotObject.dataLimits['x']
 
@@ -446,8 +452,10 @@ class OverallPlotOptions(QWidget):
         deltaYCoordinate = 25
         yCoordinate += deltaYCoordinate
         self.yRangeLabel = self.createTextBoxLabel('        y range = ', yCoordinate)
-        self.yRangeLower = self.createTextBox(plotAttributes['yMin'], yCoordinate, 100, self.updateYRange )
-        self.yRangeUpper = self.createTextBox(plotAttributes['yMax'], yCoordinate, 100, self.updateYRange, moveX=205 )
+        self.yRangeLower = self.createTextBox(plotAttributes['yMin'], yCoordinate, 100, self.updateYRange, \
+            setValidator=QDoubleValidator(-maxSystemFloat, maxSystemFloat, maxNumberDigits) )
+        self.yRangeUpper = self.createTextBox(plotAttributes['yMax'], yCoordinate, 100, self.updateYRange, \
+            setValidator=QDoubleValidator(-maxSystemFloat, maxSystemFloat, maxNumberDigits), moveX=205 )
         self.yLog = self.createCheckBox('ylog', 350, yCoordinate, self.axisHandle.get_yscale() == 'log',
                                         self.toggleYScale)
 

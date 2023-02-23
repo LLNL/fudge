@@ -70,23 +70,27 @@ def return_pointwiseXY_AsXYs1d( self, data, units = None, index = None, outerDom
 
     return( xys1d )
 
-def otherToSelfsUnits( self, other, checkXOnly = False ) :
-    """For internal use only."""
+def otherToSelfsUnits(self, other, checkXOnly=False):
+    '''For internal use only.'''
 
-    if( not( isinstance( other, XYs1d ) ) ) : raise TypeError( 'other instance not XYs1d instance' )
+    if not isinstance(other, XYs1d):
+        raise TypeError('other instance not XYs1d instance; is type "%s".' % type(other))
 
-    if len(self.axes) == 0 and len(other.axes) == 0: return other.nf_pointwiseXY
+    if len(self.axes) == 0 or len(other.axes) == 0:
+        return other.nf_pointwiseXY
+
     yScale = 1
-    xUnitSelf = PQUModule._getPhysicalUnit( self.axes[xAxisIndex].unit )
-    xScale = xUnitSelf.conversionFactorTo( other.axes[xAxisIndex].unit )
-    if( not( checkXOnly ) ) :
-        yUnitSelf = PQUModule._getPhysicalUnit( self.axes[yAxisIndex].unit )
-        yScale = yUnitSelf.conversionFactorTo( other.axes[yAxisIndex].unit )
+    xUnitSelf = PQUModule._getPhysicalUnit(self.axes[xAxisIndex].unit)
+    xScale = xUnitSelf.conversionFactorTo(other.axes[xAxisIndex].unit)
+    if not checkXOnly:
+        yUnitSelf = PQUModule._getPhysicalUnit(self.axes[yAxisIndex].unit)
+        yScale = yUnitSelf.conversionFactorTo(other.axes[yAxisIndex].unit)
 
     other = other.nf_pointwiseXY
-    if( ( xScale != 1 ) or ( yScale != 1 ) ) : other = other.scaleOffsetXAndY( xScale = xScale, yScale = yScale )
+    if xScale != 1 or yScale != 1:
+        other = other.scaleOffsetXAndY(xScale=xScale, yScale=yScale)
 
-    return( other )
+    return other
 
 def getValueAsUnit( unit, quantity ) :
     """For internal use only."""
@@ -447,9 +451,12 @@ class XYs1d(baseModule.XDataFunctional):
         memodict[ id(self.axes) ] = copy_.axes
         return copy_
 
-    def copyDataToNestedLists( self ) :
+    def copyDataToNestedLists(self):
+        '''
+        This is the same as the method copyDataToXYs.
+        '''
 
-        return( self.nf_pointwiseXY.copyDataToXYs( ) )
+        return self.copyDataToXYs()
 
     def areDomainsMutual( self, other ) :
 
@@ -581,6 +588,21 @@ class XYs1d(baseModule.XDataFunctional):
 
         self.nf_pointwiseXY.setData( points )
 
+    def setDataFromList(self, pointsAsList):
+        '''
+        Replaces the points in *self* the list of values in *pointsAsList*. *pointsAsList* must have an even number of points
+        of [x1, y1, x2, y2, ... xn, yn] values.
+        '''
+
+        self.nf_pointwiseXY.setDataFromList(pointsAsList)
+
+    def setDataFromXsAndYs(self, xs, ys):
+        '''
+        Replaces the points in *self* the list of *xs* and *ys*.
+        '''
+
+        self.nf_pointwiseXY.setDataFromXsAndYs(xs, ys)
+
     def setValue( self, xValue, yValue ) :
 
         self.nf_pointwiseXY.setValue( xValue, yValue )
@@ -691,6 +713,11 @@ class XYs1d(baseModule.XDataFunctional):
 
         if( unitTo is None ) : return( 1. )
         return( PQUModule.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
+
+    def range(self):
+        '''Returns the list (rangeMin, rangeMax).'''
+
+        return self.nf_pointwiseXY.range()
 
     def domainSlice(self, domainMin=None, domainMax=None, fill=1, dullEps=0.0, **kwargs):
         """
@@ -830,6 +857,13 @@ class XYs1d(baseModule.XDataFunctional):
         if( isinstance( norm, XYs1d ) ) : norm = norm.nf_pointwiseXY
 
         return( self.nf_pointwiseXY.groupThreeFunctions(  boundaries, f2, f3, norm = norm ) )
+
+    def hasData(self):
+        '''
+        Returns True if self's len is greater than 1 and False otherwise.
+        '''
+
+        return len(self) > 1
 
     def integrate( self, domainMin = None, domainMax = None ) :
         """
@@ -1244,8 +1278,7 @@ class XYs1d(baseModule.XDataFunctional):
     @staticmethod
     def multiPlot( curve1ds, **kwargs ) :
         """
-        Plots a list of 1d curves on the same plot. Uses each curve's 'plotLabel' as the legend key. Each curve must be
-        and XYs1d instance.
+        Plots a list of 1d curves on the same plot. Uses each curve's 'plotLabel' as the legend key. Each curve must have a copyDataToXsAndYs method.
         """
 
         def argumentValue( name, default ) :
@@ -1269,7 +1302,8 @@ class XYs1d(baseModule.XDataFunctional):
                 plotLabel = curve1d.plotLabel
             else :
                 plotLabel = 'curve %d' % index
-            if( not( isinstance( curve1d, XYs1d ) ) ) : raise TypeError( 'Curve is not an XYs1d instance.' )
+            if not hasattr(curve1d, 'copyDataToXsAndYs'):
+                raise TypeError('Curve does not have a "copyDataToXsAndYs" method. Curve type is %s.' % type(curve1))
             plotData[plotLabel] = curve1d.copyDataToXsAndYs( )
             domainMin.append( curve1d.domainMin )
             domainMax.append( curve1d.domainMax )

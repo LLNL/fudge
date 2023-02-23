@@ -15,7 +15,7 @@
 #include "crossSectionAdjustForHeatedTarget.h"
 
 #define sqrtpi 1.7724538509055160273
-static const double vCutoffRatio = 6., fInterpolationMin = 1e-5, fInterpolationMax = 0.1, xsecMin1 = 1e-10, xsecMin2 = 1e-20;
+static const double vCutoffRatio = 6., fInterpolationMin = 1e-6, fInterpolationMax = 0.1, xsecMin1 = 1e-10, xsecMin2 = 1e-20;
 
 #define FreeReturn( error ) { Free_E_cs_point( &E_cs_Info ); return( error ); }
 

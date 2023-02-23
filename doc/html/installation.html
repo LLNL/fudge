@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Installation &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Installation &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -17,7 +18,7 @@
     <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Reporting Bugs" href="reporting-bugs.html" />
+    <link rel="next" title="Generalized Nuclear Data (GNDS)" href="gnds.html" />
     <link rel="prev" title="Downloading" href="downloading.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -30,12 +31,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="reporting-bugs.html" title="Reporting Bugs"
+          <a href="gnds.html" title="Generalized Nuclear Data (GNDS)"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="downloading.html" title="Downloading"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Installation</a></li> 
       </ul>
     </div>  
@@ -45,13 +46,13 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="installation">
-<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+  <section id="installation-1">
+<span id="installation"></span><h1>Installation<a class="headerlink" href="#installation-1" title="Permalink to this headline">¶</a></h1>
 <p>The basic use of the FUDGE package requires the following:</p>
 <ul class="simple">
-<li><p>Git distributed version control system</p></li>
-<li><p>Python (versions 3.6 or higher) general-purpose programming language (with the numpy package included)</p></li>
-<li><p>C compiler for the translation of the compute-intensive modules.</p></li>
+<li><p>Git</p></li>
+<li><p>Python (versions 3.7 or higher) general-purpose programming language (with the numpy package included)</p></li>
+<li><p>C and C++ compilers for the translation of the compute-intensive modules.</p></li>
 </ul>
 <p>While there are numerous options available for the installation of FUDGE, only the following are currently supported:</p>
 <ul class="simple">
@@ -62,7 +63,7 @@
 <li><p>Run the command</p></li>
 </ol>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">ssh</span><span class="p">:</span><span class="o">//</span><span class="n">git</span><span class="nd">@czgitlab</span><span class="o">.</span><span class="n">llnl</span><span class="o">.</span><span class="n">gov</span><span class="p">:</span><span class="mi">7999</span><span class="o">/</span><span class="n">nuclear</span><span class="o">/</span><span class="n">fudge</span><span class="o">/</span><span class="n">fudge</span><span class="o">.</span><span class="n">git</span><span class="nd">@fudge4</span><span class="o">.</span><span class="mi">3</span><span class="o">-</span><span class="n">rc5</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">ssh</span><span class="p">:</span><span class="o">//</span><span class="n">git</span><span class="nd">@czgitlab</span><span class="o">.</span><span class="n">llnl</span><span class="o">.</span><span class="n">gov</span><span class="p">:</span><span class="mi">7999</span><span class="o">/</span><span class="n">nuclear</span><span class="o">/</span><span class="n">fudge</span><span class="o">/</span><span class="n">fudge</span><span class="o">.</span><span class="n">git</span><span class="nd">@fudge6</span><span class="mf">.1.0</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -86,17 +87,18 @@
 </pre></div>
 </div>
 </div></blockquote>
-<div class="section" id="optional-extra-python-packages">
+<section id="optional-extra-python-packages">
 <h2>[Optional] Extra python packages<a class="headerlink" href="#optional-extra-python-packages" title="Permalink to this headline">¶</a></h2>
 <p>For more advanced use, Fudge depends on these additional packages:</p>
 <ul class="simple">
-<li><p>The matplotlib for general plotting. Previous versions of FUDGE used gnuplot but this is being phased out in favor of matplotlib.</p></li>
+<li><p>matplotlib for general plotting.</p></li>
 <li><p>PyQt5 and Qt v5 for interactive plotting. The underlying plotting is still done with matplotlib with the Qt toolkit and bindings providing the graphical
 user interface to interact and modify some of the common matplotlib plot options.</p></li>
+<li><p>scipy and h5py are required for more advance usage including procssing data libraries.</p></li>
 </ul>
-</div>
-<div class="section" id="optional-setting-environment-variables">
-<h2>[Optional] Setting Environment Variables<a class="headerlink" href="#optional-setting-environment-variables" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="optional-setting-environment-variables-not-required-after-installing-with-pip">
+<h2>[Optional] Setting Environment Variables (not required after installing with pip)<a class="headerlink" href="#optional-setting-environment-variables-not-required-after-installing-with-pip" title="Permalink to this headline">¶</a></h2>
 <p>For general use of the fudge package, some changes should be made to your computer’s environment. The following lines make the required change.
 Note that &lt;path_to_fudge&gt; indicates the path to root FUDGE folder:</p>
 <ul>
@@ -116,8 +118,8 @@ Note that &lt;path_to_fudge&gt; indicates the path to root FUDGE folder:</p>
 </li>
 <li><p>On Windows, the environment variable should be added to the registry (see for example <a class="reference external" href="http://www.support.tabs3.com/main/R10463.htm">http://www.support.tabs3.com/main/R10463.htm</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="troubleshooting">
+</section>
+<section id="troubleshooting">
 <h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
 <p>Users on OS X may have trouble compiling Merced (the C++ code responsible for generating transfer matrices
 for deterministic transport). Merced uses OpenMP threading, which is currently not supported by the default
@@ -142,8 +144,8 @@ VisualStudio, and specify the ‘CL’ compiler while building Merced:</p>
 </div>
 <p>If you encounter other trouble with installing, building extensions or setting environment
 variables, please let us know (email: <a class="reference external" href="mailto:mattoon1&#37;&#52;&#48;llnl&#46;gov">mattoon1<span>&#64;</span>llnl<span>&#46;</span>gov</a>).</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -159,7 +161,7 @@ variables, please let us know (email: <a class="reference external" href="mailto
   <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#optional-extra-python-packages">[Optional] Extra python packages</a></li>
-<li><a class="reference internal" href="#optional-setting-environment-variables">[Optional] Setting Environment Variables</a></li>
+<li><a class="reference internal" href="#optional-setting-environment-variables-not-required-after-installing-with-pip">[Optional] Setting Environment Variables (not required after installing with pip)</a></li>
 <li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
@@ -169,8 +171,8 @@ variables, please let us know (email: <a class="reference external" href="mailto
   <p class="topless"><a href="downloading.html"
                         title="previous chapter">Downloading</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="reporting-bugs.html"
-                        title="next chapter">Reporting Bugs</a></p>
+  <p class="topless"><a href="gnds.html"
+                        title="next chapter">Generalized Nuclear Data (GNDS)</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -202,12 +204,12 @@ variables, please let us know (email: <a class="reference external" href="mailto
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="reporting-bugs.html" title="Reporting Bugs"
+          <a href="gnds.html" title="Generalized Nuclear Data (GNDS)"
              >next</a> |</li>
         <li class="right" >
           <a href="downloading.html" title="Downloading"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Installation</a></li> 
       </ul>
     </div>

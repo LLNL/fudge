@@ -123,8 +123,8 @@ class Base_reaction(ancestryModule.AncestryIO):
           Does cross section domain agree with each product distribution/multiplicity domain?
           Does energy balance?
 
-        @:param info: dict
-        @:return list of warnings
+        :param info: dict
+        :return list of warnings
         """
 
         from fudge import warning
@@ -173,10 +173,19 @@ class Base_reaction(ancestryModule.AncestryIO):
                 if Qcalc is None: raise ValueError  # caught below. Skips Q-value check for elemental targets
                 for prod in self.__outputChannel:
                     try:
-                        Qcalc -= prod.getMass('eV/c**2') * prod.multiplicity.getConstant()
+                        productMass = prod.getMass('eV/c**2')
+                    except Exception:
+                        warnings.append(warning.UnknownMass(prod.pid))
+                        raise ValueError("Unknown mass")
+
+                    try:
+                        productMultiplicity = prod.multiplicity.getConstant()
                     except Exception:   # multiplicity is not constant
                         if( prod.pid == IDsPoPsModule.photon ) : continue
                         raise ValueError("Non-constant multiplicity")
+
+                    Qcalc -= productMass * productMultiplicity
+
                 if abs(Q-Qcalc) > PQUModule.PQU(info['dQ']).getValueAs('eV'):
                     if self.__outputChannel.process != outputChannelModule.Processes.continuum:
                         warnings.append( warning.Q_mismatch( PQUModule.PQU(Qcalc,'eV'), PQUModule.PQU(Q,'eV'), self ) )
@@ -376,6 +385,14 @@ class Base_reaction(ancestryModule.AncestryIO):
         self.__crossSection.diff( other.crossSection, diffResults )
         self.__outputChannel.diff( other.outputChannel, diffResults )
 
+    def effectiveThreshold(self):
+        '''
+        Some reactions have a cross section with multiple zero values at their beginning. In such a case, the effective 
+        threshold is the point before the first non-zero cross section value. Otherwise, it is the energy of the first point.
+        '''
+
+        return self.crossSection.effectiveThreshold()
+
     def fixDomains(self, labels, energyMin, energyMax):
         """
         Calls the **fixDomains** method on the members *crossSection*, *doubleDifferentialCrossSection* and *outputChannel*.
@@ -404,9 +421,9 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         return crossSection
 
-    def thresholdQAs( self, unit, final = True ) :
+    def thresholdQAs(self, unit, final=True, pops=None) :
 
-        return( self.__outputChannel.thresholdQAs( unit, final = final ) )
+        return self.__outputChannel.thresholdQAs(unit, final=final, pops=pops)
 
     def getQ( self, unit, final = True ) :
         """Returns the Q-value for this reaction. Converted to float if possible, otherwise a string value is returned."""
@@ -657,7 +674,7 @@ class Base_reaction(ancestryModule.AncestryIO):
         productArray = productArrayModule.ProductArray()
 
         if self.isPairProduction():
-            if productID == IDsPoPsModule.photon and legendreOrder == 0:
+            if productID == IDsPoPsModule.photon:
                 matrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, 0)
                 productArray = productArray.Array(matrix)
         else:

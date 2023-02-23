@@ -129,6 +129,15 @@ class ClassWithIDKey(ancestryModule.AncestryIO):   # FIXME should classes below 
 
         return( self.__keyName )
 
+    @property
+    def keyValue(self):
+        '''Returns self's keyValue. If keyName is *None*, then *None* is returned.'''
+
+        if self.keyName is None:
+            return None
+
+        return getattr(self, self.keyName)
+
 class ClassWithSymbolKey(ancestryModule.AncestryIO):
 
     __keyName = 'symbol'

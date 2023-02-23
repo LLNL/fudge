@@ -36,10 +36,7 @@ def getProjectileAndTargetMasses(_xs):
         targetID = _xs.rootAncestor.PoPs[targetID].pid
     targ = _xs.rootAncestor.PoPs[targetID]
     proj = _xs.rootAncestor.PoPs[_xs.rootAncestor.projectile]
-    try:
-        m2 = targ.mass[0].float('amu')
-    except IndexError:
-        m2 = targ.getMass('amu')
+    m2 = targ.getMass('amu')
     m1 = proj.getMass('amu')
     return m1, m2
 

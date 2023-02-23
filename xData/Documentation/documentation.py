@@ -206,7 +206,32 @@ class Documentation(ancestryModule.AncestryIO):
 
         return
 
+    def findEntriesWithKey(self, keyValue):
+        '''
+        Returns the list of each entry in *self*'s authors, contributors, collaborations, acknowledgements, relatedItems and computerCodes
+        which have the key *keyValue*.
+        '''
+
+        entries = []
+        if keyValue in self.__authors:
+            entries.append(self.__authors[keyValue])
+        if keyValue in self.__contributors:
+            entries.append(self.__contributors[keyValue])
+        if keyValue in self.__collaborations:
+            entries.append(self.__collaborations[keyValue])
+        if keyValue in self.__acknowledgements:
+            entries.append(self.__acknowledgements[keyValue])
+        if keyValue in self.__relatedItems:
+            entries.append(self.__relatedItems[keyValue])
+        if keyValue in self.__computerCodes:
+            entries.append(self.__computerCodes[keyValue])
+
+        return entries
+
     def toXML_strList(self, indent = '', **kwargs):
+
+        if kwargs.get('skipDocumentation', False):
+            return []
 
         showEmptySuites = kwargs.get('showEmptySuites', False)
         incrementalIndent = kwargs.get('incrementalIndent', '  ')

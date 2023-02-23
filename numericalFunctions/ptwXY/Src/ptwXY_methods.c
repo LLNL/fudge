@@ -703,3 +703,123 @@ nfu_status ptwXY_scaleOffsetXAndY( statusMessageReporting *smr, ptwXYPoints *ptw
 
     return( ptwXY->status );
 }
+/*
+************************************************************
+*/
+nfu_status ptwXY_scaleAndOffsetDomainWith_ptwXYs( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXYPoints *offsetXY, ptwXYPoints *slopeXY, 
+                int skipLastPoint ) {
+/*
+    This function only modifies ptwXY over the domain defined by offsetXY via the equation ptwXY = offsetXY + slopeXY * ptwXY. 
+    slopeXY must have the same domain as offsetXY.  If skipLastPoint is non-zero, the last point modified is reverted by to its 
+    origial value.  This allows one to call this function multiple times with abutting domains for the offset and slope without 
+    getting weird jumps at the boundaries. For example, suppose ptwXY is initially defined to be 1 in the domain [0,10]. Let,
+    ptwXY have the points [ [ 0, 1 ], [ 5, 1 ], [ 10, 1 ] ]. Calling this function with an offset and slope with the points
+    [ [ 0, 0 ], [ 5, 0 ] ] and [ 0, 2 ], [ 5, 2 ], respectively would return ptwXY as [ [ 0, 2 ], [ 5, 2 ], [ 10, 1 ] ]
+    if skipLastPoint is 0 and [ [ 0, 2 ], [ 5, 1 ], [ 10, 1 ] ] otherwise. Now calling the returned ptwXYPoints instances with an 
+    offset and slope with the points [ [ 5, 0 ], [ 10, 0 ] ] and [ 5, 2 ], [ 10, 2 ], respectively would return ptwXY as 
+    [ [ 0, 2 ], [ 5, 4 ], [ 10, 2 ] ] and [ [ 0, 2 ], [ 5, 2 ], [ 10, 2 ] ], respectively.
+*/
+
+    int64_t i1;
+    ptwXYPoint *p1;
+    nfu_status status1, status2;
+    double offsetXYMin, offsetXYMax, slopeXYMin, slopeXYMax, domainMin, domainMax, domainMinXY, domainMaxXY;
+    ptwXYPoints *ptwXY2, *offsetXY2 = NULL, *slopeXY2 = NULL;
+    ptwXYPoints *mulXY = NULL, *addXY = NULL;
+
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
+
+    status1 = ptwXY_domainMin( smr, offsetXY, &offsetXYMin );       /* Also verifies that offsetXY has no issues. */
+    if( ( status1 != nfu_Okay ) && ( status1 != nfu_empty ) ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( status1 );
+    }
+    ptwXY_domainMax( smr, offsetXY, &offsetXYMax );                 /* If ptwXY_domainMin succeeded, this will succeed. */
+
+    status2 = ptwXY_domainMin( smr, slopeXY, &slopeXYMin );
+    if( ( status2 != nfu_Okay ) && ( status2 != nfu_empty ) ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( status2 );
+    }
+    ptwXY_domainMax( smr, slopeXY, &slopeXYMax );
+
+    if( ( status1 == nfu_empty ) && ( status2 == nfu_empty ) ) return( nfu_Okay );
+
+    if( ( offsetXYMin != slopeXYMin ) || ( offsetXYMax != slopeXYMax ) ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_domainsNotMutual, "Offset and slope do not have the same domain." );
+        return( ptwXY->status = nfu_domainsNotMutual );
+    }
+
+    if( ptwXY->length == 0 ) return( nfu_Okay );
+
+    ptwXY_domainMin( smr, ptwXY, &domainMinXY );
+    ptwXY_domainMax( smr, ptwXY, &domainMaxXY );
+
+    if( ( domainMinXY >= offsetXYMax ) || ( domainMaxXY <= offsetXYMin ) ) return( nfu_Okay );
+
+    domainMin = ( domainMinXY > offsetXYMin ? domainMinXY : offsetXYMin );
+    domainMax = ( domainMaxXY < offsetXYMax ? domainMaxXY : offsetXYMax );
+
+    if( ( domainMinXY == offsetXYMin ) && ( domainMaxXY == offsetXYMax ) ) {
+        ptwXY2 = ptwXY;
+        offsetXY2 = offsetXY;
+        slopeXY2 = slopeXY; }
+    else {
+        if( ( ptwXY2 = ptwXY_domainSlice( smr, ptwXY, domainMin, domainMax, 0, 1 ) ) == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            goto Err;
+        }
+
+        if( ( offsetXY2 = ptwXY_domainSlice( smr, offsetXY, domainMin, domainMax, 0, 1 ) ) == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            goto Err;
+        }
+
+        if( ( slopeXY2 = ptwXY_domainSlice( smr, slopeXY, domainMin, domainMax, 0, 1 ) ) == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            goto Err;
+        }
+    }
+
+    if( ( mulXY = ptwXY_mul2_ptwXY( smr, ptwXY2, slopeXY2 ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        goto Err;
+    }
+    if( ( addXY = ptwXY_mul2_ptwXY( smr, mulXY, offsetXY2 ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        goto Err;
+    }
+    if( skipLastPoint != 0 ) addXY->points[addXY->length-1].y = ptwXY2->points[ptwXY2->length-1].y;
+
+    if( domainMin > domainMinXY ) {
+        for( i1 = 0, p1 = ptwXY2->points; i1 < ptwXY2->length; i1++, p1++ ) {
+            if( p1->x >= domainMin ) break;
+            if( ptwXY_setValueAtX( smr, addXY, p1->x, p1->y ) != nfu_Okay ) goto Err;
+        }
+    }
+
+    if( domainMax < domainMaxXY ) {
+        for( i1 = 0, p1 = ptwXY2->points; i1 < ptwXY2->length; i1++, p1++ ) if( p1->x > domainMax ) break;
+        for( ; i1 < ptwXY2->length; i1++, p1++ ) {
+            if( ptwXY_setValueAtX( smr, addXY, p1->x, p1->y ) != nfu_Okay ) goto Err;
+        }
+    }
+
+    ptwXY_copy( smr, ptwXY, addXY );
+
+TheEnd:
+    ptwXY_free( offsetXY2 );
+    ptwXY_free( slopeXY2 );
+    ptwXY_free( ptwXY2 );
+    ptwXY_free( mulXY );
+    ptwXY_free( addXY );
+
+    return( ptwXY->status );
+
+Err:
+    ptwXY->status = nfu_Error;
+    goto TheEnd;
+}

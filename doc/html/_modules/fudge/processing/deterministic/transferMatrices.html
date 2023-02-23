@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.processing.deterministic.transferMatrices &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.processing.deterministic.transferMatrices &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.deterministic.transferMatrices</a></li> 
       </ul>
@@ -107,25 +107,31 @@
         <span class="n">TM1s</span><span class="p">,</span> <span class="n">TMEs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="n">lowestBound</span><span class="p">,</span> <span class="n">highestBound</span> <span class="o">=</span> <span class="n">angularData</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">angularData</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMax</span>
         <span class="n">weightAxes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">iRegion</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">angularData</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="k">if</span><span class="p">(</span> <span class="n">iRegion</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-                    <span class="n">weightData</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">lowestBound</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">highestBound</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]</span> <span class="p">]</span>
-                <span class="k">elif</span><span class="p">(</span> <span class="n">iRegion</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span> <span class="n">angularData</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
-                    <span class="n">weightData</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">lowestBound</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="n">highestBound</span><span class="p">,</span> <span class="mi">1</span> <span class="p">]</span> <span class="p">]</span>
-                <span class="k">else</span> <span class="p">:</span>
-                    <span class="n">weightData</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">lowestBound</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">highestBound</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]</span> <span class="p">]</span>
-                <span class="n">_weight</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">weightData</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">weightAxes</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">flat</span><span class="p">)</span>
 
-                <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;r</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iRegion</span> <span class="p">)</span>
-                <span class="k">try</span> <span class="p">:</span>
-                    <span class="n">TM1</span><span class="p">,</span> <span class="n">TME</span> <span class="o">=</span> <span class="n">twoBodyTransferMatrix2</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span>
-                            <span class="n">productFrame</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="n">_weight</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span> <span class="p">)</span>
-                <span class="k">except</span> <span class="p">:</span>
-                    <span class="k">del</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="k">raise</span>
+        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
+        <span class="n">projectileName</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span>
+        <span class="n">maxGroupEnergy</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">transportables</span><span class="p">[</span><span class="n">projectileName</span><span class="p">]</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">boundaries</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">iRegion</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">angularData</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">&gt;=</span> <span class="n">maxGroupEnergy</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">iRegion</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">weightData</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">lowestBound</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">highestBound</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]</span> <span class="p">]</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">iRegion</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span> <span class="n">angularData</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">weightData</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">lowestBound</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="n">highestBound</span><span class="p">,</span> <span class="mi">1</span> <span class="p">]</span> <span class="p">]</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">weightData</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">lowestBound</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">highestBound</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]</span> <span class="p">]</span>
+            <span class="n">_weight</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">weightData</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">weightAxes</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">flat</span><span class="p">)</span>
+
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;r</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iRegion</span> <span class="p">)</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">TM1</span><span class="p">,</span> <span class="n">TME</span> <span class="o">=</span> <span class="n">twoBodyTransferMatrix2</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span>
+                        <span class="n">productFrame</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="n">_weight</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="p">:</span>
                 <span class="k">del</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">TM1s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">TM1</span> <span class="p">)</span>
-                <span class="n">TMEs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">TME</span> <span class="p">)</span>
+                <span class="k">raise</span>
+            <span class="k">del</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">TM1s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">TM1</span> <span class="p">)</span>
+            <span class="n">TMEs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">TME</span> <span class="p">)</span>
         <span class="n">TM1</span> <span class="o">=</span> <span class="n">addTMs</span><span class="p">(</span> <span class="n">TM1s</span> <span class="p">)</span>
         <span class="n">TME</span> <span class="o">=</span> <span class="n">addTMs</span><span class="p">(</span> <span class="n">TMEs</span> <span class="p">)</span>
     <span class="k">else</span> <span class="p">:</span>
@@ -1158,7 +1164,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.processing.deterministic.transferMatrices</a></li> 
       </ul>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.styles &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.styles &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.styles</a></li> 
       </ul>
@@ -205,22 +205,28 @@
         <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="n">style</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Styles.preProcessingChainHead"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles.preProcessingChainHead">[docs]</a>    <span class="k">def</span> <span class="nf">preProcessingChainHead</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Styles.preProcessingChainHead"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles.preProcessingChainHead">[docs]</a>    <span class="k">def</span> <span class="nf">preProcessingChainHead</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the pre-processing style that heads the chain containing the pre-processing label *label*. If label is None, there must be</span>
 <span class="sd">        only one pre-processing chain and that head is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">chains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preProcessingChains</span><span class="p">(</span> <span class="n">ends</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">chains</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;No pre-processing style exist.&#39;</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">chains</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Must have only one pre-processing chain, have </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">preProcessingChains</span> <span class="p">)</span> <span class="p">)</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
-        <span class="k">else</span> <span class="p">:</span>
-            <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span> <span class="p">:</span>
-                <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">chain</span> <span class="p">:</span>
-                    <span class="k">if</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">chain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;No pre-processing chain containing label &quot;</span><span class="si">%s</span><span class="s1">&quot; found.&#39;</span> <span class="o">%</span> <span class="n">label</span> <span class="p">)</span></div>
+        <span class="n">chains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preProcessingChains</span><span class="p">(</span><span class="n">ends</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No pre-processing style exist.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
+                    <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">chain</span><span class="p">)])</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Must have only one pre-processing chain, have </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">),</span> <span class="n">labels</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">chain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No pre-processing chain containing label &quot;</span><span class="si">%s</span><span class="s1">&quot; found.&#39;</span> <span class="o">%</span> <span class="n">label</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Styles.preProcessingChains"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles.preProcessingChains">[docs]</a>    <span class="k">def</span> <span class="nf">preProcessingChains</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ends</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -253,6 +259,17 @@
             <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span> <span class="k">return</span> <span class="n">style</span>
 
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not find style &quot;</span><span class="si">%s</span><span class="s1">&quot; with label &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">entityName</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Styles.findDocumentationEntriesWithKey"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles.findDocumentationEntriesWithKey">[docs]</a>    <span class="k">def</span> <span class="nf">findDocumentationEntriesWithKey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyValue</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Calls **findDocumentationEntriesWithKey** on each style in *self* and returns the results.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">entries</span> <span class="o">+=</span> <span class="n">style</span><span class="o">.</span><span class="n">findDocumentationEntriesWithKey</span><span class="p">(</span><span class="n">keyValue</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">entries</span></div>
 
 <div class="viewcode-block" id="Styles.findInstancesOfClassInChildren"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles.findInstancesOfClassInChildren">[docs]</a>    <span class="k">def</span> <span class="nf">findInstancesOfClassInChildren</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">9999</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -367,29 +384,38 @@
 
         <span class="k">return</span> <span class="n">temperatureInfos2</span></div>
 
-<div class="viewcode-block" id="Styles.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Styles.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns an XML representation of self as a list of lines.&quot;&quot;&quot;</span>
 
-        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">do_multiGroup</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span>
 
         <span class="n">parameters</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">do_multiGroup</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="n">heatedMultiGroups</span> <span class="o">=</span> <span class="p">[</span> <span class="n">_style</span> <span class="k">for</span> <span class="n">_style</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_style</span><span class="p">,</span> <span class="n">HeatedMultiGroup</span> <span class="p">)</span> <span class="p">]</span>
-            <span class="n">do_multiGroup</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">heatedMultiGroups</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-            <span class="k">if</span><span class="p">(</span> <span class="n">do_multiGroup</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="n">do_multiGroup</span><span class="p">:</span>
+            <span class="n">heatedMultiGroups</span> <span class="o">=</span> <span class="p">[</span><span class="n">_style</span> <span class="k">for</span> <span class="n">_style</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_style</span><span class="p">,</span> <span class="n">HeatedMultiGroup</span><span class="p">)]</span>
+            <span class="n">do_multiGroup</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">heatedMultiGroups</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">do_multiGroup</span><span class="p">:</span>
                 <span class="n">parameters</span> <span class="o">=</span> <span class="s1">&#39;MultiGroup&#39;</span>
-                <span class="n">multiGroup1</span> <span class="o">=</span> <span class="n">MultiGroup</span><span class="p">(</span> <span class="n">parameters</span><span class="p">,</span> <span class="mi">3</span> <span class="p">)</span>
-                <span class="k">for</span> <span class="n">transportable</span> <span class="ow">in</span> <span class="n">heatedMultiGroups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transportables</span> <span class="p">:</span> <span class="n">multiGroup1</span><span class="o">.</span><span class="n">transportables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">transportable</span> <span class="p">)</span>
+                <span class="n">multiGroup1</span> <span class="o">=</span> <span class="n">MultiGroup</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">transportable</span> <span class="ow">in</span> <span class="n">heatedMultiGroups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transportables</span><span class="p">:</span>
+                    <span class="n">multiGroup1</span><span class="o">.</span><span class="n">transportables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">transportable</span><span class="p">)</span>
 
         <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)]</span>
-        <span class="k">for</span> <span class="n">_style</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="n">do_multiGroup</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_style</span><span class="p">,</span> <span class="n">Heated</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="n">multiGroup1</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">_style</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">do_multiGroup</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_style</span><span class="p">,</span> <span class="n">Heated</span><span class="p">):</span>
+                <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="n">multiGroup1</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="n">do_multiGroup</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="n">_style</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span> <span class="p">)</span>
-        <span class="n">xmlStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">xmlStringList</span> <span class="p">)</span></div>
+            <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="n">_style</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xmlStringList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptySuites&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[</span><span class="n">xmlStringList</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/&gt;&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xmlStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">xmlStringList</span></div>
 
 <div class="viewcode-block" id="Styles.parseNode"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stylesElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -528,6 +554,17 @@
             <span class="n">_chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">_derivedFrom</span> <span class="p">)</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">_chain</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Style.findDocumentationEntriesWithKey"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Style.findDocumentationEntriesWithKey">[docs]</a>    <span class="k">def</span> <span class="nf">findDocumentationEntriesWithKey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyValue</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Calls **findEntriesWithKey** the *self*&#39;s documentation member and returns a list of [self, entry] for each entry in *self*&#39;s documentation</span>
+<span class="sd">        that **findEntriesWithKey** returns.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__documentation</span><span class="o">.</span><span class="n">findEntriesWithKey</span><span class="p">(</span><span class="n">keyValue</span><span class="p">)</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">entries</span></div>
 
 <div class="viewcode-block" id="Style.findFormMatchingDerivedStyle"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Style.findFormMatchingDerivedStyle">[docs]</a>    <span class="k">def</span> <span class="nf">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">styleFilter</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1483,7 +1520,7 @@
         <span class="k">return</span> <span class="n">xmlStringList</span></div>
 
 <div class="viewcode-block" id="Realization.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Realization.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate an instance of this class from *node*.&quot;&quot;&quot;</span>
 
         <span class="n">label</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="n">Style</span><span class="o">.</span><span class="n">parseNodeBase</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1556,7 +1593,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.styles</a></li> 
       </ul>

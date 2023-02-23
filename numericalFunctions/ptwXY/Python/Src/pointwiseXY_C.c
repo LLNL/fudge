@@ -239,6 +239,9 @@ static ptwXPoints *pointwiseXY_C_PyFloatList_to_ptwXPoints( PyObject *PyFloatLis
 static PyObject *pointwiseXY_C_ptwXPoints_to_PyFloatList( ptwXPoints *ptwX );
 static int pointwiseXY_C_PyNumberToFloat( PyObject *n, double *d );
 static int pyObject_NumberOrPtwXY( PyObject *other );
+#if 0
+static int pyObject_getNumberOrPtwXYAsPtwXY( statusMessageReporting *smr, pointwiseXY_CPy *self, PyObject *object, ptwXYPoints **ptwXY, char *variableName );
+#endif
 static int pointwiseXY_C_Get_pointwiseXY_CAsSelf( PyObject *self, PyObject *other, PyObject **self2, PyObject **other2,
     pointwiseXY_CPy **self3, pointwiseXY_CPy **other3 );
 static int pointwiseXY_C_addedItemToPythonList( PyObject *list, PyObject *item );
@@ -2785,7 +2788,7 @@ static PyObject *pointwiseXY_C_union(  pointwiseXY_CPy *self, PyObject *args, Py
 /*
 ************************************************************
 */
-static PyObject *pointwiseXY_C_scaleOffsetXAndY(  pointwiseXY_CPy *self, PyObject *args, PyObject *keywords ) {
+static PyObject *pointwiseXY_C_scaleOffsetXAndY( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords ) {
 
     int insitu = 0;
     double xScale = 1., xOffset = 0., yScale = 1., yOffset = 0.;
@@ -2817,6 +2820,41 @@ static PyObject *pointwiseXY_C_scaleOffsetXAndY(  pointwiseXY_CPy *self, PyObjec
     if( insitu ) Py_INCREF( (PyObject *) self );    /* FIXME: Why is this needed when insitu if True? Or is it? */
     return( (PyObject *) nPy );
 }
+#if 0
+/*
+************************************************************
+*/
+static PyObject *pointwiseXY_C_scaleAndOffsetDomainWithPointwiseXYs( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords ) {
+/* This does not work. */
+
+    int offsetStatus = 0, slopeStatus = 0, skipLastPoint = 0;
+    pointwiseXY_CPy *nPy = NULL;
+    PyObject *offsetPy, *slopePy;
+    ptwXYPoints *offset_ptwXY = NULL, *slope_ptwXY = NULL;
+    static char *kwlist[] = { "offset", "slope", "skipLastPoint", NULL };
+    statusMessageReporting *smr = &(self->smr);
+
+    if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
+
+    if( !PyArg_ParseTupleAndKeywords( args, keywords, "|OOi", kwlist, &offsetPy, &slopePy, &skipLastPoint ) ) return( NULL );
+
+    if( ( offsetStatus = pyObject_getNumberOrPtwXYAsPtwXY( NULL, self, offsetPy, &offset_ptwXY, "offset" ) ) < 0 ) goto error;
+    if( ( slopeStatus  = pyObject_getNumberOrPtwXYAsPtwXY( NULL, self, slopePy,  &slope_ptwXY, "slope"  ) ) < 0 ) goto error;
+
+    if( ( nPy = pointwiseXY_CNewInitialize( self->infill, self->safeDivide ) ) == NULL ) goto error;
+
+    if( ( nPy->ptwXY = ptwXY_clone( smr, self->ptwXY ) ) == NULL ) {
+        Py_DECREF( (PyObject *) nPy );
+        pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        goto error;
+    }
+
+error:
+    if( offsetStatus > 0 ) ptwXY_free( offset_ptwXY );
+    if( slopeStatus > 0 ) ptwXY_free( slope_ptwXY );
+    return( NULL );
+}
+#endif
 /*
 ************************************************************
 */
@@ -3548,6 +3586,50 @@ static int pyObject_NumberOrPtwXY(  PyObject *other ) {
     }
     return( pyObject_Unsupported );
 }
+
+#if 0
+/*
+************************************************************
+*/
+static int pyObject_getNumberOrPtwXYAsPtwXY( statusMessageReporting *smr, pointwiseXY_CPy *self, PyObject *object, ptwXYPoints **ptwXY, char *variableName ) {
+/*
+    If return value is 
+            -1 - an error occured and nothing created by this function that needs to be freed,
+             0 - object is a ptwXYPoints instance and nothing created by this function that needs to be freed,
+             1 - object is a number and a ptwXYPoints instance is created that the caller needs to free.
+*/
+
+    int status = -1;
+    double domainMin, domainMax, xys[4];
+
+    *ptwXY = NULL;
+
+    switch( pyObject_NumberOrPtwXY( object ) ) {
+    case pyObject_Number :
+        if( pointwiseXY_C_domainMinMax( self, &domainMin, &domainMax ) == -1 ) {
+            return( -1 );
+        }
+        xys[0] = domainMin;
+        xys[2] = domainMax;
+
+        if( pointwiseXY_C_PyNumberToFloat( object, &xys[1] ) < 0 ) return( -1 );
+        xys[3] = xys[1];
+
+        *ptwXY = ptwXY_create( smr, ptwXY_interpolationLinLin, NULL, 12, 1e-3, 4, 0, 4, xys, 0 );
+        status = 1;
+        break;
+    case pyObject_ptwXY :
+        *ptwXY = ((pointwiseXY_CPy *)object)->ptwXY;
+        status = 0;
+        break;
+    default :
+        pointwiseXY_C_SetPyErrorExceptionReturnMinusOne( "%s is not a number or a pointwiseXY_C.", variableName );
+    }
+
+    return( status );
+}
+#endif
+
 /*
 ************************************************************
 */
@@ -3788,7 +3870,7 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
         "Returns True if self's interpolation is 'other', otherwise returns False." },
     { "getslice", (PyCFunction) pointwiseXY_C_getslice, METH_VARARGS | METH_KEYWORDS,
         "getslice( lowerIndex, upperIndex )\n\n" \
-        "Returns the slice of self from lowerIndex to upperIndex with a step of 1.\n" \
+        "Returns the slice of self from lowerIndex to upperIndex with a step of 1. This is redundent with __getslice__ and will be deprecated.\n" \
         "\nArguments are: ([o] implies optional argument)\n" \
         "   lowerIndex [o]      Value of the lower index. Default is 0.\n" \
         "   upperIndex [o]      Value of the upper index. Default is length of pointwiseXY_C.\n" \
@@ -3943,9 +4025,11 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
         "   xOffset  [o] the offset for the x-axis,\n" \
         "   yScale   [o] the scale for the y-axis,\n" \
         "   yOffset  [o] the offset for the y-axis,\n" \
-        "   insitu   [o] If True, self is scalled and offset and returned.\n Otherwise, a new instances is created and returned, and self is unchanged." },
+        "   insitu   [o] If True, self is scaled and offset, and returned.\n Otherwise, a new instances is created and returned, and self is unchanged." },
     { "mergeClosePoints", (PyCFunction) pointwiseXY_C_mergeClosePoints, METH_VARARGS, 
-        "Returns a new pointwiseXY_C object whose x values are the union of self and other." },
+        "Returns a new pointwiseXY_C object whose x values are thinned. The first and last point of *self* are not altered but intermediate points are average so that the fractional distance between points is greater than *epsilon*." \
+        "\nArguments are: ([o] implies optional argument)\n" \
+        "epsilon         the minimum fractional distance between x values in the return instance.\n" },
     { "domainGrid", (PyCFunction) pointwiseXY_C_domainGrid, METH_VARARGS, "Returns a list of x-values for self." },
     { "domain", (PyCFunction) pointwiseXY_C_domain, METH_NOARGS, "Returns the x-value of the first and last points as a tuple." },
     { "domainMin", (PyCFunction) pointwiseXY_C_domainMin, METH_NOARGS, "Returns the x-value of the first point." },

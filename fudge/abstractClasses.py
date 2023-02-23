@@ -109,19 +109,22 @@ class Component( suitesModule.Suite, abc.ABC ) :
         if( style is not None ) : style = self[style.label]
         return( style )
 
-    def processMC_cdf( self, style, tempInfo, indent = '' ) :
+    def processMC_cdf(self, style, tempInfo, indent=''):
 
         indent2 = indent + tempInfo['incrementalIndent']
 
-        addToComponent = tempInfo.get( 'addToComponent', True )
+        addToComponent = tempInfo.get('addToComponent', True)
 
-        _form = style.findFormMatchingDerivedStyle( self )
-        try :
-            MonteCarlo_cdf = _form.processMC_cdf( style, tempInfo, indent2 )
-        except :
-            print('==== form = %s failed' % _form.moniker)
+        form = style.findFormMatchingDerivedStyle(self)
+        try:
+            MonteCarlo_cdf = form.processMC_cdf(style, tempInfo, indent2)
+        except:
+            print('==== form = %s failed' % form.moniker)
             raise
-        if( addToComponent and ( MonteCarlo_cdf is not None ) ) : self.add( MonteCarlo_cdf )
+        if addToComponent and MonteCarlo_cdf is not None:
+            self.add(MonteCarlo_cdf)
+
+        return MonteCarlo_cdf
 
     def processMultiGroup( self, style, tempInfo, indent ) :
 
@@ -171,8 +174,8 @@ class Component( suitesModule.Suite, abc.ABC ) :
         """
         This method calls the toPointwise_withLinearXYs method for the evaluated style and returns a "lin-lin" pointwise representation of it.
 
-        @:param lowerEps: lower epsilon for converting discontinuities to monotonic function
-        @:param upperEps: upper epsilon for converting discontinuities to monotonic function
+        :param lowerEps: lower epsilon for converting discontinuities to monotonic function
+        :param upperEps: upper epsilon for converting discontinuities to monotonic function
         """
 
         evaluated = self.evaluated

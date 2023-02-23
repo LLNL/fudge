@@ -498,12 +498,12 @@ class ScatteringAtom(ancestryModule.AncestryIO):
                         DistinctScatteringKernel.moniker: DistinctScatteringKernel,
                         T_effective.moniker : T_effective }.get( child.tag, None )
             if _class is None:
-                if not (child.tag == 'freeAtomCrossSection' and formatVersion == GNDS_formatVersionModule.version_1_10):
+                if not (child.tag == 'freeAtomCrossSection' and formatVersion in [GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_4]):
                     print("Warning: encountered unexpected element '%s' in scatteringAtom!" % child.tag)
                 continue
             attrs[child.tag] = _class.parseNodeUsingClass(child, xPath, linkData, **kwargs)
 
-        if formatVersion == GNDS_formatVersionModule.version_1_10:
+        if formatVersion in [GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_4]:
             attrs['pid'] = element.get('label')
             if 'e_max' not in attrs:
                 energyUnit = linkData['reactionSuite'].styles.getEvaluatedStyle().projectileEnergyDomain.unit
@@ -654,7 +654,7 @@ class Form(baseModule.Form):
             'incoherentApproximation': readBool(element.get('incoherentApproximation', 'true')),
         }
 
-        if formatVersion == GNDS_formatVersionModule.version_1_10:
+        if formatVersion in [GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_4]:
             attrs['calculatedAtThermal'] = readBool(element.find('options').get('calculatedAtThermal'))
 
             # read S_ab array, to be added to primary scattering atom while parsing scatteringAtoms below
@@ -665,7 +665,7 @@ class Form(baseModule.Form):
         incoherentInelastic.scatteringAtoms.parseNode(
             element.find(ScatteringAtoms.moniker), xPath, linkData, **kwargs
         )
-        if formatVersion == GNDS_formatVersionModule.version_1_10:
+        if formatVersion in [GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_4]:
             for atom in incoherentInelastic.scatteringAtoms:
                 if atom.primaryScatterer:
                     incoherentInelastic.primaryScatterer = atom.pid

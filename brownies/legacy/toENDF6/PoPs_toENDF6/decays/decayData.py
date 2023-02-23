@@ -8,6 +8,7 @@
 from math import sqrt
 
 from brownies.legacy.toENDF6 import endfFormats as endfFormatsModule
+from brownies.legacy.toENDF6 import gndsToENDF6 as gndsToENDF6Module
 from brownies.legacy.converting.ENDFToGNDS import ENDF_ITYPE_4
 
 from PoPs.decays import decayData as decayDataModule
@@ -114,7 +115,17 @@ def toENDF6( self, MT, endfMFList, flags, info, verbosityIndent = '' ) :
                 spectrumData += endfFormatsModule.endfDataList(dataList)
 
             for continuum in continuums:
-                pass
+                endfInterpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag(continuum.spectrum.interpolation)
+                interpolationFlatData = [len(continuum.spectrum), endfInterpolation]
+                continuumFlatData = []
+                for xy in continuum.spectrum.copyDataToXYs(): continuumFlatData += xy
+
+                if interpolationFlatData is not None:
+                    spectrumData.append( endfFormatsModule.endfContLine(RTYP, 0, 0, 0,
+                                                                        len(interpolationFlatData)//2,
+                                                                        len(continuum.spectrum)) )
+                    spectrumData += endfFormatsModule.endfInterpolationList(interpolationFlatData)
+                    spectrumData += endfFormatsModule.endfDataList(continuumFlatData)
 
             endfMFList[8][457].append( endfFormatsModule.endfDataLine([1,0,average_energy,sqrt(d_average_energy),0,0]) )
             endfMFList[8][457] += spectrumData

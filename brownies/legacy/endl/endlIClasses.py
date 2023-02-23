@@ -91,7 +91,7 @@ class endlI0(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         return( getThresholdsForChecker2d( self ) )
 
     def heat( self, T, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False, doNotThin = True, EMin = 1e-11, 
-        heatBelowThreshold = True, removeClosePoints = True, heatAllEDomain = True ) :
+        heatBelowThreshold = True, removeClosePoints = True, heatAllEDomain = True, setThresholdToZero = True ) :
         """Calls crossSectionAdjustForHeatedTarget with self's data. Returns an endl2dmath
     instance. See module crossSectionAdjustForHeatedTarget for more details."""
 
@@ -112,6 +112,8 @@ class endlI0(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
             d  = heatModule.crossSectionAdjustForHeatedTarget( massRatio, dT, EMin, unheated.data, lowerlimit = lowerlimit, \
                 upperlimit = upperlimit, interpolationAccuracy = interpolationAccuracy, heatAllPoints = heatAllPoints, doNotThin = doNotThin,
                 heatAllEDomain = heatAllEDomain )
+            if unheated.data[0][1] == 0.0 and setThresholdToZero:
+                d[0][1] = 0.0
             heated = endl2dmathClasses.endl2dmath(d)
             if( removeClosePoints ) : heated.removeClosePoints( )
         else :

@@ -120,34 +120,39 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
         self.Zr90URR.getWidthsAndSpacings()
         self.Zr90_table_generator.extrapolate_URR_parameters(self.Zr90URR.lowerBound, self.Zr90URR.upperBound)
         lastResEnergies={(0,0.5):198400.0, (1, 1.5):193400.0, (1, 0.5):189100.0, (2, 1.5):188400.0, (2, 2.5):160000.0}
-        fakeRR=self.Zr90_table_generator.sampleRR(lastResEnergies, lowerBound=None, upperBound=None, style='goe', verbose=False)
 
-        # Make sure all spin groups present
-        for lj in lastResEnergies:
-            self.assertTrue(lj in fakeRR)
+        # draw multiple realizations to reduce MC variance in correlation test:
+        correlation_coefs = []
+        for idx in range(10):
+            fakeRR=self.Zr90_table_generator.sampleRR(lastResEnergies, lowerBound=None, upperBound=None, style='goe', verbose=False)
 
-        # Make sure starting energies are kosher,
-        # Just above the lowerBound of the URR and the upper end of the RRR, by 1-2 units of mean level spacing
-        for lj in lastResEnergies:
-            firstEnergy = fakeRR[lj].data[0][0]
-            self.assertLess(
-                (firstEnergy-max(lastResEnergies[lj], self.Zr90URR.lowerBound))*self.Zr90URR.levelDensities[lj].evaluate(self.Zr90URR.lowerBound), 3)
+            # Make sure all spin groups present
+            for lj in lastResEnergies:
+                self.assertTrue(lj in fakeRR)
 
-        # For next two tests, just work with one channel
-        lj0 = list( fakeRR.keys() )[0]
-        num_levels=len(fakeRR[lj0].data)
+            # Make sure starting energies are kosher,
+            # Just above the lowerBound of the URR and the upper end of the RRR, by 1-2 units of mean level spacing
+            for lj in lastResEnergies:
+                firstEnergy = fakeRR[lj].data[0][0]
+                self.assertLess(
+                    (firstEnergy-max(lastResEnergies[lj], self.Zr90URR.lowerBound))*self.Zr90URR.levelDensities[lj].evaluate(self.Zr90URR.lowerBound), 3)
 
-        # Check the mean level spacing, this is very non-trivial test, we check that the spacing-spacing
-        # correlation is consistent with GOE expectations
-        diff_spacings=[]
-        spacings=[fakeRR[lj0].data[i+1][0]-fakeRR[lj0].data[i][0] for i in range(num_levels-1)]
-        for i in range(num_levels-1):
-            aveE=0.5*(fakeRR[lj0].data[i+1][0]+fakeRR[lj0].data[i][0])
-            diff_spacings.append(spacings[i]-1.0/self.Zr90URR.levelDensities[lj0].evaluate(aveE))
-        correlation_matrix = numpy.corrcoef(numpy.array([[diff_spacings[i], diff_spacings[i+1]] for i in range(num_levels-2)]).T)
-# BRB
-        print( 'Test 3', correlation_matrix[0,1], -0.27, 30.0 )
-        self.assertWithinXPercent(correlation_matrix[0,1], -0.27, 30.0) # GOE says this should be -0.27, this is a Monte-Carlo test, so have big potential variation
+            # For next two tests, just work with one channel
+            lj0 = list( fakeRR.keys() )[0]
+
+            # Check the mean level spacing: is the spacing-spacing correlation consistent with GOE expectations?
+            energies = numpy.array(fakeRR[lj0].getColumn('energy'))
+            spacings = energies[1:] - energies[:-1]
+            aveE = 0.5 * (energies[1:] + energies[:-1])
+            lds = numpy.array([self.Zr90URR.levelDensities[lj0].evaluate(ee) for ee in aveE])
+            diff_spacings = spacings - 1/lds
+            correlation_matrix = numpy.corrcoef(numpy.array([diff_spacings[:-1], diff_spacings[1:]]))
+
+            correlation_coefs.append(correlation_matrix[0,1])
+
+        mean_correlation = numpy.mean(correlation_coefs)
+        print( 'Test 3', mean_correlation, -0.27, 30.0 )
+        self.assertWithinXPercent(mean_correlation, -0.27, 30.0) # GOE says this should be -0.27, this is a Monte-Carlo test, so have big potential variation
 
         # Check the mean width against the average width I get by averaging the average width function over the entire URR
         # Only check 'capture' because 'elastic' in URR is "reduced" and I'm too lazy to code up the correction to full width

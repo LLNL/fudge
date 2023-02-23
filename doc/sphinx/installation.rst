@@ -5,9 +5,9 @@ Installation
 
 The basic use of the FUDGE package requires the following:
 
-* Git distributed version control system 
-* Python (versions 3.6 or higher) general-purpose programming language (with the numpy package included)
-* C compiler for the translation of the compute-intensive modules.
+* Git
+* Python (versions 3.7 or higher) general-purpose programming language (with the numpy package included)
+* C and C++ compilers for the translation of the compute-intensive modules.
 
 While there are numerous options available for the installation of FUDGE, only the following are currently supported:
 
@@ -19,7 +19,7 @@ While there are numerous options available for the installation of FUDGE, only t
 
     ::
 
-        pip install git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/fudge.git@fudge4.3-rc5
+        pip install git+ssh://git@czgitlab.llnl.gov:7999/nuclear/fudge/fudge.git@fudge6.1.0
 
 * Installation via Makefiles which is our typical development mode for active FUDGE code maintenance and improvements. The following steps are recommended:
 
@@ -43,13 +43,14 @@ While there are numerous options available for the installation of FUDGE, only t
   
 For more advanced use, Fudge depends on these additional packages:
 
-* The matplotlib for general plotting. Previous versions of FUDGE used gnuplot but this is being phased out in favor of matplotlib. 
+* matplotlib for general plotting.
 * PyQt5 and Qt v5 for interactive plotting. The underlying plotting is still done with matplotlib with the Qt toolkit and bindings providing the graphical
   user interface to interact and modify some of the common matplotlib plot options.
+* scipy and h5py are required for more advance usage including procssing data libraries.
 
 
-[Optional] Setting Environment Variables
-----------------------------------------
+[Optional] Setting Environment Variables (not required after installing with pip)
+---------------------------------------------------------------------------------
 
 For general use of the fudge package, some changes should be made to your computer's environment. The following lines make the required change. 
 Note that <path_to_fudge> indicates the path to root FUDGE folder:

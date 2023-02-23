@@ -22,6 +22,7 @@ from LUPY import ancestry as ancestryModule
 from . import base as baseModule
 from . import link as linkModule
 
+
 class Uncertainty(ancestryModule.AncestryIO_bare):
 
     moniker = 'uncertainty'
@@ -80,6 +81,8 @@ class Uncertainty(ancestryModule.AncestryIO_bare):
                 ListOfCovariances.moniker: ListOfCovariances,
             }.get(node[0].tag)
             self.__functional = functionalClass.parseNodeUsingClass(node[0], xPath, linkData, **kwargs)
+            if self.__functional:
+                self.__functional.setAncestor(self)
 
         xPath.pop()
 

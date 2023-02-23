@@ -18,6 +18,9 @@ MaxA = 400
 continuumID = 1000000
 sumID = continuumID + 1
 
+import math
+
+from pqu import PQU as PQUModule
 from .. import misc as miscModule
 
 chemicalElementZSymbolNames = (
@@ -344,3 +347,19 @@ def nuclideIDFromNucleusID( nucleusID ) :
     """ The nuclide id is computed from nucleus id by converting 1st letter to upper case """
 
     return( nucleusID[0].upper( ) + nucleusID[1:] )
+
+def nuclearBindingEnergyPerNucleonSemiEmpirical(Z, A, unit):
+    '''
+    Returns the nuclear binding energy per nucleon from a semi empirical formula (see https://en.wikipedia.org/wiki/Nuclear_binding_energy).
+    '''
+
+    N = A - Z
+    pairingTerm = 0
+    if A % 2 == 0:
+        pairingTerm = 33.0
+        if Z % 2 == 1:
+            pairingTerm *= -1
+
+    energy_MeV = 14.0 - 13.0 * math.pow(A, -1/3) - 0.585 * Z**2 * math.pow(A, -4/3) - 19.3 * (N - Z)**2 / A**2 + pairingTerm * math.pow(A, -7/4)
+
+    return PQUModule.PQU(energy_MeV, 'MeV').getValueAs(unit)

@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-#
+# 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -195,14 +195,14 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
         matrix.setAncestor( self )
         self.matrix = matrix
 
-    def check( self, info ):
+    def check(self, info):
         import numpy
         from fudge import warning
         warnings = []
 
         params = self.parameters.nParameters
-        if self.matrix.shape != (params,params):
-            warnings.append( warning.ParameterCovarianceMismatch(params, self.matrix.shape) )
+        if self.matrix.shape != (params, params):
+            warnings.append(warning.ParameterCovarianceMismatch(params, self.matrix.shape))
 
         else:
             matrix = self.matrix.constructArray()
@@ -219,30 +219,50 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
                     raise NotImplementedError("Model parameter covariance linking to %s" % type(parameterLink.link))
             params = numpy.array(params)
 
+            # params may contain zeros, e.g. for L/J columns in BreitWigner table. Replace with 1
+            params2 = params[:]
+            params2[params2 == 0] = 1
             if self.type == covarianceEnumsModule.Type.absolute:
-                # params may contain zeros, e.g. for L/J columns in BreitWigner table. Replace with 1
-                params2 = params[:]
-                params2[ params2==0 ] = 1
-                matrix = matrix / params2 / params2[:,numpy.newaxis]
+                absolute_matrix = matrix
+                relative_matrix = matrix / params2 / params2[:, numpy.newaxis]
+            elif self.type == covarianceEnumsModule.Type.relative:
+                relative_matrix = matrix
+                absolute_matrix = matrix * params2 * params2[:, numpy.newaxis]
+            else:
+                raise NotImplementedError("Checking for model parameter covariance type %s" % self.type)
 
-            uncertainty = numpy.sqrt(matrix.diagonal())
-            for idx, unc in enumerate(uncertainty):
+            rel_uncertainty = numpy.sqrt(relative_matrix.diagonal())
+            abs_uncertainty = numpy.sqrt(absolute_matrix.diagonal())
+
+            for idx, unc in enumerate(rel_uncertainty):
                 if unc < info['minRelUnc']:
                     # FIXME should probably ignore fake resonances (e.g. with negative energies)
-                    warnings.append( warning.VarianceTooSmall( idx, unc**2, self ) )
+                    matrixWarnings.append(warning.VarianceTooSmall(idx, unc, abs_uncertainty[idx], self))
                 elif unc > info['maxRelUnc']:
-                    warnings.append( warning.VarianceTooLarge( idx, unc**2, self ) )
+                    matrixWarnings.append(warning.VarianceTooLarge(idx, unc, abs_uncertainty[idx], self))
 
-            vals, vecs = numpy.linalg.eigh( matrix )
+            # check for out-of-range correlations
+            rel_uncert2 = rel_uncertainty[:]
+            rel_uncert2[rel_uncert2 == 0] = 1
+            corr_matrix = relative_matrix / rel_uncert2 / rel_uncert2[:, numpy.newaxis]
+            epsilon = 1e-14     # allow for round-off error when converting to correlation matrix
+            badCount = (corr_matrix > 1 + epsilon).sum() + (corr_matrix < -1 - epsilon).sum()
+            if badCount:
+                worstCase = numpy.max(corr_matrix)
+                if abs(numpy.min(corr_matrix)) > worstCase:
+                    worstCase = numpy.min(corr_matrix)
+                matrixWarnings.append(warning.CorrelationsOutOfRange(badCount, worstCase, self))
+
+            vals, vecs = numpy.linalg.eigh(matrix)
             if min(vals) < info['negativeEigenTolerance']:
-                matrixWarnings.append( warning.NegativeEigenvalues( len(vals[vals<0]), min(vals), self ))
-            minpos, maxpos = min(vals[vals>=0]),max(vals[vals>=0])
+                matrixWarnings.append(warning.NegativeEigenvalues(len(vals[vals < 0]), min(vals), self))
+            minpos, maxpos = min(vals[vals >= 0]), max(vals[vals >= 0])
             # Check that the condition number of the matrix is reasonable
             if minpos/maxpos < info['eigenvalueRatioTolerance'] and matrix.size != 1:
-                matrixWarnings.append( warning.BadEigenvalueRatio( minpos/maxpos, self ) )
+                matrixWarnings.append(warning.BadEigenvalueRatio(minpos/maxpos, self))
 
             if matrixWarnings:
-                warnings.append( warning.Context("Model parameter covariances", matrixWarnings ) )
+                warnings.append(warning.Context("Model parameter covariances", matrixWarnings))
 
         return warnings
 

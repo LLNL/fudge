@@ -157,7 +157,7 @@ class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
 
     def toXML_strList(self, indent = '', **kwargs):
 
-        xs_pdf_cdf1d_singleLine = kwargs.get('xs_pdf_cdf1d_singleLine', False)
+        xs_pdf_cdf1d_singleLine = kwargs.get('xs_pdf_cdf1d_singleLine', True)
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent
         if xs_pdf_cdf1d_singleLine: indent2 = ''
@@ -215,28 +215,59 @@ class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
         return instance
 
     @classmethod
-    def fromXYs( cls, xys, outerDomainValue = None ) :
+    def fromXYs(cls, xys, outerDomainValue=None, thinEpsilon=None):
+        '''
+        Creates an **Xs_pdf_cdf1d** instance for an **XYs1d** instance. If *thinEpsilon* is not None, then points are
+        thinned so that the returned cdf has cdf[i+1] - cdf[i] > *thinEpsilon*.
+
+        :param cls:                 The **Xs_pdf_cdf1d** class create.
+        :param xys:                 The **XYs1d** to convert to an **Xs_pdf_cdf1d**.
+        :param outerDomainValue:    The value of the *outerDomainValue* for the returned **XYs1d** instance. If None, taken from *xys*.
+        :param thinEpsilon:         Set the thinning parameter.
+        '''
 
         if xys.interpolation not in [enumsModule.Interpolation.linlin, enumsModule.Interpolation.flat]:
-            xys = xys.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 0, upperEps = 1e-8 )
+            xys = xys.toPointwise_withLinearXYs(accuracy=1e-3, lowerEps=0, upperEps=1e-8)
 
         if outerDomainValue is None:
             outerDomainValue = xys.outerDomainValue
 
-        try :
-            norm = xys.normalize( )
-        except :
-            norm = xys.copy( )
-            for i1 in range( len( norm ) ) : norm[i1] = [ norm[i1][0], 1.0 ]
-            if( len( norm ) > 2 ) : norm[ 0] = [ norm[ 0][0], 0.0 ]
-            norm[-1] = [ norm[-1][0], 0.0 ]
-            norm = norm.normalize( )
+        try:
+            norm = xys.normalize()
+        except:
+            norm = xys.copy()
+            for i1 in range(len(norm)):
+                norm[i1] = [norm[i1][0], 1.0]
+            if len(norm) > 2:
+                norm[0] = [norm[0][0], 0.0]
+            norm[-1] = [norm[-1][0], 0.0]
+            norm = norm.normalize()
 
-        _cdf = norm.runningIntegral( )
-        _cdf[-1] = 1.0
-        _xs, _pdf = norm.copyDataToXsAndYs( )
-        _xs = Xs( valuesModule.Values( _xs ) )
-        _pdf = Pdf( valuesModule.Values( _pdf ) )
-        _cdf = Cdf( valuesModule.Values( _cdf ) )
+        cdf = norm.runningIntegral()
+        cdf[-1] = 1.0
+        xs, pdf = norm.copyDataToXsAndYs()
 
-        return( cls( _xs, _pdf, _cdf, outerDomainValue = outerDomainValue, interpolation = xys.interpolation ) )
+        if thinEpsilon is not None:
+            indicesToRemove = []
+            for index, cdf2 in enumerate(cdf):
+                if cdf2 == 1:
+                    break
+                if index != 0:
+                    if cdf2 - cdf1 <= thinEpsilon * cdf2:
+                        indicesToRemove.append(index)
+                    else:
+                        lastKept = index
+                cdf1 = cdf2
+            for index in range(index, len(cdf) - 1):
+                indicesToRemove.append(index)
+            if len(indicesToRemove) > 0:
+                for index in reversed(indicesToRemove):
+                    xs.pop(index)
+                    pdf.pop(index)
+                    cdf.pop(index)
+                
+        xs = Xs(valuesModule.Values(xs))
+        pdf = Pdf(valuesModule.Values(pdf))
+        cdf = Cdf(valuesModule.Values(cdf))
+
+        return cls(xs, pdf, cdf, outerDomainValue = outerDomainValue, interpolation = xys.interpolation)

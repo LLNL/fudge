@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6. Other Fudge Examples &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>6. Other Fudge Examples &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -17,7 +18,7 @@
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Downloading" href="../downloading.html" />
+    <link rel="next" title="External Packages used in Fudge" href="../externals.html" />
     <link rel="prev" title="5. Processing GNDS files" href="processing.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -30,12 +31,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../downloading.html" title="Downloading"
+          <a href="../externals.html" title="External Packages used in Fudge"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="processing.html" title="5. Processing GNDS files"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">The Fudge Tutorial</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">6. </span>Other Fudge Examples</a></li> 
       </ul>
@@ -46,38 +47,36 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="other-fudge-examples">
+  <section id="other-fudge-examples">
 <h1><span class="section-number">6. </span>Other Fudge Examples<a class="headerlink" href="#other-fudge-examples" title="Permalink to this headline">¶</a></h1>
 <p>After installing Fudge, most users will be interested in translating ENDF files to the new format and in measuring how
 well the translation works. Two tools for translating ENDF are included in the <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory.</p>
-<div class="section" id="reprint-py">
+<section id="reprint-py">
 <h2><span class="section-number">6.1. </span>rePrint.py<a class="headerlink" href="#reprint-py" title="Permalink to this headline">¶</a></h2>
 <p>This is a tool translate one ENDF-formatted file to GNDS, then translate back to ENDF for comparison with the original.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Usage</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">&lt;path_to_fudge&gt;/bin/rePrint.py</span> <span class="pre">filename.endf</span></code></p>
+<dt class="field-odd">Usage<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">&lt;path_to_fudge&gt;/brownies/bin/rePrint.py</span> <span class="pre">filename.endf</span></code></p>
 </dd>
 </dl>
 <dl class="simple">
 <dt>Several files are produced:</dt><dd><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">test.endf6.xml</span></code>        (the gnds-formatted file)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">test.endf6-covar.xml</span></code>  (covariances in gnds, produced only if the original file has covariances)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test.endf6-covar.xml</span></code>  (covariances in GNDS, produced only if the original file has covariances)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">test.endf6.noLineNumbers</span></code>  (the gnds file translated back to ENDF format)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">test.endf6.orig.noLineNumbers</span></code>  (the original ENDF file with line numbers stripped for easy comparison)</p></li>
 </ul>
 </dd>
 </dl>
-<p>After running rePrint.py, you may wish to compare the original/new ENDF files using diff,kompare, etc:</p>
+<p>After running rePrint.py, you may wish to compare the original/new ENDF files using diff, kompare, meld, etc:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$diff test.endf6.orig.noLineNumbers test.endf6.noLineNumbers
 </pre></div>
 </div>
-<p>Another tool included in the release is <code class="docutils literal notranslate"><span class="pre">rePrintSample.py</span></code>. This is very similar to <code class="docutils literal notranslate"><span class="pre">rePrint.py</span></code>, except it randomly picks
-an ENDF-formatted file from the included samples.</p>
-</div>
-<div class="section" id="making-plots">
+</section>
+<section id="making-plots">
 <h2><span class="section-number">6.2. </span>Making Plots<a class="headerlink" href="#making-plots" title="Permalink to this headline">¶</a></h2>
-<p>After translating an ENDF file to GNDS, fudge can be used to make plots from the data. Plotting in fudge may require
-installing extra components (<code class="docutils literal notranslate"><span class="pre">gnuplot</span></code> and/or <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>). A sample plotting script is included in the <code class="docutils literal notranslate"><span class="pre">examples/</span></code>
+<p>After translating an ENDF file to GNDS, FUDGE can be used to make plots from the data. Plotting in fudge may require
+installing extra components (<code class="docutils literal notranslate"><span class="pre">PyQt5</span></code> and/or <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>). A sample plotting script is included in the <code class="docutils literal notranslate"><span class="pre">examples/</span></code>
 directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python &lt;path_to_fudge&gt;/examples/plotCrossSection.py &lt;path_to_endf_file&gt; &lt;list_of_mt_numbers&gt;
 </pre></div>
@@ -86,8 +85,8 @@ directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python &lt;path_to_fudge&gt;/examples/compareCrossSections.py &lt;mt&gt; &lt;first_file&gt; &lt;second_file&gt;
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -112,8 +111,8 @@ directory:</p>
   <p class="topless"><a href="processing.html"
                         title="previous chapter"><span class="section-number">5. </span>Processing GNDS files</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../downloading.html"
-                        title="next chapter">Downloading</a></p>
+  <p class="topless"><a href="../externals.html"
+                        title="next chapter">External Packages used in Fudge</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -145,12 +144,12 @@ directory:</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../downloading.html" title="Downloading"
+          <a href="../externals.html" title="External Packages used in Fudge"
              >next</a> |</li>
         <li class="right" >
           <a href="processing.html" title="5. Processing GNDS files"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">6. </span>Other Fudge Examples</a></li> 
       </ul>

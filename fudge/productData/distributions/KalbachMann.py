@@ -33,6 +33,15 @@ KalbachMann_a_parameters = { IDsPoPsModule.neutron  : { 'M' : 1, 'm' : 0.5, 'I' 
                              'He3'                  : { 'M' : 0, 'm' : 1.0, 'I' : 7.72 }, 'He4' : { 'M' : 0, 'm' : 2.0, 'I' : 28.3 },
                              IDsPoPsModule.photon   : { 'M' : 0, 'm' : 0.0, 'I' : 0.0 } }
 
+class XYs2d(multiD_XYsModule.XYs2d):
+    '''Special XYs2d class for Kalbach/Mann functions r and a to make sure 'unitbase-unscaled' interpolation qualifier.'''
+
+    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, interpolationQualifier=None, **kwargs):
+
+        function = multiD_XYsModule.XYs2d.evaluate(self, domainValue, extrapolation=extrapolation, 
+                interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBaseUnscaled, **kwargs)
+
+        return function
 
 class Subform( baseModule.Subform ) :
     """Abstract base class for Kalback/Mann subforms."""
@@ -409,14 +418,34 @@ class Form( baseModule.Form ) :
         amu = _a * mu
         return( 0.5 * _a * ( math.cosh( amu ) + _r * math.sinh( amu ) ) / math.sinh( _a ) )
 
-    def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
+    def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
+
+        muMin = kwargs.get('muMin', -1.0)
+        muMax = kwargs.get('muMax',  1.0)
 
         if frame == xDataEnumsModule.Frame.centerOfMass:
-            return( self.fSubform.data.evaluate( energyIn ) )
+            if muMin == -1 and muMax == -1:
+                return self.fSubform.data.evaluate(energyIn)
 
-        xys2d = self.spectrumAtEnergy(energyIn, xDataEnumsModule.Frame.lab)
-        data = [ [ xys1d.outerDomainValue, xys1d.integrate() ] for xys1d in xys2d ]
-        return( energyModule.XYs1d( data = data, axes = energyModule.defaultAxes( self.domainUnit ) ) )
+            projectileIsPhoton = self.findAttributeInAncestry('projectile') == IDsPoPsModule.photon
+            fAtEnergy, rAtEnergy, aAtEnergy = self.getFRAatEnergy_asLinearPointwise(energyIn, **kwargs)
+            data = []
+            for energyOut, PofEnergyOut in fAtEnergy:
+                rValue = rAtEnergy.evaluate(energyOut)
+                aValue = aAtEnergy.evaluate(energyOut)
+                aMuMin = aValue * muMin
+                aMuMax = aValue * muMax
+                if projectileIsPhoton:
+                    factor = 0.5 * ((1.0 - rValue) * (muMax - muMin) + rValue * aValue * (math.exp(aMuMax) - math.exp(aMuMin)) / math.sinh(aValue))
+                else:
+                    factor = 0.5 * ((math.sinh(aMuMax) - math.sinh(aMuMin)) +
+                            rValue * ((math.cosh(aValue *muMax) - math.cosh(aValue * muMin))) / math.sinh(aValue))
+                data.append([energyOut, factor * PofEnergyOut])
+        else:
+            xys2d = self.spectrumAtEnergy(energyIn, xDataEnumsModule.Frame.lab)
+            data = [[xys1d.outerDomainValue, xys1d.integrate(domainMin=muMin, domainMax=muMax)] for xys1d in xys2d]
+
+        return energyModule.XYs1d(data=data, axes=energyModule.defaultAxes(self.domainUnit))
 
     def fixDomains(self, energyMin, energyMax, domainToFix):
         """
@@ -559,12 +588,13 @@ class Form( baseModule.Form ) :
         oldData = self.fSubform.data
         subform = energyModule.XYs2d( axes = oldData.axes, interpolation = oldData.interpolation,
                 interpolationQualifier = oldData.interpolationQualifier )
-        for xys in oldData : subform.append( energyModule.Xs_pdf_cdf1d.fromXYs( xys, xys.outerDomainValue ) )
-        _fSubform = FSubform( subform )
+        for xys in oldData :
+            subform.append(energyModule.Xs_pdf_cdf1d.fromXYs(xys, xys.outerDomainValue, thinEpsilon=1e-14))
+        _fSubform = FSubform(subform)
 
         if( self.aSubform.isEmptyASubform( ) ) :
             KalbachMann_a_Axes = ASubform.defaultAxes( oldData.domainUnit )
-            _aSubform = multiD_XYsModule.XYs2d(axes=KalbachMann_a_Axes, interpolation=xDataEnumsModule.Interpolation.linlin,
+            _aSubform = XYs2d(axes=KalbachMann_a_Axes, interpolation=xDataEnumsModule.Interpolation.linlin,
                 interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBaseUnscaled)
             suppressNoResidualInPoPs = kwargs.get('suppressNoResidualInPoPs', False)
             for f_xys in oldData :
@@ -645,7 +675,7 @@ class Form( baseModule.Form ) :
             if( child.tag == FSubform.moniker ) :
                 xData = energyModule.XYs2d.parseNodeUsingClass(child[0], xPath, linkData, **kwargs)
             else :
-                xData = multiD_XYsModule.XYs2d.parseNodeUsingClass(child[0], xPath, linkData, **kwargs)
+                xData = XYs2d.parseNodeUsingClass(child[0], xPath, linkData, **kwargs)
             childArrays[ '_%sSubform' % child.tag ] = _subformClass( xData )
         if '_aSubform' not in childArrays: childArrays['_aSubform'] = ASubform( None )
 

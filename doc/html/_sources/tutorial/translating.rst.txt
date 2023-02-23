@@ -13,9 +13,9 @@ files n-001_H_001.xml and n-001_H_001-covar.xml::
 
     /full/path/to/FUDGE/brownies/bin/endf2gnds.py n-001_H_001.endf n-001_H_001.xml
 
-If using the *pip installed* version of **FUDGE**, the one only needs the::
+If using the *pip installed* version of **FUDGE**, then endf2gnds is installed in the `bin` directory and you can simply  do::
 
-    brownies/bin/endf2gnds.py n-001_H_001.endf n-001_H_001.xml
+    endf2gnds.py n-001_H_001.endf n-001_H_001.xml
 
 Translating GNDS files back into ENDF
 -------------------------------------
@@ -26,18 +26,21 @@ file generated in the endf2gnds.py comannd above back into an ENDF-6 file::
 
     /full/path/to/FUDGE/brownies/bin/gnds2endf.py n-001_H_001.xml
 
+or (if you installed using pip)::
+
+    gnds2endf.py n-001_H_001.xml
+
 Reading GNDS XML files
 ----------------------
 
 If I didn't have pre-made instances of ``reactionSuite`` and ``covarianceSuite``, how would I read in the XML files?
-For this purpose, both the ``fudge.reactionSuite`` and ``fudge.covariances`` have the factory function ``readXML()``.
-To use them do:
+For this purpose, the ``fudge.reactionSuite`` module has a factory function ``read()``.
+To use it, do:
 
     >>> from fudge import reactionSuite
-    >>> from fudge.covariances import covarianceSuite
-    >>> n_H1 = reactionSuite.readXML( "n-001_H_001.gnds.xml" )
+    >>> n_H1 = reactionSuite.read( "n-001_H_001.gnds.xml" )
+    >>> covariances = n_H1.loadCovariances()
 
-This reads in the evaluation itself.  To read in the covariances, we need to tell the `covariances.readXML()` function
-where the evaluation is so that it can set up the hyperlinks correctly:
+The `loadCovariances` method returns a list of 0 or more `CovarianceSuite` instances, using the references
+from the `externalFiles` section in the `reactionSuite` to find the covariance data.
 
-    >>> myOtherCov = covarianceSuite.readXML( "n-001_H_001.gndsCov.xml", reactionSuite=myOtherEval )

@@ -45,6 +45,7 @@ from .outputChannelData import Q as QModule
 class Processes :
 
     continuum = 'continuum'
+    inclusive = 'inclusive'
 
 class OutputChannel( ancestryModule.AncestryIO ) :
     """This is the GNDS outputChannel which is a Q value and a list of products (i.e., product objects)."""
@@ -160,9 +161,14 @@ class OutputChannel( ancestryModule.AncestryIO ) :
 
         for product in self : product.checkProductFrame( )
 
-    def diff( self, other, diffResults ) :
+    def diff(self, other, diffResults):
 
         self.Q.diff( other.Q, diffResults )
+
+        selfQ = self.Q[0].evaluate(self.Q[0].domainMin)
+        otherQ = other.Q[0].evaluate(self.Q[0].domainMin)
+        if abs(selfQ - otherQ) > 0.1:
+            diffResults.append('Q values differ', '%s vs %s' % (selfQ, otherQ), self.toXLink(), other.toXLink())
 
         aliases = self.rootAncestor.PoPs.aliases
         productIDs = []
@@ -281,27 +287,29 @@ class OutputChannel( ancestryModule.AncestryIO ) :
         self.__products.removeStyles( styleLabels )
         self.__fissionFragmentData.removeStyles( styleLabels )
 
-    def thresholdQAs( self, unit, final = True ) :
+    def thresholdQAs(self, unit, final=True, pops=None):
 
-        if( len( self.__Q ) > 0 ) :
-            Q = self.__Q.thresholdQAs( unit )
-        else :                      # Calculate from particle masses.
+        if len(self.__Q) > 0 and pops is None:
+            Q = self.__Q.thresholdQAs(unit)
+        else:                       # Calculate from particle masses.
             massUnit = unit + '/c**2'
             reactionSuite = self.rootAncestor
-            projectile = reactionSuite.PoPs[reactionSuite.projectile]
-            targetID = reactionSuite.target
-            if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs[targetID].pid
-            target = reactionSuite.PoPs[targetID]
-            Q = target.mass[0].float( massUnit ) + projectile.mass[0].float( massUnit )
+            projectile = pops.final(reactionSuite.projectile)
+            target = pops.final(reactionSuite.target)
+            Q = target.getMass(massUnit) + projectile.getMass(massUnit)
             for product in self:
-                try :   
-                    Q -= product.getMass(massUnit) * product.multiplicity.getConstant()
-                except :
-                    if( product.pid == IDsPoPsModule.photon ) : continue
-                    raise ValueError( "Non-constant Q-value must be explicitly listed in GNDS!" )
-        if( final ) :
-            for product in self.__products : Q += product.thresholdQAs( unit, final = final )
-        return( Q )  
+                try:
+                    Q -= pops[product.pid].getMass(massUnit) * product.multiplicity.getConstant()
+                except:
+                    if product.pid == IDsPoPsModule.photon:
+                        continue
+                    raise ValueError('Non-constant Q-value must be explicitly listed in GNDS! Maybe missing mass for particle "%s".' % product.pid)
+
+        if final:
+            for product in self.__products:
+                Q += product.thresholdQAs(unit, final=final, pops=pops)
+
+        return Q
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
         """

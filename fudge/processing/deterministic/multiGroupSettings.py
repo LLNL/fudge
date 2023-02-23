@@ -25,8 +25,8 @@ class Settings:
         if not isinstance(projectileID, str):
             raise TypeError('First argument is expected to be of type {str}')
 
-        if not self.isAllowedParticle(projectileID):
-            raise TypeError(f'First argument is expected to be one of the common particles in {popsIDsModule}.')
+#        if not self.isAllowedParticle(projectileID):
+#            raise TypeError(f'First argument is expected to be one of the common particles in {popsIDsModule}.')
 
         self.projectileID = projectileID
 

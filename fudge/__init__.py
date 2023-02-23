@@ -5,9 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""
-Top-level __init__ for the fudge project.
-"""
+from LUPY import checkPythonVerions
 
 from . import fudgeVersion as versionModule
 

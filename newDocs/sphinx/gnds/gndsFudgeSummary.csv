@@ -1,7 +1,0 @@
-Attribute,GNDS,Fudge Object,Fudge Instantiation,Fudge Default Value
-projectile,node attribute,string object,from required input argument,N/A
-target,node attribute,string object,from required input argument,N/A
-evaluation,node attribute,string object,from required input argument,N/A
-format,node attribute,string object,from optional input argument,fudge.version.GNDS_VERSION
-projectileFrame,node attribute,xData.standards.frames.labToken or xData.standards.frames.centerOfMassToken,from optional input argument,xData.standards.frames.labToken
-styles,child node,fudge.styles.styles object,from optional input argument,new fudge.styles.styles object

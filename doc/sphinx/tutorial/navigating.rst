@@ -8,28 +8,29 @@ The Fudge reactionSuite and covarianceSuite classes are meant to reflect the GND
 Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,
 
     >>> from fudge import reactionSuite
-    >>> RS = reactionSuite.readXML("path_to_GNDS_file.xml")
+    >>> RS = reactionSuite.read("path_to_GNDS_file.xml")
     >>> elastic = RS.getReaction("elastic")
     >>> elastic
-    <fudge.reactions.reaction.reaction object at 0x1020dc590>
+    <fudge.reactions.reaction.Reaction object at 0x1020dc590>
     >>> elastic.crossSection
-    <fudge.reactionData.crossSection.component object at 0x10220dcd0>
+    <fudge.reactionData.crossSection.Component object at 0x10220dcd0>
     >>> elastic.outputChannel.Q
-    <fudge.outputChannelData.Q.component object at 0x10212a0d0>
+    <fudge.outputChannelData.Q.Component object at 0x10212a0d0>
     >>> elastic.outputChannel.products
-    <fudge.product.products object at 0x102608e10>
+    <fudge.product.Products object at 0x102608e10>
     >>> elastic.outputChannel.products[0].multiplicity
-    <fudge.productData.multiplicity.component object at 0x102610310>
+    <fudge.productData.multiplicity.Component object at 0x102610310>
     >>> elastic.outputChannel.products[0].distribution
-    <fudge.productData.distributions.distribution.component object at 0x1026103d0>
+    <fudge.productData.distributions.distribution.Component object at 0x1026103d0>
 
 The 'getReaction' method of reactionSuite provides a simple way to search for a desired reaction.
 In addition to strings like "elastic", "fission" or "n + Fe56_e3" (to search for a reaction that emits a neutron
 plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.
 
-instead they are instances of Fudge classes like ``crossSection.component``, ``Q.component``, ``distribution.component``,
-etc.  This reflects the basic design of GNDS: each physical quantity can potentially contain more than one form of data
-including the original 'evaluated' data as well as other types that may be processed by heating, grouping, etc.
+Fields like 'crossSection', 'Q' and 'multiplicity' point to instances of Fudge classes like
+``crossSection.Component``, ``Q.Component``, ``distribution.Component``, etc.
+This reflects the basic design of GNDS: each physical quantity can potentially contain more than one style of data
+including the original 'evaluated' style as well as other types that may be processed by heating, grouping, etc.
 Each ``component`` class contains a list of one or more ``form`` instances containing the actual data.
 
 The components behave like Python dictionaries:
@@ -60,7 +61,7 @@ corresponding to the data with resonances reconstructed. More detail about diffe
 
 The reconstructed data are most useful for viewing and plotting:
 
-    >>> print( elastic.crossSection['recon'] )
+    >>> print( elastic.crossSection['recon'].toString() )
        1.00000000e-05   2.09675600e+00
        6.19409249e+00   2.17147300e+00
        1.23695253e+01   2.25184300e+00

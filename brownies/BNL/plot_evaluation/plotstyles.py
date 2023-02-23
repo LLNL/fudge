@@ -388,7 +388,7 @@ def getPlotColor(i, defaultScheme=True):
         return '0.5'
 
     #hashval = hash(i)   # not deterministic between Python sessions
-    hashval = random.Random(i).randint(0, 256 * 256 * 256)
+    hashval = random.Random(i).randint(0, 0xffffff)
     return '#' + str(hex(hashval)).replace('0x', '').zfill(6)
 
 

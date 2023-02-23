@@ -42,4 +42,4 @@ Documentation is available :download:`here <../../Merced/Doc/merced.pdf>`
 statusMessageReporting
 ----------------------
 The statusMessageReporting library provides more robust error message reporting for c codes. It is used
-by other externals such as numericalFunctions and crossSectionAdjustForHeatedTarget.
+within numericalFunctions.

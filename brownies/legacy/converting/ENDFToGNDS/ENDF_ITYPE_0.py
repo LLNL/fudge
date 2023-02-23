@@ -10,6 +10,7 @@ For translating ENDF ITYPE=0 data ('normal' reaction evaluations for various pro
 """
 
 import sys
+import copy
 import fractions
 
 from pqu import PQU as PQUModule
@@ -74,6 +75,18 @@ def deriveMT3MF3FromMT1_2( info, reactionSuite ) :
 
     form.label = info.style
     return( form )
+
+def checkProductList(outputChannel, productList):
+
+    if outputChannel is None:
+        return
+    for product in outputChannel:
+        if product.pid in productList:
+            try:
+                multiplicity = int(product.multiplicity.getConstant())
+            except:
+                continue
+            productList[product.pid] -= multiplicity
 
 def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSectionOnly, doCovariances, verbose, reconstructResonances = True ) :
 
@@ -141,12 +154,13 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
         if( ( singleMTOnly is not None ) and ( MT != singleMTOnly ) ) : continue
 
         channelProcess = None
-        if( MT == inelasticMT ) :
+        if MT == inelasticMT:
             channelProcess = outputChannelModule.Processes.continuum
-        else :
-            if( MT in continuumMTs ) :
-                for discreteMT in continuumMTs[MT] :
-                    if( discreteMT in MTList ) : channelProcess = outputChannelModule.Processes.continuum
+        elif MT in range(103, 108):
+            channelProcess = outputChannelModule.Processes.inclusive
+        elif MT in continuumMTs:
+                for discreteMT in continuumMTs[MT]:
+                    if discreteMT in MTList: channelProcess = outputChannelModule.Processes.continuum
 
         warningList = []
         MTData = MTDatas[MT]
@@ -278,7 +292,24 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
         if( verbose > 0 ) :
             for warning in warningList : info.logs.write( "       WARNING: %s\n" % warning, stderrWriting = True )
 
-    for MT, reaction in reactions :
+    for MT, reaction in reactions:
+        if reaction.label in reactionSuite.reactions:
+            warningList.append('Duplicate reaction label "%s".' % reaction.label)
+            print('  WARNING: %s' % warningList[-1])
+            reaction.outputChannel.process = 'ENDF MT %s' % MT
+            reaction.updateLabel()
+        if MT not in [5, 18, 19, 20, 21, 38]:
+            productList = copy.copy(endf_endlModule.endfMTtoC_ProductLists[MT].productCounts)
+            checkProductList(reaction.outputChannel, productList)
+            missingProduct = []
+            for product, multiplicity in productList.items():
+                if product == IDsPoPsModule.photon:
+                    continue
+                if multiplicity > 0:
+                    missingProduct.append(product)
+            if len(missingProduct) > 0:
+                warningList.append('For MT=%s, product list does not match MT. Missing products are %s.' % (MT, ','.join(missingProduct)))
+                print('  WARNING: %s' % warningList[-1])
         reactionSuite.reactions.add( reaction )
 
     for reaction in delayInsertingSummedReaction :
@@ -289,8 +320,12 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
 
 # BRB, The channelIDs should be in a common area?????
     channelIDs = { 1 : 'total', 3 : 'nonelastic', 4 : '(z,n)', 103 : '(z,p)', 104 : '(z,d)', 105 : '(z,t)', 106 : '(z,He3)', 107 :'(z,alpha)' }
-    if( 3 in summedReactions ) : summedReactionsInfo[3] = nonElastic
-    if( ( 1 in summedReactions ) and ( 2 in MTList ) ) : summedReactionsInfo[1] = [ 2 ] + nonElastic
+    if 3 in summedReactions: summedReactionsInfo[3] = nonElastic
+    if 1 in summedReactions:
+        if 2 in MTList:
+            summedReactionsInfo[1] = [ 2 ] + nonElastic
+        elif info.projectile == IDsPoPsModule.photon:   # photo-nuclear evaluations usually omit MT2
+            summedReactionsInfo[1] = nonElastic
     summedReactionMTs = endfFileToGNDSMiscModule.niceSortOfMTs( list(summedReactions.keys( )), verbose = 0, logFile = info.logs )
     for MT in ( 4, 3, 1 ) :
         if( MT in summedReactionMTs ) :

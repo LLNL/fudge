@@ -888,14 +888,15 @@ can be used to get a reference to the neutron in-elastic cross section,
         self.documentation.setText( text )
 
     def heat( self, T, interpolationAccuracy = 0.002, heatAllPoints = False, doNotThin = True, EMin = 1e-11,
-        heatBelowThreshold = True, removeClosePoints = True, heatAllEDomain = True ) :
+            heatBelowThreshold = True, removeClosePoints = True, heatAllEDomain = True, setThresholdToZero   =True ) :
         """Calls heat method for all cross section data (i.e., I = 0). and sets the temperature in the header for all data to T."""
 
         self.read( printWarning = False )
         datas = self.findDatas( )
         for data in datas :
             if( data.I == 0 ) : data.set( data.heat( T, interpolationAccuracy = interpolationAccuracy, heatAllPoints = heatAllPoints, doNotThin = doNotThin,
-                EMin = EMin, heatBelowThreshold = heatBelowThreshold, removeClosePoints = removeClosePoints, heatAllEDomain = heatAllEDomain ) )
+                EMin = EMin, heatBelowThreshold = heatBelowThreshold, removeClosePoints = removeClosePoints, heatAllEDomain = heatAllEDomain,
+                setThresholdToZero = setThresholdToZero ) )
             data.setTemperature( T )
 
     def info( self ) :

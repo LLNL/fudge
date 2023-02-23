@@ -57,6 +57,7 @@ from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 from .chemicalElements import chemicalElements as chemicalElementsModule
 from .chemicalElements import chemicalElement as chemicalElementModule
 from .chemicalElements import isotope as isotopeModule
+from .chemicalElements import misc as chemicalElementsMiscModule
 from .families import particle as particleModule
 from .families import gaugeBoson as gaugeBosonModule
 from .families import lepton as leptonModule
@@ -65,6 +66,8 @@ from .families import nuclide as nuclideModule
 from .families import nucleus as nucleusModule
 from .families import unorthodox as unorthodoxModule
 
+from . import IDs as IDsModule
+from . import misc as miscModule
 from . import styles as stylesModule
 from . import alias as aliasModule
 
@@ -176,7 +179,7 @@ class Database(ancestryModule.AncestryIO):
             for item in parentDB: yield item    # FIXME skip particles that are overridden in child database?
 
     def keys( self ) :
-        """Return a list of ids for all particles in self"""
+        """Return a list of ids for all particles in self."""
 
         return( [ particle.id for particle in self ] )
 
@@ -352,6 +355,74 @@ class Database(ancestryModule.AncestryIO):
 
         return( _database )
 
+    def estimateMass(self, pid, unit, maxASpan=4):
+        '''
+        Returns the mass of the particle specified by *pid* if it exists in *self* and has a mass; otherwise,
+        the mass is estimate if possible. Currenlty, estimates are only performed if *pid* is a nuclide. In 
+        which case, its mass is estimated by trying to find a near by nuclide with the same Z. If this fails, 
+        None is returned.
+
+        If the particle exists and has a mass (ergo, the mass is not estimated), the returned value is positive. 
+        If the mass is estimated, a negative value is returned whose absolute value is the estimated mass. 
+        Otherwise, None is returned.
+
+        If the mass is estimated for a nuclide, the returned mass is for the ground state of the nuclide. Ergo, the *pid*
+        specifies a nuclear level, the level information is ignored.
+
+        :param pid:             The PoPs id of the particle whose mass is to be returned.
+        :param unit:            The unit of the returned mass.
+        :maxASpan:              If estimating a nuclide mass, only consider A's within this value of the A for *pid*.
+
+        :return:                A positive float if a mass for *pid* exist in *self*, a negative float if the mass is estimated and None otherwise.
+        '''
+
+        mass = None
+
+        try:
+            particle = self[pid]
+            try:
+                return particle.getMass(unit)
+            except:
+                pass
+        except:
+            pass
+
+        dummy, symbol, A, level, dummy, dummy, dummy = chemicalElementsMiscModule.chemicalElementALevelIDsAndAnti(pid)
+        if symbol is None:
+            return None
+        try:
+            chemicalElement = self.chemicalElements[symbol]
+        except:
+            return None
+
+        lowerIsotopes = [999, None]
+        upperIsotopes = [999, None]
+        neutronMass = self[IDsModule.neutron].getMass(unit)
+        for index, isotope in enumerate(chemicalElement):
+            A_diff = A - isotope.A
+            if A_diff > 0:
+                if A_diff < lowerIsotopes[0]:
+                    lowerIsotopes = [A_diff, isotope]
+            else:
+                A_diff = abs(A_diff)
+                if A_diff < upperIsotopes[0]:
+                    upperIsotopes = [A_diff, isotope]
+
+        if lowerIsotopes[0] < maxASpan:
+            isotope = lowerIsotopes[1]
+            mass = isotope[isotope.symbol].getMass(unit) + neutronMass * lowerIsotopes[0]
+        if upperIsotopes[0] < maxASpan:
+            numberOfMass = 2
+            if mass is None:
+                mass = 0.0
+                numberOfMass = 1
+            isotope = upperIsotopes[1]
+            mass = (isotope[isotope.symbol].getMass(unit) - neutronMass * upperIsotopes[0] + mass) / numberOfMass
+        if mass is not None:
+            mass = -mass
+
+        return mass
+
     def final( self, id ) :
         """
         Returns the particle matching id. If id is an alias, will follow the alias pid until a non-alias particle is found and that particle is returned.
@@ -381,35 +452,40 @@ class Database(ancestryModule.AncestryIO):
         fOut.write( '\n' )
         fOut.close( )
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        formatVersion = kwargs.get( 'formatVersion', self.format )
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
         if formatVersion in (GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4):
             print('INFO: converting GNDS format from "%s" to "%s".' % (formatVersion, GNDS_formatVersionModule.version_2_0))
             formatVersion = GNDS_formatVersionModule.version_2_0
-        if( formatVersion not in GNDS_formatVersionModule.allowed ) : raise Exception( "Unsupported GNDS structure '%s'!" % str( formatVersion ) )
+        if formatVersion not in GNDS_formatVersionModule.allowed:
+            raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
         kwargs['formatVersion'] = formatVersion
 
-        xmlString = [ '%s<%s name="%s" version="%s" format="%s">' % ( indent, self.moniker, self.name, self.version, formatVersion ) ]
+        xmlString = ['%s<%s name="%s" version="%s" format="%s">' % (indent, self.moniker, self.name, self.version, formatVersion)]
         # FIXME for v1.10 also print link to parent database?
-        xmlString += self.__styles.toXML_strList( indent2, **kwargs )
+        xmlString += self.__styles.toXML_strList(indent2, **kwargs)
 
         if formatVersion == '0.1' and len(self.styles) != 0:
-            xmlString += self.styles.getEvaluatedStyle().documentation.toXML_strList( indent2, **kwargs )
+            xmlString += self.styles.getEvaluatedStyle().documentation.toXML_strList(indent2, **kwargs)
         # FIXME: currently both PoPs and PoPs/styles/evaluated have documentation nodes according to GNDS-2.0 specs
-        xmlString += self.__documentation.toXML_strList( indent2, **kwargs )
+        xmlString += self.__documentation.toXML_strList(indent2, **kwargs)
 
-        xmlString += self.__aliases.toXML_strList( indent2, **kwargs )
-        xmlString += self.__gaugeBosons.toXML_strList( indent2, **kwargs )
-        xmlString += self.__leptons.toXML_strList( indent2, **kwargs )
-        xmlString += self.__baryons.toXML_strList( indent2, **kwargs )
-        xmlString += self.__chemicalElements.toXML_strList( indent2, **kwargs )
-        xmlString += self.__unorthodoxes.toXML_strList( indent2, **kwargs )
-        xmlString[-1] += '</%s>' % self.moniker
+        xmlString += self.__aliases.toXML_strList(indent2, **kwargs)
+        xmlString += self.__gaugeBosons.toXML_strList(indent2, **kwargs)
+        xmlString += self.__leptons.toXML_strList(indent2, **kwargs)
+        xmlString += self.__baryons.toXML_strList(indent2, **kwargs)
+        xmlString += self.__chemicalElements.toXML_strList(indent2, **kwargs)
+        xmlString += self.__unorthodoxes.toXML_strList(indent2, **kwargs)
 
-        return( xmlString )
+        if len(xmlString) == 1:
+            xmlString = []
+        else:
+            xmlString[-1] += '</%s>' % self.moniker
+
+        return xmlString
 
     def parseNode(self, element, xPath, linkData, **kwargs):
 
@@ -454,6 +530,8 @@ class Database(ancestryModule.AncestryIO):
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
         formatVersion = element.get( 'format' )
+        if formatVersion in [GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4]:
+            formatVersion = GNDS_formatVersionModule.version_2_0
         if( formatVersion == '0.1' ) :                             # PoPs 0.1 and 2.0 are the same so allow for now. There was no 1.10 for PoPs.
             formatVersion = GNDS_formatVersionModule.version_1_10
         else :

@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fudge and GNDS &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Fudge and GNDS &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -17,7 +18,7 @@
     <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="fudge Package" href="fudge/index.html" /> 
+    <link rel="next" title="Downloading" href="downloading.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -29,9 +30,9 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="fudge/index.html" title="fudge Package"
+          <a href="downloading.html" title="Downloading"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Fudge and GNDS</a></li> 
       </ul>
     </div>  
@@ -41,14 +42,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="fudge-and-gnds">
+  <section id="fudge-and-gnds">
 <h1>Fudge and GNDS<a class="headerlink" href="#fudge-and-gnds" title="Permalink to this headline">¶</a></h1>
 <dl class="field-list simple">
-<dt class="field-odd">Release</dt>
-<dd class="field-odd"><p>5.0</p>
+<dt class="field-odd">Release<span class="colon">:</span></dt>
+<dd class="field-odd"><p>6.1</p>
 </dd>
-<dt class="field-even">Date</dt>
-<dd class="field-even"><p>Aug 31, 2022</p>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>Jan 27, 2023</p>
 </dd>
 </dl>
 <p>Welcome to FUDGE (For Updating Data and GEnerating Evaluations), a nuclear data platform built with Python that permits
@@ -57,27 +58,25 @@ Theory group (NDT) at Lawrence Livermore National Laboratory (LLNL).</p>
 <p>For installation instruction be review the REAME.md file are visit <a class="reference external" href="https://github.com/llnl/fudge">https://github.com/llnl/fudge</a>.</p>
 <p>This release of Fudge expands support for processing and visualizing data in the Generalized Nuclear Data (GNDS) format.
 GNDS is intended to modernize how nuclear data are stored and used, eventually replacing the legacy ENDF-6 format.
-This version of FUDGE supports GNDS version 2.0.LLNL_4 which is essentially version 2.0 but since 2.0 has not been
-officially release, FUDGE is calling its verions with the allowed extension ‘.LLNL_4.
+This version of FUDGE supports the latest version of the GNDS standard, version 2.0, as well as older versions ‘2.0.LLNL_4’ and ‘1.10’.
 The package includes tools to translate other formats to and from GNDS, plus tools
 for testing, visualizing and processing GNDS-formatted data.
 Python code within the <em>fudge</em> directory only support GNDS formatted data. Python code to support lecagy formats
 (e.g., ENDF-6 and ACE) reside in the brownies directory.</p>
-<p>As of this release, Fudge is compatible with Python 3 (version 3.6 and higher).
+<p>Fudge requires Python 3 (version 3.7 and higher).
 See the installation notes for more details on working with multiple versions of Python.</p>
 <p>New users (and returning users) are encouraged to check out <a class="reference internal" href="tutorial/index.html"><span class="doc">The Fudge Tutorial</span></a>.</p>
 <p>If you just want to see what a GNDS file looks like, visit the ENDF/B-VIII library pages. The library
 is available in both ENDF-6 and <a class="reference external" href="http://www.nndc.bnl.gov/endf/b8.0/gndsfiles.html">GNDS format</a>.</p>
-<div class="section" id="contents">
+<section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="fudge/index.html">The Fudge Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="externals.html">External Packages used in Fudge</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gnds.html">Generalized Nuclear Data (GNDS)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="downloading.html">Downloading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gnds.html">Generalized Nuclear Data (GNDS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="externals.html">External Packages used in Fudge</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reporting-bugs.html">Reporting Bugs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="todo.html">To Do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="thanks.html">Thanks</a></li>
@@ -86,8 +85,8 @@ is available in both ENDF-6 and <a class="reference external" href="http://www.n
 </div>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="indices-and-tables">
+</section>
+<section id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
@@ -95,8 +94,8 @@ is available in both ENDF-6 and <a class="reference external" href="http://www.n
 <li><p><a class="reference internal" href="glossary.html#glossary"><span class="std std-ref">Glossary</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -120,8 +119,8 @@ is available in both ENDF-6 and <a class="reference external" href="http://www.n
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="fudge/index.html"
-                        title="next chapter">fudge Package</a></p>
+  <p class="topless"><a href="downloading.html"
+                        title="next chapter">Downloading</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -153,9 +152,9 @@ is available in both ENDF-6 and <a class="reference external" href="http://www.n
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="fudge/index.html" title="fudge Package"
+          <a href="downloading.html" title="Downloading"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Fudge and GNDS</a></li> 
       </ul>
     </div>
