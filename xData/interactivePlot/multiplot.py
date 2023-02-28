@@ -917,7 +917,7 @@ class IndividualPlotOptions(QWidget):
 
         # noinspection PyArgumentList
         textBox = QLineEdit(self, objectName=objectName)
-        textBox.resize(xSize, self.ySize)
+        textBox.resize(int(xSize), int(self.ySize))
         textBox.setText(defaultText)
 
         if setValidator is not None:
@@ -956,7 +956,7 @@ class IndividualPlotOptions(QWidget):
             warnings.warn('Default %s for plot number %d may be used but is intentionally not made available in the '
                           'drop-down list.' % (plotAttribute, plotIndex))
 
-        comboBox.resize(xSize, self.ySize)
+        comboBox.resize(int(xSize), int(self.ySize))
         # noinspection PyUnresolvedReferences
         comboBox.currentIndexChanged.connect(connectMethod)
 
