@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
         widthInches, heightInches = pyplot.rcParams["figure.figsize"]
         width = widthInches*dpi*magnification
         height = heightInches*dpi*magnification
-        self.setGeometry(0, 0, width, height)
+        self.setGeometry(0, 0, int(width), int(height))
 
         # generate plot
         self.plotInstance = PlotCanvas(self, widthInches, heightInches, plotAttributes, plotData, dpi, plotType)
@@ -162,7 +162,7 @@ class PlotCanvas(FigureCanvas):
         if plotType == '2d':
             self.plot2d(plotData, plotAttributes)
             assert self.plotAxis is not None
-        
+
             self.legendDraggableNotScrollable = len(self.plotAxis.lines) < 10
             self.percentPlotWidth = 1.0 if self.legendDraggableNotScrollable else 0.8
             self.legend = self.addLegend(self.legendDraggableNotScrollable)
@@ -291,7 +291,7 @@ class PlotCanvas(FigureCanvas):
                 legend.set_draggable(True)
 
             else:
-                transformation = self.legend.axes.transAxes.inverted()                
+                transformation = self.legend.axes.transAxes.inverted()
                 boundingBox = self.legend.get_bbox_to_anchor().transformed(transformation)
                 location = self.legend.get_window_extent().transformed(transformation)
                 legend = self.plotAxis.legend(loc=(location.x0, location.y0), bbox_to_anchor=boundingBox)
@@ -736,7 +736,7 @@ class OverallPlotOptions(QWidget):
             self.axisHandle.grid(True)
 
         else:
-            self.plotInstance.gridOn = False            
+            self.plotInstance.gridOn = False
             self.axisHandle.grid(False)
 
         self.figureHandle.canvas.draw_idle()
