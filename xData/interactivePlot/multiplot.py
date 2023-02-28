@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         self.dialogWindow = DialogWindow(width, height, plotAttributes, plotObject=self.plotInstance, plotType=plotType,
                                          parent=self)
 
-        self.dialogWindow.setGeometry(x0, y0, width, height)
+        self.dialogWindow.setGeometry(int(x0), int(y0), int(width), int(height))
         self.dialogWindow.show()
 
     def closeEvent(self, event):
