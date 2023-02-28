@@ -175,7 +175,7 @@ class PlotCanvas(FigureCanvas):
     def plot2d(self, plotData, plotAttributes):
         self.plotAxis = self.figure.add_subplot(111)
 
-        floatInfo = numpy.finfo(numpy.float())
+        floatInfo = numpy.finfo(float(0))
         self.dataLimits = {'x': [floatInfo.max, floatInfo.min], 'y': [floatInfo.max, floatInfo.min]}
         for plotLegend in plotData.keys():
             if (not isinstance(plotData[plotLegend], (list, tuple))) or (len(plotData[plotLegend]) != 2):
