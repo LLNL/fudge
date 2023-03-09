@@ -253,17 +253,18 @@ class XYsnd( baseModule.XDataFunctional ) :
         sub-functions is within domainValue * epsilon of domainValue then that sub-function is returned.
         If both sub-functions are within domainValue * epsilon of domainValue, the closest is returned.
         """
-
         epsilon = kwargs.get('epsilon', 0.0)
         if interpolationQualifier is None:
             interpolationQualifier = self.interpolationQualifier
         else:
             interpolationQualifier = enumsModule.InterpolationQualifier.checkEnumOrString(interpolationQualifier)
-        outerDomainValue = baseModule.getDomainValue2( domainValue )
 
+        outerDomainValue = baseModule.getDomainValue2( domainValue )
         if extrapolation not in enumsModule.Extrapolation:
             raise ValueError( 'Invalid extrapolation outerDomainValue = "%s"' % extrapolation )
         position, function1, function2, frac, interpolation, interpolationQualifier2 = self.getBoundingSubFunctions( domainValue )
+        if( function2 is not None and function1.interpolation != function2.interpolation ) : 
+            raise NotImplementedError( "Interpolation between two functions with different interpolation rules" )
         if( position is None ) : raise Exception( "No data to interpolate" )
 
         fracRel = frac
@@ -298,10 +299,13 @@ class XYsnd( baseModule.XDataFunctional ) :
                             function2 = function2.toPointwiseLinear( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
                         else :
                             function2 = function2.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
-                    if interpolationQualifier == enumsModule.InterpolationQualifier.unitBase:
+                    if interpolationQualifier == enumsModule.InterpolationQualifier.unitBase: 
                         if( function1.dimension == 1 ) :
-                            xy = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( outerDomainValue, function1.outerDomainValue, function1.nf_pointwiseXY,
-                                    function2.outerDomainValue, function2.nf_pointwiseXY, 1 )
+                            if (self.interpolation == enumsModule.Interpolation.linlin):
+                                xy = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( outerDomainValue, function1.outerDomainValue, function1.nf_pointwiseXY,
+                                        function2.outerDomainValue, function2.nf_pointwiseXY, 1 )
+                            else :
+                                raise Exception( str(self.interpolation)+" is not supported in unit-base interpolation at the moment." )
                         elif( function1.dimension == 2 ) :
                             frac1 = 1.0 - frac
                             frac2 = frac
@@ -341,14 +345,47 @@ class XYsnd( baseModule.XDataFunctional ) :
                     elif interpolationQualifier == enumsModule.InterpolationQualifier.unitBaseUnscaled:
                         xy = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( outerDomainValue, function1.outerDomainValue, function1.nf_pointwiseXY,
                                                                                  function2.outerDomainValue, function2.nf_pointwiseXY, 0 )
+                    elif interpolationQualifier == enumsModule.InterpolationQualifier.correspondingPoints:
+                        if( function1.dimension == 1 ) :
+                            nBins = kwargs.get('nBins', 32)
+                            xylist = regionsModule.Regions1d()
+                            f1eqb = function1.equalProbableBins(nBins)
+                            f2eqb = function2.equalProbableBins(nBins)
+                            for i in range(nBins):
+                                function1trimmed = function1.copy()
+                                function1trimmed.fixDomains(f1eqb[i], f1eqb[i+1],enumsModule.FixDomain.both)
+                                function2trimmed = function2.copy()
+                                function2trimmed.fixDomains(f2eqb[i], f2eqb[i+1],enumsModule.FixDomain.both)
+                                xypartial = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( outerDomainValue, function1.outerDomainValue, function1trimmed.nf_pointwiseXY,
+                                    function2.outerDomainValue, function2trimmed.nf_pointwiseXY, 1 )
+                                function = function1trimmed.returnAsClass( function1trimmed, xypartial, outerDomainValue = outerDomainValue, interpolation = function1.interpolation )
+                                xylist.append(function)
+                            xy = xylist.toPointwise_withLinearXYs(lowerEps=1e-8)
+                        else :
+                            raise ValueError( "CorrespondingPoints interpolate of %d dimensional function not supported." % function1.dimension )
+                    elif interpolationQualifier == enumsModule.InterpolationQualifier.cumulativePoints:
+                        if( function1.dimension == 1 ) :
+                            xylist = regionsModule.Regions1d()
+                            cumuBins1, cumuBins2 = function1.cumulativeBins(function2)
+                            for i in range(len(cumulativeBins)-1):
+                                function1trimmed = function1.copy()
+                                function1trimmed.fixDomains(cumuBins1[i], cumuBins1[i+1], enumsModule.FixDomain.both)
+                                function2trimmed = function2.copy()
+                                function2trimmed.fixDomains(cumuBins2[i], cumuBins2[i+1], enumsModule.FixDomain.both)
+                                xypartial = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( outerDomainValue, function1.outerDomainValue, function1trimmed.nf_pointwiseXY,
+                                    function2.outerDomainValue, function2trimmed.nf_pointwiseXY, 1 )
+                                function = function1trimmed.returnAsClass( function1trimmed, xypartial, outerDomainValue = outerDomainValue, interpolation = function1.interpolation )
+                                xylist.append(function)
+                            xy = xylist.toPointwise_withLinearXYs(lowerEps=1e-8)
+                        else :
+                            raise ValueError( "CorrespondingPoints interpolate of %d dimensional function not supported." % function1.dimension )
                     else :
                         xy = ( 1.0 - frac ) * function1 + frac * function2
-
                     try :
                         interpolation = xy.interpolation
                     except :
                         interpolation = xy.getInterpolation( )
-                    function = function1.returnAsClass( function1, xy, outerDomainValue = outerDomainValue, interpolation = interpolation )
+                    function = function1.returnAsClass( function1, xy, outerDomainValue = outerDomainValue, interpolation = function1.interpolation )
 
         function.outerDomainValue = outerDomainValue
 

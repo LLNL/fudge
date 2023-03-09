@@ -48,6 +48,8 @@ class InterpolationQualifier(enumsModule.Enum):
     unitBaseUnscaled = 'unitbase-unscaled'
     correspondingPoints = 'correspondingPoints'
     correspondingPointsUnscaled = 'correspondingPoints-unscaled'
+    cumulativePoints = 'cumulativePoints'
+    cumulativePointsUnscaled = 'cumulativePointsUnscaled'
 
 class Frame(enumsModule.Enum):
     '''

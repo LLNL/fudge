@@ -338,10 +338,9 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         probabilitiesModule.PofX1GivenX2.__init__( self, **kwargs )
         Subform.__init__( self )
 
-    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, epsilon = 0 ) :
+    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, epsilon = 0, **kwargs ) :
 
-        return probabilitiesModule.PofX1GivenX2.evaluate(self, domainValue, extrapolation = extrapolation, epsilon = epsilon, 
-                interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
+        return probabilitiesModule.PofX1GivenX2.evaluate(self, domainValue, extrapolation = extrapolation, epsilon = epsilon, **kwargs)
 
     def getAtEnergy( self, energy ) :
         """This method is deprecated, use getSpectrumAtEnergy."""
