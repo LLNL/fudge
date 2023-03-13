@@ -360,6 +360,9 @@ class XYsnd( baseModule.XDataFunctional ) :
                                     function2.outerDomainValue, function2trimmed.nf_pointwiseXY, 1 )
                                 function = function1trimmed.returnAsClass( function1trimmed, xypartial, outerDomainValue = outerDomainValue, interpolation = function1.interpolation )
                                 xylist.append(function)
+                            if (function1.interpolation == enumsModule.Interpolation.flat):
+                                firstbin = XYs1dModule.XYs1d(data=[(0., 0.), (xylist.copyDataToXsAndYs()[0][0], xylist.copyDataToXsAndYs()[1][0])], dataForm="xys")
+                                xylist.prepend(firstbin)
                             xy = xylist.toPointwise_withLinearXYs(lowerEps=1e-8)
                         else :
                             raise ValueError( "CorrespondingPoints interpolate of %d dimensional function not supported." % function1.dimension )
@@ -367,7 +370,7 @@ class XYsnd( baseModule.XDataFunctional ) :
                         if( function1.dimension == 1 ) :
                             xylist = regionsModule.Regions1d()
                             cumuBins1, cumuBins2 = function1.cumulativeBins(function2)
-                            for i in range(len(cumulativeBins)-1):
+                            for i in range(len(cumuBins1)-1):
                                 function1trimmed = function1.copy()
                                 function1trimmed.fixDomains(cumuBins1[i], cumuBins1[i+1], enumsModule.FixDomain.both)
                                 function2trimmed = function2.copy()
@@ -376,6 +379,9 @@ class XYsnd( baseModule.XDataFunctional ) :
                                     function2.outerDomainValue, function2trimmed.nf_pointwiseXY, 1 )
                                 function = function1trimmed.returnAsClass( function1trimmed, xypartial, outerDomainValue = outerDomainValue, interpolation = function1.interpolation )
                                 xylist.append(function)
+                            if (function1.interpolation == enumsModule.Interpolation.flat):
+                                firstbin = XYs1dModule.XYs1d(data=[(0., 0.), (xylist.copyDataToXsAndYs()[0][0], xylist.copyDataToXsAndYs()[1][0])], dataForm="xys")
+                                xylist.prepend(firstbin)
                             xy = xylist.toPointwise_withLinearXYs(lowerEps=1e-8)
                         else :
                             raise ValueError( "CorrespondingPoints interpolate of %d dimensional function not supported." % function1.dimension )
