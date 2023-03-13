@@ -491,24 +491,94 @@ class XYs1d(baseModule.XDataFunctional):
 
         selfRunningIntegrals = selfTrimmed.runningIntegral()
         otherRunningIntegrals = otherTrimmed.runningIntegral()
-        selfrunningIntegralMax = selfRunningIntegrals[-1]
-        otheRrunningIntegralMax = otherRunningIntegrals[-1]
+        selfRunningIntegralMax = selfRunningIntegrals[-1]
+        otherRrunningIntegralMax = otherRunningIntegrals[-1]
+    
         if (selfRunningIntegrals == 0.0 or otherRunningIntegrals == 0.0): raise Exception('Function does not have any area - 2.')
 
-        jointedCdfList = sorted(selfRunningIntegrals+otherRunningIntegrals)
+        normalizedSelfRunningIntegrals = [x / selfRunningIntegralMax for x in selfRunningIntegrals]
+        normalizedOtherRunningIntegrals = [x / otherRrunningIntegralMax for x in otherRunningIntegrals]
+
+        jointedCdfList = sorted(normalizedSelfRunningIntegrals+normalizedOtherRunningIntegrals)
         cleanedCdfList = []
         [cleanedCdfList.append(x) for x in jointedCdfList if x not in cleanedCdfList]
 
+        selfUnnormalizedCdfList = [x * selfRunningIntegralMax for x in cleanedCdfList]
+        otherUnnormalizedCdfList = [x * otherRrunningIntegralMax for x in cleanedCdfList]
+
         cumuBins1 = [ selfTrimmed[0][0] ]
         indexOfBin = 1
-        # for index, runningIntegral in enumerate(cleanedCdfList):
-        #     if indexOfBin >= len(cleanedCdfList): break
+        numberOfBins = len(selfUnnormalizedCdfList)-1
+        integral = selfUnnormalizedCdfList[1]
+        for index, runningIntegral in enumerate(selfTrimmed.runningIntegral()):
+            if indexOfBin >= numberOfBins: break
+            x2, y2 = selfTrimmed[index]
+            if index > 0:
+                while integral <= runningIntegral:
+                    deltaArea = integral - priorRunningIntegral
+                    if deltaArea == 0.0:
+                        nextX = x2
+                    else:
+                        if y1 == y2:
+                            if y1 == 0.0:
+                                nextX = None
+                            else:
+                                nextX = x1 + deltaArea / y1
+                        else:
+                            if self.interpolation == enumsModule.Interpolation.flat:
+                                nextX = x1 + deltaArea / y1
+                            elif self.interpolation == enumsModule.Interpolation.linlin:
+                                slope = ( y2 - y1 ) / ( x2 - x1 )
+                                sqrtArgument = y1 * y1 + 2.0 * slope * deltaArea
+                                if sqrtArgument <= 0:
+                                    nextX = x2
+                                else:
+                                    nextX = x1 + 2.0 * deltaArea / ( y1 + math.sqrt( sqrtArgument ) )
+                            else: raise NotImplementedError( 'cumulativeBins is not implemented for '+ str(self.interpolation) )
+                    if nextX is not None: cumuBins1.append(nextX)
+                    indexOfBin += 1
+                    if indexOfBin >= numberOfBins: break
+                    integral = selfUnnormalizedCdfList[indexOfBin]
+            x1 = x2
+            y1 = y2
+            priorRunningIntegral = runningIntegral
         cumuBins1.append(selfTrimmed[-1][0])
 
         cumuBins2 = [ otherTrimmed[0][0] ]
         indexOfBin = 1
-        # for index, runningIntegral in enumerate(cleanedCdfList):
-        #     if indexOfBin >= len(cleanedCdfList): break
+        integral = otherUnnormalizedCdfList[1]
+        for index, runningIntegral in enumerate(otherTrimmed.runningIntegral()):
+            if indexOfBin >= numberOfBins: break
+            x2, y2 = otherTrimmed[index]
+            if index > 0:
+                while integral <= runningIntegral:
+                    deltaArea = integral - priorRunningIntegral
+                    if deltaArea == 0.0:
+                        nextX = x2
+                    else:
+                        if y1 == y2:
+                            if y1 == 0.0:
+                                nextX = None
+                            else:
+                                nextX = x1 + deltaArea / y1
+                        else:
+                            if other.interpolation == enumsModule.Interpolation.flat:
+                                nextX = x1 + deltaArea / y1
+                            elif other.interpolation == enumsModule.Interpolation.linlin:
+                                slope = ( y2 - y1 ) / ( x2 - x1 )
+                                sqrtArgument = y1 * y1 + 2.0 * slope * deltaArea
+                                if sqrtArgument <= 0:
+                                    nextX = x2
+                                else:
+                                    nextX = x1 + 2.0 * deltaArea / ( y1 + math.sqrt( sqrtArgument ) )
+                            else: raise NotImplementedError( 'cumulativeBins is not implemented for '+ str(other.interpolation) )
+                    if nextX is not None: cumuBins2.append(nextX)
+                    indexOfBin += 1
+                    if indexOfBin >= numberOfBins: break
+                    integral = otherUnnormalizedCdfList[indexOfBin]
+            x1 = x2
+            y1 = y2
+            priorRunningIntegral = runningIntegral
         cumuBins2.append(otherTrimmed[-1][0])
 
         return cumuBins1, cumuBins2
