@@ -304,6 +304,14 @@ class XYsnd( baseModule.XDataFunctional ) :
                             if (self.interpolation == enumsModule.Interpolation.linlin):
                                 xy = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( outerDomainValue, function1.outerDomainValue, function1.nf_pointwiseXY,
                                         function2.outerDomainValue, function2.nf_pointwiseXY, 1 )
+                            if (function1.interpolation == enumsModule.Interpolation.flat):
+                                xy = XYs1dModule.pointwiseXY_C.unitbaseInterpolate( outerDomainValue, function1.outerDomainValue, function1.trim().nf_pointwiseXY,
+                                        function2.outerDomainValue, function2.trim().nf_pointwiseXY, 1 )
+                                function = function1.returnAsClass( function1, xy, outerDomainValue = outerDomainValue, interpolation = function1.interpolation )
+                                xylist = regionsModule.Regions1d()
+                                xylist.append(function)
+                                firstbin = XYs1dModule.XYs1d(data=[(0., 0.), (xylist.copyDataToXsAndYs()[0][0], xylist.copyDataToXsAndYs()[1][0])], dataForm="xys")
+                                xylist.prepend(firstbin)
                             else :
                                 raise Exception( str(self.interpolation)+" is not supported in unit-base interpolation at the moment." )
                         elif( function1.dimension == 2 ) :
