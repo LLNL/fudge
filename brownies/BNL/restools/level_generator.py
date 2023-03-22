@@ -3,7 +3,7 @@ import numpy
 
 from fudge.core.math.pdf import UnivariatePDF, WignerDistribution, PoissonDistribution, \
     BrodyDistribution, GOEDistribution
-from xData import XYs1d
+from xData import XYs1d as XYs1d
 
 """
 Collection of fake level sequence generators, including the One True Generator: getGOEFakeLevelSequence
@@ -195,7 +195,7 @@ def getCLDInverse(levelDensity):
     DOPLOTS = False
 
     # Normalized level density as a PDF
-    totalNumLevels = int(levelDensity.integrate())
+    totalNumLevels = int(levelDensity.integrate()) #.getValue())
     fakePDF = levelDensity / totalNumLevels
     fakePDF.axes[0].label = "PDF(E)"
     if DOPLOTS:
@@ -303,7 +303,8 @@ def unfoldThenRefoldLevelSequence(
         originalSequenceSecularVariationDistribution.cdf.plot()
 
     # Get the original "energies" and remove the secular variation; this is the "unfolding" step
-    xList = list(map(originalSequenceSecularVariationDistribution.cdf.evaluate, originalSequence))
+    xList = [originalSequenceSecularVariationDistribution.cdf.evaluate(x) for x in originalSequence]
+    #xList = list(map(originalSequenceSecularVariationDistribution.cdf.evaluate, originalSequence))
 
     # Need to invert the cumulative level distribution for refolding
     invFakeCDF = getCLDInverse(finalSecularVariationFunction)
@@ -311,8 +312,7 @@ def unfoldThenRefoldLevelSequence(
         invFakeCDF.plot()  # title='lookup table')
 
     # We'll add that back using the real level density.  The "refolds" back in the correct secular variation.
-    xList[-1] = 1.0
-    result = [offset + invFakeCDF.evaluate(x) for x in xList]
+    result = [offset + invFakeCDF.evaluate(x) for x in xList if invFakeCDF.evaluate(x) is not None]
     result.sort()
 
     return result
