@@ -7,8 +7,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-description = """Prints the file name, the temperature unit and the list of evaluated temperatures for a thermal neutron scattering law (TNSL) GNDS file 
-    as string following by a python list of floats.  If the GNDS file is not a TNSL file, an empty list of temperatrures is printed."""
+summaryDocStringFUDGE = '''Prints the list of temperatures in a GNDS reactionSuite and labels for each processed style for each temperature.'''
+
+description = '''For each GNDS reactionSuite file, prints the list of temperatures and labels for each processed style for each temperature.'''
 
 from argparse import ArgumentParser
 

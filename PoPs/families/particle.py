@@ -218,7 +218,7 @@ class Particle(miscModule.ClassWithIDKey, abc.ABC):
 
     def buildFromRawData( self, mass = None, spin = None, parity = None, charge = None, halflife = None, label = 'default' ) :
         """
-        Helper method for quickly adding properties to a particle
+        Helper method to conviniently add the common properties to a particle.
 
         :param mass:  tuple(float value, string unit)
         :param spin:  tuple(int or fraction value, string unit)
@@ -377,6 +377,25 @@ class Particle(miscModule.ClassWithIDKey, abc.ABC):
 
         xPath.pop( )
         return( self )
+
+    @classmethod
+    def buildFromClassAndRawData(cls, id, mass = None, spin = None, parity = None, charge = None, halflife = None, label = 'default'):
+        """
+        Helper method to create a particle from class *cls8 and to add common properties to the particle.
+
+        :param id:  the string id of the partical
+        :param mass:  tuple(float value, string unit)
+        :param spin:  tuple(int or fraction value, string unit)
+        :param parity: tuple(int value, string unit)
+        :param charge: tuple(int value, string unit)
+        :param halflife: tuple(float or string value, string unit)
+        :param label: style label (string) to apply to each quantity
+        """
+
+        particle = cls(id)
+        particle.buildFromRawData(mass=mass, spin=spin, parity=parity, charge=charge, halflife=halflife, label=label)
+
+        return particle
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):

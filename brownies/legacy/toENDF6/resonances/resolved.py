@@ -85,26 +85,21 @@ def getENDFtuple(spin, parity):
         return (spin, parity)
 
 
-def writeRMatrixParticlePairs(RMatrixLimited, targetInfo):
+def writeRMatrixParticlePairs(RMatrix, targetInfo):
     """
     Used for writing both MF=2 and MF=32 to ENDF6
-    :param RMatrixLimited:
+    :param RMatrix:
     :param targetInfo:
     :return:
     """
     endf = []
-    NPP = len(RMatrixLimited.resonanceReactions)
+    NPP = len(RMatrix.resonanceReactions)
     endf.append(endfFormatsModule.endfHeadLine(0, 0, NPP, 0, 12 * NPP, 2 * NPP))
-    PoPs = RMatrixLimited.PoPs
+    PoPs = RMatrix.PoPs
 
     def MZIP(particle, ignoreMissingJpi=False):  # helper: extract mass, z, spin and parity from particle list
 
-        try:
-            nMass = PoPs[IDsPoPsModule.neutron].getMass('amu')
-        except:
-            nMass = 1.00866491578  # From ENDF102 manual, Appendix H.4
-
-        mass = particle.getMass('amu') / nMass
+        mass = particle.getMass('amu') / targetInfo['massTracker'].getMassAMU(1)
 
         if hasattr(particle, 'nucleus'):
             particle = particle.nucleus
@@ -120,7 +115,7 @@ def writeRMatrixParticlePairs(RMatrixLimited, targetInfo):
                 raise ValueError("When formatting particle %s, encountered %s" % (particle.id, err))
         return mass, Z, I, P
 
-    for idx, pp in enumerate(RMatrixLimited.resonanceReactions):
+    for idx, pp in enumerate(RMatrix.resonanceReactions):
         reaction = pp.link.link
         MT = reaction.ENDF_MT
         if reaction.isFission():
@@ -135,7 +130,13 @@ def writeRMatrixParticlePairs(RMatrixLimited, targetInfo):
         PNT = 1
         if MT in (18, 19, 102):
             PNT = 0  # special case
-        SHF = 0
+
+        if RMatrix.boundaryCondition == resolvedModule.BoundaryCondition.EliminateShiftFunction or pp.eliminated:
+            SHF = 0
+        elif RMatrix.boundaryCondition == resolvedModule.BoundaryCondition.Brune:
+            SHF = 2
+        else:   # 'Given' or 'NegativeOrbitalMomentum'
+            SHF = 1
         if pp.Q is not None:
             Q = pp.Q.getConstantAs('eV')
         else:
@@ -153,7 +154,7 @@ def writeRMatrixParticlePairs(RMatrixLimited, targetInfo):
     return endf
 
 
-def writeRMatrixSpinGroupHeader(RMatrixLimited, spingrp, targetInfo):
+def writeRMatrixSpinGroupHeader(RMatrix, spingrp, targetInfo):
     endf = []
     AJ, PJ = getENDFtuple(float(spingrp.spin), int(spingrp.parity))
     KBK = len([ch for ch in spingrp.channels if ch.externalRMatrix is not None
@@ -165,19 +166,19 @@ def writeRMatrixSpinGroupHeader(RMatrixLimited, spingrp, targetInfo):
     except TypeError as err:
         raise TypeError("Got '%s' when formatting '%s'" % (err.message, str((AJ, PJ, KBK, KPS, 6 * NCH, NCH))))
     for chan in spingrp.channels:
-        rreac = RMatrixLimited.resonanceReactions[chan.resonanceReaction]
+        rreac = RMatrix.resonanceReactions[chan.resonanceReaction]
         PPI = rreac.index
         L = chan.L
         if type(L) not in [int, float]: L = L.value
         SCH = chan.channelSpin
         if chan.boundaryConditionValue is not None:
             BND = chan.boundaryConditionValue
-        elif RMatrixLimited.boundaryCondition == resolvedModule.BoundaryCondition.EliminateShiftFunction:
+        elif RMatrix.boundaryCondition == resolvedModule.BoundaryCondition.EliminateShiftFunction:
             BND = 0
-        elif RMatrixLimited.boundaryCondition == resolvedModule.BoundaryCondition.NegativeOrbitalMomentum:
+        elif RMatrix.boundaryCondition == resolvedModule.BoundaryCondition.NegativeOrbitalMomentum:
             BND = -L
         else:
-            raise NotImplementedError("Writing boundary condition '%s' to ENDF-6" % RMatrixLimited.boundaryCondition)
+            raise NotImplementedError("Writing boundary condition '%s' to ENDF-6" % RMatrix.boundaryCondition)
 
         APT = chan.getScatteringRadius()
         APE = chan.hardSphereRadius or rreac.hardSphereRadius or APT

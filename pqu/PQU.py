@@ -2366,7 +2366,7 @@ class PhysicalUnit :
 
         raise TypeError( 'Only integer and inverse integer exponents are allowed' )
 
-    def conversionFactorTo( self, other ) :
+    def conversionFactorTo( self, other, ignoreTemperatureOffsets = False ) :
         """
         :param other: another unit
         :type other: `PhysicalUnit`
@@ -2379,7 +2379,8 @@ class PhysicalUnit :
         if( self.powers != other.powers ) : raise TypeError( 'Incompatible units: cannot convert "%s" to "%s"' % ( str( self ), str( other ) ) )
 
         if( ( self.offset != other.offset ) and ( self.factor != other.factor ) ) :
-            raise TypeError( 'Unit conversion (%s to %s) cannot be expressed as a simple multiplicative factor' % ( self.symbol( ), other.symbol( ) ) )
+            if ignoreTemperatureOffsets or self.powers != _unit_table['K'].powers:
+                raise TypeError( 'Unit conversion (%s to %s) cannot be expressed as a simple multiplicative factor' % ( self.symbol( ), other.symbol( ) ) )
 
         if math.log10( self.factor ).is_integer() and math.log10( other.factor ).is_integer():
             # special treatment to reduce numeric error in order-of-magnitude conversions

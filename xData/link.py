@@ -66,7 +66,7 @@ class Link(baseModule.XDataCoreMembers):
     def link(self):
         """
         Returns *self.__link*. However, if *self.__link* is **None** then **updateLink()** is called before *self.__link* is returned.
-        Also see **linkNoUpdate**.
+        Also see **linkWithoutUpdating**.
         """
 
         if self.__link is None:
@@ -115,8 +115,23 @@ class Link(baseModule.XDataCoreMembers):
 
         if self.path[0] == '.':
             self.link = self.follow(self)
-        else:
+        elif not self.root:
             self.link = self.follow(self.rootAncestor)
+        else:
+            # link points to an external resource. Check in externalFiles section:
+            from fudge import suites as suitesModule
+            externalFiles = self.findAttributeInAncestry(suitesModule.ExternalFiles.moniker)
+            if externalFiles is None:
+                print("WARNING: unable to locate external resource '%s#%s': no externalFiles section found!" %
+                      (self.root, self.path))
+                return
+
+            externalFile = externalFiles[self.root[1:]] # skip '$' character from start of self.root
+            if externalFile.instance is None:
+                print("WARNING: link '%s#%s' points to an external file that has not been loaded yet." %
+                      (self.root, self.path))
+                return
+            self.link = self.follow(externalFile.instance)
 
     def updateXPath( self ):
         """Ensure the xPath agrees with the linked-to data."""

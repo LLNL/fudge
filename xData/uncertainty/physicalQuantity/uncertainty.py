@@ -116,12 +116,13 @@ class Quantity(ancestryModule.AncestryIO):
 
         return( self.__class__( self.value, self.relation ) )
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
         relation = ''
-        if( self.relation != self.absolute ) : relation = ' relation="%s"' % self.relation
+        if self.relation != self.absolute:
+            relation = ' relation="%s"' % self.relation
 
-        return [ '%s<%s value="%s"%s/>' % ( indent, self.moniker, self.value, relation ) ]
+        return ['%s<%s value="%s"%s/>' % (indent, self.moniker, self.valueToString(), relation)]
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
@@ -196,3 +197,7 @@ class Double( Number ) :
     def toValueType( cls, value ) :
 
         return( cls.__valueType( value ) )
+
+    def valueToString(self, precision=12):
+
+        return PQUModule.floatToShortestString(self.value, min(max( 0, precision), 17), keepPeriod=True)

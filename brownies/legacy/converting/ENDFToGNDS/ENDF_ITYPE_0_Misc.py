@@ -949,11 +949,11 @@ def readMF2( info, MF2, warningList ) :
                 computeShift = {
                     -1: False,  # old (pre-2012) ENDF format
                     0: False,   # current ENDF format
-                    # 1: True,    # supported by ENDF-6 but not used AFAIK
+                    1: True,    # For boundaryCondition = Given or NegativeOrbitalMomentum
                     # 2: False,   # SHF=2 now indicates Brune transform, but this is not yet handled
-                }.get( SHF )
+                }.get(SHF)
                 if computeShift is None:
-                    info.doRaise.append( "Unexpected value for SHF: %d" % SHF )
+                    info.doRaise.append("Unexpected value for SHF: %d" % SHF)
 
                 Qval = None
                 eliminated = (KRM==3 and MT==102)
@@ -1580,8 +1580,9 @@ def readMF5( info, MT, MF5Data, warningList, delayNeutrons = False, product = No
             energySubforms = energySubforms[0]
     return( energySubforms, weights )
 
-def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isTwoBody, crossSection, LR ) :
+def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isTwoBody, crossSection, LR, compoundZA=None):
 
+    twoBodyIndex = 0
     ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[0], logFile = info.logs )
     ZA = int( ZA )
     printAWR_mode( info, MT, 6, ZA, AWR )
@@ -1785,82 +1786,88 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                             energySubform = energySubformRegion
 
                         form = uncorrelated( info.style, frame, angularSubform, energySubform )
-                else :
+                else:
                     EPrior = -1
-                    energyAngularSubform = energyAngularModule.Regions3d( axes = energyAngularAxes )
-                    energyAngularSubformRegion = energyAngularModule.XYs3d( axes = energyAngularAxes, interpolation = EinInterpolation,
-                            interpolationQualifier = interpolationQualifier )
-                    for i1, ( e_in, EpCls, multiRegion ) in enumerate( EEpClsData ) :
-                        if( multiRegion ) : raise NotImplemented
-                        multiD_2d = energyAngularModule.XYs2d( outerDomainValue = e_in, interpolation = interpolationLEP, axes = energyAngularAxes )
-                        for i2, ( e_out, Cls ) in enumerate( EpCls ) :
-                            multiD_2d.append( energyAngularModule.Legendre( coefficients = Cls, outerDomainValue = e_out, axes = energyAngularAxes ) )
-                        if( e_in == EPrior ) :
-                            energyAngularSubform.append( energyAngularSubformRegion )
-                            energyAngularSubformRegion = energyAngularModule.XYs3d( axes = energyAngularAxes, interpolation = EinInterpolation,
-                            interpolationQualifier = interpolationQualifier )
-                        energyAngularSubformRegion.append( multiD_2d )
+                    energyAngularSubform = energyAngularModule.Regions3d(axes = energyAngularAxes)
+                    energyAngularSubformRegion = energyAngularModule.XYs3d(axes = energyAngularAxes, interpolation = EinInterpolation,
+                            interpolationQualifier = interpolationQualifier)
+                    for i1, (e_in, EpCls, multiRegion) in enumerate(EEpClsData):
+                        if multiRegion:
+                            raise NotImplemented
+                        multiD_2d = energyAngularModule.XYs2d(outerDomainValue = e_in, interpolation = interpolationLEP, axes = energyAngularAxes)
+                        for i2, (e_out, Cls) in enumerate(EpCls):
+                            multiD_2d.append(energyAngularModule.Legendre(coefficients = Cls, outerDomainValue = e_out, axes = energyAngularAxes))
+                        if e_in == EPrior:
+                            if len(energyAngularSubformRegion) > 1:
+                                energyAngularSubform.append(energyAngularSubformRegion)
+                            energyAngularSubformRegion = energyAngularModule.XYs3d(axes=energyAngularAxes, interpolation=EinInterpolation,
+                            interpolationQualifier = interpolationQualifier)
+                        energyAngularSubformRegion.append(multiD_2d)
                         EPrior = e_in
-                    if( len( energyAngularSubform ) > 0 ) :
-                        energyAngularSubform.append( energyAngularSubformRegion )
-                    else :
+                    if len(energyAngularSubform) > 1:
+                        energyAngularSubform.append(energyAngularSubformRegion)
+                    else:
                         energyAngularSubform = energyAngularSubformRegion
-                    form = energyAngularModule.Form( info.style, frame, energyAngularSubform )
+                    form = energyAngularModule.Form( info.style, frame, energyAngularSubform)
 
-            elif( LANG == 2 ) :             # Kalbach-Mann data
-                if( LCTp != 2 ) : raise Exception( 'LCT = %s != 2 as required for Kalbach-Mann data for MF=6, MT=%s' % ( LCTp, MT ) )
-                dataLine, KalbachMannData = endfFileToGNDSMiscModule.getTAB2_Lists( dataLine, MF6Data, logFile = info.logs )
-                if( KalbachMannData['NR'] != 1 ) :
-                    raise Exception( "Currently only one interpolation flag is supported for MF = 6, LAW = 1, LANG = 2; MT = %s" % MT )
-                interpolationQualifier, interpolation = endfFileToGNDSMiscModule.ENDFInterpolationToGNDS2plusd( KalbachMannData['interpolationInfo'][0][1] )
-                NA = int( KalbachMannData['Lists'][0]['L2'] )
+            elif LANG == 2:                 # Kalbach-Mann data
+                if LCTp != 2:
+                    raise Exception('LCT = %s != 2 as required for Kalbach-Mann data for MF=6, MT=%s' % (LCTp, MT))
+                dataLine, KalbachMannData = endfFileToGNDSMiscModule.getTAB2_Lists(dataLine, MF6Data, logFile=info.logs)
+                if KalbachMannData['NR'] != 1:
+                    raise Exception("Currently only one interpolation flag is supported for MF = 6, LAW = 1, LANG = 2; MT = %s" % MT)
+                interpolationQualifier, interpolation = endfFileToGNDSMiscModule.ENDFInterpolationToGNDS2plusd(KalbachMannData['interpolationInfo'][0][1])
+                NA = int(KalbachMannData['Lists'][0]['L2'])
                 dataPerPoint = NA + 2
 
-                fData = multiD_XYsModule.XYs2d( axes = KalbachMann_f_Axes, interpolation = interpolation,
-                        interpolationQualifier = interpolationQualifier )
+                fData = energyModule.XYs2d(axes=KalbachMann_f_Axes, interpolation=interpolation, interpolationQualifier=interpolationQualifier)
 
-                rData = multiD_XYsModule.XYs2d( axes = KalbachMann_r_Axes, interpolation = interpolation,
-                        interpolationQualifier = interpolationQualifier )
+                ra_interpolationQualifier = {xDataEnumsModule.InterpolationQualifier.none: xDataEnumsModule.InterpolationQualifier.none, 
+                        xDataEnumsModule.InterpolationQualifier.unitBase: xDataEnumsModule.InterpolationQualifier.unitBaseUnscaled, 
+                        xDataEnumsModule.InterpolationQualifier.correspondingPoints: xDataEnumsModule.InterpolationQualifier.correspondingPoints}[interpolationQualifier]
+
+                rData = KalbachMannModule.XYs2d(axes=KalbachMann_r_Axes, interpolation=interpolation, interpolationQualifier=ra_interpolationQualifier)
 
                 aData = None
-                if( NA == 2 ) :
-                    aData = multiD_XYsModule.XYs2d( axes = KalbachMann_a_Axes, interpolation = interpolation,
-                            interpolationQualifier = interpolationQualifier )
+                if NA == 2:
+                    aData = KalbachMannModule.XYs2d(axes=KalbachMann_a_Axes, interpolation=interpolation, interpolationQualifier=ra_interpolationQualifier)
 
-                priorE, priorEp_f_r_ = -1, [ -1, -1, -1 ]
-                for i1, data in enumerate( KalbachMannData['Lists'] ) :
+                priorE, priorEp_f_r_ = -1, [-1, -1, -1]
+                for i1, data in enumerate(KalbachMannData['Lists']):
                     value = data['C2']
                     Ep_ = data['data'][::dataPerPoint]
                     f_ = data['data'][1::dataPerPoint]
                     r_ = data['data'][2::dataPerPoint]
-                    priorEp_f_r__ = [ Ep_, f_, r_ ]
-                    if( value == priorE ) :
-                        if( i1 == 1 ) :
-                            fData.pop( 0 )
-                            rData.pop( 0 )
-                            if( aData is not None ) : aData.pop( 0 )
-                        else :
-                            if( priorEp_f_r_ == priorEp_f_r__ ) : continue        # For TENDL files with duplicate data.
+                    priorEp_f_r__ = [Ep_, f_, r_]
+                    if value == priorE:
+                        if i1 == 1:
+                            fData.pop(0)
+                            rData.pop(0)
+                            if aData is not None:
+                                aData.pop(0)
+                        else:
+                            if priorEp_f_r_ == priorEp_f_r__:
+                                continue        # For TENDL files with duplicate data.
                             print('\nMT=%d' % MT)
                             print(value, priorEp_f_r_)
                             print(priorE, priorEp_f_r__)
-                            raise NotImplementedError( 'hell - need to support regions' )
+                            raise NotImplementedError('hell - need to support regions')
                     priorE, priorEp_f_r_ = value, priorEp_f_r__
                     if Ep_[-2] == Ep_[-1]:
                         Ep_[-1] *= 1.00000001
-                    fData.append( XYs1dModule.XYs1d( data = ( Ep_, f_ ), dataForm = 'xsandys', axes = KalbachMann_f_Axes,
-                                                 outerDomainValue = value, interpolation = interpolationLEP ) )
-                    rData.append( XYs1dModule.XYs1d( data = ( Ep_, r_ ), dataForm = 'xsandys', axes = KalbachMann_r_Axes,
-                                                 outerDomainValue = value, interpolation = interpolationLEP ) )
-                    if( aData is not None ) :
+                    fData.append(energyModule.XYs1d(data=(Ep_, f_), dataForm='xsandys', axes=KalbachMann_f_Axes,
+                                                 outerDomainValue=value, interpolation=interpolationLEP))
+                    rData.append(XYs1dModule.XYs1d(data=(Ep_, r_), dataForm= 'xsandys', axes=KalbachMann_r_Axes,
+                                                 outerDomainValue=value, interpolation=interpolationLEP))
+                    if aData is not None:
                         a_ = data['data'][3::dataPerPoint]
-                        aData.append( XYs1dModule.XYs1d( data = ( Ep_, a_ ), dataForm = 'xsandys', axes = KalbachMann_a_Axes,
-                                                     outerDomainValue = value, interpolation = interpolationLEP ) )
+                        aData.append(XYs1dModule.XYs1d(data=(Ep_, a_), dataForm='xsandys', axes=KalbachMann_a_Axes,
+                                                     outerDomainValue=value, interpolation=interpolationLEP))
 
-                fSubform = KalbachMannModule.FSubform( fData )
-                rSubform = KalbachMannModule.RSubform( rData )
-                aSubform = KalbachMannModule.ASubform( aData )
-                form = KalbachMannModule.Form( info.style, frame, fSubform, rSubform, aSubform )
+                fSubform = KalbachMannModule.FSubform(fData)
+                rSubform = KalbachMannModule.RSubform(rData)
+                aSubform = KalbachMannModule.ASubform(aData)
+                form = KalbachMannModule.Form(info.style, frame, fSubform, rSubform, aSubform)
 
             elif( LANG in [ 11, 12, 13, 14, 15 ] ) :    # P(E',mu|E)
                 NR = int( NR )                      # number of interpolation regions for incident energy
@@ -1914,6 +1921,7 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
         elif( LAW == 2 ) :
             if( LCT not in (2,4) ): raise Exception( "Discrete two-body must be in the center-of-mass frame: LCT = %d MT = %d." % ( LCT, MT ) )
             isTwoBody = True
+            twoBodyIndex = len(productList)
             dataLine, angularData = endfFileToGNDSMiscModule.getTAB2_Lists( dataLine, MF6Data, logFile = info.logs )
             LANG = int( angularData['Lists'][0]['L1'] )
             info.logs.write( ', LANG=%s' % LANG )
@@ -2210,12 +2218,30 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
             print('    "%s": (1, unknownMetaStableEnergy),' % k)
         raise KeyError( 'Meta stable data not available for %s' % missingMetaStable)
 
+    if twoBodyIndex != 0:
+        product = productList.pop(twoBodyIndex)
+        productList.insert(0, product)
+
+    productZAs = 0    
     for product in productList :
         if( product.pid == IDsPoPsModule.photon ) :
             info.ENDFconversionFlags.add( product, 'MF6' )
         elif( info.reactionSuite.projectile in ( IDsPoPsModule.neutron, IDsPoPsModule.photon ) ) :
             if( isTwoBody or ( product.pid == IDsPoPsModule.neutron ) ) :
                 info.ENDFconversionFlags.add(product, 'MF6')
+
+    if LR == 1 and MT != 5:
+        residualZA = compoundZA
+        for product in productList:
+            if product.pid == IDsPoPsModule.photon:
+                continue
+            residualZA -= int(particleZA(info, product.pid) * product.multiplicity.getConstant())
+        if residualZA != 0:
+            if residualZA < 0:
+                raise Except('Negative residual ZA calculated as %s.' % residualZA)
+            thisParticle = toGNDSMiscModule.getTypeNameGamma(info, residualZA)
+            product = toGNDSMiscModule.newGNDSParticle( info, thisParticle, crossSection)
+            productList.append(product)
 
     return( isTwoBody )
 
@@ -2302,8 +2328,15 @@ def readMF8( info, MT, MTData, warningList ) :
 
             radioactiveDatas.append( [ ZAP, ELFS, LFS, multiplicity, crossSection, LFS, QI ] )
 
-            if( metastables[ZAP] and ( ZAP != 0 ) ) :
+            if metastables[ZAP] and ZAP != 0:
                 residual = toGNDSMiscModule.getTypeNameGamma( info, ZAP, level = ELFS, levelIndex = LFS )
+                if ELFS != 0:
+                    if abs(residual.energy.float('eV') - ELFS) / ELFS > 0.005:
+                        warningList.append(
+                            f"MF8 residual level energy = {ELFS} for level {LFS} of ZA = {ZAP} not close "
+                            f"to value in PoPs (likely computed from MF=3 Q-values) for MT = {MT}")
+                        info.doRaise.append(warningList[-1])
+
                 isotopeName = residual.isotope.key
                 aliasName = PoPsAliasModule.MetaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex(isotopeName, metastables[ZAP])
                 if( not( aliasName in info.PoPs ) ) :
@@ -2581,8 +2614,7 @@ def genID( cov_info, MT, MF, MT2=None, MF2=None, MAT2=None, QI=None, QI2=None, l
 
     def makeID(MT, reaction):
         if reaction is not None:
-            #Id = str( reaction.outputChannel )
-            Id = str( reaction )
+            Id = str(reaction)
         elif MT in (452,455,456):
             Id = { 452 : totalToken, 455 : delayedToken, 456 : promptToken }[MT]
         elif MT in (1,3,4,103,104,105,106,107):
@@ -2590,7 +2622,9 @@ def genID( cov_info, MT, MF, MT2=None, MF2=None, MAT2=None, QI=None, QI2=None, l
                     105:'sum(z,t)', 106:'sum(z,He3)', 107:'sum(z,a)'}[MT]
         elif 850 < MT < 871:
             Id = "lump%d" % (MT-851)
-        else: Id = "MF%d_MT%d" % (MF,MT)
+        else:
+            Id = "MF%d_MT%d" % (MF,MT)
+
         return Id
 
     rowId = makeID( MT, rowReaction )
@@ -3759,12 +3793,13 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
         form = uncorrelated( info.style, frames[1], angularSubform, energySubform )  # BRB: is frame right.
         product.distribution.add( form )
         productList.append( product )
-    elif( 6 in MFKeys ) :
-        isTwoBody = readMF6( MT, info, MTData[6], productList, warningList, undefinedLevelInfo, isTwoBody, crossSection, LR )
-        MFKeys.remove( 6 )
-        if isTwoBody and MT==102:
+    elif 6 in MFKeys:
+        compoundZA2 = compoundZA
+        isTwoBody = readMF6(MT, info, MTData[6], productList, warningList, undefinedLevelInfo, isTwoBody, crossSection, LR, compoundZA)
+        MFKeys.remove(6)
+        if isTwoBody and MT == 102:
             ZAP = 0
-            undefinedLevelInfo['ZA'] = calculateZA( compoundZA, ZAP )
+            undefinedLevelInfo['ZA'] = calculateZA(compoundZA, ZAP)
     elif( neutronMFs == [] ) :
         if( isTwoBody and False ) :                 # ????????? Why False
             raise Exception( 'How did we get here.' )

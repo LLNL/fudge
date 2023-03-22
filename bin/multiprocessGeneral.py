@@ -44,7 +44,7 @@ if args.optionsJSON is not None:
 
 def f( filename ) :
 
-    fileOptions = args.options if args.optionsJSON is None else '%s %s' % (individualFileOptions[filename], args.options)
+    fileOptions = args.options if args.optionsJSON is None else '@%s %s' % (individualFileOptions[filename], args.options)
 
     CD = ''
     if args.cd != '':

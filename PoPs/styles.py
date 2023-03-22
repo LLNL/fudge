@@ -8,6 +8,7 @@
 import abc
 import datetime
 
+from LUPY import misc as LUPY_miscModule
 from LUPY import ancestry as ancestryModule
 from xData.Documentation import documentation as documentationModule
 
@@ -117,6 +118,8 @@ class Styles(ancestryModule.AncestryIO_base):
 class Style(ancestryModule.AncestryIO, abc.ABC):
     """ Abstract base class for all 'style' classes in PoPs """
 
+    keyName = 'label'
+
     def __init__( self, label, derivedFrom, date = None ) :
         """
         :param label: string identifying this style
@@ -132,8 +135,7 @@ class Style(ancestryModule.AncestryIO, abc.ABC):
         if( date is None ) : date = str( datetime.date.today( ) )
         self.__date = date
 
-        if( not( isinstance( derivedFrom, str ) ) ) : raise TypeError( 'label must be a str instance.' )
-        self.__derivedFrom = derivedFrom
+        self.derivedFrom = derivedFrom
 
         self.__documentation = documentationModule.Documentation()
         self.__documentation.setAncestor(self)
@@ -149,6 +151,12 @@ class Style(ancestryModule.AncestryIO, abc.ABC):
         """Returns string label of the style that self derives from"""
 
         return( self.__derivedFrom )
+
+    @derivedFrom.setter
+    def derivedFrom(self, derivedFrom):
+        '''Sets *self*'s derivedFrom to *derivedFrom*.'''
+
+        self.__derivedFrom = LUPY_miscModule.isString(derivedFrom, 'derivedFrom must be a string.')
 
     @property
     def derivedFromStyle( self ) :
@@ -244,7 +252,7 @@ class Evaluated(Style):
     def __init__( self, label, derivedFrom, library = '', version = '', date = None ) :
         """
         :param label: a unique string identifying this style
-        :param derivedFrom: may be a string (equal to another style's label), or None if this is an original evaluation
+        :param derivedFrom: may be a string (equal to another style's label). For an original evaluation use an empty string.
         :param library: optional string identifying the library, e.g. 'ENSDF'
         :param version: optional string identifying the library version
         :param date: optional date when style was generated. Defaults to today's date

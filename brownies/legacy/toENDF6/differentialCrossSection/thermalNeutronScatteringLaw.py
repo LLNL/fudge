@@ -12,6 +12,7 @@ from PoPs import IDs as IDsPoPsModule
 
 from fudge.reactionData.doubleDifferentialCrossSection.thermalNeutronScatteringLaw import incoherentInelastic
 
+from xData import enums as xDataEnumsModule
 from xData import gridded as griddedModule
 
 from fudge.reactionData.doubleDifferentialCrossSection import thermalNeutronScatteringLaw as thermalScatteringModule
@@ -153,9 +154,12 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
         for key in interpolations:
             if interpolations[key] is None:
                 continue
-            if not interpolations[key].startswith('log'):
+            if not str(interpolations[key]).startswith('log'):
                 raise ValueError("Expected log interpolation on S (linear on ln(S)) but got %s" % interpolations[key])
-            interpolations[key] = interpolations[key].replace('log','lin',1)
+            interpolations[key] = {
+                xDataEnumsModule.Interpolation.loglin: xDataEnumsModule.Interpolation.linlin,
+                xDataEnumsModule.Interpolation.loglog: xDataEnumsModule.Interpolation.linlog
+            }[interpolations[key]]
 
     NR = 1; NB = len(betas)
     beta_interp = gndsToENDF6.gndsToENDFInterpolationFlag( interpolations['beta'] )

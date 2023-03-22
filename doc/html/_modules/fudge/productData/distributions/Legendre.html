@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.productData.distributions.Legendre &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.productData.distributions.Legendre &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.productData.distributions.Legendre</a></li> 
       </ul>
@@ -176,9 +176,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LLNLPointwise.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.LLNLPointwise.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="LLNLPointwise.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.LLNLPointwise.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="n">muMin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;muMin&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">muMax</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;muMax&#39;</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="n">muFactor</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="n">muMin</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="ow">and</span> <span class="n">muMax</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Energy spectrum only supported for full mu domain (i.e., -1 to 1) and not (% to </span><span class="si">%s</span><span class="s1">).&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">muMin</span><span class="p">,</span> <span class="n">muMax</span><span class="p">))</span>
+            <span class="n">muFactor</span> <span class="o">=</span> <span class="n">muMax</span> <span class="o">-</span> <span class="n">muMin</span>
+
+        <span class="k">return</span> <span class="n">muFactor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">energyIn</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LLNLPointwise.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.LLNLPointwise.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -307,11 +316,12 @@
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">Legendre</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Form.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.Form.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Form.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.Form.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">frame</span> <span class="o">==</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">centerOfMass</span><span class="p">)</span> <span class="p">:</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Lab to center-of-mass translation not supported.&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">frame</span> <span class="o">==</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">centerOfMass</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Lab to center-of-mass translation not supported.&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">Legendre</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Legendre</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span><span class="n">energyIn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.Form.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -385,7 +395,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.productData.distributions.Legendre</a></li> 
       </ul>

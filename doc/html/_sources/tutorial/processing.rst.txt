@@ -21,29 +21,34 @@ processProtare supports many command-line options. Perhaps the most useful is th
 ::
 
         >python processProtare.py -h
-        usage: processProtare.py [-h] [--tag TAG] [-o OUTPUT] [--writeConvertedUnits]
-                                 [--energyUnit ENERGYUNIT] [-t TEMPERATURES]
-                                 [--temperatureUnit TEMPERATUREUNIT] [--bdfls BDFLS]
-                                 [--fluxID FLUXID] [-g GID]
-                                 [--legendreMax LEGENDREMAX] [-mg] [-mc] [-up]
-                                 [--reconstruct {all,crossSection,angular}]
-                                 [--threads THREADS] [-v]
-                                 [--reconAccuracy RECONACCURACY]
-                                 [--prefixMultiGroup PREFIXMULTIGROUP]
-                                 [--prefixMonteCarlo PREFIXMONTECARLO]
-                                 [--prefixUpscatter PREFIXUPSCATTER]
-                                 [--prefixHeated PREFIXHEATED] [--prefixAep PREFIXAEP]
-                                 [--prefixEval PREFIXEVAL] [--prefixRecon PREFIXRECON]
-                                 gnds
+usage: processProtare.py [-h] [--pid PID] [--tid TID] [--noLazyParse]
+                         [--exit EXIT] [--tag TAG] [-o OUTPUT]
+                         [--writeConvertedUnits] [--energyUnit ENERGYUNIT]
+                         [--CoulombPlusNuclearMuCutOff COULOMBPLUSNUCLEARMUCUTOFF]
+                         [--doNotAddNuclearPlusInterference] [-t TEMPERATURES]
+                         [--temperatureUnit TEMPERATUREUNIT]
+                         [--legendreMax LEGENDREMAX] [-mg] [-up]
+                         [--skipMultiGroupSums] [-mc] [--fluxFile FLUXFILE]
+                         [--fluxID FLUXID] [--groupFile GROUPFILE] [-g GID]
+                         [--formatVersion {1.10,2.0}] [--cullProcessedData]
+                         [--threads THREADS] [-v]
+                         [--reconAccuracy RECONACCURACY] [--restart]
+                         [--preProcessLabel PREPROCESSLABEL]
+                         [--prefixRecon PREFIXRECON]
+                         [--prefixMuCutoff PREFIXMUCUTOFF]
+                         [--prefixAEP PREFIXAEP] [--prefixHeated PREFIXHEATED]
+                         [--prefixMultiGroup PREFIXMULTIGROUP]
+                         [--prefixMonteCarlo PREFIXMONTECARLO]
+                         [--prefixUpScatter PREFIXUPSCATTER]
+                         mapOrProtareFileName [outputFile]
 
-        Processes all data in a GNDS file.
+This script processes all data in a GNDS file as requested by input arguments. In addition to entering arguments on the comannd
+line, arguments can also be read from an input file by specifying an input file on the command line. The character '@' must prefix
+the input file's name. For example, to include the arguments in a file named pp.input execute this script as
 
-        positional arguments:
-          gnds                   gnds file to process
+    processProtare.py -mc @pp.input -vvv -up eval.xml proc.xml
 
-        optional arguments:
-          -h, --help            show this help message and exit
-          ...
+...
 
 Sample usage
 ------------
@@ -55,7 +60,7 @@ After translating an ENDF file into GNDS, you can do simple processing by:
 
 ::
 
-        > python processProtare.py GNDS_file_name.xml --bdfls <path_to_fudge>/fudge/legacy/endl/bdfls
+        > python processProtare.py GNDS_file_name.xml -t 2.586e-8
 
 This performs basic processing: Doppler-broadens cross sections to 300 K (2.586e-8 MeV/k) and computes average
 energy and momentum deposited into reaction products. It writes a new processed file with the extension ".proc.xml" (i.e., if
@@ -69,49 +74,40 @@ Heating cross sections to multiple temperatures:
 
 ::
 
-        > python processProtare.py GNDS_file_name.xml --bdfls <path_to_fudge>/fudge/legacy/endl/bdfls -t 300 -t 600 -t 900
+        > python processProtare.py GNDS_file_name.xml -t 300 -t 600 -t 900
                 --temperatureUnit K 
 
 Using eV instead of the default MeV for energies:
 
 ::
 
-        > python processProtare.py GNDS_file_name.xml --bdfls <path_to_fudge>/fudge/legacy/endl/bdfls --energyUnit eV
+        > python processProtare.py GNDS_file_name.xml --energyUnit eV
 
 Heating to two temperatures and generating cumulative distribution functions (CDFs) for faster sampling in Monte Carlo transport codes:
 
 ::
 
-        > python processProtare.py GNDS_file_name.xml --bdfls <path_to_fudge>/fudge/legacy/endl/bdfls -t 300 -t 600
+        > python processProtare.py GNDS_file_name.xml -t 300 -t 600
                 --temperatureUnit K --energyUnit eV -mc
         
 Generating multi-group cross sections and transfer matrices (requires that Merced be compiled):
 
 ::
 
-        > python processProtare.py GNDS_file_name.xml --bdfls <path_to_fudge>/fudge/legacy/endl/bdfls -t 300 -t 600
-                --temperatureUnit K --energyUnit eV -mg
+        > python processProtare.py GNDS_file_name.xml --groupFile groups.xml --fluxFile fluxes.xml
+                -t 300 -t 600 --temperatureUnit K --energyUnit eV -mg
+                --fluxID LLNL_fid_1 -g n=LLNL_gid_4 -g photon=LLNL_gid_4
 
-By default, processProtare uses LLNL's 230-group energy boundaries for neutrons,
-41 groups for photons and 64 groups for light charged particles. Other groups may be selected using the -g option.
-For example, to select LLNL's 87-group structure (gid 4) for neutrons:
+The 'LLNL_gid_4' group structure is defined in groups.xml, and 'LLNL_fid_1' is defined in fluxes.xml.
+The resulting processed GNDS file will contain grouped cross sections and transfer matrices at both 300 and 600 K.
 
-::
-
-        > python processProtare.py GNDS_file_name.xml --bdfls <path_to_fudge>/fudge/legacy/endl/bdfls -t 300 -t 600
-                --temperatureUnit K --energyUnit eV -mg -g n=LLNL_gid_4
-
-Group boundaries are currently defined inside the bdfls file, although we plan to update that to a more user-friendly format soon.
 
 To-do list
 ----------
 
 processProtare is not yet complete. Some functionality yet to be implemented:
 
-- thermal upscattering corrections for elastic transfer matrices
-- processing thermal neutron scattering data including S(alpha,beta)
 - generating probability tables from unresolved resonance parameters
 - reconstructing detailed angular distributions from resonance parameters
 - processing covariances
 - and likely other features
-

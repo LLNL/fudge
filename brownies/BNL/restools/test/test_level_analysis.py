@@ -119,7 +119,7 @@ class TestLevelAnalyzer_simple(AssertMixIn):
         """
         Compare Delta3 statistic for a picket fence to the expected systematics
 
-        10% agreement is lowsy, but the agreement improves as L-> big.
+        10% agreement is lousy, but the agreement improves as L-> big.
         If I wanted to be fancy, I could make an L dependent tolerance
         """
         testDelta3Values = self.picketFenceSequenceAnalyzer.getDysonMehtaDelta3_vs_L()
@@ -271,7 +271,7 @@ class TestLevelAnalyzer_90Zr(AssertMixIn):
             for sD_over_aveD in cls._testNNSDValues:
                 D_over_aveD = float(sD_over_aveD)
                 cls._testNNSDValues[sD_over_aveD].append(
-                    makeXYs(thisNNSD[0], interpolation=xDataEnumsModule.InterpolationQualifier.flat).evaluate(D_over_aveD))
+                    makeXYs(thisNNSD[0], interpolation=xDataEnumsModule.Interpolation.flat).evaluate(D_over_aveD))
             if DEBUG:
                 nnsdOutputFile.write('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in thisNNSD]) + '\n')
                 nnsdOutputFile.write('&\n')

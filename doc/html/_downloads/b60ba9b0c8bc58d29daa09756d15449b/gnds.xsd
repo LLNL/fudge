@@ -728,7 +728,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="index" type="xs:integer" use="required"/>
-      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="mode" type="xs:string"/>
       <xs:attribute name="complete" type="xs:boolean"/>
     </xs:complexType>
 
@@ -1875,6 +1875,7 @@
           <xs:attribute name="value" type="xs:double" use="required"/>
           <xs:attribute name="domainMin" type="xs:double" use="required"/>
           <xs:attribute name="domainMax" type="xs:double" use="required"/>
+          <xs:attribute name="finalState" type="xs:string"/>
         </xs:complexType>
         <!-- end of energy distribution forms -->
 

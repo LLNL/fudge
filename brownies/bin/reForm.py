@@ -34,18 +34,23 @@ for i, l in enumerate( ls ) :
         newLines.append( "%s%5d" % ( l[:75], index ) )
     index += 1
 
-for l in newLines :
-    if( int( l[66:70] ) == -1 ) :
-        l = END66Characters + l[66:]
-    if( int( l[72:75] ) == 0 ) :
-        l = END66Characters + l[66:]
-    elif( l[70:75] not in (' 1451','32151') ) :
-        if( l.find( '.' ) < 0 ) :
-            s = l[:66].rstrip( )
-            if( len( s ) < 56 ) :
-                n = ( len( s ) + 10 ) // 11
-                s += ( n * 11 - len( s ) ) * ' '
-                for i in range( n, 6 ) : s += fillZero
-                l = s + l[66:]
-    f.write( l + '\n' )
+for lidx, l in enumerate(newLines):
+    try:
+        if( int( l[66:70] ) == -1 ) :
+            l = END66Characters + l[66:]
+        if( int( l[72:75] ) == 0 ) :
+            l = END66Characters + l[66:]
+        elif( l[70:75] not in (' 1451','32151') ) :
+            if( l.find( '.' ) < 0 ) :
+                s = l[:66].rstrip( )
+                if( len( s ) < 56 ) :
+                    n = ( len( s ) + 10 ) // 11
+                    s += ( n * 11 - len( s ) ) * ' '
+                    for i in range( n, 6 ) : s += fillZero
+                    l = s + l[66:]
+        f.write( l + '\n' )
+    except Exception as ex:
+        print("Error encountered on line %d of file %s" % (lidx, sys.argv[1]))
+        raise ex
+
 f.close( )

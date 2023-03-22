@@ -51,9 +51,11 @@ betaPlusOrElectronCaptureProduct = "beta+ or electronCapture"
 alphaProduct = "alpha"
 neutronProduct = "neutron"
 SFProduct = "spontaneous fission fragments"
-protronProduct = "proton"
+protonProduct = "proton"
 discreteElectronProduct = "discrete electron"
 xRayProduct = "x-ray"
+antiNeutrinoProduct = "anti-neutrino"
+neutrinoProduct = "neutrino"
 
 class TransitionType(enumsModule.Enum):
 

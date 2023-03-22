@@ -22,6 +22,7 @@ def setup():
             'xData.interactivePlot'
         ],
         package_dir={'xData': '.'},
+        scripts=['bin/convolute1d.py'],
         install_requires=[
             'numericalFunctions',
             'pqu',

@@ -38,6 +38,7 @@ def process_args( ) :
     parser.add_argument( "--traceback", action = "store_true", default = False,                 help = "print traceback on exception" )
     parser.add_argument( "--formatVersion", default = GNDS_formatVersionModule.default, choices = GNDS_formatVersionModule.allowed,
                                                                                                 help = "Specifies the format for the outputted GNDS file. " )
+    parser.add_argument("--JENDL_stylePrimarygammas", action="store_true",                      help="If prsent, treat MF=6 primary gamma energies as binding energy, otherwise as gamma energy.")
     parser.add_argument('--IDs', choices = ('familiar', 'nucleus', 'nuclide'), default='nuclide',
             help='Choose between light charged particle naming conversion: "nuclide" (i.e., H1, H2, H3, He3 and He4), "nucleus" (i.e., h1, h2, h3, he3 and he4), or "familiar" (i.e., p, d, t, h and a).')
     return parser.parse_args()
@@ -57,10 +58,14 @@ else:
     outCovFile = outFile + "-covar.xml"
 
 try:
-    results = endfFileToGNDS.endfFileToGNDS(inFile, toStdOut=args.verbose, verbose=args.verbose, skipBadData=args.skipBadData, doCovariances=not args.skipCovariances,
+    kwargs = {}
+    if args.JENDL_stylePrimarygammas:
+        kwargs['JENDL_stylePrimarygammas'] = True
+    results = endfFileToGNDS.endfFileToGNDS(inFile, toStdOut=args.verbose, verbose=args.verbose, skipBadData=args.skipBadData, 
+            doCovariances=not args.skipCovariances, 
             verboseWarnings=args.verboseWarnings, printBadNK14=args.printBadNK14, continuumSpectraFix=args.continuumSpectraFix,
             ignoreBadDate=args.ignoreBadDate, acceptBadMF10FissionZAP=args.acceptBadMF10FissionZAP, formatVersion=args.formatVersion,
-            specialNuclearParticleID=specialNuclearParticleID)
+            specialNuclearParticleID=specialNuclearParticleID, **kwargs)
 
     reactionSuite = results.get('reactionSuite', None)
     covariance = results.get('covarianceSuite', None)

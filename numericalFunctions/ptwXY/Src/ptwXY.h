@@ -149,6 +149,7 @@ ptwXYPoints *ptwXY_free( ptwXYPoints *ptwXY );
 int64_t ptwXY_length( statusMessageReporting *smr, ptwXYPoints *ptwXY );
 int64_t ptwXY_getNonOverflowLength( statusMessageReporting *smr, ptwXYPoints const *ptwXY );
 
+nfu_status ptwXY_startIndex( statusMessageReporting *a_smr, ptwXYPoints *a_ptwXY, double a_x, int64_t *a_startIndex, int64_t *a_length );
 nfu_status ptwXY_setXYData( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t length, double const *xy );
 nfu_status ptwXY_setXYDataFromXsAndYs( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t length, double const *x, double const *y );
 nfu_status ptwXY_deletePoints( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t i1, int64_t i2 );
@@ -195,6 +196,7 @@ ptwXYPoints *ptwXY_union( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwX
 
 nfu_status ptwXY_scaleOffsetXAndY( statusMessageReporting *smr, ptwXYPoints *ptwXY, double xScale, double xOffset, 
         double yScale, double yOffset );
+nfu_status ptwXY_scaleAndOffsetDomainWith_ptwXYs( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXYPoints *offset, ptwXYPoints *slope, int skipLastPoint );
 
 /*
 * Functions in ptwXY_unitaryOperators.c
@@ -249,6 +251,8 @@ ptwXYPoints *ptwXY_fromUnitbase( statusMessageReporting *smr, ptwXYPoints *ptwXY
 */
 ptwXPoints *ptwXY_getXArray( statusMessageReporting *smr, ptwXYPoints *ptwXY );
 ptwXPoints *ptwXY_ysMappedToXs( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXPoints *Xs, int64_t *offset );
+nfu_status ptwXY_mapToXsAndAdd( statusMessageReporting *a_smr, ptwXYPoints *a_ptwXY, int64_t a_offset, int64_t a_length, double const *a_Xs,
+        double *a_results, double a_scaleFractor );
 nfu_status ptwXY_dullEdges( statusMessageReporting *smr, ptwXYPoints *ptwXY, double lowerEps, double upperEps, int positiveXOnly );
 nfu_status ptwXY_mergeClosePoints( statusMessageReporting *smr, ptwXYPoints *ptwXY, double epsilon );
 ptwXYPoints *ptwXY_intersectionWith_ptwX( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXPoints *ptwX );

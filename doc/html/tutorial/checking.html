@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2. Checking ENDF or GNDS files &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>2. Checking ENDF or GNDS files &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="translating.html" title="1. Basic translating between ENDF and GNDS"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">The Fudge Tutorial</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">2. </span>Checking ENDF or GNDS files</a></li> 
       </ul>
@@ -46,7 +47,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="checking-endf-or-gnds-files">
+  <section id="checking-endf-or-gnds-files">
 <h1><span class="section-number">2. </span>Checking ENDF or GNDS files<a class="headerlink" href="#checking-endf-or-gnds-files" title="Permalink to this headline">¶</a></h1>
 <p>Let’s face it.  ENDF evaluations often have mistakes and bugs.  Fortunately <cite>fudge</cite> comes
 armed with a large number of pre-made checks.  Running them is as simple as running the
@@ -54,7 +55,7 @@ armed with a large number of pre-made checks.  Running them is as simple as runn
 evaluation and its covariance is just to run the main <code class="docutils literal notranslate"><span class="pre">check()</span></code> function of either an
 instance of <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> or <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code>.  <code class="docutils literal notranslate"><span class="pre">Fudge</span></code> will then recursively descend
 through the instances and check every data member.</p>
-<div class="section" id="checking-reactionsuite-instances">
+<section id="checking-reactionsuite-instances">
 <h2><span class="section-number">2.1. </span>Checking <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> instances<a class="headerlink" href="#checking-reactionsuite-instances" title="Permalink to this headline">¶</a></h2>
 <p>Using the <code class="docutils literal notranslate"><span class="pre">myEval</span></code> and <code class="docutils literal notranslate"><span class="pre">myCov</span></code> instances from the previous tutorial, we find:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myEval</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
@@ -135,8 +136,8 @@ value calculated from incident and outgoing particle masses.
 Note, you don’t just get the warning or error, you get the entire context in which it occurred.
 This is very useful for bug tracking. In the example above, we can tell that the problem is in the capture
 reaction by looking at the list of outgoing particles: ‘H2 + gamma’.</p>
-</div>
-<div class="section" id="checking-covariancesuite-instances">
+</section>
+<section id="checking-covariancesuite-instances">
 <h2><span class="section-number">2.2. </span>Checking <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code> instances<a class="headerlink" href="#checking-covariancesuite-instances" title="Permalink to this headline">¶</a></h2>
 <p>The covariances have <code class="docutils literal notranslate"><span class="pre">check()</span></code> functions too and they find all sorts of stuff:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myCov</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
@@ -146,8 +147,8 @@ reaction by looking at the list of outgoing particles: ‘H2 + gamma’.</p>
 <span class="go">            WARNING: Ratio of smallest/largest eigenvalue (2.359558e-10) is too small</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="setting-up-a-checker-script">
+</section>
+<section id="setting-up-a-checker-script">
 <h2><span class="section-number">2.3. </span>Setting up a checker script<a class="headerlink" href="#setting-up-a-checker-script" title="Permalink to this headline">¶</a></h2>
 <p>We will set up a script to use <code class="docutils literal notranslate"><span class="pre">fudge</span></code> to check ENDF files.  I’ll leave to you to figure out how
 to do the same with GNDS files (if you do, remember to load both the evaluation and the covariance!).</p>
@@ -181,8 +182,8 @@ to do the same with GNDS files (if you do, remember to load both the evaluation 
 </pre></div>
 </div>
 <p>Try it out!</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -246,7 +247,7 @@ to do the same with GNDS files (if you do, remember to load both the evaluation 
         <li class="right" >
           <a href="translating.html" title="1. Basic translating between ENDF and GNDS"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">2. </span>Checking ENDF or GNDS files</a></li> 
       </ul>

@@ -124,6 +124,61 @@ ptwXPoints *ptwXY_ysMappedToXs( statusMessageReporting *smr, ptwXYPoints *ptwXY,
 
     return( Ys );
 }
+
+/*
+************************************************************
+*/
+nfu_status ptwXY_mapToXsAndAdd( statusMessageReporting *a_smr, ptwXYPoints *a_ptwXY, int64_t a_offset, int64_t a_length, double const *a_Xs,
+        double *a_results, double a_scaleFractor ) {
+
+    int64_t offset, startIndex, length, length_m1;
+    double x1, x2, y1, y2;
+    ptwXYPoint *point;
+    ptwXY_interpolation interpolation = ptwXY_getInterpolation( a_ptwXY );
+    double xValue, yValue;
+
+    if( a_offset < 0 ) a_offset = 0;                                    /* This and next line also ensure that a_length > 0. */
+    if( a_offset >= a_length ) return( nfu_Okay );
+
+    offset = a_offset;
+    nfu_status status = ptwXY_startIndex( a_smr, a_ptwXY, a_Xs[a_offset], &startIndex, &length );
+    if( status != nfu_Okay ) return( status );
+    if( startIndex < 0 ) {
+        if( startIndex == -2 ) {
+            if( a_Xs[a_length-1] >= a_ptwXY->points[0].x ) startIndex = 0;      /* Case A. */
+        }
+        if( startIndex < 0 ) return( nfu_Okay );
+    }
+
+    length_m1 = length - 1;
+    point = &a_ptwXY->points[startIndex];
+    x1 = point->x;
+    y1 = point->y;
+    while( startIndex < length_m1 ) {
+        ++startIndex;
+        point = &a_ptwXY->points[startIndex];
+        x2 = point->x;
+        y2 = point->y;
+
+        for( ; offset < a_length; ++offset ) {
+            xValue = a_Xs[offset];
+
+            if( xValue < x1 ) continue;                     /* Can happend per case A above. */
+            if( xValue > x2 ) break;
+
+            if( ( status = ptwXY_interpolatePoint( a_smr, interpolation, xValue, &yValue, x1, y1, x2, y2 ) ) != nfu_Okay ) {
+                smr_setReportError2p( a_smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( status );
+            }
+            a_results[offset] += a_scaleFractor * yValue;
+        }
+        x1 = x2;
+        y1 = y2;
+    }
+
+    return( nfu_Okay );
+}
+
 /*
 ************************************************************
 */

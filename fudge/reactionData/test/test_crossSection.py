@@ -65,6 +65,7 @@ class TestPointwise( unittest.TestCase ):
              1.0e6   2.0      0.1353352832366127
             15.0e6  16.0      1.1253517471925912e-07
         """
+
         ptwise_linear = XYs1d(axes=XYs1d.defaultAxes(labelsUnits={
             XYs1dModule.yAxisIndex: ('crossSection', 'b'),
             XYs1dModule.xAxisIndex: ('energy_in', 'eV')}), data=[[1e-5, 1.0], [20.0e6, 21.0]])

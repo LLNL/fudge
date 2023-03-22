@@ -9,7 +9,6 @@
 
 import argparse, os
 from fudge import reactionSuite
-from fudge.covariances import covarianceSuite
 
 # Process command line options
 parser = argparse.ArgumentParser(description='Translate GNDS into ENDF')
@@ -27,9 +26,12 @@ if args.outFile == None: outFile = args.inFilePrefix + '.endf'
 else:                    outFile = args.outFile
     
 # Read in XML files
-myEval = reactionSuite.ReactionSuite.readXML_file( inEvalFile )
-if os.path.exists( inCovFile ): myCov = covarianceSuite.CovarianceSuite.readXML_file( inCovFile, reactionSuite=myEval )
-else:                           myCov = None
+myEval = reactionSuite.read( inEvalFile )
+covariances = myEval.loadCovariances()
+if len(covariances) > 0:
+    myCov = covariances[0]
+else:
+    myCov = None
 
 # Now translate
 open( outFile, mode='w' ).write( myEval.toENDF6( args.style, {'verbosity':0}, covarianceSuite=myCov ) )

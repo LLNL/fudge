@@ -20,6 +20,28 @@ def getFakeResonanceSet(
         domainMax=None,
         seed=None,
         verbose=False):
+    """
+    Random draw fake set of resonances for given L/J, returning a Table of resonance parameters.
+    Supports several styles for drawing resonance energies ranging from picket fence to Gaussian orthogonal ensemble (goe).
+
+    :param E0: energy of first resonance in the sequence.
+    :param aveD: average level spacing. Can be inferred from levelDensity if not supplied.
+    :param numLevels: number of resonances to generate. Can be inferred from levelDensity if not supplied.
+    :param style: style of resonance generator. Options: ['wigner','picket fence', 'poisson', 'brody', 'goe']
+    :param BrodyW: Brody 'trade-off' parameter, only used if style=='brody'
+    :param L: orbital angular momentum
+    :param J: total angular momentum
+    :param levelDensity: dictionary containing L/J-specific energy-dependent level densities
+    :param aveWidthFuncs': dictionary containing L/J-specific energy-dependent widths
+    :param DOFs: Chi-square degrees of freedom for each reaction channel, used for drawing resonance widths.
+    :param widthKeys: column headers for resulting Table
+    :param domainMin: lower bound for generating resonances, usually equal to lower bound for level densities / widths
+    :param domainMax: upper bound for generating resonances, usually equal to upper bound for level densities / widths
+    :param seed: optional seed for the random generator.
+    :param verbose: produce verbose messages.
+
+    :return: xData.table.Table containing random resonance parameters for this L/J.
+    """
 
     if seed is not None:
         numpy.random.seed(seed)
@@ -59,13 +81,16 @@ def getFakeResonanceSet(
         numLevels=numLevels,
         style=style,
         BrodyW=BrodyW,
-        levelDensity=levelDensity)
+        levelDensity=levelDensity,
+        verbose=verbose)
     energies = numpy.array(
         [x for x in _energies if (domainMin is None or x >= domainMin) and (domainMax is None or x <= domainMax)])
     numLevels = len(energies)
     if verbose:
-        print("Generated %d L=%s, J=%s resonances over the energy range %s to %s %s"
-              % (numLevels, L, J, min(_energies), max(_energies), energyUnit))
+        energyRange = ""
+        if _energies:
+            energyRange = " over the energy range %s to %s %s" % (min(_energies), max(_energies), energyUnit)
+        print("Generated %d L=%s, J=%s resonances%s" % (numLevels, L, J, energyRange))
 
     # Build the column headers
     columns = [tableModule.ColumnHeader(0, name='energy', unit=energyUnit),

@@ -168,22 +168,28 @@ class Styles(ancestryModule.AncestryIO_base):
         for style in self:
             style.convertUnits(unitMap)
 
-    def preProcessingChainHead( self, label = None ) :
+    def preProcessingChainHead(self, label=None):
         """
         Returns the pre-processing style that heads the chain containing the pre-processing label *label*. If label is None, there must be
         only one pre-processing chain and that head is returned.
         """
 
-        chains = self.preProcessingChains( ends = True )
-        if( len( chains ) == 0 ) : raise Exception( 'No pre-processing style exist.' )
-        if( label is None ) :
-            if( len( chains ) > 1 ) : raise Exception( 'Must have only one pre-processing chain, have %s.' % len( preProcessingChains ) )
-            return( chains[0][0] )
-        else :
-            for chain in chains :
-                for style in chain :
-                    if( style.label == label ) : return( chain[0] )
-            raise Exception( 'No pre-processing chain containing label "%s" found.' % label )
+        chains = self.preProcessingChains(ends=True)
+        if len(chains) == 0:
+            raise Exception('No pre-processing style exist.')
+        if label is None:
+            if len(chains) > 1:
+                labels = []
+                for chain in chains:
+                    labels.append([style.label for style in reversed(chain)])
+                raise Exception('Must have only one pre-processing chain, have %s: %s.' % (len(chains), labels))
+            return chains[0][0]
+        else:
+            for chain in chains:
+                for style in chain:
+                    if style.label == label:
+                        return chain[0]
+            raise Exception('No pre-processing chain containing label "%s" found.' % label)
 
     def preProcessingChains( self, ends = True ) :
         """
@@ -216,6 +222,17 @@ class Styles(ancestryModule.AncestryIO_base):
             if style.label == value: return style
 
         raise ValueError('Could not find style "%s" with label "%s".' % (entityName, value))
+
+    def findDocumentationEntriesWithKey(self, keyValue):
+        '''
+        Calls **findDocumentationEntriesWithKey** on each style in *self* and returns the results.
+        '''
+
+        entries = []
+        for style in self:
+            entries += style.findDocumentationEntriesWithKey(keyValue)
+
+        return entries
 
     def findInstancesOfClassInChildren( self, cls, level = 9999 ) :
 
@@ -330,29 +347,38 @@ class Styles(ancestryModule.AncestryIO_base):
 
         return temperatureInfos2
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent = '', **kwargs):
         """Returns an XML representation of self as a list of lines."""
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
         do_multiGroup = kwargs['formatVersion'] == GNDS_formatVersionModule.version_1_10
 
         parameters = ''
-        if( do_multiGroup ) :
-            heatedMultiGroups = [ _style for _style in self if isinstance( _style, HeatedMultiGroup ) ]
-            do_multiGroup = len( heatedMultiGroups ) > 0
-            if( do_multiGroup ) :
+        if do_multiGroup:
+            heatedMultiGroups = [_style for _style in self if isinstance(_style, HeatedMultiGroup)]
+            do_multiGroup = len(heatedMultiGroups) > 0
+            if do_multiGroup:
                 parameters = 'MultiGroup'
-                multiGroup1 = MultiGroup( parameters, 3 )
-                for transportable in heatedMultiGroups[0].transportables : multiGroup1.transportables.add( transportable )
+                multiGroup1 = MultiGroup(parameters, 3)
+                for transportable in heatedMultiGroups[0].transportables:
+                    multiGroup1.transportables.add(transportable)
 
         xmlStringList = ['%s<%s>' % (indent, self.moniker)]
-        for _style in self :
-            if( do_multiGroup and isinstance( _style, Heated ) ) :
-                xmlStringList += multiGroup1.toXML_strList( indent2, **kwargs )
+        for _style in self:
+            if do_multiGroup and isinstance(_style, Heated):
+                xmlStringList += multiGroup1.toXML_strList(indent2, **kwargs)
                 do_multiGroup = False
-            xmlStringList += _style.toXML_strList( indent2, **kwargs, parameters = parameters )
-        xmlStringList[-1] += '</%s>' % self.moniker
-        return( xmlStringList )
+            xmlStringList += _style.toXML_strList(indent2, **kwargs, parameters = parameters)
+
+        if len(xmlStringList) == 1:
+            if kwargs.get('showEmptySuites', False):
+                xmlStringList = [xmlStringList[0][:-1] + '/>']
+            else:
+                xmlStringList = []
+        else:
+            xmlStringList[-1] += '</%s>' % self.moniker
+
+        return xmlStringList
 
     def parseNode(self, stylesElement, xPath, linkData, **kwargs):
         """
@@ -491,6 +517,17 @@ class Style(ancestryModule.AncestryIO, abc.ABC):
             _chain.append( _derivedFrom )
 
         return( _chain )
+
+    def findDocumentationEntriesWithKey(self, keyValue):
+        '''
+        Calls **findEntriesWithKey** the *self*'s documentation member and returns a list of [self, entry] for each entry in *self*'s documentation
+        that **findEntriesWithKey** returns.
+        '''
+
+        entries = self.__documentation.findEntriesWithKey(keyValue)
+        entries = [[self, entry] for entry in entries]
+
+        return entries
 
     def findFormMatchingDerivedStyle( self, component, styleFilter = None ) :
         """
@@ -1446,7 +1483,7 @@ class Realization( Style ) :
         return xmlStringList
 
     @classmethod
-    def parseNodeUsingClass(cls, done, xPath, linkData, **kwargs):
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """Generate an instance of this class from *node*."""
 
         label, derivedFrom, date = Style.parseNodeBase(node, xPath, linkData, **kwargs)

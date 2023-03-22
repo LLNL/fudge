@@ -391,16 +391,10 @@ ptwXYPoints *ptwXY_div_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, 
     double x1, x2, y1, y2, u1, u2, v1, v2, y, xz, nan = nfu_getNAN( ), s1, s2;
     ptwXYPoints *div = NULL;
     ptwXYPoint *p;
-    nfu_status status;
+    nfu_status status = ptwXY_simpleCoalescePoints( smr, ptwXY1 );
 
-    if( ptwXY_simpleCoalescePoints( smr, ptwXY1 ) != nfu_Okay ) {
-        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
-        return( NULL );
-    }
-    if( ptwXY_simpleCoalescePoints( smr, ptwXY2 ) != nfu_Okay ) {
-        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
-        return( NULL );
-    }
+    if( status != nfu_Okay ) goto Err;
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY2 ) != nfu_Okay ) goto Err;
 
     if( ptwXY1->interpolation == ptwXY_interpolationOther ) {
         smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Source1: Other interpolation not allowed." );
@@ -416,7 +410,7 @@ ptwXYPoints *ptwXY_div_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, 
         if( div == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
         return( div );
     }
-    
+
     if( ptwXY_areDomainsMutual( smr, ptwXY1, ptwXY2 ) != nfu_Okay ) {
         double domainMin1, domainMax1, domainMin2, domainMax2;
 
@@ -443,7 +437,7 @@ ptwXYPoints *ptwXY_div_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, 
                         if( status != nfu_XOutsideDomain ) goto Err;
                         s1 = 0.;
                     }
-                    if( ptwXY_getSlopeAtX( smr, ptwXY2, p->x, '-', &s2 ) != nfu_Okay ) goto Err;
+                    if( ( status = ptwXY_getSlopeAtX( smr, ptwXY2, p->x, '-', &s2 ) ) != nfu_Okay ) goto Err;
                     if( s2 == 0. ) {
                         y1 = nan; }
                     else {
@@ -456,7 +450,7 @@ ptwXYPoints *ptwXY_div_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, 
                         if( status != nfu_XOutsideDomain ) goto Err;
                         s1 = 0.;
                     }
-                    if( ptwXY_getSlopeAtX( smr, ptwXY2, p->x, '+', &s2 ) != nfu_Okay ) goto Err;
+                    if( ( status = ptwXY_getSlopeAtX( smr, ptwXY2, p->x, '+', &s2 ) ) != nfu_Okay ) goto Err;
                     if( s2 == 0. ) {
                         y2 = nan; }
                     else {
@@ -550,7 +544,11 @@ ptwXYPoints *ptwXY_div_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, 
     return( div );
 
 Err:
-    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    if( status == nfu_XOutsideDomain ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_XOutsideDomain, "x-value outside domain." ); }
+    else {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    }
 Err2:
     if( div ) ptwXY_free( div );
     return( NULL );

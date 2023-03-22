@@ -9,6 +9,8 @@
 This module contains common argparse options used by some of the FUDGE scripts.
 """
 
+import os
+
 from argparse import ArgumentParser
 
 from PoPs import IDs as IDsModule
@@ -32,6 +34,8 @@ class SingleProtareArguments :
         parser.add_argument( '--tid', action = 'store', default = None,                 help = 'The PoPs id for the target. Required if the argument "mapOrProtareFileName" is a map file; otherwise, it is ignored.' )
         parser.add_argument( '--noLazyParse', action = 'store_true',                    help = 'Disable lazy parsing (increases load time but sometimes useful).' )
 
+        self.path = None
+
     def protare(self, args, verbosity=0, lazyParsing=True):
         """
         Returns a protare (i.e., "reactionSuite") instance that has been read per the "mapOrProtareFileName", "--pid" and "--tid" parameters.
@@ -42,11 +46,13 @@ class SingleProtareArguments :
         mapOrProtare = GNDS_fileModule.read(args.mapOrProtareFileName, verbosity=verbosity, lazyParsing=lazyParsing)
 
         if( isinstance( mapOrProtare, reactionSuiteModule.ReactionSuite ) ) :
+            self.path = args.mapOrProtareFileName
             return( mapOrProtare )
         elif( isinstance( mapOrProtare, mapModule.Map ) ) :
             if( args.tid is None ) : raise ValueError( '--tid option required for the map file.' )
             mapProtare = mapOrProtare.find( args.pid, args.tid )
+            self.path = mapOrProtare.path if os.path.isabs(mapProtare.path) else os.path.join(os.path.dirname(args.mapOrProtareFileName), mapProtare.path)
             if( mapProtare is None ) : raise Exception( 'No match in map file for pid = "%s" and tid = "%s".' % ( args.pid, args.tid ) )
             return(mapProtare.protare(verbosity=verbosity, lazyParsing=lazyParsing))
         else :
-            raise TypeError( 'File "%s" is not a map or protare file.' )
+            raise TypeError( 'File "%s" is not a map or protare file.' % mapOrProtare )

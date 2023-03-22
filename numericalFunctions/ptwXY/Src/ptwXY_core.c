@@ -811,6 +811,55 @@ int64_t ptwXY_getNonOverflowLength( statusMessageReporting *smr, ptwXYPoints con
 
     return( ptwXY->length - ptwXY->overflowLength );
 }
+
+/*
+************************************************************
+*/
+nfu_status ptwXY_startIndex( statusMessageReporting *a_smr, ptwXYPoints *a_ptwXY, double a_x, int64_t *a_startIndex, int64_t *a_length ) {
+/*
+    Sets *a_startIndex to -2 if a_x < domainMin, -1 if a_x > domainMax, otherwise to the lowest index in a_ptwXY->points 
+where a_x >= a_ptwXY->points[*a_startIndex]. The logic below guarantees that *a_startIndex < (*a_length - 1 ). For example, if
+a_x == domainMax, then *a_startIndex = *a_length - 2, or the next to the last point.
+*/
+
+    int64_t lower = 0, mid, upper;
+    ptwXYPoint *point;
+    *a_length = ptwXY_length( NULL, a_ptwXY );
+
+    if( ptwXY_simpleCoalescePoints( a_smr, a_ptwXY ) != nfu_Okay ) { 
+        smr_setReportError2p( a_smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( a_ptwXY->status );
+    }
+
+    if( *a_length < 2 ) {
+        smr_setReportError2( a_smr, nfu_SMR_libraryID, nfu_tooFewPoints, "number of points = %lld < 2", *a_length );
+        return( nfu_tooFewPoints );
+    }
+
+    *a_startIndex = -2;
+    point = &a_ptwXY->points[lower];
+    if( a_x < point->x ) return( nfu_Okay );
+
+    upper = *a_length - 1;
+    *a_startIndex = -1;
+    point = &a_ptwXY->points[upper];
+    if( a_x > point->x ) return( nfu_Okay );
+
+    while( 1 ) {
+        mid = ( lower + upper ) >> 1;
+        if( mid == lower ) break;
+        point = &a_ptwXY->points[mid];
+        if( a_x < point->x ) {
+            upper = mid; }
+        else {
+            lower = mid;
+        }
+    }
+
+    *a_startIndex = mid;
+    return( nfu_Okay );
+}
+
 /*
 ************************************************************
 */
@@ -1484,9 +1533,10 @@ nfu_status ptwXY_setXYPairAtIndex( statusMessageReporting *smr, ptwXYPoints *ptw
 nfu_status ptwXY_getSlopeAtX( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, const char side, double *slope ) {
 
     nfu_status status  = nfu_Okay;
-    ptwXYOverflowPoint lessThanEqualXPoint, greaterThanXPoint;
+    ptwXYOverflowPoint lessThanEqualXPoint = { NULL, NULL, 0, {0.0, 0.0}}, greaterThanXPoint;
     ptwXY_lessEqualGreaterX legx = ptwXY_getPointsAroundX( smr, ptwXY, x, &lessThanEqualXPoint, &greaterThanXPoint );
     ptwXYPoint *point;
+    greaterThanXPoint = lessThanEqualXPoint;        /* Done to stop a compiler from complaining. */
 
     *slope = 0.;
 

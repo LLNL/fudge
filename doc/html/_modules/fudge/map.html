@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.map &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.map &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.map</a></li> 
       </ul>
@@ -47,9 +47,11 @@
 
 <span class="s2">Example of expected usage:</span>
 
+<span class="s2">.. code-block::</span>
+
 <span class="s2">    from fudge import map as mapModule</span>
 <span class="s2">    file = &#39;/path/to/GIDI/Test/Data/MG_MC/all_maps.map&#39;</span>
-<span class="s2">    map = mapModule.Map.readXML_file( file )            # Read in a map file.</span>
+<span class="s2">    map = mapModule.read( file )                        # Read in a map file.</span>
 <span class="s2">    m_O16 = map.find( &#39;n&#39;, &#39;O16&#39; )                      # This gets a reference to a map Protare instance.</span>
 <span class="s2">    O16 = m_O16.protare( )                              # The creates a FUDGE protare (i.e., reactionSuite instance).</span>
 
@@ -63,6 +65,8 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
+<span class="kn">import</span> <span class="nn">pathlib</span>
+
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">GNDS_formatVersion</span> <span class="k">as</span> <span class="n">GNDS_formatVersionModule</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
@@ -72,17 +76,17 @@
 <span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">guessInteraction</span> <span class="k">as</span> <span class="n">guessInteractionModule</span>
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span> <span class="k">as</span> <span class="n">reactionSuiteModule</span>
 
-<div class="viewcode-block" id="FormatVersion"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.FormatVersion">[docs]</a><span class="k">class</span> <span class="nc">FormatVersion</span> <span class="p">:</span>
+<div class="viewcode-block" id="FormatVersion"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.FormatVersion">[docs]</a><span class="k">class</span> <span class="nc">FormatVersion</span><span class="p">:</span>
 
     <span class="n">version_0_1</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
     <span class="n">version_0_2</span> <span class="o">=</span> <span class="s2">&quot;0.2&quot;</span>
-    <span class="n">allowed</span> <span class="o">=</span> <span class="p">(</span><span class="n">version_0_1</span><span class="p">,</span> <span class="n">version_0_2</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">)</span>
-    <span class="n">default</span> <span class="o">=</span> <span class="n">version_0_1</span>
+    <span class="n">allowed</span> <span class="o">=</span> <span class="p">(</span><span class="n">version_0_1</span><span class="p">,</span> <span class="n">version_0_2</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">)</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span>
 
 <div class="viewcode-block" id="FormatVersion.check"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.FormatVersion.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="nb">format</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span>
-            <span class="nb">format</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_1</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_1</span> <span class="ow">or</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_2</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported format &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">format</span><span class="p">)</span>
 
@@ -320,6 +324,26 @@
 
         <span class="k">return</span><span class="p">(</span> <span class="n">allFound</span> <span class="p">)</span></div>
 
+<div class="viewcode-block" id="Map.unrecurseAndSave"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.unrecurseAndSave">[docs]</a>    <span class="k">def</span> <span class="nf">unrecurseAndSave</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newFileName</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterate through all entries recursively and save as a flattened map files</span>
+
+<span class="sd">        :param newFileName:  New filename to which flattened mapfile will be saved </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">newInstance</span> <span class="o">=</span> <span class="n">Map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span> <span class="n">newFileName</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="n">pathList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterate</span><span class="p">():</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pathList</span><span class="p">:</span>
+                <span class="n">newInstance</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="n">pathList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Duplicate (</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">projectile</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">target</span><span class="si">}</span><span class="s1">) entry in map file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span> 
+
+        <span class="n">newInstance</span><span class="o">.</span><span class="n">updateChecksum</span><span class="p">()</span>
+        <span class="n">newInstance</span><span class="o">.</span><span class="n">saveToFile</span><span class="p">(</span><span class="n">newFileName</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Map.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
@@ -362,7 +386,7 @@
         <span class="n">library</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;library&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">library</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Map node does not have &#39;library&#39; attribute.&quot;</span> <span class="p">)</span>
 
-        <span class="nb">map</span> <span class="o">=</span> <span class="n">Map</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="n">sourcePath</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checksum&#39;</span><span class="p">),</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;algorithm&#39;</span><span class="p">))</span>
+        <span class="nb">map</span> <span class="o">=</span> <span class="n">Map</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="n">sourcePath</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checksum&#39;</span><span class="p">),</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;algorithm&#39;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
 
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span> <span class="p">:</span>
@@ -380,7 +404,7 @@
 <div class="viewcode-block" id="Map.read"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.read">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads in the file name *fileName* and returns a **ReactionSuite** instance.</span>
+<span class="sd">        Reads in the file name *fileName* and returns a **Map** instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">Map</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
@@ -398,9 +422,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">Base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
-
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">path</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Path must be a string.&quot;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fileName</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
@@ -415,6 +437,14 @@
         <span class="sd">&quot;&quot;&quot;Returns the path of the map file. This may be absolute or relative.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="p">)</span>
+
+    <span class="nd">@path</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets member self.__path to *path*.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Path must be a string.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="o">=</span> <span class="n">path</span>
 
 <div class="viewcode-block" id="EntryBase.buildFileName"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.EntryBase.buildFileName">[docs]</a>    <span class="k">def</span> <span class="nf">buildFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapDirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This method is designed to aid in building a map file when the map file does not reside in its final resting place.</span>
@@ -809,7 +839,7 @@
         <span class="nb">format</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">default</span><span class="p">)))</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_1</span> <span class="ow">or</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span>
             <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
             <span class="n">XML_list</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attrs</span> <span class="p">)</span> <span class="p">]</span>
             <span class="n">XML_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;protare projectile=&quot;n&quot; target=&quot;</span><span class="si">%s</span><span class="s1">&quot; evaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> 
@@ -822,29 +852,33 @@
 
 <div class="viewcode-block" id="TNSL.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.TNSL.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Creates a TNSL instance from an XML TNSL element.</span>
 
-<span class="sd">        :param node:        XML element to parse.</span>
+<span class="sd">        :param node:            XML element to parse.</span>
+<span class="sd">        :param xPath:           Current not used.</span>
+<span class="sd">        :param linkData:        Currently not used.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
 
-<span class="sd">        :return:            TNSL instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        :return:                TNSL instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">TNSL</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Invalid node name.&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">TNSL</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid node name.&#39;</span><span class="p">)</span>
 
         <span class="nb">format</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">default</span><span class="p">)))</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span>
                   <span class="p">(</span><span class="s1">&#39;projectile&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluation&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;checksum&#39;</span><span class="p">,</span> <span class="s1">&#39;algorithm&#39;</span><span class="p">)}</span>
 
-        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_1</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardTarget&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardEvaluation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;evaluation&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_1</span> <span class="ow">or</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardTarget&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardEvaluation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;evaluation&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardTarget&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;standardTarget&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardEvaluation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;standardEvaluation&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardTarget&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;standardTarget&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardEvaluation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;standardEvaluation&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">TNSL</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">TNSL</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="read"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -886,7 +920,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.map</a></li> 
       </ul>

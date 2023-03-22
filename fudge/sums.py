@@ -86,14 +86,22 @@ class Sums(ancestryModule.AncestryIO_bare):
 
     def toXML_strList(self, indent='', **kwargs):
 
-        if not any([getattr(self,val) for val in self.ancestryMembers]): return []
         indent2 = indent + kwargs.get('incrementalIndent','  ')
-        xml = ['%s<%s>' % (indent, self.moniker)]
+
+        xmlStringList = ['%s<%s>' % (indent, self.moniker)]
         for child in self.ancestryMembers:
-            val = getattr(self,child)
-            if val: xml += val.toXML_strList(indent2, **kwargs)
-        xml[-1] += '</%s>' % self.moniker
-        return xml
+            val = getattr(self, child)
+            xmlStringList += val.toXML_strList(indent2, **kwargs)
+
+        if len(xmlStringList) == 1:
+            if kwargs.get('showEmptySuites', False):
+                xmlStringList = [xmlStringList[0][:-1] + '/>']
+            else:
+                xmlStringList = []
+        else:
+            xmlStringList[-1] += '</%s>' % self.moniker
+
+        return xmlStringList
 
     def parseNode(self, element, xPath, linkData, **kwargs):
 

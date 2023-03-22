@@ -20,6 +20,8 @@ from fudge import suites as suitesModule
 from fudge import reactionSuite as reactionSuiteModule
 from fudge.covariances import covarianceSuite as covarianceSuiteModule
 
+summaryDocStringFUDGE = '''Checks a GNDS map file and its contents for consistency.'''
+
 description = """
 This script checks a map file for consistency. In the following description a protare is considered 
 to be in the map file if it is directly specified in the map file via a **protare** or **TNSL** node,
@@ -48,7 +50,8 @@ Note, here a protare and reactionSuite are synonymous.
 """
 
 parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('mapFile', type=pathlib.Path,                 help='The path to a GNDS map file.')
+parser.add_argument('mapFile', type=pathlib.Path,                   help='The path to a GNDS map file.')
+parser.add_argument('--skipRIS', action='store_true',               help='If present, missing *ris* information is not printed.')
 
 args = parser.parse_args( )
 
@@ -81,12 +84,22 @@ missingExternalFiles = set()
 unsupportedExternalFileTypes = set()
 missingRIS_files = set()
 
+masterMap = None
+protareFormatMisMatch = set()
+mapFormatMisMatch = set()
+
 def checkProtare( protareFileName, map, entry ) :
+
+    global masterMap
 
     protaresInMap.add( protareFileName )
     protareDirectories.add( os.path.dirname( protareFileName ) )
     if( os.path.exists( protareFileName ) ) :
         protare = GNDS_fileModule.preview(protareFileName, haltParsingMoniker = suitesModule.ExternalFiles.moniker)
+
+        if protare.format != masterMap.format:
+            protareFormatMisMatch.add(protareFileName)
+
         interaction = entry.interaction
         if isinstance(entry, mapModule.TNSL) and entry.interaction is None:
             interaction = enumsModule.Interaction.TNSL
@@ -103,7 +116,7 @@ def checkProtare( protareFileName, map, entry ) :
             realpath = externalFile.realpath( )
             if( os.path.exists( realpath ) ) :
                 name, dummy = GNDS_fileModule.type(realpath)
-                if( name == GNDS_fileModule.HDF5_values) :
+                if( name == GNDS_fileModule.HDF5_values) :  
                     hdf5ExternalFiles.add( realpath )
                     hdf5Directories.add( os.path.dirname( realpath ) )
                 elif( name == covarianceSuiteModule.CovarianceSuite.moniker ) :
@@ -113,37 +126,57 @@ def checkProtare( protareFileName, map, entry ) :
             else :
                 missingExternalFiles.add( ','.join( [ externalFile.path, protareFileName, realpath ] ) )
 
-masterMap = None
+mapFileInfo = []
 missingTNSL_standardTarget = set()
 
-def checkMap( mapFileName, priorMaps = [] ) :
+def checkMap(mapFileName, path, priorMaps=[]):
 
-    global masterMap
+    global masterMap, mapFileInfo
 
     risFile = pathlib.Path(mapFileName).with_suffix('.ris')
     if not risFile.exists():
         missingRIS_files.add(str(mapFileName))
 
-    try :
+    try:
         map = mapModule.Map.read(mapFileName)
-    except FileNotFoundError :
-        print( 'ERROR: map file %s does not exist.' % mapFileName )
-        for priorMap in priorMaps : print( '    From map file %s' % priorMap )
+    except FileNotFoundError:
+        print('ERROR: map file %s does not exist.' % mapFileName)
+        for priorMap in priorMaps:
+            print('    From map file %s' % priorMap)
         return
-    except :
+    except:
         raise
 
-    if masterMap is None: masterMap = map
+    if masterMap is None:
+        masterMap = map
+    else:
+        if map.format != masterMap.format:
+            mapFormatMisMatch.add(mapFileName)
 
-    for entry in map :
-        if( isinstance( entry, mapModule.Import ) ) :
-            checkMap( entry.fileName, [ mapFileName ] + priorMaps )
-        else :
-            checkProtare( entry.fileName, map, entry )
+    mapFileIndex = len(mapFileInfo)
+    mapFileInfo.append([len(priorMaps), path, 0])
+
+    for entry in map:
+        if isinstance(entry, mapModule.Import):
+            map2 = pathlib.Path(entry.fileName)
+            recursiveMaps = ''
+            recursionFound = False
+            for priorMap in priorMaps:
+                recursiveMaps += ' > %s' % priorMap
+                if pathlib.Path(mapFileName).samefile(priorMap):
+                    recursionFound = True
+                    print('Recursive mapping found: %s %s' % (mapFileName, recursiveMaps))
+                    break
+            if not recursionFound:
+                checkMap(entry.fileName, entry.path, [mapFileName] + priorMaps)
+        else:
+            mapFileInfo[mapFileIndex][2] += 1
+            checkProtare(entry.fileName, map, entry)
             if isinstance(entry, mapModule.TNSL):
-                if masterMap.find(entry.projectile, entry.standardTarget) is None: missingTNSL_standardTarget.add(entry.standardTarget)
+                if masterMap.find(entry.projectile, entry.standardTarget) is None:
+                    missingTNSL_standardTarget.add(entry.standardTarget)
 
-checkMap( args.mapFile )
+checkMap(str(args.mapFile), str(args.mapFile))
 
 #
 # Phase 2: Analyze all files in the protare directories.
@@ -192,6 +225,10 @@ for hdf5Directory in hdf5Directories :
             except :
                 unknownsInHDF5_directories.add( file )
 
+print('A total of %s protares found in map file (directly or indirectly). Broken down as:' % len(protaresInMap))
+for level, path, numberOfProtares in mapFileInfo:
+    print('%-60s: %s' % (((level + 1) * '    ' + path), numberOfProtares))
+
 printSet('Directories in protare directories', dirsInDirectories)
 printSet('Protares in protare directories but not in map file', protaresInDirectories.difference(protaresInMap))
 printSet('Protares in map file but not in protare directories', protaresInMap.difference(protaresInDirectories))
@@ -201,4 +238,7 @@ printSet('Unknown files in protare directories', unknownsInDirectories)
 printSet('Missing external files', missingExternalFiles, printFunction = printMissingExternalFile)
 printSet('Unknown files in HDF5 directories', unknownsInHDF5_directories)
 printSet('Missing TNSL standard targets', missingTNSL_standardTarget)
-printSet('Map files with missing RIS files', missingRIS_files)
+if not args.skipRIS:
+    printSet('Map files with missing RIS files', missingRIS_files)
+printSet('Maps with format that does not match that of the master map file', mapFormatMisMatch)
+printSet('Protares with format that does not match that of the master map file', protareFormatMisMatch)

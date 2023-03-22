@@ -2,15 +2,16 @@ Outgoing Distributions
 ======================
 
 Applications of nuclear data are often sensitive not only to the reaction cross section, but also to the angular distributions and energy 
-spectra of the reaction products. Each product in GNDS therefore contains a 'distribution' element. The distribution data may be given in 
+spectra of the reaction products. Each product in GNDS therefore contains a 'distribution' component. The distribution data may be given in
 several different ways.
 
 Angular distributions
 ---------------------
 
-For reactions producing exactly two outgoing products (such as n + Mn55 -> p + Cr55), the evaluation only needs to include an angular 
-distribution for one product. The kinematics of these 'two-body' reactions mean that the angular distribution for the other product 
-(and the energy spectra for both) can be computed from the first product.
+For reactions producing exactly two outgoing products where the final energy of both products is specified
+(such as n + Mn55 -> p + Cr55 or n + Mn55 -> n + Mn55_e3), the evaluation only needs to include an angular
+distribution for one product. The kinematics of these 'two-body' reactions mean that the angular distribution
+for the other product (and the energy spectra for both) can be computed from the first product distribution.
 
 There are several ways of describing angular distributions in GNDS:
 
@@ -61,5 +62,8 @@ Discrete gammas can appear in several places in a GNDS evaluation. Where possibl
 the PoPs particle database, where they are listed as decay modes from excited nuclear states down to lower energy states.
 In other cases, the source of the gamma may not be known exactly (or may not have been included in the ENDF evaluation
 that was translated to GNDS).  In those cases, discrete gammas are listed as normal reaction products,
-with uncorrelated distributions here the energy distribution is listed as ``discreteGamma``.
+with uncorrelated distributions where the energy distribution is listed as ``discreteGamma``.
 Primary gammas are listed in a similar fashion, as uncorrelated distributions with a ``primaryGamma`` energy distribution.
+GNDS supports specifying the final state for a ``primaryGamma`` so the connection to a discrete cascade can be preserved,
+but most current evaluations do not use this capability since the ENDF-6 format does not support specifying the final
+state for a primary gamma.

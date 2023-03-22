@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pqu.PQU &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>pqu.PQU &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pqu.PQU</a></li> 
       </ul>
@@ -2403,7 +2403,7 @@
 
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Only integer and inverse integer exponents are allowed&#39;</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="PhysicalUnit.conversionFactorTo"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.conversionFactorTo">[docs]</a>    <span class="k">def</span> <span class="nf">conversionFactorTo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="PhysicalUnit.conversionFactorTo"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.conversionFactorTo">[docs]</a>    <span class="k">def</span> <span class="nf">conversionFactorTo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">ignoreTemperatureOffsets</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param other: another unit</span>
 <span class="sd">        :type other: `PhysicalUnit`</span>
@@ -2416,7 +2416,8 @@
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Incompatible units: cannot convert &quot;</span><span class="si">%s</span><span class="s1">&quot; to &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span> <span class="p">),</span> <span class="nb">str</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Unit conversion (</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">) cannot be expressed as a simple multiplicative factor&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">(</span> <span class="p">),</span> <span class="n">other</span><span class="o">.</span><span class="n">symbol</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ignoreTemperatureOffsets</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">!=</span> <span class="n">_unit_table</span><span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">powers</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Unit conversion (</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">) cannot be expressed as a simple multiplicative factor&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">(</span> <span class="p">),</span> <span class="n">other</span><span class="o">.</span><span class="n">symbol</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
             <span class="c1"># special treatment to reduce numeric error in order-of-magnitude conversions</span>
@@ -2936,7 +2937,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pqu.PQU</a></li> 
       </ul>

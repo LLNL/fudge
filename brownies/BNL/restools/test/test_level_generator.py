@@ -1,5 +1,6 @@
 import unittest
 from xData import axes
+from xData import XYs1d
 from brownies.BNL.restools.level_generator import *
 
 DEBUG = True
@@ -34,8 +35,8 @@ class TestLevelGeneration(AssertMixIn):
         self.dE = self.Emax - self.Emin
 
         # Make a level density rho(E) = e^(E/T)
-        self.ld = XYs.XYs1d.createFromFunction(
-            axes=axes.axes(2, labelsUnits={0: ('rho(E)', '1/eV'), 1: ("E", "eV")}),
+        self.ld = XYs1d.XYs1d.createFromFunction(
+            axes=axes.Axes(2, labelsUnits={0: ('rho(E)', '1/eV'), 1: ("E", "eV")}),
             Xs=[x * self.dE / self.nE for x in range(self.nE)],
             func=lambda x, par: math.exp(x / self.T),
             parameters=None,

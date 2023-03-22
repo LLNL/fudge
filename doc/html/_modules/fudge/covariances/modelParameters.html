@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.covariances.modelParameters &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.covariances.modelParameters &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.covariances.modelParameters</a></li> 
       </ul>
@@ -204,7 +204,7 @@
 
 
 <div class="viewcode-block" id="ParameterCovarianceMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix">[docs]</a><span class="k">class</span> <span class="nc">ParameterCovarianceMatrix</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Form</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; </span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Store covariances (or correlations, depending on &#39;type&#39;) between model parameters</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -232,14 +232,14 @@
         <span class="n">matrix</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span>
 
-<div class="viewcode-block" id="ParameterCovarianceMatrix.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+<div class="viewcode-block" id="ParameterCovarianceMatrix.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">numpy</span>
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">nParameters</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="n">params</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">ParameterCovarianceMismatch</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">ParameterCovarianceMismatch</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span>
@@ -256,30 +256,50 @@
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Model parameter covariance linking to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">parameterLink</span><span class="o">.</span><span class="n">link</span><span class="p">))</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
+            <span class="c1"># params may contain zeros, e.g. for L/J columns in BreitWigner table. Replace with 1</span>
+            <span class="n">params2</span> <span class="o">=</span> <span class="n">params</span><span class="p">[:]</span>
+            <span class="n">params2</span><span class="p">[</span><span class="n">params2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">covarianceEnumsModule</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">absolute</span><span class="p">:</span>
-                <span class="c1"># params may contain zeros, e.g. for L/J columns in BreitWigner table. Replace with 1</span>
-                <span class="n">params2</span> <span class="o">=</span> <span class="n">params</span><span class="p">[:]</span>
-                <span class="n">params2</span><span class="p">[</span> <span class="n">params2</span><span class="o">==</span><span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span> <span class="o">/</span> <span class="n">params2</span> <span class="o">/</span> <span class="n">params2</span><span class="p">[:,</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+                <span class="n">absolute_matrix</span> <span class="o">=</span> <span class="n">matrix</span>
+                <span class="n">relative_matrix</span> <span class="o">=</span> <span class="n">matrix</span> <span class="o">/</span> <span class="n">params2</span> <span class="o">/</span> <span class="n">params2</span><span class="p">[:,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">covarianceEnumsModule</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">relative</span><span class="p">:</span>
+                <span class="n">relative_matrix</span> <span class="o">=</span> <span class="n">matrix</span>
+                <span class="n">absolute_matrix</span> <span class="o">=</span> <span class="n">matrix</span> <span class="o">*</span> <span class="n">params2</span> <span class="o">*</span> <span class="n">params2</span><span class="p">[:,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Checking for model parameter covariance type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
 
-            <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">())</span>
-            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">unc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">uncertainty</span><span class="p">):</span>
+            <span class="n">rel_uncertainty</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">relative_matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">())</span>
+            <span class="n">abs_uncertainty</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">absolute_matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">unc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rel_uncertainty</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">unc</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;minRelUnc&#39;</span><span class="p">]:</span>
                     <span class="c1"># FIXME should probably ignore fake resonances (e.g. with negative energies)</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">VarianceTooSmall</span><span class="p">(</span> <span class="n">idx</span><span class="p">,</span> <span class="n">unc</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="n">matrixWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">VarianceTooSmall</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">unc</span><span class="p">,</span> <span class="n">abs_uncertainty</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="p">))</span>
                 <span class="k">elif</span> <span class="n">unc</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;maxRelUnc&#39;</span><span class="p">]:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">VarianceTooLarge</span><span class="p">(</span> <span class="n">idx</span><span class="p">,</span> <span class="n">unc</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="n">matrixWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">VarianceTooLarge</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">unc</span><span class="p">,</span> <span class="n">abs_uncertainty</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="p">))</span>
 
-            <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span> <span class="n">matrix</span> <span class="p">)</span>
+            <span class="c1"># check for out-of-range correlations</span>
+            <span class="n">rel_uncert2</span> <span class="o">=</span> <span class="n">rel_uncertainty</span><span class="p">[:]</span>
+            <span class="n">rel_uncert2</span><span class="p">[</span><span class="n">rel_uncert2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">relative_matrix</span> <span class="o">/</span> <span class="n">rel_uncert2</span> <span class="o">/</span> <span class="n">rel_uncert2</span><span class="p">[:,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-14</span>     <span class="c1"># allow for round-off error when converting to correlation matrix</span>
+            <span class="n">badCount</span> <span class="o">=</span> <span class="p">(</span><span class="n">corr_matrix</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">corr_matrix</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">badCount</span><span class="p">:</span>
+                <span class="n">worstCase</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">worstCase</span><span class="p">:</span>
+                    <span class="n">worstCase</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">)</span>
+                <span class="n">matrixWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">CorrelationsOutOfRange</span><span class="p">(</span><span class="n">badCount</span><span class="p">,</span> <span class="n">worstCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+
+            <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">]:</span>
-                <span class="n">matrixWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">NegativeEigenvalues</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="bp">self</span> <span class="p">))</span>
-            <span class="n">minpos</span><span class="p">,</span> <span class="n">maxpos</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]),</span><span class="nb">max</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">matrixWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">NegativeEigenvalues</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="bp">self</span><span class="p">))</span>
+            <span class="n">minpos</span><span class="p">,</span> <span class="n">maxpos</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">])</span>
             <span class="c1"># Check that the condition number of the matrix is reasonable</span>
             <span class="k">if</span> <span class="n">minpos</span><span class="o">/</span><span class="n">maxpos</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">matrix</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">matrixWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">BadEigenvalueRatio</span><span class="p">(</span> <span class="n">minpos</span><span class="o">/</span><span class="n">maxpos</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">matrixWarnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">BadEigenvalueRatio</span><span class="p">(</span><span class="n">minpos</span><span class="o">/</span><span class="n">maxpos</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">matrixWarnings</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Model parameter covariances&quot;</span><span class="p">,</span> <span class="n">matrixWarnings</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Model parameter covariances&quot;</span><span class="p">,</span> <span class="n">matrixWarnings</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">warnings</span></div>
 
@@ -287,14 +307,48 @@
 
         <span class="c1">#raise NotImplementedError()</span>
         <span class="k">pass</span></div>
-    
-<div class="viewcode-block" id="ParameterCovarianceMatrix.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span> 
+
+<div class="viewcode-block" id="ParameterCovarianceMatrix.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;assemble some useful info, to be handed down to children&#39;s fix() functions&#39;&#39;&#39;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;rowENDF_MFMT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;columnENDF_MFMT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">kw</span> <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span> <span class="o">**</span><span class="n">info</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ParameterCovarianceMatrix.plot"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scalelabel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ylog</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param title:</span>
+<span class="sd">        :param scalelabel:</span>
+<span class="sd">        :param xlim:</span>
+<span class="sd">        :param ylim:</span>
+<span class="sd">        :param xlog:</span>
+<span class="sd">        :param ylog:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+        <span class="n">_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">covariance_to_correlation</span><span class="p">(</span><span class="n">__matrix</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Convert a covariance matrix to a correlation matrix&quot;&quot;&quot;</span>
+            <span class="n">diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">__matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">())</span>
+            <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+                <span class="n">corr</span> <span class="o">=</span> <span class="n">__matrix</span> <span class="o">/</span> <span class="n">diag</span> <span class="o">/</span> <span class="n">diag</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="c1"># now fix diagonal + remove any NaN (from div/0):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corr</span><span class="p">)):</span>
+                <span class="n">corr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># must be exactly 1</span>
+            <span class="n">corr</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">corr</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="n">corr</span>
+
+        <span class="n">_array</span> <span class="o">=</span> <span class="n">covariance_to_correlation</span><span class="p">(</span><span class="n">_array</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.vis.matplotlib</span> <span class="kn">import</span> <span class="n">plot_matrix</span>
+        <span class="n">plot_matrix</span><span class="o">.</span><span class="n">plot_matrix</span><span class="p">(</span><span class="n">_array</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">xyTitle</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;row index&#39;</span><span class="p">,</span> <span class="s1">&#39;column index&#39;</span><span class="p">),</span>
+                                <span class="n">zRange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">colorMap</span><span class="o">=</span><span class="n">plot_matrix</span><span class="o">.</span><span class="n">generateColorMap</span><span class="p">())</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ParameterCovarianceMatrix.toXML_strList"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -363,7 +417,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.covariances.modelParameters</a></li> 
       </ul>

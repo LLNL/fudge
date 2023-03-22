@@ -97,7 +97,7 @@ def type(fileName, show=False, checkForHDF5=True):
     parser.setContentHandler(handler)
 
     try:
-        parser.parse(fileName)
+        parser.parse(str(fileName))
     except GNDSTypeException:
         if show: print('%-16s %s: %s' % (handler.name, fileName, handler.data))
         return handler.name, handler.data

@@ -22,6 +22,8 @@ from fudge.reactionData import crossSection as crossSectionModule
 from fudge.reactionData.doubleDifferentialCrossSection.photonScattering import coherent as coherentModule
 from fudge.reactionData.doubleDifferentialCrossSection.photonScattering import incoherent as incoherentModule
 
+summaryDocStringFUDGE = '''Outputs the cross section for each reaction and total for a GNDS reactionSuite.'''
+
 description = '''
 Print cross section data about the requested protare. If input options '--outputDir' and '--plot' are not specified, then
 the total cross section is printed to the screen. If the input options '--outputDir', cross section data for each reaction

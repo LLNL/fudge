@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.suites &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.suites &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.suites</a></li> 
       </ul>
@@ -361,19 +361,25 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="o">=</span> <span class="p">[]</span></div>
 
-<div class="viewcode-block" id="Suite.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Suite.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> href=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> href=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span><span class="p">)]</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span>
         <span class="n">moniker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">monikerByFormat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
-        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="n">moniker</span> <span class="p">)</span> <span class="p">]</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span> <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptySuites&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="n">moniker</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="n">moniker</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="n">moniker</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">xmlString</span></div>
 
 <div class="viewcode-block" id="Suite.uniqueLabel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.uniqueLabel">[docs]</a>    <span class="k">def</span> <span class="nf">uniqueLabel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -666,7 +672,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.suites</a></li> 
       </ul>

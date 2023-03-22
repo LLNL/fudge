@@ -88,6 +88,9 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
     elif( 'ice' in fileBaseName.lower() ) :
         ZA = 1001
         scatterers = [('H',2),('O',1)]
+    elif( 'Paraffin' in fileBaseName ) :
+        ZA = 1001
+        scatterers = [('H',11), ('C',15), ('C',1), ('I',1), ('O',7)]
     elif( ( 'para' in fileBaseName ) or ( 'ortho' in fileBaseName ) ) :
         ZA = 1001
         if( fileBaseName[-1] == 'D' ) : ZA = 1002
@@ -135,8 +138,9 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
         scatterers = [('H',12),('C',9)]
     elif( 'in' in fileBaseName ) :
         targetSymbol, molecule = fileBaseName.split( 'in' )
-        ZA = { 'H' : 1001, 'D' : 1002, 'Li' : 3006, 'Be' : 4009, 'C' : 6012, 'N' : 7014, 'O' : 8016, 'O16': 8016,
-               'Al' : 13027, 'Al27': 13027, 'Si' : 14028, 'Ca' : 20040, 'Y' : 39089, 'Zr' : 40090, 'U' : 92238 }[targetSymbol]
+        ZA = {'H': 1001, 'H1': 1001, 'D': 1002, 'H2': 1002, 'Li': 3006, 'Be': 4009, 'C': 6012, 'N': 7014, 'O': 8016,
+              'O16': 8016, 'F': 9019, 'Al': 13027, 'Al27': 13027, 'Si': 14028, 'Ca': 20040, 'Y': 39089, 'Zr': 40090,
+              'U': 92238}[targetSymbol]
 
         # try extract scattering atoms & number per molecule from molecule name:
         import re
@@ -151,6 +155,12 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
             scatterers.append((symbol, int(count)))
     elif( 'BeO' in fileBaseName ) :  # ENDF-VII.0 and earlier didn't break up into Be and O components
         ZA = 4009
+    elif( 'Mg' in fileBaseName ) :
+        targetID = "tnsl-Mg"
+        ZA = 12024  # Mg24 is 79% of natural abundance
+    elif( 'Si' in fileBaseName ) :
+        targetID = "tnsl-Si"
+        ZA = 14028  # Si28 is 92% of natural abundance
     else :
         # FIXME try using the MAT number to get targetID? Unfortunately libraries use different conventions for TNSL MAT numbers...
         raise Exception("Cannot determine TNSL target ZA or id from filename %s" % fileName)
@@ -204,7 +214,7 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
 
     if len(info.doRaise) > 0:
         info.logs.write( '\nRaising due to following errors:\n' )
-        for err in info.doRaise : info.logs.write( '    ' + err + '\n' )
+        for err in info.doRaise : info.logs.write( '    ' + err + '\n', True )
         raise Exception( 'len( info.doRaise ) > 0' )
 
     return { 'reactionSuite' : reactionSuite, 'errors' : errors, 'covarianceSuite' : None }
@@ -234,10 +244,10 @@ def readSTable( line, MF7 ) :
         t_interp.append(endfFileToGNDSMisc.ENDFInterpolationToGNDS1d(dat['L1']))
 
     # sanity checks: beta and temperature interpolation should be identical for all T
-    if( len( set( betas ) ) != 1 ) : raise ValueError( "inconsistent beta values encountered!" )
+    if len(set(betas)) != 1: raise ValueError( "inconsistent beta values encountered!" )
     beta = betas[0]
-    if( len( set( t_interp ) ) > 1 ) : raise ValueError( "inconsistent temperature interpolations encountered!" )
-    if( t_interp ) :
+    if len(set(t_interp)) > 1: raise ValueError( "inconsistent temperature interpolations encountered!" )
+    if t_interp:
         t_interp = t_interp[0]
     else :
         t_interp = xDataEnumsModule.Interpolation.linlin    # Only one temperature.
@@ -416,12 +426,17 @@ def readMF7( info, MT, MF7 ) :
             data = numpy.exp(data)
 
             # FIXME this assumes the original interpolation applied to ln(S) rather than to S. Assumption needs checking!
-            for idx, interp in ((3, t_interp), (2, b_interp), (1, a_interp)):
+            for idx, interp, label in ((3, t_interp, 'T'), (2, b_interp, 'beta'), (1, a_interp, 'alpha')):
                 if interp is None:
                     continue
-                if not interp.startswith('lin-'):
-                    raise ValueError("Expected linear interpolation for ln(S), got %s instead" % interp)
-                axes[idx].interpolation = interp.replace('lin','log',1)
+                if not str(interp).startswith('lin-'):
+                    info.doRaise.append("Expected linear interpolation for ln(S) along %s, got %s instead" % (label, interp))
+
+                # modify interpolation since we're storing S instead of ln(S)
+                axes[idx].interpolation = {
+                    xDataEnumsModule.Interpolation.linlin: xDataEnumsModule.Interpolation.loglin,
+                    xDataEnumsModule.Interpolation.linlog: xDataEnumsModule.Interpolation.loglog
+                }.get(interp, interp)
 
         zeroFraction = sum(data==0) / len(data)
         data = data.reshape( arrayShape_orig )

@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 import glob
@@ -35,7 +35,7 @@ def setup():
             'brownies.legacy.toENDF6.reactionData', 'brownies.legacy.toENDF6.reactionData.chargedParticleElastic',
             'brownies.legacy.toENDF6.reactionData.photonScattering', 'brownies.legacy.toENDF6.resonances'],
         package_dir={'brownies': '.'},
-        scripts=['legacy/bin/prepro.py']+['bin/check.py', 'bin/grokres.py', 'bin/mcres.py', 'bin/plot_evaluation.py', 'bin/inter.py', 'bin/plot_covariance.py'],
+        scripts=['legacy/bin/prepro.py'] + glob.glob('bin/*.py'),
         package_data = {
             'brownies.BNL.inter': ['README.txt', '*.json'],
             'brownies.BNL.inter.test': ['*.endf'],

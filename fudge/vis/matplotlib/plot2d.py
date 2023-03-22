@@ -440,7 +440,7 @@ class DataSet2d(DataSetParameters):
         self.xUnit = convertUnit(self.xUnit, xUnit, self.x, self.xerr, self.legend)
         self.yUnit = convertUnit(self.yUnit, yUnit, self.y, self.yerr, self.legend)
 
-    def addToPlot(self, thePlot, logY=False, minY=1e-12, verbose=False):
+    def addToPlot(self, thePlot, logY=False, verbose=False):
         if self.dataType == 'scatter':
             thePlot.errorbar(self.x, self.y, yerr=self.yerr, xerr=self.xerr,
                              **self.getFormatMap(doErrors=self.xerr is not None or self.yerr is not None))
@@ -458,27 +458,20 @@ class DataSet2d(DataSetParameters):
                     theYLowBounds = []
                     theYUpBounds = []
                 for _i in range(len(self.y)):
-                    if self.y[_i] <= 0.0:
-                        if verbose:
-                            print("WARNING: y value <= 0.0 (", self.y[_i], ") at index", _i, "on a log plot")
-                        theYs.append(minY)
-                    else:
-                        theYs.append(self.y[_i])
+                    if verbose and self.y[_i] <= 0.0:
+                        print("WARNING: y value <= 0.0 (", self.y[_i], ") at index", _i, "on a log plot")
+                    theYs.append(self.y[_i])
+
                     if self.yerr is not None:
                         lb = self.y[_i] - abs(self.yerr[_i])
-                        if lb <= 0.0:
-                            if verbose:
-                                print("WARNING: y-yerr value <= 0.0 (", lb, ") at index", _i, "on a log plot")
-                            theYLowBounds.append(minY)
-                        else:
-                            theYLowBounds.append(lb)
+                        if verbose and lb <= 0.0:
+                            print("WARNING: y-yerr value <= 0.0 (", lb, ") at index", _i, "on a log plot")
+                        theYLowBounds.append(lb)
+
                         ub = self.y[_i] + abs(self.yerr[_i])
-                        if ub <= 0.0:
-                            if verbose:
-                                print("WARNING: y+yerr value <= 0.0 (", ub, ") at index", _i, "on a log plot")
-                            theYUpBounds.append(minY)
-                        else:
-                            theYUpBounds.append(ub)
+                        if verbose and ub <= 0.0:
+                            print("WARNING: y+yerr value <= 0.0 (", ub, ") at index", _i, "on a log plot")
+                        theYUpBounds.append(ub)
                 thePlot.plot(self.x, theYs, **self.getFormatMap())
                 if self.yerr is not None:
                     thePlot.fill_between(self.x, theYLowBounds, theYUpBounds, facecolor=self.color, alpha=0.25)

@@ -58,32 +58,33 @@ class MassTracker:
          116000: 292., 117000: 293., 118000: 294.}
 
     def __init__(self):
-        self.amuMasses = { 1: self.neutronMass }
+
+        self.amuMasses = {1: self.neutronMass}
         self.ZA_AWRMasses = {}
         self.ZA_AWRMasses_nuclear = {}
+        self.history = {}
 
     def addMassAMU(self, ZA, massInAmu):
         self.amuMasses[ ZA ] = massInAmu
 
     def addMassAWR(self, ZA, AWR, asTarget=True):
 
-        # what's this all about? Found in ITYPE_0_Misc readMF6
-        """
-        if( ZAP not in info.ZAMasses ) :
-            info.ZAMasses[ZAP] = AWP * info.ZAMasses[1]
-        elif( info.ZAMasses[ZAP] is None ) :
-            info.ZAMasses[ZAP] = -AWP * info.ZAMasses[1]
-        """
-        if ZA==0: return    # exclude gammas
+        if ZA == 0:
+            return      # Exclude gammas.
 
         warning = ''
         amuMass = AWR * self.neutronMass
+        inputAMU_mass = amuMass
         Z, A = divmod(ZA, 1000)
         if not asTarget and ZA in self.electronBindingEnergiesAmu: # AWR should be a nuclear mass rather than atomic
             self.ZA_AWRMasses_nuclear.setdefault( ZA, collections.Counter() ).update( [AWR] )
             amuMass += self.electronMass * Z + self.electronBindingEnergiesAmu[ZA]
         else:
             self.ZA_AWRMasses.setdefault( ZA, collections.Counter() ).update( [AWR] )
+
+        if ZA not in self.history:
+            self.history[ZA] = []
+        self.history[ZA].append([asTarget, AWR, inputAMU_mass, amuMass])
 
         AMEmass = massModule.getMassFromZA(ZA)
         if AMEmass is not None:
@@ -180,3 +181,13 @@ class MassTracker:
         for ZA in self.ZA_AWRMasses:
             AWR = self.getMostCommonMassAWR( ZA )
             self.addMassAMU( ZA, AWR * self.neutronMass )
+
+    def printHistory(self):
+
+        print()
+        print('MassTracker history:')
+        for ZA in sorted(self.history):
+            print('    %s' % ZA)
+            for asTarget, AWR, inputAMU_mass, amuMass in self.history[ZA]:
+                diff = amuMass - inputAMU_mass
+                print('        %-6s %14.8e %14.8e %14.8e %10.2e' % (asTarget, AWR, inputAMU_mass, amuMass, diff))

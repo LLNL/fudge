@@ -11,7 +11,9 @@ import argparse
 
 from fudge import map as mapModule
 
-description = """This script converts the specific map file into the requested GNDS format."""
+summaryDocStringFUDGE = '''Converts a GNDS map file from one format to another.'''
+
+description = """This script converts the specified map file into the requested GNDS format."""
 
 parser = argparse.ArgumentParser(description=description)
 parser.add_argument('input', type=str,                      help='The name map file to convert.')

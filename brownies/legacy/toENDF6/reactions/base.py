@@ -117,39 +117,40 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     if outputChannel.genre == enumsModule.Genre.twoBody:
         tryLR = True
     elif outputChannel.genre == enumsModule.Genre.NBody:
-        if( MT == 91 ) : tryLR = True
-    if( tryLR and ( len( outputChannel ) > 1 ) ) :
+        if MT == 91: tryLR = True
+    if tryLR and len(outputChannel) > 1:
         secondProduct = outputChannel[1]
         primaryResidualName, decayProducts, decayChannel, = secondProduct.pid.split( '_' )[0], [], secondProduct.outputChannel
         numberOfDistributions = 0
-        if( not( decayChannel is None ) ) :
+        if decayChannel is not None:
             for decayProduct in decayChannel :
-                if( not( isinstance( decayProduct.distribution[0], unspecifiedModule.Form ) ) ) : numberOfDistributions += 1
+                if not isinstance(decayProduct.distribution[0], unspecifiedModule.Form): numberOfDistributions += 1
                 decayProductName = decayProduct.pid
-                if( decayProductName not in [ primaryResidualName, IDsPoPsModule.photon ] ) : decayProducts.append( decayProductName )
-        if( len( decayProducts ) == 1 ) :   # Kludge for Carbon breakup into 3 alphas.
-            if( ( primaryResidualName in ('C0','C12') ) and ( decayProducts == [ 'He4' ] ) ) : LR = 23
-            else : LR = 1   # FIXME may want to use other more specific LR flags
-        elif( len( decayProducts ) > 1 ) :                                        # This must be a breakup reaction.
-            if( numberOfDistributions > 0 ) :
-                if( numberOfDistributions != len( decayProducts ) ) :
-                    raise Exception( 'Do not know what to do here: MT="%s' % MT )
+                if decayProductName not in [primaryResidualName, IDsPoPsModule.photon]:
+                    decayProducts.append(decayProductName)
+        if len(decayProducts) == 1:   # Kludge for Carbon breakup into 3 alphas.
+            if (primaryResidualName in ('C0', 'C12')) and (decayProducts == ['He4']): LR = 23
+            else: LR = 1   # FIXME may want to use other more specific LR flags
+        elif len(decayProducts) > 1:                                        # This must be a breakup reaction.
+            if numberOfDistributions > 0:
+                if numberOfDistributions != len(decayProducts):
+                    raise Exception('Do not know what to do here: MT="%s' % MT)
                 LR = 1
-            else :
-                MTProducts = endf_endlModule.ENDF_MTtoC_ProductList( 0, '' )
-                MTProducts.productCounts[outputChannel[0].pid] += 1
-                for decayProduct in decayProducts[:-1] :
-                    decayProductID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(decayProduct, specialNuclearParticleIDPoPsModule.Mode.nuclide)
-                    particle = reactionSuite.PoPs[decayProductID]
+            else:
+                MTProducts = endf_endlModule.ENDF_MTtoC_ProductList(0, '')
+                for decayProduct in decayProducts[:-1]:
+                    decayProductID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(
+                        decayProduct, specialNuclearParticleIDPoPsModule.Mode.nuclide)
                     MTProducts.productCounts[decayProductID] += 1
-                for MT_LR in [ 22, 23, 24, 25, 28, 29, 30, 32, 33, 34, 35, 36 ] :   # 39 and 40 not allowed in ENDF6
-                    if( endf_endlModule.endfMTtoC_ProductLists[MT_LR].productCounts == MTProducts.productCounts ) :
+                for MT_LR in [22, 23, 24, 25, 28, 29, 30, 32, 33, 34, 35, 36]:   # 39 and 40 not allowed in ENDF6
+                    if endf_endlModule.endfLRtoC_ProductLists[MT_LR].productCounts == MTProducts.productCounts:
                         LR = MT_LR
                         break
-                if( ( LR == 32 ) and ( primaryResidualName == 'B10' ) and ( decayProducts[-1] == 'He4' ) ) : LR = 35   # Kludge for bad data.
-        if( LR != 0 ) :
-            QM = gndsToENDF6Module.getForm( targetInfo['style'], outputChannel.Q ).evaluate( 0 ) + \
-                 gndsToENDF6Module.getForm( targetInfo['style'], decayChannel.Q ).evaluate( 0 )
+                if (LR == 32) and (primaryResidualName == 'B10') and (decayProducts[-1] == 'He4'):
+                    LR = 35   # Kludge for bad data.
+        if LR != 0:
+            QM = gndsToENDF6Module.getForm(targetInfo['style'], outputChannel.Q).evaluate(0) + \
+                 gndsToENDF6Module.getForm(targetInfo['style'], decayChannel.Q).evaluate(0)
             targetInfo['QM'] = QM
     targetInfo['LRs'][MT] = LR
 

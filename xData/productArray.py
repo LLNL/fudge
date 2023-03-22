@@ -52,13 +52,13 @@ class ProductArray:
         smaller = other.array
         larger = self.__array
         if smaller.shape[2] > larger.shape[2]:
-            smaller, larget = larger, smaller
+            smaller, larger = larger, smaller
 
         n3 = smaller.shape[2]
         if n3 == larger.shape[2]:
             array = larger + smaller
         else:
-            array = larger
+            array = larger.copy()
             array[:,:,0:n3] += smaller
 
         return ProductArray(array)

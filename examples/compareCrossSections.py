@@ -46,7 +46,7 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
 
     ax1 = plt.subplot2grid((4,1), (0,0), rowspan=3)
     mplot = plot2d.__makePlot2d( [plot1, plot2], xAxisSettings, yAxisSettings,
-            legendOn=True, legendXY=legendXY, thePlot = ax1, minY=0 )
+            legendOn=True, legendXY=legendXY, thePlot = ax1 )
     plt.setp( ax1.get_xticklabels(), visible=False )
     plt.setp( ax1.get_label(), visible=False )
 
@@ -57,7 +57,7 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
 
     ax2 = plt.subplot2grid((4,1), (3,0), sharex=ax1)
     plot2d.__makePlot2d( [reldiff_plot], xAxisSettings, yAxisSettings,
-            legendOn=False, thePlot = ax2, minY=0)
+            legendOn=False, thePlot = ax2 )
     # tick marks may be too dense on this y-axis:
     #ax2.get_yaxis().set_ticks( [-0.2,0,0.2] )
 

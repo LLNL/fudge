@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pqu package &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>pqu package &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -17,7 +18,7 @@
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Glossary" href="../glossary.html" />
+    <link rel="next" title="fudge Package" href="../fudge/index.html" />
     <link rel="prev" title="pqu" href="modules.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -30,12 +31,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../glossary.html" title="Glossary"
+          <a href="../fudge/index.html" title="fudge Package"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="modules.html" title="pqu"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">pqu</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pqu package</a></li> 
       </ul>
@@ -46,12 +47,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="pqu-package">
+  <section id="pqu-package">
 <h1>pqu package<a class="headerlink" href="#pqu-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-pqu.NumberDict">
+</section>
+<section id="module-pqu.NumberDict">
 <span id="pqu-numberdict-module"></span><h2>pqu.NumberDict module<a class="headerlink" href="#module-pqu.NumberDict" title="Permalink to this headline">¶</a></h2>
 <p>Dictionary storing numerical values.</p>
 <dl class="py class">
@@ -66,15 +67,15 @@ instances, and multiplication and division by scalars.</p>
 For example, for the unit ‘m**2 / kg**3’, the dictionary items are [(‘kg’, -3), (‘m’, 2)].</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-pqu.PQU">
+</section>
+<section id="module-pqu.PQU">
 <span id="pqu-pqu-module"></span><h2>pqu.PQU module<a class="headerlink" href="#module-pqu.PQU" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="introduction">
+<section id="introduction">
 <h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h3>
 <p>This module contains classes and functions for representing and manipulating a value with units and uncertainty, 
 herein called a “Physical Quantity with Uncertainty” or PQU. For example, if the distance between start and 
 finish lines is measured to be ‘100.1 m’ with an uncertainty of ‘0.4 m’, it can be inputted to PQU as the string
-‘100.1(4) m’ or ‘100.1 +/- 0.4 m’ (both are allowed input forms as well as several others - see <a href="#id3"><span class="problematic" id="id4">`PQU`_</span></a>).</p>
+‘100.1(4) m’ or ‘100.1 +/- 0.4 m’ (both are allowed input forms as well as several others - see <a href="#system-message-2"><span class="problematic" id="problematic-2">`PQU`_</span></a>).</p>
 <p>From this module, most users should only need the PQU class which stores a PQU object and
 supports common math operations (e.g., addition, subtraction, multiplication) including the operation on 
 the units and uncertainty. 
@@ -163,20 +164,15 @@ Some examples are (note - these are the same as the last examples, with uncertai
 <span class="go">1.200e-3 +/- 2.e-6</span>
 </pre></div>
 </div>
-<p>The PQU constructor (i.e., its __init__ method) allows various input options for creating an instance (see <a href="#id5"><span class="problematic" id="id6">`PQU`_</span></a>).</p>
+<p>The PQU constructor (i.e., its __init__ method) allows various input options for creating an instance (see <a href="#system-message-3"><span class="problematic" id="problematic-3">`PQU`_</span></a>).</p>
 <p>Each PQU has three main members. They are a value stored as a <a class="reference internal" href="#pqu.PQU.PQU_float" title="pqu.PQU.PQU_float"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU_float</span></code></a> instance, an uncertainty stored
 as a <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU_uncertainty</span></code></a> instance and a unit stored as a <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhysicalUnit</span></code></a> instance.</p>
-</div>
-<div class="section" id="units-and-conversions">
+</section>
+<section id="units-and-conversions">
 <h3>Units and conversions<a class="headerlink" href="#units-and-conversions" title="Permalink to this headline">¶</a></h3>
 <p>This module uses the SI units along with units for angle and solid angle as its base units. The base units are:</p>
 <blockquote>
 <div><table class="docutils align-default">
-<colgroup>
-<col style="width: 24%" />
-<col style="width: 16%" />
-<col style="width: 60%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Unit</p></th>
 <th class="head"><p>symbol</p></th>
@@ -265,8 +261,8 @@ For example, <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="
 </pre></div>
 </div>
 <p>Also see the methods <a class="reference internal" href="#pqu.PQU.PQU.convertToUnit" title="pqu.PQU.PQU.convertToUnit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.convertToUnit()</span></code></a> and <a class="reference internal" href="#pqu.PQU.PQU.getValueAs" title="pqu.PQU.PQU.getValueAs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.getValueAs()</span></code></a>.</p>
-</div>
-<div class="section" id="changing-non-hardwired-constants">
+</section>
+<section id="changing-non-hardwired-constants">
 <h3>Changing non-hardwired constants<a class="headerlink" href="#changing-non-hardwired-constants" title="Permalink to this headline">¶</a></h3>
 <p>PQU has a set of defined constants that are hardwired and a set that are not hardwired. The non-hardwired
 constants reside in the module pqu_constants.py and are import by PQU when it is first loaded. It is 
@@ -312,10 +308,10 @@ the constant and then importing PQU. For example, as of this writing the element
 <span class="go">&lt;module &#39;pqu.PQU&#39; from &#39;pqu/PQU.pyc&#39;&gt;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="uncertainty-propagation">
+</section>
+<section id="uncertainty-propagation">
 <h3>Uncertainty propagation<a class="headerlink" href="#uncertainty-propagation" title="Permalink to this headline">¶</a></h3>
-<p>This section describes the propagation of uncertainties for the binary operators ‘+’, ‘-‘, ‘*’ and ‘/’ as well as the power operator
+<p>This section describes the propagation of uncertainties for the binary operators ‘+’, ‘-’, ‘*’ and ‘/’ as well as the power operator
 (i.e., ‘**’). Firstly, a comment on the limits of uncertainty propagation. Uncertainties were added mainly to support the inputting
 and outputting (i.e., converting to and from a string) of a physical quantity with an associated uncertainty. As can be seen from the documentation below,
 the supported propagations of uncertainties are limited to simple propagation rules.</p>
@@ -369,14 +365,14 @@ value of the operand is 0. Divide-by-zero always executes a raise of ‘ZeroDivi
 <p>For the rest of this discussion, the two binary operands will be assumed to not be the same instance.
 For addition and subtraction with PQU instances Q1 and Q2 as operands the uncertainty is propagated as dQ3 = sqrt( dQ1**2 + dQ2**2 ).
 For multiplication with PQU instances Q1 and Q2 as operands the uncertainty is propagated using Goodman’s expression with
-uncorrelated values (i.e., as dQ3 = sqrt( ( V2 * dQ1 )**2 + ( V1 * dQ2) <a href="#id1"><span class="problematic" id="id2">**</span></a>2 + ( dQ1 * dQ2 )**2 )). For division, the expression ‘Q1 / Q2’
+uncorrelated values (i.e., as dQ3 = sqrt( ( V2 * dQ1 )**2 + ( V1 * dQ2) <a href="#system-message-1"><span class="problematic" id="problematic-1">**</span></a>2 + ( dQ1 * dQ2 )**2 )). For division, the expression ‘Q1 / Q2’
 is converted to ‘Q1 * Q3’ with ‘Q3 = PQU( 1 / V2, unit = 1 / U2, uncertainty = dQ2 / ( V2 * V2 ) )’ where U2 is the unit of Q2.</p>
 <p>For the power method, simple propagation is perform which is only valid if the uncertainty is small relative to the value. 
 This is, for ‘Q2 = pow( Q1, n1 )’ the uncertainty for Q2 is ‘dQ2 = n1 * V1**(n1-1) * dQ1’.
 Note, the ‘sqrt’ method is equivalent to the ‘pow’ method with power of 0.5.</p>
 <p>For the trigonometry methods, no propagation of uncertainty is performed.</p>
-</div>
-<div class="section" id="pqu-methods-by-functionality">
+</section>
+<section id="pqu-methods-by-functionality">
 <h3>PQU methods by functionality<a class="headerlink" href="#pqu-methods-by-functionality" title="Permalink to this headline">¶</a></h3>
 <p>This section classifies some of the methods in the PQU class by their function.</p>
 <p>For PQU methods that require a second operand (e.g., ‘+’, ‘/’), the second operand will be passed to the
@@ -458,15 +454,15 @@ by its significant digits.</p>
 <div><p>These methods allow for the changing of a PQU instance uncertainty.</p>
 </div></blockquote>
 <p># BRB: need more detail here.</p>
-</div>
-<div class="section" id="supporting-classes">
+</section>
+<section id="supporting-classes">
 <h3>Supporting classes<a class="headerlink" href="#supporting-classes" title="Permalink to this headline">¶</a></h3>
 <p>In addition to the <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> class, the following classes are a part the the PQU module:
 <a class="reference internal" href="#pqu.PQU.Parsers" title="pqu.PQU.Parsers"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parsers</span></code></a>, <a class="reference internal" href="#pqu.PQU.PQU_float" title="pqu.PQU.PQU_float"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU_float</span></code></a>, <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU_uncertainty</span></code></a>, <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhysicalUnit</span></code></a> and NumberDict.
 These classes are only intended as helper classes for the PQU class; hence, they have limited functionality and
 are only intended for internal use.</p>
-</div>
-<div class="section" id="history">
+</section>
+<section id="history">
 <h3>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h3>
 <p>This module is based on the Scientific/Physics/PhysicalQuantities.py module (Last revision: 2007-5-25)
 written by Konrad Hinsen &lt;<a class="reference external" href="mailto:hinsen&#37;&#52;&#48;cnrs-orleans&#46;fr">hinsen<span>&#64;</span>cnrs-orleans<span>&#46;</span>fr</a>&gt; with contributions from Greg Ward and Berthold Hoellmann.</p>
@@ -476,8 +472,8 @@ with feedback from Caleb M. Mattoon, Neil Summers and David Brown.</p>
 CODATA. Other conversion factors (e.g. for British units) come from various 
 sources. I can’t guarantee for the correctness of all entries in the unit table,
 so use this at your own risk.</p>
-</div>
-<div class="section" id="issues-or-features-to-be-aware-of">
+</section>
+<section id="issues-or-features-to-be-aware-of">
 <h3>Issues or features to be aware of<a class="headerlink" href="#issues-or-features-to-be-aware-of" title="Permalink to this headline">¶</a></h3>
 <p>This section describes several oddities about PQU.</p>
 <blockquote>
@@ -571,8 +567,8 @@ The following illustrates the issue:</p></li>
 <span class="go">2.23 c*2.0/9/3.14159265359</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="future-plans">
+</section>
+<section id="future-plans">
 <h3>Future plans<a class="headerlink" href="#future-plans" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <div><ul class="simple">
@@ -580,11 +576,11 @@ The following illustrates the issue:</p></li>
 <li><p>Added uncertainty to data in pqu_constants.py and supporting logic.</p></li>
 </ul>
 </div></blockquote>
-</div>
-<div class="section" id="defined-prefixes-and-units">
+</section>
+<section id="defined-prefixes-and-units">
 <h3>Defined prefixes and units<a class="headerlink" href="#defined-prefixes-and-units" title="Permalink to this headline">¶</a></h3>
 <p>This section outlines the prefixes and unit defined by the PQU module as well as the values used for the physical constant.</p>
-<div class="section" id="prefixes">
+<section id="prefixes">
 <h4>Prefixes<a class="headerlink" href="#prefixes" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">----</span>  <span class="o">------</span> <span class="o">------</span>
 <span class="n">name</span>  <span class="n">factor</span> <span class="n">symbol</span>
@@ -611,8 +607,8 @@ The following illustrates the issue:</p></li>
 <span class="n">yocto</span> <span class="mf">1e-24</span>  <span class="n">y</span>                                              
 </pre></div>
 </div>
-</div>
-<div class="section" id="derived-si-units">
+</section>
+<section id="derived-si-units">
 <h4>Derived SI units<a class="headerlink" href="#derived-si-units" title="Permalink to this headline">¶</a></h4>
 <p>These automatically get prefixes.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--------------------------</span> <span class="o">--------------------------------</span> <span class="o">------</span>
@@ -638,8 +634,8 @@ The following illustrates the issue:</p></li>
 <span class="n">Sievert</span>                    <span class="n">J</span><span class="o">/</span><span class="n">kg</span>                             <span class="n">Sv</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="fundamental-constants">
+</section>
+<section id="fundamental-constants">
 <h4>Fundamental constants<a class="headerlink" href="#fundamental-constants" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Fundamental</span> <span class="n">constants</span> <span class="o">............................................</span> 
 <span class="n">speed</span> <span class="n">of</span> <span class="n">light</span>             <span class="mf">299792458.</span> <span class="o">*</span> <span class="n">m</span> <span class="o">/</span> <span class="n">s</span>               <span class="n">c</span>
@@ -655,8 +651,8 @@ The following illustrates the issue:</p></li>
 <span class="n">Boltzmann</span> <span class="n">constant</span>         <span class="mf">1.38064852e-23</span> <span class="o">*</span> <span class="n">J</span> <span class="o">/</span> <span class="n">K</span>           <span class="n">k</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="more-units">
+</section>
+<section id="more-units">
 <h4>More units<a class="headerlink" href="#more-units" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Time</span> <span class="n">units</span> <span class="o">.......................................................</span> 
 <span class="n">minute</span>                     <span class="mf">60.</span><span class="o">*</span><span class="n">s</span>                            <span class="nb">min</span>
@@ -733,8 +729,8 @@ The following illustrates the issue:</p></li>
 <span class="n">degrees</span> <span class="n">Fahrenheit</span>         <span class="n">degF</span>                             <span class="n">degF</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="prefixed-units">
+</section>
+<section id="prefixed-units">
 <h4>Prefixed units<a class="headerlink" href="#prefixed-units" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-------------</span> <span class="o">------</span> <span class="o">--------------</span>
 <span class="n">name</span>          <span class="n">symbol</span> <span class="n">prefixed</span> <span class="n">units</span>
@@ -809,10 +805,6 @@ A PQU is anything that the staticmethod Parsers.parsePQUString can parse.</p>
 <p>In this section the following notations are used:</p>
 <blockquote>
 <div><table class="docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Notation</p></th>
 <th class="head"><p>Denote</p></th>
@@ -888,7 +880,7 @@ capable of parsing (e.g., ‘1.23’, ‘1.23 m’, ‘1.23%’, ‘1.23(12) m�
 is True (False) self’s uncertainty will be converted to a percent (non-percent) if not already a percent
 (non-percent).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>toPercent</strong> (<cite>bool</cite>) – Specifies whether self’s uncertainty should be percent or not</p>
 </dd>
 </dl>
@@ -900,7 +892,7 @@ is True (False) self’s uncertainty will be converted to a percent (non-percent
 <dd><p>Changes self.uncertainty’s style. If style is the same as self.uncertainty’s style nothing is done. If style
 or self.uncertainty’s style is PQU_uncertainty.pqu_uncertaintyStyleNone as raise is executed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>style</strong> – One of the three PQU_uncertainty styles</p>
 </dd>
 </dl>
@@ -913,13 +905,13 @@ or self.uncertainty’s style is PQU_uncertainty.pqu_uncertaintyStyleNone as rai
 <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> function.</p>
 <p>Also see method <a class="reference internal" href="#pqu.PQU.PQU.equivalent" title="pqu.PQU.PQU.equivalent"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.equivalent()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>other</strong> (<em>A PQU equivalent instance</em>) – The PQU instance to compare to self</p></li>
 <li><p><strong>epsilonFactor</strong> – See the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> function</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>See the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> function</p>
 </dd>
 </dl>
@@ -931,10 +923,10 @@ or self.uncertainty’s style is PQU_uncertainty.pqu_uncertaintyStyleNone as rai
 <dd><p>Changes self’s unit to unit and adjusts the value such that the new value/unit is equivalent to
 the original value/unit. The new unit must be compatible with the original unit of self.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>unit</strong> (<em>str</em>) – a unit equivalent</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>TypeError</strong> – if the unit string is not a known unit or is a unit incompatible with self’s unit</p>
 </dd>
 </dl>
@@ -945,10 +937,10 @@ the original value/unit. The new unit must be compatible with the original unit 
 <code class="sig-name descname">copyToUnit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.copyToUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.copyToUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Like convertToUnit except a copy is made and returned. The copy unit is changed to unit. Self is left unchanged.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>unit</strong> (<em>str</em>) – a unit equivalent</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU">PQU</a></p>
 </dd>
 </dl>
@@ -970,13 +962,13 @@ values within ‘factor times uncertainty’ of its value. That is, the band for
 <p>Note, this is different than the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compare()</span></code></a> method which compares the values using sys.float_info.epsilon
 to calculate a ‘band’ and not their uncertainties.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>other</strong> (<em>a PQU equivalent</em>) – The object to compare to self</p></li>
 <li><p><strong>factor</strong> (<cite>float</cite>) – the 1/2 width in standard deviations of the band</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>1 if self is deemed greater than other, 0 if equal and -1 otherwise</p>
 </dd>
 </dl>
@@ -987,7 +979,7 @@ to calculate a ‘band’ and not their uncertainties.</p>
 <code class="sig-name descname">getSignificantDigits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.getSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.getSignificantDigits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the number of significant digits for self’s value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>int</cite></p>
 </dd>
 </dl>
@@ -999,7 +991,7 @@ to calculate a ‘band’ and not their uncertainties.</p>
 <dd><p>Returns a python float representing self’s uncertainty value. If the uncertainty is a percent, the returned
 float is self’s value times self’s uncertainty value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>float</cite></p>
 </dd>
 </dl>
@@ -1010,7 +1002,7 @@ float is self’s value times self’s uncertainty value.</p>
 <code class="sig-name descname">getUnitAsString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.getUnitAsString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.getUnitAsString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a string representation of self’s unit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -1021,7 +1013,7 @@ float is self’s value times self’s uncertainty value.</p>
 <code class="sig-name descname">getUnitSymbol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pqu.PQU.PQU.getUnitSymbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a string representation of self’s unit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -1038,10 +1030,10 @@ float is self’s value times self’s uncertainty value.</p>
 <code class="sig-name descname">getValueAs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span></em>, <em class="sig-param"><span class="n">asPQU</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.getValueAs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.getValueAs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns self’s value in units of unit. Unit must be compatible with self’s unit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>unit</strong> – The unit to return self’s value in</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>float</cite></p>
 </dd>
 </dl>
@@ -1051,10 +1043,10 @@ float is self’s value times self’s uncertainty value.</p>
 <dt id="pqu.PQU.PQU.inBaseUnits">
 <code class="sig-name descname">inBaseUnits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.inBaseUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.inBaseUnits" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A copy of self converted to base units, i.e. SI units in most cases</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU">PQU</a></p>
 </dd>
 </dl>
@@ -1071,16 +1063,16 @@ quantities in the tuple equals the the original quantity and all the values
 except for the last one are integers. This is used to convert to irregular unit
 systems like hour/minute/second.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>units</strong> (<cite>str</cite> or sequence of <cite>str</cite>) – one or several units</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>one or more physical quantities</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>PQU</cite> or <cite>tuple</cite> of <cite>PQU</cite></p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>TypeError</strong> – if any of the specified units are not compatible with the original unit</p>
 </dd>
 </dl>
@@ -1091,7 +1083,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">17</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a detailed string of self. Mainly for debugging.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -1102,7 +1094,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isAngle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isAngle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of angle and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1113,7 +1105,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isCharge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isCharge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isCharge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of charge and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1124,10 +1116,10 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isCompatible</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isCompatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isCompatible" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self’s unit is compatible with unit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>unit</strong> (<cite>str</cite>) – a unit</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1138,7 +1130,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isCurrent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isCurrent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isCurrent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of current and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1149,7 +1141,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isDimensionless</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isDimensionless"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isDimensionless" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self is dimensionless and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1160,7 +1152,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isEnergy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isEnergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isEnergy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of energy and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1171,7 +1163,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of length and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1182,7 +1174,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isLuminousIntensity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isLuminousIntensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isLuminousIntensity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of luminous intensity and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1193,7 +1185,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isMass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isMass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of mass and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1204,7 +1196,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isMoles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isMoles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isMoles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of mol and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1215,7 +1207,7 @@ systems like hour/minute/second.</p>
 <code class="sig-name descname">isPercent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isPercent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isPercent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if value is a percent and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1227,13 +1219,13 @@ systems like hour/minute/second.</p>
 <dd><p>Returns True if elf has the same unit as the argument unit and False otherwise. Elf and unit can be an instance of string,
 PhysicalUnit or PQU.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>elf</strong> (<em>a unit equivalent</em>) – The instance to compare to unit</p></li>
 <li><p><strong>unit</strong> (<em>a unit equivalent</em>) – The desired unit</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1244,7 +1236,7 @@ PhysicalUnit or PQU.</p>
 <code class="sig-name descname">isSolidAngle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isSolidAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isSolidAngle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of solid angle and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1255,7 +1247,7 @@ PhysicalUnit or PQU.</p>
 <code class="sig-name descname">isSpin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isSpin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isSpin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of spin (i.e., same as ‘hbar’) and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1266,7 +1258,7 @@ PhysicalUnit or PQU.</p>
 <code class="sig-name descname">isTemperature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isTemperature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of temperature and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1277,7 +1269,7 @@ PhysicalUnit or PQU.</p>
 <code class="sig-name descname">isTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isTime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self has unit of time and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1289,7 +1281,7 @@ PhysicalUnit or PQU.</p>
 <dd><p>Changes the percent flag only when self is dimensionless and isPercent != self.isPercent( ).
 Otherwise, a raise is executed.  For scaleValue argument see <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>isPercent</strong> – See <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a></p></li>
 <li><p><strong>scaleValue</strong> – See <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a></p></li>
@@ -1333,7 +1325,7 @@ this case) and the ‘lb’ and ‘kg’ are all converted to ‘lb’ (or ‘kg
 <code class="sig-name descname">toString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">keepPeriod</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.toString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a string representation of self (e.g., ‘35 +/- 1.2% J’).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -1345,7 +1337,7 @@ this case) and the ‘lb’ and ‘kg’ are all converted to ‘lb’ (or ‘kg
 <dd><p>If value is True, calls self.value’s truncate method. If uncertainty is True, calls self.uncertainty’s truncate method.
 See <a class="reference internal" href="#pqu.PQU.PQU_float.truncate" title="pqu.PQU.PQU_float.truncate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.truncate()</span></code></a></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> (<cite>bool</cite>) – If True self’s value is truncated</p></li>
 <li><p><strong>uncertainty</strong> (<cite>bool</cite>) – If True self’s uncertainty is truncated</p></li>
@@ -1382,10 +1374,10 @@ is provided by the python float class as well as methods to operator on this inf
 <dd><p>Returns the order of value. Value must be convertible to a float. A float’s order is the exponent in the
 representation ‘m * 10**o’ where ‘m’ is the mantissa and ‘o’ is the exponent. For example, 1.234e43 has order 43.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> – any object convertible to a float.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer</p>
 </dd>
 </dl>
@@ -1402,10 +1394,10 @@ To check for this, the value is multiplied by a small (of order sys.float_info.e
 changes.  If it does, value is set to the smallest multiplier greater than 1 for which order is changed. 
 The fixed value and its order are returned.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> – any object convertible to a float.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple of float and integer</p>
 </dd>
 </dl>
@@ -1416,7 +1408,7 @@ The fixed value and its order are returned.</p>
 <code class="sig-name descname">getOrder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.getOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.getOrder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns self’s order.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>int</cite></p>
 </dd>
 </dl>
@@ -1427,7 +1419,7 @@ The fixed value and its order are returned.</p>
 <code class="sig-name descname">getSignificantDigits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.getSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.getSignificantDigits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns self’s significant digits.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>int</cite></p>
 </dd>
 </dl>
@@ -1444,7 +1436,7 @@ The fixed value and its order are returned.</p>
 <code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">17</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a detailed string of self. Mainly for debugging.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -1455,7 +1447,7 @@ The fixed value and its order are returned.</p>
 <code class="sig-name descname">isPercent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.isPercent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.isPercent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self is a percent and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1470,7 +1462,7 @@ Otherwise, a raise is executed.</p>
 <p>If scaleValue is False, the value is not changed; otherwise, value is scale by 0.01 (100)
 if isPercent is True (False).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>isPercent</strong> (<cite>bool</cite>) – </p>
 </dd>
 </dl>
@@ -1483,7 +1475,7 @@ if isPercent is True (False).</p>
 <code class="sig-name descname">setSignificantDigits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.setSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.setSignificantDigits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets self’s significant digits to significantDigits.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>significantDigits</strong> (<cite>int</cite>) – </p>
 </dd>
 </dl>
@@ -1501,7 +1493,7 @@ something “reasonable”. The significantDigits are determined by using PQU.fl
 <code class="sig-name descname">toString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trimZeros</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">keepPeriod</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">includePercent</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">favorEFormBy</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_float.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_float.toString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a string representation of self (i.e., ‘1.234e6’ or ‘12%’) using function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>trimZeros</strong> (<em>bool</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a></p></li>
 <li><p><strong>keepPeriod</strong> (<em>bool</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal notranslate"><span class="pre">floatToShortestString()</span></code></a></p></li>
@@ -1509,7 +1501,7 @@ something “reasonable”. The significantDigits are determined by using PQU.fl
 <li><p><strong>significantDigits</strong> – (<em>int</em> or <em>None</em>) Used to override self’s default significantDigits</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -1522,7 +1514,7 @@ something “reasonable”. The significantDigits are determined by using PQU.fl
 and significantDigits = 4 then the value is set to 3.454. If significantDigits is None, self’s significantDigits
 is used.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>significantDigits</strong> (None or <cite>int</cite>) – </p>
 </dd>
 </dl>
@@ -1554,7 +1546,7 @@ The members are:</p>
 <dd><p>Returns self’s value. If value is a percent, returned result is multiplied by argument v first, where v
 is expected to be the number associated the the percent value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>float</cite></p>
 </dd>
 </dl>
@@ -1565,7 +1557,7 @@ is expected to be the number associated the the percent value.</p>
 <code class="sig-name descname">getStyle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.getStyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.getStyle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns self’s style.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>One of the three uncertainty styles</p>
 </dd>
 </dl>
@@ -1576,7 +1568,7 @@ is expected to be the number associated the the percent value.</p>
 <code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">17</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a detailed string of self. Mainly for debugging.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -1587,7 +1579,7 @@ is expected to be the number associated the the percent value.</p>
 <code class="sig-name descname">isPercent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.isPercent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.isPercent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self is a percent and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1598,7 +1590,7 @@ is expected to be the number associated the the percent value.</p>
 <code class="sig-name descname">isUncertainty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.isUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.isUncertainty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns False is style is pqu_uncertaintyStyleNone and True otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1624,13 +1616,13 @@ is expected to be the number associated the the percent value.</p>
 <code class="sig-name descname">toString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">' '</span></em>, <em class="sig-param"><span class="n">significantDigits</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU_uncertainty.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU_uncertainty.toString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a string representation of self (i.e., ‘+/- 1.2%’).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<em>str</em>) – A prefix for the ‘+/-‘ style</p></li>
+<li><p><strong>prefix</strong> (<em>str</em>) – A prefix for the ‘+/-’ style</p></li>
 <li><p><strong>significantDigits</strong> – Passed onto method <a class="reference internal" href="#pqu.PQU.PQU_float.toString" title="pqu.PQU.PQU_float.toString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.toString()</span></code></a></p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -1666,13 +1658,13 @@ characters after the last one used for converting the float.  For example, with 
 the returned tuple is:</p>
 <p>( PQU_float( 1.2345e4, 5 ), None, ‘ABCD XYS’ ).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>str1</strong> – String to parse.</p></li>
 <li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.PQU_float" title="pqu.PQU.PQU_float">PQU_float</a>, integer | None, string )</p>
 </dd>
 </dl>
@@ -1687,15 +1679,6 @@ unit is an instance of PhysicalUnit and uncertainty is an instance of PQU_uncert
 the string ‘(#)’ where ‘#’ is a 1 or 2 digit number, +/- represents the string ‘+/- F’, % is itself
 and u is a unit.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 11%" />
-<col style="width: 18%" />
-<col style="width: 10%" />
-<col style="width: 24%" />
-<col style="width: 24%" />
-<col style="width: 7%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>#</p></th>
 <th class="head"><p>Form</p></th>
@@ -1859,10 +1842,10 @@ and u is a unit.</p>
 </table>
 <p>Note 1) 5% of 234 is 11.7 rounded to 12.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>str1</strong> – String to parse.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.PQU_float" title="pqu.PQU.PQU_float">PQU_float</a>, <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit">PhysicalUnit</a>, <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty">PQU_uncertainty</a> )</p>
 </dd>
 </dl>
@@ -1877,13 +1860,13 @@ a PQU_uncertainty of style pqu_uncertaintyStyleParenthesis. Characters after the
 as the second item. For example, with str1 = ‘(34) ABCD XYS’ the returned tuple is:</p>
 <p>( PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleParenthesis, 34, significantDigits = 2 ), ‘ ABCD XYS’ ).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>str1</strong> – String to parse.</p></li>
 <li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty">PQU_uncertainty</a>, string )</p>
 </dd>
 </dl>
@@ -1892,20 +1875,20 @@ as the second item. For example, with str1 = ‘(34) ABCD XYS’ the returned tu
 <dl class="py method">
 <dt id="pqu.PQU.Parsers.parsePlusMinusUncertainty">
 <em class="property">static </em><code class="sig-name descname">parsePlusMinusUncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str1</span></em>, <em class="sig-param"><span class="n">fullStr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#Parsers.parsePlusMinusUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.Parsers.parsePlusMinusUncertainty" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method parses the beginning of str1 for the sub-string ‘+/-‘ followed by a float string. An arbitrary number of 
-white spaces can exists before the ‘+/-‘ sub-string and between it and the float string. This method
+<dd><p>This method parses the beginning of str1 for the sub-string ‘+/-’ followed by a float string. An arbitrary number of 
+white spaces can exists before the ‘+/-’ sub-string and between it and the float string. This method
 returns a tuple of length 2. The first item of the tuple is float value returned as a PQU_uncertainty
 of style pqu_uncertaintyStylePlusMinus. Characters after the last one used for converting the float are 
 returned as the second item. For example, with str1 = ‘ +/-  12. ABCD XYS’ the returned tuple is:</p>
 <p>( PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, 12. ), ‘ ABCD XYS’ )</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>str1</strong> – String to parse.</p></li>
 <li><p><strong>fullStr</strong> – String which str1 is a part of.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>( <a class="reference internal" href="#pqu.PQU.PQU_uncertainty" title="pqu.PQU.PQU_uncertainty">PQU_uncertainty</a>, string )</p>
 </dd>
 </dl>
@@ -1928,7 +1911,7 @@ returned as the second item. For example, with str1 = ‘ +/-  12. ABCD XYS’ t
 the powers of each of the SI base units that enter into it. Units can be 
 multiplied, divided, and raised to integer powers.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>symbols</strong> (<cite>dict</cite> or <cite>str</cite>) – a dictionary mapping each symbol component to its associated integer
 power (e.g., <code class="docutils literal notranslate"><span class="pre">{'m':</span> <span class="pre">1,</span> <span class="pre">'s':</span> <span class="pre">-1}</span></code>) for <cite>m/s</cite>). As a shorthand, a string may be 
@@ -1941,18 +1924,18 @@ passed which is assigned an implicit power 1.</p></li>
 </dl>
 <dl class="py method">
 <dt id="pqu.PQU.PhysicalUnit.conversionFactorTo">
-<code class="sig-name descname">conversionFactorTo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.conversionFactorTo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.conversionFactorTo" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conversionFactorTo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em>, <em class="sig-param"><span class="n">ignoreTemperatureOffsets</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.conversionFactorTo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.conversionFactorTo" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> (<cite>PhysicalUnit</cite>) – another unit</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the conversion factor from this unit to another unit</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>float</cite></p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>TypeError</strong> – if the units are not compatible</p>
 </dd>
 </dl>
@@ -1962,16 +1945,16 @@ passed which is assigned an implicit power 1.</p></li>
 <dt id="pqu.PQU.PhysicalUnit.conversionTupleTo">
 <code class="sig-name descname">conversionTupleTo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.conversionTupleTo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.conversionTupleTo" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> (<cite>PhysicalUnit</cite>) – another unit</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the conversion factor and offset from this unit to another unit</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(<cite>float</cite>, <cite>float</cite>)</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>TypeError</strong> – if the units are not compatible</p>
 </dd>
 </dl>
@@ -1982,7 +1965,7 @@ passed which is assigned an implicit power 1.</p></li>
 <code class="sig-name descname">isAngle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.isAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.isAngle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self is an angle and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -1993,13 +1976,13 @@ passed which is assigned an implicit power 1.</p></li>
 <code class="sig-name descname">isCompatible</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.isCompatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.isCompatible" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self is compatible with other and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> (<cite>PhysicalUnit</cite>) – another unit</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>True</cite> if the units are compatible, i.e. if the powers of the base units are the same</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -2010,7 +1993,7 @@ passed which is assigned an implicit power 1.</p></li>
 <code class="sig-name descname">isDimensionless</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.isDimensionless"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.isDimensionless" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self is dimensionless and False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>bool</cite></p>
 </dd>
 </dl>
@@ -2021,7 +2004,7 @@ passed which is assigned an implicit power 1.</p></li>
 <code class="sig-name descname">setSymbol</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.setSymbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.setSymbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets self’s symbols to symbol with power 1.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>symbol</strong> (<cite>str</cite>) – </p>
 </dd>
 </dl>
@@ -2040,10 +2023,10 @@ if self has units of ‘km/m’ then the returned PQU is equivalent to ‘1e3 m/
 <code class="sig-name descname">symbol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a string representation of self.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a string representation of self.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -2071,17 +2054,17 @@ epsilonFactor * sys.float_info.epsilon. The relative difference is defined as</p
 </div></blockquote>
 <p>For the default epsilonFactor = 0, a 0 is return (i.e., the two floats are ‘equal’) only if they have the same value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value1</strong> (<em>any object which float</em><em>(</em><em>) </em><em>accepts</em>) – value to compare to value2</p></li>
 <li><p><strong>value2</strong> (<em>any object which float</em><em>(</em><em>) </em><em>accepts</em>) – value to compare to value1</p></li>
 <li><p><strong>epsilonFactor</strong> (<em>any object which float</em><em>(</em><em>) </em><em>accepts</em>) – The factor to scale sys.float_info.epsilon to determine the fuzz factor.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>1 if value1 is deemed greater than value2, 0 if equal and -1 otherwise</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>int</cite></p>
 </dd>
 </dl>
@@ -2097,7 +2080,7 @@ epsilonFactor * sys.float_info.epsilon. The relative difference is defined as</p
 <code class="sig-prename descclassname">pqu.PQU.</code><code class="sig-name descname">description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a string describing all available units.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -2116,7 +2099,7 @@ the F-form is returned.</p>
 not “1.234000000000” or “1.23400000000e+00” while the string for the float 1.234e-9 will be “1.234-9”, and
 not “0.00000000123400000000” or “1.23400000000e-09”.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> (<em>float</em>) – The float to convert.</p></li>
 <li><p><strong>significantDigits</strong> (<em>integer</em>) – The number of significant digits desired. Restricted to the range 0 to 24 inclusive.</p></li>
@@ -2128,7 +2111,7 @@ with the shortest representation is determined.</p></li>
 (i.e., ‘+’ or ‘-‘). Otherwise, only negative values will have a sign.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -2152,7 +2135,7 @@ the F-form is returned.</p>
 not “1.234000000000” or “1.23400000000e+00” while the string for the float 1.234e-9 will be “1.234-9”, and
 not “0.00000000123400000000” or “1.23400000000e-09”.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> (<em>float</em>) – The float to convert.</p></li>
 <li><p><strong>significantDigits</strong> (<em>integer</em>) – The number of significant digits desired. Restricted to the range 0 to 24 inclusive.</p></li>
@@ -2164,7 +2147,7 @@ with the shortest representation is determined.</p></li>
 (i.e., ‘+’ or ‘-‘). Otherwise, only negative values will have a sign.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>str</cite></p>
 </dd>
 </dl>
@@ -2186,15 +2169,6 @@ same units.</p>
 units. As it now supports dimensionless units, this function may not be of much value but should be kept anyway.</p>
 <dl>
 <dt>Options for input are:</dt><dd><table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 12%" />
-<col style="width: 9%" />
-<col style="width: 12%" />
-<col style="width: 12%" />
-<col style="width: 12%" />
-<col style="width: 38%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"></th>
 <th class="head"></th>
@@ -2296,7 +2270,7 @@ unitTo</p></td>
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> (<em>PQU instance</em><em> or </em><em>any object which float</em><em>(</em><em>) </em><em>accepts</em>) – The number object convert if requested</p></li>
 <li><p><strong>unitFrom</strong> (<em>None</em><em> or </em><em>instance from which units can be determined</em>) – If not None, the unit for value</p></li>
@@ -2304,25 +2278,25 @@ unitTo</p></td>
 <li><p><strong>asPQU</strong> (<cite>bool</cite>) – If True returned instance is a PQU; otherwise, it is a float</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>value - in units of unitTo if unitTo is not None</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>float</cite> or PQU instance</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-</div>
-</div>
-<div class="section" id="module-pqu.pqu_constants">
+</section>
+</section>
+</section>
+<section id="module-pqu.pqu_constants">
 <span id="pqu-pqu-constants-module"></span><h2>pqu.pqu_constants module<a class="headerlink" href="#module-pqu.pqu_constants" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-pqu">
+</section>
+<section id="module-pqu">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pqu" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -2369,8 +2343,8 @@ unitTo</p></td>
   <p class="topless"><a href="modules.html"
                         title="previous chapter">pqu</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../glossary.html"
-                        title="next chapter">Glossary</a></p>
+  <p class="topless"><a href="../fudge/index.html"
+                        title="next chapter">fudge Package</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -2402,12 +2376,12 @@ unitTo</p></td>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../glossary.html" title="Glossary"
+          <a href="../fudge/index.html" title="fudge Package"
              >next</a> |</li>
         <li class="right" >
           <a href="modules.html" title="pqu"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >pqu</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pqu package</a></li> 
       </ul>

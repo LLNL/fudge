@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-# 
+#
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -28,9 +28,11 @@ from PyQt5.QtGui import QColor, QPalette, QFont, QIntValidator, QDoubleValidator
 from collections import OrderedDict
 
 import re
+import sys
 import numpy
 import warnings
 
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
@@ -93,7 +95,7 @@ class MainWindow(QMainWindow):
         widthInches, heightInches = pyplot.rcParams["figure.figsize"]
         width = widthInches*dpi*magnification
         height = heightInches*dpi*magnification
-        self.setGeometry(0, 0, width, height)
+        self.setGeometry(0, 0, int(width), int(height))
 
         # generate plot
         self.plotInstance = PlotCanvas(self, widthInches, heightInches, plotAttributes, plotData, dpi, plotType)
@@ -109,7 +111,7 @@ class MainWindow(QMainWindow):
         self.dialogWindow = DialogWindow(width, height, plotAttributes, plotObject=self.plotInstance, plotType=plotType,
                                          parent=self)
 
-        self.dialogWindow.setGeometry(x0, y0, width, height)
+        self.dialogWindow.setGeometry(int(x0), int(y0), int(width), int(height))
         self.dialogWindow.show()
 
     def closeEvent(self, event):
@@ -160,7 +162,7 @@ class PlotCanvas(FigureCanvas):
         if plotType == '2d':
             self.plot2d(plotData, plotAttributes)
             assert self.plotAxis is not None
-        
+
             self.legendDraggableNotScrollable = len(self.plotAxis.lines) < 10
             self.percentPlotWidth = 1.0 if self.legendDraggableNotScrollable else 0.8
             self.legend = self.addLegend(self.legendDraggableNotScrollable)
@@ -173,7 +175,7 @@ class PlotCanvas(FigureCanvas):
     def plot2d(self, plotData, plotAttributes):
         self.plotAxis = self.figure.add_subplot(111)
 
-        floatInfo = numpy.finfo(numpy.float())
+        floatInfo = numpy.finfo(float(0))
         self.dataLimits = {'x': [floatInfo.max, floatInfo.min], 'y': [floatInfo.max, floatInfo.min]}
         for plotLegend in plotData.keys():
             if (not isinstance(plotData[plotLegend], (list, tuple))) or (len(plotData[plotLegend]) != 2):
@@ -289,7 +291,7 @@ class PlotCanvas(FigureCanvas):
                 legend.set_draggable(True)
 
             else:
-                transformation = self.legend.axes.transAxes.inverted()                
+                transformation = self.legend.axes.transAxes.inverted()
                 boundingBox = self.legend.get_bbox_to_anchor().transformed(transformation)
                 location = self.legend.get_window_extent().transformed(transformation)
                 legend = self.plotAxis.legend(loc=(location.x0, location.y0), bbox_to_anchor=boundingBox)
@@ -432,10 +434,14 @@ class OverallPlotOptions(QWidget):
 
         # X range
         deltaYCoordinate = 35
+        maxSystemFloat = sys.float_info.max
+        maxNumberDigits = 16
         yCoordinate += deltaYCoordinate if plotType == '2d' else deltaYCoordinate + deltaYCoordinateZLabel
         self.xRangeLabel = self.createTextBoxLabel('        x range = ', yCoordinate)
-        self.xRangeLower = self.createTextBox(plotAttributes['xMin'], yCoordinate, 100, self.updateXRange )
-        self.xRangeUpper = self.createTextBox(plotAttributes['xMax'], yCoordinate, 100, self.updateXRange, moveX=205 )
+        self.xRangeLower = self.createTextBox(plotAttributes['xMin'], yCoordinate, 100, self.updateXRange, \
+            setValidator=QDoubleValidator(-maxSystemFloat, maxSystemFloat, maxNumberDigits) )
+        self.xRangeUpper = self.createTextBox(plotAttributes['xMax'], yCoordinate, 100, self.updateXRange, \
+            setValidator=QDoubleValidator(-maxSystemFloat, maxSystemFloat, maxNumberDigits), moveX=205 )
         self.xLog = self.createCheckBox('xlog', 350, yCoordinate, self.axisHandle.get_xscale() == 'log', self.toggleXScale)
         self.xrange = plotObject.dataLimits['x']
 
@@ -446,8 +452,10 @@ class OverallPlotOptions(QWidget):
         deltaYCoordinate = 25
         yCoordinate += deltaYCoordinate
         self.yRangeLabel = self.createTextBoxLabel('        y range = ', yCoordinate)
-        self.yRangeLower = self.createTextBox(plotAttributes['yMin'], yCoordinate, 100, self.updateYRange )
-        self.yRangeUpper = self.createTextBox(plotAttributes['yMax'], yCoordinate, 100, self.updateYRange, moveX=205 )
+        self.yRangeLower = self.createTextBox(plotAttributes['yMin'], yCoordinate, 100, self.updateYRange, \
+            setValidator=QDoubleValidator(-maxSystemFloat, maxSystemFloat, maxNumberDigits) )
+        self.yRangeUpper = self.createTextBox(plotAttributes['yMax'], yCoordinate, 100, self.updateYRange, \
+            setValidator=QDoubleValidator(-maxSystemFloat, maxSystemFloat, maxNumberDigits), moveX=205 )
         self.yLog = self.createCheckBox('ylog', 350, yCoordinate, self.axisHandle.get_yscale() == 'log',
                                         self.toggleYScale)
 
@@ -728,7 +736,7 @@ class OverallPlotOptions(QWidget):
             self.axisHandle.grid(True)
 
         else:
-            self.plotInstance.gridOn = False            
+            self.plotInstance.gridOn = False
             self.axisHandle.grid(False)
 
         self.figureHandle.canvas.draw_idle()
@@ -909,7 +917,7 @@ class IndividualPlotOptions(QWidget):
 
         # noinspection PyArgumentList
         textBox = QLineEdit(self, objectName=objectName)
-        textBox.resize(xSize, self.ySize)
+        textBox.resize(int(xSize), int(self.ySize))
         textBox.setText(defaultText)
 
         if setValidator is not None:
@@ -948,7 +956,7 @@ class IndividualPlotOptions(QWidget):
             warnings.warn('Default %s for plot number %d may be used but is intentionally not made available in the '
                           'drop-down list.' % (plotAttribute, plotIndex))
 
-        comboBox.resize(xSize, self.ySize)
+        comboBox.resize(int(xSize), int(self.ySize))
         # noinspection PyUnresolvedReferences
         comboBox.currentIndexChanged.connect(connectMethod)
 

@@ -18,7 +18,6 @@ class Form( baseModule.Form ) :
     def __init__(self, label, productFrame=xDataEnumsModule.Frame.lab):
 
         if productFrame is None:
-            raise 'hell'
             productFrame = xDataEnumsModule.Frame.lab      # This is a kludge and needs to be fixed. Ergo, None should never be allowed as a productFrame value.
         baseModule.Form.__init__( self, label, productFrame, [] )
 

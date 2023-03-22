@@ -74,21 +74,19 @@ class Reaction(baseModule.Base_reaction2):
         if( self.outputChannel > other.outputChannel ) : return(  1 )
         return( 0 )
 
-    def getThreshold( self, unit ) :
+    def getThreshold(self, unit):
 
-        Q = self.getQ( unit = unit, final = False )
-        if( Q >= 0. ) : return( 0. )
-        reactionSuite = self.getReactionSuite( )
+        Q = self.getQ(unit = unit, final = False)
+        if Q >= 0.: return 0.
+        reactionSuite = self.getReactionSuite()
         projectile = reactionSuite.PoPs[reactionSuite.projectile]
-        projectileMass = projectile.mass[0].float( 'amu' )
+        projectileMass = projectile.getMass('amu')
         targetID = reactionSuite.target
-        if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs[targetID].pid
+        if targetID in reactionSuite.PoPs.aliases:
+            targetID = reactionSuite.PoPs[targetID].pid
         target = reactionSuite.PoPs[targetID]
-        try:
-            targetMass = target.mass[0].float( 'amu' )
-        except IndexError:
-            targetMass = target.getMass('amu')
-        return( -Q * ( 1. + projectileMass / targetMass ) )
+        targetMass = target.getMass('amu')
+        return -Q * (1. + projectileMass / targetMass)
 
     def isBasicReaction( self ) :
 

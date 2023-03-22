@@ -140,8 +140,8 @@ class Particle( particleModule.Particle ) :
         """
 
 # FIXME Still need to correct for electron masses and binding energy.
-        if( len( self.mass ) > 0 ) : return( self.mass[0].float( unit ) )
-        return( self.nuclide.getMass( unit ) )
+        if len(self.mass) > 0: return self.mass[0].float(unit)
+        return self.nuclide.getMass(unit)
 
     def replicate( self, other ) :
         """

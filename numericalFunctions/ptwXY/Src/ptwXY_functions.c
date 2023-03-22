@@ -158,7 +158,7 @@ ptwXYPoints *ptwXY_convolution( statusMessageReporting *smr, ptwXYPoints *ptwXY1
     n = n1 * n2;
     if( mode == 0 ) {
         mode = 1;
-        if( n > 1000 ) mode = -1;
+        if( n > 10000 ) mode = -1;
     }
     if( n > 100000 ) mode = -1;
     if( ( convolute = ptwXY_new( smr, ptwXY_interpolationLinLin, NULL, 1., accuracy, 400, 40, 0 ) ) == NULL ) {
@@ -172,7 +172,7 @@ ptwXYPoints *ptwXY_convolution( statusMessageReporting *smr, ptwXYPoints *ptwXY1
     if( ptwXY_setValueAtX( smr, convolute, rangeMin, 0. ) != nfu_Okay ) goto Err;
 
     if( mode < 0 ) {
-        dy = ( rangeMax - rangeMin ) / 400;
+        dy = ( rangeMax - rangeMin ) / 2000;
         for( y = rangeMin + dy; y < rangeMax; y += dy ) {
             if( ptwXY_convolution2( smr, f1, f2, y, rangeMin, &c ) != nfu_Okay ) goto Err;
             if( ptwXY_setValueAtX( smr, convolute, y, c ) != nfu_Okay ) goto Err;

@@ -292,6 +292,23 @@ endfMTtoC_ProductList_excitedStateInitializer( endfMTtoC_ProductLists, 800, 849,
 endfMTtoC_ProductLists[851] = ENDF_MTtoC_ProductList( -1, "Lumped reaction covariances." )
 endfMTtoC_ProductList_excitedStateInitializer( endfMTtoC_ProductLists, 875, 891, 12, "2n", ns = 2 )
 
+# also need dictionary of products for LR 'breakup' flags (product list excludes the initial 2-body product):
+endfLRtoC_ProductLists = {
+    22: ENDF_MTtoC_ProductList(-1, "(z,r+a)", 0, 0, 0, 0, 0, 0, 1, 0),
+    23: ENDF_MTtoC_ProductList(-1, "(z,r+3a)", 0, 0, 0, 0, 0, 0, 3, 0),
+    24: ENDF_MTtoC_ProductList(-1, "(z,r+na)", 0, 1, 0, 0, 0, 0, 1, 0),
+    25: ENDF_MTtoC_ProductList(-1, "(z,r+2na)", 0, 2, 0, 0, 0, 0, 1, 0),
+    28: ENDF_MTtoC_ProductList(-1, "(z,r+p)", 0, 0, 1, 0, 0, 0, 0, 0),
+    29: ENDF_MTtoC_ProductList(-1, "(z,r+2a)", 0, 0, 0, 0, 0, 0, 2, 0),
+    30: ENDF_MTtoC_ProductList(-1, "(z,r+n2a)", 0, 1, 0, 0, 0, 0, 2, 0),
+    32: ENDF_MTtoC_ProductList(-1, "(z,r+d)", 0, 0, 0, 1, 0, 0, 0, 0),
+    33: ENDF_MTtoC_ProductList(-1, "(z,r+t)", 0, 0, 0, 0, 1, 0, 0, 0),
+    34: ENDF_MTtoC_ProductList(-1, "(z,r+H)", 0, 0, 0, 0, 0, 1, 0, 0),
+    35: ENDF_MTtoC_ProductList(-1, "(z,r+d2a)", 0, 0, 0, 1, 0, 0, 2, 0),
+    36: ENDF_MTtoC_ProductList(-1, "(z,r+t2a)", 0, 0, 0, 0, 1, 0, 2, 0)
+}
+
+
 def getCSFromMT( MT ) :
 
     if( MT ==   1 ) : return(   1, 0 )     # (z,total)
@@ -509,16 +526,19 @@ def ENDF_MTZAEquation( projectileZA, targetZA, MT ) :
     compoundZA = projectileZA + targetZA
     residualZA = compoundZA
     productCountList = []
-    adder, equationZA, equation = '', [], '%s + %s ->' % \
-            ( chemicalElementMiscPoPsModule.idFromZA( projectileZA ), chemicalElementMiscPoPsModule.idFromZA( targetZA ) )
+    if projectileZA == 0:
+        projectile = IDsPoPsModule.photon
+    else:
+        projectile = chemicalElementMiscPoPsModule.idFromZA(projectileZA)
+    adder, equationZA, equation = '', [], '%s + %s ->' % (projectile, chemicalElementMiscPoPsModule.idFromZA(targetZA))
     for product in productCounts :
-        if( product == IDsPoPsModule.photon ) :
+        if product == IDsPoPsModule.photon:
             productZA = 0
         else :
-            productZA = miscENDLModule.getZ_A_suffix_andZAFromName( product )[-1]
-        if( productCounts[product] > 0 ) : productCountList.append( [ productZA, product, productCounts[product] ] )
-    productCountList.sort( )
-    for productZA, token, count in productCountList :
+            productZA = miscENDLModule.getZ_A_suffix_andZAFromName(product)[-1]
+        if productCounts[product] > 0: productCountList.append([productZA, product, productCounts[product]])
+    productCountList.sort()
+    for productZA, token, count in productCountList:
         residualZA -= count * productZA
         for idx in range( count ) :
             equation += ' %s%s' % ( adder, token )

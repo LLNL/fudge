@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.reactionSuite &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.reactionSuite &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.reactionSuite</a></li> 
       </ul>
@@ -50,6 +50,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
+<span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
@@ -447,7 +448,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check all data in the reactionSuite, returning a gnds.warning.context object with list of warnings.</span>
 
-<span class="sd">        Currently supported options:</span>
+<span class="sd">        Currently supported options::</span>
+
 <span class="sd">            &#39;branchingRatioSumTolerance&#39; 1e-6        # branching ratios must sum to 1 (within this tolerance)</span>
 <span class="sd">            &#39;dQ&#39;                         &#39;1e-3 MeV&#39;  # tolerance for comparing tabulated / calculated Q values</span>
 <span class="sd">            &#39;dThreshold&#39;                 &#39;1e-3 MeV&#39;</span>
@@ -465,7 +467,8 @@
 <span class="sd">            &#39;failOnException&#39;            False       # if True, crash instead of converting exceptions to warnings</span>
 <span class="sd">            &#39;cleanUpTempFiles&#39;           True        # remove derived data that was produced during checking</span>
 
-<span class="sd">        Currently unused options:</span>
+<span class="sd">        Currently unused options::</span>
+
 <span class="sd">            &#39;checkForEnDepData&#39;         False</span>
 <span class="sd">            &#39;allowZeroE&#39;                False</span>
 <span class="sd">            &#39;xCloseEps&#39;                 None</span>
@@ -804,8 +807,8 @@
 <div class="viewcode-block" id="ReactionSuite.getMassRatio"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.getMassRatio">[docs]</a>    <span class="k">def</span> <span class="nf">getMassRatio</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__massRatio&#39;</span> <span class="p">):</span>
-            <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span>
-            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__massRatio</span> <span class="o">=</span> <span class="p">(</span><span class="n">M</span> <span class="o">/</span> <span class="p">(</span><span class="n">M</span><span class="o">+</span><span class="n">m</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__massRatio</span></div>
 
@@ -855,7 +858,7 @@
 
 <span class="sd">        If &#39;channel&#39; is an int, then we assume it&#39;s an ENDF MT</span>
 
-<span class="sd">        Raises &#39;KeyError&#39; if specified channel can&#39;t be found.</span>
+<span class="sd">        Returns None if no matching reaction is found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># If channel is an int, it might be an ENDF MT, so check those first</span>
@@ -866,7 +869,16 @@
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># translate special channel names:</span>
-        <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="s1">&#39;elastic&#39;</span><span class="p">:</span> <span class="n">channel</span> <span class="o">=</span> <span class="n">channel_tr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elasticReactionLabel</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="s1">&#39;elastic&#39;</span><span class="p">:</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">channel_tr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elasticReactionLabel</span><span class="p">(</span> <span class="p">)</span>
+
+            <span class="c1"># FIXME we&#39;re not dealing with metastables or other aliases very well right now, need to rework this.</span>
+            <span class="c1"># special treatment to check for elastic reactions with labels like &#39;n + Am242_m1&#39; (instead of Am242_e2):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
+                <span class="n">metastableElastic</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="si">}</span><span class="s2"> + </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">if</span> <span class="n">metastableElastic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">:</span>
+                    <span class="n">channel</span> <span class="o">=</span> <span class="n">channel_tr</span> <span class="o">=</span> <span class="n">metastableElastic</span>
+
         <span class="k">elif</span> <span class="n">channel</span><span class="o">==</span><span class="s1">&#39;capture&#39;</span><span class="p">:</span> <span class="n">channel_tr</span><span class="o">=</span><span class="s1">&#39;z,gamma&#39;</span>
         <span class="k">else</span><span class="p">:</span> <span class="n">channel_tr</span> <span class="o">=</span> <span class="n">channel</span>
 
@@ -1096,9 +1108,14 @@
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">external</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>
             <span class="c1"># TODO submit proposal to include file type attribute in the externalFile GNDS node so we don&#39;t need to run GNDS_fileModule.type</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">()):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  WARNING: skipping externalFile &#39;</span><span class="si">%s</span><span class="s2">&#39; which points to non-existing file </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">()))</span>
+                <span class="k">continue</span>
             <span class="n">gndsType</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">GNDS_fileModule</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">())</span>
             <span class="k">if</span> <span class="n">gndsType</span> <span class="o">==</span> <span class="n">covarianceSuiteModule</span><span class="o">.</span><span class="n">CovarianceSuite</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
-                <span class="n">covariances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">covarianceSuiteModule</span><span class="o">.</span><span class="n">CovarianceSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+                <span class="n">external</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">covarianceSuiteModule</span><span class="o">.</span><span class="n">CovarianceSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">covariances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">covariances</span></div>
 
@@ -1301,7 +1318,7 @@
 <span class="sd">        Generate multi-group processed data, including cross sections, weighted multiplicities and Q-values and transfer matrices.</span>
 <span class="sd">        Processed results will be stored as new forms inside the reactionSuite.</span>
 
-<span class="sd">        :param style: fudge.gnds.styles.HeatedMultiGroup instance</span>
+<span class="sd">        :param style: fudge.styles.HeatedMultiGroup instance</span>
 <span class="sd">        :param legendreMax: number of Legendre orders to produce in transfer matrices.</span>
 <span class="sd">        :param verbosity: verbosity level</span>
 <span class="sd">        :param indent: indentation level for verbose output</span>
@@ -1761,11 +1778,11 @@
 <span class="sd">        tabulated pointwise cross sections. Resulting pointwise cross sections are stored</span>
 <span class="sd">        alongside the original &#39;resonancesWithBackground&#39; data in the reactionSuite.</span>
 
-<span class="sd">        @:param style: style - an instance of style CrossSectionReconstructed.</span>
-<span class="sd">        @:param accuracy: float - target accuracy during reconstruction. For example, 0.001.</span>
-<span class="sd">        @:param thin: boolean - enable/disable thinning after reconstruction (disabling makes summed cross sections consistency checks easier).</span>
-<span class="sd">        @:param significantDigits: int - energy grid will only include points that can be exactly represented using specified number of significant digits.</span>
-<span class="sd">        @:param verbose: boolean - turn on/off verbosity</span>
+<span class="sd">        :param style: style - an instance of style CrossSectionReconstructed.</span>
+<span class="sd">        :param accuracy: float - target accuracy during reconstruction. For example, 0.001.</span>
+<span class="sd">        :param thin: boolean - enable/disable thinning after reconstruction (disabling makes summed cross sections consistency checks easier).</span>
+<span class="sd">        :param significantDigits: int - energy grid will only include points that can be exactly represented using specified number of significant digits.</span>
+<span class="sd">        :param verbose: boolean - turn on/off verbosity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">resonances</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
@@ -1861,11 +1878,11 @@
 <span class="sd">        tabulated angular distributions (overwriting original values in the resonance region). Resulting pointwise</span>
 <span class="sd">        angular distributions are stored alongside the original angular distributions in the reactionSuite.</span>
 
-<span class="sd">        @:param styleName: string - label for reconstructed distribution style</span>
-<span class="sd">        @:param overwrite: boolean - if style already in use for another distribution, overwrite it with the reconstructed distribution</span>
-<span class="sd">        @:param accuracy: float - giving target accuracy during reconstruction. For example, 0.001</span>
-<span class="sd">        @:param thin: boolean - enable/disable thinning after reconstruction</span>
-<span class="sd">        @:param verbose: boolean - turn on/off verbosity</span>
+<span class="sd">        :param styleName: string - label for reconstructed distribution style</span>
+<span class="sd">        :param overwrite: boolean - if style already in use for another distribution, overwrite it with the reconstructed distribution</span>
+<span class="sd">        :param accuracy: float - giving target accuracy during reconstruction. For example, 0.001</span>
+<span class="sd">        :param thin: boolean - enable/disable thinning after reconstruction</span>
+<span class="sd">        :param verbose: boolean - turn on/off verbosity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">accuracy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Refining interpolation grid for angular distributions still TBD&quot;</span><span class="p">)</span>
@@ -1910,7 +1927,7 @@
                             <span class="n">interpolationQualifier</span><span class="o">=</span><span class="n">region</span><span class="o">.</span><span class="n">interpolationQualifier</span> <span class="p">)</span>
                     <span class="n">newregion</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">region</span><span class="o">.</span><span class="n">getAtEnergy</span><span class="p">(</span> <span class="n">reconstructed</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span> <span class="p">)</span>
                     <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
-                        <span class="k">if</span><span class="p">(</span> <span class="n">val</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="n">reconstructed</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">val</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="o">&lt;=</span> <span class="n">reconstructed</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
                         <span class="n">newregion</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">val</span> <span class="p">)</span>
                     <span class="n">merged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">newregion</span> <span class="p">)</span>
                     <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -1952,13 +1969,14 @@
                     <span class="n">removeStyleFromComponent</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">dproduct</span><span class="o">.</span><span class="n">averageProductMomentum</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReactionSuite.saveToHybrid"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.saveToHybrid">[docs]</a>    <span class="k">def</span> <span class="nf">saveToHybrid</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xmlName</span><span class="p">,</span> <span class="n">hdfName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minLength</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+<div class="viewcode-block" id="ReactionSuite.saveToHybrid"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.saveToHybrid">[docs]</a>    <span class="k">def</span> <span class="nf">saveToHybrid</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xmlName</span><span class="p">,</span> <span class="n">hdfName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hdfSubDir</span><span class="o">=</span><span class="s1">&#39;HDF5&#39;</span><span class="p">,</span> <span class="n">minLength</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save the reactionSuite to a hybrid layout, with the data hierarchy in xml</span>
 <span class="sd">        but most actual data saved in an associated HDF file</span>
 
 <span class="sd">        :param xmlName: file name to save.</span>
 <span class="sd">        :param hdfName: if None, will be the same as xmlName with extension changed to .h5</span>
+<span class="sd">        :param hdfSubDir: if not None, the sub-directoty to add to path hdfName.</span>
 <span class="sd">        :param minLength: minimum number of values before moving a dataset from XML to HDF</span>
 <span class="sd">            Need to determine best default setting</span>
 <span class="sd">        :param flatten: if True, GNDS datasets are concatenated into flattened HDF5 datasets</span>
@@ -1968,18 +1986,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">externalFile</span> <span class="k">as</span> <span class="n">externalFileModule</span>
-        <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">checksums</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">HDF5_present</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Missing module &#39;h5py&#39; must be installed to support generating HDF5 files.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">hdfName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">xmlName</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xml&#39;</span><span class="p">):</span>
-                <span class="n">hdfName</span> <span class="o">=</span> <span class="n">xmlName</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">hdfName</span> <span class="o">=</span> <span class="n">xmlName</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.xml&#39;</span><span class="p">,</span><span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+        <span class="n">xmlName</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">xmlName</span><span class="p">)</span>
 
-        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hdfName</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hdfName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdfName</span> <span class="o">=</span> <span class="n">xmlName</span>
+            <span class="k">if</span> <span class="n">hdfName</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s1">&#39;.xml&#39;</span><span class="p">:</span>
+                <span class="n">hdfName</span> <span class="o">=</span> <span class="n">hdfName</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">hdfName</span><span class="o">.</span><span class="n">suffix</span> <span class="o">+</span> <span class="s1">&#39;.xml&#39;</span><span class="p">)</span>
+            <span class="n">hdfName</span> <span class="o">=</span> <span class="n">hdfName</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hdfName</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">hdfName</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hdfSubDir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdfName</span> <span class="o">=</span> <span class="n">hdfName</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">hdfSubDir</span> <span class="o">/</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">hdfName</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">hdfName</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">hdfName</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">hdfName</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
             <span class="n">HDF_opts</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;h5file&#39;</span><span class="p">:</span> <span class="n">h5</span><span class="p">,</span>
@@ -1993,10 +2017,15 @@
             <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
                 <span class="n">HDF_opts</span><span class="p">[</span><span class="s1">&#39;compression&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;compression&#39;</span><span class="p">:</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="s1">&#39;shuffle&#39;</span><span class="p">:</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;chunks&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">}</span>
 
-            <span class="c1"># add filler external file, actual checksum computed below</span>
+            <span class="n">checksumAlgorithm</span> <span class="o">=</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span>
             <span class="n">relHdfName</span> <span class="o">=</span> <span class="n">hdfName</span>
-            <span class="k">if</span> <span class="n">relHdfName</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">relHdfName</span><span class="p">):</span> <span class="n">relHdfName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">relHdfName</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">externalFileModule</span><span class="o">.</span><span class="n">ExternalFile</span><span class="p">(</span><span class="s2">&quot;HDF&quot;</span><span class="p">,</span> <span class="n">relHdfName</span><span class="p">,</span> <span class="n">checksum</span> <span class="o">=</span> <span class="s2">&quot;deadbeef&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;sha1&quot;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">relHdfName</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">hdfName</span><span class="p">)</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">xmlName</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">relHdfName</span> <span class="o">==</span> <span class="n">relHdfName</span><span class="o">.</span><span class="n">resolve</span><span class="p">():</span>
+                    <span class="n">relHdfName</span> <span class="o">=</span> <span class="n">relHdfName</span><span class="o">.</span><span class="n">name</span>
+            <span class="c1"># add filler external file, actual checksum computed below</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">externalFileModule</span><span class="o">.</span><span class="n">ExternalFile</span><span class="p">(</span><span class="s2">&quot;HDF&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">relHdfName</span><span class="p">),</span> <span class="n">checksum</span> <span class="o">=</span> <span class="s2">&quot;deadbeef&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">checksumAlgorithm</span><span class="o">.</span><span class="n">algorithm</span><span class="p">))</span>
 
             <span class="n">xmlString</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">HDF_opts</span> <span class="o">=</span> <span class="n">HDF_opts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
 
@@ -2007,14 +2036,14 @@
                 <span class="n">dData</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="n">HDF_opts</span><span class="p">[</span><span class="s1">&#39;dData&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span> <span class="p">)</span>
                 <span class="n">h5</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;dData&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">dData</span><span class="p">,</span> <span class="o">**</span><span class="n">HDF_opts</span><span class="p">[</span><span class="s1">&#39;compression&#39;</span><span class="p">])</span>
 
-        <span class="n">sha1sum</span> <span class="o">=</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">hdfName</span><span class="p">)</span>
+        <span class="n">sha1sum</span> <span class="o">=</span> <span class="n">checksumAlgorithm</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">hdfName</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xmlString</span><span class="p">):</span>
             <span class="k">if</span> <span class="s1">&#39;externalFile&#39;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s1">&#39;checksum=&quot;deadbeef&quot;&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                 <span class="n">xmlString</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;deadbeef&quot;</span><span class="p">,</span> <span class="n">sha1sum</span><span class="p">)</span>
                 <span class="k">break</span>
 
-        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">xmlName</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">xmlName</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">xmlName</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">xmlName</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span> <span class="p">)</span> <span class="k">as</span> <span class="n">fout</span> <span class="p">:</span>
             <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span> <span class="p">)</span>
@@ -2028,19 +2057,20 @@
         <span class="k">for</span> <span class="n">reaction</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span> <span class="p">:</span> <span class="n">reaction</span><span class="o">.</span><span class="n">thermalNeutronScatteringLawTemperatures</span><span class="p">(</span> <span class="n">temperatures</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">temperatures</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReactionSuite.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="ReactionSuite.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a list of GNDS/XML strings representing self.&quot;&quot;&quot;</span>
 
         <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
         <span class="n">indent3</span> <span class="o">=</span> <span class="n">indent2</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
 
-        <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatVersion</span> <span class="p">)</span>
+        <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">formatVersion</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_3</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: converting GNDS format from &quot;</span><span class="si">%s</span><span class="s1">&quot; to &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">formatVersion</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">))</span>
             <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatVersion</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">formatVersion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">allowed</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;Unsupported GNDS structure &#39;</span><span class="si">%s</span><span class="s2">&#39;!&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span> <span class="n">formatVersion</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">formatVersion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unsupported GNDS structure &#39;</span><span class="si">%s</span><span class="s2">&#39;!&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">formatVersion</span><span class="p">))</span>
 
         <span class="n">interaction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span>
         <span class="k">if</span> <span class="n">interaction</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interaction</span><span class="o">.</span><span class="n">TNSL</span><span class="p">:</span>
@@ -2049,22 +2079,22 @@
             <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="n">formatVersion</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectileFrame</span><span class="p">,</span> <span class="n">interaction</span><span class="p">)]</span>
 
         <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resonances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resonances</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resonances</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orphanProducts</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sums</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionComponents</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">productions</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orphanProducts</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sums</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionComponents</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">productions</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">incompleteReactions</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">applicationData</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">xmlString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div>
+        <span class="n">xmlString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">xmlString</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.toString"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns a string representation of an reactionSuite.&quot;&quot;&quot;</span>
@@ -2087,9 +2117,10 @@
         <span class="n">numberOfBrokenLinksToPrint</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;numberOfBrokenLinksToPrint&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
         <span class="k">try</span> <span class="p">:</span>
-            <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;sourcePath&#39;</span> <span class="p">)</span>
-            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">sourcePath</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">sourcePath</span><span class="o">.</span><span class="n">name</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="n">sourcePath</span> <span class="p">)</span>
+            <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sourcePath&#39;</span><span class="p">,</span> <span class="s1">&#39;./&#39;</span><span class="p">)</span>     <span class="c1"># This (i.e., &#39;./&#39;) may not be the correct default.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sourcePath</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">sourcePath</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sourcePath</span><span class="p">)</span>
 
             <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;format&#39;</span> <span class="p">)</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatVersion</span>
@@ -2171,7 +2202,7 @@
             <span class="k">try</span> <span class="p">:</span>
                 <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">ReactionSuite</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
                     <span class="n">quant</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">quant</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span> <span class="n">rs</span> <span class="p">)</span>
-                <span class="k">elif</span> <span class="n">quant</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span> <span class="s1">&#39;/covarianceSuite&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">elif</span> <span class="n">quant</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
                     <span class="n">rs</span><span class="o">.</span><span class="n">_externalLinks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">quant</span> <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>   <span class="c1"># relative link</span>
                     <span class="n">quant</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">quant</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span> <span class="n">quant</span> <span class="p">)</span>
@@ -2235,7 +2266,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.reactionSuite</a></li> 
       </ul>

@@ -12,7 +12,7 @@ Collection of fake level sequence generators, including the One True Generator: 
 fakeLevelStyles = ['wigner', 'picket fence', 'poisson', 'brody', 'goe']
 
 
-def getFakeLevelSequence(E0=0.0, aveD=None, numLevels=None, style='goe', BrodyW=0.5, levelDensity=None):
+def getFakeLevelSequence(E0=0.0, aveD=None, numLevels=None, style='goe', BrodyW=0.5, levelDensity=None, verbose=False):
     """
     wrapper function
 
@@ -22,6 +22,7 @@ def getFakeLevelSequence(E0=0.0, aveD=None, numLevels=None, style='goe', BrodyW=
     :param style: one of ['wigner','picket fence', 'poisson', 'brody', 'goe']
     :param BrodyW: see documentation for individual styles
     :param levelDensity: see documentation for individual styles
+    :param verbose: set True to print messages
     :return:
     """
 
@@ -49,7 +50,8 @@ def getFakeLevelSequence(E0=0.0, aveD=None, numLevels=None, style='goe', BrodyW=
             raise ValueError("For GOE style, need a level density")
         if numLevels is None:
             numLevels = numpy.random.poisson(levelDensity.integrate())
-            print("setting numLevels to", numLevels)
+            if verbose:
+                print("setting numLevels to", numLevels)
 
     if style == 'wigner':
         return getWignerFakeLevelSequence(E0, 1/levelDensity)
@@ -109,9 +111,11 @@ def getWignerFakeLevelSequence(E0, levelSpacing):
     :param levelSpacing: energy-dependent level spacing, assumed to be in same units as E0
     :return: the list of level energies
     """
+    domainMax = levelSpacing.domainMax
+    if E0 > domainMax:
+        return []
     result = [E0]
     WD = WignerDistribution()
-    domainMax = levelSpacing.domainMax
     while True:
         s = WD.drawSample()
         result.append(result[-1] + s * levelSpacing.evaluate(result[-1]))

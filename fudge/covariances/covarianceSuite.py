@@ -305,29 +305,31 @@ class CovarianceSuite(ancestryModule.AncestryIO):
                         if hasattr(covar, "removeExtraZeros"):
                             covar.removeExtraZeros()
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
         """Returns a list of GNDS/XML strings representing self."""
 
-        incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
+        incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent
 
-        formatVersion = kwargs.get( 'formatVersion', self.formatVersion )
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
         if formatVersion in (GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4):
             print('INFO: converting GNDS format from "%s" to "%s".' % (formatVersion, GNDS_formatVersionModule.version_2_0))
             formatVersion = GNDS_formatVersionModule.version_2_0
         kwargs['formatVersion'] = formatVersion
-        if formatVersion not in GNDS_formatVersionModule.allowed: raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
+        if formatVersion not in GNDS_formatVersionModule.allowed:
+            raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
 
         interaction = self.interaction
         if interaction == enumsModule.Interaction.TNSL:
             interaction = enumsModule.Interaction.getTNSLInteration(formatVersion)
         xmlString = ['%s<%s projectile="%s" target="%s" evaluation="%s" interaction="%s" format="%s">'
                 % (indent, self.moniker, self.projectile, self.target, self.evaluation, interaction, formatVersion)]
-        xmlString += self.externalFiles.toXML_strList( indent2, **kwargs )
-        xmlString += self.styles.toXML_strList( indent2, **kwargs )
-        xmlString += self.covarianceSections.toXML_strList( indent2, **kwargs )
-        xmlString += self.parameterCovariances.toXML_strList( indent2, **kwargs )
-        xmlString.append( '%s</%s>' % (indent, self.moniker) )
+        xmlString += self.externalFiles.toXML_strList(indent2, **kwargs)
+        xmlString += self.styles.toXML_strList(indent2, **kwargs)
+        xmlString += self.covarianceSections.toXML_strList(indent2, **kwargs)
+        xmlString += self.parameterCovariances.toXML_strList(indent2, **kwargs)
+        xmlString.append('%s</%s>' % (indent, self.moniker))
+
         return xmlString
 
     @classmethod

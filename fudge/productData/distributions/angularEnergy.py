@@ -246,14 +246,14 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
         angular = angularModule.XYs2d( axes = self.axes )
         for PofEpGivenMu in self :
             data = angularModule.XYs1d( [ [ PofEp.outerDomainValue, PofEp.integrate() ] for PofEp in PofEpGivenMu ] )
-            angular.append( angularModule.Xs_pdf_cdf1d.fromXYs( angularModule.XYs1d( data ), outerDomainValue = PofEpGivenMu.outerDomainValue ) )
+            angular.append(angularModule.Xs_pdf_cdf1d.fromXYs(angularModule.XYs1d(data), outerDomainValue=PofEpGivenMu.outerDomainValue, thinEpsilon=1e-14))
 
         xys3d = angularEnergyMCModule.XYs3d( axes = self.axes )
         for PofEpGivenMu in self :
             xys2d = angularEnergyMCModule.XYs2d( outerDomainValue = PofEpGivenMu.outerDomainValue )
             for PofEp in PofEpGivenMu :
                 _PofEp = PofEp.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
-                xys2d.append( angularEnergyMCModule.Xs_pdf_cdf1d.fromXYs( _PofEp, PofEp.outerDomainValue ) )
+                xys2d.append(angularEnergyMCModule.Xs_pdf_cdf1d.fromXYs(_PofEp, PofEp.outerDomainValue, thinEpsilon=1e-14))
             xys3d.append( xys2d )
 
         return( angularEnergyMCModule.Angular( angular ), angularEnergyMCModule.AngularEnergy( xys3d ) )
@@ -293,13 +293,17 @@ class Form(  baseModule.Form ) :
 
         self.angularEnergySubform.convertUnits( unitMap )
 
-    def energySpectrumAtEnergy( self, energyIn, frame, **kwargs ) :
+    def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
 
-        if( self.productFrame == frame ) :
-            self.angularEnergySubform.energySpectrumAtEnergy( energyIn )
-            function2d = self.angularEnergySubform.evaluate( energyIn )
-        else :
-            raise TypeError( '%s to %s translation not supported.' % ( self.productFrame, frame ) )
+        muMin = kwargs.get('muMin', -1.0)
+        muMax = kwargs.get('muMax',  1.0)
+
+        raise NotImplementedError('energySpectrumAtEnergy is currently not supported for an angularEnergy distribution.')
+
+        if self.productFrame == frame:
+            function2d = self.angularEnergySubform.evaluate(energyIn)
+        else:
+            raise TypeError('%s to %s translation not supported.' % (self.productFrame, frame))
 
     def fixDomains(self, energyMin, energyMax, domainToFix):
         """

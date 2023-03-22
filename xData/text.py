@@ -103,10 +103,13 @@ class Text(ancestryModule.AncestryIO):
         isString(text2)
 
         if self.encoding == Encoding.ascii:                                 # If encoding is ascii verify text is.
-            if sys.version_info.major == 2:
-                text2 = text2.decode('ascii')
-            else :
+            try:
                 text2.encode('ascii')
+            except UnicodeEncodeError as ex:
+                print("    ERROR: encountered non-ascii character '%s' at index %d of text" %
+                      (ex.object[ex.start], ex.start))
+                print("    Bad character in context:\n", ex.object[ex.start-20:ex.end+20], "\n")
+                raise ex
 
         if text is not None: self.__filled = True
         self.__body = text2
@@ -145,8 +148,9 @@ class Text(ancestryModule.AncestryIO):
         extraAttributes = self.XML_extraAttributes(**kwargs)
 
         if not self.__filled:
-            if extraAttributes == '': return []
-            return [ '%s<%s%s/>' % ( indent, self.moniker, extraAttributes ) ]
+            if extraAttributes == '' and not kwargs.get('showEmptyText', False):
+                return []
+            return ['%s<%s%s/>' % (indent, self.moniker, extraAttributes)]
 
         attributeStr = ''
         if self.__label is not None: attributeStr += ' label="%s"' % self.__label

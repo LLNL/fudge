@@ -4,3 +4,5 @@
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
+
+from LUPY import checkPythonVerions

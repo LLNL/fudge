@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.outputChannel &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.outputChannel &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.outputChannel</a></li> 
       </ul>
@@ -81,7 +81,8 @@
 
 <div class="viewcode-block" id="Processes"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.Processes">[docs]</a><span class="k">class</span> <span class="nc">Processes</span> <span class="p">:</span>
 
-    <span class="n">continuum</span> <span class="o">=</span> <span class="s1">&#39;continuum&#39;</span></div>
+    <span class="n">continuum</span> <span class="o">=</span> <span class="s1">&#39;continuum&#39;</span>
+    <span class="n">inclusive</span> <span class="o">=</span> <span class="s1">&#39;inclusive&#39;</span></div>
 
 <div class="viewcode-block" id="OutputChannel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel">[docs]</a><span class="k">class</span> <span class="nc">OutputChannel</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;This is the GNDS outputChannel which is a Q value and a list of products (i.e., product objects).&quot;&quot;&quot;</span>
@@ -197,9 +198,14 @@
 
         <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">product</span><span class="o">.</span><span class="n">checkProductFrame</span><span class="p">(</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="OutputChannel.diff"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="OutputChannel.diff"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">diffResults</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">Q</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span>
+
+        <span class="n">selfQ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domainMin</span><span class="p">)</span>
+        <span class="n">otherQ</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domainMin</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">selfQ</span> <span class="o">-</span> <span class="n">otherQ</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="n">diffResults</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Q values differ&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> vs </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">selfQ</span><span class="p">,</span> <span class="n">otherQ</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">toXLink</span><span class="p">())</span>
 
         <span class="n">aliases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootAncestor</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span>
         <span class="n">productIDs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -318,27 +324,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="OutputChannel.thresholdQAs"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.thresholdQAs">[docs]</a>    <span class="k">def</span> <span class="nf">thresholdQAs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="OutputChannel.thresholdQAs"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.thresholdQAs">[docs]</a>    <span class="k">def</span> <span class="nf">thresholdQAs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pops</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span>
-        <span class="k">else</span> <span class="p">:</span>                      <span class="c1"># Calculate from particle masses.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>                       <span class="c1"># Calculate from particle masses.</span>
             <span class="n">massUnit</span> <span class="o">=</span> <span class="n">unit</span> <span class="o">+</span> <span class="s1">&#39;/c**2&#39;</span>
             <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootAncestor</span>
-            <span class="n">projectile</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span>
-            <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span>
-            <span class="k">if</span><span class="p">(</span> <span class="n">targetID</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span> <span class="p">)</span> <span class="p">:</span> <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
-            <span class="n">target</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span>
-            <span class="n">Q</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span> <span class="o">+</span> <span class="n">projectile</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+            <span class="n">projectile</span> <span class="o">=</span> <span class="n">pops</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">)</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">pops</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span> <span class="o">+</span> <span class="n">projectile</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-                <span class="k">try</span> <span class="p">:</span>   
-                    <span class="n">Q</span> <span class="o">-=</span> <span class="n">product</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span> <span class="o">*</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
-                <span class="k">except</span> <span class="p">:</span>
-                    <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Non-constant Q-value must be explicitly listed in GNDS!&quot;</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">final</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span> <span class="p">:</span> <span class="n">Q</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="n">final</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">Q</span> <span class="p">)</span>  </div>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">Q</span> <span class="o">-=</span> <span class="n">pops</span><span class="p">[</span><span class="n">product</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span> <span class="o">*</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Non-constant Q-value must be explicitly listed in GNDS! Maybe missing mass for particle &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">final</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="p">:</span>
+                <span class="n">Q</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="n">final</span><span class="p">,</span> <span class="n">pops</span><span class="o">=</span><span class="n">pops</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Q</span></div>
 
 <div class="viewcode-block" id="OutputChannel.calculateAverageProductData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -633,7 +641,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.outputChannel</a></li> 
       </ul>

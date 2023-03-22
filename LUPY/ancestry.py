@@ -367,7 +367,7 @@ class AncestryIO_base(Ancestry):
             fout.write(XML_declaration)
             self.saveToOpenedFile(fout, **kwargs)
 
-    def saveToHybrid(self, XML_name, HDF_name=None, HDF_subDir=None, minLength=4, flatten=False, compress=False, **kwargs):
+    def saveToHybrid(self, XML_name, HDF_name=None, HDF_subDir=None, minLength=3, flatten=True, compress=False, **kwargs):
         """
         Saves *self* to as two files, with most of the hierarchy in an XML file but most of the numerical data saved in an associated HDF file.
         To construct the file names, the best is to leave *HDF_name* as None. However, if the HDF file should be put into a sub-directory
@@ -502,8 +502,11 @@ class AncestryIO_base(Ancestry):
         node = cElementTree.parse(fileName).getroot()
         node = xmlNodeMode.XML_node(node, xmlNodeMode.XML_node.etree)
 
+        if node.tag != cls.moniker:
+            raise ValueError('Node name "%s" in XML not the same as requested class moniker "%s".' % (node.tag, cls.moniker))
+
         kwargs['sourcePath'] = fileName
-        
+
         instance = cls.parseNodeUsingClass(node, [], {}, **kwargs)
         instance.parseCleanup(node, **kwargs)
 

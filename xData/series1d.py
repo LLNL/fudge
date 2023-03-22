@@ -122,6 +122,15 @@ class Series1d( baseModule.XDataFunctional ) :
 
     __rmul__ = __mul__
 
+    def _div__(self, value):
+        '''Returns a new series that is each coefficient of self divided by value. Value must be convertible to a float.'''
+
+        value_ = float(value)
+        c_ls = self.copy()
+        for l, c_l in enumerate(self):
+            c_ls[l] /= value
+        return c_ls 
+
     def __str__( self ) :
         """Returns a string representation of the coefficients of self."""
 
@@ -136,6 +145,16 @@ class Series1d( baseModule.XDataFunctional ) :
     def coefficients( self, coefficients ) :
 
         self.__coefficients = list( map( float, coefficients ) )
+
+    def areDomainsMutual(self, other):
+        '''
+        Returns True if domain mins are the same for *self* and *other*, and domain maxs are the same for *self* and *other*;
+        otherwise, returns False.
+
+        :param other:       Another xData 1d instance.
+        '''
+
+        return self.domainMin == other.domainMin and self.domainMax == other.domainMax
 
     def evaluate(self, mu):
         """Evaluates the Legendre series at the mu."""
@@ -217,6 +236,13 @@ class Series1d( baseModule.XDataFunctional ) :
 
         if( l >= len( self ) ) : return( 0. )
         return( self.__coefficients[l] )
+
+    def hasData(self):
+        '''
+        Returns True if the length of self's coefficients is greater than 0.
+        '''
+
+        return len(self.__coefficients) > 0
 
     def invert( self ) :
         """
@@ -362,41 +388,49 @@ class LegendreSeries( Series1d ) :
     def evaluateBasisFunction(self, mu, l):
         return ( l + 0.5 ) * Legendre( l, mu, checkXRange = False )
 
-    def integrate( self, domainMin = None, domainMax = None ) :
+    def integrate(self, domainMin=None, domainMax=None):
 
-        if( domainMin is None ) : domainMin = -1.0
-        if( domainMax is None ) : domainMax =  1.0
+        if domainMin is None:
+            domainMin = -1.0
+        if domainMax is None:
+            domainMax =  1.0
 
         sign = 1
-        if( domainMin > domainMax ) : domainMin, domainMax, sign = domainMax, domainMin, -1
+        if domainMin > domainMax:
+            domainMin, domainMax, sign = domainMax, domainMin, -1
             
-        if( domainMin < -1.0 ) : raise ValueError( 'domainMin must be greater than or equal to -1: it is %e' % domainMin )
-        if( domainMax >  1.0 ) : raise ValueError( 'domainMax must be greater than or equal to 1: it is %e' % domainMax )
-        if( domainMin == domainMax ) : return( 0.0 )
-        if( ( domainMin == -1.0 ) and ( domainMax == 1.0 ) ) : return( self.coefficients[0] )
+        if domainMin < -1.0:
+            raise ValueError('domainMin must be greater than or equal to -1: it is %e' % domainMin )
+        if domainMax >  1.0:
+            raise ValueError('domainMax must be greater than or equal to 1: it is %e' % domainMax )
+        if domainMin == domainMax:
+            return 0.0
+        if domainMin == -1.0 and domainMax == 1.0:
+            return self.coefficients[0]
 
-        maxOrder = len( self.coefficients )
-        if( maxOrder == 0 ) : return( 0.0 )
+        maxOrder = len(self.coefficients)
+        if maxOrder == 0:
+            return 0.0
 
-        integral = ( domainMax - domainMin ) * self.coefficients[0]
+        integral = 0.5 * (domainMax - domainMin) * self.coefficients[0]
 
-        if( maxOrder > 1 ) :
-            integral += 0.5 * ( domainMin + domainMax ) * ( domainMax - domainMin ) * self.coefficients[1]
+        if maxOrder > 1:
+            integral += 0.75 * (domainMin + domainMax) * (domainMax - domainMin) * self.coefficients[1]
 
             P_l_m1_1 = domainMin
             P_l_m1_2 = domainMax
-            P_l_1 = 0.5 * ( 3.0 * domainMin * domainMin - 1.0 )
-            P_l_2 = 0.5 * ( 3.0 * domainMax * domainMax - 1.0 )
-            for order in range( 2, maxOrder ) :
-                P_l_p2_1 = Legendre( order + 1, domainMin )
-                P_l_p2_2 = Legendre( order + 1, domainMax )
-                integral += ( P_l_p2_2 - P_l_p2_1 + P_l_m1_1 - P_l_m1_2 ) * self.coefficients[1] / ( 2 * order + 1 )
+            P_l_1 = 0.5 * (3.0 * domainMin * domainMin - 1.0)
+            P_l_2 = 0.5 * (3.0 * domainMax * domainMax - 1.0)
+            for order in range(2, maxOrder):
+                P_l_p1_1 = Legendre(order + 1, domainMin)
+                P_l_p1_2 = Legendre(order + 1, domainMax)
+                integral += 0.5 * (P_l_p1_2 - P_l_p1_1 + P_l_m1_1 - P_l_m1_2) * self.coefficients[order]
                 P_l_m1_1 = P_l_1
                 P_l_m1_2 = P_l_2
-                P_l_1 = P_l_p2_1
-                P_l_2 = P_l_p2_2
+                P_l_1 = P_l_p1_1
+                P_l_2 = P_l_p1_2
         
-        return( sign * integral )
+        return sign * integral
 
     def isIsotropic( self ) :
         """Returns True if self is isotropic."""

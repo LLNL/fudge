@@ -120,7 +120,7 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     NWD = int(NWD)    #
     NXC = int(NXC)    #
 
-    info.convertJENDL_stylePrimarygammas = NLIB == 6        # If True, treats Mf=6 primary gamma energies as binding energy, otherwise as gamma energy.
+    info.convertJENDL_stylePrimarygammas = kwargs.get('JENDL_stylePrimarygammas', NLIB == 6)    # If True, treats MF=6 primary gamma energies as binding energy, otherwise as gamma energy.
     # Save the library name and version
     info.library = {
         0: "ENDF/B",
@@ -216,7 +216,15 @@ def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation
 
     # Parse the ENDF documentation section
     info = readMF1MT451(MAT, MTDatas, formatVersion, specialNuclearParticleID, styleName=styleName, logFile=logs, verboseWarnings=verboseWarnings, **kwargs)
+
     info.missingRadioactiveProduct = []
+    info.printBadNK14 = True
+    info.continuumSpectraFix = False
+    info.acceptBadMF10FissionZAP = False
+    options = ['printBadNK14', 'continuumSpectraFix', 'ignoreBadDate', 'acceptBadMF10FissionZAP', 'JENDL_stylePrimarygammas', 'printMassHistory']
+    for option in kwargs:
+        if option not in options: raise DeprecationWarning('invalid or deprecated option "%s"' % option)
+        setattr(info, option, kwargs[option])
 
     if( info.ITYPE == 1 ) :                                                         # NFY
         return( ENDF_ITYPE_1Module.ITYPE_1( MTDatas, info, verbose = verbose ) )
@@ -268,25 +276,17 @@ def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation
 
     # Compute the reconstructed and evaluated Styles
     projectileDomain = stylesModule.ProjectileEnergyDomain( 1e-5, 2e+7, 'eV' )  # will be overwritten after parsing all reactions
-    evaluatedStyle = fudge.styles.Evaluated(styleName, '',
-                                                physicalQuantityModule.Temperature(
+    evaluatedStyle = stylesModule.Evaluated(styleName, '',
+                                            physicalQuantityModule.Temperature(
                                                     PQUModule.PQU_float.surmiseSignificantDigits(info.targetTemperature),
                                                     'K'),
-                                                projectileDomain,
-                                                info.library, info.libraryVersion, date=info.Date)
+                                            projectileDomain, info.library, info.libraryVersion, date=info.Date)
     if (evaluation is None): evaluation = "%s-%d.%d" % (info.library, info.NVER, info.LREL)
     info.reconstructedStyle = stylesModule.CrossSectionReconstructed(reconstructedStyleName,
                                                                      derivedFrom=evaluatedStyle.label,
                                                                      date="2016-11-06")
 
     # Stuff for handling transport data
-    info.printBadNK14 = True
-    info.continuumSpectraFix = False
-    info.acceptBadMF10FissionZAP = False
-    options = ['printBadNK14', 'continuumSpectraFix', 'ignoreBadDate', 'acceptBadMF10FissionZAP']
-    for option in kwargs:
-        if (option not in options): raise DeprecationWarning('invalid or deprecated option "%s"' % option)
-        setattr(info, option, kwargs[option])
     evaluatedStyle.documentation.endfCompatible.body = info.documentation
     endfFileToGNDSMisc.completeDocumentation(info, evaluatedStyle.documentation)
     info.evaluatedStyle = evaluatedStyle
@@ -428,6 +428,8 @@ def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation
         for missingRadioactiveProduct in info.missingRadioactiveProduct:
             print('     ========', missingRadioactiveProduct)
 
+    if kwargs.get('printMassHistory', False):
+        info.massTracker.printHistory()
     return( { 'reactionSuite' : reactionSuite, 'covarianceSuite' : covarianceSuite, 'errors' : info.doRaise, 'info':info } )
 
 def addUnspecifiedDistributions( info, outputChannel ) :

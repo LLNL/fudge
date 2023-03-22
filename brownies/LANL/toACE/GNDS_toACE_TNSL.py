@@ -85,10 +85,15 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
 
     NILm1 = args.NILm1
     NCL = args.NCL
-    IFENG = 2
+    IFENG = 2                                           # With this as 2, NIEB is not used.
     checkEqualProbableBinning = False
 
-    targetMap = targetMapping[self.target]
+    target = self.target
+    if target in ['HinZrH2', 'HinZrHx']:               # Special targets in ENDF/B-VIII.1 beta release.
+        target = 'HinZrH'
+    if target in ['ZrinZrH2', 'ZrinZrHx']:
+        target = 'ZrinZrH'
+    targetMap = targetMapping[target]
     standardData = standardsData[targetMap[1]]
 
     strRecords = []
@@ -98,7 +103,7 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
     line = '%6s.%2.2dt%12.6f%12.5e %10s' % ( targetMap[0], evaluationId, standardData[1], cdf_style.temperature.getValueAs('MeV/k'), date)
     strRecords.append(line)
 
-    line = '%-70s' % ('%s at %12.2fK' % (self.target, cdf_style.temperature.getValueAs('K'))) + '%10s' % ('mat%4d' % standardData[0])
+    line = '%-70s' % ('%s at %12.2fK' % (target, cdf_style.temperature.getValueAs('K'))) + '%10s' % ('mat%4d' % standardData[0])
     strRecords.append(line)
 
     IZ = 16 * [ 0 ]
@@ -127,7 +132,8 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
     IDPNC = 0
     ITCE_X = None
     ITCA_X = []
-    ITIE_X = None
+    ITIE = []
+    ITIX = []
     ITIEA_X = []
 
     for reaction in self.reactions:
@@ -173,7 +179,6 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
 
         elif isinstance(doubleDifferential, incoherentInelasticModule.Form):
             crossSection = reaction.crossSection[cdf_style.label]
-            ITIE_X = crossSection.copyDataToXsAndYs( )
 
             distribution = reaction.outputChannel.products[0].distribution[cdf_style.label]
             if not isinstance( distribution, energyAngularMCModule.Form ):
@@ -187,15 +192,18 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
             if not isinstance(angular3d, energyAngularMCModule.XYs3d):
                 raise Exception('Inelastic angular distribution is "%s" but needs to be "%s".' % (angular3d.moniker, energyAngularMCModule.XYs2d.moniker))
 
-            if len(energy2d) != len(angular3d): raise Exception('Inelastic energy and angular have different number of data: %s vs %s' % (len(energy2d), len(angular3d)))
+            if len(energy2d) != len(angular3d):
+                raise Exception('Inelastic energy and angular have different number of data: %s vs %s' % (len(energy2d), len(angular3d)))
             NXS[2-1] = 3                        # Equally-likely cosines; currently the only scattering mode allowed for inelastic angular distributions.
             NXS[3-1] = NILm1 + 1
-            NXS[4-1] = 0
+            NXS[4-1] = 0                        # Not used for IFENG = 2.
             NXS[7-1] = IFENG
 
             for index1, energy1d in enumerate(energy2d):
                 if not isinstance(energy1d, energyModule.Xs_pdf_cdf1d):
                     raise Exception('Incoherent inelastic outgoing energy1d is %s but needs to be "%s".' % (energy1d.moniker, energyModule.Xs_pdf_cdf1d.moniker))
+                ITIE.append(energy1d.outerDomainValue)
+                ITIX.append(crossSection.evaluate(energy1d.outerDomainValue))
 
                 angular2d = angular3d[index1]
                 if not isinstance(angular2d, energyAngularMCModule.XYs2d):
@@ -212,13 +220,15 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
                 cdf = energy1d.cdf.values
                 subITIEA_X = []
                 for index2, angular1d in enumerate(angular2d):
+                    if index2 == 0:                                     # NOTE-A: NJOY seems to skip the first outgoing energy.
+                        continue                                        # MCNP must assume that the first point is 0, 0, 0 for energy_out, pdf, cdf.
                     if not isinstance(angular1d, energyAngularMCModule.Xs_pdf_cdf1d):
                         raise Exception('Incoherent inelastic outgoing angular1d is %s but needs to be "%s".' % (angular1d.moniker, energyAngularMCModule.Xs_pdf_cdf1d.moniker))
 
                     subITIEA_X += [xs[index2], pdf[index2], cdf[index2]]
                     subITIEA_X += getEqualProbableBins(angular1d, 2 * NILm1, checkEqualProbableBinning)[::2]
 
-                ITIEA_X.append([len(energy1d), subITIEA_X])
+                ITIEA_X.append([len(energy1d) - 1, subITIEA_X])         # See note NOTE-A above.
         else:
             raise Exception( 'Unsupport ENDF_MT = %d' % reaction.ENDF_MT )
 
@@ -227,15 +237,14 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
     XSS = []
     annotates = []
 
-    if ITIE_X is not None:
+    if len(ITIE) > 0:
         JXS[1-1] = len(XSS) + 1
-        energyGrid, crossSection = ITIE_X
-        GNDS_toACE_miscModule.updateXSSInfo('Number of inelastic energies', annotates, XSS, [ len( energyGrid ) ])
-        GNDS_toACE_miscModule.updateXSSInfo('Inelastic energy', annotates, XSS, energyGrid)
+        GNDS_toACE_miscModule.updateXSSInfo('Number of inelastic energies', annotates, XSS, [ len(ITIE) ])
+        GNDS_toACE_miscModule.updateXSSInfo('Inelastic energy', annotates, XSS, ITIE)
         JXS[2-1] = len(XSS) + 1
-        GNDS_toACE_miscModule.updateXSSInfo('Inelastic cross section', annotates, XSS, crossSection)
+        GNDS_toACE_miscModule.updateXSSInfo('Inelastic cross section', annotates, XSS, ITIX)
 
-        numberOfIncidentEnergies = len(energyGrid)
+        numberOfIncidentEnergies = len(ITIE)
         offset = len(XSS)
         JXS[3-1] = offset + 1
         incidentEnergyLocator = numberOfIncidentEnergies * [ 0 ]

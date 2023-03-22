@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.reactions.reaction &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.reactions.reaction &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.reactions.reaction</a></li> 
       </ul>
@@ -111,21 +111,19 @@
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="Reaction.getThreshold"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.getThreshold">[docs]</a>    <span class="k">def</span> <span class="nf">getThreshold</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Reaction.getThreshold"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.getThreshold">[docs]</a>    <span class="k">def</span> <span class="nf">getThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
 
-        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">Q</span> <span class="o">&gt;=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.</span> <span class="p">)</span>
-        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Q</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">:</span> <span class="k">return</span> <span class="mf">0.</span>
+        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">()</span>
         <span class="n">projectile</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span>
-        <span class="n">projectileMass</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span>
+        <span class="n">projectileMass</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
         <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">targetID</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span> <span class="p">)</span> <span class="p">:</span> <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
+        <span class="k">if</span> <span class="n">targetID</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
+            <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">targetMass</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="s1">&#39;amu&#39;</span> <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-            <span class="n">targetMass</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="n">Q</span> <span class="o">*</span> <span class="p">(</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">projectileMass</span> <span class="o">/</span> <span class="n">targetMass</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="n">targetMass</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s1">&#39;amu&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">Q</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">projectileMass</span> <span class="o">/</span> <span class="n">targetMass</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reaction.isBasicReaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.isBasicReaction">[docs]</a>    <span class="k">def</span> <span class="nf">isBasicReaction</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -312,7 +310,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.reactions.reaction</a></li> 
       </ul>

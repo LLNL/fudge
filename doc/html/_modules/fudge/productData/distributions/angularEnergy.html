@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fudge.productData.distributions.angularEnergy &#8212; Fudge and GNDS 5.0.0 documentation</title>
+    <title>fudge.productData.distributions.angularEnergy &#8212; Fudge and GNDS 6.1.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.productData.distributions.angularEnergy</a></li> 
       </ul>
@@ -283,14 +283,14 @@
         <span class="n">angular</span> <span class="o">=</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">PofEpGivenMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span> <span class="p">]</span> <span class="k">for</span> <span class="n">PofEp</span> <span class="ow">in</span> <span class="n">PofEpGivenMu</span> <span class="p">]</span> <span class="p">)</span>
-            <span class="n">angular</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">Xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="p">),</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">PofEpGivenMu</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">angular</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angularModule</span><span class="o">.</span><span class="n">Xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span><span class="n">angularModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="n">PofEpGivenMu</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">thinEpsilon</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">))</span>
 
         <span class="n">xys3d</span> <span class="o">=</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">XYs3d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">PofEpGivenMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
             <span class="n">xys2d</span> <span class="o">=</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="p">(</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">PofEpGivenMu</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span>
             <span class="k">for</span> <span class="n">PofEp</span> <span class="ow">in</span> <span class="n">PofEpGivenMu</span> <span class="p">:</span>
                 <span class="n">_PofEp</span> <span class="o">=</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span>
-                <span class="n">xys2d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">Xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span> <span class="n">_PofEp</span><span class="p">,</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">xys2d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">Xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span><span class="n">_PofEp</span><span class="p">,</span> <span class="n">PofEp</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">thinEpsilon</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">))</span>
             <span class="n">xys3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">xys2d</span> <span class="p">)</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">Angular</span><span class="p">(</span> <span class="n">angular</span> <span class="p">),</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">AngularEnergy</span><span class="p">(</span> <span class="n">xys3d</span> <span class="p">)</span> <span class="p">)</span></div>
@@ -330,13 +330,17 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Form.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Form.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="o">==</span> <span class="n">frame</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span>
-            <span class="n">function2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span>
-        <span class="k">else</span> <span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1"> translation not supported.&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="n">frame</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="n">muMin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;muMin&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">muMax</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;muMax&#39;</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;energySpectrumAtEnergy is currently not supported for an angularEnergy distribution.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="o">==</span> <span class="n">frame</span><span class="p">:</span>
+            <span class="n">function2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">energyIn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1"> translation not supported.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="n">frame</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Form.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -406,7 +410,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">fudge.productData.distributions.angularEnergy</a></li> 
       </ul>
