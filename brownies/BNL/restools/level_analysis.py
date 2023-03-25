@@ -4,7 +4,7 @@ import scipy.optimize
 
 from xData import enums as xDataEnumsModule
 from xData import axes as axesModule
-from xData import XYs1d as XYs1dModule
+from xData import XYs as XYs1dModule
 from brownies.BNL.utilities.fitting import bounded_nonlinear_curve_fit
 
 # ---------------------------------------------------------------------------------
