@@ -19,6 +19,7 @@ def setup():
             'brownies.BNL.plot_evaluation', 'brownies.BNL.plot_evaluation.test',
             'brownies.BNL.inter', 'brownies.BNL.inter.spectra', 'brownies.BNL.inter.test',
             'brownies.BNL.reaclib',
+            'brownies.BNL.RIPL',
             'brownies.LANL', 'brownies.LANL.toACE',
             'brownies.LLNL', 'brownies.LLNL.fetePy',
             'brownies.legacy',
