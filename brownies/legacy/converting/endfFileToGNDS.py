@@ -84,6 +84,7 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     targetZA, targetMass, LRP, LFI, NLIB, NMOD = \
         endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][0], logFile=logFile)
     targetZA = int(targetZA)  # Target's ZA
+    info.ZA_massLineInfo.add(targetZA, targetMass, 451, 1, 0)
     LRP = int(LRP)            # Resonance parameter data info
     LFI = int(LFI)            # Is fission present
     NLIB = int(NLIB)          # What library (e.g., 0 = ENDF/B
@@ -112,6 +113,7 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     IPART, ITYPE = divmod( NSUB, 10 )
     projectileZA = IPART
     if (projectileZA == 11): projectileZA = 9
+    info.ZA_massLineInfo.add(projectileZA, projectileMass, 451, 1, 2)
 
     # Line #4
     targetTemperature, dummy, LDRZ, dummy, NWD, NXC = \
@@ -130,6 +132,8 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
         4: "ENDF/B (HE)",
         5: "CENDL",
         6: "JENDL",
+        17: "TENDL",
+        18: "ROSFOND",
         21: "SG-23",
         31: "INDL/V",
         32: "INDL/A",
@@ -138,6 +142,7 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
         35: "BROND (IAEA version)",
         36: "INGDB-90",
         37: "FENDL/A",
+        38: "IAEA/PD",
         41: "BROND",
     }.get(NLIB, 'Unknown')
     info.evaluation=info.library # why do I need this?
@@ -430,6 +435,8 @@ def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation
 
     if kwargs.get('printMassHistory', False):
         info.massTracker.printHistory()
+        info.ZA_massLineInfo.printInfo()
+
     return( { 'reactionSuite' : reactionSuite, 'covarianceSuite' : covarianceSuite, 'errors' : info.doRaise, 'info':info } )
 
 def addUnspecifiedDistributions( info, outputChannel ) :

@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoPs.decays.averageEnergy &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.decays.averageEnergy</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PoPs.decays.averageEnergy</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines classes for storing the average outgoing energy of various types of particles</span>
+<span class="sd">emitted during a decay.</span>
+
+<span class="sd">Average energies are not as informative as detailed spectra, but for decay modes with very small probabilities</span>
+<span class="sd">they may be the only available information.</span>
+<span class="sd">These classes follow the example of the ENDF decay sub-library, providing average energies for a few general classes</span>
+<span class="sd">of decay products, such as &#39;electroMagneticRadiation&#39;, &#39;lightParticles&#39;, &#39;heavyParticles&#39;, etc.</span>
+
+<span class="sd">These classes are thin wrappers around the xData.physicalQuantity.PhysicalQuantity class.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">abc</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">physicalQuantity</span> <span class="k">as</span> <span class="n">physicalQuantityModule</span>
+<span class="kn">from</span> <span class="nn">xData.uncertainty.physicalQuantity</span> <span class="kn">import</span> <span class="n">uncertainty</span> <span class="k">as</span> <span class="n">uncertaintyModule</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
+
+<span class="c1">#</span>
+<span class="c1"># FIXME Need a physicalQuantity class with keyName.</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="AverageEnergy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.AverageEnergy">[docs]</a><span class="k">class</span> <span class="nc">AverageEnergy</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">PhysicalQuantity</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;averageEnergy&#39;</span>
+    <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
+
+<div class="viewcode-block" id="AverageEnergy.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.AverageEnergy.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;See documentation in xData.physicalQuantity.PhysicalQuantity.__init__&quot;&quot;&quot;</span>
+
+        <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">PhysicalQuantity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="p">)</span></div>
+
+    <span class="c1"># overrides required since __init__ arguments differ</span>
+<div class="viewcode-block" id="AverageEnergy.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.AverageEnergy.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">instance</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">instance</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="AverageEnergy.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.AverageEnergy.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;value&#39;</span> <span class="p">)</span> <span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;unit&#39;</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">uncertaintyModule</span><span class="o">.</span><span class="n">Uncertainty</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">uncertaintyModule</span><span class="o">.</span><span class="n">Uncertainty</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">instance</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="LightParticles"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.LightParticles">[docs]</a><span class="k">class</span> <span class="nc">LightParticles</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;lightParticles&#39;</span></div>
+
+<div class="viewcode-block" id="ElectroMagneticRadiation"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.ElectroMagneticRadiation">[docs]</a><span class="k">class</span> <span class="nc">ElectroMagneticRadiation</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;electroMagneticRadiation&#39;</span></div>
+
+<div class="viewcode-block" id="HeavyParticles"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.HeavyParticles">[docs]</a><span class="k">class</span> <span class="nc">HeavyParticles</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;heavyParticles&#39;</span></div>
+
+<div class="viewcode-block" id="BetaMinus"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.BetaMinus">[docs]</a><span class="k">class</span> <span class="nc">BetaMinus</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;betaMinus&#39;</span></div>
+
+<div class="viewcode-block" id="BetaPlus"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.BetaPlus">[docs]</a><span class="k">class</span> <span class="nc">BetaPlus</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;betaPlus&#39;</span></div>
+
+<div class="viewcode-block" id="AugerElectron"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.AugerElectron">[docs]</a><span class="k">class</span> <span class="nc">AugerElectron</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;AugerElectron&#39;</span></div>
+
+<div class="viewcode-block" id="ConversionElectron"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.ConversionElectron">[docs]</a><span class="k">class</span> <span class="nc">ConversionElectron</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;conversionElectron&#39;</span></div>
+
+<div class="viewcode-block" id="Gamma"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.Gamma">[docs]</a><span class="k">class</span> <span class="nc">Gamma</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;gamma&#39;</span></div>
+
+<div class="viewcode-block" id="XRay"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.XRay">[docs]</a><span class="k">class</span> <span class="nc">XRay</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;xRay&#39;</span></div>
+
+<div class="viewcode-block" id="InternalBremsstrahlung"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.InternalBremsstrahlung">[docs]</a><span class="k">class</span> <span class="nc">InternalBremsstrahlung</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;internalBremsstrahlung&#39;</span></div>
+
+<div class="viewcode-block" id="Annihilation"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.Annihilation">[docs]</a><span class="k">class</span> <span class="nc">Annihilation</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;annihilation&#39;</span></div>
+
+<div class="viewcode-block" id="Alpha"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.Alpha">[docs]</a><span class="k">class</span> <span class="nc">Alpha</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;alpha&#39;</span></div>
+
+<div class="viewcode-block" id="Recoil"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.Recoil">[docs]</a><span class="k">class</span> <span class="nc">Recoil</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;recoil&#39;</span></div>
+
+<div class="viewcode-block" id="SpontaneousFission"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.SpontaneousFission">[docs]</a><span class="k">class</span> <span class="nc">SpontaneousFission</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;spontaneousFission&#39;</span></div>
+
+<div class="viewcode-block" id="FissionNeutrons"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.FissionNeutrons">[docs]</a><span class="k">class</span> <span class="nc">FissionNeutrons</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;fissionNeutrons&#39;</span></div>
+
+<div class="viewcode-block" id="Proton"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.Proton">[docs]</a><span class="k">class</span> <span class="nc">Proton</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;proton&#39;</span></div>
+
+<div class="viewcode-block" id="Neutrino"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.Neutrino">[docs]</a><span class="k">class</span> <span class="nc">Neutrino</span><span class="p">(</span> <span class="n">AverageEnergy</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">_label</span> <span class="o">=</span> <span class="s1">&#39;neutrino&#39;</span></div>
+
+<div class="viewcode-block" id="AverageEnergies"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.AverageEnergies">[docs]</a><span class="k">class</span> <span class="nc">AverageEnergies</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;averageEnergies&#39;</span>
+
+<div class="viewcode-block" id="AverageEnergies.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.AverageEnergies.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span> <span class="n">AverageEnergy</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="AverageEnergies.parseNode"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.averageEnergy.AverageEnergies.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">subclass</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">LightParticles</span><span class="p">,</span> <span class="n">ElectroMagneticRadiation</span><span class="p">,</span> <span class="n">HeavyParticles</span><span class="p">,</span> <span class="n">BetaMinus</span><span class="p">,</span> <span class="n">BetaPlus</span><span class="p">,</span> <span class="n">AugerElectron</span><span class="p">,</span>
+                <span class="n">ConversionElectron</span><span class="p">,</span> <span class="n">Gamma</span><span class="p">,</span> <span class="n">XRay</span><span class="p">,</span> <span class="n">InternalBremsstrahlung</span><span class="p">,</span> <span class="n">Annihilation</span><span class="p">,</span> <span class="n">Alpha</span><span class="p">,</span> <span class="n">Recoil</span><span class="p">,</span>
+                <span class="n">SpontaneousFission</span><span class="p">,</span> <span class="n">FissionNeutrons</span><span class="p">,</span> <span class="n">Proton</span><span class="p">,</span> <span class="n">Neutrino</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="n">subclass</span><span class="o">.</span><span class="n">_label</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">subclass</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.decays.averageEnergy</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

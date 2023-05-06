@@ -242,3 +242,9 @@ if not args.skipRIS:
     printSet('Map files with missing RIS files', missingRIS_files)
 printSet('Maps with format that does not match that of the master map file', mapFormatMisMatch)
 printSet('Protares with format that does not match that of the master map file', protareFormatMisMatch)
+
+unreferenceCovarianceFiles = set()
+for covarianceInDirectories in covariancesInDirectories:
+    if covarianceInDirectories not in covarianceExternalFiles:
+        unreferenceCovarianceFiles.add(covarianceInDirectories)
+printSet('Unreferenced covariance files', unreferenceCovarianceFiles)

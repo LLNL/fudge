@@ -43,20 +43,11 @@ parser.add_argument('--summaryGammas', action='store_true',                 help
 parser.add_argument('--productPath', action='store_true',                   help='If present, the product path needed by other scripts (e.g., spectrum.py) are included with each product.')
 parser.add_argument('--unspecified', action='store_true',                   help='If present, only information for products with unspecified multiplicities or distributions are printed.')
 parser.add_argument('--doNotShowProducts', action='store_true',             help='If present, no product data are displayed.')
+parser.add_argument('--skipProductions', action='store_true',               help='If present, skips the "productions" node.')
+parser.add_argument('--skipIncompleteReactions', action='store_true',       help='If present, skips the "incompleteReactions" node.')
 parser.add_argument('--products', action='append', default=[],              help='Only show reactions with these products in their list. If empty, all reactions are shown.')
 parser.add_argument('--MT', action='append', type=int, default=[],          help='Only show reactions with these MTs. If empty, all reactions are shown.')
-
-args = parser.parse_args()
-onlyReactionsWithTheseProducts = set(args.products)
-additionalProducts = []
-for particle in onlyReactionsWithTheseProducts:
-    additionalProducts.append(specialNuclearParticleIDModule.familiarID(particle))
-    additionalProducts.append(specialNuclearParticleIDModule.nuclideID(particle))
-additionalProducts = set(additionalProducts)
-additionalProducts.discard(None)
-onlyReactionsWithTheseProducts = onlyReactionsWithTheseProducts.union(additionalProducts)
-
-protare = singleProtareArguments.protare(args, verbosity=0, lazyParsing=True)
+parser.add_argument('--crossSectionSums', action='store_true',              help='If present, also show crossSectionSum information.')
 
 class PhotonDummy:
 
@@ -165,7 +156,7 @@ def outputChannelPeek(self, indent, productPath):
 
 outputChannelModule.OutputChannel.__peek = outputChannelPeek
 
-def reactionPeek(self, prefix, index, indent):
+def reactionPeek(self, prefix, index, indent, reactionIndex):
 
     if len(onlyReactionsWithTheseProducts) > 0:
         if len(onlyReactionsWithTheseProducts.intersection(self.listOfProducts())) == 0:
@@ -188,8 +179,55 @@ def reactionPeek(self, prefix, index, indent):
 
 reactionBaseModule.Base_reaction.__peek = reactionPeek
 
-indent = indentIncrement
-print(protare.sourcePath, '(GNDS-%s)' % protare.format)
-print('%sreactions:' % indent)
-for reactionIndex, reaction in enumerate(protare.reactions): reaction.__peek('%s', reactionIndex, 2 * indentIncrement)
-for reactionIndex, reaction in enumerate(protare.orphanProducts): reaction.__peek('orphanProduct %s', reactionIndex, 2 * indentIncrement)
+def crossSectionSum(self, index, indent):
+
+    if len(onlyReactionsWithTheseProducts) > 0:
+        return
+    if len(args.MT) > 0:
+        if self.ENDF_MT not in args.MT:
+            return
+    crossSectionStr = ''
+    crossSection = self.crossSection[0]
+    if isinstance(crossSection, crossSectionModule.Reference):
+        try:
+            crossSectionSum = crossSection.link.findClassInAncestry(sumsModule.CrossSectionSum)
+            crossSectionStr = ': %s' % crossSectionSum.label
+        except:
+            pass
+    print('%s%-32s (%4d): domainMin = %s, domainMax = %s %s%s' % (indent, str(self), index, crossSection.domainMin, 
+            crossSection.domainMax, crossSection.domainUnit, crossSectionStr))
+
+def showChildren(node, skip):
+
+    if skip:
+        return
+    if len(node) > 0:
+        print('%s%s:' % (indent, node.moniker))
+        for reactionIndex, reaction in enumerate(node):
+            reaction.__peek('%s', reactionIndex, 2 * indentIncrement, reactionIndex)
+
+sumsModule.CrossSectionSum.__peek = crossSectionSum
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    onlyReactionsWithTheseProducts = set(args.products)
+    additionalProducts = []
+    for particle in onlyReactionsWithTheseProducts:
+        additionalProducts.append(specialNuclearParticleIDModule.familiarID(particle))
+        additionalProducts.append(specialNuclearParticleIDModule.nuclideID(particle))
+    additionalProducts = set(additionalProducts)
+    additionalProducts.discard(None)
+    onlyReactionsWithTheseProducts = onlyReactionsWithTheseProducts.union(additionalProducts)
+
+    protare = singleProtareArguments.protare(args, verbosity=0, lazyParsing=True)
+
+    indent = indentIncrement
+    print(protare.sourcePath, '(GNDS-%s)' % protare.format)
+    showChildren(protare.reactions, False)
+    showChildren(protare.orphanProducts, False)
+    showChildren(protare.productions, args.skipProductions)
+    showChildren(protare.incompleteReactions, args.skipIncompleteReactions)
+    if args.crossSectionSums:
+        print('%sCross section sums:' % indent)
+        for crossSectionSumIndex, crossSectionSum in enumerate(protare.sums.crossSectionSums):
+            crossSectionSum.__peek(crossSectionSumIndex, 2 * indentIncrement)

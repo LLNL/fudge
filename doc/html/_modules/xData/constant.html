@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.constant &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.constant</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.constant</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">numericalFunctions</span> <span class="kn">import</span> <span class="n">pointwiseXY_C</span> <span class="k">as</span> <span class="n">pointwiseXY_CModule</span>
+<span class="n">floatToShortestString</span> <span class="o">=</span> <span class="n">pointwiseXY_CModule</span><span class="o">.</span><span class="n">floatToShortestString</span>
+
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
+
+<div class="viewcode-block" id="Constant"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant">[docs]</a><span class="k">class</span> <span class="nc">Constant</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span> <span class="p">)</span>  <span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_value</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_value</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">domainMin</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">domainMin</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">domainMin</span><span class="p">,</span> <span class="nb">float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;domainMin not a float instance&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">=</span> <span class="n">domainMin</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">domainMax</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">domainMax</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">domainMax</span><span class="p">,</span> <span class="nb">float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;domainMax not a float instance&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">=</span> <span class="n">domainMax</span>
+
+<div class="viewcode-block" id="Constant.copy"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">axes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span></div>
+
+    <span class="n">__copy__</span> <span class="o">=</span> <span class="n">copy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="p">)</span>
+
+    <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_value</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_value</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">_value</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_value</span><span class="p">,</span> <span class="nb">float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;value not a float instance&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="p">)</span>
+
+    <span class="nd">@domainMin</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets self&#39;s domainMin to *domainMin*. *domainMin* must be less than self.domainMax or a **raise** is executed.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">domainMin</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;domainMin = %.17 &gt;= self.domainMax = </span><span class="si">%.17e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">=</span> <span class="n">domainMin</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="p">)</span>
+
+    <span class="nd">@domainMax</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets self&#39;s domainMax to *domainMax*. *domainMax* must be greater than self.domainMin or a **raise** is executed.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">domainMax</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;domainMax = %.17 &lt;= self.domainMin = </span><span class="si">%.17e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">=</span> <span class="n">domainMax</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAxisUnitSafely</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rangeMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="p">)</span>
+
+    <span class="n">rangeMax</span> <span class="o">=</span> <span class="n">rangeMin</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rangeUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAxisUnitSafely</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Constant.fixDomainPerUnitChange"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant.fixDomainPerUnitChange">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomainPerUnitChange</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">factors</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Constant.fixDomains"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets *domainMin* and *domainMax* per the arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">OldDomainMin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span>
+        <span class="n">OldDomainMax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span>
+
+        <span class="n">domainMin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">)</span>
+        <span class="n">domainMax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fixToDomain</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">FixDomain</span><span class="o">.</span><span class="n">lower</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">=</span> <span class="n">domainMin</span>
+        <span class="k">elif</span> <span class="n">fixToDomain</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">FixDomain</span><span class="o">.</span><span class="n">upper</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">=</span> <span class="n">domainMax</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">=</span> <span class="n">domainMin</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">=</span> <span class="n">domainMax</span>
+
+        <span class="k">if</span> <span class="n">OldDomainMin</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="ow">and</span> <span class="n">OldDomainMax</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">:</span> <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="mi">1</span></div></div>
+
+<div class="viewcode-block" id="Constant1d"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d">[docs]</a><span class="k">class</span> <span class="nc">Constant1d</span><span class="p">(</span> <span class="n">Constant</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;constant1d&#39;</span>
+    <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">Constant1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dividing Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">Constant1d</span><span class="p">(</span><span class="n">other</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dividing Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">/=</span> <span class="n">other</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dividing Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">Constant1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiplying Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+
+    <span class="k">def</span> <span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="n">other</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiplying Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Constant1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        unitMap is a dictionary of the for { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span>
+
+        <span class="n">factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixDomainPerUnitChange</span><span class="p">(</span> <span class="n">factors</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixValuePerUnitChange</span><span class="p">(</span> <span class="n">factors</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Constant1d.convertAxisToUnit"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.convertAxisToUnit">[docs]</a>    <span class="k">def</span> <span class="nf">convertAxisToUnit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indexOrName</span><span class="p">,</span> <span class="n">newUnit</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">getAxisIndexByIndexOrName</span><span class="p">(</span> <span class="n">indexOrName</span> <span class="p">)</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;1 &#39;</span> <span class="o">+</span> <span class="n">axis</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">newUnit</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">fixDomainPerUnitChange</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="n">factor</span><span class="p">})</span>
+            <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="n">factor</span>
+            <span class="n">axis</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">newUnit</span>
+        <span class="k">return</span> <span class="n">n</span></div>
+
+<div class="viewcode-block" id="Constant1d.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Constant1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xys1d</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">]],</span>
+                      <span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xys1d</span></div>
+
+<div class="viewcode-block" id="Constant1d.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+        <span class="n">valueFormatter</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;valueFormatter&#39;</span><span class="p">,</span> <span class="n">floatToShortestString</span><span class="p">)</span>
+        <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;significantDigits&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+
+        <span class="n">attributeStr</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="n">attributesToXMLAttributeStr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">startTag</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> value=&quot;</span><span class="si">%s</span><span class="s1">&quot; domainMin=&quot;</span><span class="si">%s</span><span class="s1">&quot; domainMax=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributeStr</span><span class="p">,</span> 
+                <span class="n">valueFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span><span class="p">),</span>
+                <span class="n">valueFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span><span class="p">),</span>
+                <span class="n">valueFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span><span class="p">)</span> <span class="p">)</span> <span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="n">startTag</span><span class="p">,</span> <span class="p">[],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Constant1d.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">attributes</span><span class="p">,</span> <span class="n">extraAttributes</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">parseBareNodeCommonAttributes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">)</span>     <span class="c1"># parseBareNodeCommonAttributes adds to xPath.</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">extraAttributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
+        <span class="n">domainMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">extraAttributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;domainMin&#39;</span><span class="p">))</span>
+        <span class="n">domainMax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">extraAttributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;domainMax&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extraAttributes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid attributes: </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">extraAttributes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="p">))</span>
+
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+
+        <span class="n">extraNodes</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">parseNodeStandardChildren</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extraNodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid nodes: </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">extraNode</span><span class="o">.</span><span class="n">tag</span> <span class="k">for</span> <span class="n">extraNode</span> <span class="ow">in</span> <span class="n">extraNodes</span><span class="p">])))</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>                                     <span class="c1"># Per comment above, parseBareNodeCommonAttributes adds to xPath.</span>
+
+        <span class="k">return</span> <span class="n">instance</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.constant</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

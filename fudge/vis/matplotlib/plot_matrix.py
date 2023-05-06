@@ -13,19 +13,22 @@ from matplotlib import ticker
 def plot_matrix( matrix, energyBoundariesX=None, energyBoundariesY=None, title="Matrix", xyTitle='Energy (MeV)',
         xylog=False, zlog=False, zRange=(), switchY=False, colorMap='jet', subplot=None ):
     """Plot a matrix. Arguments are:
-        @matrix (required): 2-dimensional numpy array (or equivalent)
-        @energyBoundariesX: list of group boundary edges. If omitted, use matrix indices for axis
-        @energyBoundariesY: "". If omitted, use same boundaries as x-axis
-        @title
-        @xyTitle: specify x (and optionally y) titles. May be string or tuple of two strings
-        @xylog: if True, energyBoundariesX (and Y if different) must also be specified
-        @zlog
-        @zRange: for plotting a sub-range of z
-        @switchY: if True, plot matrix[0,0] at upper left rather than lower left
-        @colorMap: select color range for z-axis. Options include 'jet', 'jet_r', 'correlation', etc.
-        @subplot: matplotlib.axes.AxesSubplot instance (for drawing matrix inside larger figure)
-        
-        This prepares a 2-d matrix plot. Use pyplot.show() to view the result."""
+    :matrix (required): 2-dimensional numpy array (or equivalent)
+    :energyBoundariesX: list of group boundary edges. If omitted, use matrix indices for axis
+    :energyBoundariesY: "". If omitted, use same boundaries as x-axis
+    :title: specify plot title
+    :xyTitle: specify x (and optionally y) titles. May be string or tuple of two strings
+    :xylog: if True, energyBoundariesX (and Y if different) must also be specified
+    :zlog: if True, use log scale for z-axis colorbar. See note below for symmetric log scale.
+    :zRange: for plotting a sub-range of z
+    :switchY: if True, plot matrix[0,0] at upper left rather than lower left
+    :colorMap: select color range for z-axis. Options include 'jet', 'jet_r', 'correlation', etc.
+    :subplot: optional matplotlib.axes.AxesSubplot instance (for drawing matrix inside larger figure)
+
+    This prepares a 2-d matrix plot. Use pyplot.show() to view the result.
+
+    plot_matrix supports symmetric log-scale for the z-axis, using these arguments:
+        zlog=True, zRange=(-z,z), colorMap=plot_matrix.generateColorMap()"""
 
     matrix = numpy.array( matrix )
     if matrix.ndim != 2:

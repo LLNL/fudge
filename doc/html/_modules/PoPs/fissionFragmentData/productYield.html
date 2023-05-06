@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoPs.fissionFragmentData.productYield &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.fissionFragmentData.productYield</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PoPs.fissionFragmentData.productYield</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;This module defines the ProductYield and ProductYields classes, storing yields for multiple</span>
+<span class="sd">fission products at various elapsed times after fission.&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">miscModule</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">nuclides</span> <span class="k">as</span> <span class="n">nuclidesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">elapsedTime</span> <span class="k">as</span> <span class="n">elapsedTimeModule</span>
+
+<div class="viewcode-block" id="ProductYield"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.productYield.ProductYield">[docs]</a><span class="k">class</span> <span class="nc">ProductYield</span><span class="p">(</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The ProductYield class stores a list of fission product nuclides and a list of elapsed times</span>
+<span class="sd">    after fission.  The prompt fission product yield for each nuclide is stored with elapsedTime.time = 0,</span>
+<span class="sd">    and delayed product yields are listed with elapsedTime.time &gt; 0.&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;productYield&#39;</span>
+
+<div class="viewcode-block" id="ProductYield.__init__"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.productYield.ProductYield.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">nuclides</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a ProductYield with specified style label and list of nuclides.</span>
+
+<span class="sd">        :param label: string corresponding to a data style, typically the evaluated style.</span>
+<span class="sd">        :param nuclides: Nuclides instance or list of PoPs particle ids, e.g. [&#39;Mn55&#39;, &#39;Mn56&#39;, ...]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span> <span class="o">=</span> <span class="n">nuclidesModule</span><span class="o">.</span><span class="n">Nuclides</span><span class="p">(</span> <span class="n">nuclides</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__elapsedTimes</span> <span class="o">=</span> <span class="n">elapsedTimeModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__elapsedTimes</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nuclides</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the list of nuclides for which fission product yield data are given.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">elapsedTimes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Suite of elapsedTimes.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__elapsedTimes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">durations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deprecated accessor using the GNDS-1.9 name. Returns the Suite of elapsedTimes.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__elapsedTimes</span>
+
+<div class="viewcode-block" id="ProductYield.convertUnits"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.productYield.ProductYield.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method currently does nothing.&quot;&quot;&quot;</span>
+        <span class="c1"># FIXME yields are unitless, but we need to support changing units of time.</span>
+
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ProductYield.toXML_strList"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.productYield.ProductYield.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
+
+<span class="sd">        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.</span>
+<span class="sd">        :param kwargs:    A keyword list.</span>
+
+<span class="sd">        :return:          List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+
+        <span class="n">XMLStringList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt; &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span> <span class="p">]</span>
+        <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__elapsedTimes</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">XMLStringList</span></div>
+
+<div class="viewcode-block" id="ProductYield.parseNode"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.productYield.ProductYield.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parses contents of the given node into self (a ProductYield instance).</span>
+
+<span class="sd">        :param node: pointer to a &#39;productYield&#39; node in a GNDS file.</span>
+<span class="sd">        :param xPath: list storing the xPath to the current node, useful for debugging.</span>
+<span class="sd">        :param linkData: dictionary containing unresolved links and other parsing information.&quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">nuclidesModule</span><span class="o">.</span><span class="n">Nuclides</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nuclides</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">elapsedTimeModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">elapsedTimes</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unexpected child node &#39;</span><span class="si">%s</span><span class="s2">&#39; in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ProductYield.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.productYield.ProductYield.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
+
+<span class="sd">        :param cls: FUDGE Python class to return.</span>
+<span class="sd">        :param node: **FissionFragmentData** node to parse.</span>
+<span class="sd">        :param xPath: List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData: dict that collects unresolved links.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nuclides</span><span class="o">=</span><span class="p">[])</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+
+<div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.productYield.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Contains one or more ProductYield instances, each with a label corresponding to a unique **style**.&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;productYields&#39;</span>
+
+<div class="viewcode-block" id="Suite.__init__"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.productYield.Suite.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">ProductYield</span><span class="p">,))</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.fissionFragmentData.productYield</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

@@ -199,7 +199,11 @@ for file in args.files :
 if( type is not None ) : groups.append( [ type, files ] )
 
 map = mapModule.Map( args.library, args.path )
-if( args.nonMetaStablesMapFile is not None ) : map.append( mapModule.Import( args.nonMetaStablesMapFile ) )
+if args.nonMetaStablesMapFile is not None:
+    # ensure file exists and is a map file
+    ftype, info = GNDS_fileModule.type(args.nonMetaStablesMapFile)
+    assert ftype == 'map', "nonMetaStablesMapFile argument must be a map file! Received %s instead" % type
+    map.append( mapModule.Import( args.nonMetaStablesMapFile ) )
 
 TNSL_missingStandardTargets = []
 for type, files in groups :

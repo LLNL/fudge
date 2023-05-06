@@ -1,17 +1,6 @@
 pqu package
 ===========
 
-Submodules
-----------
-
-pqu.NumberDict module
----------------------
-
-.. automodule:: pqu.NumberDict
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 pqu.PQU module
 --------------
 
@@ -28,6 +17,13 @@ pqu.pqu_constants module
     :undoc-members:
     :show-inheritance:
 
+pqu.NumberDict module
+---------------------
+
+.. automodule:: pqu.NumberDict
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Module contents
 ---------------

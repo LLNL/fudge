@@ -187,7 +187,7 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
         if( isinstance( particle, ( nucleusPoPsModule.Particle, nuclidePoPsModule.Particle ) ) ) :
             if( len( particle.decayData.decayModes ) > 0 ) :
                 doGammaDecay = True
-                for baseMT in [ 50, 600, 650, 700, 750, 800, 1000 ] :   # 1000 causes raise in endf_endlModule.ENDF_MTZAEquation.
+                for baseMT in [50, 600, 650, 700, 750, 800, 900, 1000]:     # 1000 causes raise in endf_endlModule.ENDF_MTZAEquation.
                     if baseMT == 1000:
                         doGammaDecay = False
                         break
@@ -221,7 +221,7 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
 
     if covarianceSuite:
         if covarianceSuite.domainUnit != 'eV':
-            covarianceSuite = covarianceSuite.copy()
+            covarianceSuite = covarianceSuite.parseXMLString(covarianceSuite.toXML(), lazyParsing=True)
             covarianceSuite.convertUnits({ covarianceSuite.domainUnit : 'eV' })
         if( styleLabel not in covarianceSuite.styles ) : targetInfo['style'] = covarianceSuite.styles[0].label       # FIXME, this is a kludge.
         covarianceSuite.toENDF6( endfMFList, flags, targetInfo )

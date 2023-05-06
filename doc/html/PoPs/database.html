@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Database &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Particle families" href="families.html" />
+    <link rel="prev" title="Tutorial and Examples" href="tutorial.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="families.html" title="Particle families"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial and Examples"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Properties of Particles (PoPs)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Database</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="database">
+<span id="id1"></span><h1>Database<a class="headerlink" href="#database" title="Permalink to this heading">¶</a></h1>
+<span class="target" id="module-PoPs.database"></span><p>This module defines the PoPs database class, which is the top-level container in PoPs.
+A database is a collection of particles, each with a unique id.
+It may also store documentation and ‘style’ information.</p>
+<p>Within the database, particles are organized by family (i.e. gauge bosons, leptons, baryons or chemical elements).
+For nuclear data users, the largest part of the database will likely be inside the chemical elements section
+where isotopes, nuclides and excited nuclear states are defined.</p>
+<p>The database supports looking up particles by their id. For example, if ‘pops’ is a PoPs.database instance that
+contains a particle with id ‘Al27’,</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;Al27&#39;</span> <span class="ow">in</span> <span class="n">pops</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">pops</span><span class="p">[</span><span class="s1">&#39;Al27&#39;</span><span class="p">]</span> <span class="p">)</span>
+<span class="go">&lt;class PoPs.families.nuclide.particle&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pops</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>   <span class="c1"># list all particle ids in the database</span>
+<span class="go">[&#39;photon&#39;, &#39;n&#39;, ... &#39;Al28&#39;, &#39;Al26_m1&#39;, &#39;Na24_m1&#39;]</span>
+</pre></div>
+</div>
+<p>The particle database may also define aliases. These can be used to refer to a particle by another name.
+For example, the id for the electron is normally “e-”, but could also be aliased to ‘e’ or ‘electron’.
+In the example above, ‘Al26_m1’ and ‘Na24_m1’ are aliases pointing to excited nuclides.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">pops</span><span class="p">[</span><span class="s1">&#39;Na24_m1&#39;</span><span class="p">]</span> <span class="p">)</span>
+<span class="go">&lt;class &#39;PoPs.families.nuclide.alias&#39;&gt;</span>
+</pre></div>
+</div>
+<p>Each alias has a ‘pid’ field with the id of the actual particle it points to:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pops</span><span class="p">[</span><span class="s1">&#39;Na24_m1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
+<span class="go">&#39;Na24_e1&#39;</span>
+</pre></div>
+</div>
+<p>In this case, the first metastable state of Na24 is also the first excited state (as indicated by the ‘_e1’ suffix).</p>
+<p>A PoPs database has methods to write itself out to an XML-formatted file or string, to read back in from XML,
+to convert units, etc.</p>
+<p>One PoPs database may point to another parent database. In that case, if a particle is not found in the current
+database it will also check in the parent database before throwing a KeyError.
+This option allows an evaluator to override part of the parent database (i.e. to define a different mass
+for one or more particles).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.database.Database">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.database.</span></span><span class="sig-name descname"><span class="pre">Database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2.0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../LUPY/index.html#LUPY.ancestry.AncestryIO" title="LUPY.ancestry.AncestryIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a particle to the database, inside the appropriate particle family.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particle</strong> – instance of families.particle.Particle or derived class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.addFile">
+<span class="sig-name descname"><span class="pre">addFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.addFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.addFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the file <em>fileName</em> and adds its particles to self. If replace is False, particles already in self are
+not replaced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for physics problems in the database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – options controlling i.e. how strict checks should be. Currently unused.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of warnings along with context about where they appear in the database</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively searches for units within all sections, converting units that appear in the unitMap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>unitMap</strong> – dictionary with old/new unit pairs where the old unit is the key (e.g., { ‘eV’ : ‘MeV’, ‘b’ : ‘mb’ }).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>deep copy of the entire database.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="PoPs.database.Database.documentation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">documentation</span></span><a class="headerlink" href="#PoPs.database.Database.documentation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the documentation instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.estimateMass">
+<span class="sig-name descname"><span class="pre">estimateMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxASpan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.estimateMass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.estimateMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mass of the particle specified by <em>pid</em> if it exists in <em>self</em> and has a mass; otherwise,
+the mass is estimate if possible. Currenlty, estimates are only performed if <em>pid</em> is a nuclide. In 
+which case, its mass is estimated by trying to find a near by nuclide with the same Z. If this fails, 
+None is returned.</p>
+<p>If the particle exists and has a mass (ergo, the mass is not estimated), the returned value is positive. 
+If the mass is estimated, a negative value is returned whose absolute value is the estimated mass. 
+Otherwise, None is returned.</p>
+<p>If the mass is estimated for a nuclide, the returned mass is for the ground state of the nuclide. Ergo, the <em>pid</em>
+specifies a nuclear level, the level information is ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pid</strong> – The PoPs id of the particle whose mass is to be returned.</p></li>
+<li><p><strong>unit</strong> – The unit of the returned mass.</p></li>
+</ul>
+</dd>
+<dt class="field-even">MaxASpan<span class="colon">:</span></dt>
+<dd class="field-even"><p>If estimating a nuclide mass, only consider A’s within this value of the A for <em>pid</em>.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A positive float if a mass for <em>pid</em> exist in <em>self</em>, a negative float if the mass is estimated and None otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.final">
+<span class="sig-name descname"><span class="pre">final</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.final"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.final" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the particle matching id. If id is an alias, will follow the alias pid until a non-alias particle is found and that particle is returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of ids for all particles in self.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.parentDatabase">
+<span class="sig-name descname"><span class="pre">parentDatabase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.parentDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.parentDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search up ancestry chain for another PoPs database.
+Return PoPs.database if found, otherwise return None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.read">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in the file name <em>fileName</em> and returns a <strong>database</strong> instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.saveToFile">
+<span class="sig-name descname"><span class="pre">saveToFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.saveToFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.saveToFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes an XML representation of <em>self</em> to path <em>fileName</em>. This methods opens the file and calls <strong>saveToOpenedFile</strong> and then closes the file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.database.read">
+<span class="sig-prename descclassname"><span class="pre">PoPs.database.</span></span><span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in the file name <em>fileName</em> and returns a <strong>database</strong> instance.</p>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="tutorial.html"
+                          title="previous chapter">Tutorial and Examples</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="families.html"
+                          title="next chapter">Particle families</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/PoPs/database.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="families.html" title="Particle families"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial and Examples"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Properties of Particles (PoPs)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Database</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>fudge.reactionSuite &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -48,7 +50,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
@@ -216,7 +220,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__applicationData</span> <span class="o">=</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">ApplicationData</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__applicationData</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_externalLinks</span> <span class="o">=</span> <span class="p">[]</span>    <span class="c1"># keep track of links to external files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_externalLinks</span> <span class="o">=</span> <span class="p">[]</span>        <span class="c1"># Keep track of links to external files.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loadedCovariances</span> <span class="o">=</span> <span class="kc">None</span>   <span class="c1"># If loadCovariances called, store results here.</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -405,13 +410,19 @@
             <span class="k">if</span><span class="p">(</span> <span class="n">reaction</span><span class="o">.</span><span class="n">isThermalNeutronScatteringLaw</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReactionSuite.photonBranchingData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.photonBranchingData">[docs]</a>    <span class="k">def</span> <span class="nf">photonBranchingData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="ReactionSuite.photonBranchingData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.photonBranchingData">[docs]</a>    <span class="k">def</span> <span class="nf">photonBranchingData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        For each isotope in *self.PoPs*, calls decaysMiscPoPsModule.photonBranchingData.</span>
+
+<span class="sd">        :return:        Dictionary with keys being each isotope in *self.PoPs* and their values being that returned by </span>
+<span class="sd">                            decaysMiscPoPsModule.photonBranchingData.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">branchingData</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">chemicalElement</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">chemicalElements</span> <span class="p">:</span>
-            <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="n">chemicalElement</span> <span class="p">:</span>
-                <span class="n">branchingData</span><span class="p">[</span><span class="n">isotope</span><span class="o">.</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="n">decaysMiscPoPsModule</span><span class="o">.</span><span class="n">photonBranchingData</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="p">,</span> <span class="n">isotope</span><span class="o">.</span><span class="n">symbol</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">branchingData</span> <span class="p">)</span></div>
+        <span class="k">for</span> <span class="n">chemicalElement</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">chemicalElements</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="n">chemicalElement</span><span class="p">:</span>
+                <span class="n">branchingData</span><span class="p">[</span><span class="n">isotope</span><span class="o">.</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="n">decaysMiscPoPsModule</span><span class="o">.</span><span class="n">photonBranchingData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="p">,</span> <span class="n">isotope</span><span class="o">.</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">branchingData</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.convertUnits"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -861,6 +872,9 @@
 <span class="sd">        Returns None if no matching reaction is found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="s1">&#39;capture&#39;</span><span class="p">:</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="mi">102</span>
+
         <span class="c1"># If channel is an int, it might be an ENDF MT, so check those first</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span> <span class="c1"># must be an ENDF MT</span>
             <span class="k">for</span> <span class="n">reactionList</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sums</span><span class="o">.</span><span class="n">crossSectionSums</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionComponents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">productions</span><span class="p">:</span>
@@ -1095,29 +1109,46 @@
 
         <span class="k">return</span> <span class="n">products</span></div>
 
-<div class="viewcode-block" id="ReactionSuite.loadCovariances"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.loadCovariances">[docs]</a>    <span class="k">def</span> <span class="nf">loadCovariances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load all external files of type &#39;covarianceSuite&#39;, and resolve links between self and covarianceSuites</span>
-<span class="sd">        @return: list of loaded covarianceSuites</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ReactionSuite.covarianceExternalFiles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.covarianceExternalFiles">[docs]</a>    <span class="k">def</span> <span class="nf">covarianceExternalFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of all ExternalFile instanaces in *self* that point to covariance files.</span>
+
+<span class="sd">        :return:    The list of ExternalFile instanaces that point to covariance files.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">GNDS_file</span> <span class="k">as</span> <span class="n">GNDS_fileModule</span>
         <span class="kn">from</span> <span class="nn">fudge.covariances</span> <span class="kn">import</span> <span class="n">covarianceSuite</span> <span class="k">as</span> <span class="n">covarianceSuiteModule</span>
 
-        <span class="n">covariances</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
-        <span class="k">for</span> <span class="n">external</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>
+        <span class="n">externalFiles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">externalFile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>
             <span class="c1"># TODO submit proposal to include file type attribute in the externalFile GNDS node so we don&#39;t need to run GNDS_fileModule.type</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">realpath</span><span class="p">()):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  WARNING: skipping externalFile &#39;</span><span class="si">%s</span><span class="s2">&#39; which points to non-existing file </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
-                      <span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">()))</span>
+                      <span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">externalFile</span><span class="o">.</span><span class="n">realpath</span><span class="p">()))</span>
                 <span class="k">continue</span>
-            <span class="n">gndsType</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">GNDS_fileModule</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">())</span>
+            <span class="n">gndsType</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">GNDS_fileModule</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">realpath</span><span class="p">())</span>
             <span class="k">if</span> <span class="n">gndsType</span> <span class="o">==</span> <span class="n">covarianceSuiteModule</span><span class="o">.</span><span class="n">CovarianceSuite</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
-                <span class="n">external</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">covarianceSuiteModule</span><span class="o">.</span><span class="n">CovarianceSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">realpath</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                <span class="n">covariances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">external</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+                <span class="n">externalFiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">externalFile</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">covariances</span></div>
+        <span class="k">return</span> <span class="n">externalFiles</span></div>
+
+<div class="viewcode-block" id="ReactionSuite.loadCovariances"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.loadCovariances">[docs]</a>    <span class="k">def</span> <span class="nf">loadCovariances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load all external files of type &#39;covarianceSuite&#39;, and resolve links between self and covarianceSuites.</span>
+
+<span class="sd">        :return: list of loaded covarianceSuites</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.covariances</span> <span class="kn">import</span> <span class="n">covarianceSuite</span> <span class="k">as</span> <span class="n">covarianceSuiteModule</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loadedCovariances</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loadedCovariances</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">covariance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceExternalFiles</span><span class="p">():</span>
+                <span class="n">covariance</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">covarianceSuiteModule</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">covariance</span><span class="o">.</span><span class="n">realpath</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_loadedCovariances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">covariance</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loadedCovariances</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.partialProductionIntegral"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.partialProductionIntegral">[docs]</a>    <span class="k">def</span> <span class="nf">partialProductionIntegral</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">lab</span><span class="p">,</span>
                 <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
@@ -1458,7 +1489,7 @@
 <span class="sd">        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">styleLabel</span> <span class="o">=</span> <span class="n">temperatureInfo</span><span class="p">[</span><span class="s1">&#39;heatedMultiGroup&#39;</span><span class="p">]</span>
+        <span class="n">styleLabel</span> <span class="o">=</span> <span class="n">temperatureInfo</span><span class="o">.</span><span class="n">heatedMultiGroup</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="n">styleLabel</span><span class="p">]</span><span class="o">.</span><span class="n">inverseSpeed</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">constructVector</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupQ"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupQ">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">includeFinalProducts</span><span class="p">):</span>
@@ -1969,6 +2000,67 @@
                     <span class="n">removeStyleFromComponent</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">dproduct</span><span class="o">.</span><span class="n">averageProductMomentum</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span></div>
 
+<div class="viewcode-block" id="ReactionSuite.saveAllToFile"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.saveAllToFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveAllToFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">hybrid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Writes *self* and its covariance data to files. The name of the covariance file will be the same as the *fileName* but</span>
+<span class="sd">        it will be put into a &quot;Covariance&quot; sub-directory inside the directory where *self* is written and &quot;-covar&quot; will be</span>
+<span class="sd">        added before the extension. If hybrid is *True*, self will be written out in default hybrid mode with the HDF5 data </span>
+<span class="sd">        written into a file with the same name as *self* but different extension and in a sub-directory named &quot;HDF5&quot;.</span>
+
+<span class="sd">        :param fileName:        The name of the file to write *self* to.</span>
+<span class="sd">        :param hybrid:          If *True* data are written in hybrid XML/HDF5 files.</span>
+<span class="sd">        :param kwargs:          Additional key-word arguments that are passed to internal calls.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">covarianceDir</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;Covariances&#39;</span><span class="p">)</span>
+        <span class="n">fileName</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+        <span class="n">covarianceName</span> <span class="o">=</span> <span class="n">covarianceDir</span> <span class="o">/</span> <span class="p">(</span><span class="n">fileName</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s1">&#39;-covar&#39;</span> <span class="o">+</span> <span class="n">fileName</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span>
+        <span class="n">covariancePath</span> <span class="o">=</span> <span class="n">fileName</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">covarianceName</span>
+
+        <span class="n">covariances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadCovariances</span><span class="p">()</span>
+        <span class="n">originalPaths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">covariance</span> <span class="ow">in</span> <span class="n">covariances</span><span class="p">:</span>
+            <span class="n">sourcePathC</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">covariance</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">)</span>
+            <span class="n">externalPath</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">externalFile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>                             <span class="c1"># Find externalFile for this convariance.</span>
+                <span class="k">if</span> <span class="n">sourcePathC</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">realpath</span><span class="p">()):</span>
+                    <span class="n">externalPath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">externalPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: could not find externalFile for covariance &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">sourcePathC</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">externalPath</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>                                <span class="c1"># Only write if not absolute.</span>
+                <span class="k">if</span> <span class="n">externalFile</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">originalPaths</span><span class="p">:</span>
+                    <span class="n">originalPaths</span><span class="p">[</span><span class="n">externalFile</span><span class="p">]</span> <span class="o">=</span> <span class="n">externalFile</span><span class="o">.</span><span class="n">path</span>             <span class="c1"># Needs to be reset back to original name before this method exits..</span>
+                <span class="n">externalFile</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">covarianceName</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">covariancePath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">covariancePath</span> <span class="o">=</span> <span class="n">fileName</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">covarianceDir</span> <span class="o">/</span> <span class="n">sourcePathC</span><span class="o">.</span><span class="n">name</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: multiple covariance files, using &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">covariancePath</span><span class="p">)</span>
+
+                <span class="n">externalPathC</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">selfSourcePath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">externalFileC</span> <span class="ow">in</span> <span class="n">covariance</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>
+                    <span class="n">externalFilePath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">externalFileC</span><span class="o">.</span><span class="n">realpath</span><span class="p">())</span>
+                    <span class="k">if</span> <span class="n">externalFilePath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">selfSourcePath</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">externalFilePath</span><span class="p">):</span>
+                        <span class="n">externalPathC</span> <span class="o">=</span> <span class="n">externalFileC</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">externalPathC</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: could not find externalFile in covariance for reactionSuite.&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">externalFileC</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">originalPaths</span><span class="p">:</span>
+                        <span class="n">originalPaths</span><span class="p">[</span><span class="n">externalFileC</span><span class="p">]</span> <span class="o">=</span> <span class="n">externalFileC</span><span class="o">.</span><span class="n">path</span>             <span class="c1"># Needs to be reset back to original name before this method exits..</span>
+                    <span class="n">externalPathC</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">fileName</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">covariance</span><span class="o">.</span><span class="n">saveToFile</span><span class="p">(</span><span class="n">covariancePath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">covariancePath</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">hybrid</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">saveToHybrid</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">saveToFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">externalFile</span> <span class="ow">in</span> <span class="n">originalPaths</span><span class="p">:</span>
+            <span class="n">externalFile</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">originalPaths</span><span class="p">[</span><span class="n">externalFile</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="ReactionSuite.saveToHybrid"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.saveToHybrid">[docs]</a>    <span class="k">def</span> <span class="nf">saveToHybrid</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xmlName</span><span class="p">,</span> <span class="n">hdfName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hdfSubDir</span><span class="o">=</span><span class="s1">&#39;HDF5&#39;</span><span class="p">,</span> <span class="n">minLength</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save the reactionSuite to a hybrid layout, with the data hierarchy in xml</span>
@@ -2232,6 +2324,91 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">ReactionSuite</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="niceSortOfMTs"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.niceSortOfMTs">[docs]</a><span class="k">def</span> <span class="nf">niceSortOfMTs</span><span class="p">(</span><span class="n">MTs</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">logFile</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Sorts the list of ENDF MTs into a sensible, defined order.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        For internal use only.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">MT</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MTs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">MTs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">MT</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">MT</span><span class="p">]</span>
+
+    <span class="n">MTs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">MTs</span><span class="p">)))</span>
+
+    <span class="n">newMTs</span> <span class="o">=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span>  <span class="mi">2</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>                       <span class="c1"># Elastic reaction.</span>
+
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">92</span><span class="p">):</span>                                   <span class="c1"># (z,n) reactions.</span>
+        <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">16</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>                      <span class="c1"># (z,2n) reactions.</span>
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">875</span><span class="p">,</span> <span class="mi">892</span><span class="p">):</span>
+        <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">17</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">37</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">18</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>                      <span class="c1"># Fission reactions.</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">19</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">20</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">21</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">38</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">28</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">32</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span> <span class="mi">33</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">650</span><span class="p">):</span>                                  <span class="c1"># (z,p) reactions.</span>
+        <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="mi">103</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">650</span><span class="p">,</span> <span class="mi">700</span><span class="p">):</span>                                  <span class="c1"># (z,d) reactions.</span>
+        <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="mi">104</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">700</span><span class="p">,</span> <span class="mi">750</span><span class="p">):</span>                                  <span class="c1"># (z,t) reactions.</span>
+        <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="mi">105</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">750</span><span class="p">,</span> <span class="mi">800</span><span class="p">):</span>                                 <span class="c1"># (z,He3) reactions.</span>
+        <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="mi">106</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">850</span><span class="p">):</span>                                 <span class="c1"># (z,a) reactions.</span>
+        <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="mi">107</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">1000</span><span class="p">):</span>                                <span class="c1"># (z,g) reactions.</span>
+        <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="n">newMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="mi">102</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="n">MT5</span> <span class="o">=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span>  <span class="mi">5</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>                          <span class="c1"># (z,everything else).</span>
+
+    <span class="n">MTAtomics</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">573</span><span class="p">):</span>
+        <span class="n">MTAtomics</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="n">skippingMTs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">151</span><span class="p">]:</span>
+        <span class="n">skippingMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">201</span><span class="p">,</span> <span class="mi">600</span><span class="p">):</span>
+        <span class="n">skippingMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">850</span><span class="p">,</span> <span class="mi">875</span><span class="p">):</span>
+        <span class="n">skippingMTs</span> <span class="o">+=</span> <span class="n">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">skippingMTs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Skipping MTs = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">skippingMTs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">newMTs</span> <span class="o">+</span> <span class="n">MTs</span> <span class="o">+</span> <span class="n">MT5</span> <span class="o">+</span> <span class="n">MTAtomics</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -2247,12 +2424,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -2273,7 +2450,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

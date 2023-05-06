@@ -1,0 +1,745 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.series1d &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.series1d</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.series1d</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+
+<span class="kn">from</span> <span class="nn">numericalFunctions</span> <span class="kn">import</span> <span class="n">pointwiseXY_C</span> <span class="k">as</span> <span class="n">pointwiseXY_CModule</span>
+<span class="n">floatToShortestString</span> <span class="o">=</span> <span class="n">pointwiseXY_CModule</span><span class="o">.</span><span class="n">floatToShortestString</span>
+
+<span class="kn">from</span> <span class="nn">numericalFunctions</span> <span class="kn">import</span> <span class="n">Legendre</span> <span class="k">as</span> <span class="n">Legendre_C</span>
+<span class="n">maxLegendreOrder</span> <span class="o">=</span> <span class="n">Legendre_C</span><span class="o">.</span><span class="n">maxMaxOrder</span><span class="p">(</span> <span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">values</span> <span class="k">as</span> <span class="n">valuesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
+
+<div class="viewcode-block" id="Legendre"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Legendre">[docs]</a><span class="k">def</span> <span class="nf">Legendre</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">checkXRange</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the value of the Legendre function of order n at mu using the recursive relationship.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error, n = </span><span class="si">%d</span><span class="s2"> &lt; 0&quot;</span> <span class="o">%</span> <span class="n">n</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">checkXRange</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">mu</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Legendre: |mu| &gt; 1; mu = </span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mu</span> <span class="p">)</span>
+    <span class="n">Pn</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">Pnp1</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">n_</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">twoNp1</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span><span class="p">(</span> <span class="n">n_</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">Pnm1</span> <span class="o">=</span> <span class="n">Pn</span>
+        <span class="n">Pn</span> <span class="o">=</span> <span class="n">Pnp1</span>
+        <span class="n">n_p1</span> <span class="o">=</span> <span class="n">n_</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">Pnp1</span> <span class="o">=</span> <span class="p">(</span> <span class="n">twoNp1</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">Pn</span> <span class="o">-</span> <span class="n">n_</span> <span class="o">*</span> <span class="n">Pnm1</span> <span class="p">)</span> <span class="o">/</span> <span class="n">n_p1</span>
+        <span class="n">twoNp1</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="n">n_</span> <span class="o">=</span> <span class="n">n_p1</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">Pnp1</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Series1d"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d">[docs]</a><span class="k">class</span> <span class="nc">Series1d</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is the base class for storing a 1d function as a polynomial series. The function store the </span>
+<span class="sd">    polynomial coefficients and has methods for manipulations of the coefficients that are generic to</span>
+<span class="sd">    all polynomial series (e.g., simple polynomial, Legendre).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="c1"># + ( &#39;coefficients&#39;, )</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">domainMin</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">domainMax</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lowerIndex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">lowerIndex</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">=</span> <span class="n">coefficients</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the number of coefficients in the instance (e.g., for Legendre series it is lMax + 1).&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">l</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the (l+1)^th coefficient.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sets the (l+1)^th coefficient to c_l. l must be less than or equal to lMax.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="n">c_l</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">c_l</span> <span class="p">)</span> 
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a series that is the sum of self and other. Other must be of type series.&quot;&quot;&quot;</span>
+
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
+            <span class="n">c_ls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">c_ls</span> <span class="p">)</span> <span class="p">:</span> <span class="n">c_ls</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">+=</span> <span class="n">other</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkSameSeriesType</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="s1">&#39;add&#39;</span> <span class="p">)</span>
+            <span class="n">c_l1</span><span class="p">,</span> <span class="n">c_l2</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">c_l1</span><span class="p">,</span> <span class="n">c_l2</span> <span class="o">=</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span>
+            <span class="n">c_ls</span> <span class="o">=</span> <span class="n">c_l1</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">c_l2</span> <span class="p">)</span> <span class="p">:</span> <span class="n">c_ls</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c_l</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">c_ls</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a series that is the difference of self and other. Other must be of type series.&quot;&quot;&quot;</span>
+
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
+            <span class="n">c_ls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">c_ls</span> <span class="p">)</span> <span class="p">:</span> <span class="n">c_ls</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">-=</span> <span class="n">other</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkSameSeriesType</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="s1">&#39;subtract&#39;</span> <span class="p">)</span>
+            <span class="n">c_l1</span><span class="p">,</span> <span class="n">c_l2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">coefficients</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">c_l1</span><span class="p">,</span> <span class="n">c_l2</span> <span class="o">=</span> <span class="n">c_l2</span><span class="p">,</span> <span class="n">c_l1</span>
+            <span class="n">c_ls</span> <span class="o">=</span> <span class="n">c_l1</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">c_l2</span> <span class="p">)</span> <span class="p">:</span> <span class="n">c_ls</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c_l</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">c_ls</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new series that is each coefficient of self multiplied by value. Value must be convertible to a float.&quot;&quot;&quot;</span>
+
+        <span class="n">value_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span>
+        <span class="n">c_ls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span> <span class="n">c_ls</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*=</span> <span class="n">value</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">c_ls</span> <span class="p">)</span>
+
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+
+    <span class="k">def</span> <span class="nf">_div__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns a new series that is each coefficient of self divided by value. Value must be convertible to a float.&#39;&#39;&#39;</span>
+
+        <span class="n">value_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">c_ls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">c_ls</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">/=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">c_ls</span> 
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a string representation of the coefficients of self.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">c_l</span> <span class="k">for</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="p">)</span>
+
+    <span class="nd">@coefficients</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="nb">float</span><span class="p">,</span> <span class="n">coefficients</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Series1d.areDomainsMutual"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.areDomainsMutual">[docs]</a>    <span class="k">def</span> <span class="nf">areDomainsMutual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns True if domain mins are the same for *self* and *other*, and domain maxs are the same for *self* and *other*;</span>
+<span class="sd">        otherwise, returns False.</span>
+
+<span class="sd">        :param other:       Another xData 1d instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">domainMin</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">domainMax</span></div>
+
+<div class="viewcode-block" id="Series1d.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluates the Legendre series at the mu.&quot;&quot;&quot;</span>
+
+        <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">):</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">c</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluateBasisFunction</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total</span></div>
+
+<div class="viewcode-block" id="Series1d.evaluateBasisFunction"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.evaluateBasisFunction">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateBasisFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implement in derived classes&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Series1d.checkSameSeriesType"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.checkSameSeriesType">[docs]</a>    <span class="k">def</span> <span class="nf">checkSameSeriesType</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">operator</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">Series1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;other of type &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Cannot </span><span class="si">%s</span><span class="s1"> series </span><span class="si">%s</span><span class="s1"> to series </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">operator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Series1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        unitMap is a dictionary of the for { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">factors</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span><span class="p">[</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span> <span class="n">factors</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">__lowerIndex</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">l</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lowerIndex</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span>
+                <span class="n">factor</span> <span class="o">*=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">factors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixValuePerUnitChange</span><span class="p">(</span> <span class="n">factors</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Series1d.copy"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new series that is a copy of self. The new </span>
+<span class="sd">        instance&#39;s index and value members are changes if index or value arguments are not None </span>
+<span class="sd">        respectively.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span> <span class="p">)</span></div>
+
+    <span class="n">__copy__</span> <span class="o">=</span> <span class="n">copy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lowerIndex</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lowerIndex</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">upperIndex</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lowerIndex</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Series1d.domainUnitConversionFactor"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.domainUnitConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">domainUnitConversionFactor</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">unitTo</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;1 &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Series1d.getCoefficientSafely"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.getCoefficientSafely">[docs]</a>    <span class="k">def</span> <span class="nf">getCoefficientSafely</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">l</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the (l+1)^th coefficient. Returns 0 if l is greater than lMax. This is like</span>
+<span class="sd">        __getitem__ but allows for l to be greater than lMax.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Series1d.hasData"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.hasData">[docs]</a>    <span class="k">def</span> <span class="nf">hasData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns True if the length of self&#39;s coefficients is greater than 0.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Series1d.invert"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a series instance that is the mirror of self about x1 = 0 (i.e., negates all odd coefficients).</span>
+<span class="sd">        For example, for a Legendre series return equilavent of pdf(-mu).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">series_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">series_</span> <span class="p">),</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="n">series_</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">series_</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Series1d.setData"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.setData">[docs]</a>    <span class="k">def</span> <span class="nf">setData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="o">=</span> <span class="n">data</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rangeMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rangeMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Series1d.toString"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="nb">str</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%16.8g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">coefficient</span> <span class="p">)</span> <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">coefficient</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Series1d.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns self as a list of strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+        <span class="n">valueFormatter</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;valueFormatter&#39;</span><span class="p">,</span> <span class="n">floatToShortestString</span><span class="p">)</span>
+        <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;significantDigits&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+
+        <span class="n">attributesStr</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">attributesToXMLAttributeStr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixedDomain</span><span class="p">():</span> <span class="n">attributesStr</span> <span class="o">+=</span> <span class="s1">&#39; domainMin=&quot;</span><span class="si">%s</span><span class="s1">&quot; domainMax=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">valueFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span><span class="p">),</span>
+                <span class="n">valueFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerIndex</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="n">attributesStr</span> <span class="o">+=</span> <span class="s1">&#39; lowerIndex=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerIndex</span>
+
+        <span class="c1"># FIXME2: converting self.__coefficients to values for printing. Should it be stored as values in the first place?</span>
+        <span class="n">coefs</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valueType</span><span class="p">)</span>
+
+        <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributesStr</span><span class="p">)</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPrimaryXData</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">XML_strList</span> <span class="o">+=</span> <span class="n">coefs</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="p">:</span> <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">XML_strList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">XML_strList</span> <span class="o">+=</span> <span class="n">coefs</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">XML_strList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+            <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">XML_strList</span><span class="p">)</span> <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">XML_strList</span></div>
+
+<div class="viewcode-block" id="Series1d.returnAsClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.returnAsClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">returnAsClass</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerIndex</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> 
+                <span class="n">valueType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Series1d.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Translate a series XML element into its python xData class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">attributes</span><span class="p">,</span> <span class="n">extraAttributes</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">parseBareNodeCommonAttributes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">)</span>     <span class="c1"># parseBareNodeCommonAttributes adds to xPath.</span>
+
+        <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fixedDomain</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">domainMin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">extraAttributes</span><span class="p">[</span><span class="s1">&#39;domainMin&#39;</span><span class="p">])</span>
+        <span class="n">extraAttributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;domainMin&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">domainMax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">extraAttributes</span><span class="p">[</span><span class="s1">&#39;domainMax&#39;</span><span class="p">])</span>
+        <span class="n">extraAttributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;domainMax&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">series</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">([],</span> <span class="n">domainMin</span><span class="o">=</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="o">=</span><span class="n">domainMax</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+
+        <span class="n">extraNodes</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">parseNodeStandardChildren</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extraNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">extraNodes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">series</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">=</span> <span class="n">values</span>                                    <span class="c1"># FIXME store self.__coefficients as values instance instead of list?</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extraNodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid nodes: </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">extraNode</span><span class="o">.</span><span class="n">tag</span> <span class="k">for</span> <span class="n">extraNode</span> <span class="ow">in</span> <span class="n">extraNodes</span><span class="p">])))</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">series</span></div>
+
+<div class="viewcode-block" id="Series1d.fixedDomain"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.fixedDomain">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fixedDomain</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="LegendreSeries"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries">[docs]</a><span class="k">class</span> <span class="nc">LegendreSeries</span><span class="p">(</span> <span class="n">Series1d</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represent a Legendre series for a function f(mu) as:</span>
+
+<span class="sd">    ..math::</span>
+
+<span class="sd">        f(\mu) = \sum_L ( l + 0.5 ) * C_l * P_l(\mu)</span>
+
+<span class="sd">    so</span>
+
+<span class="sd">    ..math::</span>
+<span class="sd">        C_l=\int_{-1}^1 d\mu P_l(\mu) f(\mu)</span>
+
+<span class="sd">    where the sum is from l = 0 to lMax, lMax is the highest Legendre coefficients in the instance, C_l</span>
+<span class="sd">    is the Legendre coefficient for Legendre order l and P_l(mu) is the Legendre polynomial of order l.</span>
+<span class="sd">    This class stores the Legendre coefficients C_l.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;Legendre&#39;</span>
+    <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+            <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">lowerIndex</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;lowerIndex = </span><span class="si">%s</span><span class="s1"> must be 0&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">domainMin</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">domainMax</span> <span class="o">!=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;domain must be [-1, 1], not [</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">Series1d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">outerDomainValue</span><span class="p">,</span> 
+                <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">length</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LegendreSeries.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mu</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Using the Legendre coefficients, this method calculates f(mu) and returns it.&quot;&quot;&quot;</span>
+
+        <span class="n">P</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="p">)</span> <span class="p">:</span> <span class="n">P</span> <span class="o">+=</span> <span class="p">(</span> <span class="n">l</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="o">*</span> <span class="n">c_l</span> <span class="o">*</span> <span class="n">Legendre</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">checkXRange</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> 
+        <span class="k">return</span><span class="p">(</span> <span class="n">P</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.evaluateBasisFunction"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.evaluateBasisFunction">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateBasisFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span> <span class="n">l</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="o">*</span> <span class="n">Legendre</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">checkXRange</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.integrate"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">domainMin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">domainMin</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+        <span class="k">if</span> <span class="n">domainMax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">domainMax</span> <span class="o">=</span>  <span class="mf">1.0</span>
+
+        <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">domainMin</span> <span class="o">&gt;</span> <span class="n">domainMax</span><span class="p">:</span>
+            <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">sign</span> <span class="o">=</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+            
+        <span class="k">if</span> <span class="n">domainMin</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;domainMin must be greater than or equal to -1: it is </span><span class="si">%e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">domainMin</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">domainMax</span> <span class="o">&gt;</span>  <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;domainMax must be greater than or equal to 1: it is </span><span class="si">%e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">domainMax</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">domainMin</span> <span class="o">==</span> <span class="n">domainMax</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">domainMin</span> <span class="o">==</span> <span class="o">-</span><span class="mf">1.0</span> <span class="ow">and</span> <span class="n">domainMax</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">maxOrder</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">maxOrder</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">integral</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">domainMax</span> <span class="o">-</span> <span class="n">domainMin</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">maxOrder</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">integral</span> <span class="o">+=</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="p">(</span><span class="n">domainMin</span> <span class="o">+</span> <span class="n">domainMax</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">domainMax</span> <span class="o">-</span> <span class="n">domainMin</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">P_l_m1_1</span> <span class="o">=</span> <span class="n">domainMin</span>
+            <span class="n">P_l_m1_2</span> <span class="o">=</span> <span class="n">domainMax</span>
+            <span class="n">P_l_1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">domainMin</span> <span class="o">*</span> <span class="n">domainMin</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">P_l_2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">domainMax</span> <span class="o">*</span> <span class="n">domainMax</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxOrder</span><span class="p">):</span>
+                <span class="n">P_l_p1_1</span> <span class="o">=</span> <span class="n">Legendre</span><span class="p">(</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">)</span>
+                <span class="n">P_l_p1_2</span> <span class="o">=</span> <span class="n">Legendre</span><span class="p">(</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">)</span>
+                <span class="n">integral</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">P_l_p1_2</span> <span class="o">-</span> <span class="n">P_l_p1_1</span> <span class="o">+</span> <span class="n">P_l_m1_1</span> <span class="o">-</span> <span class="n">P_l_m1_2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+                <span class="n">P_l_m1_1</span> <span class="o">=</span> <span class="n">P_l_1</span>
+                <span class="n">P_l_m1_2</span> <span class="o">=</span> <span class="n">P_l_2</span>
+                <span class="n">P_l_1</span> <span class="o">=</span> <span class="n">P_l_p1_1</span>
+                <span class="n">P_l_2</span> <span class="o">=</span> <span class="n">P_l_p1_2</span>
+        
+        <span class="k">return</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">integral</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.isIsotropic"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if self is isotropic.&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">coefficient</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">coefficient</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.normalize"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">insitu</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The dimension argument is ignored. Only here to be compatable with calling from XYsnd.normalize.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">coefficients</span> <span class="o">=</span> <span class="p">[</span> <span class="n">coefficient</span> <span class="o">/</span> <span class="n">norm</span> <span class="k">for</span> <span class="n">coefficient</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">insitu</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span> <span class="n">coefficients</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.toLinearXYsClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.toPointwiseLinear"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method constructs the pdf(mu) versus mu and returns it as a XYs1d instance. The accuracy of the </span>
+<span class="sd">        reconstruction (hence the number of points in the returned XYs1d) is determined by the accuracy argument.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getArguments</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;accuracy&#39;</span> <span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;biSectionMax&#39;</span> <span class="p">:</span> <span class="mi">16</span> <span class="p">}</span> <span class="p">)</span>
+        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
+        <span class="n">biSectionMax</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s1">&#39;biSectionMax&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">&lt;</span> <span class="mf">1e-6</span> <span class="p">)</span> <span class="p">:</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-6</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">&gt;</span> <span class="mf">0.1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">Legendre_C</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="p">)</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">toPointwiseLinear</span><span class="p">(</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">biSectionMax</span> <span class="o">=</span> <span class="n">biSectionMax</span><span class="p">,</span> <span class="n">checkForRoots</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="n">P</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="p">[],</span> <span class="mi">400</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">mu</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">i</span> <span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">mu</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="n">P</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAxisUnitSafely</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span> <span class="s1">&#39;P(mu)&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+        <span class="n">Pclass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toLinearXYsClass</span><span class="p">()</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">Pclass</span><span class="p">(</span> <span class="n">P</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">P</span><span class="o">.</span><span class="n">thin</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Calls self&#39;s toPointwiseLinear method.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwiseLinear</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.fixedDomain"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.fixedDomain">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fixedDomain</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreSeries.fromXYs1d"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.fromXYs1d">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fromXYs1d</span><span class="p">(</span> <span class="n">xys1d</span><span class="p">,</span> <span class="n">maxOrder</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Domain min must be -1. It is </span><span class="si">%e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">!=</span>  <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Domain max must be 1. It is </span><span class="si">%e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">axes</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">LegendreSeries</span><span class="p">(</span> <span class="n">Legendre_C</span><span class="o">.</span><span class="n">from_pointwiseXY_C</span><span class="p">(</span> <span class="n">xys1d</span><span class="p">,</span> <span class="n">maxOrder</span> <span class="p">),</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Polynomial1d"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d">[docs]</a><span class="k">class</span> <span class="nc">Polynomial1d</span><span class="p">(</span> <span class="n">Series1d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;polynomial1d&#39;</span>
+    <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+            <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">Series1d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="n">lowerIndex</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> 
+                <span class="n">valueType</span> <span class="o">=</span> <span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__findExtrema</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">numpy.polynomial.polynomial</span> <span class="kn">import</span> <span class="n">Polynomial</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">),</span>
+            <span class="n">window</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">))</span>
+        <span class="n">pprimeroots</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">deriv</span><span class="p">()</span><span class="o">.</span><span class="n">roots</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">pprimeroots</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Polynomial1d.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Using the polynomial coefficients, this method calculates p(x) and returns it.&quot;&quot;&quot;</span>
+
+        <span class="n">P</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="p">)</span> <span class="p">:</span> <span class="n">P</span> <span class="o">=</span> <span class="n">c_l</span>  <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">P</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">P</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polynomial1d.evaluateBasisFunction"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.evaluateBasisFunction">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateBasisFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rangeMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="n">extrema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__findExtrema</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">extrema</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rangeMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="n">extrema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__findExtrema</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">extrema</span><span class="p">])</span>
+
+<div class="viewcode-block" id="Polynomial1d.fixDomains"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets *domainMin* and *domainMax* per the arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">OldDomainMin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span>
+        <span class="n">OldDomainMax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span>
+
+        <span class="n">domainMin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">)</span>
+        <span class="n">domainMax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fixToDomain</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">FixDomain</span><span class="o">.</span><span class="n">lower</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">=</span> <span class="n">domainMin</span>
+        <span class="k">elif</span> <span class="n">fixToDomain</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">FixDomain</span><span class="o">.</span><span class="n">upper</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">=</span> <span class="n">domainMax</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">=</span> <span class="n">domainMin</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">=</span> <span class="n">domainMax</span>
+
+        <span class="k">if</span> <span class="n">OldDomainMin</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="ow">and</span> <span class="n">OldDomainMax</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">:</span> <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Polynomial1d.toLinearXYsClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polynomial1d.toPointwiseLinear"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method constructs the y(x) versus x and returns it as a XYs1d instance. The accuracy of the </span>
+<span class="sd">        reconstruction (hence the number of points in the returned XYs1d) is determined by the accuracy argument.</span>
+<span class="sd">        Currently, accuracy is not implemented.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getArguments</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;accuracy&#39;</span> <span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;biSectionMax&#39;</span> <span class="p">:</span> <span class="mi">16</span> <span class="p">}</span> <span class="p">)</span>
+        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
+        <span class="n">biSectionMax</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s1">&#39;biSectionMax&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">&lt;</span> <span class="mf">1e-6</span> <span class="p">)</span> <span class="p">:</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-6</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">&gt;</span> <span class="mf">0.1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="n">P</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="p">[],</span> <span class="mi">1000</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span> <span class="n">n</span> <span class="o">-</span> <span class="n">i</span> <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">*</span> <span class="n">i</span> <span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+            <span class="n">P</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">Pclass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toLinearXYsClass</span><span class="p">()</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">Pclass</span><span class="p">(</span> <span class="n">P</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">P</span><span class="o">.</span><span class="n">thin</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polynomial1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Calls self&#39; toPointwiseLinear method.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwiseLinear</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="LinearSpline1d"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d">[docs]</a><span class="k">class</span> <span class="nc">LinearSpline1d</span><span class="p">(</span> <span class="n">Series1d</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is a simple linear spline.  It basically wraps the XYs1d class.</span>
+<span class="sd">    Linear interpolation uses the linear spline or the &quot;hat&quot; basis.  The first basis function looks like this::</span>
+
+<span class="sd">        |\</span>
+<span class="sd">        | \</span>
+<span class="sd">        |  \</span>
+<span class="sd">        ----</span>
+
+<span class="sd">    The second basis function looks like this::</span>
+
+<span class="sd">          /\</span>
+<span class="sd">         /  \</span>
+<span class="sd">        /    \</span>
+<span class="sd">        ------</span>
+
+<span class="sd">    and so on.  Together y(x) = \sum_i B_i(x) y_i such that y_i = y(x_i)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;linearSpline1d&#39;</span>
+    <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">xdata</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">ydata</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Number of x and y values not equal.&quot;</span> <span class="p">)</span>
+
+        <span class="n">Series1d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">xdata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xdata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="n">valueType</span><span class="p">,</span> 
+                <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">)),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LinearSpline1d.evaluateBasisFunction"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d.evaluateBasisFunction">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateBasisFunction</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="LinearSpline1d.toLinearXYsClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearSpline1d.toPointwiseLinear"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method constructs the y(x) versus x and returns it as a XYs1d instance. Basically we just copy the basis</span>
+<span class="sd">        function widget and put the y values back.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">coefficient</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">result</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coefficient</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="LinearSpline1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Calls self&#39;s toPointwiseLinear method.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwiseLinear</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.series1d</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

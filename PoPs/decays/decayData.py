@@ -258,17 +258,23 @@ class DecayMode( miscModule.ClassWithLabelKey ) :
         self.__decayPath.convertUnits( unitMap )
         self.__spectra.convertUnits( unitMap )
 
-    def copy( self ) :
+    def copy(self):
         """
         :return: deep copy of self
         """
 
-        other = self.__class__( self.label, self.mode )
-        for item in self.__probability : other.probability.add( item.copy( ) )
-        for item in self.__Q : other.Q.add( item.copy( ) )
-        for item in self.__decayPath : other.decayPath.add( item.copy( ) )
-        for item in self.__spectra : other.spectra.add( item.copy( ) )
-        return( other )
+        other = self.__class__(self.label, self.mode)
+        for item in self.__probability:
+            other.probability.add(item.copy())
+        for item in self.__photonEmissionProbabilities:
+            other.photonEmissionProbabilities.add(item.copy())
+        for item in self.__Q:
+            other.Q.add(item.copy())
+        for item in self.__decayPath:
+            other.decayPath.add(item.copy())
+        for item in self.__spectra:
+            other.spectra.add(item.copy())
+        return other
 
     def toXML_strList( self, indent = '', **kwargs ) :
 

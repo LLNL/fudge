@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoPs.suite &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.suite</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PoPs.suite</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+
+<div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for holding a list of objects that can be indexed by an integer or a string.</span>
+<span class="sd">    For integer indexing, the indexing is by order in which an object was put into the array or,</span>
+<span class="sd">    if a sortedSuite instance, by the index assigned when the object was added to the suite.</span>
+<span class="sd">    For string indexing, this class acts like the python dictionary.</span>
+
+<span class="sd">    The suite also has a tuple of &#39;allowedClasses&#39; controlling what type(s) of objects it can contain.</span>
+<span class="sd">    The allowedClasses must be passed in as an argument to the constructor.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">allowedClasses</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param allowedClasses: tuple of classes. Only instances of these classes can be added to the suite.</span>
+<span class="sd">        :param replace: boolean (default=True). If False, the add method can only add objects with keys</span>
+<span class="sd">            not already present in the suite. If True, the original object will be replaced by the new object</span>
+<span class="sd">            having the same key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">__allowedClasses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">allowedClasses</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span> <span class="bp">cls</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Item at index </span><span class="si">%d</span><span class="s1"> is not a class&#39;</span> <span class="o">%</span> <span class="n">i1</span> <span class="p">)</span>
+            <span class="n">__allowedClasses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">cls</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span> <span class="n">__allowedClasses</span> <span class="p">)</span>   <span class="c1"># Make it a tuple so that it cannot be changed.</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">replace</span><span class="p">,</span> <span class="nb">bool</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;replace must be a bool instance.&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__replace</span> <span class="o">=</span> <span class="n">replace</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;key must be a string&#39;</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;item with key &quot;</span><span class="si">%s</span><span class="s1">&quot; not found in suite &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">allowedClasses</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the tuple of classes that are allowed in this suite.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">)</span>     <span class="c1"># No fear, user cannot alter as __allowedClasses is a tuple.</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__replace</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Suite.add"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempt to add item to self.</span>
+<span class="sd">        Raises TypeError if item is not an instance of any class in self.allowedClasses</span>
+<span class="sd">        Raises KeyError if self.replace == False and the item shares a key with another item already in the suite.</span>
+
+<span class="sd">        :param item: instance to add to self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">classAllowed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="bp">cls</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">classAllowed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">classAllowed</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid class &quot;</span><span class="si">%s</span><span class="s1">&quot; for suite &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">index</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addIndex</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">replace</span> <span class="p">)</span> <span class="p">:</span> <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Suite.addIndex"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.addIndex">[docs]</a>    <span class="k">def</span> <span class="nf">addIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the index at which item will be added to self.</span>
+<span class="sd">        Raises KeyError if self.replace == False and the item shares a key with another item already in the suite.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">_item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">_item</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">replace</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">i1</span><span class="p">,</span> <span class="kc">True</span> <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;item with key = &quot;</span><span class="si">%s</span><span class="s1">&quot; already present in non-replaceable suite&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">index</span><span class="p">,</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Suite.check"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;See documentation in database.check&quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">warning</span> <span class="k">as</span> <span class="n">warningModule</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">childWarnings</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">childWarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">child</span><span class="p">)),</span> <span class="n">childWarnings</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="Suite.convertUnits"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;See documentation in database.convertUnits&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Suite.keys"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the list of all keys in *self*.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">keyValue</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Suite.pop"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Removes item with key *key* and returns it. If item is not found, a raise KeyError is executed.</span>
+
+<span class="sd">        :param key:       The key of the item to pop.</span>
+
+<span class="sd">        :return:            The item popped.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">keyValue</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i1</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Suite.remove"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Remove object with specified key from the suite.&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+                <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Suite.replicate"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.replicate">[docs]</a>    <span class="k">def</span> <span class="nf">replicate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add copies of all items in other to self.</span>
+<span class="sd">        :param other: suite or other iterable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">other</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Suite.toXML_strList"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xmlString</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptySuites&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span><span class="n">xmlString</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/&gt;&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">xmlString</span></div>
+
+<div class="viewcode-block" id="Suite.uniqueLabel"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.uniqueLabel">[docs]</a>    <span class="k">def</span> <span class="nf">uniqueLabel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If item&#39;s key is the same as another item&#39;s key in self, construct a new unique key</span>
+<span class="sd">        based on item&#39;s key appended with &#39;__&#39; and one or more lower case letters (i.e., &#39;a&#39; to &#39;z&#39;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">incrementSuffix</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">suffix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">!=</span> <span class="mi">26</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">suffix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">incrementSuffix</span><span class="p">(</span> <span class="n">suffix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">key__</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;__&#39;</span>
+            <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">key__</span> <span class="p">)</span>
+            <span class="n">l1</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>          <span class="c1"># Find list of longest keys that start with key__.</span>
+                <span class="n">subkey</span> <span class="o">=</span> <span class="n">_item</span><span class="o">.</span><span class="n">key</span><span class="p">[:</span><span class="n">n1</span><span class="p">]</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">subkey</span> <span class="o">==</span> <span class="n">key__</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">suffix</span> <span class="o">=</span> <span class="n">_item</span><span class="o">.</span><span class="n">key</span><span class="p">[</span><span class="n">n1</span><span class="p">:]</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">suffix</span><span class="o">.</span><span class="n">islower</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>       <span class="c1"># Ignore non-standard keys.</span>
+                    <span class="n">l2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">l2</span> <span class="o">&lt;</span> <span class="n">l1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">l2</span> <span class="o">&gt;</span> <span class="n">l1</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">l1</span> <span class="o">=</span> <span class="n">l2</span>
+                        <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">suffixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">suffixes</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="n">incrementSuffix</span><span class="p">(</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">suffixes</span> <span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key__</span> <span class="o">+</span> <span class="n">suffix</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Suite.parseNode"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+            <span class="n">parseClass</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">_class</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">_class</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                    <span class="n">parseClass</span> <span class="o">=</span> <span class="n">_class</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">parseClass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid node &quot;</span><span class="si">%s</span><span class="s1">&quot; encountered in suite &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">parseClass</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="SortedSuite"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.SortedSuite">[docs]</a><span class="k">class</span> <span class="nc">SortedSuite</span><span class="p">(</span> <span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="SortedSuite.addIndex"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.SortedSuite.addIndex">[docs]</a>    <span class="k">def</span> <span class="nf">addIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the location to insert item into a sorted suite.</span>
+<span class="sd">        :param item: instance to add. Must define a &#39;sortCompare&#39; method (used to determine insertion point).</span>
+<span class="sd">        :return: tuple(insertion index (int), whether to replace existing item at that index (boolean))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">_item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">cmp</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">sortCompare</span><span class="p">(</span> <span class="n">_item</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">cmp</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">replace</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">i1</span><span class="p">,</span> <span class="kc">True</span> <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;item with key = &quot;</span><span class="si">%s</span><span class="s1">&quot; already present in non-replaceable suite&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">cmp</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">return</span><span class="p">(</span> <span class="n">i1</span><span class="p">,</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">),</span> <span class="kc">False</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.suite</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

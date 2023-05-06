@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>fudge.processing.deterministic.transferMatrices &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -575,7 +577,7 @@
             <span class="k">if</span> <span class="n">previousInput</span> <span class="o">==</span> <span class="n">cmd</span><span class="p">:</span>
                 <span class="c1"># This input has already been successfully run (e.g. by previous processProtare run that timed out).</span>
                 <span class="c1"># Ensure variables are initialized:</span>
-                <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;  Reading previously computed results&quot;</span><span class="p">)</span>
+                <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;  Reading previously computed results</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">t0</span> <span class="o">=</span> <span class="n">timesModule</span><span class="o">.</span><span class="n">Times</span><span class="p">(</span> <span class="p">)</span>
                 <span class="n">status</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">else</span><span class="p">:</span>
@@ -588,8 +590,9 @@
             <span class="n">dataFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">cmd</span> <span class="p">)</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">timesModule</span><span class="o">.</span><span class="n">Times</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">try</span> <span class="p">:</span>
-            <span class="n">status</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocessingModule</span><span class="o">.</span><span class="n">executeCommand</span><span class="p">(</span> <span class="p">[</span> <span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-output&#39;</span><span class="p">,</span> <span class="n">fullFileName</span> <span class="o">+</span> <span class="s1">&#39;.out&#39;</span><span class="p">,</span> <span class="n">fullFileName</span> <span class="p">],</span> 
+            <span class="n">status</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocessingModule</span><span class="o">.</span><span class="n">executeCommand</span><span class="p">(</span> <span class="p">[</span> <span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-output&#39;</span><span class="p">,</span> <span class="n">outputFile</span><span class="o">+</span><span class="s2">&quot;.tmp&quot;</span><span class="p">,</span> <span class="n">fullFileName</span> <span class="p">],</span>
                 <span class="n">stdout</span> <span class="o">=</span> <span class="n">infoFile</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span> <span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">outputFile</span><span class="o">+</span><span class="s2">&quot;.tmp&quot;</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">:</span>
             <span class="n">fErr</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fullFileName</span> <span class="o">+</span> <span class="s2">&quot;.err&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span> <span class="p">)</span>
             <span class="n">fErr</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
@@ -1145,12 +1148,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1171,7 +1174,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

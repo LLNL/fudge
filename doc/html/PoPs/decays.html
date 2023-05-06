@@ -1,0 +1,999 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Decay data &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Fission fragment data" href="fissionFragmentData.html" />
+    <link rel="prev" title="Atomic" href="atomic.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fissionFragmentData.html" title="Fission fragment data"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="atomic.html" title="Atomic"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Properties of Particles (PoPs)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Decay data</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-PoPs.decays.decayData">
+<span id="decay-data"></span><span id="decays"></span><h1>Decay data<a class="headerlink" href="#module-PoPs.decays.decayData" title="Permalink to this heading">¶</a></h1>
+<p>This module defines classes for storing particle decay information.
+Decay data are organized as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">particle</span>
+   <span class="o">-</span> <span class="n">decayData</span>
+      <span class="o">-</span> <span class="n">averageEnergies</span>
+      <span class="o">-</span> <span class="n">decayModes</span>
+         <span class="o">-</span> <span class="n">decayMode</span>
+            <span class="o">-</span> <span class="n">probability</span>
+            <span class="o">-</span> <span class="n">Q</span>
+            <span class="o">-</span> <span class="n">spectra</span>
+            <span class="o">-</span> <span class="n">decayPath</span>
+               <span class="o">-</span> <span class="n">decay</span>
+</pre></div>
+</div>
+<p>All decay info is stored inside the &lt;decayData&gt; section.</p>
+<p>&lt;averageEnergies&gt; stores a summary of average outgoing energy for various types of decay radiation,
+summed over all possible decay modes.</p>
+<p>&lt;decayModes&gt; contains a list of &lt;decayMode&gt;, each with a corresponding probability.
+A &lt;decayMode&gt; may also contain a &lt;Q&gt;  (i.e. the decay Q-value), a &lt;spectra&gt; (describing the outgoing energy spectrum
+for each types of decay product), and a &lt;decayPath&gt; (listing each step of the decay along with outgoing products).</p>
+<p>Ideally the outgoing spectra would be associated with specific decay products under the &lt;decayPath&gt;, but
+often the spectra are summed over multiple products.  For example, in B-nn decay (beta-delayed 2-neutron emission),
+the spectra of the 2 outgoing neutrons cannot be resolved, so the evaluation usually stores only the summed spectrum
+for the two neutrons.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.Decay">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.decayData.</span></span><span class="sig-name descname"><span class="pre">Decay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complete</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#Decay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.Decay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes one step in a multi-step decay. For example, in beta-delayed 2-n emission
+the first &lt;decay&gt; is for the beta-decay, and the 2nd and 3rd &lt;decay&gt; elements describe the two neutrons
+being emitted sequentially.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.Decay.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complete</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#Decay.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.Decay.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – int, identifies the position of this decay within the decayPath. 0 = first, 1 = second, etc.</p></li>
+<li><p><strong>mode</strong> – string identifying a decay mode, such as “isomeric transition”</p></li>
+<li><p><strong>complete</strong> – boolean, whether all outgoing products are listed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.Decay.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#Decay.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.Decay.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See documentation in PoPs.database.convertUnits</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.Decay.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#Decay.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.Decay.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses deepcopy to make a copy of self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.Decay.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#Decay.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.Decay.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.Decay.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#Decay.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.Decay.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.decayData.</span></span><span class="sig-name descname"><span class="pre">DecayData</span></span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains all decay information for a particle, including average energies for decay products
+and a list of decay modes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See convertUnits documentation in PoPs.database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>deep copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData.copyItems">
+<span class="sig-name descname"><span class="pre">copyItems</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData.copyItems"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData.copyItems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy all items in self to other
+:param other: decayData instance where contents of self will be copied</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData.parseNode">
+<span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.decayData.</span></span><span class="sig-name descname"><span class="pre">DecayMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes one way a particle can decay. The description includes the probability, Q-value, outgoing products
+and spectra. For electro-magnetic decays, may also include a set of internal conversion coefficients
+and/or photon emission probabilities.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayMode.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayMode.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayMode.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – string, must be unique within this &lt;decayModes&gt; section</p></li>
+<li><p><strong>mode</strong> – string, describes the decay mode. Examples: “beta+ or e.c.”, “beta-,n”, “alpha”, etc.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayMode.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayMode.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayMode.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See convertUnits documentation in PoPs.database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayMode.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayMode.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayMode.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>deep copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayMode.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayMode.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayMode.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayMode.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayMode.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayMode.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayModes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.decayData.</span></span><span class="sig-name descname"><span class="pre">DecayModes</span></span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayModes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayModes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains a list of decayMode instances</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayModes.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayModes.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayModes.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allowedClasses</strong> – tuple of classes. Only instances of these classes can be added to the suite.</p></li>
+<li><p><strong>replace</strong> – boolean (default=True). If False, the add method can only add objects with keys
+not already present in the suite. If True, the original object will be replaced by the new object
+having the same key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayModes.parseNode">
+<span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayModes.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayModes.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayPath">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.decayData.</span></span><span class="sig-name descname"><span class="pre">DecayPath</span></span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores all &lt;decay&gt; steps involved in a decayMode</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayPath.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayPath.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayPath.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allowedClasses</strong> – tuple of classes. Only instances of these classes can be added to the suite.</p></li>
+<li><p><strong>replace</strong> – boolean (default=True). If False, the add method can only add objects with keys
+not already present in the suite. If True, the original object will be replaced by the new object
+having the same key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.decayData.DecayPath.parseNode">
+<span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayPath.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayPath.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<section id="module-PoPs.decays.averageEnergy">
+<span id="averageenergy"></span><h2>averageEnergy<a class="headerlink" href="#module-PoPs.decays.averageEnergy" title="Permalink to this heading">¶</a></h2>
+<p>This module defines classes for storing the average outgoing energy of various types of particles
+emitted during a decay.</p>
+<p>Average energies are not as informative as detailed spectra, but for decay modes with very small probabilities
+they may be the only available information.
+These classes follow the example of the ENDF decay sub-library, providing average energies for a few general classes
+of decay products, such as ‘electroMagneticRadiation’, ‘lightParticles’, ‘heavyParticles’, etc.</p>
+<p>These classes are thin wrappers around the xData.physicalQuantity.PhysicalQuantity class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.Alpha">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">Alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#Alpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.Alpha" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.Annihilation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">Annihilation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#Annihilation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.Annihilation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AugerElectron">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">AugerElectron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AugerElectron"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AugerElectron" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergies">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">AverageEnergies</span></span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergies" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergies.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergies.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergies.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allowedClasses</strong> – tuple of classes. Only instances of these classes can be added to the suite.</p></li>
+<li><p><strong>replace</strong> – boolean (default=True). If False, the add method can only add objects with keys
+not already present in the suite. If True, the original object will be replaced by the new object
+having the same key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergies.parseNode">
+<span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergies.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergies.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">AverageEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergy.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergy.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergy.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>See documentation in xData.physicalQuantity.PhysicalQuantity.__init__</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergy.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergy.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergy.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses deepcopy to make a copy of self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergy.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergy.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergy.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.BetaMinus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">BetaMinus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#BetaMinus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.BetaMinus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.BetaPlus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">BetaPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#BetaPlus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.BetaPlus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.ConversionElectron">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">ConversionElectron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#ConversionElectron"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.ConversionElectron" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.ElectroMagneticRadiation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">ElectroMagneticRadiation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#ElectroMagneticRadiation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.ElectroMagneticRadiation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.FissionNeutrons">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">FissionNeutrons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#FissionNeutrons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.FissionNeutrons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.Gamma">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">Gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#Gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.Gamma" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.HeavyParticles">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">HeavyParticles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#HeavyParticles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.HeavyParticles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.InternalBremsstrahlung">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">InternalBremsstrahlung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#InternalBremsstrahlung"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.InternalBremsstrahlung" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.LightParticles">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">LightParticles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#LightParticles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.LightParticles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.Neutrino">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">Neutrino</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#Neutrino"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.Neutrino" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.Proton">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">Proton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#Proton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.Proton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.Recoil">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">Recoil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#Recoil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.Recoil" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.SpontaneousFission">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">SpontaneousFission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#SpontaneousFission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.SpontaneousFission" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.averageEnergy.XRay">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.averageEnergy.</span></span><span class="sig-name descname"><span class="pre">XRay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#XRay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.XRay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-PoPs.decays.probability">
+<span id="probability"></span><h2>probability<a class="headerlink" href="#module-PoPs.decays.probability" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the decay probability classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.probability.Double">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.probability.</span></span><span class="sig-name descname"><span class="pre">Double</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documentation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/probability.html#Double"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.probability.Double" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.probability.Double.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documentation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/probability.html#Double.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.probability.Double.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – label for this quantity. Must be unique within the containing suite</p></li>
+<li><p><strong>value</strong> – quantity value</p></li>
+<li><p><strong>unit</strong> – unit (string)</p></li>
+<li><p><strong>documentation</strong> – documentation specific to this quantity</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.probability.Suite">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.probability.</span></span><span class="sig-name descname"><span class="pre">Suite</span></span><a class="reference internal" href="../_modules/PoPs/decays/probability.html#Suite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.probability.Suite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-PoPs.decays.Q">
+<span id="q"></span><h2>Q<a class="headerlink" href="#module-PoPs.decays.Q" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the decay Q classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.Q.Double">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.Q.</span></span><span class="sig-name descname"><span class="pre">Double</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documentation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/Q.html#Double"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.Q.Double" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.Q.Suite">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.Q.</span></span><span class="sig-name descname"><span class="pre">Suite</span></span><a class="reference internal" href="../_modules/PoPs/decays/Q.html#Suite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.Q.Suite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-PoPs.decays.spectrum">
+<span id="spectrum"></span><h2>spectrum<a class="headerlink" href="#module-PoPs.decays.spectrum" title="Permalink to this heading">¶</a></h2>
+<p>This module contains classes for storing an outgoing energy spectrum for decay products.
+The spectrum may include a combination of discrete and continuum contributions.</p>
+<p>Spectral data are organized as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">decayMode</span>
+   <span class="o">-</span> <span class="o">...</span>
+   <span class="o">-</span> <span class="n">spectra</span>
+      <span class="o">-</span> <span class="n">spectrum</span> <span class="p">(</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">more</span><span class="p">)</span>
+         <span class="o">-</span> <span class="n">discrete</span> <span class="p">(</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">more</span><span class="p">)</span>
+            <span class="o">-</span> <span class="n">intensity</span>
+            <span class="o">-</span> <span class="n">energy</span>
+            <span class="o">-</span> <span class="o">...</span>
+         <span class="o">-</span> <span class="n">continuum</span> <span class="p">(</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">more</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Each spectrum corresponds to one type of decay product (e.g. photon, positron or neutron).
+Sometimes a product is broken out into more than one spectrum sections, however. For example, photons
+may be divided into ‘gamma’ and ‘x-ray’ parts.</p>
+<p>Discrete radiations each have an associated intensity, indicating how often that discrete radiation is emitted
+per decay. The intensity may be &gt; 1, for example for 511 keV photons emitted by beta+ decay.
+Discrete radiation may be accompanied by internalConversionCoefficients, internalPairFormationCoefficients, etc.</p>
+<dl class="simple">
+<dt>Continuum radiation is described by a probability distribution of outgoing energy.</dt><dd><p>FIXME is it really a probability distribution? Not always normalized…</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Continuum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">Continuum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Continuum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Continuum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes continuum particle emission</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Continuum.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Continuum.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Continuum.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spectrum</strong> – outgoing energy probability distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Continuum.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Continuum.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Continuum.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See convertUnits documentation in PoPs.database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Continuum.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Continuum.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Continuum.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>deep copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Continuum.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Continuum.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Continuum.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Continuum.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Continuum.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Continuum.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Discrete">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">Discrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TransitionType.none</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_internalPairFormationCoefficient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_positronEmissionIntensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Discrete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Discrete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores a decay particle emitted with discrete energy</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Discrete.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TransitionType.none</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_internalPairFormationCoefficient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_positronEmissionIntensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Discrete.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Discrete.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_intensity</strong> – relative intensity for emission of this discrete particle</p></li>
+<li><p><strong>_energy</strong> – outgoing product energy</p></li>
+<li><p><strong>type</strong> – optional type of transition (i.e. ‘allowed’, ‘first-forbidden’, etc.</p></li>
+<li><p><strong>_internalPairFormationCoefficient</strong> – optional coefficient for forming an electron/positron pair
+Should only be used with electromagnetic decays</p></li>
+<li><p><strong>_positronEmissionIntensity</strong> – optional coefficient for emitting a positron
+Should only be used with electron capture / beta+ decays</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Discrete.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Discrete.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Discrete.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses deepcopy to make a copy of self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Discrete.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Discrete.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Discrete.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Discrete.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Discrete.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Discrete.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Energy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">Energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Intensity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">Intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Intensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Intensity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.InternalConversionCoefficients">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">InternalConversionCoefficients</span></span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#InternalConversionCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.InternalConversionCoefficients" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.InternalConversionCoefficients.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#InternalConversionCoefficients.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.InternalConversionCoefficients.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allowedClasses</strong> – tuple of classes. Only instances of these classes can be added to the suite.</p></li>
+<li><p><strong>replace</strong> – boolean (default=True). If False, the add method can only add objects with keys
+not already present in the suite. If True, the original object will be replaced by the new object
+having the same key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.InternalPairFormationCoefficient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">InternalPairFormationCoefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#InternalPairFormationCoefficient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.InternalPairFormationCoefficient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.PhotonEmissionProbabilities">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">PhotonEmissionProbabilities</span></span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#PhotonEmissionProbabilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.PhotonEmissionProbabilities" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.PhotonEmissionProbabilities.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#PhotonEmissionProbabilities.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.PhotonEmissionProbabilities.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allowedClasses</strong> – tuple of classes. Only instances of these classes can be added to the suite.</p></li>
+<li><p><strong>replace</strong> – boolean (default=True). If False, the add method can only add objects with keys
+not already present in the suite. If True, the original object will be replaced by the new object
+having the same key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.PositronEmissionIntensity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">PositronEmissionIntensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#PositronEmissionIntensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.PositronEmissionIntensity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Shell">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">Shell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Shell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Shell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectra">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">Spectra</span></span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the outgoing spectrum list for a decayMode</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectra.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectra.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectra.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allowedClasses</strong> – tuple of classes. Only instances of these classes can be added to the suite.</p></li>
+<li><p><strong>replace</strong> – boolean (default=True). If False, the add method can only add objects with keys
+not already present in the suite. If True, the original object will be replaced by the new object
+having the same key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectra.parseNode">
+<span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectra.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectra.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">Spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the outgoing spectrum for one type of decay product.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – unique label for the outgoing product (i.e. ‘x-ray’ or ‘gamma’)</p></li>
+<li><p><strong>pid</strong> – PoPs particle id (i.e. ‘photon’)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emission</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new emitted particle to self
+:param emission: ‘discrete’ or ‘continuum’ instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See convertUnits documentation in PoPs.database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>deep copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.emissions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emissions</span></span><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.emissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of all discrete and continuum emissions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.TransitionType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">TransitionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#TransitionType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.TransitionType" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Unitless">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.spectrum.</span></span><span class="sig-name descname"><span class="pre">Unitless</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Unitless"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Unitless" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Unitless.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Unitless.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Unitless.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Unitless.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Unitless.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Unitless.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses deepcopy to make a copy of self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Unitless.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Unitless.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Unitless.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-PoPs.decays.product">
+<span id="product"></span><h2>product<a class="headerlink" href="#module-PoPs.decays.product" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the decay product classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.product.Product">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.product.</span></span><span class="sig-name descname"><span class="pre">Product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Product"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Product" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.product.Product.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Product.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Product.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – unique label. Usually equal to the pid unless more than one is emitted</p></li>
+<li><p><strong>pid</strong> – PoPs id for the emitted particle</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.product.Product.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Product.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Product.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses deepcopy to make a copy of self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.product.Product.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Product.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Product.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.product.Product.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Product.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Product.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.product.Suite">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.product.</span></span><span class="sig-name descname"><span class="pre">Suite</span></span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Suite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Suite" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.product.Suite.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Suite.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Suite.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allowedClasses</strong> – tuple of classes. Only instances of these classes can be added to the suite.</p></li>
+<li><p><strong>replace</strong> – boolean (default=True). If False, the add method can only add objects with keys
+not already present in the suite. If True, the original object will be replaced by the new object
+having the same key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.product.Suite.parseNode">
+<span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Suite.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Suite.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-PoPs.decays.misc">
+<span id="misc"></span><h2>misc<a class="headerlink" href="#module-PoPs.decays.misc" title="Permalink to this heading">¶</a></h2>
+<p>This module contains general enums and functions of use for decay data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.decays.misc.Mode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.decays.misc.</span></span><span class="sig-name descname"><span class="pre">Mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/misc.html#Mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.misc.Mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.decays.misc.completePhotonBranchingData">
+<span class="sig-prename descclassname"><span class="pre">PoPs.decays.misc.</span></span><span class="sig-name descname"><span class="pre">completePhotonBranchingData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initialState</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branchingData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completePhotons</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/misc.html#completePhotonBranchingData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.misc.completePhotonBranchingData" title="Permalink to this definition">¶</a></dt>
+<dd><p>For <em>initialState</em>, determines the multiplicity (i.e., total probability) that a photon from
+level <em>initialState</em> or any level it decays to is emitted. Data are added to <em>completePhotons</em>
+as needed. <em>completePhotons</em> is a dictionary with keys “inital:final” where “initial” and final</p>
+<p>represent the decay of initial to final leading to the emission of a photon. For example,
+for the decay from level “Fe56_e6” to level “Fe56_e3” the key is “Fe56_e6:Fe56_e3”. The data
+for each key is the energy difference of the initial and final levels and the multiplicity (i.e., 
+totoal probability) that the photon was emitted. For example, for Fe56 in ENDF/B-VIII.0., the
+data for the key “Fe56_e6:Fe56_e3” are “[PQU( “462521.000000000 eV” ), 0.009888135544683001]”.</p>
+<p>This function is mainly for use by the function <strong>photonBranchingData</strong> to fill in its “completePhotons” data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initialState</strong> – The current state (nuclide) the decaying isotope is in.</p></li>
+<li><p><strong>branchingData</strong> – Branching data calculated by the function <strong>photonBranchingData</strong>.</p></li>
+<li><p><strong>probability</strong> – The probability of reaching level <em>initialState</em>.</p></li>
+<li><p><strong>completePhotons</strong> – The list of all emitted photon data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.decays.misc.photonBranchingData">
+<span class="sig-prename descclassname"><span class="pre">PoPs.decays.misc.</span></span><span class="sig-name descname"><span class="pre">photonBranchingData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pops</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/misc.html#photonBranchingData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.misc.photonBranchingData" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function summarizes all photon branches for the specified nuclide. The returned object is a dictionary with 
+keys “energy”, “photons” and “completePhotons”. The value of the “energy” key is the energy level of the nucleus. 
+The value of the “photons” key is a list of information about the the photons (i.e., gammas) emittied from the decay
+of the nucleus.  For each photo, the information is the tuple branching ratio, <strong>PQU</strong> of the photon energy, final 
+nuclear state and photon emission probability. For example, for Fe56_e9 in ENDF/B-VIII.0, the data in the “photons” key is:</p>
+<dl class="simple">
+<dt>[ ( 0.013, PQU( “0.265580000000000 MeV” ), “Fe56_e7”, 0.9875568 ), </dt><dd><p>( 0.987, PQU( “1.303445 MeV” ), “Fe56_e2”, 0.999862 ) ]</p>
+</dd>
+</dl>
+<p>These data state that the Fe56_e9 nuclear level decays to Fe56_e7 0.13% of time emitting a photon of 
+energy 0.26558 MeV 98.75568% of the time, and it decays to Fe56_e2 98.7% of time emitting a photon of 
+energy 1.303445 MeV 99.9862% of the time.</p>
+<p>The value of the “completePhotons” key is a dictionary. Each key in the dictionary is comprised of the initial
+and final state ids for each emtted photon in the format “intial:final” (e.g., “Fe56_e6:Fe56_e3”) which means 
+that it is the photon emitted from the transition from the initial level to the final level (e.g., from level 
+“Fe56_e6” to level “Fe56_e3”). The data for each key is the energy of the emitted photon and its multiplicity.
+The multiplicity is the total probability that this photon is emitted.
+These data are obtained by calling the function <strong>completePhotonBranchingData</strong>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pops</strong> – A PoPs database.</p></li>
+<li><p><strong>id</strong> – The id of the requested nuclide.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with level energy and photon branching data for each nuclide in the isotope.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If id is in <em>pops</em> but not of family nuclide or nucleus.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Decay data</a><ul>
+<li><a class="reference internal" href="#module-PoPs.decays.averageEnergy">averageEnergy</a></li>
+<li><a class="reference internal" href="#module-PoPs.decays.probability">probability</a></li>
+<li><a class="reference internal" href="#module-PoPs.decays.Q">Q</a></li>
+<li><a class="reference internal" href="#module-PoPs.decays.spectrum">spectrum</a></li>
+<li><a class="reference internal" href="#module-PoPs.decays.product">product</a></li>
+<li><a class="reference internal" href="#module-PoPs.decays.misc">misc</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="atomic.html"
+                          title="previous chapter">Atomic</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="fissionFragmentData.html"
+                          title="next chapter">Fission fragment data</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/PoPs/decays.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fissionFragmentData.html" title="Fission fragment data"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="atomic.html" title="Atomic"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Properties of Particles (PoPs)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Decay data</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

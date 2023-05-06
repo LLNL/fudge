@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from LUPY import checkPythonVerions
+from LUPY import checkPythonVersion
 
 POPS_MAJORVERSION = 0
 POPS_MINORVERSION = 1

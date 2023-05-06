@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+# FIXME CMM QMatrix is not part of GNDS-2.0 specification. Remove?
+
 from LUPY import ancestry as ancestryModule
 
 from xData import xDataArray as arrayModule

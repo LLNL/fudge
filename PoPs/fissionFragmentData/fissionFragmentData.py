@@ -6,8 +6,12 @@
 # <<END-copyright>>
 
 """
-This module defines the FissionFragmentData class, used to store fission product yields
+This module defines the FissionFragmentData class, used to store spontaneous fission product yields
 and the delayed neutrons and gammas emitted by the decay of those fission products.
+
+ CMM documentation comments:
+  - for common stuff like convertUnits, define them once and refer to them from other classes?
+  - similar question on toXML_strList
 """
 
 from LUPY import ancestry as ancestryModule
@@ -16,6 +20,7 @@ from . import delayedNeutronData as delayedNeutronDataModule
 from . import productYield as productYieldModule
 
 class FissionFragmentData(ancestryModule.AncestryIO):
+    """This class stores information about spontaneous fission fragments and their decays."""
 
     moniker = 'fissionFragmentData'
 
@@ -23,28 +28,40 @@ class FissionFragmentData(ancestryModule.AncestryIO):
 
         ancestryModule.AncestryIO.__init__(self)
 
+        # FIXME doesn't conform with GNDS specs. Should be Suite of delayedNeutron.
         self.__delayedNeutronData = delayedNeutronDataModule.DelayedNeutronData( )
         self.__delayedNeutronData.setAncestor( self )
+
+        # FIXME should also support fissionEnergyRelease section, even if no files currently use it.
 
         self.__productYields = productYieldModule.Suite( )
         self.__productYields.setAncestor( self )
         
     @property
     def delayedNeutronData( self ) :
+        """This accesses the delayed neutron data within a **FissionFragmentData** instance."""
 
         return( self.__delayedNeutronData )
 
     @property
     def productYields( self ) :
+        """This accesses the fission product yield data within a **FissionFragmentData** instance."""
+
 
         return( self.__productYields )
 
     def convertUnits( self, unitMap ) :
+        """The convertUnits method recursively searches the **FissionFragmentData** and child classes
+        for each unit in the **unitMap** dictionary and converts to the desired new unit.
+
+        :param unitMap: dict storing {'oldUnit': 'newUnit'} key-value pairs. Units must be compatible,
+        e.g. {'eV': 'MeV'} works but {'amu': 'MeV'} does not."""
 
         self.__delayedNeutronData.convertUnits( unitMap )
         self.__productYields.convertUnits( unitMap )
 
     def replicate( self, other ) :
+        # FIXME why replicate instead of copy? Does this method get used? Recommend removing it if not.
 
         self.__delayedNeutronData = other.delayedNeutronData    # FIXME not making a copy?
         self.__delayedNeutronData.setAncestor( self )
@@ -53,30 +70,45 @@ class FissionFragmentData(ancestryModule.AncestryIO):
         self.__productYields.setAncestor( self )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of self.
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.
+        :param kwargs:    A keyword list.
 
-        XMLStringList = [ '%s<%s> ' % ( indent, self.moniker ) ]
-        XMLStringList += self.__delayedNeutronData.toXML_strList( indent2, **kwargs )
-        XMLStringList += self.__productYields.toXML_strList( indent2, **kwargs )
+        :return:          List of str instances representing the XML lines of self.
+        """
+
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+
+        XMLStringList = [ '%s<%s> ' % (indent, self.moniker) ]
+        XMLStringList += self.__delayedNeutronData.toXML_strList(indent2, **kwargs)
+        XMLStringList += self.__productYields.toXML_strList(indent2, **kwargs)
         XMLStringList[-1] += '</%s>' % self.moniker
 
-        if( len( XMLStringList ) == 1 ) : XMLStringList = []
+        if len(XMLStringList) == 1: XMLStringList = []
 
-        return( XMLStringList )
+        return XMLStringList
 
     @classmethod
-    def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """Parse node from a file, returning a new **FissionFragmentData** instance unless errors were encountered during parsing.
 
-        xPath.append( element.tag )
+        :param cls: FUDGE Python class to return.
+        :param node: **FissionFragmentData** node to parse.
+        :param xPath: List containing xPath to current node, useful mostly for debugging.
+        :param linkData: dict that collects unresolved links.
+        """
+
+        xPath.append( node.tag )
         FFD = cls()
-        for child in element:
+        for child in node:
             if child.tag == delayedNeutronDataModule.DelayedNeutronData.moniker:
                 FFD.delayedNeutronData.parseNode(child, xPath, linkData, **kwargs)
             elif child.tag == productYieldModule.Suite.moniker:
                 FFD.productYields.parseNode(child, xPath, linkData, **kwargs)
             else:
-                raise TypeError("Encountered unknown node '%s' in %s" % (child.tag, element.tag))
+                raise TypeError("Encountered unknown node '%s' in %s" % (child.tag, node.tag))
 
         xPath.pop()
         return FFD

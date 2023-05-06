@@ -6,6 +6,7 @@
 # <<END-copyright>>
 
 SHELL = /bin/bash
+PYTHON = python3
 
 .PHONY: default check clean realclean
 

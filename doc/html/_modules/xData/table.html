@@ -1,0 +1,342 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.table &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.table</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.table</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+
+<div class="viewcode-block" id="Table"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table">[docs]</a><span class="k">class</span> <span class="nc">Table</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;table&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">storageOrder</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">):</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">storageOrder</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">storageOrder</span> <span class="o">!=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Currently, only supported value for storageOrder is &quot;</span><span class="si">%s</span><span class="s1">&quot;, got &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span> <span class="n">storageOrder</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span> <span class="ow">or</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">]</span> <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data is the wrong shape for a table with </span><span class="si">%i</span><span class="s2"> columns!&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">storageOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns to value of storageOrder.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__storageOrder</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nColumns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nRows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nRows</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indices</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span> <span class="n">indices</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">indices</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">slice</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;invalid index&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Table.addRow"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table.addRow">[docs]</a>    <span class="k">def</span> <span class="nf">addRow</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">dataRow</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataRow</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;New row has </span><span class="si">%i</span><span class="s2"> columns, should have </span><span class="si">%i</span><span class="s2">!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataRow</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">dataRow</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Table.addColumn"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table.addColumn">[docs]</a>    <span class="k">def</span> <span class="nf">addColumn</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">columnHeader</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; add another column, either at &#39;index&#39; or at the end of the table &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columnHeader</span><span class="p">,</span> <span class="n">ColumnHeader</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;addColumn requires a ColumnHeader instance but got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">columnHeader</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">index</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">columnHeader</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">columnHeader</span> <span class="p">)</span>
+            <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span> <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">idx</span></div>
+
+<div class="viewcode-block" id="Table.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        unitMap is a dictionary of the form { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
+<span class="sd">        Converts all columns whose units appear as keys in unitMap</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">unit</span> <span class="ow">in</span> <span class="n">unitMap</span><span class="p">:</span>
+                <span class="n">factor</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">column</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">unitMap</span><span class="p">[</span><span class="n">column</span><span class="o">.</span><span class="n">unit</span><span class="p">])</span>
+                <span class="n">column</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unitMap</span><span class="p">[</span><span class="n">column</span><span class="o">.</span><span class="n">unit</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+                    <span class="n">row</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span></div>
+
+<div class="viewcode-block" id="Table.getColumn"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table.getColumn">[docs]</a>    <span class="k">def</span> <span class="nf">getColumn</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">columnNameOrIndex</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; get data from one column, identified by the column &#39;name&#39; attribute.</span>
+<span class="sd">        Convert results to desired unit if specified &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columnNameOrIndex</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">columnNameOrIndex</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">columnNameOrIndex</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">column</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Column named &#39;</span><span class="si">%s</span><span class="s2">&#39; is not unique!&quot;</span> <span class="o">%</span> <span class="n">columnNameOrIndex</span><span class="p">)</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="n">column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">index</span><span class="p">(</span> <span class="n">column</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">unit</span><span class="p">:</span>
+            <span class="n">cf</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">column</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">convertToUnit</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">cf</span> <span class="o">*</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[:,</span><span class="n">index</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[:,</span><span class="n">index</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Table.removeColumn"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table.removeColumn">[docs]</a>    <span class="k">def</span> <span class="nf">removeColumn</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">columnName</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; remove one column from the table &quot;&quot;&quot;</span>
+        <span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">columnName</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">column</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;column &#39;</span><span class="si">%s</span><span class="s2">&#39; isn&#39;t present in the table!&quot;</span> <span class="o">%</span> <span class="n">columnName</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Column named &#39;</span><span class="si">%s</span><span class="s2">&#39; is not unique!&quot;</span> <span class="o">%</span> <span class="n">columnName</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">index</span><span class="p">(</span> <span class="n">column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span>
+        <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span> <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">idx</span></div>
+
+<div class="viewcode-block" id="Table.toStringList"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">addHeader</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;addHeader&#39;</span><span class="p">,</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="n">addHeaderUnit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;addHeaderUnit&#39;</span><span class="p">,</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="n">outline</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;outline&#39;</span><span class="p">,</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="n">columnWidths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span>
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span><span class="p">):</span>
+            <span class="n">columnDat</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">Blank</span><span class="p">)]</span>
+            <span class="n">asStrings</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">toShortestString</span><span class="p">,</span> <span class="n">columnDat</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">columnWidths</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="nb">len</span><span class="p">,</span> <span class="n">asStrings</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">addHeader</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot; put column labels at the top of the table &quot;&quot;&quot;</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+            <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span> <span class="p">[</span><span class="s1">&#39; width&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span> <span class="p">):</span>
+                <span class="c1"># special treatment for RML widths: split up onto two lines</span>
+                <span class="n">nameL</span> <span class="o">=</span> <span class="p">[[],[]]</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39; width&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span> <span class="n">l</span><span class="p">,</span><span class="n">r</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; width&#39;</span><span class="p">);</span> <span class="n">r</span> <span class="o">=</span> <span class="s1">&#39; width&#39;</span><span class="o">+</span><span class="n">r</span><span class="o">+</span><span class="s1">&#39; &#39;</span>
+                    <span class="k">else</span><span class="p">:</span> <span class="n">l</span><span class="p">,</span><span class="n">r</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
+                    <span class="n">nameL</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">);</span> <span class="n">nameL</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="n">nameL</span>
+                <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">names</span><span class="p">]</span>
+            <span class="n">columnWidths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">columnWidths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">lengths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span><span class="p">)]</span>
+
+            <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;!--&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indent</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39; | &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([(</span><span class="s1">&#39;</span><span class="si">%%%i</span><span class="s1">s&#39;</span><span class="o">%</span><span class="n">columnWidths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">%</span> <span class="n">nameList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span><span class="p">)])</span> <span class="o">+</span> <span class="s1">&#39;  --&gt;&#39;</span>   <span class="k">for</span> <span class="n">nameList</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+            <span class="n">xml</span> <span class="o">+=</span> <span class="n">header</span>
+
+        <span class="k">if</span> <span class="n">addHeaderUnit</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot; put column unit at the top of the table &quot;&quot;&quot;</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+            <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">unit</span><span class="p">]</span>
+            <span class="n">columnWidths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">columnWidths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">lengths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span><span class="p">)]</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;!--&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indent</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39; | &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="n">columnWidths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">u</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;  --&gt;&#39;</span><span class="p">]</span>
+            <span class="n">xml</span> <span class="o">+=</span> <span class="n">header</span>
+
+        <span class="n">template</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%%%i</span><span class="s1">s&#39;</span> <span class="o">%</span> <span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">columnWidths</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Blank</span><span class="p">):</span> <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">toShortestString</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">outline</span><span class="p">:</span>
+            <span class="n">xml</span> <span class="o">+=</span> <span class="p">[(</span><span class="s1">&#39;   &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">template</span><span class="p">)</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span><span class="n">toString</span><span class="p">,</span> <span class="n">dataRow</span><span class="p">)))</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">dataRow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="mi">3</span><span class="p">]]</span>
+            <span class="n">xml</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> ...&#39;</span> <span class="o">%</span> <span class="n">indent</span><span class="p">]</span>
+            <span class="n">xml</span> <span class="o">+=</span> <span class="p">[(</span><span class="s1">&#39;   &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">template</span><span class="p">)</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span><span class="n">toString</span><span class="p">,</span> <span class="n">dataRow</span><span class="p">)))</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">dataRow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xml</span> <span class="o">+=</span> <span class="p">[(</span><span class="s1">&#39;   &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">template</span><span class="p">)</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span><span class="n">toString</span><span class="p">,</span> <span class="n">dataRow</span><span class="p">)))</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">dataRow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="Table.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+        <span class="n">indent3</span> <span class="o">=</span> <span class="n">indent2</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span> <span class="n">outline</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> rows=&quot;</span><span class="si">%i</span><span class="s1">&quot; columns=&quot;</span><span class="si">%i</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nRows</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nColumns</span><span class="p">)]</span>
+        <span class="n">XML_strList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;columnHeaders&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent2</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span> <span class="n">XML_strList</span> <span class="o">+=</span> <span class="n">column</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent3</span><span class="p">)</span>
+        <span class="n">XML_strList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/columnHeaders&gt;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="n">XML_strList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;data/&gt;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">XML_strList</span>
+
+        <span class="n">XML_strList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;data&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent2</span><span class="p">))</span>
+        <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toStringList</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">indent3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_strList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/data&gt;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">XML_strList</span></div>
+
+<div class="viewcode-block" id="Table.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.table.Table.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read a table element from xml into python. To convert a column or attribute from string to some other type,</span>
+<span class="sd">        enter the new type in the conversionTable: {&#39;index&#39;:int, &#39;scatteringRadius&#39;:PhysicalQuantityWithUncertainty, etc}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">fixAttributes</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">conversionTable</span><span class="p">:</span> <span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">conversionTable</span><span class="p">[</span><span class="n">key</span><span class="p">](</span> <span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="n">attrs</span>
+
+        <span class="k">def</span> <span class="nf">floatOrBlank</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">val</span><span class="o">==</span><span class="s1">&#39;_&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">Blank</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="n">conversionTable</span> <span class="o">=</span> <span class="n">linkData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conversionTable&#39;</span><span class="p">,{})</span>
+        <span class="n">nRows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rows&#39;</span><span class="p">))</span>
+        <span class="n">nColumns</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;columns&#39;</span><span class="p">))</span>
+        <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;storageOrder&#39;</span><span class="p">,</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">storageOrder</span> <span class="o">!=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">:</span>
+            <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">storageOrder</span><span class="p">)</span>
+
+        <span class="n">_columns</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;columnHeaders&#39;</span><span class="p">)</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span> <span class="n">ColumnHeader</span><span class="p">(</span><span class="o">**</span><span class="n">fixAttributes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">_columns</span> <span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">floatOrBlank</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">conversionTable</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">nColumns</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">conversionTable</span><span class="p">[</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">nColumns</span><span class="p">]))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="n">nRows</span> <span class="o">*</span> <span class="n">nColumns</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">nColumns</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nColumns</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nRows</span><span class="p">)]</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">storageOrder</span><span class="o">=</span><span class="n">storageOrder</span><span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">table</span></div></div>
+
+<div class="viewcode-block" id="ColumnHeader"><a class="viewcode-back" href="../../xData/index.html#xData.table.ColumnHeader">[docs]</a><span class="k">class</span> <span class="nc">ColumnHeader</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; defines one column in a table &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">unit</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span>
+
+<div class="viewcode-block" id="ColumnHeader.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.table.ColumnHeader.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;column index=&quot;</span><span class="si">%d</span><span class="s1">&quot; name=&quot;</span><span class="si">%s</span><span class="s1">&quot; unit=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span> <span class="p">]</span></div></div>
+
+<div class="viewcode-block" id="Blank"><a class="viewcode-back" href="../../xData/index.html#xData.table.Blank">[docs]</a><span class="k">class</span> <span class="nc">Blank</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Blank table entry, to indicate missing data.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">pass</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">return</span> <span class="s1">&#39;_&#39;</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span> <span class="k">return</span> <span class="bp">self</span>
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span> <span class="k">return</span> <span class="bp">self</span>
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span> <span class="k">return</span> <span class="bp">self</span>
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span> <span class="k">return</span> <span class="bp">self</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.table</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

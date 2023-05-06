@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoPs.families.nuclide &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.families.nuclide</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PoPs.families.nuclide</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the nuclear level classes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">miscModule</span>
+<span class="kn">from</span> <span class="nn">..chemicalElements</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">chemicalElementMiscModule</span>
+<span class="kn">from</span> <span class="nn">..fissionFragmentData</span> <span class="kn">import</span> <span class="n">fissionFragmentData</span> <span class="k">as</span> <span class="n">fissionFragmentDataModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">particle</span> <span class="k">as</span> <span class="n">particleModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">nucleus</span> <span class="k">as</span> <span class="n">nucleusModule</span>
+
+<div class="viewcode-block" id="Alias"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Alias">[docs]</a><span class="k">class</span> <span class="nc">Alias</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Alias</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;nuclideAlias&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chemicalElement</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">chemicalElement</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Z</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">Z</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">A</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">index</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">energy</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Particle"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle">[docs]</a><span class="k">class</span> <span class="nc">Particle</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Particle</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;nuclide&#39;</span>
+    <span class="n">familyOrder</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">alias</span> <span class="o">=</span> <span class="n">Alias</span>
+
+<div class="viewcode-block" id="Particle.__init__"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">particleModule</span><span class="o">.</span><span class="n">Particle</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">)</span>
+
+        <span class="n">baseID</span><span class="p">,</span> <span class="n">chemicalElementSymbol</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">levelID</span><span class="p">,</span> <span class="n">isNucleus</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="o">=</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">chemicalElementALevelIDsAndAnti</span><span class="p">(</span> <span class="nb">id</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span> <span class="o">=</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">(</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">nucleusIDFromNuclideID</span><span class="p">(</span> <span class="nb">id</span> <span class="p">),</span> <span class="n">levelID</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span> <span class="o">=</span> <span class="n">fissionFragmentDataModule</span><span class="o">.</span><span class="n">FissionFragmentData</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Particle.__lt__"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.__lt__">[docs]</a>    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrderLessThan</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">Z</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">Z</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">A</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">A</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fissionFragmentData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nucleus</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">__A</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chemicalElementSymbol</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">chemicalElementSymbol</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">index</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">isotope</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">ancestor</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">energy</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Z</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">Z</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Particle.check"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">warning</span> <span class="k">as</span> <span class="n">warningModule</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">subWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">subWarnings</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warningModule</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s1">&#39;nucleus&#39;</span><span class="p">,</span> <span class="n">subWarnings</span><span class="p">)</span> <span class="p">)</span>
+        <span class="c1"># FIXME other checks to perform on the nuclide? Will decay info ever live in the nuclide?</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="Particle.convertUnits"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">particleModule</span><span class="o">.</span><span class="n">Particle</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Particle.copy"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">_particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__copyStandardQuantities</span><span class="p">(</span> <span class="n">_particle</span> <span class="p">)</span>
+        <span class="n">_particle</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">replicate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span> <span class="p">)</span>
+        <span class="n">_particle</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">replicate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">_particle</span> <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">extraXMLElements</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">XMLStringList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XMLStringList</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Particle.getMass"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.getMass">[docs]</a>    <span class="k">def</span> <span class="nf">getMass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Recursion detected as ground-state does not have a mass: ID = </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">unit</span> <span class="o">+</span> <span class="s1">&#39; * c**2&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">parseExtraXMLElement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">nucleus</span> <span class="o">=</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__nucleus</span><span class="o">.</span><span class="n">replicate</span><span class="p">(</span> <span class="n">nucleus</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">fissionFragmentDataModule</span><span class="o">.</span><span class="n">FissionFragmentData</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">fissionFragmentData</span> <span class="o">=</span> <span class="n">fissionFragmentDataModule</span><span class="o">.</span><span class="n">FissionFragmentData</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">replicate</span><span class="p">(</span> <span class="n">fissionFragmentData</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Particle.sortCompare"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.sortCompare">[docs]</a>    <span class="k">def</span> <span class="nf">sortCompare</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">Particle</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid other.&#39;</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Particle.particleCompare"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.particleCompare">[docs]</a>    <span class="k">def</span> <span class="nf">particleCompare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compares *self* to particle *other* which can be from an particle family.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">Z</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">Z</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">A</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">A</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span></div></div>
+
+<div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;nuclides&#39;</span>
+    <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.families.nuclide</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

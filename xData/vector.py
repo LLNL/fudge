@@ -32,16 +32,16 @@ class Vector:
                 self.vector = numpy.zeros(size)
             else:
                 if isinstance(values, (int, float)):
-                    self.vector = numpy.full(size, numpy.float(values))
+                    self.vector = numpy.full(size, numpy.float64(values))
                 else:
                     raise TypeError('Only an int or float value of the named "values" argument is allowed to accompany non-zero instances of the size argument.')
 
         else:
             if isinstance(values, (list, tuple)):
-                values = numpy.array(values).astype(numpy.float)
+                values = numpy.array(values).astype(numpy.float64)
 
             if isinstance(values, numpy.ndarray) and values.ndim == 1:
-                self.vector = values.astype(numpy.float)
+                self.vector = values.astype(numpy.float64)
             elif isinstance(values, Vector):
                 self.vector = values.vector.copy()
             else:
@@ -152,7 +152,7 @@ class Vector:
         Return value of self.vector at location specified by the input scalar argument.
 
         :index: Index of the self.vector value to return.
-        :returns: A numpy.float value.
+        :returns: A numpy.float64 value.
         """
         return self.vector[index]
 
@@ -165,7 +165,7 @@ class Vector:
         """
         checkScalarValidity(newScalarValue, 'item assignment')
 
-        self.vector[index] = numpy.float(newScalarValue)
+        self.vector[index] = numpy.float64(newScalarValue)
         return self
 
     def __len__(self):
@@ -194,6 +194,13 @@ class Vector:
         Return a boolean indicating whether self.vector is sorted.
         """
         return all(numpy.sort(self.vector) == self.vector)
+    
+    @property
+    def size(self):
+        """
+        Return the length of self.vector.
+        """
+        return self.vector.size
 
     def reverse(self):
         """

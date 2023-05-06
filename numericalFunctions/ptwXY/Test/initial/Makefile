@@ -18,7 +18,7 @@ localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 TARGETS = testBinaryUnion testOverwrite testAddRandomPoints testAddRandomPoints2 testInterpolation_1 \
           testMultiPly2_1 testDivide2_1 testExp_1
 
-PYTHON = python
+PYTHON = python3
 
 .PHONY: default check clean realclean
 

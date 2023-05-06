@@ -48,7 +48,7 @@ def toGridded1d(module, axesTemplate1d, data, label):
     """
 
     for index, value in enumerate(data):
-        if value > 0:
+        if value != 0:
             break
     if value == 0:
         index += 1

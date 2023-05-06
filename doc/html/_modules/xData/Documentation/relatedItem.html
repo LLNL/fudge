@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.Documentation.relatedItem &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.Documentation.relatedItem</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.Documentation.relatedItem</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the classes representing the GNDS documentation nodes author and authors.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
+
+<div class="viewcode-block" id="RelationType"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelationType">[docs]</a><span class="k">class</span> <span class="nc">RelationType</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">none</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">isCitedBy</span> <span class="o">=</span> <span class="s1">&#39;IsCitedBy&#39;</span>
+    <span class="n">cites</span> <span class="o">=</span> <span class="s1">&#39;Cites&#39;</span>
+    <span class="n">isSupplementTo</span> <span class="o">=</span> <span class="s1">&#39;IsSupplementTo&#39;</span>
+    <span class="n">isSupplementedBy</span> <span class="o">=</span> <span class="s1">&#39;IsSupplementedBy&#39;</span>
+    <span class="n">isContinuedBy</span> <span class="o">=</span> <span class="s1">&#39;IsContinuedBy&#39;</span>
+    <span class="n">continues</span> <span class="o">=</span> <span class="s1">&#39;Continues&#39;</span>
+    <span class="n">describes</span> <span class="o">=</span> <span class="s1">&#39;Describes&#39;</span>
+    <span class="n">isDescribedBy</span> <span class="o">=</span> <span class="s1">&#39;IsDescribedBy&#39;</span>
+    <span class="n">hasMetadata</span> <span class="o">=</span> <span class="s1">&#39;HasMetadata&#39;</span>
+    <span class="n">isMetadataFor</span> <span class="o">=</span> <span class="s1">&#39;IsMetadataFor&#39;</span>
+    <span class="n">hasVersion</span> <span class="o">=</span> <span class="s1">&#39;HasVersion&#39;</span>
+    <span class="n">isVersionOf</span> <span class="o">=</span> <span class="s1">&#39;IsVersionOf&#39;</span>
+    <span class="n">isNewVersionOf</span> <span class="o">=</span> <span class="s1">&#39;IsNewVersionOf&#39;</span>
+    <span class="n">isPreviousVersionOf</span> <span class="o">=</span> <span class="s1">&#39;IsPreviousVersionOf&#39;</span>
+    <span class="n">isPartOf</span> <span class="o">=</span> <span class="s1">&#39;IsPartOf&#39;</span>
+    <span class="n">hasPart</span> <span class="o">=</span> <span class="s1">&#39;HasPart&#39;</span>
+    <span class="n">isPublishedIn</span> <span class="o">=</span> <span class="s1">&#39;IsPublishedIn&#39;</span>
+    <span class="n">isReferencedBy</span> <span class="o">=</span> <span class="s1">&#39;IsReferencedBy&#39;</span>
+    <span class="n">references</span> <span class="o">=</span> <span class="s1">&#39;References&#39;</span>
+    <span class="n">isDocumentedBy</span> <span class="o">=</span> <span class="s1">&#39;IsDocumentedBy&#39;</span>
+    <span class="n">documents</span> <span class="o">=</span> <span class="s1">&#39;Documents&#39;</span>
+    <span class="n">isCompiledBy</span> <span class="o">=</span> <span class="s1">&#39;IsCompiledBy&#39;</span>
+    <span class="n">complies</span> <span class="o">=</span> <span class="s1">&#39;Complies&#39;</span>
+    <span class="n">isVariantFormOf</span> <span class="o">=</span> <span class="s1">&#39;IsVariantFormOf&#39;</span>
+    <span class="n">isOriginalFormOf</span> <span class="o">=</span> <span class="s1">&#39;IsOriginalFormOf&#39;</span>
+    <span class="n">isIdenticalTo</span> <span class="o">=</span> <span class="s1">&#39;IsIdenticalTo&#39;</span>
+    <span class="n">isReviewedBy</span> <span class="o">=</span> <span class="s1">&#39;IsReviewedBy&#39;</span>
+    <span class="n">reviews</span> <span class="o">=</span> <span class="s1">&#39;Reviews&#39;</span>
+    <span class="n">isDerivedFrom</span> <span class="o">=</span> <span class="s1">&#39;IsDerivedFrom&#39;</span>
+    <span class="n">isSourceOf</span> <span class="o">=</span> <span class="s1">&#39;IsSourceOf&#39;</span>
+    <span class="n">isRequiredBy</span> <span class="o">=</span> <span class="s1">&#39;IsRequiredBy&#39;</span>
+    <span class="n">requires</span> <span class="o">=</span> <span class="s1">&#39;Requires&#39;</span>
+    <span class="n">obsoletes</span> <span class="o">=</span> <span class="s1">&#39;Obsoletes&#39;</span>
+    <span class="n">isObsoletedBy</span> <span class="o">=</span> <span class="s1">&#39;IsObsoletedBy&#39;</span></div>
+
+<div class="viewcode-block" id="RelatedItem"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItem">[docs]</a><span class="k">class</span> <span class="nc">RelatedItem</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;relatedItem&#39;</span>
+    <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;name&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">href</span><span class="p">,</span> <span class="n">relationType</span><span class="p">):</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">href</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__relationType</span> <span class="o">=</span> <span class="n">RelationType</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">relationType</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">relationType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relationType</span>
+
+<div class="viewcode-block" id="RelatedItem.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItem.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;indent&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="s1">&#39; name=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__href</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; href=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__relationType</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; relationType=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relationType</span>
+
+        <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributes</span> <span class="p">)</span> <span class="p">]</span></div>
+
+<div class="viewcode-block" id="RelatedItem.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItem.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="n">href</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">relationType</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;relationType&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">href</span><span class="p">,</span> <span class="n">relationType</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="RelatedItems"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItems">[docs]</a><span class="k">class</span> <span class="nc">RelatedItems</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;relatedItems&#39;</span>
+    <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;name&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">RelatedItem</span> <span class="p">])</span>
+
+<div class="viewcode-block" id="RelatedItems.toXML"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItems.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.Documentation.relatedItem</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

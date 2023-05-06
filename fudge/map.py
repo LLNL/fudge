@@ -6,7 +6,8 @@
 # <<END-copyright>>
 
 __doc__ = """
-This module contains classes for dealing with a map file. A map file creates a library from a list of GNDS files.
+This module contains classes for dealing with a **GNDS** map file. A map file creates a nuclear data library 
+from a list of **GNDS** **reactionSuite** files.
 
 Example of expected usage:
 
@@ -14,32 +15,36 @@ Example of expected usage:
 
     from fudge import map as mapModule
     file = '/path/to/GIDI/Test/Data/MG_MC/all_maps.map'
-    map = mapModule.read( file )                        # Read in a map file.
-    m_O16 = map.find( 'n', 'O16' )                      # This gets a reference to a map Protare instance.
-    O16 = m_O16.protare( )                              # The creates a FUDGE protare (i.e., reactionSuite instance).
+    map = mapModule.read( file )    # Read in a map file.
+    m_O16 = map.find( 'n', 'O16' )  # Gets a reference to a map Protare instance for "n + O16".
+    O16 = m_O16.read( )             # Creates a FUDGE protare (i.e., reactionSuite instance).
 
-Note, in general, most user should get a protare this way.
+Note, in general, most user should get a protare (i.e., **GNDS** **reactionSuite**) this way.
 """
 
 __todo = """
-    -) Need to make Base and some other class a meta class.
+    -) Need to make Base and some other classes a meta class.
 """
 
-import os
 import re
-
 import pathlib
 
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 
 from LUPY import ancestry as ancestryModule
 from LUPY import checksums as checksumsModule
+from LUPY import misc as LUPY_miscModule
 
 from fudge import enums as enumsModule
 from fudge.core.utilities import guessInteraction as guessInteractionModule
 from fudge import reactionSuite as reactionSuiteModule
 
 class FormatVersion:
+    '''
+    This class is only needed because some legacy map files (map files created before the map node was
+    defined in **GNDS**) are still used at LLNL. When these map files are no longer used, this class
+    will be removed. New map files should only be created with **GNDS** format '2.0'.
+    '''
 
     version_0_1 = "0.1"
     version_0_2 = "0.2"
@@ -47,6 +52,14 @@ class FormatVersion:
     default = GNDS_formatVersionModule.default
 
     def check(format):
+        '''
+        This methods should be used to check that the format of a map file is valid. Also, the returned value is the format
+        that should be used after calling this method.
+
+        :param format:  The format string to check.
+
+        :return:        The format that should be used by other logic in this module.
+        '''
 
         if format == FormatVersion.version_0_1 or format == FormatVersion.version_0_2:
             format = GNDS_formatVersionModule.version_1_10
@@ -56,9 +69,26 @@ class FormatVersion:
         return format
 
 class Base( ancestryModule.AncestryIO ) :
-    """Base class used by all other map related classes. Mainly inherits class ancestryModule.AncestryIO."""
+    '''
+    Base class used by all other map related classes. Mainly inherits class :py:class:`ancestryModule.AncestryIO`
+    and adds the members **checksum** and **algorithm**.
 
-    def __init__( self, checksum=None, algorithm=None):
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | checksum  | The check sum of the file referrence by the path member.  |
+    +-----------+-----------------------------------------------------------+
+    | algorithm | The algorithm used to calculate *checksum*.               |
+    +-----------+-----------------------------------------------------------+
+    '''
+
+    def __init__(self, checksum=None, algorithm=None):
+        '''
+        :param checksum:        The check sum of the file referrence by the path member.
+        :param algorithm:       The algorithm used to calculate *checksum*.
+        '''
 
         ancestryModule.AncestryIO.__init__(self)
 
@@ -73,7 +103,7 @@ class Base( ancestryModule.AncestryIO ) :
 
     @checksum.setter
     def checksum(self, checksum_):
-        """Sets self's checksum to checksum_."""
+        """Sets *self*'s checksum to checksum_."""
 
         if checksum_ is not None and not isinstance(checksum_, str): raise TypeError("Checksum must be a string.")
         self.__checksum = checksum_
@@ -89,14 +119,22 @@ class Base( ancestryModule.AncestryIO ) :
 
     @algorithm.setter
     def algorithm(self, algorithm_):
-        """Set self's algorithm to algorithm_."""
+        """Set *self*'s algorithm to algorithm_."""
 
         if algorithm_ is not None and algorithm_ not in checksumsModule.supportedAlgorithms:
             raise ValueError("Unsupported checksum algorithm '%s'." % algorithm_)
         self.__algorithm = algorithm_
 
-    def standardXML_attributes( self, checkAncestor = True ) :
-        """Returns the XML attribute string for *checksum* and *algorithm*."""
+    def standardXML_attributes(self, checkAncestor=True):
+        '''
+        Returns the XML attribute string for *checksum* and *algorithm*. Mainly for internal use.
+        If *checkAncestor* is **True** and *self*'s *ancestor* uses the same *algorithm* as *self*, then
+        the algorithm attribute string is **not** included in the returned string.
+
+        :param checkAncestor:   Used to determine if *algorithm* needed to be added to attribute string.
+
+        :return:                XML attribute string for *checksum* and *algorithm*.
+        '''
 
         attrs = ''
         if self.checksum:
@@ -112,36 +150,56 @@ class Base( ancestryModule.AncestryIO ) :
         return attrs
 
 class Map( Base ) :
-    """
-    This class represents a map file that is used to create a library from a list of protares and other map files.
-    """
+    '''
+    This class represents a **GNDS** **map** that is used to create a nuclear data library from a list 
+    of :py:class:`Protare` :py:class:`TNSL` and :py:class:`Import` instances. Each instance in the list
+    is called an entry.
+
+    The following table list the primary members of this class:
+
+    +---------------+-----------------------------------------------------------+
+    | Member        | Description                                               |
+    +===============+===========================================================+
+    | library       | The name of the library.                                  |
+    +---------------+-----------------------------------------------------------+
+    | path          | The path to the map file read in.                         |
+    +---------------+-----------------------------------------------------------+
+    | parentsDir    | May be deprecated, needs more investigating.              |
+    +---------------+-----------------------------------------------------------+
+    | format        | The format version for the map read in.                   |
+    +---------------+-----------------------------------------------------------+
+    | checksum      | The check sum of the file referrence by the path member.  |
+    +---------------+-----------------------------------------------------------+
+    | algorithm     | The algorithm used to calculate *checksum*.               |
+    +---------------+-----------------------------------------------------------+
+    '''
 
     moniker = "map"
 
     def __init__( self, library, path, parentsDir = "", format = FormatVersion.default, checksum = None, algorithm = None ) :
-        """
-        Constructor for Map class.
+        '''
+        Constructor for **Map** class.
 
         :param library:         The name of the library.
-        :param path:            The path to the map file.
+        :param path:            The path to the map file that was used to construct *self*.
         :param parentsDir:      May be deprecated, needs more investigating.
-        :param format:          The format version for the map.
+        :param format:          The format version for the map file read in.
         :param checksum:        Hash for the map (computed from the concatenation of all checksums inside the map)
         :param algorithm:       Algorithm used to compute checksums.
-        """
+        '''
 
         Base.__init__(self, checksum=checksum, algorithm=algorithm)
 
-        if( not( isinstance( library, str ) ) ) : raise TypeError( "Library must be a string." )
-        self.__library = library
+        self.__library = LUPY_miscModule.isString(library, 'Library must be a string.')
+        self.__path = LUPY_miscModule.isString(path, 'Path must be a string.')
+        parentsDir = LUPY_miscModule.isString(parentsDir, '''Parent's path must be a string.''')
 
-        if( not( isinstance( path, str ) ) ) : raise TypeError( "Path must be a string." )
-        self.__path = path
-
-        if( not( isinstance( parentsDir, str ) ) ) : raise TypeError( "Parent's path must be a string." )
-        fileName = path
-        if( path[0] != os.sep ) : fileName = os.path.realpath( os.path.join( parentsDir, path ) )
-        self.__fileName = fileName
+        fileName = pathlib.Path(path)
+        if not fileName.is_absolute():
+            if parentsDir != '':
+                fileName = parentsDir / fileName
+            fileName = fileName.resolve()
+        self.__fileName = str(fileName)
 
         self.__format = FormatVersion.check(format)
 
@@ -149,7 +207,7 @@ class Map( Base ) :
 
     def __getitem__( self, index ) :
         """
-        Returns the (index-1)^th item of self.
+        Returns the (*index*-1)^th item of *self*.
 
         :param index:       The index of the iter to return.
         """
@@ -157,44 +215,51 @@ class Map( Base ) :
         return( self.__entries[index] )
 
     def __iter__( self ) :
-        """Iterators over each entry in self. Does not dive into import entries."""
+        """Iterators over each entry in *self*. Does not dive into import entries."""
 
         for entry in self.__entries : yield entry
 
     def __len__( self ) :
-        """Returns the number of entries in self. Does not dive into import entries."""
+        """Returns the number of entries in *self*. Does not dive into import entries."""
 
         return( len( self.__entries ) )
 
     @property
     def path( self ) :
-        """Returns the path this map was read from or may be written to. It may be absolote or relative, depending on how it was initialize."""
+        '''
+        Returns the path this map was read from or may be written to. It may be absolote or relative, 
+        depending on how it was initialize.
+        '''
 
         return( self.__path )
 
     @property
     def format( self ) :
-        """Returns to format for self."""
+        """Returns to format for *self*."""
 
         return( self.__format )
 
     @property
     def library( self ) :
-        """Returns the library name for self."""
+        """Returns the library name for *self*."""
 
         return( self.__library )
 
     @property
     def fileName( self ) :
-        """Returns the file name for the location of self. Unlike path, this will always be the absolute path."""
+        '''
+        Returns the file name for the location of *self*. Unlike the method :py:meth:`path`, 
+        this will always be the absolute path.
+        '''
 
         return( self.__fileName )
 
     def updateAllChecksums(self, algorithm=checksumsModule.Sha1sum.algorithm, mapDirectory=None):
-        """Calls *updateChecksum* on all entries and then updates self's *checksum*."""
+        """Calls *updateChecksum* on all entries and then updates *self*'s *checksum*."""
 
         import threading
         from LUPY import parallelprocessing
+
         class computeSum(threading.Thread):
 
             def __init__(self, entry):
@@ -210,19 +275,20 @@ class Map( Base ) :
         self.updateChecksum(algorithm)
 
     def updateChecksum(self, algorithm=checksumsModule.Sha1sum.algorithm):
-        """
-        Compute map file checksum: concatenate checksums for all entries into a string and compute the sum
-        of that string.
-        @param algorithm:
-        """
+        '''
+        Computes map file checksum by concatenating checksums for all entries of *self* into a string and compute the 
+        checksum of that string.
 
-        checker = checksumsModule.checkers[algorithm]           # Caleb, I think checker and checkers should be called algorithm and algorithms.
+        :param algorithm:           The algorithm to use to calculate the checksum.
+        '''
+
+        checker = checksumsModule.checkers[algorithm]  # Caleb, I think checker and checkers should be called algorithm and algorithms.
         s1 = ''.join([entry.checksum for entry in self if entry.checksum is not None])
         self.checksum = checker.from_string(s1)
         self.algorithm = algorithm
 
     def append( self, entry ) :
-        '''Appends the entry to self.'''
+        '''Appends *entry* to *self*.'''
 
         if not isinstance(entry, EntryBase):
             TypeError('Invalid entry.')
@@ -231,7 +297,7 @@ class Map( Base ) :
         entry.setAncestor( self )
 
     def insert(self, index, entry):
-        '''Inserts the entry into self at index.'''
+        '''Inserts the entry into *self* at index.'''
 
         if not isinstance(entry, EntryBase):
             TypeError('Invalid entry of type "%s".' % type(entry))
@@ -240,7 +306,11 @@ class Map( Base ) :
         entry.setAncestor(self)
 
     def iterate( self ) :
-        """Iterates over all protares and TNSLs in self. Dives into import entries."""
+        '''
+        Iterates over all protares and TNSLs in *self* including those in import entries. 
+        Ergo, unlike :py:class:`__getitem__`, this method dives into import entries.
+        That is, no :py:class:`Import` instances is returned.
+        '''
 
         for entry in self.__entries :
             if( isinstance( entry, Import ) ) :
@@ -249,12 +319,19 @@ class Map( Base ) :
                 yield entry
 
     def find( self, projectile, target, library = None, evaluation = None ) :
-        """
-        Returns the first entry matching projectile, target, library and evaluation. Searches each entry in the order they
-        were appended and dives into imported maps.
+        '''
+        Returns the first entry matching *projectile*, *target*, *library* and *evaluation*. 
+        Searches each entry in the order they were appended and dives into imported maps.
+        If *library* is **None**, then all libraries are treated as matched.
+        If *evaluation* is **None**, then all evaluations are treated as matched.
 
-        :return:        Returns the found entry or None is no match was found.
-        """
+        :param projectile:      The **GNDS** **PoPs** id for the projectile to match.
+        :param target:          The **GNDS** **PoPs** id for the target to match.
+        :param library:         The name of the library to match.
+        :param evaluation:      The name of the evaluation to match.
+
+        :return:            Returns the found entry or **None** is no match was found.
+        '''
 
         for entry in self.__entries :
             if( isinstance( entry, Import ) ) :
@@ -267,14 +344,16 @@ class Map( Base ) :
 
     def findAllOf( self, projectile = None, target = None, library = None, evaluation = None ) :
         """
-        Returns a list of all entries matching projectile, target, library and evaluation. Searches all imported maps.
+        Returns a list of all entries matching *projectile*, *target*, *library* and *evaluation*. Searches 
+        all imported maps. If *library* is **None**, the all libraries are treated as matched.
+        If *evaluation* is **None**, the all evaluations are treated as matched.
 
-        :param projectile:      The name of the projectile to match.
-        :param target:          The name of the projectile to match.
+        :param projectile:      The **GNDS** **PoPs** id for the projectile to match.
+        :param target:          The **GNDS** **PoPs** id for the target to match.
         :param library:         The name of the library to match.
         :param evaluation:      The name of the evaluation to match.
 
-        :return:                Returns the list of all matches found.
+        :return:                Returns the list of all entries that match the input arguments.
         """
 
         allFound = []
@@ -287,11 +366,14 @@ class Map( Base ) :
 
         return( allFound )
 
-    def unrecurseAndSave(self, newFileName) :
+    def unrecurseAndSave(self, newFileName):
         """
-        Iterate through all entries recursively and save as a flattened map files
+        Iterate through all entries recursively and save as a flattened map files to file *newFileName*.
+        Ergo, produces a similar :py:class:`Map` instance but with no import entries.
 
-        :param newFileName:  New filename to which flattened mapfile will be saved 
+        :param newFileName:  New filename to which flattened mapfile will be saved.
+
+        :return:            Returns the flattened :py:class:`Map` instance.
         """
 
         newInstance = Map(self.library, newFileName, "", self.format, algorithm=self.algorithm)
@@ -307,14 +389,16 @@ class Map( Base ) :
         newInstance.updateChecksum()
         newInstance.saveToFile(newFileName)
 
+        return newInstance
+
     def toXML_strList( self, indent = "", **kwargs ) :
         """
-        Returns a list of str instances representing the XML lines of self.
+        Returns a list of str instances representing the XML lines of *self*.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
         :param kwargs:          A keyword list.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:                List of str instances representing the XML lines of *self*.
         """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
@@ -334,9 +418,12 @@ class Map( Base ) :
         """
         Creates a Map instance from an map node.
 
-        :param node:        node to parse.
+        :param node:        Node to parse.
+        :param xPath:       Currently not used.
+        :param linkData:    Currently not used.
+        :param kwargs:      A keyword list.
 
-        :return:            Map instance.
+        :return:            :py:class:`Map` instance.
         """
 
         if( node.tag != Map.moniker ) : raise TypeError( 'Invalid node name "%s" for a map file.' % node.tag )
@@ -368,12 +455,31 @@ class Map( Base ) :
     def read(fileName, **kwargs):
         """
         Reads in the file name *fileName* and returns a **Map** instance.
+
+        :param fileName:    The file to read in and parse.
+        :param kwargs:      A keyword list.
+
+        :return:            :py:class:`Map` instance.
         """
 
         return Map.readXML_file(fileName, **kwargs)
 
 class EntryBase( Base ) :
-    """Base class for all map entry classes."""
+    '''
+    Base class for all map entry classes.
+
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | path      | The file path to the file to read in for this entry.      |
+    +-----------+-----------------------------------------------------------+
+    | checksum  | The check sum of the file referrence by the path member.  |
+    +-----------+-----------------------------------------------------------+
+    | algorithm | The algorithm used to calculate *checksum*.               |
+    +-----------+-----------------------------------------------------------+
+    '''
 
     def __init__( self, path, checksum=None, algorithm=None) :
         """
@@ -389,34 +495,49 @@ class EntryBase( Base ) :
 
     @property
     def fileName( self ) :
-        """Returns the absolute path to the file pointed to by the 'path' attribute."""
+        '''
+        Returns the file name for the location of *self*. Unlike the method :py:meth:`path`, 
+        this will always be the absolute path.
+        '''
 
-        filename = self.path
-        if filename[0] != os.sep: filename = os.path.join(os.path.dirname(os.path.realpath(self.ancestor.path)), filename)
-        return( filename )
+        fileName = pathlib.Path(self.path)
+        if not fileName.is_absolute():
+            fileName = pathlib.Path(self.ancestor.fileName).parent / fileName
+            fileName = fileName.resolve()
+
+        return str(fileName)
 
     @property
     def path( self ) :
-        """Returns the path of the map file. This may be absolute or relative."""
+        """Returns the value of the *__path* member. This may be absolute or relative."""
 
         return( self.__path )
 
     @path.setter
     def path(self, path):
-        '''Sets member self.__path to *path*.'''
+        '''
+        Sets member *self*.__path to *path*.
+
+        :param path:    The name of the path for *self*.
+        '''
 
         if not isinstance(path, str):
             raise TypeError('Path must be a string.')
         self.__path = path
 
     def buildFileName(self, mapDirectory=None):
-        """This method is designed to aid in building a map file when the map file does not reside in its final resting place.
+        '''
+        This method is designed to aid in building a map file when the map file does not reside in its final resting place.
         The value of *mapDirectory* should be the final resting place (i.e., directory) of the map file.
         Otherwise, this method is the same as the propery methods *fileName*.
-        """
 
-        if mapDirectory is None: return self.fileName
-        return os.path.join(os.path.realpath(mapDirectory), self.path)
+        :param mapDirectory:    The final directory where the map file will reside if it is different than "./".
+        '''
+
+        if mapDirectory is None:
+            return self.fileName
+
+        return str(pathlib.Path(pathlib.Path(mapDirectory).resolve()) / self.path)
 
     def updateChecksum(self, algorithm=checksumsModule.Sha1sum.algorithm, mapDirectory=None):
         """
@@ -429,7 +550,21 @@ class EntryBase( Base ) :
         self.checksum = checksumsModule.checkers[algorithm].from_file(self.buildFileName(mapDirectory))
 
 class Import( EntryBase ) :
-    """Class representing an 'import' entry in a map. An import entry specifies the location of another map file to import."""
+    '''
+    Class representing an 'import' entry in a map. An import entry specifies the location of another map file to import.
+
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | path      | The file path to the map file in for this entry.          |
+    +-----------+-----------------------------------------------------------+
+    | checksum  | The check sum of the file referrence by the path member.  |
+    +-----------+-----------------------------------------------------------+
+    | algorithm | The algorithm used to calculate *checksum*.               |
+    +-----------+-----------------------------------------------------------+
+    '''
 
     moniker = "import"
 
@@ -437,28 +572,36 @@ class Import( EntryBase ) :
         """Constructor for the import entry.
 
         :param path:            Path to the map file in import.
+        :param checksum:        Checksum for this entry, computed using the indicated algorithm.
+        :param algorithm:       Algorithm for computing the checksum. Only required if different from parent <map> file.
         """
 
         EntryBase.__init__( self, path, checksum=checksum, algorithm=algorithm)
         self.__map = None
 
     def __str__( self ) :
-        """Returns a simple string representation of self."""
+        """Returns a simple string representation of *self*."""
 
         return( '%s with path "%s".' % ( self.moniker, self.path ) )
 
     @property
     def derivedPath(self):
+        '''
+        Returns the parent part of the ancestor's path. This, together with *self*'s path defines the
+        location of the map file to read in.
+
+        :return:        The parent part of the ancestor's path.
+        '''
 
         ancestor = self.ancestor
         if isinstance(ancestor, Map):
-            return os.path.dirname(ancestor.path)
+            return pathlib.Path(ancestor.fileName).parent
 
         raise TypeError('Import not an entry of a Map instance.')
 
     @property
     def map( self ) :
-        """Returns a reference to self.__map."""
+        """Returns a reference to *self*.__map."""
 
         self.readMap( )
 
@@ -466,14 +609,14 @@ class Import( EntryBase ) :
 
     def find( self, projectile, target, library = None, evaluation = None ) :
         """
-        Calls find on self.__map and returns its results.
+        Calls :py:meth:`Map.find` on *self*.__map and returns its results.
 
         :param projectile:      The name of the projectile to match.
         :param target:          The name of the projectile to match.
         :param library:         The name of the library to match.
         :param evaluation:      The name of the evaluation to match.
 
-        :return:                Returns the found entry or None is no match was found.
+        :return:                Returns the found entry or **None** is no match was found.
         """
 
         self.readMap( )
@@ -482,7 +625,9 @@ class Import( EntryBase ) :
 
     def findAllOf( self, projectile = None, target = None, library = None, evaluation = None ) :
         """
-        Returns a list of all entries matching projectile, target, library and evaluation. Searches all imported maps.
+        Calls :py:meth:`Map.findAllOf` on *self*.__map and returns its results.
+        Arguments that are **None** match all values of their type. For example, if *projectile* is **None**,
+        then all projectiles are a match.
 
         :param projectile:      The name of the projectile to match.
         :param target:          The name of the projectile to match.
@@ -496,30 +641,34 @@ class Import( EntryBase ) :
         return( self.__map.findAllOf( projectile, target, library, evaluation ) )
 
     def iterate( self ) :
-        """Iterates over all protares and TNSLs in self's map."""
+        '''
+        Iterates over all protares and TNSLs in *self*'s map including nested :py:class:`Map` instances.
+        No :py:class:`Import` instances is returned.
+        '''
 
         self.readMap( )
         yield from self.map.iterate( )
 
     def readMap( self ) :
-        """Reads in the map file pointed to by self if not already read in. An import only reads its map file when needed."""
+        """Reads in the map file pointed to by *self* if not already read in. An import only reads its map file when needed."""
 
         if self.__map is None:
-            mapFilePath = self.path
-            if mapFilePath[0] != os.sep: mapFilePath = os.path.join(self.derivedPath, mapFilePath)
+            mapFilePath = pathlib.Path(self.path)
+            if not mapFilePath.is_absolute():
+                mapFilePath = self.derivedPath / mapFilePath
             self.__map = Map.readXML_file(mapFilePath)
-            self.__map.setAncestor( self )
+            self.__map.setAncestor(self)
 
         return self.__map
     
     def toXML_strList( self, indent = "", **kwargs ) :
         """
-        Returns a list of str instances representing the XML lines of self.
+        Returns a list of str instances representing the XML lines of *self*.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
         :param kwargs:          A keyword list.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:                List of str instances representing the XML lines of *self*.
         """
 
         attrs = self.standardXML_attributes( )
@@ -528,11 +677,14 @@ class Import( EntryBase ) :
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Creates an Import instance from an XML import element.
+        Creates an :py:class:`Import` instance from an import node.
 
-        :param node:            XML element to parse.
+        :param node:            Node to parse.
+        :param xPath:           Currently not used.
+        :param linkData:        Currently not used.
+        :param kwargs:          A keyword list.
 
-        :return:                Import instance.
+        :return:                :py:class:`Import` instance.
         """
 
         if node.tag != Import.moniker: raise TypeError( "Invalid node name." )
@@ -542,7 +694,29 @@ class Import( EntryBase ) :
         return _import
 
 class ProtareBase( EntryBase ) :
-    """Base class for all protare-like entry classes."""
+    '''
+    Base class for all protare-like entry classes (i.e., the :py:class:`Protare` and :py:class:`TNSL` classes).
+
+    The following table list the primary members of this class:
+
+    +---------------+-----------------------------------------------------------+
+    | Member        | Description                                               |
+    +===============+===========================================================+
+    | projectile    | The name of the projectile.                               |
+    +---------------+-----------------------------------------------------------+
+    | target        | The name of the target.                                   |
+    +---------------+-----------------------------------------------------------+
+    | evaluation    | The name of the evaluation.                               |
+    +---------------+-----------------------------------------------------------+
+    | interaction   | The type of interacter for the protare.                   |
+    +---------------+-----------------------------------------------------------+
+    | path          | The file path to the file to read in for this entry.      |
+    +---------------+-----------------------------------------------------------+
+    | checksum      | The check sum of the file referrence by the path member.  |
+    +---------------+-----------------------------------------------------------+
+    | algorithm     | The algorithm used to calculate *checksum*.               |
+    +---------------+-----------------------------------------------------------+
+    '''
 
     def __init__( self, projectile, target, evaluation, path, interaction, checksum=None, algorithm=None ) :
         """
@@ -553,8 +727,8 @@ class ProtareBase( EntryBase ) :
         :param evaluation:          Name for the protare's Evaluation.
         :param path:                Path to the protare file.
         :param interaction:         Type of interaction for the data in the protare file (see class reactionSuite.Interaction).
-        :param checksum:            The checksum for the file referenced by *path*.
-        :param algorithm:           The algorithm used to calculate the checksum.
+        :param checksum:            Checksum for this entry, computed using the indicated algorithm.
+        :param algorithm:           Algorithm for computing the checksum. Only required if different from parent <map> file.
         """
 
         EntryBase.__init__(self, path, checksum=checksum, algorithm=algorithm)
@@ -590,37 +764,45 @@ class ProtareBase( EntryBase ) :
 
     @property
     def evaluation( self ) :
-        """Returns the protare's evaluation string."""
+        """Returns the evaluation string."""
 
         return( self.__evaluation )
 
     @property
     def interaction( self ) :
-        """Returns the protare's interaction attribute."""
+        """Returns the interaction attribute."""
 
         return( self.__interaction )
 
     @property
     def guessedInteraction(self) :
-        '''Returns the guessedInteraction value. This is for pre GNDS 2.0 use only and should not be used with GNDS 2.0 or higher
-        (i.e., it should always be False for GNDS 2.0 or higher.'''
+        '''
+        Returns the guessedInteraction value. This is for pre GNDS 2.0 use only and should not be used with GNDS 2.0 or higher
+        (i.e., it should always return **False** for GNDS 2.0 or higher).
+        '''
 
         return self.__guessedInteraction
 
     @guessedInteraction.setter
     def guessedInteraction(self, value) :
-        '''Set self's guessedInteraction member. This is for pre GNDS 2.0 use only and should not be used with GNDS 2.0 or higher.'''
+        '''
+        Set *self*'s guessedInteraction member. This is for pre GNDS 2.0 use only and should not be 
+        used with GNDS 2.0 or higher.
+        '''
 
         self.__guessedInteraction = value
 
     @property
     def library( self ) :
-        """Returns the label for the library the protare resides in."""
+        """Returns the name of the library the protare resides in."""
 
         return( self.ancestor.library )
 
     @property
     def derivedPath(self):
+        '''
+        Returns the location of the file pointed to by the *path* member relative to the ancestor's locations.
+        '''
 
         ancestor = self.ancestor
         if self.path[0] == os.sep or not isinstance(ancestor, Base):
@@ -629,15 +811,16 @@ class ProtareBase( EntryBase ) :
 
     def isMatch( self, projectile, target, library = None, evaluation = None ) :
         """
-        Returns True is self matches projectile, target, library and evaluation, and False otherwise. If an argument has a value of None, 
-        that argument is a match.  For example, isMatch( None, "O16", None, None ) will match any entry with a target of "O16".
+        Returns **True** is *self* matches projectile, target, library and evaluation, and **False** otherwise.
+        If an argument has a value of **None**, that argument is a match.  
+        For example, isMatch( None, "O16", None, None ) will match any entry with a target of "O16".
 
-        :param projectile:      The requested projectile's PoPs id to match.
-        :param target:          The requested target's PoPs id to match.
-        :param library:         The requested library to match.
-        :param evaluation:      The requested evaluation to match.
+        :param projectile:      The requested projectile's **PoPs** id to check for match.
+        :param target:          The requested target's **PoPs** id to check for match.
+        :param library:         The requested library to check for match.
+        :param evaluation:      The requested evaluation to check for match.
 
-        :return:                Returns True if a match and False otherwise.
+        :return:                Returns **True** if a match and **False** otherwise.
         """
 
         if( self.adaptable( self.projectile, projectile ) ) :
@@ -647,21 +830,29 @@ class ProtareBase( EntryBase ) :
         return( False )
 
     def protare(self, verbosity=0, lazyParsing=True):
-        """Call self.read."""
+        """Calls *self*.read. This method is deprecated."""
 
         return self.read(verbosity=verbosity, lazyParsing=lazyParsing)
 
     def read(self, verbosity=0, lazyParsing=True):
         """
-        Reads in the protare using ReactionSuite.readXML_file and returns the instance.
+        Reads in the protare using the **read** function in the module ReactionSuite.py and returns the instance.
+
+        :param verbosity:       Passed onto ReactionSuite.read.
+        :param lazyParsing:     Passed onto ReactionSuite.read.
         """
 
-        return reactionSuiteModule.ReactionSuite.readXML_file(self.fileName, verbosity=verbosity, lazyParsing=lazyParsing)
+        return reactionSuiteModule.read(self.fileName, verbosity=verbosity, lazyParsing=lazyParsing)
 
     def standardXML_attributes(self, checkAncestor=True):
-        """Returns the XML attribute string for protare, target, evalution and interaction as well that those
-        returned by Base.standardXML_attributes.
-        """
+        '''
+        Returns the XML attribute string for protare, target, evalution and interaction as well that those
+        returned by :py:meth:`Base.standardXML_attributes`.
+
+        :param checkAncestor:   Passed to the method :py:meth:`Base.standardXML_attributes`.
+
+        :returns:               A XML attribute string.
+        '''
 
         attributeString = ' projectile="%s" target="%s" evaluation="%s" path="%s"' % (self.projectile, self.target, self.evaluation, self.path)
         if not self.guessedInteraction:
@@ -673,7 +864,7 @@ class ProtareBase( EntryBase ) :
     @staticmethod
     def adaptable( item1, item2 ) :
         """
-        Returns True whenever item2 is None or item1 and item2 are the same. For internal use.
+        Returns **True** whenever item2 is **None** or *item1* and *item2* are the same. For internal use.
 
         :param item1:       Item to compare to item2.
         :param item2:       Item to compare to item1.
@@ -683,7 +874,29 @@ class ProtareBase( EntryBase ) :
         return re.fullmatch(item2, item1) is not None
     
 class Protare( ProtareBase ) :
-    """The class for a map's protare node."""
+    '''
+    The class for a map's protare child node.
+
+    The following table list the primary members of this class:
+
+    +---------------+-----------------------------------------------------------+
+    | Member        | Description                                               |
+    +===============+===========================================================+
+    | projectile    | The name of the projectile.                               |
+    +---------------+-----------------------------------------------------------+
+    | target        | The name of the target.                                   |
+    +---------------+-----------------------------------------------------------+
+    | evaluation    | The name of the evaluation.                               |
+    +---------------+-----------------------------------------------------------+
+    | interaction   | The type of interacter for the protare.                   |
+    +---------------+-----------------------------------------------------------+
+    | path          | The file path to the file to read in for this entry.      |
+    +---------------+-----------------------------------------------------------+
+    | checksum      | The check sum of the file referrence by the path member.  |
+    +---------------+-----------------------------------------------------------+
+    | algorithm     | The algorithm used to calculate *checksum*.               |
+    +---------------+-----------------------------------------------------------+
+    '''
 
     moniker = "protare"
 
@@ -691,29 +904,31 @@ class Protare( ProtareBase ) :
         """
         Construtor for a Protare instance.
 
-        :param projectile:      Name for the projectile.
-        :param target:          Name for the target.
-        :param evaluation:      Name for the protare's Evaluation.
-        :param path:            Path to the protare file.
-        :param interaction:     Type of interaction for the data in the protare file (see class reactionSuite.Interaction).
+        :param projectile:          Name for the projectile.
+        :param target:              Name for the target.
+        :param evaluation:          Name for the protare's Evaluation.
+        :param path:                Path to the protare file.
+        :param interaction:         Type of interaction for the data in the protare file (see class reactionSuite.Interaction).
+        :param checksum:            Checksum for this entry, computed using the indicated algorithm.
+        :param algorithm:           Algorithm for computing the checksum. Only required if different from parent <map> file.
         """
 
         ProtareBase.__init__( self, projectile, target, evaluation, path, interaction, checksum=checksum, algorithm=algorithm)
 
     def __str__( self ) :
-        """Returns a simple string representation of self."""
+        """Returns a simple string representation of *self*."""
 
         return( '%s with projectile "%s", target "%s", evaluation "%s", path "%s" and interaction "%s".' % 
             ( self.moniker, self.projectile, self.target, self.evaluation, self.path, self.interaction ) )
 
     def toXML_strList( self, indent = "", **kwargs ) :
         """
-        Returns a list of str instances representing the XML lines of self.
+        Returns a list of str instances representing the XML lines of *self*.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
         :param kwargs:          A keyword list.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:                List of str instances representing the XML lines of *self*.
         """
 
         format = FormatVersion.check(kwargs.get('format', kwargs.get('formatVersion', FormatVersion.default)))
@@ -723,11 +938,14 @@ class Protare( ProtareBase ) :
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Creates a Protare instance from an XML protare element.
+        Creates a Protare instance from a protare node.
 
-        :param node:        XML element to parse.
+        :param node:        Node to parse.
+        :param xPath:       Currently not used.
+        :param linkData:    Currently not used.
+        :param kwargs:      A keyword list.
 
-        :return:            A map Protare instance.
+        :return:            A :py:class:`Protare` instance.
         """
 
         if( node.tag != Protare.moniker ) : raise TypeError( "Invalid node name." )
@@ -744,12 +962,36 @@ class Protare( ProtareBase ) :
         return protare
 
 class TNSL( ProtareBase ) :
-    """The class for a map's TNSL node."""
+    '''
+    The class for a map's TNSL node.
+
+    The following table list the primary members of this class:
+
+    +-----------------------+-----------------------------------------------------------+
+    | Member                | Description                                               |
+    +=======================+===========================================================+
+    | projectile            | The name of the projectile.                               |
+    +-----------------------+-----------------------------------------------------------+
+    | target                | The name of the target.                                   |
+    +-----------------------+-----------------------------------------------------------+
+    | evaluation            | The name of the evaluation.                               |
+    +-----------------------+-----------------------------------------------------------+
+    | path                  | The file path to the file to read in for this entry.      |
+    +-----------------------+-----------------------------------------------------------+
+    | standardTarget        | Name for the standard target.                             |
+    +-----------------------+-----------------------------------------------------------+
+    | standardEvaluation    | Name for the standard evaluation.                         |
+    +-----------------------+-----------------------------------------------------------+
+    | checksum              | The check sum of the file referrence by the path member.  |
+    +-----------------------+-----------------------------------------------------------+
+    | algorithm             | The algorithm used to calculate *checksum*.               |
+    +-----------------------+-----------------------------------------------------------+
+    '''
 
     moniker = "TNSL"
 
-    def __init__( self, projectile, target, evaluation, path, standardTarget, standardEvaluation, 
-            interaction=None, checksum=None, algorithm=None) :
+    def __init__(self, projectile, target, evaluation, path, standardTarget, standardEvaluation, 
+                interaction=None, checksum=None, algorithm=None):
         """
         Construtor for a TNSL instance.
 
@@ -759,6 +1001,8 @@ class TNSL( ProtareBase ) :
         :param path:                    Path to the protare file.
         :param standardTarget:          Name for the standard target.
         :param standardEvaluation:      Name for the standard evaluation.
+        :param checksum:                Checksum for this entry, computed using the indicated algorithm.
+        :param algorithm:               Algorithm for computing the checksum. Only required if different from parent <map> file.
         """
 
         ProtareBase.__init__( self, projectile, target, evaluation, path, None, checksum=checksum, algorithm=algorithm)
@@ -772,7 +1016,7 @@ class TNSL( ProtareBase ) :
         self.__standardEvaluation = standardEvaluation
 
     def __str__( self ) :
-        """Returns a simple string representation of self."""
+        """Returns a simple string representation of *self*."""
 
         return( '%s with projectile "%s", target "%s", evaluation "%s", path "%s", standardTarget "%s" and standardEvaluation "%s".' % 
             ( self.moniker, self.projectile, self.target, self.evaluation, self.path, self.standardTarget, self.standardEvaluation ) )
@@ -791,12 +1035,12 @@ class TNSL( ProtareBase ) :
 
     def toXML_strList( self, indent = "", **kwargs ) :
         """
-        Returns a list of str instances representing the XML lines of self.
+        Returns a list of str instances representing the XML lines of *self*.
 
         :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
         :param kwargs:          A keyword list.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:                List of str instances representing the XML lines of *self*.
         """
 
         format = FormatVersion.check(kwargs.get('format', kwargs.get('formatVersion', FormatVersion.default)))
@@ -816,14 +1060,14 @@ class TNSL( ProtareBase ) :
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         '''
-        Creates a TNSL instance from an XML TNSL element.
+        Creates a TNSL instance from a TNSL node.
 
-        :param node:            XML element to parse.
+        :param node:            Node to parse.
         :param xPath:           Current not used.
         :param linkData:        Currently not used.
         :param kwargs:          A keyword list.
 
-        :return:                TNSL instance.
+        :return:                A :py:class:`TNSL` instance.
         '''
 
         if node.tag != TNSL.moniker:
@@ -845,7 +1089,7 @@ class TNSL( ProtareBase ) :
 
 def read(fileName, **kwargs):
     """
-    Reads in the file name *fileName* and returns a **database** instance.
+    Reads in the file named *fileName* and returns a :py:class:`Map` instance.
     """
 
     return Map.read(fileName, **kwargs)

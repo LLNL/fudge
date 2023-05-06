@@ -381,7 +381,7 @@ class Particle(miscModule.ClassWithIDKey, abc.ABC):
     @classmethod
     def buildFromClassAndRawData(cls, id, mass = None, spin = None, parity = None, charge = None, halflife = None, label = 'default'):
         """
-        Helper method to create a particle from class *cls8 and to add common properties to the particle.
+        Helper method to create a particle from class *cls* and to add common properties to the particle.
 
         :param id:  the string id of the partical
         :param mass:  tuple(float value, string unit)

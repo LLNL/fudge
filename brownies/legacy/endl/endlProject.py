@@ -18,7 +18,6 @@ To resolve the location of the bdfls file, endlProject does the following,
 
 import os
 import tempfile
-import string
 import sys
 import types
 
@@ -251,14 +250,14 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
             raise Exception( "\nError in endlProject.process: project does not have a work directory." )
         else :
             if ( not os.path.exists( oldfile ) ) :
-                if ( string.rfind( oldfile, "/" ) == -1 ) :
+                if ( oldfile.rfind( "/" ) == -1 ) :
                     f = os.path.join(fudgeDefaults.NDF_DATABASE_DIR, oldfile)
                     if ( not os.path.exists( f ) ) : f = os.path.join(fudgeDefaults.MCF_DATABASE_DIR, oldfile)
                     if ( os.path.exists( f ) ) : oldfile = f
             if ( not os.path.exists( oldfile ) ) :
                 raise Exception( "\nError in endlProject.process: old file does not exist (%s)" % oldfile )
             if ( newfile is None ) :
-                i = string.rfind( oldfile, "/" ) + 1        # rfind returns -1 if "/" not found. This is great.
+                i = oldfile.rfind( "/" ) + 1        # rfind returns -1 if "/" not found. This is great.
                 newfile = oldfile[i:] + ".new"
             endlmisc.processDataBase(self.workDir, oldfile, newfile, options, defines = defines, bdflsFile = bdflsFile, ndfgen = ndfgen,
                                      mcfgen = mcfgen, endep = endep, extraZAs = extraZAs)

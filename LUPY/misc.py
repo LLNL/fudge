@@ -6,13 +6,20 @@
 # <<END-copyright>>
 
 '''
-This module contains miscellaneous functions that do not fit in other modules.
+This module contains general miscellaneous functions that do not fit in other LUPY modules.
 '''
 
 def isString(value, message):
     '''
-    This function check if *value* is a type str instance. If it is, *value* is returned. Otherwise, a TypeError raise
+    This function check if *value* is of type python str instance. If it is, *value* is returned. Otherwise, a TypeError raise
     is execute with message *message*.
+
+    :param value:           The instance to check if it is a python str instance.
+    :param message:         The message passed to **TypeError**.
+
+    :returns:               *value*.
+
+    :raises TypeError:      If *value* is not a python str instance.
     '''
 
     if isinstance(value, str):

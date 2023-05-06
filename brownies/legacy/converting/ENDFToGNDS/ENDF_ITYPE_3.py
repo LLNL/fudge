@@ -78,6 +78,8 @@ def readMF27( info, MT, MF27Datas, label, warningList ) :
     energyUnit = 'eV'
     if( MT in [ 502, 504 ] ) : energyUnit = '1/Ang'
     axes = baseModule.defaultAxes( label, energyUnit = energyUnit )
+    ZA, AWR = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MF27Data[0], intIndices=[0], logFile=info.logs )[0:2]
+    info.ZA_massLineInfo.add(ZA, AWR, MT, 8, 0)
     dataLine, TAB1, MF27s = endfFileToGNDSMisc.getTAB1Regions(1, MF27Data, axes = axes, allowInterpolation6 = True, logFile = info.logs, cls = XYs1d)
     if( len( MF27s ) == 1 ) :
         if( MT == 504 ) : return( MF27s[0] )

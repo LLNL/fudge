@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+# FIXME CMM this appears to be unused.  Likely replaced by the fissionFramentData.rate module
+# Remove?
+
 from LUPY import ancestry as ancestryModule
 
 from .. import suite as suiteModule

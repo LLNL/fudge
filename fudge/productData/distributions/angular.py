@@ -797,7 +797,7 @@ class TwoBody( baseModule.Form ) :
 
     def __init__( self, label, productFrame, angularSubform ) :
 
-        angularSubform.label = None
+        angularSubform.label = None                 # FIXME: Need to check the type of angularSubform.
         baseModule.Form.__init__( self, label, productFrame, ( angularSubform, ) )
 
     @property
@@ -855,10 +855,18 @@ class TwoBody( baseModule.Form ) :
 
         productMass = reactionSuite.PoPs[outputChannel.products[0].pid].getMass(massUnit)
         residualMass = reactionSuite.PoPs[outputChannel.products[1].pid].getMass(massUnit)
-        if productMass == 0.0 or residualMass == 0.0:
+        if productMass == 0.0:                      # This is capture with product being primary photon.
+            Q = outputChannel.Q[0].value
+            inputMass = projectileMass + targetMass
+            gammaEnergy = Q + energyIn * targetMass / inputMass * (1 - Q / inputMass)
+            halfWidth = kwargs['twoBodyCOM_energyResolution']
+            data = [[gammaEnergy - halfWidth, 0.0], [gammaEnergy, 1 / halfWidth], [gammaEnergy + halfWidth, 0.0]]
+            return energyModule.XYs1d(data=data, axes=energyModule.defaultAxes(energyUnit))
+        elif residualMass == 0.0:
             print('    WARNING: skipping unsupported relativistic TwoBody.energySpectrumAtEnergy: product mass = %s, target mass = %s' % 
                 (productMass, residualMass))
             return energyModule.XYs1d(axes=energyModule.defaultAxes(energyUnit))
+
         if outputChannel.products[1] == product:
             productMass, residualMass = residualMass, productMass
 

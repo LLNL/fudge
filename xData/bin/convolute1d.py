@@ -13,7 +13,7 @@ import shutil
 
 from xData import XYs1d as XYs1dModule
 
-summaryDocString_xData = '''Reads 1d data from a file and convolutes its data with data from another file or a Gaussian.'''
+summaryDocStringxData = '''Reads 1d data from a file and convolutes its data with data from another file or a Gaussian.'''
 
 description = '''
 Reads 1d data from a file, and convolutes with data from another file if present or a Gaussian function. That is, performs
@@ -39,8 +39,6 @@ group = parser.add_argument_group(title='Gaussian function parameters', descript
 group.add_argument('-s', '--stdDev', type=float, default=1.0,                           help='The standard deviation of the Gaussian function. Default is 1.0.')
 group.add_argument('-o', '--offset', type=float, default=0.0,                           help='The offset of the Gaussian function. Default is 0.0.')
 
-args = parser.parse_args()
-
 def read(fileName):
 
     file = pathlib.Path(fileName)
@@ -56,16 +54,19 @@ def read(fileName):
 
     return XYs1dModule.XYs1d(data=data)
 
-function1 = read(args.data1)
-function1 = function1.thin(args.accuracy)
-if args.data2 is not None:
-    function2 = read(args.data2)
-    function2 = function2.thin(args.accuracy)
-else:
-    domainMin = -5 * args.stdDev
-    domainMax =  5 * args.stdDev
-    function2 = XYs1dModule.XYs1d(data=XYs1dModule.pointwiseXY_C.gaussian(args.accuracy, domainMin, domainMax, args.offset, args.stdDev, 1.0)).normalize()
+if __name__ == '__main__':
+    args = parser.parse_args()
 
-print(len(function1), len(function2))
-convolution = function1.convolute(function2).thin(accuracy=args.accuracy)
-print(convolution.toString())
+    function1 = read(args.data1)
+    function1 = function1.thin(args.accuracy)
+    if args.data2 is not None:
+        function2 = read(args.data2)
+        function2 = function2.thin(args.accuracy)
+    else:
+        domainMin = -5 * args.stdDev
+        domainMax =  5 * args.stdDev
+        function2 = XYs1dModule.XYs1d(data=XYs1dModule.pointwiseXY_C.gaussian(args.accuracy, domainMin, domainMax, args.offset, args.stdDev, 1.0)).normalize()
+
+    print(len(function1), len(function2))
+    convolution = function1.convolute(function2).thin(accuracy=args.accuracy)
+    print(convolution.toString())

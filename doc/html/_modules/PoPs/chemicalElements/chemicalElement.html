@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoPs.chemicalElements.chemicalElement &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.chemicalElements.chemicalElement</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PoPs.chemicalElements.chemicalElement</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the class for the suite chemicalElement.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">miscModule</span>
+
+<span class="kn">from</span> <span class="nn">..atomic</span> <span class="kn">import</span> <span class="n">atomic</span> <span class="k">as</span> <span class="n">atomicDataModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">chemicalElementMiscModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">isotope</span> <span class="k">as</span> <span class="n">isotopeModule</span>
+
+<div class="viewcode-block" id="ChemicalElement"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement">[docs]</a><span class="k">class</span> <span class="nc">ChemicalElement</span><span class="p">(</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithSymbolKey</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a chemical element (i.e., Oyxgen, Iron, Uranium). A chemical element</span>
+<span class="sd">    stores all isotopes that contain the same number of protons (i.e., O16, O17, and O18). </span>
+<span class="sd">    The members of a chemicalElement are:</span>
+
+<span class="sd">    .. table:: Chemical element members</span>
+<span class="sd">       :widths: auto</span>
+
+<span class="sd">       =========== =========== =========================================================================</span>
+<span class="sd">       member      type        description</span>
+<span class="sd">       =========== =========== =========================================================================</span>
+<span class="sd">       symbol      string      This is the symbol for the chemical element (e.g., &#39;O&#39; for oxygen).</span>
+<span class="sd">       Z           int         Number of protons for this chemical element (e.g., 8 for &#39;O&#39;).</span>
+<span class="sd">       name        string      The name of the chemical element (i.e., &#39;Oxygen&#39;)</span>
+<span class="sd">       atomicData  atomicData  Container for atomic data, including ionized states and atomic relaxation</span>
+<span class="sd">       isotopes    suite       The list of isotopes</span>
+<span class="sd">       =========== =========== =========================================================================</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;chemicalElement&#39;</span>
+
+<div class="viewcode-block" id="ChemicalElement.__init__"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param symbol: Chemical symbol for the element, e.g. &#39;Fe&#39; (string)</span>
+<span class="sd">        :param Z: Atomic number, e.g. 26 (int)</span>
+<span class="sd">        :param name: Full name of the element, e.g. &#39;Iron&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithSymbolKey</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span> <span class="p">)</span>
+
+        <span class="n">base</span><span class="p">,</span> <span class="n">anti</span> <span class="o">=</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">baseAntiFromID</span><span class="p">(</span> <span class="n">symbol</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__anti</span> <span class="o">=</span> <span class="n">anti</span> <span class="o">==</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">antiSuffix</span>
+
+        <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">checkZ</span><span class="p">(</span> <span class="n">Z</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__Z</span> <span class="o">=</span> <span class="n">Z</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">symbolFromZ</span><span class="p">[</span><span class="n">Z</span><span class="p">]</span> <span class="o">!=</span> <span class="n">base</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;Z = </span><span class="si">%s</span><span class="s1"> and chemical element symbol = &quot;</span><span class="si">%s</span><span class="s1">&quot; are not consistent&#39;</span> <span class="o">%</span>
+                <span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">toLimitedString</span><span class="p">(</span> <span class="n">symbol</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;name must be a string&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">nameFromZ</span><span class="p">[</span><span class="n">Z</span><span class="p">]</span> <span class="o">!=</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;Z = &quot;</span><span class="si">%s</span><span class="s1">&quot; and chemical element name = &quot;</span><span class="si">%s</span><span class="s1">&quot; are not consistent, should be &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">toLimitedString</span><span class="p">(</span> <span class="n">name</span> <span class="p">),</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">nameFromZ</span><span class="p">[</span><span class="n">Z</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span> <span class="o">=</span> <span class="n">isotopeModule</span><span class="o">.</span><span class="n">Isotopes</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> </div>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span> 
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="ChemicalElement.__iter__"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Iterates over isotopes of this element (but not over the excited states of those isotopes) &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span> <span class="p">:</span> <span class="k">yield</span> <span class="n">isotope</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Z</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Z</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">isAnti</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__anti</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">atomicData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span> <span class="p">)</span>
+
+    <span class="nd">@atomicData</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">atomicData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">atomicDataModule</span><span class="o">.</span><span class="n">Atomic</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;value must be an instance of atomicData.&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">isotopes</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="ChemicalElement.add"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param item: isotope instance, will be added to the list of isotopes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElement.convertUnits"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; See convertUnits documentation in PoPs.database &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElement.copy"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: deep copy of self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_chemicalElement</span> <span class="o">=</span> <span class="n">ChemicalElement</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">_chemicalElement</span><span class="o">.</span><span class="n">atomicData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span> <span class="p">:</span> <span class="n">_chemicalElement</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">_chemicalElement</span> <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">sortCompare</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">ChemicalElement</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid other.&#39;</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">Z</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="ChemicalElement.check"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; See check documentation in PoPs.database &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">warning</span> <span class="k">as</span> <span class="n">warningModule</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">isotopeWarnings</span> <span class="o">=</span> <span class="n">isotope</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">isotopeWarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warningModule</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s1">&#39;Isotope </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">isotope</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">isotopeWarnings</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="ChemicalElement.toXML_strList"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">XMLStringList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> symbol=&quot;</span><span class="si">%s</span><span class="s1">&quot; Z=&quot;</span><span class="si">%s</span><span class="s1">&quot; name=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atomicData</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">XMLStringList</span> <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@symbol=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;symbol&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">isotopeModule</span><span class="o">.</span><span class="n">Isotopes</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__isotopes</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">atomicDataModule</span><span class="o">.</span><span class="n">Atomic</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atomicData</span> <span class="o">=</span> <span class="n">atomicDataModule</span><span class="o">.</span><span class="n">Atomic</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;Invalid child = &quot;</span><span class="si">%s</span><span class="s1">&quot; for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="ChemicalElement.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElement.ChemicalElement.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@symbol=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;symbol&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symbol&#39;</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">)</span> <span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.chemicalElements.chemicalElement</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

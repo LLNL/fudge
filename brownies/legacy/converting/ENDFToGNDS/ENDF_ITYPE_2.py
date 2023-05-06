@@ -81,66 +81,70 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
 
     # if multiple scattering atoms are present, MF=1 mass *should* correspond to the primary scatterer
     # however, some evaluations (e.g. benzene and CH4 in ENDF-VIII) enter the mass of the entire molecule instead!
-    if( fileBaseName[0].isdigit( ) ) :
+    if fileBaseName[0].isdigit() and fileBaseName.count('_') == 2:
         Z, Symbol, A = fileBaseName.split( '_' )
         ZA = int( Z ) * 1000 + int( A )
         targetID = 'tnsl-%s%d' % ( Symbol, int( A ) )
-    elif( 'ice' in fileBaseName.lower() ) :
+    elif 'ice' in fileBaseName.lower():
         ZA = 1001
         scatterers = [('H',2),('O',1)]
-    elif( 'Paraffin' in fileBaseName ) :
+    elif 'Paraffin' in fileBaseName:
         ZA = 1001
         scatterers = [('H',11), ('C',15), ('C',1), ('I',1), ('O',7)]
-    elif( ( 'para' in fileBaseName ) or ( 'ortho' in fileBaseName ) ) :
+    elif 'para' in fileBaseName or 'ortho' in fileBaseName:
         ZA = 1001
-        if( fileBaseName[-1] == 'D' ) : ZA = 1002
-    elif( 'graphite' in fileBaseName.lower() ) :
+        if fileBaseName[-1] == 'D': ZA = 1002
+    elif 'graphite' in fileBaseName.lower():
         ZA = 6012
-    elif( 'Be-metal' in fileBaseName ) :
+    elif 'Be-metal' in fileBaseName:
         ZA = 4009
-    elif( 'SiO2' in fileBaseName ) :
+    elif 'SiO2' in fileBaseName:
         ZA = 14028
         scatterers = [('Si',1),('O',2)]
-    elif( 'benzene' in fileBaseName.lower() or 'benzine' in fileBaseName.lower() ) :    # ENDF-VII.1 had spelling error
+    elif 'U-metal-HEU' in fileBaseName:
+        ZA = 92235
+    elif 'U-metal' in fileBaseName:
+        ZA = 92238
+    elif 'benzene' in fileBaseName.lower() or 'benzine' in fileBaseName.lower():    # ENDF-VII.1 had spelling error
         ZA = 1001
         if fileBaseName.startswith('Cin'):
             ZA = 6012
         scatterers = [('H',6),('C',6)]
-    elif( 'ethanol' in fileBaseName.lower() ) :
+    elif 'ethanol' in fileBaseName.lower():
         ZA = 1001
         if fileBaseName.startswith('Cin'):
             ZA = 6012
         scatterers = [('H',6),('C',2),('O',1)]
-    elif( 'triphenylmethane' in fileBaseName.lower() ) :
+    elif 'triphenylmethane' in fileBaseName.lower():
         ZA = 1001
         if fileBaseName.startswith('Cin'):
             ZA = 6012
         scatterers = [('H',16),('C',19)]
-    elif( 'CH4' in fileBaseName or 'methane'  in fileBaseName.lower() ) :
+    elif 'CH4' in fileBaseName or 'methane'  in fileBaseName.lower():
         ZA = 1001
         if fileBaseName.startswith('Cin'):
             ZA = 6012
         scatterers = [('H',4),('C',1)]
-    elif( 'toluene' in fileBaseName.lower() ) :
+    elif 'toluene' in fileBaseName.lower():
         ZA = 1001
         if fileBaseName.startswith('Cin'):
             ZA = 6012
         scatterers = [('H',8),('C',7)]
-    elif( 'xylene' in fileBaseName.lower() ) :
+    elif 'xylene' in fileBaseName.lower():
         ZA = 1001
         if fileBaseName.startswith('Cin'):
             ZA = 6012
         scatterers = [('H',10),('C',8)]
-    elif( 'mesitylene' in fileBaseName.lower() ) :
+    elif 'mesitylene' in fileBaseName.lower():
         ZA = 1001
         if fileBaseName.startswith('Cin'):
             ZA = 6012
         scatterers = [('H',12),('C',9)]
-    elif( 'in' in fileBaseName ) :
-        targetSymbol, molecule = fileBaseName.split( 'in' )
-        ZA = {'H': 1001, 'H1': 1001, 'D': 1002, 'H2': 1002, 'Li': 3006, 'Be': 4009, 'C': 6012, 'N': 7014, 'O': 8016,
-              'O16': 8016, 'F': 9019, 'Al': 13027, 'Al27': 13027, 'Si': 14028, 'Ca': 20040, 'Y': 39089, 'Zr': 40090,
-              'U': 92238}[targetSymbol]
+    elif 'in' in fileBaseName:
+        targetSymbol, molecule = fileBaseName.split('in')
+        ZA = {'H': 1001, 'H1': 1001, 'D': 1002, 'H2': 1002, 'Li': 3006, '7Li': 3007, 'Be': 4009, 'C': 6012, 'N': 7014,
+              'O': 8016, 'O16': 8016, 'F': 9019, 'Al': 13027, 'Al27': 13027, 'Si': 14028, 'Ca': 20040, 'Y': 39089,
+              'Zr': 40090, 'U': 92238}[targetSymbol]
 
         # try extract scattering atoms & number per molecule from molecule name:
         import re
@@ -153,16 +157,17 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
             symbol, count = match.groups()
             if not count: count = 1
             scatterers.append((symbol, int(count)))
-    elif( 'BeO' in fileBaseName ) :  # ENDF-VII.0 and earlier didn't break up into Be and O components
+    elif 'BeO' in fileBaseName:  # ENDF-VII.0 and earlier didn't break up into Be and O components
         ZA = 4009
-    elif( 'Mg' in fileBaseName ) :
+    elif 'Mg' in fileBaseName:
         targetID = "tnsl-Mg"
         ZA = 12024  # Mg24 is 79% of natural abundance
-    elif( 'Si' in fileBaseName ) :
+    elif 'Si' in fileBaseName:
         targetID = "tnsl-Si"
         ZA = 14028  # Si28 is 92% of natural abundance
-    else :
-        # FIXME try using the MAT number to get targetID? Unfortunately libraries use different conventions for TNSL MAT numbers...
+    else:
+        # FIXME try using the MAT number or ZSYMAM to get targetID?
+        # Unfortunately libraries use different conventions for TNSL MAT numbers, and ZSYMAM can only be 11 chars
         raise Exception("Cannot determine TNSL target ZA or id from filename %s" % fileName)
 
     target = toGNDSMiscModule.getTypeNameGamma( info, ZA )
@@ -268,6 +273,7 @@ def readT_effective( line, MF7 ) :
 def readMF7( info, MT, MF7 ) :
 
     ZA, AWR, LTHR, LAT, LASYM, dum = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MF7[0], range(2, 6))
+    info.ZA_massLineInfo.add(ZA, AWR, MT, 7, 0)
     if LTHR not in range(0,4):
         raise NotImplementedError("MF7 with LTHR=%d" % LTHR)
 

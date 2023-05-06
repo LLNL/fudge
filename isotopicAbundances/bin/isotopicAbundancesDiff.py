@@ -15,7 +15,8 @@ from isotopicAbundances import isotopicAbundances as isotopicAbundancesModule
 
 summaryDocStringIAM = '''This script prints the difference of two isotopic abundance files.'''
 
-description ='''This script prints the difference of two isotopic abundance files.'''
+description = '''This script prints the difference of two isotopic abundance files 
+(i.e., isotopicAbundancesByChemicalElement node files).'''
 
 parser = argparse.ArgumentParser(description=description)
 parser.add_argument('files', type=pathlib.Path, nargs=2,                       help='The two isotopic abundance files to diff.')

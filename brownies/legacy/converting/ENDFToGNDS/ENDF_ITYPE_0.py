@@ -97,13 +97,13 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
     info.PoPsOverrides = {}
 
     if( 452 in MTDatas ) :
-        info.totalOrPromptFissionNeutrons[totalToken] = getTotalOrPromptFission( info, MTDatas[452][1], totalToken, warningList )
+        info.totalOrPromptFissionNeutrons[totalToken] = getTotalOrPromptFission( info, 452, MTDatas, totalToken, warningList )
         #MTDatas.pop( 452 ) # don't remove these yet, still need the covariance info
     if( 455 in MTDatas ) :
-        info.delayedFissionDecayChannel = getDelayedFission( info, MTDatas[455], warningList )
+        info.delayedFissionDecayChannel = getDelayedFission( info, 455, MTDatas, warningList )
         #MTDatas.pop( 455 )
     if( 456 in MTDatas ) :
-        info.totalOrPromptFissionNeutrons[promptToken] = getTotalOrPromptFission( info, MTDatas[456][1], promptToken, warningList )
+        info.totalOrPromptFissionNeutrons[promptToken] = getTotalOrPromptFission( info, 456, MTDatas, promptToken, warningList )
         #MTDatas.pop( 456 )
     if( 458 in MTDatas ) :
         info.fissionEnergyReleaseData = MTDatas[458]
@@ -121,9 +121,17 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
     haveTotalFission = (18 in MTList)
     fissionMTs = [mt for mt in MTList if mt in (19,20,21,38)]
 
-    continuumMTs = { 91 : range( 50, 91 ), 649 : range( 600, 649 ), 699 : range( 650, 699 ), 749: range( 700, 749 ), 799 : range( 750, 799 ), 849 : range( 800, 849 ) }
+    continuumMTs = {91: range(50, 91), 649: range(600, 649), 699: range(650, 699), 749: range(700, 749), 799: range(750, 799), 849: range(800, 849), 999: range(900, 999)}
     summedReactions = {}
-    summedReactionsInfo = { 4 : range( 50, 92 ), 103 : range( 600, 650 ), 104 : range( 650, 700 ), 105 : range( 700, 750 ), 106 : range( 750, 800 ), 107 : range( 800, 850 ) }
+    summedReactionsInfo = {4: range(50, 92), 102: range(900, 1000), 103: range(600, 650), 104: range(650, 700), 105: range(700, 750), 106: range(750, 800), 107: range(800, 850)}
+
+    keep102 = False
+    for MT in summedReactionsInfo[102]:
+        if MT in MTList:
+            keep102 = True
+    if not keep102:
+        del summedReactionsInfo[102]
+
     for summedMT, partialReactions in summedReactionsInfo.items( ) :
         if( summedMT not in MTList ) : continue
         for MT in MTList :
@@ -156,7 +164,7 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
         channelProcess = None
         if MT == inelasticMT:
             channelProcess = outputChannelModule.Processes.continuum
-        elif MT in range(103, 108):
+        elif MT in range(102, 108):
             channelProcess = outputChannelModule.Processes.inclusive
         elif MT in continuumMTs:
                 for discreteMT in continuumMTs[MT]:
@@ -396,7 +404,8 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
             incompleteReaction.crossSection.add(crossSection)
             endf_endlModule.setReactionsOutputChannelFromOutputChannel(info, incompleteReaction, outputChannel)
             incompleteReactions.append(incompleteReaction)
-            print()
+            if verbose > 0:
+                print()     # put messages for each extraMT on a separate line
         else:
             unprocessedMTs.append(MT)
     if len(unprocessedMTs) > 0:
@@ -477,10 +486,19 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
                                     continue
 
                         originalBackgroundForm = backgroundForm = crossSectionComponent[info.style]
+
                         if isinstance(backgroundForm, crossSectionModule.XYs1d):
                             tmp = crossSectionModule.Regions1d(axes=backgroundForm.axes)
                             tmp.append(backgroundForm)
                             backgroundForm = tmp
+
+                        if MT == 3 and backgroundForm.domainMin > resonances.scatteringRadius.form.domainMin:
+                            # Address error appearing in several JEFF evaluations
+                            warningList.append("MT3 background cross section does not span resonance region. Assuming background == 0")
+                            backgroundForm.prepend(crossSectionModule.XYs1d(
+                                axes=backgroundForm.axes,
+                                data=[[resonances.scatteringRadius.form.domainMin, 0], [backgroundForm.domainMin, 0]])
+                            )
 
                         if haveUnresolved:
                             maxResonanceDomain = resonances.unresolved.domainMax
@@ -598,7 +616,7 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
         warningList.append( '       ERROR: unable to parse resonances! Error message: %s' % e )
         info.doRaise.append( warningList[-1] )
 
-    MF12BaseMTsAndRange = [ [ 50, 92 ], [ 600, 650 ], [ 650, 700 ], [ 700, 750 ], [ 750, 800 ], [ 800, 850 ] ]
+    MF12BaseMTsAndRange = [[50, 92], [600, 650], [650, 700], [700, 750], [750, 800], [800, 850], [900, 1000] ]
 
     if( singleMTOnly is None ) :
         for MTLO2, MF12_LO2 in sorted(info.MF12_LO2.items()) :  # The logic below assumes MTs are in ascending order per base MT.
@@ -860,7 +878,8 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
             if( residual.outputChannel is None ) :
                 particle = info.PoPs[residual.pid]
                 if( isinstance( particle, nuclideModule.Particle ) ) :
-                    if( ( particle.nucleus.index != 0 ) and ( len( particle.decayData.decayModes ) == 0 ) ) :   # gamma data should be in orphanProducts.
+                    addGroundState = particle.nucleus.index != 0
+                    if addGroundState:                      # gamma data should be in orphanProducts.
                         groundState = particle.isotope.nuclides[0]
                         ZA = chemicalElementMiscModule.ZA( groundState )
                         multiplicity = residual.multiplicity[0].copy( )
@@ -968,3 +987,4 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
         residual.energy[0].value = Q - QI
 
     return( covarianceSuite )
+

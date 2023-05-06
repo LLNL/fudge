@@ -172,7 +172,7 @@ if __name__=='__main__':
     crossSectionEnergyAxes = averageProductEnergyModule.defaultAxes(protare.domainUnit)
     crossSectionEnergyAxes[0].unit = '%s * %s' % (crossSectionAxes[0].unit, averageProductEnergyAxes[0].unit)
 
-    for MT, indices in [(4, (50, 91)), (103, (600, 649)), (104, (650, 699)), (105, (700, 749)), (106, (750, 799)), (107, (800, 849))]:
+    for MT, indices in [(4, (50, 91)), (103, (600, 649)), (104, (650, 699)), (105, (700, 749)), (106, (750, 799)), (107, (800, 849), (102, (900, 999))]:
         sums[MT] = {'indices': indices, 'crossSection': XYs1dModule.XYs1d(axes=crossSectionAxes), 
                     'crossSection_energy': {},
                     'crossSection_availableEnergy': XYs1dModule.XYs1d(axes=crossSectionEnergyAxes)}

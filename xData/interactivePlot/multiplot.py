@@ -93,8 +93,8 @@ class MainWindow(QMainWindow):
         # window dimensions from default pyplot parameters
         dpi = 100
         widthInches, heightInches = pyplot.rcParams["figure.figsize"]
-        width = widthInches*dpi*magnification
-        height = heightInches*dpi*magnification
+        width = int(widthInches*dpi*magnification)
+        height = int(heightInches*dpi*magnification)
         self.setGeometry(0, 0, width, height)
 
         # generate plot
@@ -175,7 +175,7 @@ class PlotCanvas(FigureCanvas):
     def plot2d(self, plotData, plotAttributes):
         self.plotAxis = self.figure.add_subplot(111)
 
-        floatInfo = numpy.finfo(numpy.float())
+        floatInfo = numpy.finfo(numpy.float64())
         self.dataLimits = {'x': [floatInfo.max, floatInfo.min], 'y': [floatInfo.max, floatInfo.min]}
         for plotLegend in plotData.keys():
             if (not isinstance(plotData[plotLegend], (list, tuple))) or (len(plotData[plotLegend]) != 2):
@@ -917,7 +917,7 @@ class IndividualPlotOptions(QWidget):
 
         # noinspection PyArgumentList
         textBox = QLineEdit(self, objectName=objectName)
-        textBox.resize(xSize, self.ySize)
+        textBox.resize(int(xSize), int(self.ySize))
         textBox.setText(defaultText)
 
         if setValidator is not None:
@@ -956,7 +956,7 @@ class IndividualPlotOptions(QWidget):
             warnings.warn('Default %s for plot number %d may be used but is intentionally not made available in the '
                           'drop-down list.' % (plotAttribute, plotIndex))
 
-        comboBox.resize(xSize, self.ySize)
+        comboBox.resize(int(xSize), int(self.ySize))
         # noinspection PyUnresolvedReferences
         comboBox.currentIndexChanged.connect(connectMethod)
 

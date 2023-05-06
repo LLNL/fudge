@@ -1,20 +1,22 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>External Packages used in Fudge &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,42 +49,42 @@
           <div class="body" role="main">
             
   <section id="external-packages-used-in-fudge">
-<h1>External Packages used in Fudge<a class="headerlink" href="#external-packages-used-in-fudge" title="Permalink to this headline">¶</a></h1>
+<h1>External Packages used in Fudge<a class="headerlink" href="#external-packages-used-in-fudge" title="Permalink to this heading">¶</a></h1>
 <p>Fudge depends on some stand-alone packages that are also maintained by the LLNL Nuclear Data and Theory group.
 These ‘external’ packages are distributed with Fudge but have their own source tree and documentation.</p>
 <section id="pqu">
-<h2>pqu<a class="headerlink" href="#pqu" title="Permalink to this headline">¶</a></h2>
+<h2>pqu<a class="headerlink" href="#pqu" title="Permalink to this heading">¶</a></h2>
 <p>Also known as physicalQuantitiesWithUncertainties, this is a Python package for managing values with units and
 (optional) uncertainties. For more information, see the <a class="reference external" href="../../pqu/doc/html/index.html">pqu package documentation</a>.</p>
 </section>
 <section id="numericalfunctions">
-<h2>numericalFunctions<a class="headerlink" href="#numericalfunctions" title="Permalink to this headline">¶</a></h2>
+<h2>numericalFunctions<a class="headerlink" href="#numericalfunctions" title="Permalink to this heading">¶</a></h2>
 <p>A package written primarily in C that handles many of the low-level data containers used by <code class="docutils literal notranslate"><span class="pre">Fudge</span></code> and GNDS.
 Documentation is available <a class="reference download internal" download="" href="_downloads/d8c5e0620d4e7de0f4d1ef4317718aff/ptwXY.pdf"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a></p>
 </section>
 <section id="xdata">
-<h2>xData<a class="headerlink" href="#xdata" title="Permalink to this headline">¶</a></h2>
+<h2>xData<a class="headerlink" href="#xdata" title="Permalink to this heading">¶</a></h2>
 <p>A Python module containing basic data containers such as interpolation tables, arrays, matrices and tables.
 Some of the classes in xData use numericalFunctions internally for better performance.</p>
 </section>
 <section id="crosssectionadjustforheatedtarget">
-<h2>crossSectionAdjustForHeatedTarget<a class="headerlink" href="#crosssectionadjustforheatedtarget" title="Permalink to this headline">¶</a></h2>
+<h2>crossSectionAdjustForHeatedTarget<a class="headerlink" href="#crosssectionadjustforheatedtarget" title="Permalink to this heading">¶</a></h2>
 <p>A package written in C for the numerically-intensive task of Doppler broadening cross sections.
 Documentation is available <a class="reference download internal" download="" href="_downloads/97e02cd8ab14a4dae1747479d7e57e09/crossSectionAdjustForHeatedTarget.pdf"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a></p>
 </section>
 <section id="pops">
-<h2>PoPs<a class="headerlink" href="#pops" title="Permalink to this headline">¶</a></h2>
+<h2>PoPs<a class="headerlink" href="#pops" title="Permalink to this heading">¶</a></h2>
 <p>Properties of Particles (such as mass, spin and parity, charge and halflife) are collected together in a
 particle database. The PoPs Python package is meant for reading and writing these particle databases.
 See <a class="reference external" href="../../PoPs/Doc/html/index.html">PoPs documentation</a> for more information.</p>
 </section>
 <section id="merced">
-<h2>Merced<a class="headerlink" href="#merced" title="Permalink to this headline">¶</a></h2>
+<h2>Merced<a class="headerlink" href="#merced" title="Permalink to this heading">¶</a></h2>
 <p>A package written in C++ for computing transfer matrices for deterministic transport.
 Documentation is available <a class="reference download internal" download="" href="_downloads/b1e7299487c69239391310c7ff8b9a0c/merced.pdf"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a></p>
 </section>
 <section id="statusmessagereporting">
-<h2>statusMessageReporting<a class="headerlink" href="#statusmessagereporting" title="Permalink to this headline">¶</a></h2>
+<h2>statusMessageReporting<a class="headerlink" href="#statusmessagereporting" title="Permalink to this heading">¶</a></h2>
 <p>The statusMessageReporting library provides more robust error message reporting for c codes. It is used
 within numericalFunctions.</p>
 </section>
@@ -98,8 +100,9 @@ within numericalFunctions.</p>
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">External Packages used in Fudge</a><ul>
 <li><a class="reference internal" href="#pqu">pqu</a></li>
 <li><a class="reference internal" href="#numericalfunctions">numericalFunctions</a></li>
@@ -112,12 +115,17 @@ within numericalFunctions.</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="tutorial/other-examples.html"
-                        title="previous chapter"><span class="section-number">6. </span>Other Fudge Examples</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="reporting-bugs.html"
-                        title="next chapter">Reporting Bugs</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="tutorial/other-examples.html"
+                          title="previous chapter"><span class="section-number">6. </span>Other Fudge Examples</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="reporting-bugs.html"
+                          title="next chapter">Reporting Bugs</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -129,12 +137,12 @@ within numericalFunctions.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -160,7 +168,7 @@ within numericalFunctions.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

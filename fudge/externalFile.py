@@ -10,7 +10,7 @@ This module contains the externalFile class, used to keep track of
 connections between GNDS files.
 """
 
-import os
+import pathlib
 
 from LUPY import ancestry as ancestryModule
 from LUPY import checksums as checksumsModule
@@ -42,8 +42,13 @@ class ExternalFile(ancestryModule.AncestryIO):
 
     @path.setter
     def path(self, value):
-        if not isinstance(value,str):
+
+        if isinstance(value, pathlib.Path):
+            value = str(value)
+
+        if not isinstance(value, str):
             raise TypeError("Path must be a string!")
+
         self.__path = value
 
     @property
@@ -78,11 +83,11 @@ class ExternalFile(ancestryModule.AncestryIO):
     def realpath( self ) :
         """Returns the realpath to the external file."""
 
-        path = self.path
-        if( path[0] != os.sep ) :
-            path = os.path.join( os.path.dirname( self.rootAncestor.sourcePath ), path )
+        path = pathlib.Path(self.path)
+        if not path.is_absolute():
+            path = pathlib.Path(self.rootAncestor.sourcePath).parent / path
 
-        return( os.path.realpath( path ) )
+        return str(path.resolve())
 
     def toXML_strList(self, indent='', **kwargs):
 

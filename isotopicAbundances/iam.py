@@ -5,8 +5,12 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+# Questions for Caleb and Godfree.
+#   -) Should checksum and algorithm always be a str with an empty one representing no data vs. None representing no data.
+#   -) I do not like the name isotopicAbundancesByChemicalElement.
+
 '''
-This module contains the classes needed to represent the nodes of an isotopic abundance map (iam) instance.
+This module contains the classes needed to represent the nodes for an isotopic abundance map (iam) instance.
 '''
 
 import pathlib 
@@ -18,12 +22,25 @@ from LUPY import checksums as checksumsModule
 from . import isotopicAbundances as isotopicAbundancesModule
 
 class Base(ancestryModule.AncestryIO):
-    '''Base class used by all other iam related classes. Inherits class ancestryModule.AncestryIO, and adds checksum and algorithm properties.'''
+    '''
+    Base class used by all other iam (Isotopic Abundance Map) related classes. Inherits class ancestryModule.AncestryIO, 
+    and adds checksum and algorithm properties.
+
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | checksum  | The check sum of the file referrence by the path member.  |
+    +-----------+-----------------------------------------------------------+
+    | algorithm | The algorithm used to calculate *checksum*.               |
+    +-----------+-----------------------------------------------------------+
+    '''
 
     def __init__(self, checksum=None, algorithm=None):
         '''
         :param checksum:        The check sum of the file referrence by the path member.
-        :param algorithm:       The algorithm  used to calculate *checksum*.
+        :param algorithm:       The algorithm used to calculate *checksum*.
         '''
 
         ancestryModule.AncestryIO.__init__(self)
@@ -81,7 +98,7 @@ class Base(ancestryModule.AncestryIO):
         '''
 
         attributes = ''
-        if self.checksum:
+        if isinstance(self.__checksum, str) and len(self.__checksum) > 0:
             attributes += ' checksum="%s"' % self.checksum
 
         algorithm = self.algorithm
@@ -94,18 +111,36 @@ class Base(ancestryModule.AncestryIO):
         return attributes
 
 class Iam(Base):
-    '''This class represents an Isotopic Abundance Map (IAM) instance.'''
+    '''This class represents an Isotopic Abundance Map (iam) instance.'''
 
     moniker = 'iam'
 
     def __init__(self, library, path, format=isotopicAbundancesModule.Format.default(), checksum=None, algorithm=None):
         ''' 
-        Constructor for Iam class.
+        Constructor for the Iam class.
+
+        The following table list the primary members of this class:
+
+        +-----------+-----------------------------------------------------------+
+        | Member    | Description                                               |
+        +===========+===========================================================+
+        | library   | The check sum of the file referrence by the path member.  |
+        +-----------+-----------------------------------------------------------+
+        | path      | The algorithm used to calculate *checksum*.               |
+        +-----------+-----------------------------------------------------------+
+        | format    | The algorithm used to calculate *checksum*.               |
+        +-----------+-----------------------------------------------------------+
+        | checksum  | See inherited class **Base**.                             |
+        +-----------+-----------------------------------------------------------+
+        | algorithm | See inherited class **Base**.                             |
+        +-----------+-----------------------------------------------------------+
+        | __entries | The list of all child entries.                            |
+        +-----------+-----------------------------------------------------------+
 
         :param library:         The name of the library.
         :param path:            The path to the iam file read in to construct *self*. If created anew, this can be the string "./".
         :param format:          The format version for the iam.
-        :param checksum:        Hash for the iam (computed from the concatenation of all checksums inside the iam)
+        :param checksum:        Hash for the iam (computed from the concatenation of the checksum of all entries)
         :param algorithm:       Algorithm used to compute checksums.
         '''
 
@@ -120,13 +155,13 @@ class Iam(Base):
         '''
         Returns the (index-1)^th item of self.
 
-        :param index:           The index of the iter to return.
+        :param index:           The index of the item to return.
         '''
 
         return self.__entries[index]
 
     def __iter__(self):
-        '''Iterators over each entry in self. Does not dive into import entries.'''
+        '''Iterators over each entry in self. Does not dive into import entries. Also see the method **iterate**.'''
 
         for entry in self.__entries:
             yield entry
@@ -138,13 +173,16 @@ class Iam(Base):
 
     @property
     def path(self):
-        '''Returns the path this iam was read from or may be written to. It may be absolote or relative, depending on how it was initialize.'''
+        '''
+        Returns the path *self* was read from or may be written to. It may be absolute or relative, 
+        depending on how it was initialize.
+        '''
 
         return self.__path
 
     @property
     def format(self):
-        '''Returns to format for self.'''
+        '''Returns the format for self.'''
 
         return self.__format
 
@@ -156,7 +194,7 @@ class Iam(Base):
 
     def updateAllChecksums(self, algorithm=checksumsModule.Sha1sum.algorithm, iamDirectory=None):
         '''
-        Calls *updateChecksum* on all entries and then updates self's *checksum*.
+        Calls *updateChecksum* on all entries and then updates *self*'s *checksum*.
 
         :param algorithm:       Algorithm that will be used to compute checksums.
         :param iamDirectory:    See documentation for the method **buildFileName** in class **EntryBase**.
@@ -164,11 +202,12 @@ class Iam(Base):
 
         for entry in self:
             entry.updateChecksum(algorithm, iamDirectory=iamDirectory)
+
         self.updateChecksum(algorithm)
 
     def updateChecksum(self, algorithm=checksumsModule.Sha1sum.algorithm):
         '''
-        Computes iam file's checksum: concatenate checksums for all entries into a string and compute the checksum
+        Computes *self's* checksum: concatenate checksums for all entries into a string and compute the checksum
         of that string.
 
         :param algorithm:       Algorithm that will be used to compute checksums.
@@ -179,7 +218,11 @@ class Iam(Base):
         self.algorithm = algorithm
 
     def append(self, entry):
-        '''Appends *entry* to self.'''
+        '''
+        Appends *entry* to self. *entry* must be an instance of **EntryBase**.
+
+        :param entry:       The entry to add to *self*.
+        '''
 
         if not isinstance(entry, EntryBase):
             TypeError('Invalid entry.')
@@ -188,7 +231,12 @@ class Iam(Base):
         entry.setAncestor(self)
 
     def insert(self, index, entry):
-        '''Inserts the entry into self at index.'''
+        '''
+        Inserts *entry* into self at *index*.
+
+        :param index:       The 0-based index where *entry* is inserted.
+        :param entry:       The entry to add to *self*.
+        '''
 
         if not isinstance(entry, EntryBase):
             TypeError('Invalid entry of type "%s".' % type(entry))
@@ -206,10 +254,14 @@ class Iam(Base):
                 yield entry
 
     def evaluations(self):
-        '''Returns a list of available evaluations.'''
+        '''
+        Returns a list of available evaluations.
+
+        :return:                List of available evaluations.
+        '''
 
         evaluations = []
-        return [isotopicAbundancesByChemicalElement.evaluation for isotopicAbundancesByChemicalElement in self.iterate()]
+        return list(set([isotopicAbundancesByChemicalElement.evaluation for isotopicAbundancesByChemicalElement in self.iterate()]))
 
     def find(self, symbol, evaluation=None):
         '''
@@ -219,7 +271,7 @@ class Iam(Base):
         :param symbol:          The requested chemical element's PoPs symbol to match.
         :param evaluation:      The name of the evaluation to match. Can be None to match the first *symbol* found.
 
-        :return:                Returns the found entry or None is no match was found.
+        :return:                Returns the found entry or None if no match is found.
         '''
 
         for entry in self.__entries:
@@ -230,7 +282,10 @@ class Iam(Base):
         return None
 
     def findEvaluation(self, evaluation):
-        '''Returns an IsotopicAbundancesByChemicalElement from from the module isotopicAbundances.py matching *evaluation* or None if no match is found.'''
+        '''
+        Returns an IsotopicAbundancesByChemicalElement instance from the module isotopicAbundances.py matching *evaluation* or 
+        None if no match is found.
+        '''
 
         for isotopicAbundancesByChemicalElement in self.iterate():
             if isotopicAbundancesByChemicalElement.evaluation == evaluation:
@@ -298,8 +353,9 @@ class Iam(Base):
     @staticmethod
     def read(fileName, **kwargs):
         '''
-        Reads in the file name *fileName* and returns a **Iam** instance.
+        Reads in the file named *fileName* and returns a **Iam** instance.
 
+        :param fileName:        The path to the file to read in.
         :param kwargs:          A keyword list.
 
         :return:                Iam instance.
@@ -308,7 +364,22 @@ class Iam(Base):
         return Iam.readXML_file(fileName, **kwargs)
 
 class EntryBase(Base):
-    '''Base class for all ian entry classes.'''
+    '''
+    Base class for all **Iam** entry classes.
+
+    The following table list the primary members of this class:
+
+        +---------------+-----------------------------------------------------------+
+        | Member        | Description                                               |
+        +===============+===========================================================+
+        | path          | The path to the file referenced by *self*.                |
+        +---------------+-----------------------------------------------------------+
+        | checksum      | See inherited class **Base**.                             |
+        +---------------+-----------------------------------------------------------+
+        | algorithm     | See inherited class **Base**.                             |
+        +---------------+-----------------------------------------------------------+
+    '''
+
 
     def __init__(self, path, checksum=None, algorithm=None):
         '''
@@ -344,7 +415,7 @@ class EntryBase(Base):
 
     def updateChecksum(self, algorithm=checksumsModule.Sha1sum.algorithm, iamDirectory=None):
         '''
-        Compute the checksum of the file specified by *path* member and store it into the *checksum* member.
+        Compute the checksum of the file specified by the *path* member and stores it into the *checksum* member.
 
         :param algorithm:       The algorithm to use for the checksum.
         :param iamDirectory:    See documentation for the method **buildFileName**.
@@ -359,13 +430,29 @@ class EntryBase(Base):
         return ' path="%s"%s' % (self.path, Base.standardXML_attributes(self))
 
 class Import(EntryBase):
-    '''This class represents an import instance within an Isotopic Abundance Map (IAM) instance.'''
+    '''
+    This class represents an import instance within an Isotopic Abundance Map (IAM) instance.
+
+    The following table list the primary members of this class:
+        
+        +---------------+-----------------------------------------------------------+
+        | Member        | Description                                               |
+        +===============+===========================================================+
+        | path          | The path to the file referenced by *self*.                |
+        +---------------+-----------------------------------------------------------+
+        | checksum      | See inherited class **Base**.                             |
+        +---------------+-----------------------------------------------------------+
+        | algorithm     | See inherited class **Base**.                             |
+        +---------------+-----------------------------------------------------------+
+        | iam           | The Iam instance *self* references.                       |
+        +---------------+-----------------------------------------------------------+
+    '''
 
     moniker = 'import'
 
     def __init__(self, path, checksum=None, algorithm=None):
         '''
-        Constructor for the import entry.
+        Constructor for the import entry of an iam node.
 
         :param path:            Path to the iam file to import.
         :param checksum:        The check sum of the file referrence by the path member.
@@ -419,7 +506,7 @@ class Import(EntryBase):
         yield from self.iam.iterate()
 
     def readIam(self):
-        '''Reads in the iam file pointed to by self if not already read in. An import only reads its iam file when needed.'''
+        '''Reads in the iam file pointed to by self if not already read in. *Self* only reads its iam file when needed.'''
 
         if self.__iam is None:
             iamFilePath = self.path
@@ -445,14 +532,14 @@ class Import(EntryBase):
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         '''
-        Creates an Import instance from an import node.
+        Creates an **Import** instance from an import node.
 
         :param node:            The XML node to parse.
         :param xPath:           Currently not used.
         :param linkData:        Currently not used.
         :param kwargs:          A keyword list.
 
-        :return:                Import instance.
+        :return:                An **Import** instance.
         '''
 
         if node.tag != Import.moniker:
@@ -463,7 +550,25 @@ class Import(EntryBase):
         return _import
 
 class IsotopicAbundancesByChemicalElement(EntryBase):
-    '''This class represents an isotopicAbundancesByChemicalElement instance within an Isotopic Abundance Map (IAM) instance.'''
+    '''
+    This class represents an isotopicAbundancesByChemicalElement instance within an Isotopic Abundance Map (IAM) instance.
+
+    The following table list the primary members of this class:
+        
+        +-------------------------------------------+-----------------------------------------------------------------------+
+        | Member                                    | Description                                                           |
+        +===========================================+=======================================================================+
+        | evaluation                                | The evaluation for *self*.                                            |
+        +-------------------------------------------+-----------------------------------------------------------------------+
+        | path                                      | The path to the file referenced by *self*.                            |
+        +-------------------------------------------+-----------------------------------------------------------------------+
+        | isotopicAbundancesByChemicalElement       | The IsotopicAbundancesByChemicalElement instance *self* references.   |
+        +-------------------------------------------+-----------------------------------------------------------------------+
+        | checksum                                  | See inherited class **Base**.                                         |
+        +-------------------------------------------+-----------------------------------------------------------------------+
+        | algorithm                                 | See inherited class **Base**.                                         |
+        +-------------------------------------------+-----------------------------------------------------------------------+
+    '''
 
     moniker = 'isotopicAbundancesByChemicalElement'
 
@@ -515,12 +620,12 @@ class IsotopicAbundancesByChemicalElement(EntryBase):
 
     def find(self, symbol, evaluation=None):
         '''
-        Returns the entry matching a chemical elememnt's *symbol*. If non is found, None is returned.
+        Returns the entry matching a chemical elememnt's *symbol*. If one is not found, None is returned.
 
         :param symbol:          The requested chemical element's PoPs symbol to match.
         :param evaluation:      The requested evaluation to match.
 
-        :return:                Returns found chemical element or None.
+        :return:                Returns chemical element if a match is found or None.
         '''
 
         self.readIsotopicAbundancesByChemicalElement()

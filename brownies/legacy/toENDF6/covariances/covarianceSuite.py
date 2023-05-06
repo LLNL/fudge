@@ -50,6 +50,8 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, MTL, 0, len(thisMFMT) )]
         elif mf==34:
             LTT = 1
+            if any([slice.domainValue == 0 for section in thisMFMT for slice in section.rowData.slices]):
+                LTT = 3
             NMT1 = 1    # cross-reaction terms not yet supported
             endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, LTT, 0, NMT1 )]
             MAT1 = 0

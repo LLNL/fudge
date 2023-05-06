@@ -60,6 +60,11 @@ class ProductYield( ancestryModule.AncestryIO ) :
 
         return self.__elapsedTimes
 
+    def convertUnits(self, unitMap):
+        '''This method currently does nothing.'''
+
+        pass
+
     def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )

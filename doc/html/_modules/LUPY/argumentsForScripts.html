@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LUPY.argumentsForScripts &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">LUPY.argumentsForScripts</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for LUPY.argumentsForScripts</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains common argparse options used by some of the FUDGE scripts.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="nb">map</span> <span class="k">as</span> <span class="n">mapModule</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">GNDS_file</span> <span class="k">as</span> <span class="n">GNDS_fileModule</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span> <span class="k">as</span> <span class="n">reactionSuiteModule</span>
+
+
+<div class="viewcode-block" id="SingleProtareArguments"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.argumentsForScripts.SingleProtareArguments">[docs]</a><span class="k">class</span> <span class="nc">SingleProtareArguments</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">parser</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param parser:      An argparse.ArgumentParser instance which will be updated with parameters for accessing a profile from a file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span> <span class="o">=</span> <span class="n">parser</span>
+
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span> <span class="s1">&#39;mapOrProtareFileName&#39;</span><span class="p">,</span>                                    <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;The path to a map or protare file. If it is a map file then option &quot;--tid&quot; (and maybe &quot;--pid&quot;) is required.&#39;</span> <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span> <span class="s1">&#39;--pid&#39;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">neutron</span><span class="p">,</span>    <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;The PoPs id for the projectile. Only used if the argument &quot;mapOrProtareFileName&quot; is a map file; otherwise, it is ignored. Default is &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">neutron</span> <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span> <span class="s1">&#39;--tid&#39;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>                 <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;The PoPs id for the target. Required if the argument &quot;mapOrProtareFileName&quot; is a map file; otherwise, it is ignored.&#39;</span> <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span> <span class="s1">&#39;--noLazyParse&#39;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>                    <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Disable lazy parsing (increases load time but sometimes useful).&#39;</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="SingleProtareArguments.protare"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.argumentsForScripts.SingleProtareArguments.protare">[docs]</a>    <span class="k">def</span> <span class="nf">protare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lazyParsing</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a protare (i.e., &quot;reactionSuite&quot;) instance that has been read per the &quot;mapOrProtareFileName&quot;, &quot;--pid&quot; and &quot;--tid&quot; parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">lazyParsing</span> <span class="o">=</span> <span class="n">lazyParsing</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">noLazyParse</span>
+
+        <span class="n">mapOrProtare</span> <span class="o">=</span> <span class="n">GNDS_fileModule</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mapOrProtareFileName</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="n">verbosity</span><span class="p">,</span> <span class="n">lazyParsing</span><span class="o">=</span><span class="n">lazyParsing</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">mapOrProtare</span><span class="p">,</span> <span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">ReactionSuite</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">mapOrProtareFileName</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">mapOrProtare</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">mapOrProtare</span><span class="p">,</span> <span class="n">mapModule</span><span class="o">.</span><span class="n">Map</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">args</span><span class="o">.</span><span class="n">tid</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;--tid option required for the map file.&#39;</span> <span class="p">)</span>
+            <span class="n">mapProtare</span> <span class="o">=</span> <span class="n">mapOrProtare</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">args</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">tid</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">mapOrProtare</span><span class="o">.</span><span class="n">path</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">mapProtare</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mapOrProtareFileName</span><span class="p">),</span> <span class="n">mapProtare</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">mapProtare</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;No match in map file for pid = &quot;</span><span class="si">%s</span><span class="s1">&quot; and tid = &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">args</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">tid</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span><span class="n">mapProtare</span><span class="o">.</span><span class="n">protare</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="n">verbosity</span><span class="p">,</span> <span class="n">lazyParsing</span><span class="o">=</span><span class="n">lazyParsing</span><span class="p">))</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;File &quot;</span><span class="si">%s</span><span class="s1">&quot; is not a map or protare file.&#39;</span> <span class="o">%</span> <span class="n">mapOrProtare</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">LUPY.argumentsForScripts</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

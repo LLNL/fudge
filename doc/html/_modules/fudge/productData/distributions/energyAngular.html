@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>fudge.productData.distributions.energyAngular &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -182,26 +184,26 @@
         <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">energy_in</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">energy_in</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Legendre</span><span class="p">):</span>
-                <span class="n">integral</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="p">[</span> <span class="p">(</span> <span class="n">eout</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">eout</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="k">for</span> <span class="n">eout</span> <span class="ow">in</span> <span class="n">energy_in</span> <span class="p">],</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="p">)</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">integral</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="p">[</span> <span class="p">(</span> <span class="n">eout</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">eout</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span> <span class="p">)</span> <span class="k">for</span> <span class="n">eout</span> <span class="ow">in</span> <span class="n">energy_in</span> <span class="p">],</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="p">)</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
+            <span class="n">integral</span> <span class="o">=</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">integral</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;normTolerance&#39;</span><span class="p">]:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">UnnormalizedDistribution</span><span class="p">(</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">),</span> <span class="n">index</span><span class="p">,</span> <span class="n">integral</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">UnnormalizedDistribution</span><span class="p">(</span><span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                                                                 <span class="n">index</span><span class="p">,</span> <span class="n">integral</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()))</span>
             <span class="n">energy_outs</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="n">energy_in</span> <span class="p">:</span>
-                <span class="n">energy_outs</span><span class="p">[</span><span class="n">xy</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">defaultAccuracy</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span><span class="o">.</span><span class="n">rangeMin</span><span class="p">]</span> <span class="o">=</span> <span class="n">xy</span><span class="o">.</span><span class="n">outerDomainValue</span>
-            <span class="n">minProb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span> <span class="n">energy_outs</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="n">energy_in</span><span class="p">:</span>
+                <span class="n">energy_outs</span><span class="p">[</span><span class="n">xy</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="n">XYs1dModule</span><span class="o">.</span><span class="n">defaultAccuracy</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span><span class="o">.</span><span class="n">rangeMin</span><span class="p">]</span> <span class="o">=</span> <span class="n">xy</span><span class="o">.</span><span class="n">outerDomainValue</span>
+            <span class="n">minProb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">energy_outs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
             <span class="k">if</span> <span class="n">minProb</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">NegativeProbability</span><span class="p">(</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">),</span> <span class="n">value</span> <span class="o">=</span> <span class="n">minProb</span><span class="p">,</span> 
-                        <span class="n">energy_out</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">energy_outs</span><span class="p">[</span><span class="n">minProb</span><span class="p">],</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">),</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">energy_in</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">warning</span><span class="o">.</span><span class="n">NegativeProbability</span><span class="p">(</span><span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span> <span class="n">value</span><span class="o">=</span><span class="n">minProb</span><span class="p">,</span>
+                                                <span class="n">energy_out</span><span class="o">=</span><span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">energy_outs</span><span class="p">[</span><span class="n">minProb</span><span class="p">],</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span> <span class="n">obj</span><span class="o">=</span><span class="n">energy_in</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolationQualifier</span> <span class="ow">is</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">InterpolationQualifier</span><span class="o">.</span><span class="n">unitBase</span><span class="p">:</span>
                 <span class="c1"># check for more than one outgoing distribution integrating to 0 at high end of incident energies</span>
                 <span class="n">integrals</span> <span class="o">=</span> <span class="p">[</span><span class="n">eout</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span> <span class="k">for</span> <span class="n">eout</span> <span class="ow">in</span> <span class="n">energy_in</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">integral</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">integrals</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">integral</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="k">break</span>
                 <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">ExtraOutgoingEnergy</span><span class="p">(</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">),</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">energy_in</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">ExtraOutgoingEnergy</span><span class="p">(</span><span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">energy_in</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                                                                <span class="n">obj</span><span class="o">=</span><span class="n">energy_in</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">warnings</span></div>
 
 <div class="viewcode-block" id="XYs3d.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energyAngular.XYs3d.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -488,12 +490,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -514,7 +516,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

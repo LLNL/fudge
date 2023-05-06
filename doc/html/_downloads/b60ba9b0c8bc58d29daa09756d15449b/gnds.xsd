@@ -739,16 +739,7 @@
 
     <xs:complexType name="PoPs_averageEnergies">
       <xs:sequence>
-        <xs:element name="averageEnergy" maxOccurs="unbounded">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="uncertainty" type="PQU_uncertainty" minOccurs="0"/>
-            </xs:sequence>
-            <xs:attribute name="label" type="xs:string"/>
-            <xs:attribute name="value" type="xs:double"/>
-            <xs:attribute name="unit" type="xs:string"/>
-          </xs:complexType>
-        </xs:element>
+        <xs:element name="averageEnergy" type="PQU_double" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:complexType>
 
@@ -1994,9 +1985,6 @@
 
   <!-- double and int are similar when they appear inside <uncertainty>, but don't require a label -->
   <xs:complexType name="PQU_uncertainty_double">
-    <xs:sequence>
-      <xs:element name="uncertainty" type="PQU_uncertainty" minOccurs="0"/>
-    </xs:sequence>
     <xs:attribute name="label" type="xs:string"/>
     <xs:attribute name="value" type="xs:double" use="required"/>
     <xs:attribute name="unit" type="xs:string"/>

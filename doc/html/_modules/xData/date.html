@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.date &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.date</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.date</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+
+<div class="viewcode-block" id="Resolution"><a class="viewcode-back" href="../../xData/index.html#xData.date.Resolution">[docs]</a><span class="k">class</span> <span class="nc">Resolution</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">date</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">undefined</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Date"><a class="viewcode-back" href="../../xData/index.html#xData.date.Date">[docs]</a><span class="k">class</span> <span class="nc">Date</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The class supports a date or datetime in one of 3 forms. The forms are</span>
+
+<span class="sd">        -) date only (e.g., &quot;2021-01-21&quot;),</span>
+<span class="sd">        -) date and time (e.g., &quot;2021-01-21T08:42:04&quot;) or</span>
+<span class="sd">        -) date and time with UTC offset (e.g., &quot;2021-01-21T08:42:04-08:00&quot;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">UTC</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__datetime</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">resolution</span> <span class="o">==</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">undefined</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">_datetime</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="n">microsecond</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">resolution</span> <span class="o">==</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">date</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">_datetime</span> <span class="o">=</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="n">hour</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">minute</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">==</span> <span class="mi">3</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">UTC</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">_datetime</span> <span class="o">=</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid _datetime instance.&#39;</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__datetime</span> <span class="o">=</span> <span class="n">_datetime</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolution</span> <span class="o">==</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">undefined</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+
+        <span class="n">stringDate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__datetime</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span> <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">timespec</span> <span class="o">=</span> <span class="s1">&#39;seconds&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolution</span> <span class="o">==</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">date</span> <span class="p">)</span> <span class="p">:</span> <span class="n">stringDate</span> <span class="o">=</span> <span class="n">stringDate</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s1">&#39;T&#39;</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">stringDate</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">date</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__datetime</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">resolution</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolution</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Date.asXML_attribute"><a class="viewcode-back" href="../../xData/index.html#xData.date.Date.asXML_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">asXML_attribute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">==</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">undefined</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Date.parse"><a class="viewcode-back" href="../../xData/index.html#xData.date.Date.parse">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span> <span class="n">stringDate</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">date</span>
+        <span class="n">datetime1</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">stringDate</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">undefined</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">stringDate</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">10</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">datetime1</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span> <span class="n">stringDate</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">stringDate</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">19</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">time</span>
+            <span class="n">datetime1</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span> <span class="n">stringDate</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">time</span>
+            <span class="n">datetime1</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span> <span class="n">stringDate</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S%z&quot;</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">Date</span><span class="p">(</span> <span class="n">datetime1</span><span class="p">,</span> <span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Date.fromYearMonthDay"><a class="viewcode-back" href="../../xData/index.html#xData.date.Date.fromYearMonthDay">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fromYearMonthDay</span><span class="p">(</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">Date</span><span class="p">(</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="raiseIfNotDate"><a class="viewcode-back" href="../../xData/index.html#xData.date.raiseIfNotDate">[docs]</a><span class="k">def</span> <span class="nf">raiseIfNotDate</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">Date</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid date instance.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">date</span></div>
+
+<div class="viewcode-block" id="raiseIfNotPythonDateTime"><a class="viewcode-back" href="../../xData/index.html#xData.date.raiseIfNotPythonDateTime">[docs]</a><span class="k">def</span> <span class="nf">raiseIfNotPythonDateTime</span><span class="p">(</span><span class="n">_datetime</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_datetime</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid python datetime instance.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">Date</span><span class="p">(</span><span class="n">_datetime</span><span class="p">)</span> <span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.date</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

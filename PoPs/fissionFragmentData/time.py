@@ -7,7 +7,7 @@
 
 """
 This module defines classes for storing the elapsed time since fission.
-Each 'duration' instance has an associated time, where time = 0 for prompt fission products and time > 0 for delayed
+Each 'duration' instance has an associated time, where time = 0 for prompt fission products and time > 0 for delayed. Time may also be given as a string, e.g. 'Unspecified'.
 """
 
 from .. import suite as suiteModule

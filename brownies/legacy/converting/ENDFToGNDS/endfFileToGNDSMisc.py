@@ -19,6 +19,8 @@ from xData import date as dateModule
 from xData.Documentation import dates as datesModule
 from xData.Documentation import author as authorModule
 
+from fudge import reactionSuite as reactionSuiteModule
+
 FUDGE_EPS = 1e-8
 
 def parseENDFByMT_MF(fileName, stripMATMFMTCount=True, logFile=sys.stderr):
@@ -396,63 +398,7 @@ def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile =
         n1 = n2
     return( endLine, TAB1, regions )
 
-def niceSortOfMTs( MTs, verbose = 0, logFile = sys.stderr ) :
-
-    def removeGetIfPresent( MT, MTs ) :
-
-        if( MT not in MTs ) : return( [] )
-        MTs.remove( MT )
-        return( [ MT ] )
-
-    MTs = sorted( list( copy.deepcopy( MTs ) ) )
-    newMTs = removeGetIfPresent(   2, MTs )
-    for MT in range( 50, 92 ) : newMTs += removeGetIfPresent( MT, MTs )
-    newMTs += removeGetIfPresent(   4, MTs )
-    newMTs += removeGetIfPresent(  16, MTs )        # (z,2n) reactions
-    for MT in range( 875, 892 ) : newMTs += removeGetIfPresent( MT, MTs )
-
-    newMTs += removeGetIfPresent(  17, MTs )
-    newMTs += removeGetIfPresent(  37, MTs )
-    newMTs += removeGetIfPresent(  18, MTs )
-    newMTs += removeGetIfPresent(  19, MTs )
-    newMTs += removeGetIfPresent(  20, MTs )
-    newMTs += removeGetIfPresent(  21, MTs )
-    newMTs += removeGetIfPresent(  38, MTs )
-    newMTs += removeGetIfPresent(  28, MTs )
-    newMTs += removeGetIfPresent(  32, MTs )
-    newMTs += removeGetIfPresent(  33, MTs )
-
-    for MT in range( 600, 650 ) : newMTs += removeGetIfPresent( MT, MTs )
-    newMTs += removeGetIfPresent( 103, MTs )          # (z,p) reactions
-
-    for MT in range( 650, 700 ) : newMTs += removeGetIfPresent( MT, MTs )
-    newMTs += removeGetIfPresent( 104, MTs )          # (z,d) reactions
-
-    for MT in range( 700, 750 ) : newMTs += removeGetIfPresent( MT, MTs )
-    newMTs += removeGetIfPresent( 105, MTs )          # (z,t) reactions
-
-    for MT in range( 750, 800 ) : newMTs += removeGetIfPresent( MT, MTs )
-    newMTs += removeGetIfPresent( 106, MTs )          # (z,He3) reactions
-
-    for MT in range( 800, 850 ) : newMTs += removeGetIfPresent( MT, MTs )
-    newMTs += removeGetIfPresent( 107, MTs )          # (z,a) reactions
-
-    newMTs += removeGetIfPresent( 102, MTs )          # (z,g) reactions
-
-    MT5 = removeGetIfPresent( 5, MTs )                 # (z,everything else)
-
-    MTAtomics = []
-    for MT in range( 500, 573 ) : MTAtomics += removeGetIfPresent( MT, MTs )
-
-    skippingMTs = []
-    for MT in [ 10, 27, 101, 151 ] : skippingMTs += removeGetIfPresent( MT, MTs )
-    for MT in range( 201, 600 ) : skippingMTs += removeGetIfPresent( MT, MTs )
-    for MT in range( 850, 875 ) : skippingMTs += removeGetIfPresent( MT, MTs )
-
-    if( ( verbose > 0 ) and ( len( skippingMTs ) > 0 ) ) : logFile.write( 'Skipping MTs = %s\n' % skippingMTs )
-
-    newMTs += MTs + MT5 + MTAtomics
-    return( newMTs )
+niceSortOfMTs = reactionSuiteModule.niceSortOfMTs
 
 def getMFDataInMFList( MFs, MFData ) :
 

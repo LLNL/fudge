@@ -353,6 +353,7 @@ class LegendreSeries( Series1d ) :
         f(\mu) = \sum_L ( l + 0.5 ) * C_l * P_l(\mu)
 
     so
+
     ..math::
         C_l=\int_{-1}^1 d\mu P_l(\mu) f(\mu)
 
@@ -601,15 +602,19 @@ class LinearSpline1d( Series1d ) :
     """
     This class is a simple linear spline.  It basically wraps the XYs1d class.
     Linear interpolation uses the linear spline or the "hat" basis.  The first basis function looks like this::
+
         |\
         | \
         |  \
         ----
+
     The second basis function looks like this::
+
           /\
          /  \
         /    \
         ------
+
     and so on.  Together y(x) = \sum_i B_i(x) y_i such that y_i = y(x_i)
     """
 
