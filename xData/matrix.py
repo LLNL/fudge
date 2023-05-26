@@ -37,7 +37,7 @@ class Matrix():
             self.matrix = numpy.zeros((numberRows, numberColumns))
 
             if isinstance(values, (int, float)):
-                self.matrix += numpy.float(values)
+                self.matrix += numpy.float64(values)
 
             elif values is not None:
                 raise TypeError('Only scalar value of the named "values" argument is allowed to accompany non-zero instances of the numberRows and numberColumns arguments.')
@@ -71,7 +71,7 @@ class Matrix():
         Return value of self.matrix at location specified by the input tuple.
 
         :indexTuple: Row and column indices of the self.matrix value to return.
-        :returns: A numpy.float value.
+        :returns: A numpy.float64 value.
         """
 
         return self.matrix[indexTuple]
@@ -86,7 +86,7 @@ class Matrix():
 
         vectorModule.checkScalarValidity(newScalarValue, 'item assignment')
 
-        self.matrix[indexTuple] = numpy.float(newScalarValue)
+        self.matrix[indexTuple] = numpy.float64(newScalarValue)
 
         return self
 

@@ -804,7 +804,7 @@ def _resonance_checker(self, info, things):
 
     # Setup for the physics checks
     import fudge.processing.resonances.reconstructResonances as rrReconstructModule
-    rrReconstructor = rrReconstructModule.getResonanceReconstructionClass(self)(self)
+    rrReconstructor = rrReconstructModule.getResonanceReconstructionClass(self)(self, verbose=False)
 
     # Check for mismatched spins
     warnings += rrReconstructor.setResonanceParametersByChannel(warnOnly=True)  # multipleSScheme='NJOY', 'ENDF' or None

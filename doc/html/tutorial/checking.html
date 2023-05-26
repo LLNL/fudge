@@ -1,20 +1,22 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>2. Checking ENDF or GNDS files &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -48,7 +50,7 @@
           <div class="body" role="main">
             
   <section id="checking-endf-or-gnds-files">
-<h1><span class="section-number">2. </span>Checking ENDF or GNDS files<a class="headerlink" href="#checking-endf-or-gnds-files" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">2. </span>Checking ENDF or GNDS files<a class="headerlink" href="#checking-endf-or-gnds-files" title="Permalink to this heading">¶</a></h1>
 <p>Let’s face it.  ENDF evaluations often have mistakes and bugs.  Fortunately <cite>fudge</cite> comes
 armed with a large number of pre-made checks.  Running them is as simple as running the
 <code class="docutils literal notranslate"><span class="pre">check()</span></code> member function on any fudge class instance.  The quickest way to test an
@@ -56,7 +58,7 @@ evaluation and its covariance is just to run the main <code class="docutils lite
 instance of <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> or <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code>.  <code class="docutils literal notranslate"><span class="pre">Fudge</span></code> will then recursively descend
 through the instances and check every data member.</p>
 <section id="checking-reactionsuite-instances">
-<h2><span class="section-number">2.1. </span>Checking <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> instances<a class="headerlink" href="#checking-reactionsuite-instances" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.1. </span>Checking <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> instances<a class="headerlink" href="#checking-reactionsuite-instances" title="Permalink to this heading">¶</a></h2>
 <p>Using the <code class="docutils literal notranslate"><span class="pre">myEval</span></code> and <code class="docutils literal notranslate"><span class="pre">myCov</span></code> instances from the previous tutorial, we find:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myEval</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
 <span class="go">n + H1</span>
@@ -138,7 +140,7 @@ This is very useful for bug tracking. In the example above, we can tell that the
 reaction by looking at the list of outgoing particles: ‘H2 + gamma’.</p>
 </section>
 <section id="checking-covariancesuite-instances">
-<h2><span class="section-number">2.2. </span>Checking <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code> instances<a class="headerlink" href="#checking-covariancesuite-instances" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.2. </span>Checking <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code> instances<a class="headerlink" href="#checking-covariancesuite-instances" title="Permalink to this heading">¶</a></h2>
 <p>The covariances have <code class="docutils literal notranslate"><span class="pre">check()</span></code> functions too and they find all sorts of stuff:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myCov</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
 <span class="go">CovarianceSuite: n + H1</span>
@@ -149,7 +151,7 @@ reaction by looking at the list of outgoing particles: ‘H2 + gamma’.</p>
 </div>
 </section>
 <section id="setting-up-a-checker-script">
-<h2><span class="section-number">2.3. </span>Setting up a checker script<a class="headerlink" href="#setting-up-a-checker-script" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3. </span>Setting up a checker script<a class="headerlink" href="#setting-up-a-checker-script" title="Permalink to this heading">¶</a></h2>
 <p>We will set up a script to use <code class="docutils literal notranslate"><span class="pre">fudge</span></code> to check ENDF files.  I’ll leave to you to figure out how
 to do the same with GNDS files (if you do, remember to load both the evaluation and the covariance!).</p>
 <p>This is what I came up with (download it <a class="reference download internal" download="" href="../_downloads/a14a96181ed910b123d0cb35851f8f62/checkendf.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>):</p>
@@ -195,8 +197,9 @@ to do the same with GNDS files (if you do, remember to load both the evaluation 
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">2. Checking ENDF or GNDS files</a><ul>
 <li><a class="reference internal" href="#checking-reactionsuite-instances">2.1. Checking <code class="docutils literal notranslate"><span class="pre">reactionSuite</span></code> instances</a></li>
 <li><a class="reference internal" href="#checking-covariancesuite-instances">2.2. Checking <code class="docutils literal notranslate"><span class="pre">covarianceSuite</span></code> instances</a></li>
@@ -205,12 +208,17 @@ to do the same with GNDS files (if you do, remember to load both the evaluation 
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="translating.html"
-                        title="previous chapter"><span class="section-number">1. </span>Basic translating between ENDF and GNDS</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="navigating.html"
-                        title="next chapter"><span class="section-number">3. </span>Navigating</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="translating.html"
+                          title="previous chapter"><span class="section-number">1. </span>Basic translating between ENDF and GNDS</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="navigating.html"
+                          title="next chapter"><span class="section-number">3. </span>Navigating</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -222,12 +230,12 @@ to do the same with GNDS files (if you do, remember to load both the evaluation 
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -254,7 +262,7 @@ to do the same with GNDS files (if you do, remember to load both the evaluation 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

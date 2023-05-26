@@ -14,14 +14,14 @@ Introduction
 ---------------------------
 
 This module contains classes and functions for representing and manipulating a value with units and uncertainty, 
-herein called a "Physical Quantity with Uncertainty" or PQU. For example, if the distance between start and 
-finish lines is measured to be '100.1 m' with an uncertainty of '0.4 m', it can be inputted to PQU as the string
-'100.1(4) m' or '100.1 +/- 0.4 m' (both are allowed input forms as well as several others - see `PQU`_). 
+herein called a "Physical Quantity with Uncertainty" or :py:class:`PQU`. For example, if the distance between start and 
+finish lines is measured to be '100.1 m' with an uncertainty of '0.4 m', it can be inputted to :py:class:`PQU` as the string
+'100.1(4) m' or '100.1 +/- 0.4 m' (both are allowed input forms as well as several others - see :py:class:`PQU`). 
 
-From this module, most users should only need the PQU class which stores a PQU object and
+From this module, most users should only need the :py:class:`PQU` class which stores a :py:class:`PQU` object and
 supports common math operations (e.g., addition, subtraction, multiplication) including the operation on 
 the units and uncertainty. 
-For example, if a person races between the start and finish lines in a time of '16.3 +/- 0.1 s', the PQU class can 
+For example, if a person races between the start and finish lines in a time of '16.3 +/- 0.1 s', the :py:class:`PQU` class can 
 be used to determine the person's speed as:
 
 >>> from pqu import PQU
@@ -33,7 +33,7 @@ be used to determine the person's speed as:
 >>> print(speed.copyToUnit( 'mi/h' ))
 13.7 +/- 0.1 mi/h
 
-In addition to calculating the speed and unit, the PQU class has also propagated the significant digits and the uncertainty. In this example
+As this example shows, in addition to calculating the speed and unit, the :py:class:`PQU` class also propagated the significant digits and the uncertainty. In this example
 the uncertainty was propagated using Goodman's expression for uncorrelated values (see `Uncertainty propagation`_). The
 propagation of significant digits explains why the printed speed has only 3 digits. The following Python code illustrates
 significant digits for the speed calculation:
@@ -46,8 +46,8 @@ significant digits for the speed calculation:
 value = 6.14110429447852724e+00, significantDigits = 3, order = 0, isPercent = False, unit = "m/s"
 uncertainty = value = 4.49629906071862956e-02, significantDigits = 1, order = -2, isPercent = False
 
-As can be seen, the internal speed value is as expected. However, since the PQU class (with the help
-of the PQU_float class) tracks a value's significant digits, when a PQU instance is printed (via the __str__
+As can be seen, the internal speed value is as expected. However, since the :py:class:`PQU` class (with the help
+of the :py:class:`PQU_float` class) tracks a value's significant digits, when a :py:class:`PQU` instance is printed (via the __str__
 method), only at most 'significantDigits' are displayed. The allowed range for 'significantDigits' is
 1 to sys.float_info.dig + 1 inclusive. For addition and subtraction, the member 'order' is also required and
 is why the following output is the same for both print statements:
@@ -57,7 +57,7 @@ is why the following output is the same for both print statements:
 >>> print(distance + '100.1(4) mum')        # note 'mum' is micrometer
 100.1 +/- 0.4 m
 
-How is 'significantDigits' determined? That depends on how PQU is called. If a string without
+How is 'significantDigits' determined? That depends on how :py:class:`PQU` is called. If a string without
 uncertainty is entered as the only argument then 'significantDigits' is the number of digits in the string
 (ignoring leading '0'). Some examples are:
 
@@ -106,11 +106,14 @@ uncertainty = value = 1.99999999999999991e-06, significantDigits = 1, order = -6
 >>> print(PQU.PQU( '00.0012 +/- 0.000002' ))
 1.200e-3 +/- 2.e-6
 
-The PQU constructor (i.e., its __init__ method) allows various input options for creating an instance (see `PQU`_).
+The :py:class:`PQU` constructor (i.e., its __init__ method) allows various input options for creating an instance (see :py:class:`PQU`).
 
-Each PQU has three main members. They are a value stored as a :py:class:`PQU_float` instance, an uncertainty stored
-as a :py:class:`PQU_uncertainty` instance and a unit stored as a :py:class:`PhysicalUnit` instance.
+A :py:class:`PQU` object has three main members which are:
 
+    * *value* which is stored as a :py:class:`PQU_float` instance,
+    * *unit* which is stored as a :py:class:`PQU_uncertainty` instance,
+    * *uncertainty* which is stored as a :py:class:`PQU_uncertainty` instance.
+    
 ------------------------------------------------------------------------------------------
 Units and conversions
 ------------------------------------------------------------------------------------------
@@ -139,15 +142,17 @@ This module uses the SI units along with units for angle and solid angle as its 
     | steradian | 'sr'  | solid angle               |
     +-----------+-------+---------------------------+
 
-Any PQU can be represented as a combination of each of these units with an associated power for each unit. As example, a force
-has the base units 'kg' and 'm' to power 1 as well as 's' to power -2 (represented as the string 'kg * m / s**2').
-All other units are stored with these units as a base and a conversion factor. For example, the unit for foot ('ft') is
-stored as a meter with the conversion factor of 0.3048. Two units are said to be compatible if they have the same power for each
+All other units are stored with these units as a base and a conversion factor. 
+For example, the unit for foot ('ft') is stored as a meter with the conversion factor of 0.3048.
+Any :py:class:`PQU` instance can be represented as a combination of each of these units with an associated power for each unit.
+As example, a force has the base units 'kg' and 'm' to power 1 as well as 's' to power -2 (represented as the 
+string 'kg * m / s**2').  Two units are said to be compatible if they have the same power for each
 base unit. Hence, 'ft' is compatible with 'm' but not 'kg' or 's'. Furthermore, the electron-Volt ('eV') is compatible
 with Joule ('J') and Watt-second ('W * s') but not Watt ('W').
 
-The PQU package has many defined units with prefixes (see `Defined prefixes and units`_). In general, the
-PQU methods that operate on PQU objects do not attempt to simplify the units, even if the result is dimensionless.
+The :py:class:`PQU` package has many defined units with prefixes (see `Defined prefixes and units`_). In general, the
+PQU methods that operate on :py:class:`PQU` objects do not attempt to simplify the units, even if the result is dimensionless.
+Note, to get rid of dimensionless units use the method :py:meth:`PQU.simplify`
 For example, consider the division of '3.2 m' by 11.2 km:
 
 >>> from pqu import PQU
@@ -159,6 +164,8 @@ For example, consider the division of '3.2 m' by 11.2 km:
 >>> dl = slope.copyToUnit( "" )
 >>> print(dl)
 2.9e-4
+>>> slope.simplify()
+PQU( "2.9e-4" )
 
 Here the method :py:meth:`PQU.copyToUnit` is used to convert the units into a dimensionless form. Here is another
 example showing the use of the :py:meth:`PQU.copyToUnit` method:
@@ -188,9 +195,9 @@ Changing non-hardwired constants
 ------------------------------------------------------------------------------------------
 
 PQU has a set of defined constants that are hardwired and a set that are not hardwired. The non-hardwired
-constants reside in the module pqu_constants.py and are import by PQU when it is first loaded. It is 
-possible to change a non-hardwired constant by loading the pqu_constants.py module before PQU is imported, redefining
-the constant and then importing PQU. For example, as of this writing the elementary charge is defined as '1.60217653e-19 * C':
+constants reside in the module pqu_constants.py and are import by :py:class:`PQU` when it is first loaded. It is 
+possible to change a non-hardwired constant by loading the pqu_constants.py module before :py:class:`PQU` is imported, redefining
+the constant and then importing :py:class:`PQU`. For example, as of this writing the elementary charge is defined as '1.60217653e-19 * C':
 
 >>> from pqu import PQU
 >>> eV = PQU.PQU( 1, 'eV' )
@@ -240,10 +247,10 @@ This section describes the propagation of uncertainties for the binary operators
 and outputting (i.e., converting to and from a string) of a physical quantity with an associated uncertainty. As can be seen from the documentation below,
 the supported propagations of uncertainties are limited to simple propagation rules.
 
-In the following discussion, Q1, Q2 and Q3 will be PQU instances with values
+In the following discussion, Q1, Q2 and Q3 will be :py:class:`PQU` instances with values
 V1, V2 and V3 respectively and uncertainties dQ1, dQ2 and dQ3 respectively. In addition, n1 will be a number (i.e., 1.23).
 
-For the binary operators, all numbers are converted to a PQU instance with uncertainty of 0. For example, the following
+For the binary operators, all numbers are converted to a :py:class:`PQU` instance with uncertainty of 0. For example, the following
 are all equivalent:
 
 >>> from pqu import PQU
@@ -289,8 +296,8 @@ Traceback (most recent call last):
 ZeroDivisionError: float division by zero
 
 For the rest of this discussion, the two binary operands will be assumed to not be the same instance.
-For addition and subtraction with PQU instances Q1 and Q2 as operands the uncertainty is propagated as dQ3 = sqrt( dQ1**2 + dQ2**2 ).
-For multiplication with PQU instances Q1 and Q2 as operands the uncertainty is propagated using Goodman's expression with
+For addition and subtraction with :py:class:`PQU` instances Q1 and Q2 as operands the uncertainty is propagated as dQ3 = sqrt( dQ1**2 + dQ2**2 ).
+For multiplication with :py:class:`PQU` instances Q1 and Q2 as operands the uncertainty is propagated using Goodman's expression with
 uncorrelated values (i.e., as dQ3 = sqrt( ( V2 * dQ1 )**2 + ( V1 * dQ2) **2 + ( dQ1 * dQ2 )**2 )). For division, the expression 'Q1 / Q2'
 is converted to 'Q1 * Q3' with 'Q3 = PQU( 1 / V2, unit = 1 / U2, uncertainty = dQ2 / ( V2 * V2 ) )' where U2 is the unit of Q2.
 
@@ -304,11 +311,11 @@ For the trigonometry methods, no propagation of uncertainty is performed.
 PQU methods by functionality
 ------------------------------------------------------------------------------------------
 
-This section classifies some of the methods in the PQU class by their function.
+This section classifies some of the methods in the :py:class:`PQU` class by their function.
 
-For PQU methods that require a second operand (e.g., '+', '/'), the second operand will be passed to the
+For :py:class:`PQU` methods that require a second operand (e.g., '+', '/'), the second operand will be passed to the
 staticmethod :py:meth:`PQU._getOtherAsPQU` to determine if it is a suitable object. A suitable object includes any string that
-is a valid PQU. For example: :py:meth:`PQU.toString`
+is a valid :py:class:`PQU`. For example: :py:meth:`PQU.toString`
 
 >>> print(PQU.PQU( '12.345' ) + "3.23")
 15.58
@@ -317,82 +324,83 @@ is a valid PQU. For example: :py:meth:`PQU.toString`
 
 **isCompatible**
 
-    Returns True if self's unit is compatible with the units of the argument and False otherwise.
+    Returns **True** if *self*'s unit is compatible with the units of the argument and **False** otherwise.
 
 **isPercent, isDimensionless, isLength, isMass, isTime, isCurrent, isTemperature, isMoles, isLuminousIntensity,
 isAngle, isSolidAngle, isEnergy, isSpin, isCharge**
 
-    These methods return True if self is compatible with the unit implied by the method name.
+    These methods return **True** if *self* is compatible with the unit implied by the method name.
 
 **__float__**
 
-    This method is called when the a PQU is the argument to the 'float' function (e.g., float( pqu )).
-    This method returns a python float for the value of the PQU instance. As example:
+    This method is called when the a :py:class:`PQU` is the argument to the 'float' function (e.g., float( pqu )).
+    This method returns a python float for the value of the :py:class:`PQU` instance. As example:
 
 >>> pqu = PQU.PQU( '13.7 +/- 0.1 mi/h' )
 >>> value = float( pqu )
 >>> print(type( value ), value)
 <type 'float'> 13.7
 
-The PQU class has methods for the following arithmetic operations. Unless stated, a new PQU instance is returned.
+The :py:class:`PQU` class has methods for the following arithmetic operations. Unless stated, a new :py:class:`PQU` instance is returned.
 
 **__abs__, __neg__**
 
-    These are the standard unitary operators that only operate on the PQU's value.
+    These are the standard unitary operators that only operate on the :py:class:`PQU`'s value.
 
 **__add__, __radd__, __iadd__, __sub__, __rsub__, __isub__**
 
     These are the standard binary operators for addition and subtraction. For these operators, the other
-    operand is passed to :py:meth:`PQU._getOtherAsPQU`. The other operand must have units compatible with self.
-    As expected, the __iadd__ and __isub__ methods modify self and return it.
+    operand is passed to :py:meth:`PQU._getOtherAsPQU`. The other operand must have units compatible with *self*.
+    As expected, the __iadd__ and __isub__ methods modify *self* and return it.
 
 **__mul__, __rmul__, __imul__, __div__, __rdiv__, __idiv__**
 
     These are the standard binary operators for multiplication and division. For these operators, the other
-    operand is passed to :py:meth:`PQU._getOtherAsPQU`. As expected, the __imul__ and __idiv__ methods modify self and
-    return it. All these methods call the __mul__ method; except, when a division happens, and 'self is other'
+    operand is passed to :py:meth:`PQU._getOtherAsPQU`. Any unit for other is allowed.
+    As expected, the __imul__ and __idiv__ methods modify *self* and
+    return it. All these methods call the __mul__ method; except, when a division happens, and '*self* is other'
     and the denominator is not 0.
     That is, the expression 'a / a' is handled as a special case when float( a ) != 0. In this case, a 
-    dimensionless PQU is returned with value 1 and no uncertainty.
+    dimensionless :py:class:`PQU` is returned with value 1 and no uncertainty.
 
-    If self is not other, the uncertainty is propagated using Goodman's expression for uncorrelated values.
+    If *self* is not other, the uncertainty is propagated using Goodman's expression for uncorrelated values.
     Otherwise, 100% correlated uncertainty is assumed.
 
 **__pow__**
 
     This method raises - not in the python sense but in the mathematical sense (i.e., x**y) -
-    self to a power. Standard uncertainty propagation is performed which is only valid when
+    *self* to a power. Standard uncertainty propagation is performed which is only valid when
     the uncertainty is small compared to the value.  A quantity can be raised to a non-integer power 
     only if the result can be represented by integer powers of the base units.
 
 **__eq__, __ne__, __lt__, __le__, __gt__, __ge__, compare, equivalent**
 
-    These methods compare self to another object. For these operators, the other
-    object is passed to :py:meth:`PQU._getOtherAsPQU`. The first 6 methods all call the :py:func:`compare` method
+    These methods compare *self* to another object. For these operators, the other
+    object is passed to :py:meth:`PQU._getOtherAsPQU` and must have the same unit
+    as *self*. The first 6 methods all call the :py:func:`compare` method
     with epsilonFactor = 5. All methods except 'equivalent' compare 
-    self's and other's values only. The 'equivalent' method also considers self's and other's uncertainty.
+    *self*'s and other's values and units only. 
+    The 'equivalent' method also considers *self*'s and other's uncertainty.
 
 **convertToUnit, copyToUnit, inUnitsOf, getUnitAsString, getValueAs, getUncertaintyValueAs**
 
-    These methods change a PQU's unit or return a new instance.
+    These methods change a :py:class:`PQU`'s unit or return a new instance.
 
 **truncate**
 
-    This method changes a PQU's value and uncertainty to agree with its printed value as defined
+    This method changes a :py:class:`PQU`'s value and uncertainty to agree with its printed value as defined
     by its significant digits.
 
 **changeUncertaintyStyle, changeUncertaintyPercent**
 
-    These methods allow for the changing of a PQU instance uncertainty.
-
-# BRB: need more detail here.
+    These methods allow for the changing of a :py:class:`PQU` instance uncertainty.
 
 ------------------------------------------------------------------------------------------
 Supporting classes
 ------------------------------------------------------------------------------------------
 In addition to the :py:class:`PQU` class, the following classes are a part the the PQU module:
-:py:class:`Parsers`, :py:class:`PQU_float`, :py:class:`PQU_uncertainty`, :py:class:`PhysicalUnit` and NumberDict.
-These classes are only intended as helper classes for the PQU class; hence, they have limited functionality and
+:py:class:`Parsers`, :py:class:`PQU_float`, :py:class:`PQU_uncertainty`, :py:class:`PhysicalUnit` and :py:class:`NumberDict`.
+These classes are only intended as helper classes for the :py:class:`PQU` class; hence, they have limited functionality and
 are only intended for internal use.
 
 ------------------------------------------------------------------------------------------
@@ -407,19 +415,19 @@ with feedback from Caleb M. Mattoon, Neil Summers and David Brown.
 
 The values of physical constants are taken from the 2010 recommended values from
 CODATA. Other conversion factors (e.g. for British units) come from various 
-sources. I can't guarantee for the correctness of all entries in the unit table,
+sources. The correctness of all entries in the unit table cannot be guaranteed,
 so use this at your own risk.
 
 -----------------------------------
 Issues or features to be aware of
 -----------------------------------
 
-This section describes several oddities about PQU.
+This section describes several oddities about :py:class:`PQU`.
 
     - Units 'oz', 'lb' and 'ton' (i.e., ounce, pound and ton respectively) are units of mass and not force.
       As example, the unit 'psi' (i.e., pounds per square inch) is equivalent to about '32.174 ft / s**2 * lb / inch**2'.
 
-    - In the following, the first line products a significantDigits that is small but correct per PQU 
+    - In the following, the first line produces a significantDigits that is small but correct per :py:class:`PQU` 
       rules as the number of significant digits is determined by the '1'.
 
 >>> from pqu import PQU
@@ -454,7 +462,7 @@ value = 5.29177208114537818e-11, significantDigits = 16, order = -11, isPercent 
 >>> print(t1.convertToUnit( 'degR' ))
 564. degR
 
-    - PQU, actually PhysicalUnit, allows the unit to have values. For example 'm/s/25**3' is currently a valid
+    - :py:class:`PQU`, actually :py:class:`PhysicalUnit`, allows the unit to have values. For example 'm/s/25**3' is currently a valid
       unit and stored that way.  This should probably not be allowed and will probably be 
       deprecated (i.e., do not rely on it).
       The following illustrates the issue:
@@ -519,13 +527,13 @@ maxSignificantDigits = sys.float_info.dig
 def compare( value1, value2, epsilonFactor = 0 ) :
     """
     This function compares two floats (or objects that can be converted to floats) in a fuzzy way 
-    where the fuzz factor is epsilonFactor * sys.float_info.epsilon. This function returns
+    where the fuzz factor is *epsilonFactor* * sys.float_info.epsilon. This function returns
 
-         0          if the floats are comparable as given by epsilonFactor (see below),
-         otherwise, it returns 1 (-1) if value1 is greater (less) than value2.
+         0          if the floats are comparable as given by *epsilonFactor* (see below),
+         otherwise, it returns 1 (-1) if *value1* is greater (less) than *value2*.
 
     Two floats are comparable if the magnitude of the 'relative difference' between them is less than or equal to 
-    epsilonFactor * sys.float_info.epsilon. The relative difference is defined as
+    *epsilonFactor* * sys.float_info.epsilon. The relative difference is defined as
 
          ( value1 - value2 ) / max( abs( value1 ), abs( value2 ) )
 
@@ -533,7 +541,7 @@ def compare( value1, value2, epsilonFactor = 0 ) :
 
         ( value1 - value2 ) <= epsilonFactor * sys.float_info.epsilon * max( abs( value1 ), abs( value2 ) )
 
-    For the default epsilonFactor = 0, a 0 is return (i.e., the two floats are 'equal') only if they have the same value
+    For the default *epsilonFactor* = 0, a 0 is return (i.e., the two floats are 'equal') only if they have the same value
 
     :param value1: value to compare to value2
     :type value1: any object which float() accepts
@@ -558,50 +566,50 @@ def compare( value1, value2, epsilonFactor = 0 ) :
 
 def valueOrPQ( value, unitFrom = None, unitTo = None, asPQU = False, checkOrder = True ) :
     """
-    This function is designed as a convenience function for working with PQU 
+    This function is designed as a convenience function for working with :py:class:`PQU`
     and float instances. That is, instead of checking the type of value, let valueOrPQ handle some of the
-    details. The first argument can be either a PQU or something
+    details. The first argument can be either a :py:class:`PQU` or something
     that is a valid argument for the python 'float' function (e.g., 1.23, "1.23"). The returned instance
-    is a PQU if asPQU is True and a float otherwise. The unitFrom and unitTo
-    arguments can be either None, a PhysicalUnit or a string that represents a PhysicalUnit (e.g., "m", "",
+    is a :py:class:`PQU` if asPQU is **True** and a float otherwise. The unitFrom and unitTo
+    arguments can be either None, a :py:class:`PhysicalUnit` or a string that represents a :py:class:`PhysicalUnit` (e.g., "m", "",
     "MeV * b"). If unitTo is not None, the returned instance will be in units of unitTo. If unitFrom is not None
-    and the first argument (i.e., value) is a PQU instance, they must have the
+    and the first argument (i.e., value) is a :py:class:`PQU` instance, it must have the
     same units.
 
-    Note, this function was originally written when PQU did not support dimensionless
+    Note, this function was originally written when :py:class:`PQU` did not support dimensionless
     units. As it now supports dimensionless units, this function may not be of much value but should be kept anyway.
 
     Options for input are:
-        +-----+--------+------+-----------------+-----------------------------------+
-        |     |        |      |  from _getUnit  |       returned value asPQU        |
-        +-----+--------+------+--------+--------+--------+--------------------------+
-        |value|unitFrom|unitTo|unitFrom|unitTo  |False   |True                      |
-        +=====+========+======+========+========+========+==========================+
-        |float|None    |None  |None    |None    |float   |float                     |
-        +-----+--------+------+--------+--------+--------+--------------------------+
-        |float|None    |string|None    |PU      |float in|PQ in unitTo              |
-        |     |        |or PU |        |        |unitTo  |                          |
-        +-----+--------+------+--------+--------+--------+--------------------------+
-        |float|string  |None  |PU      |None    |float in|PQ in unitFrom            |
-        |     |or PU   |      |        |        |unitFrom|                          |
-        +-----+--------+------+--------+--------+--------+--------------------------+
-        |float|string  |string|PU      |PU      |float in|PQ in unitTo              |
-        |     |or PU   |or PU |        |        |unitTo  |                          |
-        +-----+--------+------+--------+--------+--------+--------------------------+
-        |PQU  |None    |None  |PU      |None    |float   |PQ                        |
-        +-----+--------+------+--------+--------+--------+--------------------------+
-        |PQU  |string  |None  |PU      |None    |float in|PQU (need to check that PQ|
-        |     |or PU   |      |        |        |unitFrom|and unitFrom are the same)|
-        +-----+--------+------+--------+--------+--------+--------------------------+
-        |PQU  |string  |string|PU      |PU      |float in|PQU in unitTo (ditto)     | 
-        |     |or PU   |or PU |        |        |unitTo  |                          |
-        +-----+--------+------+--------+--------+--------+--------------------------+
-        |PQU  |None    |string|PU      |PU      |float in|PQU in unitTo             |
-        |     |        |or PU |        |        |unitTo  |                          |
-        +-----+--------+------+--------+--------+--------+--------------------------+
+        +-----+--------+------+-----------------+---------------------------------------+
+        |     |        |      |  from _getUnit  |           returned value asPQU        |
+        +-----+--------+------+--------+--------+-----------+---------------------------+
+        |value|unitFrom|unitTo|unitFrom|unitTo  |**False**  |**True**                   |
+        +=====+========+======+========+========+===========+===========================+
+        |float|None    |None  |None    |None    |float      |float                      |
+        +-----+--------+------+--------+--------+-----------+---------------------------+
+        |float|None    |string|None    |PU      |float in   |PQ in unitTo               |
+        |     |        |or PU |        |        |unitTo     |                          `|
+        +-----+--------+------+--------+--------+-----------+---------------------------+
+        |float|string  |None  |PU      |None    |float in   |PQ in unitFrom             |
+        |     |or PU   |      |        |        |unitFrom   |                           |
+        +-----+--------+------+--------+--------+-----------+---------------------------+
+        |float|string  |string|PU      |PU      |float in   |PQ in unitTo               |
+        |     |or PU   |or PU |        |        |unitTo     |                           |
+        +-----+--------+------+--------+--------+-----------+---------------------------+
+        |PQU  |None    |None  |PU      |None    |float      |PQ                         |
+        +-----+--------+------+--------+--------+-----------+---------------------------+
+        |PQU  |string  |None  |PU      |None    |float in   |PQU (need to check that PQ |
+        |     |or PU   |      |        |        |unitFrom   |and unitFrom are the same) |
+        +-----+--------+------+--------+--------+-----------+---------------------------+
+        |PQU  |string  |string|PU      |PU      |float in   |PQU in unitTo (ditto)      | 
+        |     |or PU   |or PU |        |        |unitTo     |                           |
+        +-----+--------+------+--------+--------+-----------+---------------------------+
+        |PQU  |None    |string|PU      |PU      |float in   |PQU in unitTo              |
+        |     |        |or PU |        |        |unitTo     |                           |
+        +-----+--------+------+--------+--------+-----------+---------------------------+
 
     :param value: The number object convert if requested
-    :type value: PQU instance or any object which float() accepts
+    :type value: :py:class:`PQU` instance or any object which float() accepts
 
     :param unitFrom: If not None, the unit for value
     :type unitFrom: None or instance from which units can be determined
@@ -609,17 +617,18 @@ def valueOrPQ( value, unitFrom = None, unitTo = None, asPQU = False, checkOrder 
     :param unitTo: If not None, the unit the returned value is in
     :type unitTo: None or instance from which units can be determined
 
-    :param asPQU: If True returned instance is a PQU; otherwise, it is a float
+    :param asPQU: If **True** returned instance is a :py:class:`PQU`; otherwise, it is a float
     :type asPQU: `bool`
 
     :returns: value - in units of unitTo if unitTo is not None
-    :rtype: `float` or PQU instance
+    :rtype: `float` or :py:class:`PQU` instance
     """
 
     def _getUnit( unit, default = None ) :
         """
-        Returns an instance of PhysicalUnit based first on the argument 'unit' and then 'default'. 'unit' can only be a PhysicalUnit, 
-        string (e.g., '', 'MeV', 'b * eV') or None. Default must be either a PQU instance or None.
+        Returns an instance of :py:class:`PhysicalUnit` based first on the argument 'unit' and then 'default'. 'unit' 
+        can only be a :py:class:`PhysicalUnit`, string (e.g., '', 'MeV', 'b * eV') or None. Default must be either 
+        a :py:class:`PQU instance` or None.
         """
 
         if( isinstance( default, PQU ) ) :
@@ -663,23 +672,23 @@ def floatToShortestString( value, significantDigits = 15, trimZeros = True, keep
     not "1.234000000000" or "1.23400000000e+00" while the string for the float 1.234e-9 will be "1.234-9", and
     not "0.00000000123400000000" or "1.23400000000e-09".
 
-    :param value:               The float to convert.
+    :param value:               The float to convert to a string.
     :type value: float
 
     :param significantDigits:   The number of significant digits desired. Restricted to the range 0 to 24 inclusive.
     :type significantDigits: integer
 
-    :param trimZeros:           If True, unneeded zeros to the right of '.' are removed.
+    :param trimZeros:           If **True**, unneeded zeros to the right of '.' are removed.
     :type trimZeros: bool
 
-    :param keepPeriod:          If False, '.' is removed if there is no digit to its right.
+    :param keepPeriod:          If **False**, '.' is removed if there is no digit to its right.
     :type keepPeriod: bool
 
     :param favorEFormBy:        The integer subtracted from the length of the E-form before the form
                                 with the shortest representation is determined.
     :type favorEFormBy: integer
 
-    :param includeSign:         If True, the returned string will always start with a sign character 
+    :param includeSign:         If **True**, the returned string will always start with a sign character 
                                 (i.e., '+' or '-'). Otherwise, only negative values will have a sign.
     :type includeSign: bool
 
@@ -689,7 +698,7 @@ def floatToShortestString( value, significantDigits = 15, trimZeros = True, keep
     if type(value)==str: return value
 
     def isfinite( value ) :
-        """Returns True if value is neither infinite nor not-a-number (NaN) and False otherwise."""
+        """Returns **True** if value is neither infinite nor not-a-number (NaN) and **False** otherwise."""
 
         if( math.isinf( value ) or math.isnan( value ) ) : return( False )
         return( True )
@@ -734,21 +743,21 @@ toShortestString = floatToShortestString    # For legacy use. Deprecated: last d
 
 class PQU_float :
     """
-    This class is used by PQU and PQU_uncertainty to store more information about a float than
+    This class is used by the classes :py:class:`PQU` and :py:class:`PQU_uncertainty` to store more information about a float than
     is provided by the python float class as well as methods to operator on this information. The main members are:
 
     - value              --- The python value of the float.
-    - significantDigits  --- The number of significant digits the value possess as defined by the creator of self.
-    - order              --- An integer that represents the order of the most significant digit of self. 
+    - significantDigits  --- The number of significant digits the value possess as defined by the creator of *self*.
+    - order              --- An integer that represents the order of the most significant digit of *self*. 
                              Calculated internally equivalent to int( log10( value ) ) and stored for convenience.
-    - _isPercent         --- True if self represents a percent and False otherwise. Note, the value is always stored as
+    - _isPercent         --- **True** if *self* represents a percent and **False** otherwise. Note, the value is always stored as
                              the non-percent value (e.g., 1% and 12% are stored as 0.01 and 0.12 respectively).
     """
 
     def __init__( self, value, significantDigits, isPercent = False, checkOrder = True ) :
         """
-        Returns a new PQU_float instance with value, significantDigits and isPercent. Order is calculated from value.
-        If argument checkOrder is True, staticmethod self.fixFloatsOrder is called and its returned value and order
+        Returns a new :py:class:`PQU_float` instance with value, significantDigits and isPercent. Order is calculated from value.
+        If argument checkOrder is **True**, staticmethod *self*.fixFloatsOrder is called and its returned value and order
         are used.
         """
 
@@ -902,7 +911,7 @@ class PQU_float :
     __nonzero__ = __bool__      # for python 2.x
 
     def _setFrom( self, other ) :
-        """Sets self's members from other. Other must be a PQU_float instance."""
+        """Sets *self*'s members from other. Other must be a :py:class:`PQU_float` instance."""
 
         if( not( isinstance( other, PQU_float ) ) ) : raise TypeError( "other type %s not supported" % type( other ) )
         self.value = other.value
@@ -911,12 +920,12 @@ class PQU_float :
         self.significantDigits = other.significantDigits
 
     def getValue( self ) :      # Deprecated - replaced with __float__
-        "Returns self's value. Equivalent to float( self )."
+        "Returns *self*'s value. Equivalent to float( *self* )."
 
         return( self.value )
 
     def getOrder( self ) :
-        """Returns self's order.
+        """Returns *self*'s order.
 
         :rtype: `int`
         """
@@ -924,7 +933,7 @@ class PQU_float :
         return( self.order )
 
     def getSignificantDigits( self ) :
-        """Returns self's significant digits.
+        """Returns *self*'s significant digits.
 
         :rtype: `int`
         """
@@ -933,7 +942,7 @@ class PQU_float :
 
     def info( self, significantDigits = 17 ) :
         """
-        Returns a detailed string of self. Mainly for debugging.
+        Returns a detailed string of *self*. Mainly for debugging.
 
         :rtype: `str`
         """
@@ -942,7 +951,7 @@ class PQU_float :
         return( "value = %s, significantDigits = %d, order = %d, isPercent = %s" % ( value, self.significantDigits, self.order, self._isPercent ) )
 
     def isPercent( self ) :
-        """Returns True if self is a percent and False otherwise.
+        """Returns **True** if *self* is a percent and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -951,17 +960,17 @@ class PQU_float :
 
     def setPercentFlag( self, isPercent, scaleValue = False ) :
         """
-        If argument isPercent is True and self is not a percent, self is converted to a percent.
-        If argument isPercent is False and self is a percent, self is converted to non-percent.
+        If argument isPercent is **True** and *self* is not a percent, *self* is converted to a percent.
+        If argument isPercent is **False** and *self* is a percent, *self* is converted to non-percent.
         Otherwise, a raise is executed.
 
-        If scaleValue is False, the value is not changed; otherwise, value is scale by 0.01 (100)
-        if isPercent is True (False).
+        If scaleValue is **False**, the value is not changed; otherwise, value is scale by 0.01 (100)
+        if isPercent is **True** (**False**).
 
-        :param isPercent:
+        :param isPercent: see documentation.
         :type isPercent: `bool`
 
-        param scaleValue:
+        :param scaleValue: see documentation.
         :type scaleValue: `bool`
         """
 
@@ -976,9 +985,9 @@ class PQU_float :
 
     def setSignificantDigits( self, significantDigits ) :
         """
-        Sets self's significant digits to significantDigits.
+        Sets *self*'s significant digits to significantDigits.
 
-        :param significantDigits:
+        :param significantDigits: see documentation.
         :type significantDigits: `int`
         """
 
@@ -986,7 +995,7 @@ class PQU_float :
 
     def toString( self, trimZeros = True, keepPeriod = True, includePercent = True, favorEFormBy = 0, significantDigits = None ) :
         """
-        Returns a string representation of self (i.e., '1.234e6' or '12%') using function :py:func:`floatToShortestString`.
+        Returns a string representation of *self* (i.e., '1.234e6' or '12%') using function :py:func:`floatToShortestString`.
 
         :param bool trimZeros: See function :py:func:`floatToShortestString`
         :param bool keepPeriod: See function :py:func:`floatToShortestString`
@@ -1005,8 +1014,8 @@ class PQU_float :
 
     def truncate( self, significantDigits = None ) :
         """
-        Adjusts self's value so that only significantDigits are non-zero. For example, if value is 3.453983207834109
-        and significantDigits = 4 then the value is set to 3.454. If significantDigits is None, self's significantDigits
+        Adjusts *self*'s value so that only significantDigits are non-zero. For example, if value is 3.453983207834109
+        and significantDigits = 4 then the value is set to 3.454. If significantDigits is None, *self*'s significantDigits
         is used.
 
         :param significantDigits: 
@@ -1041,7 +1050,7 @@ class PQU_float :
         Many numbers are not represented in IEEE floating point by there true value. For example, '1e-12' is 
         stored as the float 9.9999999999999998e-13. The order of the true value is -12 while the order of the floating 
         point representation is -13.  This function is implemented to help with this issue.  For example, for 
-        PQU the string "2.300000000003 (1)" was originally being reprinted as "2.300000000003 (10)" because of this issue.
+        :py:class:`PQU` the string "2.300000000003 (1)" was originally being reprinted as "2.300000000003 (10)" because of this issue.
         To check for this, the value is multiplied by a small (of order sys.float_info.epsilon) factor to see if order 
         changes.  If it does, value is set to the smallest multiplier greater than 1 for which order is changed. 
         The fixed value and its order are returned.
@@ -1065,8 +1074,10 @@ class PQU_float :
     @staticmethod
     def surmiseSignificantDigits( value ) :
         """
-        This factory function returns a PQU_float instance given a float value and set its significantDigits to
+        This factory function returns a :py:class:`PQU_float` instance given a float *value* and sets its significantDigits to
         something "reasonable". The significantDigits are determined by using PQU.floatToShortestString with trimZeros = True.
+
+        :param value:   The float that is converted to a :py:class:`PQU_float` instance.
         """
 
         value_ = PQU( floatToShortestString( float( value ), trimZeros = True ) )
@@ -1075,15 +1086,15 @@ class PQU_float :
 
 class PQU_uncertainty :
     """
-    This class is used by PQU to store the style of uncertainty and information about its value.
+    This class is used by :py:class:`PQU` to store the style of uncertainty and information about its value.
     The members are:
 
-    * style --- One of the three following uncertainty styles supported by PQU:
-                - pqu_uncertaintyStyleNone          - No uncertainty was given for the PQU instance.
+    * style --- One of the three following uncertainty styles supported by :py:class:`PQU`:
+                - pqu_uncertaintyStyleNone          - No uncertainty was given for the :py:class:`PQU` instance.
                 - pqu_uncertaintyStylePlusMinus     - The uncertainty was given as '+/- value' (e.g., '123 +/- 32').
                 - pqu_uncertaintyStyleParenthesis   - The uncertainty was given as '(value)' (e.g., '123(32)'.
 
-    * value --- The value stored as a PQU_float.
+    * value --- The value stored as a :py:class:`PQU_float`.
     """
 
     pqu_uncertaintyStyleNone = None
@@ -1092,8 +1103,8 @@ class PQU_uncertainty :
 
     def __init__( self, uncertaintyStyle, value = None, significantDigits = 2, isPercent = False, checkOrder = True ) :
         """
-        Constructor method for the PQU_uncertainty class. The arguments value, significantDigits, isPrecent
-        and checkOrder are passed onto PQU_float. significantDigits will be forced to be 1 or 2.
+        Constructor method for the :py:class:`PQU_uncertainty` class. The arguments value, significantDigits, isPrecent
+        and checkOrder are passed onto :py:class:`PQU_float`. significantDigits will be forced to be 1 or 2.
         """
 
         if( isPercent and ( uncertaintyStyle != PQU_uncertainty.pqu_uncertaintyStylePlusMinus ) ) :
@@ -1155,7 +1166,7 @@ class PQU_uncertainty :
 
     def getStyle( self ) :
         """
-        Returns self's style.
+        Returns *self*'s style.
 
         :rtype: One of the three uncertainty styles
         """
@@ -1164,9 +1175,10 @@ class PQU_uncertainty :
 
     def getProperValue( self, v ) :
         """
-        Returns self's value. If value is a percent, returned result is multiplied by argument v first, where v
+        Returns *self*'s value. If value is a percent, returned result is multiplied by argument v first, where v
         is expected to be the number associated the the percent value.
 
+        :param v:       Only used if *self*.value is a percent and only the float(v) is used in that case.
         :rtype: `float`
         """
 
@@ -1175,7 +1187,7 @@ class PQU_uncertainty :
         return( value )
 
     def info( self, significantDigits = 17 ) :
-        """Returns a detailed string of self. Mainly for debugging.
+        """Returns a detailed string of *self*. Mainly for debugging.
 
         :rtype: `str`
         """
@@ -1184,7 +1196,7 @@ class PQU_uncertainty :
         return( self.value.info( significantDigits = significantDigits ) )
 
     def isUncertainty( self ) :
-        """Returns False is style is pqu_uncertaintyStyleNone and True otherwise.
+        """Returns **False** is style is pqu_uncertaintyStyleNone and **True** otherwise.
 
         :rtype: `bool`
         """
@@ -1192,7 +1204,7 @@ class PQU_uncertainty :
         return( self.style != PQU_uncertainty.pqu_uncertaintyStyleNone )
 
     def isPercent( self ) :
-        """Returns True if self is a percent and False otherwise.
+        """Returns **True** if *self* is a percent and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1202,7 +1214,7 @@ class PQU_uncertainty :
 
     def toString( self, prefix = ' ', significantDigits = None ) :
         """
-        Returns a string representation of self (i.e., '+/- 1.2%').
+        Returns a string representation of *self* (i.e., '+/- 1.2%').
 
         :param str prefix: A prefix for the '+/-' style
         :param significantDigits: Passed onto method :py:meth:`PQU_float.toString`
@@ -1218,9 +1230,9 @@ class PQU_uncertainty :
 
     def truncate( self ) :
         """
-        Adjusts self's value so that only the significant digits are non-zero. This is most useful when a PQU instance is
-        calculated from other PQU instance which can create an uncertainty with many non-zero digits. As example, adding two
-        PQUs with uncertainties 1.3 and 3.2 each with two significant digits, produces the uncertainty sqrt( 1.3**2 + 3.2**2 ) 
+        Adjusts *self*'s value so that only the significant digits are non-zero. This is most useful when a :py:class:`PQU` instance is
+        calculated from other :py:class:`PQU` instance which can create an uncertainty with many non-zero digits. As example, adding two
+        :py:class:`PQU`s with uncertainties 1.3 and 3.2 each with two significant digits, produces the uncertainty sqrt( 1.3**2 + 3.2**2 ) 
         = 3.453983207834109. This uncertainty also only has two significant digits. After calling truncate the uncertainty
         become 3.5 which is the value that the method toString would return.
         """
@@ -1229,8 +1241,8 @@ class PQU_uncertainty :
 
 class PQU :
     """
-    This class supports a float value with an optional uncertainty and unit. Many basic math operations are supported (e.g., +, -, * /). 
-    A PQU is anything that the staticmethod Parsers.parsePQUString can parse.
+    This class supports a float value with an optional uncertainty and unit. Many basic math operations are supported 
+    (e.g., +, -, *, /).  A :py:class:`PQU` is anything that the staticmethod :py:meth:`Parsers.parsePQUString` can parse.
 
     In this section the following notations are used:
 
@@ -1245,18 +1257,19 @@ class PQU :
         +---------------------------+-----------------------------------------------------------------------------------+
         | float                     | A python float (e.g., 1.23e-12).                                                  |
         +---------------------------+-----------------------------------------------------------------------------------+
-        | number                    | Any of the following, int, float, PQU_float, a string representing a float (i.e., |
+        | number                    | Any of the following, int, float, :py:class:`PQU_float`, a string representing a  |
+        |                           | float (i.e.,                                                                      |
         |                           | the python float function must be able to convert the string - e.g., '12.3e3' but |
         |                           | not '12.3 eV') or any object having a __float__ method (hence, a numpy float      |
         |                           | will work).                                                                       |
         +---------------------------+-----------------------------------------------------------------------------------+
-        | uncertainty = number_unc  | The uncertainty argument must be a valid number or a PQU_uncertainty object.      | 
-        |                           | If number, uncertainty is of style '+/-'.                                         |
+        | uncertainty = number_unc  | The uncertainty argument must be a valid number or a :py:class:`PQU_uncertainty`  | 
+        |                           | object. If number, uncertainty is of style '+/-'.                                 |
         +---------------------------+-----------------------------------------------------------------------------------+
         | unit = string_pu          | The unit argument must be a valid unit string (e.g., "MeV", "MeV/m" but not       |
-        |                           | "1 MeV") or a PhysicalUnit object.                                                |
+        |                           | "1 MeV") or a :py:class:`PhysicalUnit` object.                                    |
         +---------------------------+-----------------------------------------------------------------------------------+
-        | string                    | String can be anything that the method Parsers.parsePQUString is                  |
+        | string                    | String can be anything that the method :py:meth:`Parsers.parsePQUString` is       |
         |                           | capable of parsing (e.g., '1.23', '1.23 m', '1.23%', '1.23(12) m',                |
         |                           | '1.23 +/- 0.12m'). If it contains a unit (uncertainty) then the unit              |
         |                           | (uncertainty) argument must be None.                                              |
@@ -1264,12 +1277,12 @@ class PQU :
                 
         Calling options are:
 
-            - PQU( pqu )                                            # The new PQU gets all data from pqu. Unit and uncertainty must be None.
+            - PQU( pqu )                                            # The new PQU gets all data from pqu. Unit and uncertainty arguments must be None.
             - PQU( number, [ unit = string_pu ], [ uncertainty = number_unc ] )
             - PQU( string )
-            - PQU( string, unit = string_pu )                       # If string does not contain a unit.
-            - PQU( string, uncertainty = uncertainty )              # If string does not contain an uncertainty.
-            - PQU( string, unit = string_pu, uncertainty = number ) # If string does not contain a unit or an uncertainty.
+            - PQU( string, unit = string_pu )                       # string must not contain a unit.
+            - PQU( string, uncertainty = uncertainty )              # string must not contain an uncertainty.
+            - PQU( string, unit = string_pu, uncertainty = number ) # string must not contain a unit or an uncertainty.
 
         For example, the following are allowed and are the same:
             - PQU( "1.23", "m", "12%" )
@@ -1462,7 +1475,7 @@ class PQU :
 
     def __pow__( self, other ) :
         """Does not include uncertainty of other in calculation. Other must be an object convertible to a float. If it
-        is a PQU instance, it must be dimensionless."""
+        is a :py:class:`PQU` instance, it must be dimensionless."""
 
         other = self._getOtherAsPQU( other )
         if( not( other.isDimensionless( ) ) ) : raise TypeError( 'Power must be dimensionless. It has dimension "%s".' % other.unit )
@@ -1514,10 +1527,10 @@ class PQU :
 
     def _setFrom( self, other ) :
         """
-        Sets self's members from other. Other must be an instance of PQU.
+        Sets *self*'s members from other. Other must be an instance of :py:class:`PQU`.
 
-        :param other: The PQU instance whose members are copied to self
-        :type other: a PQU instance
+        :param other: The :py:class:`PQU` instance whose members are copied to *self*
+        :type other: a :py:class:`PQU` instance
         """
 
         if( not( isinstance( other, PQU ) ) ) : raise TypeError( "other type %s not supported" % type( other ) )
@@ -1527,8 +1540,8 @@ class PQU :
 
     def changeUncertaintyStyle( self, style ) :
         """
-        Changes self.uncertainty's style. If style is the same as self.uncertainty's style nothing is done. If style
-        or self.uncertainty's style is PQU_uncertainty.pqu_uncertaintyStyleNone as raise is executed.
+        Changes *self*.uncertainty's style. If style is the same as *self*.uncertainty's style nothing is done. If style
+        or *self*.uncertainty's style is PQU_uncertainty.pqu_uncertaintyStyleNone as raise is executed.
 
         :param style: One of the three PQU_uncertainty styles
         """
@@ -1538,11 +1551,11 @@ class PQU :
 
     def changeUncertaintyPercent( self, toPercent ) :
         """
-        If self's style is not pqu_uncertaintyStylePlusMinus a raise is executed. Otherwise, if toPercent
-        is True (False) self's uncertainty will be converted to a percent (non-percent) if not already a percent
+        If *self*'s style is not pqu_uncertaintyStylePlusMinus a raise is executed. Otherwise, if toPercent
+        is **True** (**False**) *self*'s uncertainty will be converted to a percent (non-percent) if not already a percent
         (non-percent).
 
-        :param toPercent: Specifies whether self's uncertainty should be percent or not
+        :param toPercent: Specifies whether *self*'s uncertainty should be percent or not
         :type toPercent: `bool`
         """
 
@@ -1561,13 +1574,13 @@ class PQU :
 
     def compare( self, other, epsilonFactor = 0 ) :
         """
-        Compares self's value to other's value (other's value is first converted to unit of self) using the
-        :py:func:`compare` function.
+        Compares *self*'s value and unit to other's value and unit (other's value is first converted to unit of *self*) 
+        using the :py:func:`compare` function.
 
         Also see method :py:meth:`PQU.equivalent`.
 
-        :param other: The PQU instance to compare to self
-        :type other: A PQU equivalent instance
+        :param other: The :py:class:`PQU` instance to compare to *self*
+        :type other: A :py:class:`PQU` equivalent instance
 
         :param epsilonFactor: See the :py:func:`compare` function
 
@@ -1580,11 +1593,11 @@ class PQU :
 
     def convertToUnit( self, unit ) :
         """
-        Changes self's unit to unit and adjusts the value such that the new value/unit is equivalent to
-        the original value/unit. The new unit must be compatible with the original unit of self.
+        Changes *self*'s unit to unit and adjusts the value such that the new value/unit is equivalent to
+        the original value/unit. The new unit must be compatible with the original unit of *self*.
 
         :param str unit: a unit equivalent
-        :raises TypeError: if the unit string is not a known unit or is a unit incompatible with self's unit
+        :raises TypeError: if the unit string is not a known unit or is a unit incompatible with *self*'s unit
         """
 
         if( isinstance( unit, PQU ) ) : unit = unit.unit
@@ -1601,26 +1614,26 @@ class PQU :
         Like convertToUnit except a copy is made and returned. The copy unit is changed to unit. Self is left unchanged.
 
         :param str unit: a unit equivalent
-        :rtype: PQU
+        :rtype: :py:class:`PQU`
         """
 
         return( copy.deepcopy(self).convertToUnit( unit ) )
 
     def equivalent( self, other, factor = 1. ) :
         """
-        This method compares self to other and returns True if they are equivalent and False otherwise. The
-        two are considered equivalent if their bands overlap. The band for self (or other) is all
-        values within 'factor times uncertainty' of its value. That is, the band for self is the ranges from
+        This method compares *self* to other and returns **True** if they are equivalent and **False** otherwise. The
+        two are considered equivalent if their bands overlap. The band for *self* (or other) is all
+        values within 'factor times uncertainty' of its value. That is, the band for *self* is the ranges from
         'value - factor * uncertainty' to 'value + factor * uncertainty'.
 
         Note, this is different than the :py:meth:`compare` method which compares the values using sys.float_info.epsilon
         to calculate a 'band' and not their uncertainties.
 
-        :param other: The object to compare to self
-        :type other: a PQU equivalent
+        :param other: The object to compare to *self*
+        :type other: a :py:class:`PQU` equivalent
         :param factor: the 1/2 width in standard deviations of the band
         :type factor: `float`
-        :returns: 1 if self is deemed greater than other, 0 if equal and -1 otherwise
+        :returns: 1 if *self* is deemed greater than other, 0 if equal and -1 otherwise
         """
 # BRB. Should this be named equivalent or consistent.
 
@@ -1637,7 +1650,7 @@ class PQU :
     def inUnitsOf( self, *units ) :
         """
         Express the quantity in different units. If one unit is specified, a new
-        PQU object is returned that expresses the quantity
+        :py:class:`PQU` object is returned that expresses the quantity
         in that unit. If several units are specified, the return value is a tuple of
         PhysicalObject instances with one element per unit such that the sum of all
         quantities in the tuple equals the the original quantity and all the values
@@ -1694,9 +1707,9 @@ class PQU :
 
     def getValueAs( self, unit, asPQU = False ) :
         """
-        Returns self's value in units of unit. Unit must be compatible with self's unit.
+        Returns *self*'s value in units of unit. Unit must be compatible with *self*'s unit.
 
-        :param unit: The unit to return self's value in
+        :param unit: The unit to return *self*'s value in
         :rtype: `float`
         """
 
@@ -1708,8 +1721,8 @@ class PQU :
 
     def getUncertaintyValueAs( self, unit = None, asPQU = False ) :
         """
-        Returns a python float representing self's uncertainty value. If the uncertainty is a percent, the returned
-        float is self's value times self's uncertainty value.
+        Returns a python float representing *self*'s uncertainty value. If the uncertainty is a percent, the returned
+        float is *self*'s value times *self*'s uncertainty value.
 
         :rtype: `float`
         """
@@ -1719,14 +1732,14 @@ class PQU :
         return( value.getValueAs( unit, asPQU = asPQU ) )
 
     def getValue( self ) :      # To be deprecated - replaced by __float__
-        """Returns a python float representing self's value. This is equivalent to 'float( self )'."""
+        """Returns a python float representing *self*'s value. This is equivalent to 'float( self )'."""
 
         return( float( self ) )
 
     def inBaseUnits( self ) :
         """
-        :returns: A copy of self converted to base units, i.e. SI units in most cases
-        :rtype: PQU
+        :returns: A copy of *self* converted to base units, i.e. SI units in most cases
+        :rtype: :py:class:`PQU`
         """
 
         value = ( self.value + self.unit.offset ) * self.unit.factor
@@ -1753,7 +1766,7 @@ class PQU :
         return( self.__class__( value, num + denom, uncertainty ) )
 
     def info( self, significantDigits = 17 ) :
-        """Returns a detailed string of self. Mainly for debugging.
+        """Returns a detailed string of *self*. Mainly for debugging.
 
         :rtype: `str`
         """
@@ -1763,7 +1776,7 @@ class PQU :
 
     def isCompatible( self, unit ) :
         """
-        Returns True if self's unit is compatible with unit.
+        Returns **True** if *self*'s unit is compatible with unit.
 
         :param unit: a unit
         :type unit: `str`
@@ -1774,7 +1787,7 @@ class PQU :
         return( self.unit.isCompatible( unit ) )
 
     def isPercent( self ) :
-        """Returns True if value is a percent and False otherwise.
+        """Returns **True** if value is a percent and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1782,7 +1795,7 @@ class PQU :
         return( self.value.isPercent( ) )
 
     def isDimensionless( self ) :
-        """Returns True if self is dimensionless and False otherwise.
+        """Returns **True** if *self* is dimensionless and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1790,7 +1803,7 @@ class PQU :
         return( self.unit.isDimensionless( ) )
 
     def isLength( self ) :
-        """Returns True if self has unit of length and False otherwise.
+        """Returns **True** if *self* has unit of length and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1798,7 +1811,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'm' ) )
 
     def isMass( self ) :
-        """Returns True if self has unit of mass and False otherwise.
+        """Returns **True** if *self* has unit of mass and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1806,7 +1819,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'g' ) )
 
     def isTime( self ) :
-        """Returns True if self has unit of time and False otherwise.
+        """Returns **True** if *self* has unit of time and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1814,7 +1827,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 's' ) )
 
     def isCurrent( self ) :
-        """Returns True if self has unit of current and False otherwise.
+        """Returns **True** if *self* has unit of current and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1822,7 +1835,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'A' ) )
 
     def isTemperature( self ) :
-        """Returns True if self has unit of temperature and False otherwise.
+        """Returns **True** if *self* has unit of temperature and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1830,7 +1843,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'K' ) )
 
     def isMoles( self ) :
-        """Returns True if self has unit of mol and False otherwise.
+        """Returns **True** if *self* has unit of mol and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1838,7 +1851,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'mol' ) )
 
     def isLuminousIntensity( self ) :
-        """Returns True if self has unit of luminous intensity and False otherwise.
+        """Returns **True** if *self* has unit of luminous intensity and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1846,7 +1859,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'cd' ) )
 
     def isAngle( self ) :
-        """Returns True if self has unit of angle and False otherwise.
+        """Returns **True** if *self* has unit of angle and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1854,7 +1867,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'rad' ) )
 
     def isSolidAngle( self ) :
-        """Returns True if self has unit of solid angle and False otherwise.
+        """Returns **True** if *self* has unit of solid angle and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1862,7 +1875,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'sr' ) )
 
     def isEnergy( self ) :
-        """Returns True if self has unit of energy and False otherwise.
+        """Returns **True** if *self* has unit of energy and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1870,7 +1883,7 @@ class PQU :
         return( self.isPhysicalUnitOf( self, 'J' ) )
 
     def isSpin( self ) :
-        """Returns True if self has unit of spin (i.e., same as 'hbar') and False otherwise.
+        """Returns **True** if *self* has unit of spin (i.e., same as 'hbar') and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1879,7 +1892,7 @@ class PQU :
 
     def isCharge( self ) :
         """
-        Returns True if self has unit of charge and False otherwise.
+        Returns **True** if *self* has unit of charge and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -1888,7 +1901,7 @@ class PQU :
 
     def setPercentFlag( self, isPercent, scaleValue = False ) :
         """
-        Changes the percent flag only when self is dimensionless and isPercent != self.isPercent( ).
+        Changes the percent flag only when *self* is dimensionless and isPercent != *self*.isPercent( ).
         Otherwise, a raise is executed.  For scaleValue argument see :py:meth:`PQU_float.setPercentFlag`.
 
         :param isPercent: See :py:meth:`PQU_float.setPercentFlag`
@@ -1903,10 +1916,10 @@ class PQU :
 
     def simplify( self ) :
         """
-        This method returns a PQU instance that is the same as self but with its units simplified. This is,
-        units that have the same base units are reduce to one of those units. For example, if self is equivalent to
+        This method returns a :py:class:`PQU` instance that is the same as *self* but with its units simplified. This is,
+        units that have the same base units are reduce to one of those units. For example, if *self* is equivalent to
         '1.2 km/m**3' then the returned instance will be equivalent to '1.2e3 / m**2' or '1.2e9 / km**2'
-        (the actual units returned are not guaranteed). As another example, if self is equivalent to
+        (the actual units returned are not guaranteed). As another example, if *self* is equivalent to
         '1.2 ft**3 / lb / s / ( m**2 / kg )' then one returned outcome is '0.2457793723470261 ft/s'.
         That is, the 'ft' and 'm' units have the same base units and are all converted to 'ft' (in
         this case) and the 'lb' and 'kg' are all converted to 'lb' (or 'kg').
@@ -1916,7 +1929,10 @@ class PQU :
 
     def toString( self, significantDigits = None, keepPeriod = True ) :
         """
-        Returns a string representation of self (e.g., '35 +/- 1.2% J').
+        Returns a string representation of *self* (e.g., '35 +/- 1.2% J').
+
+        :param significantDigits: Passed onto the methods :py:meth:`PQU_float.toString` and :py:meth:`PQU_uncertainty.toString`
+        :param :param : Passed onto the method :py:meth:`PQU_float.toString`.
 
         :rtype: `str`
         """
@@ -1932,7 +1948,8 @@ class PQU :
             elif( self.uncertainty.style == PQU_uncertainty.pqu_uncertaintyStyleParenthesis ) :
                 str2, includePercent = '%', False
 
-        str1 += self.value.toString( trimZeros = trimZeros, includePercent = includePercent, significantDigits = significantDigits, keepPeriod = keepPeriod ) \
+        str1 += self.value.toString( trimZeros = trimZeros, includePercent = includePercent, \
+                significantDigits = significantDigits, keepPeriod = keepPeriod ) \
                 + uncertainty.toString( significantDigits = significantDigits )
         str3 = str( self.unit )
         if( str3 != '' ) : str1 += ' '
@@ -1940,12 +1957,13 @@ class PQU :
 
     def truncate( self, value = False, uncertainty = True ) :
         """
-        If value is True, calls self.value's truncate method. If uncertainty is True, calls self.uncertainty's truncate method.
-        See :py:meth:`PQU_float.truncate`
+        If value is **True**, calls *self*.value's truncate method. If uncertainty is **True**, 
+        calls *self*.uncertainty's truncate method.  See :py:meth:`PQU_float.truncate`
+        and :py:meth:`PQU_uncertainty.truncate`
 
-        :param value: If True self's value is truncated
+        :param value: If **True** *self*'s value is truncated
         :type value: `bool`
-        :param uncertainty: If True self's uncertainty is truncated
+        :param uncertainty: If **True** *self*'s uncertainty is truncated
         :type uncertainty: `bool`
         """
 
@@ -1953,24 +1971,24 @@ class PQU :
         if( uncertainty ) : self.uncertainty.truncate( )
 
     def sqrt( self ) :
-        """Returns a PQU of the square root of self."""
+        """Returns a :py:class:`PQU` of the square root of *self*."""
 
         return( pow( self, 0.5 ) )
 
     def sin( self ) :
-        """Returns a PQU of the sin of self. Self must have unit of angle."""
+        """Returns a :py:class:`PQU` of the sin of *self*. Self must have unit of angle."""
 
         if( self.unit.isAngle( ) ) : return( math.sin( self.value * self.unit.conversionFactorTo( _unit_table['rad'] ) ) )
         raise TypeError( 'Argument of sin must be an angle.' )
 
     def cos( self ) :
-        """Returns a PQU of the cos of self. Self must have unit of angle."""
+        """Returns a :py:class:`PQU` of the cos of *self*. Self must have unit of angle."""
 
         if( self.unit.isAngle( ) ) : return( math.cos( self.value * self.unit.conversionFactorTo( _unit_table['rad'] ) ) )
         raise TypeError( 'Argument of cos must be an angle.' )
 
     def tan( self ) :
-        """Returns a PQU of the tan of self. Self must have unit of angle."""
+        """Returns a :py:class:`PQU` of the tan of *self*. Self must have unit of angle."""
 
         if( self.unit.isAngle( ) ) : return( math.tan( self.value * self.unit.conversionFactorTo( _unit_table['rad'] ) ) )
         raise TypeError( 'Argument of tan must be an angle.' )
@@ -1978,12 +1996,12 @@ class PQU :
     @staticmethod
     def _getOtherAsPQU( other ) :
         """
-        Returns a PQU representation of other. If other is a PQU
+        Returns a :py:class:`PQU` representation of other. If other is a :py:class:`PQU`
         instance, it is returned (i.e., no copy is made). Otherwise, the PQU.__init__ 
         method is called with only other as an argument and its return value returned.
 
-        :param other: a PQU equivalent to convert, if needed, to a PQU instance
-        :returns: a PQU instance equivalent to other
+        :param other: a :py:class:`PQU` equivalent to convert, if needed, to a :py:class:`PQU` instance
+        :returns: a :py:class:`PQU` instance equivalent to other
         """
 
         if( isinstance( other, PQU ) ) : return( other )
@@ -1992,8 +2010,8 @@ class PQU :
     @staticmethod
     def isPhysicalUnitOf( elf, unit ) :
         """
-        Returns True if elf has the same unit as the argument unit and False otherwise. Elf and unit can be an instance of string,
-        PhysicalUnit or PQU.
+        Returns **True** if elf has the same unit as the argument unit and **False** otherwise. Elf and unit can be an instance of string,
+        :py:class:`PhysicalUnit` or :py:class:`PQU`.
 
         :param elf: The instance to compare to unit
         :type elf: a unit equivalent
@@ -2010,6 +2028,10 @@ PhysicalQuantityWithUncertainty = PQU           # This is deprecated.
 
 class Parsers :
     """
+    This is use to parse the allowed **PQU** strings (e.g., '1 m', '1.32(3) kg).
+    See the table in the :py:meth:`parsePQUString.parsePQUString` doc string for allowed **PQU** strings.
+    This class is mainly for internal use.
+
     .. rubric:: Regular Expression Matching
     """
 
@@ -2041,7 +2063,7 @@ class Parsers :
         """
         This method parses the beginning of str1 for a valid float. An arbitrary number of white spaces can exists before the 
         float characters. This method returns a tuple of length 3. The first item of the tuple is the float 
-        value returned as a PQU_float instance with significantDigits determined from the string.  The second 
+        value returned as a :py:class:`PQU_float` instance with significantDigits determined from the string.  The second 
         item is significantDigitsForZero which, if the string represents a 0 value, gives the number of significant 
         digits for the zero; otherwise None is returned. As example, the string '000.000' has 4 significant digits 
         (i.e., it is considered equivalent to the representation '0.000').  The last object is the string of all 
@@ -2084,7 +2106,7 @@ class Parsers :
         """
         This method parses the beginning of str1 for the sub-string '+/-' followed by a float string. An arbitrary number of 
         white spaces can exists before the '+/-' sub-string and between it and the float string. This method
-        returns a tuple of length 2. The first item of the tuple is float value returned as a PQU_uncertainty
+        returns a tuple of length 2. The first item of the tuple is float value returned as a :py:class:`PQU_uncertainty`
         of style pqu_uncertaintyStylePlusMinus. Characters after the last one used for converting the float are 
         returned as the second item. For example, with str1 = ' +/-  12. ABCD XYS' the returned tuple is:
 
@@ -2108,7 +2130,7 @@ class Parsers :
         """
         This method parses the beginning of str1 for the sub-string '(#)' where '#' is a 1 or 2 digit
         number.  This method returns a tuple of length 2. The first item of the tuple is the number returned as 
-        a PQU_uncertainty of style pqu_uncertaintyStyleParenthesis. Characters after the ')' are returned 
+        a :py:class:`PQU_uncertainty` of style pqu_uncertaintyStyleParenthesis. Characters after the ')' are returned 
         as the second item. For example, with str1 = '(34) ABCD XYS' the returned tuple is:
 
         ( PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStyleParenthesis, 34, significantDigits = 2 ), ' ABCD XYS' ).
@@ -2152,10 +2174,11 @@ class Parsers :
     @staticmethod
     def parsePQUString( str1 ) :
         """
-        Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of PQU_float, 
-        unit is an instance of PhysicalUnit and uncertainty is an instance of PQU_uncertainty.
+        Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of 
+        :py:class:`PQU_float`, unit is an instance of :py:class:`PhysicalUnit` and uncertainty is an instance 
+        of :py:class:`PQU_uncertainty`.
 
-        The string can be one of the following PQU forms. Here, F represents a valid float string, () represents
+        The string can be one of the following :py:class:`PQU` forms. Here, F represents a valid float string, () represents
         the string '(#)' where '#' is a 1 or 2 digit number, +/- represents the string '+/- F', % is itself
         and u is a unit.
 
@@ -2188,7 +2211,7 @@ class Parsers :
         Note 1) 5% of 234 is 11.7 rounded to 12.
 
         :param str1: String to parse.
-        :rtype: ( PQU_float, PhysicalUnit, PQU_uncertainty )
+        :rtype: ( :py:class:`PQU_float`, :py:class:`PhysicalUnit`, :py:class:`PQU_uncertainty` )
         """
 
         str2, form10, isPercent = str1.strip( ), False, False
@@ -2233,7 +2256,7 @@ class PhysicalUnit :
 
     A physical unit is defined by a symbol (possibly composite), a scaling factor, and
     the powers of each of the SI base units that enter into it. Units can be 
-    multiplied, divided, and raised to integer powers.
+    multiplied, divided, and raised to integer powers. This class is mainly for internal use.
 
     :param symbols: a dictionary mapping each symbol component to its associated integer
                 power (e.g., ``{'m': 1, 's': -1}``) for `m/s`). As a shorthand, a string may be 
@@ -2251,6 +2274,21 @@ class PhysicalUnit :
     """
     
     def __init__( self, symbols, factor, powers, offset = 0 ) :
+        '''
+        :param symbols: a dictionary mapping each symbol component to its associated integer
+                    power (e.g., ``{'m': 1, 's': -1}``) for `m/s`). As a shorthand, a string may be 
+                    passed which is assigned an implicit power 1.
+        :type symbols: `dict` or `str`
+
+        :param factor: a scaling factor
+        :type factor: `float`
+
+        :param offset: an additive offset to the base unit (used only for temperatures)
+        :type offset: `float`
+
+        :param powers: the integer powers for each of the nine base units
+        :type powers: `list` of `int`
+        '''
 
         if( symbols is not None ) :
             if( '1' in symbols ) :
@@ -2368,8 +2406,10 @@ class PhysicalUnit :
 
     def conversionFactorTo( self, other, ignoreTemperatureOffsets = False ) :
         """
+        Returns a float factor that can be used to scale a value in unit of *self* to unit of *other*.
+
         :param other: another unit
-        :type other: `PhysicalUnit`
+        :type other: :py:class:`PhysicalUnit`
         :returns: the conversion factor from this unit to another unit
         :rtype: `float`
         :raises TypeError: if the units are not compatible
@@ -2390,8 +2430,11 @@ class PhysicalUnit :
 
     def conversionTupleTo( self, other ) :
         """
+        Returns the tuple (factor, offset) that can be used to convert a value in unit of *self* to unit of *other*.
+        Offset is 0.0 except with convert some temperature units.
+
         :param other: another unit
-        :type other: `PhysicalUnit`
+        :type other: :py:class:`PhysicalUnit`
         :returns: the conversion factor and offset from this unit to another unit
         :rtype: (`float`, `float`)
         :raises TypeError: if the units are not compatible
@@ -2417,17 +2460,17 @@ class PhysicalUnit :
 
     def isCompatible( self, other ) :
         """
-        Returns True if self is compatible with other and False otherwise.
+        Returns **True** if *self* is compatible with other and **False** otherwise.
 
         :param other: another unit
-        :type other: `PhysicalUnit`
-        :returns: `True` if the units are compatible, i.e. if the powers of the base units are the same
+        :type other: :py:class:`PhysicalUnit`
+        :returns: **True** if the units are compatible, i.e. if the powers of the base units are the same
         :rtype: `bool`
         """
         return( self.powers == other.powers )
 
     def isDimensionless( self ) :
-        """Returns True if self is dimensionless and False otherwise.
+        """Returns **True** if *self* is dimensionless and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -2435,7 +2478,7 @@ class PhysicalUnit :
         return( not reduce( lambda a, b: a or b, self.powers ) )
 
     def isAngle( self ) :
-        """Returns True if self is an angle and False otherwise.
+        """Returns **True** if *self* is an angle and **False** otherwise.
 
         :rtype: `bool`
         """
@@ -2444,7 +2487,7 @@ class PhysicalUnit :
 
     def setSymbol( self, symbol ) :
         """
-        Sets self's symbols to symbol with power 1.
+        Sets *self*'s symbols to symbol with power 1.
 
         :param symbol: 
         :type symbol: `str`
@@ -2455,9 +2498,9 @@ class PhysicalUnit :
 
     def simplifyUnitsFactor( self ) :
         """
-        This method returns a PQU instance that can be used to simplify self's units.
+        This method returns a :py:class:`PQU` instance that can be used to simplify *self*'s units.
         That is, all units with the same base units are reduced to a single unit. For example,
-        if self has units of 'km/m' then the returned PQU is equivalent to '1e3 m/km'.
+        if *self* has units of 'km/m' then the returned :py:class:`PQU` is equivalent to '1e3 m/km'.
         """
 
         ignores = []
@@ -2478,9 +2521,9 @@ class PhysicalUnit :
 
     def symbol( self ) :
         """
-        Returns a string representation of self.
+        Returns a string representation of *self*.
 
-        :returns: a string representation of self.
+        :returns: a string representation of *self*.
         :rtype: `str`
         """
 
@@ -2852,6 +2895,22 @@ def printPredefinedUnits( ) :
     for unit in units : print(unit)
 
 def convertUnits( unit, unitMap ) :
+    '''
+    This function converts *unit* to a new unit based on the key/value pairs in the dictionary *unitMap*,
+    and it determines the factor that converts *unit* to the new unit.
+    That is, it looks up each term in *unit* to see if it is a key in *unitMap*. If it is,
+    it replaces that term with the value of the key and scales a factor appropriately.
+    For example, if *unit* = 'b * eV' and unitMap = {'eV': 'MeV'} then the new unit returned
+    will have 'eV' replaced with 'MeV' (i.e., it will be 'b * MeV' and the factor returned will be
+    1e-6. Also if *unit* = 'b * eV' and unitMap = {'eV': 'MeV', 'b': 'mb', 'm': 'km'} then the new unit returned
+    it will be 'mb * MeV' and the factor returned will be 1e-3. In this latter example, 'm' is not in the 
+    original unit so is not used.
+
+    :param unit:        A valid unit as a string.
+    :param unitMap:     A dictionary containing old units as keys and their new unit as the key's value.
+
+    :returns:           (string, factor)
+    '''
 
     PU = _findUnit( unit )
     unitString = ''

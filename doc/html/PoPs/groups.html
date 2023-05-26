@@ -1,0 +1,571 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Particle groups &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Particle properties" href="quantities.html" />
+    <link rel="prev" title="Particle families" href="families.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quantities.html" title="Particle properties"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="families.html" title="Particle families"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Properties of Particles (PoPs)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Particle groups</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="particle-groups">
+<span id="groups"></span><h1>Particle groups<a class="headerlink" href="#particle-groups" title="Permalink to this heading">¶</a></h1>
+<p>In addition to families, PoPs also organizes some particles into ‘groups’.
+Particle groups are collections of particles that share some common properties.
+For example, all isotopes of a chemical element share the same proton number Z,
+and are organized together inside PoPs.  Two types of particle groups are defined:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>chemicalElement</dt><dd><p>Defines the proton number Z, along with the chemical name and symbol.  A chemicalElement also contains a list
+of isotopes</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>isotope</dt><dd><p>Inherits the proton number Z from its parent chemicalElement, and defines the total nucleon number A.
+The isotope contains a list of nuclides (corresponding to the ground state and excited states).</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Particle groups are not particles, and do not generally define particle properties like mass, spin or charge.
+They are not assigned ids in PoPs, but they do have unique symbols that can be used to look them up from a PoPs
+database. For example, the unique symbol for the chemicalElement Iron is ‘Fe’.</p>
+<section id="module-PoPs.chemicalElements.chemicalElements">
+<span id="chemicalelements"></span><h2>chemicalElements<a class="headerlink" href="#module-PoPs.chemicalElements.chemicalElements" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the class for the suite chemicalElements.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.chemicalElements.</span></span><span class="sig-name descname"><span class="pre">ChemicalElements</span></span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class stores a list of chemicalElement instances.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements.__contains__">
+<span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively search for key inside self and all child particle groups.
+:param key: symbol or id of a particle or particle group
+:return: True if key found</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> – string or integer</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>chemicalElement, nuclide or nucleus.  Raises KeyError if key not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an empty suite of chemicalElements. Use the add() method to fill the suite.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a particle or particle group to the proper location inside self
+:param item: instance of chemicalElement, isotope, nuclide or nucleus</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See convertUnits documentation in PoPs.database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements.getSymbol">
+<span class="sig-name descname"><span class="pre">getSymbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements.getSymbol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements.getSymbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the chemicalElement with symbol == key, or raises KeyError if no such chemicalElement is found.
+:param key: chemicalElement symbol
+:return: chemicalElement instance (or raises KeyError)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements.hasSymbol">
+<span class="sig-name descname"><span class="pre">hasSymbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements.hasSymbol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements.hasSymbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for chemicalElement with symbol == key. Unlike __contains__, this method does not
+recursively search inside child particle groups
+:param key: chemicalElement symbol
+:return: True if key present</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElements.ChemicalElements.parseNode">
+<span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElements.html#ChemicalElements.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElements.ChemicalElements.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-PoPs.chemicalElements.chemicalElement">
+<span id="chemicalelement"></span><h2>chemicalElement<a class="headerlink" href="#module-PoPs.chemicalElements.chemicalElement" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the class for the suite chemicalElement.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.chemicalElement.</span></span><span class="sig-name descname"><span class="pre">ChemicalElement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represents a chemical element (i.e., Oyxgen, Iron, Uranium). A chemical element
+stores all isotopes that contain the same number of protons (i.e., O16, O17, and O18). 
+The members of a chemicalElement are:</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Chemical element members</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>member</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>symbol</p></td>
+<td><p>string</p></td>
+<td><p>This is the symbol for the chemical element (e.g., ‘O’ for oxygen).</p></td>
+</tr>
+<tr class="row-odd"><td><p>Z</p></td>
+<td><p>int</p></td>
+<td><p>Number of protons for this chemical element (e.g., 8 for ‘O’).</p></td>
+</tr>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>string</p></td>
+<td><p>The name of the chemical element (i.e., ‘Oxygen’)</p></td>
+</tr>
+<tr class="row-odd"><td><p>atomicData</p></td>
+<td><p>atomicData</p></td>
+<td><p>Container for atomic data, including ionized states and atomic relaxation</p></td>
+</tr>
+<tr class="row-even"><td><p>isotopes</p></td>
+<td><p>suite</p></td>
+<td><p>The list of isotopes</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> – Chemical symbol for the element, e.g. ‘Fe’ (string)</p></li>
+<li><p><strong>Z</strong> – Atomic number, e.g. 26 (int)</p></li>
+<li><p><strong>name</strong> – Full name of the element, e.g. ‘Iron’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterates over isotopes of this element (but not over the excited states of those isotopes)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement.add" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>item</strong> – isotope instance, will be added to the list of isotopes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement.check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>See check documentation in PoPs.database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See convertUnits documentation in PoPs.database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>deep copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.chemicalElement.ChemicalElement.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/chemicalElement.html#ChemicalElement.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.chemicalElement.ChemicalElement.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-PoPs.chemicalElements.isotope">
+<span id="isotope"></span><h2>isotope<a class="headerlink" href="#module-PoPs.chemicalElements.isotope" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the Isotope and Isotopes classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotope">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.isotope.</span></span><span class="sig-name descname"><span class="pre">Isotope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotope" title="Permalink to this definition">¶</a></dt>
+<dd><p>An isotope that contains a list of nuclides. The symbol is of the form  <em>SA[_anti]</em>
+where <em>S</em> is the istopes’s chemical element symbol and <em>A</em> is the isotope’s nucleon number.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotope.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotope.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotope.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get child particle by id or by integer index.
+:param key: may be a string (corresponding to a nuclide or nucleus inside the isotope) or an integer.
+:return: nuclide or nucleus instance, or returns KeyError if key not found</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotope.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotope.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotope.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> – string consisting of the chemical symbol + total number of nucleons, e.g. ‘Mn55’</p></li>
+<li><p><strong>A</strong> – integer equal to the total number of nucleons, e.g. 55</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotope.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotope.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotope.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterates over nuclides, but not over the nuclei contained inside each nucleus</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotope.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotope.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotope.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses deepcopy to make a copy of self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotope.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotope.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotope.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotope.toXML_strList">
+<span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotope.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotope.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotopes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.isotope.</span></span><span class="sig-name descname"><span class="pre">Isotopes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotopes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotopes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotopes.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotopes.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotopes.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allowedClasses</strong> – tuple of classes. Only instances of these classes can be added to the suite.</p></li>
+<li><p><strong>replace</strong> – boolean (default=True). If False, the add method can only add objects with keys
+not already present in the suite. If True, the original object will be replaced by the new object
+having the same key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotopes.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotopes.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotopes.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to add item to self.
+Raises TypeError if item is not an instance of any class in self.allowedClasses
+Raises KeyError if self.replace == False and the item shares a key with another item already in the suite.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>item</strong> – instance to add to self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.isotope.Isotopes.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/isotope.html#Isotopes.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.isotope.Isotopes.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>See documentation in database.convertUnits</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-PoPs.chemicalElements.misc">
+<span id="misc"></span><h2>misc<a class="headerlink" href="#module-PoPs.chemicalElements.misc" title="Permalink to this heading">¶</a></h2>
+<p>Module containing dictionaries and helper functions for handling particle ids and symbols.</p>
+<dl class="simple">
+<dt>Defines the following dictionaries:</dt><dd><p>symbolFromZ, nameFromZ          # look up chemical symbol or name by Z
+ZfromSymbol, nameFromSymbol     # look up Z or name by chemical symbol
+ZfromName, symbolFromName       # look up Z or symbol by chemical name</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.ZA">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">ZA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#ZA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.ZA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses ZAInfo to compute the particle ZA. See ZAInfo for more detail</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.ZAInfo">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">ZAInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#ZAInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.ZAInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Z, A, ZA and level index for a particle instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particle</strong> – PoPs particle instance. If the particle is not a baryon, isotope, nuclide or nucleus,
+Z, A, ZA and level index will all be 0.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple( Z, A, ZA, levelIndex ).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.ZAInfo_fromString">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">ZAInfo_fromString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particleName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#ZAInfo_fromString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.ZAInfo_fromString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses an isotope name (e.g., ‘Mn55_e3’) to get its Z, A, ZA and nuclear level index.
+If the level is negative, the particle is a metastable name (e.g., ‘Am242_m1’).
+The name can be an isotope which returns ( Z, A, 1000 * Z + A, level ) (e.g., ‘O16’ returns (8, 16, 8016, 0)), 
+a natural isotope which returns ( Z, 0, 1000 * Z, level) (e.g., ‘O0’ returns (8, 0, 8000, 0)) 
+or just a chemical element’s symbol which returns ( Z, 0, 0, 0 ) (e.g., ‘O’ returns (8, 0, 0, 0)).
+Also handles PoPs (GNDS) nucleus name which is the nucleus’ isotope name but with the first character lower-cased
+(e.g., ‘o16’ for the nucleus of Oyxgen-16) as well as ‘n’, ‘p’, ‘d’, ‘t’, ‘h’ and ‘a’.
+Handles nuclear excited levels (e.g., ‘Am242_e2’ returns (95, 242, 95242, 2)) and nuclear metastables 
+(e.g., ‘Am242_m1’ returns (95, 242, 95242, -1)).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particleName</strong> – string</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple( Z, A, ZA, levelIndex )</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.chemicalElementALevelIDsAndAnti">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">chemicalElementALevelIDsAndAnti</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualifierAllowed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#chemicalElementALevelIDsAndAnti"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.chemicalElementALevelIDsAndAnti" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Parse a particle id to extract the following information:</dt><dd><p>baseId: particle id with any qualifiers removed
+chemicalElementSymbol: symbol if id is a chemical element, isotope, nuclide or nucleus. None otherwise
+A: total nucleon number (as integer) if id is for an isotope, nuclide or nucleus. None otherwise
+levelId: integer level index if id is a nuclide or nucleus. None otherwise
+isNucleus: True if id is a nucleus, False if id is a chemical element, isotope or nuclide, None otherwise
+anti: ‘_anti’ if id contains that string, empty string otherwise
+qualifier: string qualifier if one is found (qualifiers appear inside {curly brackets}. Empty string otherwise</p>
+</dd>
+</dl>
+<p>Unless qualifierAllowed = True, ValueError will be raised if a qualifier is detected in id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – string particle id or symbol</p></li>
+<li><p><strong>qualifierAllowed</strong> – boolean, whether qualifiers are allowed in the id</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple(baseId, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.hasNucleus">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">hasNucleus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nucleusReturnsTrue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#hasNucleus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.hasNucleus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether particle contains a nucleus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>particle</strong> – PoPs particle instance</p></li>
+<li><p><strong>nucleusReturnsTrue</strong> – boolean. If False, hasNucleus returns False when particle is a nucleus instance</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.idFromZA">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">idFromZA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ZA</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#idFromZA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.idFromZA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the PoPs id for a particle given ZA
+:param ZA: 1000 * Z + A  (int)
+:return: string particle id</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.idFromZAndA">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">idFromZAndA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#idFromZAndA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.idFromZAndA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the PoPs id for a particle given Z and A
+:param Z: atomic number (int)
+:param A: nucleon number (int)
+:return: string particle id</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.nuclearBindingEnergyPerNucleonSemiEmpirical">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">nuclearBindingEnergyPerNucleonSemiEmpirical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#nuclearBindingEnergyPerNucleonSemiEmpirical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.nuclearBindingEnergyPerNucleonSemiEmpirical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the nuclear binding energy per nucleon from a semi empirical formula (see <a class="reference external" href="https://en.wikipedia.org/wiki/Nuclear_binding_energy">https://en.wikipedia.org/wiki/Nuclear_binding_energy</a>).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.nucleusIDFromNuclideID">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">nucleusIDFromNuclideID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nuclideID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#nucleusIDFromNuclideID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.nucleusIDFromNuclideID" title="Permalink to this definition">¶</a></dt>
+<dd><p>The nucleus id is computed from nuclide id by converting 1st letter to lower case</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.nucleusIDFromZAndA">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">nucleusIDFromZAndA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#nucleusIDFromZAndA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.nucleusIDFromZAndA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equivalent to calling nucleusIDFromNuclideID( idFromZAndA( Z, A ) )</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.chemicalElements.misc.nuclideIDFromNucleusID">
+<span class="sig-prename descclassname"><span class="pre">PoPs.chemicalElements.misc.</span></span><span class="sig-name descname"><span class="pre">nuclideIDFromNucleusID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nucleusID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/chemicalElements/misc.html#nuclideIDFromNucleusID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.chemicalElements.misc.nuclideIDFromNucleusID" title="Permalink to this definition">¶</a></dt>
+<dd><p>The nuclide id is computed from nucleus id by converting 1st letter to upper case</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Particle groups</a><ul>
+<li><a class="reference internal" href="#module-PoPs.chemicalElements.chemicalElements">chemicalElements</a></li>
+<li><a class="reference internal" href="#module-PoPs.chemicalElements.chemicalElement">chemicalElement</a></li>
+<li><a class="reference internal" href="#module-PoPs.chemicalElements.isotope">isotope</a></li>
+<li><a class="reference internal" href="#module-PoPs.chemicalElements.misc">misc</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="families.html"
+                          title="previous chapter">Particle families</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="quantities.html"
+                          title="next chapter">Particle properties</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/PoPs/groups.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quantities.html" title="Particle properties"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="families.html" title="Particle families"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Properties of Particles (PoPs)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Particle groups</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

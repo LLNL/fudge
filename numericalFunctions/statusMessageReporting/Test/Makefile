@@ -7,7 +7,7 @@
 
 SHELL = /bin/sh
 
-PYTHON = python
+PYTHON = python3
 
 localCFLAGS = $(CFLAGS) -I../include
 

@@ -11,7 +11,9 @@ reactionSuite is the top-level class for the GNDS structure.
 """
 
 import re
+import sys
 import os
+import copy
 
 import pathlib
 import numpy
@@ -179,7 +181,8 @@ class ReactionSuite(ancestryModule.AncestryIO):
         self.__applicationData = suitesModule.ApplicationData()
         self.__applicationData.setAncestor( self )
 
-        self._externalLinks = []    # keep track of links to external files
+        self._externalLinks = []        # Keep track of links to external files.
+        self._loadedCovariances = None   # If loadCovariances called, store results here.
 
     def __iter__( self ) :
 
@@ -368,13 +371,19 @@ class ReactionSuite(ancestryModule.AncestryIO):
             if( reaction.isThermalNeutronScatteringLaw( ) ) : return( True )
         return( False )
 
-    def photonBranchingData( self ) :
+    def photonBranchingData(self):
+        '''
+        For each isotope in *self.PoPs*, calls decaysMiscPoPsModule.photonBranchingData.
+
+        :return:        Dictionary with keys being each isotope in *self.PoPs* and their values being that returned by 
+                            decaysMiscPoPsModule.photonBranchingData.
+        '''
 
         branchingData = {}
-        for chemicalElement in self.PoPs.chemicalElements :
-            for isotope in chemicalElement :
-                branchingData[isotope.symbol] = decaysMiscPoPsModule.photonBranchingData( self.PoPs, isotope.symbol )
-        return( branchingData )
+        for chemicalElement in self.PoPs.chemicalElements:
+            for isotope in chemicalElement:
+                branchingData[isotope.symbol] = decaysMiscPoPsModule.photonBranchingData(self.PoPs, isotope.symbol)
+        return branchingData
 
     def convertUnits( self, unitMap ) :
         """
@@ -824,6 +833,9 @@ class ReactionSuite(ancestryModule.AncestryIO):
         Returns None if no matching reaction is found.
         """
 
+        if channel == 'capture':
+            channel = 102
+
         # If channel is an int, it might be an ENDF MT, so check those first
         if isinstance(channel, (int, numpy.integer)): # must be an ENDF MT
             for reactionList in self.reactions, self.sums.crossSectionSums, self.fissionComponents, self.productions:
@@ -1058,29 +1070,46 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         return products
 
-    def loadCovariances(self):
-        """
-        Load all external files of type 'covarianceSuite', and resolve links between self and covarianceSuites
-        @return: list of loaded covarianceSuites
-        """
+    def covarianceExternalFiles(self):
+        '''
+        Returns a list of all ExternalFile instanaces in *self* that point to covariance files.
+
+        :return:    The list of ExternalFile instanaces that point to covariance files.
+        '''
 
         from fudge import GNDS_file as GNDS_fileModule
         from fudge.covariances import covarianceSuite as covarianceSuiteModule
 
-        covariances = []
-        kwargs = {'reactionSuite': self}
-        for external in self.externalFiles:
+        externalFiles = []
+        for externalFile in self.externalFiles:
             # TODO submit proposal to include file type attribute in the externalFile GNDS node so we don't need to run GNDS_fileModule.type
-            if not os.path.exists(external.realpath()):
+            if not os.path.exists(externalFile.realpath()):
                 print("  WARNING: skipping externalFile '%s' which points to non-existing file %s." %
-                      (external.label, external.realpath()))
+                      (externalFile.label, externalFile.realpath()))
                 continue
-            gndsType, metadata = GNDS_fileModule.type(external.realpath())
+            gndsType, metadata = GNDS_fileModule.type(externalFile.realpath())
             if gndsType == covarianceSuiteModule.CovarianceSuite.moniker:
-                external.instance = covarianceSuiteModule.CovarianceSuite.readXML_file(external.realpath(), **kwargs)
-                covariances.append(external.instance)
+                externalFiles.append(externalFile)
 
-        return covariances
+        return externalFiles
+
+    def loadCovariances(self):
+        """
+        Load all external files of type 'covarianceSuite', and resolve links between self and covarianceSuites.
+
+        :return: list of loaded covarianceSuites
+        """
+
+        from fudge.covariances import covarianceSuite as covarianceSuiteModule
+
+        if self._loadedCovariances is None:
+            kwargs = {'reactionSuite': self}
+            self._loadedCovariances = []
+            for covariance in self.covarianceExternalFiles():
+                covariance.instance = covarianceSuiteModule.read(covariance.realpath(), **kwargs)
+                self._loadedCovariances.append(covariance.instance)
+
+        return self._loadedCovariances
 
     def partialProductionIntegral( self, productID, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.lab,
                 LegendreOrder = 0, **kwargs ) :
@@ -1421,7 +1450,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
         """
 
-        styleLabel = temperatureInfo['heatedMultiGroup']
+        styleLabel = temperatureInfo.heatedMultiGroup
         return self.styles[styleLabel].inverseSpeed.data.constructVector()
 
     def multiGroupQ(self, multiGroupSettings, temperatureInfo, includeFinalProducts):
@@ -1932,6 +1961,67 @@ class ReactionSuite(ancestryModule.AncestryIO):
                     removeStyleFromComponent( style, dproduct.averageProductMomentum )
         self.styles.remove( style )
 
+    def saveAllToFile(self, fileName, hybrid=False, **kwargs):
+        '''
+        Writes *self* and its covariance data to files. The name of the covariance file will be the same as the *fileName* but
+        it will be put into a "Covariance" sub-directory inside the directory where *self* is written and "-covar" will be
+        added before the extension. If hybrid is *True*, self will be written out in default hybrid mode with the HDF5 data 
+        written into a file with the same name as *self* but different extension and in a sub-directory named "HDF5".
+
+        :param fileName:        The name of the file to write *self* to.
+        :param hybrid:          If *True* data are written in hybrid XML/HDF5 files.
+        :param kwargs:          Additional key-word arguments that are passed to internal calls.
+        '''
+
+        covarianceDir = pathlib.Path('Covariances')
+        fileName = pathlib.Path(fileName)
+        covarianceName = covarianceDir / (fileName.stem + '-covar' + fileName.suffix)
+        covariancePath = fileName.parent / covarianceName
+
+        covariances = self.loadCovariances()
+        originalPaths = {}
+        for covariance in covariances:
+            sourcePathC = pathlib.Path(covariance.sourcePath)
+            externalPath = None
+            for externalFile in self.externalFiles:                             # Find externalFile for this convariance.
+                if sourcePathC.samefile(externalFile.realpath()):
+                    externalPath = pathlib.Path(externalFile.path)
+                    break
+
+            if externalPath is None:
+                print('WARNING: could not find externalFile for covariance "%s".' % sourcePathC)
+            elif not externalPath.is_absolute():                                # Only write if not absolute.
+                if externalFile not in originalPaths:
+                    originalPaths[externalFile] = externalFile.path             # Needs to be reset back to original name before this method exits..
+                externalFile.path = str(covarianceName)
+                if covariancePath is None:
+                    covariancePath = fileName.parent / covarianceDir / sourcePathC.name
+                    print('WARNING: multiple covariance files, using "%s".' % covariancePath)
+
+                externalPathC = None
+                selfSourcePath = pathlib.Path(self.sourcePath)
+                for externalFileC in covariance.externalFiles:
+                    externalFilePath = pathlib.Path(externalFileC.realpath())
+                    if externalFilePath.exists() and selfSourcePath.samefile(externalFilePath):
+                        externalPathC = externalFileC
+                        break
+                if externalPathC is None:
+                    print('WARNING: could not find externalFile in covariance for reactionSuite.')
+                else:
+                    if externalFileC not in originalPaths:
+                        originalPaths[externalFileC] = externalFileC.path             # Needs to be reset back to original name before this method exits..
+                    externalPathC.path = str(pathlib.Path('../') / fileName.name)
+                covariance.saveToFile(covariancePath, **kwargs)
+                covariancePath = None
+
+        if hybrid:
+            self.saveToHybrid(fileName, **kwargs)
+        else:
+            self.saveToFile(fileName, **kwargs)
+
+        for externalFile in originalPaths:
+            externalFile.path = originalPaths[externalFile]
+
     def saveToHybrid( self, xmlName, hdfName=None, hdfSubDir='HDF5', minLength=3, flatten=True, compress=False, **kwargs ):
         """
         Save the reactionSuite to a hybrid layout, with the data hierarchy in xml
@@ -2195,3 +2285,88 @@ def read(fileName, **kwargs):
     """
 
     return ReactionSuite.read(fileName, **kwargs)
+
+def niceSortOfMTs(MTs, verbose = 0, logFile=sys.stderr):
+    '''
+    Sorts the list of ENDF MTs into a sensible, defined order.
+    '''
+
+    def removeGetIfPresent(MT, MTs):
+        '''
+        For internal use only.
+        '''
+
+        if MT not in MTs:
+            return []
+
+        MTs.remove(MT)
+
+        return [MT]
+
+    MTs = sorted(list(copy.deepcopy(MTs)))
+
+    newMTs = removeGetIfPresent(  2, MTs)                       # Elastic reaction.
+
+    for MT in range( 50, 92):                                   # (z,n) reactions.
+        newMTs += removeGetIfPresent(MT, MTs)
+    newMTs += removeGetIfPresent(  4, MTs)
+
+    newMTs += removeGetIfPresent( 16, MTs)                      # (z,2n) reactions.
+    for MT in range(875, 892):
+        newMTs += removeGetIfPresent(MT, MTs)
+
+    newMTs += removeGetIfPresent( 17, MTs)
+    newMTs += removeGetIfPresent( 37, MTs)
+
+    newMTs += removeGetIfPresent( 18, MTs)                      # Fission reactions.
+    newMTs += removeGetIfPresent( 19, MTs)
+    newMTs += removeGetIfPresent( 20, MTs)
+    newMTs += removeGetIfPresent( 21, MTs)
+    newMTs += removeGetIfPresent( 38, MTs)
+
+    newMTs += removeGetIfPresent( 28, MTs)
+    newMTs += removeGetIfPresent( 32, MTs)
+    newMTs += removeGetIfPresent( 33, MTs)
+
+    for MT in range(600, 650):                                  # (z,p) reactions.
+        newMTs += removeGetIfPresent(MT, MTs)
+    newMTs += removeGetIfPresent(103, MTs)
+
+    for MT in range(650, 700):                                  # (z,d) reactions.
+        newMTs += removeGetIfPresent(MT, MTs)
+    newMTs += removeGetIfPresent(104, MTs)
+
+    for MT in range(700, 750):                                  # (z,t) reactions.
+        newMTs += removeGetIfPresent(MT, MTs)
+    newMTs += removeGetIfPresent(105, MTs)
+
+    for MT in range( 750, 800):                                 # (z,He3) reactions.
+        newMTs += removeGetIfPresent(MT, MTs)
+    newMTs += removeGetIfPresent(106, MTs)
+
+    for MT in range( 800, 850):                                 # (z,a) reactions.
+        newMTs += removeGetIfPresent(MT, MTs)
+    newMTs += removeGetIfPresent(107, MTs)
+
+    for MT in range( 900, 1000):                                # (z,g) reactions.
+        newMTs += removeGetIfPresent(MT, MTs)
+    newMTs += removeGetIfPresent(102, MTs)
+
+    MT5 = removeGetIfPresent(  5, MTs)                          # (z,everything else).
+
+    MTAtomics = []
+    for MT in range(500, 573):
+        MTAtomics += removeGetIfPresent(MT, MTs)
+
+    skippingMTs = []
+    for MT in [10, 27, 101, 151]:
+        skippingMTs += removeGetIfPresent(MT, MTs)
+    for MT in range(201, 600):
+        skippingMTs += removeGetIfPresent(MT, MTs)
+    for MT in range(850, 875):
+        skippingMTs += removeGetIfPresent(MT, MTs)
+
+    if verbose > 0 and len(skippingMTs) > 0:
+        logFile.write('Skipping MTs = %s\n' % skippingMTs)
+
+    return newMTs + MTs + MT5 + MTAtomics

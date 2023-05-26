@@ -235,6 +235,7 @@ class Infos:
         self.massTracker = massTrackerModule.MassTracker()
         self.__logs = None
         self.resonanceReconstructionFailed = ''
+        self.ZA_massLineInfo = massTrackerModule.ZA_massLineInfo()
 
     @property
     def logs(self): return self.__logs

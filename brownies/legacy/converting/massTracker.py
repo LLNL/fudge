@@ -191,3 +191,30 @@ class MassTracker:
             for asTarget, AWR, inputAMU_mass, amuMass in self.history[ZA]:
                 diff = amuMass - inputAMU_mass
                 print('        %-6s %14.8e %14.8e %14.8e %10.2e' % (asTarget, AWR, inputAMU_mass, amuMass, diff))
+
+class ZA_massLineInfo:
+    '''
+    '''
+
+    def  __init__(self):
+
+        self.ZAs = {}
+
+    def add(self, ZA, mass, MT, MF, line):
+
+        ZA = int(ZA)
+        if ZA not in self.ZAs:
+            self.ZAs[ZA] = []
+
+        self.ZAs[ZA].append([mass, MT, MF, line])
+
+    def printInfo(self):
+
+        print('    ZA mass line info:')
+        print('        ZA               mass     MT   MF   line')
+        print('    -----------------------------------------------------')
+        for ZA in sorted(self.ZAs):
+            print('    %6s:' % ZA)
+            for mass, MT, MF, line in self.ZAs[ZA]:
+                print('    %25s %4d %4d %8s' % (mass, MT, MF, line))
+        print('    -----------------------------------------------------')

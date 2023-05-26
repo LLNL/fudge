@@ -1,0 +1,792 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>isotopicAbundances.iam &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">isotopicAbundances.iam</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for isotopicAbundances.iam</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="c1"># Questions for Caleb and Godfree.</span>
+<span class="c1">#   -) Should checksum and algorithm always be a str with an empty one representing no data vs. None representing no data.</span>
+<span class="c1">#   -) I do not like the name isotopicAbundancesByChemicalElement.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This module contains the classes needed to represent the nodes for an isotopic abundance map (iam) instance.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">pathlib</span> 
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">LUPY_miscModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">checksums</span> <span class="k">as</span> <span class="n">checksumsModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">isotopicAbundances</span> <span class="k">as</span> <span class="n">isotopicAbundancesModule</span>
+
+<div class="viewcode-block" id="Base"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Base">[docs]</a><span class="k">class</span> <span class="nc">Base</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Base class used by all other iam (Isotopic Abundance Map) related classes. Inherits class ancestryModule.AncestryIO, </span>
+<span class="sd">    and adds checksum and algorithm properties.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | Member    | Description                                               |</span>
+<span class="sd">    +===========+===========================================================+</span>
+<span class="sd">    | checksum  | The check sum of the file referrence by the path member.  |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | algorithm | The algorithm used to calculate *checksum*.               |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param checksum:        The check sum of the file referrence by the path member.</span>
+<span class="sd">        :param algorithm:       The algorithm used to calculate *checksum*.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span> <span class="o">=</span> <span class="n">checksum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span> <span class="o">=</span> <span class="n">algorithm</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">checksum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns self&#39;s checksum.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__checksum</span>
+
+    <span class="nd">@checksum</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">checksum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets self&#39;s checksum to *checksum*.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">checksum</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">checksum</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Checksum must be a string.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__checksum</span> <span class="o">=</span> <span class="n">checksum</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the algorithm used to compute the checksum for this entry.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Iam</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">algorithm</span>
+
+    <span class="nd">@algorithm</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Set self&#39;s algorithm to *algorithm*.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">algorithm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">supportedAlgorithms</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported checksum algorithm &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">algorithm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm</span> <span class="o">=</span> <span class="n">algorithm</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fileName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the file name for the location of self. Unlike path, this will always be the absolute path.&#39;&#39;&#39;</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">filename</span>
+
+<div class="viewcode-block" id="Base.standardXML_attributes"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Base.standardXML_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">standardXML_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the XML attribute string for *checksum* and *algorithm*. For internal use.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__checksum</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__checksum</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; checksum=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span>
+
+        <span class="n">algorithm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Iam</span><span class="p">)</span> <span class="ow">and</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">algorithm</span><span class="p">:</span>
+                <span class="n">algorithm</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">algorithm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; algorithm=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">algorithm</span>
+
+        <span class="k">return</span> <span class="n">attributes</span></div></div>
+
+<div class="viewcode-block" id="Iam"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam">[docs]</a><span class="k">class</span> <span class="nc">Iam</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This class represents an Isotopic Abundance Map (iam) instance.&#39;&#39;&#39;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;iam&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">isotopicAbundancesModule</span><span class="o">.</span><span class="n">Format</span><span class="o">.</span><span class="n">default</span><span class="p">(),</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">        Constructor for the Iam class.</span>
+
+<span class="sd">        The following table list the primary members of this class:</span>
+
+<span class="sd">        +-----------+-----------------------------------------------------------+</span>
+<span class="sd">        | Member    | Description                                               |</span>
+<span class="sd">        +===========+===========================================================+</span>
+<span class="sd">        | library   | The check sum of the file referrence by the path member.  |</span>
+<span class="sd">        +-----------+-----------------------------------------------------------+</span>
+<span class="sd">        | path      | The algorithm used to calculate *checksum*.               |</span>
+<span class="sd">        +-----------+-----------------------------------------------------------+</span>
+<span class="sd">        | format    | The algorithm used to calculate *checksum*.               |</span>
+<span class="sd">        +-----------+-----------------------------------------------------------+</span>
+<span class="sd">        | checksum  | See inherited class **Base**.                             |</span>
+<span class="sd">        +-----------+-----------------------------------------------------------+</span>
+<span class="sd">        | algorithm | See inherited class **Base**.                             |</span>
+<span class="sd">        +-----------+-----------------------------------------------------------+</span>
+<span class="sd">        | __entries | The list of all child entries.                            |</span>
+<span class="sd">        +-----------+-----------------------------------------------------------+</span>
+
+<span class="sd">        :param library:         The name of the library.</span>
+<span class="sd">        :param path:            The path to the iam file read in to construct *self*. If created anew, this can be the string &quot;./&quot;.</span>
+<span class="sd">        :param format:          The format version for the iam.</span>
+<span class="sd">        :param checksum:        Hash for the iam (computed from the concatenation of the checksum of all entries)</span>
+<span class="sd">        :param algorithm:       Algorithm used to compute checksums.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">Base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__library</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="s1">&#39;Library must be a string.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;Path must be a string.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__format</span> <span class="o">=</span> <span class="n">isotopicAbundancesModule</span><span class="o">.</span><span class="n">Format</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the (index-1)^th item of self.</span>
+
+<span class="sd">        :param index:           The index of the item to return.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Iterators over each entry in self. Does not dive into import entries. Also see the method **iterate**.&#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">entry</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the number of entries in self. Does not dive into import entries.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the path *self* was read from or may be written to. It may be absolute or relative, </span>
+<span class="sd">        depending on how it was initialize.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the format for self.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">library</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the library name for self.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__library</span>
+
+<div class="viewcode-block" id="Iam.updateAllChecksums"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.updateAllChecksums">[docs]</a>    <span class="k">def</span> <span class="nf">updateAllChecksums</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">iamDirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Calls *updateChecksum* on all entries and then updates *self*&#39;s *checksum*.</span>
+
+<span class="sd">        :param algorithm:       Algorithm that will be used to compute checksums.</span>
+<span class="sd">        :param iamDirectory:    See documentation for the method **buildFileName** in class **EntryBase**.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">updateChecksum</span><span class="p">(</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">iamDirectory</span><span class="o">=</span><span class="n">iamDirectory</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateChecksum</span><span class="p">(</span><span class="n">algorithm</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Iam.updateChecksum"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.updateChecksum">[docs]</a>    <span class="k">def</span> <span class="nf">updateChecksum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">algorithm</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Computes *self&#39;s* checksum: concatenate checksums for all entries into a string and compute the checksum</span>
+<span class="sd">        of that string.</span>
+
+<span class="sd">        :param algorithm:       Algorithm that will be used to compute checksums.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">s1</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">checksum</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">checksum</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span> <span class="o">=</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">checkers</span><span class="p">[</span><span class="n">algorithm</span><span class="p">]</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span> <span class="o">=</span> <span class="n">algorithm</span></div>
+
+<div class="viewcode-block" id="Iam.append"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Appends *entry* to self. *entry* must be an instance of **EntryBase**.</span>
+
+<span class="sd">        :param entry:       The entry to add to *self*.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">EntryBase</span><span class="p">):</span>
+            <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid entry.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Iam.insert"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Inserts *entry* into self at *index*.</span>
+
+<span class="sd">        :param index:       The 0-based index where *entry* is inserted.</span>
+<span class="sd">        :param entry:       The entry to add to *self*.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">EntryBase</span><span class="p">):</span>
+            <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid entry of type &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">entry</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Iam.iterate"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.iterate">[docs]</a>    <span class="k">def</span> <span class="nf">iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Iterates over all IsotopicAbundancesByChemicalElement in *self*. Dives into import entries.&#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">Import</span><span class="p">):</span>
+                <span class="k">yield from</span> <span class="n">entry</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">entry</span></div>
+
+<div class="viewcode-block" id="Iam.evaluations"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.evaluations">[docs]</a>    <span class="k">def</span> <span class="nf">evaluations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of available evaluations.</span>
+
+<span class="sd">        :return:                List of available evaluations.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">evaluations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">isotopicAbundancesByChemicalElement</span><span class="o">.</span><span class="n">evaluation</span> <span class="k">for</span> <span class="n">isotopicAbundancesByChemicalElement</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterate</span><span class="p">()]))</span></div>
+
+<div class="viewcode-block" id="Iam.find"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the first entry matching a chemical elememnt&#39;s *symbol*. Searches each entry in the order they</span>
+<span class="sd">        were appended and dives into imported iams.</span>
+
+<span class="sd">        :param symbol:          The requested chemical element&#39;s PoPs symbol to match.</span>
+<span class="sd">        :param evaluation:      The name of the evaluation to match. Can be None to match the first *symbol* found.</span>
+
+<span class="sd">        :return:                Returns the found entry or None if no match is found.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="n">foundChemicalElement</span> <span class="o">=</span>  <span class="n">entry</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">foundChemicalElement</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">foundChemicalElement</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Iam.findEvaluation"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.findEvaluation">[docs]</a>    <span class="k">def</span> <span class="nf">findEvaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns an IsotopicAbundancesByChemicalElement instance from the module isotopicAbundances.py matching *evaluation* or </span>
+<span class="sd">        None if no match is found.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">isotopicAbundancesByChemicalElement</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterate</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">isotopicAbundancesByChemicalElement</span><span class="o">.</span><span class="n">evaluation</span> <span class="o">==</span> <span class="n">evaluation</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">isotopicAbundancesByChemicalElement</span><span class="o">.</span><span class="n">isotopicAbundancesByChemicalElement</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Iam.toXML_strList"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">isotopicAbundancesModule</span><span class="o">.</span><span class="n">Format</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">isotopicAbundancesModule</span><span class="o">.</span><span class="n">Format</span><span class="o">.</span><span class="n">default</span><span class="p">())))</span>
+
+        <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">()</span>
+
+        <span class="n">XML_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> library=&quot;</span><span class="si">%s</span><span class="s1">&quot; format=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="n">XML_list</span> <span class="o">+=</span> <span class="n">entry</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span>  <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">XML_list</span></div>
+
+<div class="viewcode-block" id="Iam.parseNodeUsingClass"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Creates a Iam instance from an iam node.</span>
+
+<span class="sd">        :param node:            node to parse.</span>
+<span class="sd">        :param xPath:           Currently not used.</span>
+<span class="sd">        :param linkData:        Currently not used.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
+
+<span class="sd">        :return:                Iam instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">Iam</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid node name &quot;</span><span class="si">%s</span><span class="s1">&quot; for a iam instance.&#39;</span> <span class="o">%</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;sourcePath&#39;</span><span class="p">]</span>
+
+        <span class="n">library</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;library&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">isotopicAbundancesModule</span><span class="o">.</span><span class="n">Format</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">))</span>
+
+        <span class="n">iam</span> <span class="o">=</span> <span class="n">Iam</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="n">sourcePath</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checksum&#39;</span><span class="p">),</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;algorithm&#39;</span><span class="p">))</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">format</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">Import</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                <span class="n">iam</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Import</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">IsotopicAbundancesByChemicalElement</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                <span class="n">iam</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IsotopicAbundancesByChemicalElement</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid child tag &quot;</span><span class="si">%s</span><span class="s1">&quot; for iam file.&#39;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">iam</span></div>
+
+<div class="viewcode-block" id="Iam.read"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Iam.read">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reads in the file named *fileName* and returns a **Iam** instance.</span>
+
+<span class="sd">        :param fileName:        The path to the file to read in.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
+
+<span class="sd">        :return:                Iam instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="n">Iam</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="EntryBase"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.EntryBase">[docs]</a><span class="k">class</span> <span class="nc">EntryBase</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Base class for all **Iam** entry classes.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">        | Member        | Description                                               |</span>
+<span class="sd">        +===============+===========================================================+</span>
+<span class="sd">        | path          | The path to the file referenced by *self*.                |</span>
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">        | checksum      | See inherited class **Base**.                             |</span>
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">        | algorithm     | See inherited class **Base**.                             |</span>
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Base constructor for map entries.</span>
+
+<span class="sd">        :param path:            Path attribute for the entry.</span>
+<span class="sd">        :param checksum:        Checksum for this entry, computed using the indicated algorithm.</span>
+<span class="sd">        :param algorithm:       Algorithm for computing the checksum. Only required if different from parent.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">Base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;Path must be a string.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the path of the file. This may be absolute or relative.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path</span>
+
+<div class="viewcode-block" id="EntryBase.buildFileName"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.EntryBase.buildFileName">[docs]</a>    <span class="k">def</span> <span class="nf">buildFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iamDirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method is designed to aid in building an iam file when the iam file does not reside in its final resting place.</span>
+<span class="sd">        The value of *iamDirectory* should be the final resting place (i.e., directory) of the iam file.</span>
+<span class="sd">        Otherwise, this method returns the file name as the method *fileName*.</span>
+
+<span class="sd">        :param iamDirectory:    Alternative directory where the iam file will be placed.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">iamDirectory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">iamDirectory</span><span class="p">)</span><span class="o">.</span><span class="n">revolve</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EntryBase.updateChecksum"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.EntryBase.updateChecksum">[docs]</a>    <span class="k">def</span> <span class="nf">updateChecksum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">iamDirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Compute the checksum of the file specified by the *path* member and stores it into the *checksum* member.</span>
+
+<span class="sd">        :param algorithm:       The algorithm to use for the checksum.</span>
+<span class="sd">        :param iamDirectory:    See documentation for the method **buildFileName**.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span> <span class="o">=</span> <span class="n">algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span> <span class="o">=</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">checkers</span><span class="p">[</span><span class="n">algorithm</span><span class="p">]</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildFileName</span><span class="p">(</span><span class="n">iamDirectory</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="EntryBase.standardXML_attributes"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.EntryBase.standardXML_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">standardXML_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the XML attribute string for *this*.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="s1">&#39; path=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">Base</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="Import"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Import">[docs]</a><span class="k">class</span> <span class="nc">Import</span><span class="p">(</span><span class="n">EntryBase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This class represents an import instance within an Isotopic Abundance Map (IAM) instance.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+<span class="sd">        </span>
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">        | Member        | Description                                               |</span>
+<span class="sd">        +===============+===========================================================+</span>
+<span class="sd">        | path          | The path to the file referenced by *self*.                |</span>
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">        | checksum      | See inherited class **Base**.                             |</span>
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">        | algorithm     | See inherited class **Base**.                             |</span>
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">        | iam           | The Iam instance *self* references.                       |</span>
+<span class="sd">        +---------------+-----------------------------------------------------------+</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;import&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Constructor for the import entry of an iam node.</span>
+
+<span class="sd">        :param path:            Path to the iam file to import.</span>
+<span class="sd">        :param checksum:        The check sum of the file referrence by the path member.</span>
+<span class="sd">        :param algorithm:       The algorithm  used to calculate *checksum*.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">EntryBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__iam</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns a simple string representation of *self*.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> with path &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">derivedPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the parent directory of the Iam instance containing *self*.&#39;&#39;&#39;</span>
+
+        <span class="n">ancestor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ancestor</span><span class="p">,</span> <span class="n">Iam</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">ancestor</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Import not an entry of a Iam instance.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">iam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns a reference to self.__iam.&#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">readIam</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__iam</span>
+
+<div class="viewcode-block" id="Import.find"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Import.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Calls find on self.__iam and returns its results.</span>
+
+<span class="sd">        :param symbol:          The requested chemical element&#39;s PoPs symbol to match.</span>
+<span class="sd">        :param evaluation:      The name of the evaluation to match.</span>
+
+<span class="sd">        :return:                Returns the found entry or None is no match was found.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">readIam</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__iam</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Import.iterate"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Import.iterate">[docs]</a>    <span class="k">def</span> <span class="nf">iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Iterates over all entries of self&#39;s iam.&#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">readIam</span><span class="p">()</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">iam</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Import.readIam"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Import.readIam">[docs]</a>    <span class="k">def</span> <span class="nf">readIam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Reads in the iam file pointed to by self if not already read in. *Self* only reads its iam file when needed.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__iam</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">iamFilePath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">iamFilePath</span><span class="p">)</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
+                <span class="n">iamFilePath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">derivedPath</span><span class="p">)</span> <span class="o">/</span> <span class="n">iamFilePath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__iam</span> <span class="o">=</span> <span class="n">Iam</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">iamFilePath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__iam</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__iam</span></div>
+
+<div class="viewcode-block" id="Import.toXML_strList"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Import.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
+
+<span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">())]</span></div>
+
+<div class="viewcode-block" id="Import.parseNodeUsingClass"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.Import.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Creates an **Import** instance from an import node.</span>
+
+<span class="sd">        :param node:            The XML node to parse.</span>
+<span class="sd">        :param xPath:           Currently not used.</span>
+<span class="sd">        :param linkData:        Currently not used.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
+
+<span class="sd">        :return:                An **Import** instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">Import</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid node name.&#39;</span><span class="p">)</span>
+
+        <span class="n">_import</span> <span class="o">=</span> <span class="n">Import</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">),</span> <span class="n">checksum</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checksum&#39;</span><span class="p">),</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;algorithm&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">_import</span></div></div>
+
+<div class="viewcode-block" id="IsotopicAbundancesByChemicalElement"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.IsotopicAbundancesByChemicalElement">[docs]</a><span class="k">class</span> <span class="nc">IsotopicAbundancesByChemicalElement</span><span class="p">(</span><span class="n">EntryBase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This class represents an isotopicAbundancesByChemicalElement instance within an Isotopic Abundance Map (IAM) instance.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+<span class="sd">        </span>
+<span class="sd">        +-------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">        | Member                                    | Description                                                           |</span>
+<span class="sd">        +===========================================+=======================================================================+</span>
+<span class="sd">        | evaluation                                | The evaluation for *self*.                                            |</span>
+<span class="sd">        +-------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">        | path                                      | The path to the file referenced by *self*.                            |</span>
+<span class="sd">        +-------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">        | isotopicAbundancesByChemicalElement       | The IsotopicAbundancesByChemicalElement instance *self* references.   |</span>
+<span class="sd">        +-------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">        | checksum                                  | See inherited class **Base**.                                         |</span>
+<span class="sd">        +-------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">        | algorithm                                 | See inherited class **Base**.                                         |</span>
+<span class="sd">        +-------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;isotopicAbundancesByChemicalElement&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Construtor for IsotopicAbundancesByChemicalElement instance.</span>
+
+<span class="sd">        :param evaluation:      Name for the evaluation.</span>
+<span class="sd">        :param path:            Path to the file.</span>
+<span class="sd">        :param checksum:        The checksum for the file referenced by *path*.</span>
+<span class="sd">        :param algorithm:       The algorithm used to calculate the checksum.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">EntryBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evaluation</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Evaluation must be a string.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span> <span class="o">=</span> <span class="n">evaluation</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__isotopicAbundancesByChemicalElement</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns a simple string representation of self.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: evaluation &quot;</span><span class="si">%s</span><span class="s1">&quot; and path &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39;Returns the self&#39;s evaluation string.&#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">derivedPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the parent directory of the instance containing *self*.&#39;&#39;&#39;</span>
+
+        <span class="n">ancestor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span>
+        <span class="k">if</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ancestor</span><span class="p">,</span> <span class="n">Base</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">ancestor</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">isotopicAbundancesByChemicalElement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns self.__isotopicAbundancesByChemicalElement.&#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">readIsotopicAbundancesByChemicalElement</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopicAbundancesByChemicalElement</span>
+
+<div class="viewcode-block" id="IsotopicAbundancesByChemicalElement.find"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.IsotopicAbundancesByChemicalElement.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the entry matching a chemical elememnt&#39;s *symbol*. If one is not found, None is returned.</span>
+
+<span class="sd">        :param symbol:          The requested chemical element&#39;s PoPs symbol to match.</span>
+<span class="sd">        :param evaluation:      The requested evaluation to match.</span>
+
+<span class="sd">        :return:                Returns chemical element if a match is found or None.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">readIsotopicAbundancesByChemicalElement</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">chemicalElement</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopicAbundancesByChemicalElement</span><span class="o">.</span><span class="n">chemicalElements</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span><span class="n">chemicalElement</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">chemicalElement</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="IsotopicAbundancesByChemicalElement.readIsotopicAbundancesByChemicalElement"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.IsotopicAbundancesByChemicalElement.readIsotopicAbundancesByChemicalElement">[docs]</a>    <span class="k">def</span> <span class="nf">readIsotopicAbundancesByChemicalElement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Reads in the isotopicAbundancesByChemicalElement file pointed to by self if not already read in.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopicAbundancesByChemicalElement</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filePath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">filePath</span><span class="p">)</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
+                <span class="n">filePath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">derivedPath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__isotopicAbundancesByChemicalElement</span> <span class="o">=</span> <span class="n">isotopicAbundancesModule</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filePath</span><span class="p">)</span>
+<span class="c1">#            self.__isotopicAbundancesByChemicalElement.setAncestor(self)           # FIXME, is this needed?</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isotopicAbundancesByChemicalElement</span></div>
+
+<div class="viewcode-block" id="IsotopicAbundancesByChemicalElement.toXML_strList"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.IsotopicAbundancesByChemicalElement.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
+
+<span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> evaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">())]</span></div>
+
+<div class="viewcode-block" id="IsotopicAbundancesByChemicalElement.parseNodeUsingClass"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.IsotopicAbundancesByChemicalElement.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Creates a IsotopicAbundancesByChemicalElement instance from a isotopicAbundancesByChemicalElement node.</span>
+
+<span class="sd">        :param node:            The node to parse.</span>
+<span class="sd">        :param xPath:           Currently not used.</span>
+<span class="sd">        :param linkData:        Currently not used.</span>
+<span class="sd">        :param kwargs:          A keyword list.</span>
+
+<span class="sd">        :return:                A iam&#39;s IsotopicAbundancesByChemicalElement instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">IsotopicAbundancesByChemicalElement</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid node name.&#39;</span><span class="p">)</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;evaluation&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;checksum&#39;</span><span class="p">,</span> <span class="s1">&#39;algorithm&#39;</span><span class="p">)}</span>
+
+        <span class="n">isotopicAbundancesByChemicalElement</span> <span class="o">=</span> <span class="n">IsotopicAbundancesByChemicalElement</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">isotopicAbundancesByChemicalElement</span></div>
+
+<div class="viewcode-block" id="IsotopicAbundancesByChemicalElement.adaptable"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.IsotopicAbundancesByChemicalElement.adaptable">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">adaptable</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns True whenever item2 is None, or when item1 and item2 are the same. For internal use.</span>
+
+<span class="sd">        :param item1:           Item to compare to item2.</span>
+<span class="sd">        :param item2:           Item to compare to item1.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">item2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">item1</span> <span class="o">==</span> <span class="n">item2</span></div></div>
+
+<div class="viewcode-block" id="read"><a class="viewcode-back" href="../../isotopicAbundances/index.html#isotopicAbundances.iam.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Reads in the file name *fileName* and returns an **Ian** instance.</span>
+
+<span class="sd">    :param fileName:            The name of the file to read.</span>
+<span class="sd">    :param kwargs:              External dictionary of extra arguments that aids in parsing.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">return</span> <span class="n">Iam</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">isotopicAbundances.iam</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

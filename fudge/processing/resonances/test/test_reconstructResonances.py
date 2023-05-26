@@ -1909,7 +1909,7 @@ class TestRMLClassAndBaseClasses(TestWithIsClose):
         self.assertEqual(str(self.RRRSmall.RR.spinGroups[0].spin), '1')
         self.assertEqual(str(self.RRRSmall.RR.spinGroups[0].parity), '1')
         self.assertEqual([x.name for x in self.RRRSmall.RR.spinGroups[0].resonanceParameters.table.columns],
-                         ['energy', 'Cl36 + photon width', 'n + Cl35 width', 'H1 + S35 width'])
+                         ['energy', 'Cl36 + photon [inclusive] width', 'n + Cl35 width', 'H1 + S35 width'])
         self.assertEqual([x.unit for x in self.RRRSmall.RR.spinGroups[0].resonanceParameters.table.columns],
                          ['eV', 'eV', 'eV', 'eV'])
 

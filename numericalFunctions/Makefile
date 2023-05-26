@@ -7,7 +7,7 @@
 
 SHELL = /bin/sh
 
-PYTHON = python
+PYTHON = python3
 
 SOURCE_DIRS = ptwC ptwX ptwXY nf_Legendre nf_specialFunctions nf_integration
 SUB_DIRS = include lib $(SOURCE_DIRS) Doc _Src

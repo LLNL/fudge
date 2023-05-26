@@ -538,7 +538,7 @@ def executeCommand( logFile, executable, cmd, workDir, workFile, restart, produc
             if previousInput == cmd:
                 # This input has already been successfully run (e.g. by previous processProtare run that timed out).
                 # Ensure variables are initialized:
-                fOut.write("  Reading previously computed results")
+                fOut.write("  Reading previously computed results\n")
                 t0 = timesModule.Times( )
                 status = 0
             else:
@@ -551,8 +551,9 @@ def executeCommand( logFile, executable, cmd, workDir, workFile, restart, produc
             dataFile.write( cmd )
         t0 = timesModule.Times( )
         try :
-            status, stdout, stderr = subprocessingModule.executeCommand( [ executable, '-output', fullFileName + '.out', fullFileName ], 
+            status, stdout, stderr = subprocessingModule.executeCommand( [ executable, '-output', outputFile+".tmp", fullFileName ],
                 stdout = infoFile, stderr = subprocess.STDOUT )
+            os.rename(outputFile+".tmp", outputFile)
         except :
             fErr = open( fullFileName + ".err", "w" )
             fErr.close( )

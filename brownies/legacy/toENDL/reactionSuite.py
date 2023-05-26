@@ -114,7 +114,7 @@ def processC55S3Photons( reactionSuite, multiplicity, crossSection, C55S3Photons
 def processC55S3Photons2( initialLevel, finalLevel, probability, crossSection, C55S3Photons, photonBranchingData, level = 1 ) :
 
     if( initialLevel == finalLevel ) : return
-    for branchingRatio, energy, endLevel in photonBranchingData[initialLevel]['photons'] :
+    for branchingRatio, energy, endLevel, photonEmissionProbability in photonBranchingData[initialLevel]['photons'] :
         _probability = probability * branchingRatio
         energy = float( '%.8e' % energy.getValueAs( 'MeV' ) )            # Fix rounding issues.
         if( energy not in C55S3Photons ) :

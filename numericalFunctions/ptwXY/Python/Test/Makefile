@@ -7,7 +7,7 @@
 
 SHELL = /bin/sh
 
-PYTHON = python
+PYTHON = python3
 
 subDirectories = initial UnitTesting Flat
 

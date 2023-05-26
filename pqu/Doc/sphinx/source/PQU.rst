@@ -26,26 +26,26 @@ PQU
     :undoc-members:
     :show-inheritance:
 
-pqu_float
+PQU_float
 +++++++++
 
-.. autoclass:: pqu.PQU.pqu_float
+.. autoclass:: pqu.PQU.PQU_float
     :members:
     :undoc-members:
     :show-inheritance:
 
-pqu_uncertainty
+PQU_uncertainty
 +++++++++++++++
 
-.. autoclass:: pqu.PQU.pqu_uncertainty
+.. autoclass:: pqu.PQU.PQU_uncertainty
     :members:
     :undoc-members:
     :show-inheritance:
 
-parsers
+Parsers
 +++++++
 
-.. autoclass:: pqu.PQU.parsers
+.. autoclass:: pqu.PQU.Parsers
     :members:
     :undoc-members:
     :show-inheritance:

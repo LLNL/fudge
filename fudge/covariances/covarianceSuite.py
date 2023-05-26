@@ -161,6 +161,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { 'eV' : 'MeV', 'b' : 'mb' }).
         """
 
+        for style in self.styles: style.convertUnits( unitMap )
         for section in self.covarianceSections: section.convertUnits( unitMap )
         for mpsection in self.parameterCovariances: mpsection.convertUnits( unitMap )
 
@@ -394,3 +395,18 @@ class CovarianceSuite(ancestryModule.AncestryIO):
                 externalLink.link = externalLink.follow(self)
 
         return CovarianceSuite
+
+    @staticmethod
+    def read(fileName, **kwargs):
+        """
+        Reads in the file name *fileName* and returns a **ReactionSuite** instance.
+        """
+
+        return CovarianceSuite.readXML_file(fileName, **kwargs)
+
+def read(fileName, **kwargs):
+    """
+    Reads in the file name *fileName* and returns a **ReactionSuite** instance.
+    """
+
+    return CovarianceSuite.read(fileName, **kwargs)

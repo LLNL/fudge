@@ -7,7 +7,7 @@
 
 SHELL = /bin/sh
 
-PYTHON = python
+PYTHON = python3
 
 .PHONY: default check checke clean realclean
 

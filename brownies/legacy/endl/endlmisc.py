@@ -158,6 +158,9 @@ def processDataBase( database, oldFile, newFile, options = "", defines = [], bdf
             ZA, suffix = intZASuffix( zas )
             f.write( "za%.6d%s\n" % ( ZA, suffix ) )
         f.close( )
+
+    if 'FUDGEPATH' not in os.environ:
+        os.environ['FUDGEPATH'] = '/usr/gapps/fudge/legacyProcessing'
     s = '$FUDGEPATH/Src/endlmod.com ' + options + ndfgenFile + mcfgenFile + endepFile + ' ' + database + ' ' + oldFile + ' ' + newFile
     if( ds != "" ) : print(ds)
     print(s)

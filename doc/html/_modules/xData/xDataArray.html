@@ -1,0 +1,748 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.xDataArray &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.xDataArray</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.xDataArray</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">LUPY_enumsModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">values</span> <span class="k">as</span> <span class="n">valuesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">vector</span> <span class="k">as</span> <span class="n">vectorModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">matrix</span> <span class="k">as</span> <span class="n">matrixModule</span>
+
+<div class="viewcode-block" id="Symmetry"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Symmetry">[docs]</a><span class="k">class</span> <span class="nc">Symmetry</span><span class="p">(</span><span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">none</span> <span class="o">=</span> <span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Permutation"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Permutation">[docs]</a><span class="k">class</span> <span class="nc">Permutation</span><span class="p">(</span><span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">plus</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span>
+    <span class="n">minus</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span></div>
+
+<div class="viewcode-block" id="ArrayBase"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase">[docs]</a><span class="k">class</span> <span class="nc">ArrayBase</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;array&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">storageOrder</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span> 
+                <span class="n">offset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;compression must be a string&#39;</span> <span class="p">)</span>
+        <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span> <span class="nb">int</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">shape</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">shape</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;shape must contain at least one value&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">min</span><span class="p">(</span> <span class="n">shape</span> <span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;illegal shape &quot;</span><span class="si">%s</span><span class="s1">&quot;: lengths must all be greater than 0&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shape</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Currently, dimension = </span><span class="si">%d</span><span class="s1"> &gt; 3 not supported&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__symmetry</span> <span class="o">=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">symmetry</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">symmetry</span> <span class="o">!=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="n">shape</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">length</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;a symmetrical array must be &quot;square&quot;: shape = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">shape</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">permutation</span> <span class="o">!=</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;currently, only &quot;</span><span class="si">%s</span><span class="s1">&quot; permutation is supported&#39;</span> <span class="o">%</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__permutation</span> <span class="o">=</span> <span class="n">permutation</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">storageOrder</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">int</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">offset</span> <span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">offset</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">shape</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;offset must contain one value for each dimension&#39;</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">min</span><span class="p">(</span> <span class="n">offset</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;offsets must be non-negative: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">offset</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span> <span class="o">=</span> <span class="n">offset</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dimension</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shape</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shape</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shape</span> <span class="p">:</span> <span class="n">size</span> <span class="o">*=</span> <span class="n">length</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">size</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">symmetry</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__symmetry</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">permutation</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__permutation</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">compression</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">storageOrder</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__storageOrder</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">offset</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="ArrayBase.offsetScaleValues"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.offsetScaleValues">[docs]</a>    <span class="k">def</span> <span class="nf">offsetScaleValues</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Modify every element in the array: multiply by scale and add offset.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">offsetScaleValues</span><span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ArrayBase.constructVector"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.constructVector">[docs]</a>    <span class="k">def</span> <span class="nf">constructVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secondIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the output of the xData.xDataArray.arrayBase.constructArray() to an instancce of xData.vector.Vector.</span>
+
+<span class="sd">        :param secondIndex: Index along the third dimension from which to extract 1d-array.</span>
+<span class="sd">        :returns: instance of xData.vector.Vector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">secondIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">secondIndex</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">),</span> <span class="s1">&#39;The method constructVector requires the first argument to be an integer.&#39;</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">secondIndex</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">vectorModule</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">vectorModule</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()[:,</span> <span class="n">secondIndex</span><span class="p">])</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">vectorModule</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constructArray</span><span class="p">())</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The method constructVector is only defined for 1D or 2D arrays&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ArrayBase.constructMatrix"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.constructMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">constructMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thirdIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate an xData.matrix.Matrix object from an xData.xDataArray.arrayBase instance.</span>
+
+<span class="sd">        :param thirdIndex: Index along the third dimension from which to extract 2d-array.</span>
+<span class="sd">        :returns: instance of xData.matrix.Matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The method constructMatrix is only defined for 3D arrays&#39;</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">thirdIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thirdIndex</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">),</span> <span class="s1">&#39;The method constructMatrix requires the first argument to be an integer.&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thirdIndex</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">matrixModule</span><span class="o">.</span><span class="n">Matrix</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">matrixModule</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()[:,</span> <span class="p">:,</span> <span class="n">thirdIndex</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ArrayBase.attributesToXMLAttributeStr"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.attributesToXMLAttributeStr">[docs]</a>    <span class="k">def</span> <span class="nf">attributesToXMLAttributeStr</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39; shape=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">length</span> <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">!=</span> <span class="n">Full</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; compression=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">!=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; symmetry=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">permutation</span> <span class="o">!=</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; permutation=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">permutation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; offset=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">offset</span> <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span> <span class="o">!=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; storageOrder=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span>
+        <span class="n">attributeStr</span> <span class="o">+=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="n">attributesToXMLAttributeStr</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">attributeStr</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ArrayBase.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="n">ArrayBase</span><span class="o">.</span><span class="n">parseNodeAttributes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">compression</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;compression&#39;</span><span class="p">)</span>
+        <span class="n">numberOfValues</span> <span class="o">=</span> <span class="p">{</span> <span class="n">Full</span><span class="o">.</span><span class="n">compression</span> <span class="p">:</span> <span class="p">[</span> <span class="mi">1</span> <span class="p">],</span> <span class="n">Diagonal</span><span class="o">.</span><span class="n">compression</span> <span class="p">:</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="p">],</span> <span class="n">Flattened</span><span class="o">.</span><span class="n">compression</span> <span class="p">:</span> <span class="p">[</span> <span class="mi">3</span> <span class="p">],</span>
+                <span class="n">Embedded</span><span class="o">.</span><span class="n">compression</span> <span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mi">1</span> <span class="p">]</span> <span class="p">}[</span><span class="n">compression</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">numberOfValues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">numberOfValues</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> array expects </span><span class="si">%s</span><span class="s1"> sub-elements: got </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">compression</span><span class="p">,</span> <span class="n">numberOfValues</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="p">))</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">)</span>
+
+        <span class="n">valuesDict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">compression</span> <span class="o">!=</span> <span class="n">Embedded</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">valuesElements</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">valuesElements</span> <span class="ow">in</span> <span class="n">node</span> <span class="p">]</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span> <span class="p">:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">label</span>
+                <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;data&#39;</span>
+                <span class="n">valuesDict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">compression</span> <span class="o">==</span> <span class="n">Full</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span>
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">Full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">valuesDict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">compression</span> <span class="o">==</span> <span class="n">Diagonal</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;startingIndices&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valuesDict</span><span class="p">:</span> <span class="n">valuesDict</span><span class="p">[</span><span class="s1">&#39;startingIndices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">Diagonal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">valuesDict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">valuesDict</span><span class="p">[</span><span class="s1">&#39;startingIndices&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">compression</span> <span class="o">==</span> <span class="n">Flattened</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span>
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">Flattened</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">valuesDict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">valuesDict</span><span class="p">[</span><span class="s1">&#39;starts&#39;</span><span class="p">],</span> <span class="n">valuesDict</span><span class="p">[</span><span class="s1">&#39;lengths&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">compression</span> <span class="o">==</span> <span class="n">Embedded</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span>
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">Embedded</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">subArrayElement</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+                <span class="n">array2</span> <span class="o">=</span> <span class="n">ArrayBase</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">subArrayElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">array1</span><span class="o">.</span><span class="n">addArray</span><span class="p">(</span><span class="n">array2</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unsupported array type = &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">compression</span><span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">array1</span></div>
+
+<div class="viewcode-block" id="ArrayBase.parseNodeAttributes"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.parseNodeAttributes">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeAttributes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span>  <span class="s1">&#39;shape&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+                        <span class="s1">&#39;symmetry&#39;</span>      <span class="p">:</span> <span class="p">(</span><span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+                        <span class="s1">&#39;permutation&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+                        <span class="s1">&#39;storageOrder&#39;</span>  <span class="p">:</span> <span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+                        <span class="s1">&#39;offset&#39;</span>        <span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+                        <span class="s1">&#39;compression&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+                        <span class="s1">&#39;index&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+                        <span class="s1">&#39;label&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="p">}</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span> <span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid attribute &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">attributes</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">](</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;shape attribute is missing from array&#39;</span><span class="p">)</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;compression&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;compression&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Full</span><span class="o">.</span><span class="n">compression</span>
+
+        <span class="k">return</span> <span class="n">attrs</span></div>
+
+<div class="viewcode-block" id="ArrayBase.indicesToFlatIndices"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.indicesToFlatIndices">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">indicesToFlatIndices</span><span class="p">(</span> <span class="n">shape</span><span class="p">,</span> <span class="n">indices</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">flatIndices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">shape</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;len( index ) = </span><span class="si">%d</span><span class="s1"> != len( shape ) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">index</span> <span class="p">),</span> <span class="nb">len</span><span class="p">(</span> <span class="n">shape</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">length</span><span class="p">,</span> <span class="n">flatIndex</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">flatIndex</span> <span class="o">*=</span> <span class="n">length</span>
+                <span class="n">flatIndex</span> <span class="o">+=</span> <span class="n">i2</span>
+                <span class="n">length</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+            <span class="n">flatIndices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">flatIndex</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">flatIndices</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ArrayBase.flatIndicesToIndices"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.flatIndicesToIndices">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">flatIndicesToIndices</span><span class="p">(</span> <span class="n">shape</span><span class="p">,</span> <span class="n">flatIndices</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">products</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">1</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">s1</span> <span class="ow">in</span> <span class="n">shape</span> <span class="p">:</span> <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">s1</span> <span class="o">*</span> <span class="n">products</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">del</span> <span class="n">products</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">products</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="n">flatIndices</span> <span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span> <span class="p">:</span>
+                <span class="n">i2</span><span class="p">,</span> <span class="n">i1</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span> <span class="n">i1</span><span class="p">,</span> <span class="n">product</span> <span class="p">)</span>
+                <span class="n">index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">i2</span> <span class="p">)</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">indices</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Full"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Full">[docs]</a><span class="k">class</span> <span class="nc">Full</span><span class="p">(</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;full&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">storageOrder</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span> 
+                <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span><span class="o">=</span><span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">ArrayBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span><span class="p">,</span> 
+                <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">data</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">else</span> <span class="p">:</span>                  <span class="c1"># Will be a &#39;square&#39; array. Checked in ArrayBase.</span>
+            <span class="n">length</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span> <span class="p">:</span> <span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">*</span> <span class="p">(</span> <span class="n">length</span> <span class="o">+</span> <span class="n">i1</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">size</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;shape requires </span><span class="si">%d</span><span class="s1"> values while data has </span><span class="si">%d</span><span class="s1"> values&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Full.constructArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Full.constructArray">[docs]</a>    <span class="k">def</span> <span class="nf">constructArray</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">import</span> <span class="nn">numpy</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="p">]</span> <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">lower</span><span class="p">:</span>
+                <span class="n">array1</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">tril_indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+                <span class="n">il</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tril_indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">iu</span> <span class="o">=</span> <span class="p">(</span><span class="n">il</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">il</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">array1</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="n">array1</span><span class="p">[</span><span class="n">il</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">upper</span><span class="p">:</span>
+                <span class="n">array1</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+                <span class="n">iu</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">il</span> <span class="o">=</span> <span class="p">(</span><span class="n">iu</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">iu</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">array1</span><span class="p">[</span><span class="n">il</span><span class="p">]</span> <span class="o">=</span> <span class="n">array1</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span>
+
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">itertools</span>
+
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="p">)</span>
+            <span class="n">dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">indexRange</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">dimension</span> <span class="o">*</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">]</span>
+            <span class="n">indexChange</span> <span class="o">=</span> <span class="n">dimension</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">upper</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> \
+                     <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">lower</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">columnMajor</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="p">:</span>
+                <span class="n">permutations</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span> <span class="n">indices</span> <span class="p">)</span>
+                <span class="k">for</span> <span class="n">permutation</span> <span class="ow">in</span> <span class="n">permutations</span> <span class="p">:</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">permutation</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">:</span> <span class="n">index</span> <span class="o">=</span> <span class="n">length</span> <span class="o">*</span> <span class="n">index</span> <span class="o">+</span> <span class="n">p1</span>
+                    <span class="n">array1</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="n">indexRange</span> <span class="p">:</span>
+                        <span class="n">indices</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">indices</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">length</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+                    <span class="k">for</span> <span class="n">i2</span> <span class="ow">in</span> <span class="n">indexRange</span> <span class="p">:</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">i1</span> <span class="o">==</span> <span class="n">i2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+                        <span class="n">indices</span><span class="p">[</span><span class="n">i2</span><span class="p">]</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">indexChange</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">indexChange</span> <span class="o">==</span> <span class="n">dimension</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">indexChange</span> <span class="o">-=</span> <span class="mi">1</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">indexChange</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="n">indexRange</span> <span class="p">:</span>
+                            <span class="k">if</span><span class="p">(</span> <span class="n">i1</span> <span class="o">==</span> <span class="p">(</span> <span class="n">dimension</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+                            <span class="k">if</span><span class="p">(</span> <span class="n">indices</span><span class="p">[</span><span class="n">indexChange</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+                            <span class="n">indices</span><span class="p">[</span><span class="n">indexChange</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="n">indexChange</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="n">indices</span><span class="p">[</span><span class="n">indexChange</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">order</span> <span class="o">=</span> <span class="p">{</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span> <span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">columnMajor</span> <span class="p">:</span> <span class="s1">&#39;F&#39;</span> <span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">]</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">array1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">order</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Full.copy"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Full.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">Full</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> 
+                <span class="n">symmetry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">,</span> 
+                <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permutation</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Full.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Full.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+
+        <span class="n">attributesStr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributesToXMLAttributeStr</span><span class="p">()</span>
+        <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributesStr</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_strList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">XML_strList</span></div></div>
+
+<div class="viewcode-block" id="Diagonal"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Diagonal">[docs]</a><span class="k">class</span> <span class="nc">Diagonal</span><span class="p">(</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;diagonal&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">startingIndices</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span> 
+                <span class="n">offset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ArrayBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span><span class="p">,</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="n">dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">data</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">startingIndices</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">startingIndices</span> <span class="o">=</span> <span class="n">dimension</span> <span class="o">*</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">]</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">startingIndices</span><span class="p">,</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">):</span>
+                <span class="n">startingIndices</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">(</span><span class="n">startingIndices</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">integer32</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">startingIndices</span><span class="o">.</span><span class="n">valueType</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">integer32</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;startingIndices must be a list of integers.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span> <span class="o">=</span> <span class="n">startingIndices</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;startingIndices&#39;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">startingIndices</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">startingIndices</span> <span class="p">)</span> <span class="o">%</span> <span class="n">dimension</span> <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;lenght of startingIndices = </span><span class="si">%d</span><span class="s1"> must be a multiple of dimension = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">startingIndices</span> <span class="p">),</span> <span class="n">dimension</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">startingIndices</span> <span class="o">=</span> <span class="p">[</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">startingIndices</span> <span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">min</span><span class="p">(</span> <span class="n">startingIndices</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;negative starting index not allowed&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startingIndices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">startingIndices</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">startingIndices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">startingIndices</span><span class="p">[:</span><span class="n">dimension</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">startingIndices</span> <span class="o">=</span> <span class="n">startingIndices</span><span class="p">[</span><span class="n">dimension</span><span class="p">:]</span>
+            <span class="n">startingIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startingIndices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">length</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="n">length</span> <span class="o">-</span> <span class="n">startingIndex</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;starting index must be less than length: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">startingIndex</span> <span class="p">)</span>
+            <span class="n">size</span> <span class="o">+=</span> <span class="n">offset</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">size</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;shape requires </span><span class="si">%d</span><span class="s1"> values while data has </span><span class="si">%d</span><span class="s1"> values&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Diagonal.constructArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Diagonal.constructArray">[docs]</a>    <span class="k">def</span> <span class="nf">constructArray</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">import</span> <span class="nn">numpy</span>
+        <span class="kn">import</span> <span class="nn">itertools</span>
+
+        <span class="n">valuesIndex</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">array1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="p">)</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">range1</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">startIndex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">startingIndices</span> <span class="p">:</span>
+            <span class="n">si</span> <span class="o">=</span> <span class="p">[</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">startIndex</span> <span class="p">]</span>
+            <span class="n">moreToDo</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">while</span><span class="p">(</span> <span class="n">moreToDo</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">valuesIndex</span><span class="p">]</span>
+                <span class="n">valuesIndex</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+                    <span class="n">permutations</span> <span class="o">=</span> <span class="p">[</span> <span class="n">si</span> <span class="p">]</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">permutations</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span> <span class="n">si</span> <span class="p">)</span>
+                <span class="k">for</span> <span class="n">permutation</span> <span class="ow">in</span> <span class="n">permutations</span> <span class="p">:</span>
+                    <span class="n">scale</span><span class="p">,</span> <span class="n">flatIndex</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">permutation</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">flatIndex</span> <span class="o">=</span> <span class="n">flatIndex</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">index</span>
+                        <span class="n">scale</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+                    <span class="n">array1</span><span class="p">[</span><span class="n">flatIndex</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="n">range1</span> <span class="p">:</span>
+                    <span class="n">si</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">si</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">shape</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">moreToDo</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">order</span> <span class="o">=</span> <span class="p">{</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">columnMajor</span><span class="p">:</span> <span class="s1">&#39;F&#39;</span> <span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">]</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">array1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">order</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Diagonal.copy"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Diagonal.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">startingIndicesOriginal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">startingIndicesOriginal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">startingIndicesOriginal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">Diagonal</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="n">startingIndicesOriginal</span><span class="p">,</span> 
+                <span class="n">symmetry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">,</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permutation</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Diagonal.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Diagonal.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">attributesStr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributesToXMLAttributeStr</span><span class="p">()</span>
+        <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributesStr</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_strList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">XML_strList</span></div></div>
+
+<div class="viewcode-block" id="Flattened"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened">[docs]</a><span class="k">class</span> <span class="nc">Flattened</span><span class="p">(</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;flattened&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="s1">&#39;lengths&#39;</span><span class="p">,</span> <span class="s1">&#39;starts&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">starts</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> 
+                <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                <span class="n">dataToString</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ArrayBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span><span class="p">,</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataToString</span> <span class="o">=</span> <span class="n">dataToString</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">data</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">starts</span><span class="p">,</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> 
+                <span class="n">starts</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">integer32</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">lengths</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">integer32</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">starts</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">lengths</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;length of starts = </span><span class="si">%d</span><span class="s1"> must equal length of lengths = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
+                <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">starts</span> <span class="p">),</span> <span class="nb">len</span><span class="p">(</span> <span class="n">lengths</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="n">lengths</span> <span class="p">:</span> <span class="n">length</span> <span class="o">+=</span> <span class="n">i1</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">size</span> <span class="o">!=</span> <span class="n">length</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;number of data = </span><span class="si">%d</span><span class="s1"> and sum of length = </span><span class="si">%d</span><span class="s1"> differ&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">size</span><span class="p">,</span> <span class="n">length</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">indexPriorEnd</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">starts</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;negative start (=</span><span class="si">%d</span><span class="s1">) not allowed&#39;</span> <span class="o">%</span> <span class="n">start</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">indexPriorEnd</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;data overlap: prior index end = </span><span class="si">%d</span><span class="s1"> current start = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indexPriorEnd</span><span class="p">,</span> <span class="n">start</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">lengths</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;negative length (=</span><span class="si">%d</span><span class="s1">) not allowed&#39;</span> <span class="o">%</span> <span class="n">length</span> <span class="p">)</span>
+            <span class="n">indexPriorEnd</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">length</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">indexPriorEnd</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;data beyond array boundary: indexPriorEnd = </span><span class="si">%d</span><span class="s1">, size = </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span> <span class="n">indexPriorEnd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">starts</span> <span class="o">=</span> <span class="n">starts</span>
+        <span class="n">starts</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;starts&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">starts</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span> <span class="o">=</span> <span class="n">lengths</span>
+        <span class="n">lengths</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;lengths&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Flattened.constructArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.constructArray">[docs]</a>    <span class="k">def</span> <span class="nf">constructArray</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">import</span> <span class="nn">numpy</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">array1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">starts</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">length</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">array1</span><span class="p">[</span><span class="n">start</span><span class="o">+</span><span class="n">i2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+                <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">order</span> <span class="o">=</span> <span class="p">{</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">columnMajor</span><span class="p">:</span> <span class="s1">&#39;F&#39;</span> <span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">]</span>
+        <span class="n">array1</span> <span class="o">=</span> <span class="n">array1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">order</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">lower</span><span class="p">:</span>
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">array1</span><span class="p">)</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">array1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">upper</span><span class="p">:</span>
+            <span class="n">array1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">array1</span><span class="p">)</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">array1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">return</span> <span class="n">array1</span></div>
+
+<div class="viewcode-block" id="Flattened.copy"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">Flattened</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">starts</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> 
+                <span class="n">symmetry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">,</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permutation</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Flattened.fromNumpyArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.fromNumpyArray">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fromNumpyArray</span><span class="p">(</span> <span class="n">array</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">nzeroes</span> <span class="o">=</span> <span class="mi">4</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a sparse flattened array that represents an arbitrary numpy array.</span>
+<span class="sd">        Only supports &#39;full&#39; or &#39;lower-symmetric&#39; matrices, with row-major data storage.</span>
+<span class="sd">        :param array: input numpy array</span>
+<span class="sd">        :param symmetry: allowed values are &#39;none&#39; or &#39;lower&#39;</span>
+<span class="sd">        :param nzeroes: how many zeroes to allow before adding a new &#39;start&#39; and &#39;length&#39; </span>
+<span class="sd">        :return: </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">starts</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">sparseData</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">helper</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">):</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">stop</span> <span class="o">=</span> <span class="n">idx</span><span class="o">+</span><span class="mi">1</span>
+                    <span class="k">while</span> <span class="n">stop</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">stop</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">stop</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">stop</span><span class="p">:</span><span class="n">stop</span> <span class="o">+</span> <span class="n">nzeroes</span><span class="p">]):</span>
+                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nzeroes</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">stop</span> <span class="o">+</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="n">stop</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="n">stop</span> <span class="o">+=</span> <span class="n">i</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">break</span>
+                    <span class="n">starts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">idx</span> <span class="o">+</span> <span class="n">offset</span> <span class="p">)</span>
+                    <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">idx</span> <span class="p">)</span>
+                    <span class="n">sparseData</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="p">)</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">stop</span>
+                <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+            <span class="n">helper</span><span class="p">(</span> <span class="n">array</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">symmetry</span> <span class="o">==</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">lower</span><span class="p">:</span>
+            <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+                <span class="n">dat</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">row</span><span class="p">][:</span><span class="n">row</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">helper</span><span class="p">(</span> <span class="n">dat</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">row</span> <span class="o">*</span> <span class="n">cols</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Symmetry = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">symmetry</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Flattened</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sparseData</span><span class="p">,</span> <span class="n">starts</span><span class="o">=</span><span class="n">starts</span><span class="p">,</span> <span class="n">lengths</span><span class="o">=</span><span class="n">lengths</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="n">symmetry</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Flattened.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+
+        <span class="n">attributesStr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributesToXMLAttributeStr</span><span class="p">()</span>
+        <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributesStr</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starts</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_strList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">XML_strList</span></div></div>
+
+<div class="viewcode-block" id="Embedded"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded">[docs]</a><span class="k">class</span> <span class="nc">Embedded</span><span class="p">(</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;embedded&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">storageOrder</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span>
+                <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span><span class="o">=</span><span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">ArrayBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span><span class="p">,</span> 
+                <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Embedded.addArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.addArray">[docs]</a>    <span class="k">def</span> <span class="nf">addArray</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">array</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">array</span><span class="p">,</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;variable not an array instance&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">&lt;</span> <span class="n">array</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;cannot embedded array into a smaller dimensional array: </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">reversed</span><span class="p">(</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">array</span><span class="o">.</span><span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;embedded array must have offset defined&#39;</span> <span class="p">)</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">reversed</span><span class="p">(</span> <span class="n">array</span><span class="o">.</span><span class="n">offset</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">shapeOfParent</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">reversed</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">offsets</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="n">shapeOfParent</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;child array outside of parent: </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">offset</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">array</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Embedded.constructArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.constructArray">[docs]</a>    <span class="k">def</span> <span class="nf">constructArray</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">import</span> <span class="nn">numpy</span>
+
+        <span class="n">order</span> <span class="o">=</span> <span class="p">{</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">columnMajor</span><span class="p">:</span> <span class="s1">&#39;F&#39;</span> <span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">]</span>
+        <span class="n">array1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">order</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span> <span class="p">:</span>
+            <span class="n">array2</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">constructArray</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">slice1</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">slice</span><span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">array2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span> <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">array</span><span class="o">.</span><span class="n">offset</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="n">array1</span><span class="p">[</span><span class="n">slice1</span><span class="p">]</span> <span class="o">=</span> <span class="n">array2</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">array1</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Embedded.copy"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">array1</span> <span class="o">=</span> <span class="n">Embedded</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> 
+                <span class="n">symmetry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">,</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permutation</span><span class="p">,</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span> <span class="p">:</span> <span class="n">array1</span><span class="o">.</span><span class="n">addArray</span><span class="p">(</span> <span class="n">array</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">array1</span></div>
+
+<div class="viewcode-block" id="Embedded.offsetScaleValues"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.offsetScaleValues">[docs]</a>    <span class="k">def</span> <span class="nf">offsetScaleValues</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Modify every sub-array: multiply by scale and add offset.&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">subarray</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span><span class="p">:</span> <span class="n">subarray</span><span class="o">.</span><span class="n">offsetScaleValues</span><span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Embedded.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+
+        <span class="n">attributesStr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributesToXMLAttributeStr</span><span class="p">()</span>
+        <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributesStr</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span><span class="p">:</span> <span class="n">toXML_strList</span> <span class="o">+=</span> <span class="n">array</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">toXML_strList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">toXML_strList</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.xDataArray</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

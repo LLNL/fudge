@@ -14,12 +14,13 @@ import subprocess
 
 minimumNumpy = 1.15
 cwd = 'file://localhost%s/' % os.getcwd()
+numpyErrorMessage = f'Install numpy>={minimumNumpy} before installing FUDGE'
 try:
     import numpy
     assert float('.'.join(numpy.__version__.split('.')[:2])) >= minimumNumpy, numpyErrorMessage
 
 except (ImportError, ModuleNotFoundError):
-    sys.exit('Install numpy>=%s before installing FUDGE' % minimumNumpy)
+    sys.exit(numpyErrorMessage)
 
 
 class CustomInstall(install):

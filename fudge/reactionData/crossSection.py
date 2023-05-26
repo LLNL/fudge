@@ -540,10 +540,14 @@ class Background(ancestryModule.AncestryIO):
                 raise NotImplementedError("Inconsistent axes/units inside background cross section")
 
             if isinstance(term.data, XYs1d):
-                regions.append(term.data.copy())
+                data = term.data.copy()
+                data.label = term.moniker
+                regions.append(data)
             elif isinstance(term.data, Regions1d):
-                for region in term.data:
-                    regions.append(region.copy())
+                for index, region in enumerate(term.data):
+                    data = region.copy()
+                    data.label = '%s: %s' % (term.moniker, index)
+                    regions.append(data)
         regions.axes = axes
         return regions
 
@@ -660,6 +664,11 @@ class ResonancesWithBackground(BaseCrossSectionForm):
 
         return self.background.domainUnit
 
+    def backgroundAsRegions1d(self):
+        '''This methods returns the backgroup cross sections as a Regions1d instance.'''
+
+        return self.background.toRegions()
+        
     def convertUnits(self, unitMap):
         """See documentation for reactionSuite.convertUnits."""
 

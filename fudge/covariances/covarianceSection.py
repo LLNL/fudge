@@ -104,7 +104,8 @@ class CovarianceSection(suitesModule.Suite):
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        moniker = self.monikerByFormat.get(kwargs['formatVersion'], self.moniker)
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
+        moniker = self.monikerByFormat.get(formatVersion, self.moniker)
         xmlString = [indent+'<%s label="%s"' % (moniker, self.label)]
         if self.crossTerm: xmlString[0] += ' crossTerm="true"'
         xmlString[0] += '>'

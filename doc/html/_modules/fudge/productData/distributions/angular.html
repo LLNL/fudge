@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>fudge.productData.distributions.angular &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -834,7 +836,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">angularSubform</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">angularSubform</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">angularSubform</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>                 <span class="c1"># FIXME: Need to check the type of angularSubform.</span>
         <span class="n">baseModule</span><span class="o">.</span><span class="n">Form</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="p">(</span> <span class="n">angularSubform</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -892,10 +894,18 @@
 
         <span class="n">productMass</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
         <span class="n">residualMass</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">productMass</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">residualMass</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">productMass</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>                      <span class="c1"># This is capture with product being primary photon.</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">inputMass</span> <span class="o">=</span> <span class="n">projectileMass</span> <span class="o">+</span> <span class="n">targetMass</span>
+            <span class="n">gammaEnergy</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">+</span> <span class="n">energyIn</span> <span class="o">*</span> <span class="n">targetMass</span> <span class="o">/</span> <span class="n">inputMass</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">Q</span> <span class="o">/</span> <span class="n">inputMass</span><span class="p">)</span>
+            <span class="n">halfWidth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;twoBodyCOM_energyResolution&#39;</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">gammaEnergy</span> <span class="o">-</span> <span class="n">halfWidth</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="n">gammaEnergy</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">halfWidth</span><span class="p">],</span> <span class="p">[</span><span class="n">gammaEnergy</span> <span class="o">+</span> <span class="n">halfWidth</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]]</span>
+            <span class="k">return</span> <span class="n">energyModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">energyModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">residualMass</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    WARNING: skipping unsupported relativistic TwoBody.energySpectrumAtEnergy: product mass = </span><span class="si">%s</span><span class="s1">, target mass = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> 
                 <span class="p">(</span><span class="n">productMass</span><span class="p">,</span> <span class="n">residualMass</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">energyModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">energyModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">))</span>
+
         <span class="k">if</span> <span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">product</span><span class="p">:</span>
             <span class="n">productMass</span><span class="p">,</span> <span class="n">residualMass</span> <span class="o">=</span> <span class="n">residualMass</span><span class="p">,</span> <span class="n">productMass</span>
 
@@ -1359,12 +1369,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1385,7 +1395,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

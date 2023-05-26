@@ -362,7 +362,7 @@ class ProcessedFlux():
             self.temperature = temperatureOrFluxInstance.temperature
             self.multiGroupFlux = temperatureOrFluxInstance.multiGroupFlux
 
-        elif isinstance(temperatureOrFluxInstance, numpy.float):
+        elif isinstance(temperatureOrFluxInstance, float):
             if not isinstance(fluxVector, vectorModule.Vector):
                 raise TypeError(f'The second argument is expected to be of type {vectorModule.Vector}')
 
@@ -385,7 +385,7 @@ def CollapseMatrix(preCollapsedMatrix, multiGroupSettings, particles, temperatur
     if not isinstance(preCollapsedMatrix, matrixModule.Matrix):
         raise TypeError(f'The first argument is expected to of the type {matrixModule.Matrix}')
 
-    if preCollapsedMatrix.size == 0:
+    if preCollapsedMatrix.shape == 0:
         return multiGroupSettings.multiGroupZeroMatrix(particles, productID, collapse=True)
 
     else:

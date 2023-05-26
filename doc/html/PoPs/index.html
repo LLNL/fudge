@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Properties of Particles (PoPs) &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Introduction" href="intro.html" />
+    <link rel="prev" title="xData" href="../xData/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../xData/index.html" title="xData"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Properties of Particles (PoPs)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="properties-of-particles-pops">
+<h1>Properties of Particles (PoPs)<a class="headerlink" href="#properties-of-particles-pops" title="Permalink to this heading">¶</a></h1>
+<p>Welcome to documentation for the Properties of Particles (PoPs) database!
+PoPs is designed to store information about a range of particles, from leptons and bosons
+up to nuclei, atoms, and possibly molecules. Properties like mass, charge, spin and parity, half-life
+and decay properties can be added to each particle in the database. The database offers a quick way to
+access any particle that it contains.</p>
+</section>
+<section id="contents">
+<h1>Contents<a class="headerlink" href="#contents" title="Permalink to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial and examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">The PoPs database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="families.html">Particle families</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="families.html#module-PoPs.families.particle">Base particle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="families.html#module-PoPs.families.gaugeBoson">gaugeBoson</a></li>
+<li class="toctree-l2"><a class="reference internal" href="families.html#module-PoPs.families.lepton">lepton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="families.html#module-PoPs.families.baryon">baryon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="families.html#module-PoPs.families.nuclide">nuclide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="families.html#module-PoPs.families.nucleus">nucleus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="families.html#module-PoPs.families.unorthodox">unorthodox</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="groups.html">Particle groups</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="groups.html#module-PoPs.chemicalElements.chemicalElements">chemicalElements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="groups.html#module-PoPs.chemicalElements.chemicalElement">chemicalElement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="groups.html#module-PoPs.chemicalElements.isotope">isotope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="groups.html#module-PoPs.chemicalElements.misc">misc</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quantities.html">Particle properties</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quantities.html#module-PoPs.quantities.quantity">quantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantities.html#module-PoPs.quantities.mass">mass</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantities.html#module-PoPs.quantities.charge">charge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantities.html#module-PoPs.quantities.spin">spin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantities.html#module-PoPs.quantities.parity">parity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantities.html#module-PoPs.quantities.halflife">halflife</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantities.html#module-PoPs.quantities.nuclearEnergyLevel">nuclearEnergyLevel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantities.html#module-PoPs.quantities.bindingEnergy">bindingEnergy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="atomic.html">Atomic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="atomic.html#module-PoPs.atomic.configuration">Atomic configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decays.html">Decay data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="decays.html#module-PoPs.decays.averageEnergy">averageEnergy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decays.html#module-PoPs.decays.probability">probability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decays.html#module-PoPs.decays.Q">Q</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decays.html#module-PoPs.decays.spectrum">spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decays.html#module-PoPs.decays.product">product</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decays.html#module-PoPs.decays.misc">misc</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fissionFragmentData.html">Fission fragment data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.nuclides">nuclides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.productYield">productYield</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.elapsedTime">elapsedTime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.spectrum">spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.time">time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.yields">yields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.QMatrix">QMatrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.product">product</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.multiplicity">multiplicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.delayedNeutronData">delayedNeutronData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.decayConstant">decayConstant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fissionFragmentData.html#module-PoPs.fissionFragmentData.rate">rate</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Particle IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html#module-PoPs.styles">Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html#module-PoPs.suite">Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html#module-PoPs.alias">Aliases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html#id1">Misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html#module-PoPs.warning">Warnings</a></li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="../genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="../py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="../search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Properties of Particles (PoPs)</a></li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../xData/index.html"
+                          title="previous chapter">xData</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="intro.html"
+                          title="next chapter">Introduction</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/PoPs/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../xData/index.html" title="xData"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Properties of Particles (PoPs)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

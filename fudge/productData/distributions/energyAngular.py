@@ -145,26 +145,26 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
         axes[1] = self.axes[-1]
 
         for index, energy_in in enumerate(self):
-            if isinstance(energy_in[0], Legendre):
-                integral = XYs1dModule.XYs1d( [ ( eout.outerDomainValue, eout.coefficients[0] ) for eout in energy_in ], axes = axes ).integrate()
-            else:
-                integral = XYs1dModule.XYs1d( [ ( eout.outerDomainValue, eout.integrate() ) for eout in energy_in ], axes = axes ).integrate()
+            integral = energy_in.integrate()
             if abs(integral-1.0) > info['normTolerance']:
-                warnings.append( warning.UnnormalizedDistribution( PQU.PQU( energy_in.outerDomainValue, axes[0].unit ), index, integral, self.toXLink() ) )
+                warnings.append(warning.UnnormalizedDistribution(PQU.PQU(energy_in.outerDomainValue, axes[0].unit),
+                                                                 index, integral, self.toXLink()))
             energy_outs = {}
-            for xy in energy_in :
-                energy_outs[xy.toPointwise_withLinearXYs( accuracy = XYs1dModule.defaultAccuracy, upperEps = 1e-8 ).rangeMin] = xy.outerDomainValue
-            minProb = min( energy_outs.keys( ) )
+            for xy in energy_in:
+                energy_outs[xy.toPointwise_withLinearXYs(accuracy=XYs1dModule.defaultAccuracy, upperEps=1e-8).rangeMin] = xy.outerDomainValue
+            minProb = min(energy_outs.keys())
             if minProb < 0:
-                warnings.append( warning.NegativeProbability( PQU.PQU( energy_in.outerDomainValue, axes[0].unit ), value = minProb, 
-                        energy_out = PQU.PQU( energy_outs[minProb], axes[1].unit ), obj = energy_in ) )
+                warnings.append(
+                    warning.NegativeProbability(PQU.PQU(energy_in.outerDomainValue, axes[0].unit), value=minProb,
+                                                energy_out=PQU.PQU(energy_outs[minProb], axes[1].unit), obj=energy_in))
             if self.interpolationQualifier is xDataEnumsModule.InterpolationQualifier.unitBase:
                 # check for more than one outgoing distribution integrating to 0 at high end of incident energies
                 integrals = [eout.integrate() for eout in energy_in]
                 for idx, integral in enumerate(integrals[::-1]):
                     if integral != 0: break
                 if idx > 1:
-                    warnings.append( warning.ExtraOutgoingEnergy( PQU.PQU( energy_in.outerDomainValue, axes[-1].unit ), obj = energy_in ) )
+                    warnings.append(warning.ExtraOutgoingEnergy(PQU.PQU(energy_in.outerDomainValue, axes[-1].unit),
+                                                                obj=energy_in))
         return warnings
 
     def energySpectrumAtEnergy(self, energyIn, **kwargs):

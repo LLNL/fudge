@@ -5,4 +5,4 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from . import checkPythonVerions
+from . import checkPythonVersion

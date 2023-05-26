@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoPs.chemicalElements.chemicalElements &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.chemicalElements.chemicalElements</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PoPs.chemicalElements.chemicalElements</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the class for the suite chemicalElements.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
+
+<span class="kn">from</span> <span class="nn">..chemicalElements</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">chemicalElementMiscModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">isotope</span> <span class="k">as</span> <span class="n">isotopeModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">chemicalElement</span> <span class="k">as</span> <span class="n">chemicalElementModule</span>
+
+<span class="kn">from</span> <span class="nn">..families</span> <span class="kn">import</span> <span class="n">nuclide</span> <span class="k">as</span> <span class="n">nuclideModule</span>
+<span class="kn">from</span> <span class="nn">..families</span> <span class="kn">import</span> <span class="n">nucleus</span> <span class="k">as</span> <span class="n">nucleusModule</span>
+
+<div class="viewcode-block" id="ChemicalElements"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements">[docs]</a><span class="k">class</span> <span class="nc">ChemicalElements</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class stores a list of chemicalElement instances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;chemicalElements&#39;</span>
+
+<div class="viewcode-block" id="ChemicalElements.__init__"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an empty suite of chemicalElements. Use the add() method to fill the suite.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">chemicalElementModule</span><span class="o">.</span><span class="n">ChemicalElement</span> <span class="p">],</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElements.__contains__"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements.__contains__">[docs]</a>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively search for key inside self and all child particle groups.</span>
+<span class="sd">        :param key: symbol or id of a particle or particle group</span>
+<span class="sd">        :return: True if key found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">baseID</span><span class="p">,</span> <span class="n">chemicalElementSymbol</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">levelID</span><span class="p">,</span> <span class="n">isNucleus</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="o">=</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">chemicalElementALevelIDsAndAnti</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">chemicalElementSymbol</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">chemicalElementSymbol</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">chemicalElementSymbol</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElements.__getitem__"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param key: string or integer</span>
+<span class="sd">        :return: chemicalElement, nuclide or nucleus.  Raises KeyError if key not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">baseID</span><span class="p">,</span> <span class="n">chemicalElementSymbol</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">levelID</span><span class="p">,</span> <span class="n">isNucleus</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="o">=</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">chemicalElementALevelIDsAndAnti</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">chemicalElementSymbol</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">chemicalElementSymbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">chemicalElement</span> <span class="o">=</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">chemicalElementSymbol</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">baseID</span> <span class="o">==</span> <span class="n">chemicalElementSymbol</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">chemicalElement</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">chemicalElement</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElements.add"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a particle or particle group to the proper location inside self</span>
+<span class="sd">        :param item: instance of chemicalElement, isotope, nuclide or nucleus</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="n">chemicalElementModule</span><span class="o">.</span><span class="n">ChemicalElement</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="p">(</span> <span class="n">isotopeModule</span><span class="o">.</span><span class="n">Isotope</span><span class="p">,</span> <span class="n">nuclideModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">,</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">chemicalElementSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">chemicalElementSymbol</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasSymbol</span><span class="p">(</span> <span class="n">chemicalElementSymbol</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">chemicalElementSymbol</span> <span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">chemicalElement</span> <span class="o">=</span> <span class="n">chemicalElementModule</span><span class="o">.</span><span class="n">ChemicalElement</span><span class="p">(</span> <span class="n">chemicalElementSymbol</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">nameFromZ</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">Z</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">chemicalElement</span> <span class="p">)</span>
+                <span class="n">chemicalElement</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Particle not a nuclide or nucleus object.&quot;</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElements.convertUnits"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; See convertUnits documentation in PoPs.database &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">chemicalElement</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">chemicalElement</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElements.getSymbol"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements.getSymbol">[docs]</a>    <span class="k">def</span> <span class="nf">getSymbol</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the chemicalElement with symbol == key, or raises KeyError if no such chemicalElement is found.</span>
+<span class="sd">        :param key: chemicalElement symbol</span>
+<span class="sd">        :return: chemicalElement instance (or raises KeyError)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElements.hasSymbol"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements.hasSymbol">[docs]</a>    <span class="k">def</span> <span class="nf">hasSymbol</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search for chemicalElement with symbol == key. Unlike __contains__, this method does not</span>
+<span class="sd">        recursively search inside child particle groups</span>
+<span class="sd">        :param key: chemicalElement symbol</span>
+<span class="sd">        :return: True if key present</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalElements.parseNode"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.chemicalElements.ChemicalElements.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">chemicalElementModule</span><span class="o">.</span><span class="n">ChemicalElement</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.chemicalElements.chemicalElements</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

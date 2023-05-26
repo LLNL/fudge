@@ -18,6 +18,8 @@ class NumberDict( dict ) :
 
     This class is used by the PhysicalUnit class to track units and their power.
     For example, for the unit 'm**2 / kg**3', the dictionary items are [('kg', -3), ('m', 2)].
+
+    This class is mainly for internal use.
     """
 
     def __getitem__( self, item ) :

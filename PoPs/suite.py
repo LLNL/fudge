@@ -136,6 +136,21 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         return [item.keyValue for item in self.__items]
 
+    def pop(self, key):
+        '''
+        Removes item with key *key* and returns it. If item is not found, a raise KeyError is executed.
+
+        :param key:       The key of the item to pop.
+
+        :return:            The item popped.
+        '''
+
+        for i1, item in enumerate(self.__items):
+            if item.keyValue == key:
+                return self.__items.pop(i1)
+
+        raise KeyError(key)
+
     def remove( self, key ) :
         """Remove object with specified key from the suite."""
 

@@ -32,6 +32,7 @@ energyUnitDefault = 'MeV'
 temperatureUnitDefault = 'MeV/k'
 discreteGammaResolutionDefault = 1e-2
 twoBodyCOMResolutionDefault = 1e-2
+twoBodyCOM_energyResolutionDefault = 0.01
 reactionCounter = -1
 outputLog = None
 accuracy = 1e-3
@@ -78,7 +79,9 @@ parser.add_argument( '--temperature', type = float,                             
 parser.add_argument( '--temperatureUnit', type = str, default = temperatureUnitDefault,         help = 'Temperature unit to convert to. Default is "%s".' % temperatureUnitDefault )
 parser.add_argument( '--outputDir', action = 'store', type=pathlib.Path,                        help = 'If present, output energy spectrum for each reaction and total are written to the directory specified by this option.' )
 parser.add_argument( '--twoBodyCOMResolution', action = 'store', type = float, default = twoBodyCOMResolutionDefault,
-                                                                                                help = 'When option "--com" is present, two-body reaction product a delta function for the outgoing particles. Their pdfs are treated as a triangle with energy width equal to twoBodyCOMResolution * its energy. Default value is %s' % twoBodyCOMResolutionDefault )
+                                                                                                help = 'This options is deprecated, please use --twoBodyCOMEnergyResolution. When option "--com" is present, two-body reaction product a delta function for the outgoing particles. Their pdfs are treated as a triangle with energy width equal to twoBodyCOMResolution * its energy. Default value is %s' % twoBodyCOMResolutionDefault )
+parser.add_argument( '--twoBodyCOM_energyResolution', action = 'store', type = float, default = None,
+                                                                                                help = 'When option "--com" is present, two-body reaction product a delta function for the outgoing particles. Their pdfs are treated as a triangle with energy width equal to twoBodyCOM_energyResolution. Default value is %s MeV.' % twoBodyCOM_energyResolutionDefault )
 parser.add_argument( '--discreteGammaResolution', action = 'store', type = float, default = discreteGammaResolutionDefault,
                                                                                                 help = 'All discrete gammas pdfs are treated as a triangle with energy width equal to discreteGammaResolution * its energy. Default value is %s' % discreteGammaResolutionDefault )
 parser.add_argument( '--plot', action = 'store_true',                                           help = 'If present, the total spectrum is plotted.' )
@@ -98,7 +101,9 @@ muMax = min(1.0, max(-1, args.muMax))
 if muMin >= muMax:
     raise Exception('muMin = %s must be less than muMax = %s.' % (muMin, muMax))
 
-minimumLogPoint = PQUModule.PQU( 1.e-11, 'MeV' ).getValueAs( args.energyUnit )
+minimumLogPoint = PQUModule.PQU(1.e-11, 'MeV').getValueAs(args.energyUnit)
+if args.twoBodyCOM_energyResolution is None:
+    args.twoBodyCOM_energyResolution = PQUModule.PQU(twoBodyCOM_energyResolutionDefault, 'MeV').getValueAs(args.energyUnit)
 
 productID = { PoPsID_Module.neutron : PoPsID_Module.neutron,
             'H1' : 'H1',            'p' : 'H1',
@@ -132,7 +137,7 @@ spectrumAxes = energyAxes.copy( )
 spectrumAxes.axes[0].unit = '%s/%s' % ( crossSectionUnit, args.energyUnit )
 
 sums = {}
-for MT, indices in [ ( 4, ( 50, 91 ) ), ( 103, ( 600, 649 ) ), ( 104, ( 650, 699 ) ), ( 105, ( 700, 749 ) ), ( 106, ( 750, 799 ) ), ( 107, ( 800, 849 ) ) ] :
+for MT, indices in [(4, (50, 91)), (103, (600, 649)), (104, (650, 699)), (105, (700, 749)), (106, (750, 799)), (107, (800, 849)), (102, (900, 999))]:
     sums[indices] = [ 0.0, XYs1dModule.XYs1d( axes = spectrumAxes ), MT ]
 
 reactionTiming = []
@@ -223,17 +228,19 @@ def output( MT, reactionStr, prefix, spectrum, crossSection ) :
     cdf = XYs1dModule.XYs1d( data = [ pdf.domainGrid, pdf.runningIntegral( ) ], dataForm = 'xsandys' )
     write( cdf, '_cdf', 'cdf' )
 
-def productSpectrum( self, pid, energy, parentMultiplicity, spectrum, discreteGammaData ) :
+def productSpectrum(self, pid, energy, parentMultiplicity, spectrum, discreteGammaData):
 
-    def branchingGammas( initialState, photonBranchingData, probability, discreteGammaData ) :
+    def branchingGammas(initialState, photonBranchingData, probability, discreteGammaData):
+        '''This needs to be replaced by the "completePhotons" data now returned by the call to PoPsDecayMiscModule.photonBranchingData.'''
 
-        if( initialState in photonBranchingData ) :
+        if initialState in photonBranchingData:
             gammas = photonBranchingData[initialState]['photons']
-            for branchingRatio, gammaEnergy, finalState in gammas :
-                gammaEnergy = float( gammaEnergy )
-                if( gammaEnergy not in discreteGammaData ) : discreteGammaData[gammaEnergy] = 0.0
-                discreteGammaData[gammaEnergy] += branchingRatio * probability
-                branchingGammas( finalState, photonBranchingData, branchingRatio * probability, discreteGammaData )
+            for branchingRatio, gammaEnergy, finalState, photonEmissionProbability in gammas:
+                gammaEnergy = float(gammaEnergy)
+                if gammaEnergy not in discreteGammaData:
+                    discreteGammaData[gammaEnergy] = 0.0
+                discreteGammaData[gammaEnergy] += branchingRatio * probability * photonEmissionProbability
+                branchingGammas(finalState, photonBranchingData, branchingRatio * probability, discreteGammaData)
 
     if( isinstance( self.multiplicity[0], multiplicityModule.Branching1d ) ) :
         parentProduct = self.parentProduct
@@ -244,7 +251,7 @@ def productSpectrum( self, pid, energy, parentMultiplicity, spectrum, discreteGa
     multiplicityAtEnergy = self.multiplicity.evaluate( energy )
     if specialNuclearParticleIDPoPsModule.sameSpecialNuclearParticle(pid, self.pid) and multiplicityAtEnergy != 0.0:
         spectrum2 = self.distribution.energySpectrumAtEnergy(energy, frame, twoBodyCOMResolution=args.twoBodyCOMResolution, 
-                styleLabel=styleLabel, muMin=muMin, muMax=muMax)
+                twoBodyCOM_energyResolution=args.twoBodyCOM_energyResolution, styleLabel=styleLabel, muMin=muMin, muMax=muMax)
         spectrum2 *= multiplicityAtEnergy
         spectrum2 = addCurves( spectrum, spectrum2 )
         spectrum.setData( spectrum2 )

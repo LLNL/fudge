@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Tutorial and Examples &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Database" href="database.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="database.html" title="Database"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Properties of Particles (PoPs)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tutorial and Examples</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="tutorial-and-examples">
+<span id="tutorial"></span><h1>Tutorial and Examples<a class="headerlink" href="#tutorial-and-examples" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial provides a quick start, showing how to create a PoPs database, populate it with some
+particles and then access particle properties. Start by creating a new empty database:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PoPs</span> <span class="kn">import</span> <span class="n">database</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PoPs.families</span> <span class="kn">import</span> <span class="n">baryon</span><span class="p">,</span> <span class="n">nuclide</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PoPs.quantities</span> <span class="kn">import</span> <span class="n">quantity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pops</span> <span class="o">=</span> <span class="n">database</span><span class="o">.</span><span class="n">database</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;PoPs_example&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">defaultLabel</span> <span class="o">=</span> <span class="s1">&#39;eval&#39;</span>
+</pre></div>
+</div>
+<p>The defaultLabel is used to identify particle properties (see discussion about multiple assignments in
+the <a class="reference external" href="quantities.html">quantities module</a>).
+Next we create a new particle (the neutron), add some properties and then add it to the database:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">neutron</span> <span class="o">=</span> <span class="n">baryon</span><span class="o">.</span><span class="n">particle</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">neutron</span><span class="o">.</span><span class="n">buildFromRawData</span><span class="p">(</span>
+<span class="go">    mass = (1.00866491574, &#39;amu&#39;),</span>
+<span class="go">    spin = (1/2, &#39;hbar&#39;),</span>
+<span class="go">    parity = (1,&#39;&#39;),</span>
+<span class="go">    charge = (0,&#39;e&#39;),</span>
+<span class="go">    halflife = (881.5,&#39;s&#39;),</span>
+<span class="go">    label = defaultLabel</span>
+<span class="go">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pops</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">neutron</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The ‘add’ method determines where the new particle should be stored in the database (in this case it belongs
+in the ‘baryons’ section) and stores it appropriately.</p>
+<p>Uncertainties can also be added to a quantity:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">xData.uncertainty.physicalQuantity</span> <span class="kn">import</span> <span class="n">uncertainty</span><span class="p">,</span> <span class="n">standard</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">neutron</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="n">defaultLabel</span><span class="p">]</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">uncertainty</span><span class="o">.</span><span class="n">uncertainty</span><span class="p">(</span>
+<span class="go">    standard.standard( uncertainty.double(4.9e-10) ) )</span>
+</pre></div>
+</div>
+<p>The uncertainty is assumed to have the same units as its associated value.</p>
+<p>A PoPs particle can print itself to XML:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span> <span class="n">neutron</span><span class="o">.</span><span class="n">toXML</span><span class="p">()</span> <span class="p">)</span>
+<span class="go">&lt;baryon id=&quot;n&quot;&gt;</span>
+<span class="go">  &lt;mass&gt;</span>
+<span class="go">    &lt;double label=&quot;eval&quot; value=&quot;1.00866491574&quot; unit=&quot;amu&quot;&gt;</span>
+<span class="go">      &lt;uncertainty&gt;</span>
+<span class="go">        &lt;standard&gt;</span>
+<span class="go">          &lt;double value=&quot;1.5e-08&quot;/&gt;&lt;/standard&gt;&lt;/uncertainty&gt;&lt;/double&gt;&lt;/mass&gt;</span>
+<span class="go">  &lt;spin&gt;</span>
+<span class="go">    &lt;fraction label=&quot;eval&quot; value=&quot;0&quot; unit=&quot;hbar&quot;/&gt;&lt;/spin&gt;</span>
+<span class="go">  &lt;parity&gt;</span>
+<span class="go">    &lt;integer label=&quot;eval&quot; value=&quot;1&quot;/&gt;&lt;/parity&gt;</span>
+<span class="go">  &lt;charge&gt;</span>
+<span class="go">    &lt;integer label=&quot;eval&quot; value=&quot;0&quot; unit=&quot;e&quot;/&gt;&lt;/charge&gt;</span>
+<span class="go">  &lt;halflife&gt;</span>
+<span class="go">    &lt;double label=&quot;eval&quot; value=&quot;881.5&quot; unit=&quot;s&quot;/&gt;&lt;/halflife&gt;&lt;/baryon&gt;</span>
+</pre></div>
+</div>
+<p>Next we add an excited-state nuclide to the database:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Am242_e2</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">particle</span><span class="p">(</span> <span class="s1">&#39;Am242_e2&#39;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>When a nuclide (i.e. an atom containing a particular nucleus) is created, the corresponding nucleus
+is also automatically created. Properties can be added to both the nuclide and the nucleus, where
+the nuclide properties apply to the electrons as well as the nucleus.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Am242_e2</span><span class="o">.</span><span class="n">buildFromRawData</span><span class="p">(</span> <span class="n">mass</span><span class="o">=</span><span class="p">(</span><span class="mf">242.0593557</span><span class="p">,</span> <span class="s1">&#39;amu&#39;</span><span class="p">)</span> <span class="p">)</span>  <span class="c1"># atomic mass including electrons</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Am242_e2</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">buildFromRawData</span><span class="p">(</span> <span class="n">spin</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;hbar&#39;</span><span class="p">)</span> <span class="p">)</span>   <span class="c1"># nuclear spin, not including electrons</span>
+</pre></div>
+</div>
+<p>The buildFromRawData method does not yet support adding excited state energies, but they can be added directly:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PoPs.quantities</span> <span class="kn">import</span> <span class="n">nuclearEnergyLevel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Am242_e2</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">nuclearEnergyLevel</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="mf">4.86e+4</span><span class="p">,</span> <span class="s1">&#39;eV&#39;</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Now add this new particle to the database. Note that this will also add a chemicalElement particle group
+(Americium) and an isotope particle group (Am242), inserting the nuclide inside the isotope.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pops</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">Am242_e2</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You may recognize Am242_e2 as a metastable state. We can add an alias identifying it as metastable:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PoPs.alias</span> <span class="kn">import</span> <span class="n">MetaStable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pops</span><span class="o">.</span><span class="n">aliases</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">MetaStable</span><span class="p">(</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;Am242_m1&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="n">Am242_e2</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">metaStableIndex</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This gives us two different ways to access the metastable state:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tmp1</span> <span class="o">=</span> <span class="n">pops</span><span class="p">[</span><span class="s1">&#39;Am242_e2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmp2</span> <span class="o">=</span> <span class="n">pops</span><span class="p">[</span><span class="s1">&#39;Am242_m1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmp2</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">tmp1</span><span class="o">.</span><span class="n">id</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A PoPs database can be written out to an XML file:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pops</span><span class="o">.</span><span class="n">saveToFile</span><span class="p">(</span><span class="s2">&quot;pops.xml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To load the data back into memory,</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">popsCopy</span> <span class="o">=</span> <span class="n">database</span><span class="o">.</span><span class="n">readFile</span><span class="p">(</span><span class="s2">&quot;pops.xml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="intro.html"
+                          title="previous chapter">Introduction</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="database.html"
+                          title="next chapter">Database</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/PoPs/tutorial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="database.html" title="Database"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Properties of Particles (PoPs)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tutorial and Examples</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

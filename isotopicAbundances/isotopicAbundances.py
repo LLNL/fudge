@@ -7,8 +7,8 @@
 
 '''
 This module contains the classes needed to represent the nodes of an isotopic abundance library.
-A library is a list of chemical elements with each chemical element has a list of isotopes
-for that chemical element what have isotopic abundance data. Each isotope in an isotopes node
+An isotopic abundance library is a list of chemical elements with each chemical element having 
+a unique list of natural occurring isotopes for that chemical element.  Each isotope in the library
 has an atom fraction and uncertainly. If the uncertainly for an isotope is not known, its 
 value must be -1.0.
 '''
@@ -22,7 +22,7 @@ from fudge import suites as suitesModule
 
 class Format(enumsModule.Enum):
     '''
-    This class represents the allowed formats for the IsotopicAbundancesByChemicalElement class.
+    This enum class represents the allowed formats for the IsotopicAbundancesByChemicalElement class.
     '''
 
     version_2_0 = '2.0'
@@ -35,7 +35,19 @@ class Format(enumsModule.Enum):
 
 class Isotope(ancestryModule.AncestryIO):
     '''
-    This class stores the atom fraction and its uncertainty for an isotope.
+    This class represents an iam *isotope* node and stores the atom fraction and its uncertainty for an isotope.
+
+    The following table list the primary members of this class:
+
+        +---------------+-----------------------------------------------------------+
+        | Member        | Description                                               |
+        +===============+===========================================================+
+        | id            | The Pops id for the isotope (e.g., "Fe56").               |
+        +---------------+-----------------------------------------------------------+
+        | atomFraction  | The atom fraction of *self*.                              |
+        +---------------+-----------------------------------------------------------+
+        | uncertainty   | The uncertainty of the atomFraction.                      |
+        +---------------+-----------------------------------------------------------+
     '''
 
     moniker = 'isotope'
@@ -130,7 +142,20 @@ class Isotopes(suitesModule.ExclusiveSuite):
 
 class ChemicalElement(ancestryModule.AncestryIO):
     '''
-    This class represents a chemical element which has a list of isotopes for the chemical element and a documentation member.
+    This class represents a chemical element which has a list of isotopes with "natural" abundance data
+    for this chemical element and a documentation member.
+
+    The following table list the primary members of this class:
+
+        +-------------------+-----------------------------------------------------------+
+        | Member            | Description                                               |
+        +===================+===========================================================+
+        | symbol            | The PoPs symbol for the chemical element (e.g., "Fe").    |
+        +-------------------+-----------------------------------------------------------+
+        | documentation     | A documentation node for *self*.                          |
+        +-------------------+-----------------------------------------------------------+
+        | __isotopes        | The list of isotopes for *self*                           |
+        +-------------------+-----------------------------------------------------------+
     '''
 
     # Missing member uncertainty.
@@ -202,6 +227,15 @@ class ChemicalElement(ancestryModule.AncestryIO):
         return atomFractionSum
 
     def mass(self, pops, unit='amu'):
+        '''
+        Calculates the element mass for *self* from the isotope atomFractions data in *self*
+        and the isotope masses given in *pops*.
+
+        :param pops:        A FUDGE PoPs instance from which masses are looked up.
+        :param unit:        The requested unit of the returned mass.
+
+        :return:            The calculated element mass as a float.
+        '''
 
         mass = 0.0
         for isotope in self:
@@ -252,7 +286,7 @@ class ChemicalElement(ancestryModule.AncestryIO):
 
 class ChemicalElements(suitesModule.ExclusiveSuite):
     '''
-    This class represents an chemicalElements instanse.
+    This class represents an chemicalElements instanse which contains a list of **ChemicalElement** instances.
     '''
 
     moniker = 'chemicalElements'
@@ -264,6 +298,23 @@ class ChemicalElements(suitesModule.ExclusiveSuite):
         suitesModule.ExclusiveSuite.__init__(self, (ChemicalElement,))
 
 class IsotopicAbundancesByChemicalElement(ancestryModule.AncestryIO):
+    '''
+    The classes represents an evaluation with a list of chemical elements evaluated.
+
+    The following table list the primary members of this class:
+
+        +-------------------+-----------------------------------------------------------+
+        | Member            | Description                                               |
+        +===================+===========================================================+
+        | evaluation        | The evaluation string for *self*.                         |
+        +-------------------+-----------------------------------------------------------+
+        | format            | The format of the file the data were stored in.           |
+        +-------------------+-----------------------------------------------------------+
+        | documentation     | The documentation for *self*.                             |
+        +-------------------+-----------------------------------------------------------+
+        | chemicalElements  | The list of unique chemical elements in *self*.           |
+        +-------------------+-----------------------------------------------------------+
+    '''
 
     moniker = 'isotopicAbundancesByChemicalElement'
     keyName = 'evaluation'
@@ -323,6 +374,15 @@ class IsotopicAbundancesByChemicalElement(ancestryModule.AncestryIO):
 
         return(self.__chemicalElements)
 
+    def getIsotope(self, id):
+
+        for chemicalElement in self.__chemicalElements:
+            for isotope in chemicalElement.isotopes:
+                if isotope.id == id:
+                    return(isotope)
+
+        return None
+
     def symbols(self):
         '''Returns a list of available chemical elements in *self*.'''
 
@@ -372,7 +432,7 @@ class IsotopicAbundancesByChemicalElement(ancestryModule.AncestryIO):
     @staticmethod
     def read(fileName, **kwargs):
         '''
-        Reads in the file named *fileName* and returns a **IsotopicAbundancesByChemicalElement** instance.
+        Reads in the file named *fileName* and returns a **IsotopicAbundancesByChemicalElement** instance of it.
 
         :param fileName:        The name of the file to read.
         :param kwargs:          External dictionary of extra arguments that aids in parsing.
@@ -382,7 +442,7 @@ class IsotopicAbundancesByChemicalElement(ancestryModule.AncestryIO):
 
 def read(fileName, **kwargs):
     '''
-    Reads in the file name *fileName* and returns a **IsotopicAbundancesByChemicalElement** instance.
+    Reads in the file named *fileName* and returns a **IsotopicAbundancesByChemicalElement** instance of it.
 
     :param fileName:            The name of the file to read.
     :param kwargs:              External dictionary of extra arguments that aids in parsing.

@@ -421,11 +421,11 @@ def writeGammas( ENDLFiles, C, S, Q, X1, multiplicity, fullDistribution ) :
         ENDLFile = ENDLFiles[ENDLFileName]
         ENDLFile.addData( [ [ 0, fullDistribution ] ], Q = Q, X1 = X1, temperature = args.temperature )
 
+def addGammas(multiplicity, ID, photonBranchingData, branchingData):
 
-def addGammas( multiplicity, ID, photonBranchingData, branchingData ) :
-    for probability, energy, residualID in photonBranchingData[ID]['photons'] :
-        branchingData.append( [ multiplicity * probability, energy ] )
-        addGammas( multiplicity * probability, residualID, photonBranchingData, branchingData )
+    for probability, energy, residualID, photonEmissionProbability in photonBranchingData[ID]['photons'] :
+        branchingData.append([multiplicity * probability * photonEmissionProbability, energy])
+        addGammas(multiplicity * probability, residualID, photonBranchingData, branchingData)
 
 branchingData = {}
 photonBranchingData = reactionSuite.photonBranchingData( )

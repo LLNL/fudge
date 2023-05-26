@@ -47,7 +47,7 @@ clean:
 	cd fudge/processing/deterministic/upscatter; $(MAKE) realclean
 	cd PoPs; $(MAKE) realclean
 	cd pqu; $(MAKE) realclean
-
+	cd doc/sphinx; $(MAKE) realclean
 
 realclean: clean
 	rm -rf Out

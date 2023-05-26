@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.Documentation.documentation &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.Documentation.documentation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.Documentation.documentation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the GNDS documentation class.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">date</span> <span class="k">as</span> <span class="n">dateModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">author</span> <span class="k">as</span> <span class="n">authorModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">contributor</span> <span class="k">as</span> <span class="n">contributorModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">collaboration</span> <span class="k">as</span> <span class="n">collaborationsModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">dates</span> <span class="k">as</span> <span class="n">datesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">copyright</span> <span class="k">as</span> <span class="n">copyrightModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">acknowledgement</span> <span class="k">as</span> <span class="n">acknowledgementModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">computerCode</span> <span class="k">as</span> <span class="n">computerCodeModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">keyword</span> <span class="k">as</span> <span class="n">keywordModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">relatedItem</span> <span class="k">as</span> <span class="n">relatedItemModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">bibitem</span> <span class="k">as</span> <span class="n">bibitemModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">exforDataSet</span> <span class="k">as</span> <span class="n">exforDataSetModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">texts</span> <span class="k">as</span> <span class="n">textsModule</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textParentModule</span>
+
+<div class="viewcode-block" id="Documentation"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation">[docs]</a><span class="k">class</span> <span class="nc">Documentation</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation node.&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;documentation&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;authors&#39;</span><span class="p">,</span> <span class="s1">&#39;contributors&#39;</span><span class="p">,</span> <span class="s1">&#39;collaborations&#39;</span><span class="p">,</span> <span class="s1">&#39;dates&#39;</span><span class="p">,</span> <span class="s1">&#39;copyright&#39;</span><span class="p">,</span> <span class="s1">&#39;acknowledgements&#39;</span><span class="p">,</span> <span class="s1">&#39;keywords&#39;</span><span class="p">,</span> 
+            <span class="s1">&#39;relatedItems&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;abstract&#39;</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="s1">&#39;computerCodes&#39;</span><span class="p">,</span> <span class="s1">&#39;experimentalDataSets&#39;</span><span class="p">,</span> <span class="s1">&#39;bibliography&#39;</span><span class="p">,</span> <span class="s1">&#39;endfCompatible&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doi</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">publicationDate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">doi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">publicationDate</span> <span class="o">=</span> <span class="n">publicationDate</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span> <span class="o">=</span> <span class="n">authorModule</span><span class="o">.</span><span class="n">Authors</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__contributors</span> <span class="o">=</span> <span class="n">contributorModule</span><span class="o">.</span><span class="n">Contributors</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__contributors</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__collaborations</span> <span class="o">=</span> <span class="n">collaborationsModule</span><span class="o">.</span><span class="n">Collaborations</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__collaborations</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dates</span> <span class="o">=</span> <span class="n">datesModule</span><span class="o">.</span><span class="n">Dates</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dates</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__copyright</span> <span class="o">=</span> <span class="n">copyrightModule</span><span class="o">.</span><span class="n">Copyright</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__copyright</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__acknowledgements</span> <span class="o">=</span> <span class="n">acknowledgementModule</span><span class="o">.</span><span class="n">Acknowledgements</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__acknowledgements</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__keywords</span> <span class="o">=</span> <span class="n">keywordModule</span><span class="o">.</span><span class="n">Keywords</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__keywords</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__relatedItems</span> <span class="o">=</span> <span class="n">relatedItemModule</span><span class="o">.</span><span class="n">RelatedItems</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__relatedItems</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__title</span> <span class="o">=</span> <span class="n">textsModule</span><span class="o">.</span><span class="n">Title</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__title</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__abstract</span> <span class="o">=</span> <span class="n">textsModule</span><span class="o">.</span><span class="n">Abstract</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__abstract</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__body</span> <span class="o">=</span> <span class="n">textsModule</span><span class="o">.</span><span class="n">Body</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__computerCodes</span> <span class="o">=</span> <span class="n">computerCodeModule</span><span class="o">.</span><span class="n">ComputerCodes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__computerCodes</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__experimentalDataSets</span> <span class="o">=</span> <span class="n">exforDataSetModule</span><span class="o">.</span><span class="n">ExperimentalDataSets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__experimentalDataSets</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bibliography</span> <span class="o">=</span> <span class="n">bibitemModule</span><span class="o">.</span><span class="n">Bibliography</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bibliography</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__endfCompatible</span> <span class="o">=</span> <span class="n">textsModule</span><span class="o">.</span><span class="n">EndfCompatible</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__endfCompatible</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">doi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns self&#39;s doi.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doi</span>
+
+    <span class="nd">@doi</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">doi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doi</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets self&#39;s doi to *doi*.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doi</span> <span class="o">=</span> <span class="n">textParentModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">doi</span><span class="p">,</span> <span class="s1">&#39;doi&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns self&#39;s version.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__version</span>
+
+    <span class="nd">@version</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets self&#39;s version to *version*.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="o">=</span> <span class="n">textParentModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">publicationDate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns self&#39;s publicationDate.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__publicationDate</span>
+
+    <span class="nd">@publicationDate</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">publicationDate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets self&#39;s publicationDate to *date*.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__publicationDate</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Date</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Resolution</span><span class="o">.</span><span class="n">undefined</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Date</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid date.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__publicationDate</span> <span class="o">=</span> <span class="n">date</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">authors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">contributors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__contributors</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">collaborations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__collaborations</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dates</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copyright</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">acknowledgements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__acknowledgements</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keywords</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">relatedItems</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relatedItems</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__title</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">abstract</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__abstract</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">computerCodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__computerCodes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">experimentalDataSets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__experimentalDataSets</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bibliography</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bibliography</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">endfCompatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__endfCompatible</span>
+
+<div class="viewcode-block" id="Documentation.convertUnits"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method does nothing as there are no units to convert in documentation.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Documentation.findEntriesWithKey"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.findEntriesWithKey">[docs]</a>    <span class="k">def</span> <span class="nf">findEntriesWithKey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyValue</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the list of each entry in *self*&#39;s authors, contributors, collaborations, acknowledgements, relatedItems and computerCodes</span>
+<span class="sd">        which have the key *keyValue*.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__authors</span><span class="p">[</span><span class="n">keyValue</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__contributors</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__contributors</span><span class="p">[</span><span class="n">keyValue</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__collaborations</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__collaborations</span><span class="p">[</span><span class="n">keyValue</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__acknowledgements</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__acknowledgements</span><span class="p">[</span><span class="n">keyValue</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relatedItems</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__relatedItems</span><span class="p">[</span><span class="n">keyValue</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__computerCodes</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__computerCodes</span><span class="p">[</span><span class="n">keyValue</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">entries</span></div>
+
+<div class="viewcode-block" id="Documentation.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skipDocumentation&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">showEmptySuites</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptySuites&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
+
+        <span class="n">XMLList</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__contributors</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__collaborations</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dates</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copyright</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__acknowledgements</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keywords</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relatedItems</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__title</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__abstract</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__computerCodes</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__experimentalDataSets</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bibliography</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__endfCompatible</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">attributes</span>  <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">doi</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="s1">&#39; doi=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">doi</span>
+        <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="s1">&#39; version=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">attributes</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__publicationDate</span><span class="o">.</span><span class="n">asXML_attribute</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;publicationDate&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">showEmptySuites</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">XMLList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">XMLList</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributes</span><span class="p">))</span>
+        <span class="n">XMLList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+
+        <span class="k">return</span> <span class="n">XMLList</span></div>
+
+<div class="viewcode-block" id="Documentation.parseNode"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parseAncestryMembers</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Documentation.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">doi</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;doi&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">publicationDate</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Date</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;publicationDate&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">doi</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">publicationDate</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.Documentation.documentation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

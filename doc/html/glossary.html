@@ -1,20 +1,22 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Glossary &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -42,36 +44,36 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="glossary-1">
-<span id="glossary"></span><h1>Glossary<a class="headerlink" href="#glossary-1" title="Permalink to this headline">¶</a></h1>
+  <section id="glossary">
+<span id="id1"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this heading">¶</a></h1>
 <dl class="simple glossary">
-<dt id="term-component">component</dt><dd><p>A GNDS ‘reaction’ object contains several types of physical data, including the crossSection, the outputChannel
+<dt id="term-component">component<a class="headerlink" href="#term-component" title="Permalink to this term">¶</a></dt><dd><p>A GNDS ‘reaction’ object contains several types of physical data, including the crossSection, the outputChannel
 with a corresponding Q-value and list of products, and for each product a multiplicity and distribution.
 Each of these data types is a ‘component’ which contains one or more data ‘form’ (see below). Each form
 in the component should have a label corresponding to a ‘style’ defined in the reactionSuite styles section.</p>
 </dd>
-<dt id="term-evaluation">evaluation</dt><dd><p>A complete set of parameters (e.g. the cross sections) defined at all energies, even when no experimentally measured data are available.
+<dt id="term-evaluation">evaluation<a class="headerlink" href="#term-evaluation" title="Permalink to this term">¶</a></dt><dd><p>A complete set of parameters (e.g. the cross sections) defined at all energies, even when no experimentally measured data are available.
 It is the task of the evaluator to assess the most probable value of a parameter at any energy, resolving issues of discrepant measurement,
 assigning values (by an educated guess or based on model calculations) where no data are available and providing data in computer-readable format.</p>
 </dd>
-<dt id="term-form">form</dt><dd><p>A form is one representation of a type of data. Forms are collected inside of a component. For example, the crossSection component
+<dt id="term-form">form<a class="headerlink" href="#term-form" title="Permalink to this term">¶</a></dt><dd><p>A form is one representation of a type of data. Forms are collected inside of a component. For example, the crossSection component
 may contain an evaluated form (which might be ‘resonancesWithBackground’) along with several processed forms including
 ‘XYs1d’ (after resonance reconstruction and/or Doppler broadening) and ‘gridded1d’ (after grouping).
 Each form should have a label corresponding to a ‘style’ defined in the reactionSuite styles section.</p>
 </dd>
-<dt id="term-PoPs">PoPs</dt><dd><p>Properties of Particles (PoPs) is a database for storing particle information such as mass, spin, halflife, etc.
+<dt id="term-PoPs">PoPs<a class="headerlink" href="#term-PoPs" title="Permalink to this term">¶</a></dt><dd><p>Properties of Particles (PoPs) is a database for storing particle information such as mass, spin, halflife, etc.
 A PoPs database may be stored inside of a reactionSuite or may be stored as a separate stand-alone file.</p>
 </dd>
-<dt id="term-protare">protare</dt><dd><p>Contraction for ‘PROjectile + TARget + Evaluation’. Also known as a reactionSuite, a protare contains all possible reactions involving this projectile/target combination.</p>
+<dt id="term-protare">protare<a class="headerlink" href="#term-protare" title="Permalink to this term">¶</a></dt><dd><p>Contraction for ‘PROjectile + TARget + Evaluation’. Also known as a reactionSuite, a protare contains all possible reactions involving this projectile/target combination.</p>
 </dd>
-<dt id="term-reactionSuite">reactionSuite</dt><dd><p>Contains all possible reactions involving a projectile/target combination. May contain additional information such as summed reactions. Also sometimes called a Protare</p>
+<dt id="term-reactionSuite">reactionSuite<a class="headerlink" href="#term-reactionSuite" title="Permalink to this term">¶</a></dt><dd><p>Contains all possible reactions involving a projectile/target combination. May contain additional information such as summed reactions. Also sometimes called a Protare</p>
 </dd>
-<dt id="term-style">style</dt><dd><p>Defines a type of data stored inside a GNDS file. The most common style is ‘evaluated’ (corresponding to data added by an evaluator).
+<dt id="term-style">style<a class="headerlink" href="#term-style" title="Permalink to this term">¶</a></dt><dd><p>Defines a type of data stored inside a GNDS file. The most common style is ‘evaluated’ (corresponding to data added by an evaluator).
 Other styles include ‘crossSectionReconstructed’, ‘heated’, ‘griddedCrossSection’, etc. Each style defines some details about the data + how
 they were derived, and each style has a unique label used to associate that style with data elsewhere in the file.
 Also see the definitions of ‘component’ and ‘form’.</p>
 </dd>
-<dt id="term-suite">suite</dt><dd><p>A suite in GNDS contains a collection of similar objects. For example, the ‘reactions’ suite contains a list of ‘reaction’ instances
+<dt id="term-suite">suite<a class="headerlink" href="#term-suite" title="Permalink to this term">¶</a></dt><dd><p>A suite in GNDS contains a collection of similar objects. For example, the ‘reactions’ suite contains a list of ‘reaction’ instances
 while a ‘nuclides’ suite (in the PoPs particle database) contains a list of ‘nuclide’ objects.</p>
 </dd>
 </dl>
@@ -87,9 +89,11 @@ while a ‘nuclides’ suite (in the PoPs particle database) contains a list of 
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="fudge/fudge.reactions.html"
-                        title="previous chapter">fudge.reactions package</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="fudge/fudge.reactions.html"
+                          title="previous chapter">fudge.reactions package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -101,12 +105,12 @@ while a ‘nuclides’ suite (in the PoPs particle database) contains a list of 
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -129,7 +133,7 @@ while a ‘nuclides’ suite (in the PoPs particle database) contains a list of 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

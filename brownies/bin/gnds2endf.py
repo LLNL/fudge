@@ -55,6 +55,9 @@ if( __name__ == '__main__' ) :
             elif len(covariances) > 1:
                 raise NotImplementedError("Converting multiple covarianceSuites back to ENDF-6")
 
+    if gndsCov is not None and gndsCov.domainUnit != 'eV':
+        gndsCov.convertUnits({gndsCov.domainUnit: 'eV'})
+
     styleLabel = args.style
     if styleLabel is None:
         styleLabel = gnds.styles[0].label

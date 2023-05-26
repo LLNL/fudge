@@ -1,24 +1,26 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Installation &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Generalized Nuclear Data (GNDS)" href="gnds.html" />
+    <link rel="next" title="Sub-packages" href="sub-packages.html" />
     <link rel="prev" title="Downloading" href="downloading.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -31,7 +33,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gnds.html" title="Generalized Nuclear Data (GNDS)"
+          <a href="sub-packages.html" title="Sub-packages"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="downloading.html" title="Downloading"
@@ -46,8 +48,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="installation-1">
-<span id="installation"></span><h1>Installation<a class="headerlink" href="#installation-1" title="Permalink to this headline">¶</a></h1>
+  <section id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
 <p>The basic use of the FUDGE package requires the following:</p>
 <ul class="simple">
 <li><p>Git</p></li>
@@ -88,7 +90,7 @@
 </div>
 </div></blockquote>
 <section id="optional-extra-python-packages">
-<h2>[Optional] Extra python packages<a class="headerlink" href="#optional-extra-python-packages" title="Permalink to this headline">¶</a></h2>
+<h2>[Optional] Extra python packages<a class="headerlink" href="#optional-extra-python-packages" title="Permalink to this heading">¶</a></h2>
 <p>For more advanced use, Fudge depends on these additional packages:</p>
 <ul class="simple">
 <li><p>matplotlib for general plotting.</p></li>
@@ -98,7 +100,7 @@ user interface to interact and modify some of the common matplotlib plot options
 </ul>
 </section>
 <section id="optional-setting-environment-variables-not-required-after-installing-with-pip">
-<h2>[Optional] Setting Environment Variables (not required after installing with pip)<a class="headerlink" href="#optional-setting-environment-variables-not-required-after-installing-with-pip" title="Permalink to this headline">¶</a></h2>
+<h2>[Optional] Setting Environment Variables (not required after installing with pip)<a class="headerlink" href="#optional-setting-environment-variables-not-required-after-installing-with-pip" title="Permalink to this heading">¶</a></h2>
 <p>For general use of the fudge package, some changes should be made to your computer’s environment. The following lines make the required change.
 Note that &lt;path_to_fudge&gt; indicates the path to root FUDGE folder:</p>
 <ul>
@@ -120,7 +122,7 @@ Note that &lt;path_to_fudge&gt; indicates the path to root FUDGE folder:</p>
 </ul>
 </section>
 <section id="troubleshooting">
-<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading">¶</a></h2>
 <p>Users on OS X may have trouble compiling Merced (the C++ code responsible for generating transfer matrices
 for deterministic transport). Merced uses OpenMP threading, which is currently not supported by the default
 clang compiler on OS X.
@@ -157,8 +159,9 @@ variables, please let us know (email: <a class="reference external" href="mailto
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#optional-extra-python-packages">[Optional] Extra python packages</a></li>
 <li><a class="reference internal" href="#optional-setting-environment-variables-not-required-after-installing-with-pip">[Optional] Setting Environment Variables (not required after installing with pip)</a></li>
@@ -167,12 +170,17 @@ variables, please let us know (email: <a class="reference external" href="mailto
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="downloading.html"
-                        title="previous chapter">Downloading</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="gnds.html"
-                        title="next chapter">Generalized Nuclear Data (GNDS)</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="downloading.html"
+                          title="previous chapter">Downloading</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="sub-packages.html"
+                          title="next chapter">Sub-packages</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -184,12 +192,12 @@ variables, please let us know (email: <a class="reference external" href="mailto
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -204,7 +212,7 @@ variables, please let us know (email: <a class="reference external" href="mailto
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gnds.html" title="Generalized Nuclear Data (GNDS)"
+          <a href="sub-packages.html" title="Sub-packages"
              >next</a> |</li>
         <li class="right" >
           <a href="downloading.html" title="Downloading"
@@ -215,7 +223,7 @@ variables, please let us know (email: <a class="reference external" href="mailto
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

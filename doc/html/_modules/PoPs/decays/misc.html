@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoPs.decays.misc &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.decays.misc</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PoPs.decays.misc</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This module contains general enums and functions of use for decay data.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsModule</span>
+<span class="kn">from</span> <span class="nn">..families</span> <span class="kn">import</span> <span class="n">nucleus</span> <span class="k">as</span> <span class="n">nucleusModule</span>
+<span class="kn">from</span> <span class="nn">..families</span> <span class="kn">import</span> <span class="n">nuclide</span> <span class="k">as</span> <span class="n">nuclideModule</span>
+
+<div class="viewcode-block" id="Mode"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.misc.Mode">[docs]</a><span class="k">class</span> <span class="nc">Mode</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">electroMagnetic</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="completePhotonBranchingData"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.misc.completePhotonBranchingData">[docs]</a><span class="k">def</span> <span class="nf">completePhotonBranchingData</span><span class="p">(</span><span class="n">initialState</span><span class="p">,</span> <span class="n">branchingData</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">completePhotons</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    For *initialState*, determines the multiplicity (i.e., total probability) that a photon from</span>
+<span class="sd">    level *initialState* or any level it decays to is emitted. Data are added to *completePhotons*</span>
+<span class="sd">    as needed. *completePhotons* is a dictionary with keys &quot;inital:final&quot; where &quot;initial&quot; and final</span>
+
+<span class="sd">    represent the decay of initial to final leading to the emission of a photon. For example,</span>
+<span class="sd">    for the decay from level &quot;Fe56_e6&quot; to level &quot;Fe56_e3&quot; the key is &quot;Fe56_e6:Fe56_e3&quot;. The data</span>
+<span class="sd">    for each key is the energy difference of the initial and final levels and the multiplicity (i.e., </span>
+<span class="sd">    totoal probability) that the photon was emitted. For example, for Fe56 in ENDF/B-VIII.0., the</span>
+<span class="sd">    data for the key &quot;Fe56_e6:Fe56_e3&quot; are &quot;[PQU( &quot;462521.000000000 eV&quot; ), 0.009888135544683001]&quot;.</span>
+
+<span class="sd">    This function is mainly for use by the function **photonBranchingData** to fill in its &quot;completePhotons&quot; data.</span>
+
+<span class="sd">    :param initialState:            The current state (nuclide) the decaying isotope is in.</span>
+<span class="sd">    :param branchingData:           Branching data calculated by the function **photonBranchingData**.</span>
+<span class="sd">    :param probability:             The probability of reaching level *initialState*.</span>
+<span class="sd">    :param completePhotons:         The list of all emitted photon data.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">gammas</span> <span class="o">=</span> <span class="n">branchingData</span><span class="p">[</span><span class="n">initialState</span><span class="p">][</span><span class="s1">&#39;photons&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">branchingRatio</span><span class="p">,</span> <span class="n">gammaEnergy</span><span class="p">,</span> <span class="n">finalState</span><span class="p">,</span> <span class="n">photonEmissionProbability</span> <span class="ow">in</span> <span class="n">gammas</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">initialState</span><span class="p">,</span> <span class="n">finalState</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">completePhotons</span><span class="p">:</span>
+            <span class="n">completePhotons</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">gammaEnergy</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+        <span class="n">completePhotons</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">branchingRatio</span> <span class="o">*</span> <span class="n">probability</span> <span class="o">*</span> <span class="n">photonEmissionProbability</span>
+        <span class="n">completePhotonBranchingData</span><span class="p">(</span><span class="n">finalState</span><span class="p">,</span> <span class="n">branchingData</span><span class="p">,</span> <span class="n">branchingRatio</span> <span class="o">*</span> <span class="n">probability</span><span class="p">,</span> <span class="n">completePhotons</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="photonBranchingData"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.misc.photonBranchingData">[docs]</a><span class="k">def</span> <span class="nf">photonBranchingData</span><span class="p">(</span><span class="n">pops</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function summarizes all photon branches for the specified nuclide. The returned object is a dictionary with </span>
+<span class="sd">    keys &quot;energy&quot;, &quot;photons&quot; and &quot;completePhotons&quot;. The value of the &quot;energy&quot; key is the energy level of the nucleus. </span>
+<span class="sd">    The value of the &quot;photons&quot; key is a list of information about the the photons (i.e., gammas) emittied from the decay</span>
+<span class="sd">    of the nucleus.  For each photo, the information is the tuple branching ratio, **PQU** of the photon energy, final </span>
+<span class="sd">    nuclear state and photon emission probability. For example, for Fe56_e9 in ENDF/B-VIII.0, the data in the &quot;photons&quot; key is:</span>
+
+<span class="sd">    [ ( 0.013, PQU( &quot;0.265580000000000 MeV&quot; ), &quot;Fe56_e7&quot;, 0.9875568 ), </span>
+<span class="sd">      ( 0.987, PQU( &quot;1.303445 MeV&quot; ), &quot;Fe56_e2&quot;, 0.999862 ) ]</span>
+
+<span class="sd">    These data state that the Fe56_e9 nuclear level decays to Fe56_e7 0.13% of time emitting a photon of </span>
+<span class="sd">    energy 0.26558 MeV 98.75568% of the time, and it decays to Fe56_e2 98.7% of time emitting a photon of </span>
+<span class="sd">    energy 1.303445 MeV 99.9862% of the time.</span>
+
+<span class="sd">    The value of the &quot;completePhotons&quot; key is a dictionary. Each key in the dictionary is comprised of the initial</span>
+<span class="sd">    and final state ids for each emtted photon in the format &quot;intial:final&quot; (e.g., &quot;Fe56_e6:Fe56_e3&quot;) which means </span>
+<span class="sd">    that it is the photon emitted from the transition from the initial level to the final level (e.g., from level </span>
+<span class="sd">    &quot;Fe56_e6&quot; to level &quot;Fe56_e3&quot;). The data for each key is the energy of the emitted photon and its multiplicity.</span>
+<span class="sd">    The multiplicity is the total probability that this photon is emitted.</span>
+<span class="sd">    These data are obtained by calling the function **completePhotonBranchingData**.</span>
+
+<span class="sd">    :param pops:        A PoPs database.</span>
+<span class="sd">    :param id:          The id of the requested nuclide.</span>
+
+<span class="sd">    :return:            Dictionary with level energy and photon branching data for each nuclide in the isotope.</span>
+
+<span class="sd">    :raises TypeError:  If id is in *pops* but not of family nuclide or nucleus.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">nuclide</span> <span class="o">=</span> <span class="n">pops</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nuclide</span><span class="p">,</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">):</span>
+        <span class="n">nuclide</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">nuclide</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nuclide</span><span class="p">,</span> <span class="n">nuclideModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Id &quot;</span><span class="si">%s</span><span class="s1">&quot; not a nuclide or nucleus&#39;</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>
+
+    <span class="n">branchingData</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">nuclide</span> <span class="ow">in</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">isotope</span><span class="p">:</span>
+        <span class="n">photons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pqu</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">decayMode</span> <span class="ow">in</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">decayData</span><span class="o">.</span><span class="n">decayModes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">decayMode</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">electroMagnetic</span><span class="p">:</span>
+                <span class="n">probability</span> <span class="o">=</span> <span class="n">decayMode</span><span class="o">.</span><span class="n">probability</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">photonEmissionProbability</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">decayMode</span><span class="o">.</span><span class="n">photonEmissionProbabilities</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">photonEmissionProbability</span> <span class="o">=</span> <span class="n">decayMode</span><span class="o">.</span><span class="n">photonEmissionProbabilities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">decayPath</span> <span class="o">=</span> <span class="n">decayMode</span><span class="o">.</span><span class="n">decayPath</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">products</span> <span class="o">=</span> <span class="p">[</span> <span class="n">decayProduct</span><span class="o">.</span><span class="n">pid</span> <span class="k">for</span> <span class="n">decayProduct</span> <span class="ow">in</span> <span class="n">decayPath</span><span class="o">.</span><span class="n">products</span> <span class="p">]</span>
+                <span class="n">products</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">IDsModule</span><span class="o">.</span><span class="n">photon</span><span class="p">)</span>
+                <span class="n">residual</span> <span class="o">=</span> <span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">photons</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">probability</span><span class="p">,</span> <span class="n">energy</span> <span class="o">-</span> <span class="n">branchingData</span><span class="p">[</span><span class="n">residual</span><span class="p">][</span><span class="s1">&#39;energy&#39;</span><span class="p">],</span> <span class="n">residual</span><span class="p">,</span> <span class="n">photonEmissionProbability</span><span class="p">))</span>
+        <span class="n">branchingData</span><span class="p">[</span><span class="n">nuclide</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;energy&#39;</span><span class="p">:</span> <span class="n">energy</span><span class="p">,</span> <span class="s1">&#39;photons&#39;</span><span class="p">:</span> <span class="n">photons</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">nuclideId</span><span class="p">,</span> <span class="n">nuclideData</span> <span class="ow">in</span> <span class="n">branchingData</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">completePhotons</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">completePhotonBranchingData</span><span class="p">(</span><span class="n">nuclideId</span><span class="p">,</span> <span class="n">branchingData</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">completePhotons</span><span class="p">)</span>
+        <span class="n">nuclideData</span><span class="p">[</span><span class="s1">&#39;completePhotons&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">completePhotons</span>
+
+    <span class="k">return</span> <span class="n">branchingData</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.decays.misc</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

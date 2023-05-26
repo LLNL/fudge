@@ -57,6 +57,7 @@ def ITYPE_6( Z, MTDatas, info, verbose = 0 ) :
 
     offset = 0
     ZA, AWP, dummy, dummy, NSS, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MF28[offset], intIndices = [4], logFile = info.logs)
+    info.ZA_massLineInfo.add(ZA, AWP, MT, 28, offset)
     offset += 1
     for subshell in range( NSS ) :
         SUBI, dummy, dummy, dummy, dummy, NTR = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MF28[offset], intIndices = [0, 5], logFile = info.logs)

@@ -334,22 +334,24 @@ class Product( ancestryModule.AncestryIO ) :
         if( self.__outputChannel is not None ) :
             self.__outputChannel.calculateAverageProductData( style, indent = indent3, **kwargs )
 
-    def partialProductionIntegral( self, reaction_suite, productID, energyIn, energyOut = None, muOut = None, phiOut = None, 
-            frame = xDataEnumsModule.Frame.product, LegendreOrder = 0, **kwargs ) :
+    def partialProductionIntegral(self, reaction_suite, productID, energyIn, energyOut=None, muOut=None, phiOut=None, 
+            frame=xDataEnumsModule.Frame.product, LegendreOrder=0, **kwargs):
 
-        def branchingGammas( initialState, photonBranchingData, probability, LegendreOrder ) :
+        def branchingGammas(initialState, photonBranchingData, probability, LegendreOrder):
 
             partialProductionIntegralSum = 0.0
-            if( LegendreOrder != 0 ) : return( partialProductionIntegralSum )           # Currently, assume isotropic scattering in lab frame.
-            if( initialState in photonBranchingData ) :
+            if LegendreOrder != 0:
+                return partialProductionIntegralSum             # Currently, assume isotropic scattering in lab frame.
+            if initialState in photonBranchingData:
                 gammas = photonBranchingData[initialState]['photons']
-                for branchingRatio, gammaEnergy, finalState in gammas :
-                    gammaEnergy = float( gammaEnergy )
-                    energyOutMin, energyOutMax = miscellaneousModule.domainLimits( energyOut, gammaEnergy, gammaEnergy )
-                    if( energyOutMin <= gammaEnergy <= energyOutMax ) : partialProductionIntegralSum += branchingRatio * probability
-                    partialProductionIntegralSum += branchingGammas( finalState, photonBranchingData, branchingRatio * probability, LegendreOrder )
+                for branchingRatio, gammaEnergy, finalState, photonEmissionProbability in gammas :
+                    gammaEnergy = float(gammaEnergy)
+                    energyOutMin, energyOutMax = miscellaneousModule.domainLimits(energyOut, gammaEnergy, gammaEnergy)
+                    if energyOutMin <= gammaEnergy <= energyOutMax:
+                        partialProductionIntegralSum += branchingRatio * probability * photonEmissionProbability
+                    partialProductionIntegralSum += branchingGammas(finalState, photonBranchingData, branchingRatio * probability, LegendreOrder)
 
-            return( partialProductionIntegralSum )
+            return partialProductionIntegralSum
 
         partialProductionIntegralSum = 0.0
 

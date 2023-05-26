@@ -38,6 +38,7 @@ def parseMF454_459( info, fissionFragmentData, MT, MTDatas ) :
     MF8Data = MFData[8]
 
     ZA, AWR, LE_plus1 = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF8Data[0], intIndices = [ 0, 2 ], logFile = info.logs )[0:3]
+    info.ZA_massLineInfo.add(ZA, AWR, MT, 8, 0)
     line = 1
 
     if( MT == 454 ) :

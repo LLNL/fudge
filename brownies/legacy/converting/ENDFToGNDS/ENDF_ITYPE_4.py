@@ -269,7 +269,9 @@ def ITYPE_4( MTDatas, info, verbose = 0 ) :
         decayData = decayParticle.decayData
 
         # Read parent info block
+        AWR_lineNumber = dataIndex
         ZA, AWR, LIS, LISO, NST, NSP = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MT457MF8Data[dataIndex], intIndices = [2, 3, 4, 5])
+        info.ZA_massLineInfo.add(ZA, AWR, 457, 8, AWR_lineNumber)
         dataIndex += printInfo( verbose, dataIndex, MT457MF8Data )
 
         if( LIS != 0 ) :

@@ -15,7 +15,7 @@ ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/
               -lptwXY_utilities -lnfut_utilities
 localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
-PYTHON=python
+PYTHON = python3
 
 TARGETS = flatToLinear flatToLinear2 flatToLinear3
 

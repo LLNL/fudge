@@ -57,7 +57,7 @@ class Test_covarianceSuite( TestCaseBase ):
     <mixed label="eval">
       <sum label="0" domainMin="1e-05" domainMax="862270.0" domainUnit="eV">
         <!-- The matrix for this reaction equals the weighted sum of the following matrices: -->
-        <summand ENDF_MFMT="33,102" coefficient="1.0" href="/covarianceSuite/covarianceSections/covarianceSection[@label='Fe57 + photon']/mixed[@label='eval']"/></sum>
+        <summand ENDF_MFMT="33,102" coefficient="1.0" href="/covarianceSuite/covarianceSections/covarianceSection[@label='Fe57 + photon [inclusive]']/mixed[@label='eval']"/></sum>
       <covarianceMatrix label="1" type="relative">
         <gridded2d>
           <axes>

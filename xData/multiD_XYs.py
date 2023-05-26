@@ -448,7 +448,7 @@ class XYsnd( baseModule.XDataFunctional ) :
         """
         Returns the tuple flag, functional1, functional2, frac, interpolation and interpolationQualifier.
 
-        Flag is one of 
+        Flag is one of
             +-------+---------------------------------------------------------------------------+
             | None  | no data,                                                                  |
             +-------+---------------------------------------------------------------------------+

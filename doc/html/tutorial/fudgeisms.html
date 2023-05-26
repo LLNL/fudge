@@ -1,20 +1,22 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>4.8. Fudge idiosyncrasies &#8212; Fudge and GNDS 6.1.0 documentation</title>
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -49,9 +51,9 @@
           <div class="body" role="main">
             
   <section id="fudge-idiosyncrasies">
-<h1><span class="section-number">4.8. </span><code class="docutils literal notranslate"><span class="pre">Fudge</span></code> idiosyncrasies<a class="headerlink" href="#fudge-idiosyncrasies" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">4.8. </span><code class="docutils literal notranslate"><span class="pre">Fudge</span></code> idiosyncrasies<a class="headerlink" href="#fudge-idiosyncrasies" title="Permalink to this heading">¶</a></h1>
 <section id="the-concept-of-styles">
-<h2><span class="section-number">4.8.1. </span>The concept of styles<a class="headerlink" href="#the-concept-of-styles" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.8.1. </span>The concept of styles<a class="headerlink" href="#the-concept-of-styles" title="Permalink to this heading">¶</a></h2>
 <p>Evaluated nuclear data is sometimes stored in a form that is not easily plotted or used by application codes. For
 example, cross section data may be given as a combination of resonance parameters and a piecewise ‘background’, but
 for plotting it must be converted to pointwise, linearly-interpolable data.</p>
@@ -62,7 +64,7 @@ a ‘styles’ section near the top, where each style is defined and given a uni
 throughout the file to indicate what style each data form is associated with.</p>
 </section>
 <section id="data-components">
-<h2><span class="section-number">4.8.2. </span>Data components<a class="headerlink" href="#data-components" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.8.2. </span>Data components<a class="headerlink" href="#data-components" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -76,8 +78,9 @@ throughout the file to indicate what style each data form is associated with.</p
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/gnd.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">4.8. <code class="docutils literal notranslate"><span class="pre">Fudge</span></code> idiosyncrasies</a><ul>
 <li><a class="reference internal" href="#the-concept-of-styles">4.8.1. The concept of styles</a></li>
 <li><a class="reference internal" href="#data-components">4.8.2. Data components</a></li>
@@ -85,12 +88,17 @@ throughout the file to indicate what style each data form is associated with.</p
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="particles.html"
-                        title="previous chapter"><span class="section-number">4.7. </span>Particles</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="processing.html"
-                        title="next chapter"><span class="section-number">5. </span>Processing GNDS files</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="particles.html"
+                          title="previous chapter"><span class="section-number">4.7. </span>Particles</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.html"
+                          title="next chapter"><span class="section-number">5. </span>Processing GNDS files</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -102,12 +110,12 @@ throughout the file to indicate what style each data form is associated with.</p
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -135,7 +143,7 @@ throughout the file to indicate what style each data form is associated with.</p
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

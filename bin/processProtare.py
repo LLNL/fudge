@@ -11,10 +11,9 @@ import sys
 import os
 import shutil
 import subprocess
-
+import pathlib
 import argparse
-
-import fudge
+import tarfile
 
 from PoPs import IDs as IDsPoPsModule
 from PoPs.families import nuclide as nuclidePoPsModule
@@ -29,8 +28,6 @@ from LUPY import locateFudgeBin as locateBinFolderModule
 from LUPY import commandlineArguments as commandlineArgumentsModule
 
 from LUPY import argumentsForScripts as argumentsForScriptsModule
-
-import fudge
 
 from fudge import enums as enumsModule
 from fudge import physicalQuantity as physicalQuantityModule
@@ -296,7 +293,7 @@ for temperatureIndex, temperatureValue in enumerate( args.temperatures ) : # Hea
     timerHeating = timesModule.Times( )
     heatStyle = stylesModule.Heated( args.prefixHeated + suffix, preLoopStyle.label, temperature, date = dateTimeStr )
     if temperatureIndex == 0:
-        codeName = os.path.basename(__file__)
+        codeName = pathlib.Path(__file__).name
         commandlineArgumentsModule.commandLineArgumentsToDocumentation(codeName, optionalArguments + positionalArguments, heatStyle.documentation)
 
     reactionSuite.styles.add( heatStyle )
@@ -327,32 +324,53 @@ for temperatureIndex, temperatureValue in enumerate( args.temperatures ) : # Hea
 
         logFile.write( '  Processing Monte Carlo\n    %s\n' % timerMC )
 
-    if( args.MultiGroup ) :
-        if( args.verbose > 1 ) : print( '  Processing multi-group' )
-        logFile.write( '  Processing multi-group\n' )
+    if args.MultiGroup:
+        if args.verbose > 1:
+            print('  Processing multi-group')
+        logFile.write('  Processing multi-group\n')
         fluxAtTemperature = fluxModule.Flux(args.fluxID, flux.evaluate(temperatureValue, extrapolation=xDataEnumsModule.Extrapolation.flat))
         fluxAtTemperature.data.outerDomainValue = None
-        fluxAtTemperature.data.axes.axes.pop( -1 )
-        heatedMultiGroupStyle = stylesModule.HeatedMultiGroup( args.prefixMultiGroup + suffix, loopStyle.label, fluxAtTemperature, date = dateTimeStr )
-        if( transportables_href is None ) :
-            for transportable in transportables : heatedMultiGroupStyle.transportables.add( transportable )
-        else :
-            heatedMultiGroupStyle.transportables.set_href( transportables_href )
-        reactionSuite.styles.add( heatedMultiGroupStyle )
-        if( transportables_href is None ) : transportables_href = heatedMultiGroupStyle.transportables.toXLink( )
-        workDir = os.path.join( 'Merced.work', reactionSuite.projectile, reactionSuite.target, 'T_%s_%s' % 
-                ( temperatureValue, args.temperatureUnit.replace( ' ', '' ).replace( os.sep, '_' ) ) )
-        if( os.path.exists( workDir ) and not args.restart ) : shutil.rmtree( workDir )
-        reactionSuite.processMultiGroup( heatedMultiGroupStyle, args.legendreMax, verbosity = args.verbose - 2, logFile = logFile, indent = '    ', 
-                additionalReactions = additionalReactions, workDir = workDir, restart = args.restart )
-        if( args.UpScatter and not( isThermalNeutronScatteringLaw or ( reactionSuite.target in reactionSuite.PoPs.unorthodoxes ) ) ) :
-            if( args.verbose > 1 ) : print( '  Processing multi group upscattering' )
-            timerUp = timesModule.Times( )
-            heatUpscatterStyle = stylesModule.SnElasticUpScatter( args.prefixUpScatter + suffix, heatedMultiGroupStyle.label, date = dateTimeStr ) 
-            reactionSuite.styles.add( heatUpscatterStyle )
-            if( temperatureValue > 0.0 ) :
-                reactionSuite.processSnElasticUpScatter( heatUpscatterStyle, args.legendreMax, verbosity = args.verbose - 2 )  # FIXME need logfile arguments in this process call
-            logFile.write( '  Upscatter correction\n    %s\n' % timerUp )
+        fluxAtTemperature.data.axes.axes.pop(-1)
+        heatedMultiGroupStyle = stylesModule.HeatedMultiGroup(args.prefixMultiGroup + suffix, loopStyle.label, fluxAtTemperature, date = dateTimeStr)
+        if transportables_href is None:
+            for transportable in transportables:
+                heatedMultiGroupStyle.transportables.add(transportable)
+        else:
+            heatedMultiGroupStyle.transportables.set_href(transportables_href)
+        reactionSuite.styles.add(heatedMultiGroupStyle)
+        if transportables_href is None:
+            transportables_href = heatedMultiGroupStyle.transportables.toXLink()
+
+        workDir = pathlib.Path('Merced.work' ) / reactionSuite.projectile / reactionSuite.target / \
+                    ('T_%s_%s' % (temperatureValue, args.temperatureUnit.replace(' ', '').replace(os.sep, '_')))
+        workDirTarFile = pathlib.Path(str(workDir) + '.tar')
+        if workDirTarFile.exists():
+            if args.restart:
+                tar = tarfile.open(str(workDirTarFile))
+                tar.extractall()
+            else:
+                workDirTarFile.unlink()
+        if workDir.exists() and not args.restart:
+            shutil.rmtree(str(workDir))
+        if not workDir.exists():
+            workDir.mkdir(parents=True)
+
+        reactionSuite.processMultiGroup(heatedMultiGroupStyle, args.legendreMax, verbosity=args.verbose - 2, logFile=logFile, indent='    ', 
+            additionalReactions=additionalReactions, workDir=str(workDir), restart=args.restart)
+
+        with tarfile.open(str(workDirTarFile), 'w:gz') as tar:
+            tar.add(workDir)
+        shutil.rmtree(str(workDir))
+
+        if args.UpScatter and not(isThermalNeutronScatteringLaw or reactionSuite.target in reactionSuite.PoPs.unorthodoxes):
+            if args.verbose > 1:
+                print('  Processing multi group upscattering')
+            timerUp = timesModule.Times()
+            heatUpscatterStyle = stylesModule.SnElasticUpScatter(args.prefixUpScatter + suffix, heatedMultiGroupStyle.label, date = dateTimeStr)
+            reactionSuite.styles.add(heatUpscatterStyle)
+            if temperatureValue > 0.0:
+                reactionSuite.processSnElasticUpScatter(heatUpscatterStyle, args.legendreMax, verbosity=args.verbose - 2)  # FIXME need logfile arguments in this process call
+            logFile.write('  Upscatter correction\n    %s\n' % timerUp)
 
 if args.MultiGroup and not args.skipMultiGroupSums and reactionSuite.interaction != enumsModule.Interaction.atomic:
     reactionSuite.addMultiGroupSums(replace=True)

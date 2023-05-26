@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.link &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.link</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.link</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
+
+<div class="viewcode-block" id="Link"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link">[docs]</a><span class="k">class</span> <span class="nc">Link</span><span class="p">(</span><span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This class contains the path to another element, that could be stored in a different file.</span>
+<span class="sd">    The **follow** member function is used to get a pointer to the linked-to element,</span>
+<span class="sd">    which will then be stored as self.link.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | Member    | Description                                               |</span>
+<span class="sd">    +===========+===========================================================+</span>
+<span class="sd">    | label     | XML tag name.                                             |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | link      | Actual pointer to other data.                             |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | root      | File name where other data are stored, only needed if     |</span>
+<span class="sd">    |           | are not int current file.                                 |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | path      | An xPath expression that identifies the other data.       |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | relative  | FIXME.                                                    |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    </span>
+<span class="sd">    example links::</span>
+
+<span class="sd">        &lt;element href=&#39;/reactionSuite/reaction[@label=&quot;102&quot;]&#39;&gt;</span>
+<span class="sd">        or</span>
+<span class="sd">        &lt;element href=&#39;/covariances.xml#covId&#39;&gt;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;link&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a link to another instance.</span>
+
+<span class="sd">        :param link: pointer to another instance. That instance should inherit from ancestry</span>
+<span class="sd">        :param root: external file identifier, required if the link points outside the current file</span>
+<span class="sd">        :param path: xPath expression that uniquely identifies the other instance</span>
+<span class="sd">        :param label: unique label, generally associated with a style (e.g. &#39;eval&#39;)</span>
+<span class="sd">        :param relative: boolean, whether to use relative link when writing out xPath (default = False)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">link</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="o">=</span> <span class="n">relative</span>
+
+            <span class="c1"># careful with nesting single/double quotes.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span> <span class="o">=</span> <span class="p">{}):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateXPath</span><span class="p">()</span>
+        <span class="n">theCopy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__link</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">theCopy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns *self.__link*. However, if *self.__link* is **None** then **updateLink()** is called before *self.__link* is returned.</span>
+<span class="sd">        Also see **linkWithoutUpdating**.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__link</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateLink</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__link</span>
+
+    <span class="nd">@link</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__link</span> <span class="o">=</span> <span class="n">instance</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">linkWithoutUpdating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self.__link* without calling &quot;self.updateLink()&quot; if *self.__link* is None. Also see method **link**.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__link</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">relative</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Link.build_href"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link.build_href">[docs]</a>    <span class="k">def</span> <span class="nf">build_href</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Builds the href (using &quot;formatVersion&quot; if present in **kwargs) and returns the href. The href will include the root if the root is not None.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__link</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>           <span class="c1"># Should only happen when linking is to another protare&#39;s data.</span>
+            <span class="n">XPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">XPath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">#</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">XPath</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;formatVersion&#39;</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;toRelativeXLink&#39;</span><span class="p">):</span>
+                <span class="n">XPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toRelativeXLink</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__link</span><span class="p">,</span> <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">formatVersion</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">XPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__link</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(</span> <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">formatVersion</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">XPath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">#</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">XPath</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XPath</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Link.updateLink"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link.updateLink">[docs]</a>    <span class="k">def</span> <span class="nf">updateLink</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses the xpath to set the link.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rootAncestor</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># link points to an external resource. Check in externalFiles section:</span>
+            <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">suites</span> <span class="k">as</span> <span class="n">suitesModule</span>
+            <span class="n">externalFiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findAttributeInAncestry</span><span class="p">(</span><span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">externalFiles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: unable to locate external resource &#39;</span><span class="si">%s</span><span class="s2">#</span><span class="si">%s</span><span class="s2">&#39;: no externalFiles section found!&quot;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+                <span class="k">return</span>
+
+            <span class="n">externalFile</span> <span class="o">=</span> <span class="n">externalFiles</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span> <span class="c1"># skip &#39;$&#39; character from start of self.root</span>
+            <span class="k">if</span> <span class="n">externalFile</span><span class="o">.</span><span class="n">instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: link &#39;</span><span class="si">%s</span><span class="s2">#</span><span class="si">%s</span><span class="s2">&#39; points to an external file that has not been loaded yet.&quot;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Link.updateXPath"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link.updateXPath">[docs]</a>    <span class="k">def</span> <span class="nf">updateXPath</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure the xPath agrees with the linked-to data.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;toRelativeXLink&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toRelativeXLink</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="s1">&#39;toXLink&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Link.follow"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link.follow">[docs]</a>    <span class="k">def</span> <span class="nf">follow</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">startNode</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param startNode: instance corresponding to the beginning of self.path (must inherit from ancestry)</span>
+<span class="sd">        :return: class instance pointed to by self.path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">startNode</span><span class="o">.</span><span class="n">followXPath</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Link.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">attributeStr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributesToXMLAttributeStr</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> href=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributeStr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_href</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="Link.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse the link. The resulting link points to None, and must be resolved by the calling function.</span>
+<span class="sd">        Link attributes can be converted to desired type by passing a &#39;typeConversion&#39; dictionary in linkData</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;#&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span> <span class="n">root</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">relative</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="c1"># derived classes may add new (non-xlink) attributes:</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span> <span class="s1">&#39;href&#39;</span> <span class="p">)]</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">linkData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;typeConversion&#39;</span><span class="p">,{}):</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;typeConversion&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">](</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">link</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="n">relative</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;unresolvedLinks&#39;</span> <span class="ow">in</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span> <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;unresolvedLinks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">result</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">result</span></div></div>
+
+<div class="viewcode-block" id="Link2"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link2">[docs]</a><span class="k">class</span> <span class="nc">Link2</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class contains an href to another node as a xPath. The href could reference a node in a different file.</span>
+<span class="sd">    The &#39;follow&#39; member function is used to get a pointer to the linked-to node,</span>
+<span class="sd">    which will then be stored as self.instance.</span>
+<span class="sd">    </span>
+<span class="sd">    Member data ::</span>
+<span class="sd">    </span>
+<span class="sd">        * moniker   : the moniker of the instance pointed to by instance (type: str)</span>
+<span class="sd">        * instance  : python reference to the linked instance (type: reference)</span>
+<span class="sd">        * root      : file name where other node exists, only needed if it&#39;s not the current file (type: str)</span>
+<span class="sd">        * href      : an xPath expression that uniquely identifies the other instance (type: str)</span>
+<span class="sd">        * relative  : Whether to use relative xlink when writing out xPath (type: bool)</span>
+
+<span class="sd">    sample links::</span>
+
+<span class="sd">        &lt;element href=&#39;/reactionSuite/reaction[@label=&quot;102&quot;]&#39;/&gt;</span>
+<span class="sd">        or</span>
+<span class="sd">        &lt;element href=&#39;/covariances.xml#covId&#39;/&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;link&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">moniker</span><span class="p">,</span> <span class="n">instance</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">href</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">keyName</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">keyValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__moniker</span> <span class="o">=</span> <span class="n">moniker</span>
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="n">instance</span>      <span class="c1"># Pointer to linked instance.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__root</span> <span class="o">=</span> <span class="n">root</span>              <span class="c1"># File name where other data is stored, only needed if it&#39;s not the current file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">href</span>              <span class="c1"># xPath expression to linked instance.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="o">=</span> <span class="n">relative</span>      <span class="c1"># Whether to use relative xlink when writing out xPath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__keyValue</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateKey</span><span class="p">(</span> <span class="n">keyName</span> <span class="o">=</span> <span class="n">keyName</span><span class="p">,</span> <span class="n">keyValue</span> <span class="o">=</span> <span class="n">keyValue</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
+
+<span class="c1"># BRB is this what we want or something else.</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span> <span class="p">)</span>        <span class="c1"># Careful with nesting single/double quotes.</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">moniker</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__moniker</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateLink</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateLink</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span>
+
+    <span class="nd">@instance</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+
+    <span class="nd">@link</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">keyName</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">keyValue</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyValue</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span> <span class="o">==</span> <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyValue</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not have an index member&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+
+    <span class="nd">@index</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span> <span class="o">==</span> <span class="s1">&#39;index&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__keyValue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not have an index member&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__root</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">relative</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Link2.build_href"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link2.build_href">[docs]</a>    <span class="k">def</span> <span class="nf">build_href</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Builds the href (using &quot;formatVersion&quot; if present in **kwargs) and returns the href. The href will include the root if the root is not None.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>                 <span class="c1"># Should only happen when linking to another protare&#39;s data.</span>
+            <span class="n">XPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">XPath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">#</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">XPath</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;formatVersion&#39;</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;toRelativeXLink&#39;</span><span class="p">):</span>
+                <span class="n">XPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toRelativeXLink</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">formatVersion</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">XPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(</span> <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">formatVersion</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">XPath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">#</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">XPath</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XPath</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Link2.updateKey"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link2.updateKey">[docs]</a>    <span class="k">def</span> <span class="nf">updateKey</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">keyName</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">keyValue</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span> <span class="o">!=</span> <span class="n">keyName</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;&#39;&#39;self&#39;s Keyname &quot;</span><span class="si">%s</span><span class="s1">&quot; != &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span><span class="p">,</span> <span class="n">keyName</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span><span class="p">,</span> <span class="s1">&#39;keyName&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">keyName</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">keyName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">keyName</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">keyName</span> <span class="o">!=</span> <span class="n">keyName</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;&#39;&#39;Keyname &quot;</span><span class="si">%s</span><span class="s1">&quot; != &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">keyName</span><span class="p">,</span> <span class="n">keyName</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span> <span class="o">=</span> <span class="n">keyName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__keyValue</span> <span class="o">=</span> <span class="n">keyValue</span></div>
+
+<div class="viewcode-block" id="Link2.updateLink"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link2.updateLink">[docs]</a>    <span class="k">def</span> <span class="nf">updateLink</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses the xpath to set the link.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rootAncestor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Link2.updateXPath"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link2.updateXPath">[docs]</a>    <span class="k">def</span> <span class="nf">updateXPath</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensure the xPath agrees with the linked instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relative</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toRelativeXLink</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>         <span class="c1"># FIXME</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Link2.follow"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link2.follow">[docs]</a>    <span class="k">def</span> <span class="nf">follow</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">startNode</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param startNode: instance corresponding to the beginning of self.href (must inherit from ancestry)</span>
+<span class="sd">        :return: instance pointed to by self.href</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">startNode</span><span class="o">.</span><span class="n">followXPath</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Link2.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link2.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pointers show up in the attributes list on an xml element (i.e., &lt;element href=&quot;...xpath&quot; anotherAttribute=&quot;foo&quot; .../&gt;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyValue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keyValue</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span>
+
+        <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> href=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_href</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span> <span class="p">]</span></div>
+
+<div class="viewcode-block" id="Link2.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.link.Link2.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse the xml-represented link back to python. The resulting link points to None, and must be resolved by the calling function.</span>
+<span class="sd">        Link attributes can be converted to desired type by passing a &#39;typeConversion&#39; dictionary in linkData</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">href</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">keyName</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">keyValue</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;href&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">href</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">keyName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Too many attributes for link: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">key</span> <span class="p">)</span>
+                <span class="n">keyName</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="n">keyValue</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;#&#39;</span> <span class="ow">in</span> <span class="n">href</span> <span class="p">)</span> <span class="p">:</span> <span class="n">root</span><span class="p">,</span> <span class="n">href</span> <span class="o">=</span> <span class="n">href</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s1">&#39;#&#39;</span> <span class="p">)</span>
+
+        <span class="n">_link</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">instance</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="n">root</span><span class="p">,</span> <span class="n">href</span> <span class="o">=</span> <span class="n">href</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="n">href</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">keyName</span> <span class="o">=</span> <span class="n">keyName</span><span class="p">,</span> <span class="n">keyValue</span> <span class="o">=</span> <span class="n">keyValue</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;unresolvedLinks&#39;</span> <span class="ow">in</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span> <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;unresolvedLinks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">_link</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">_link</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.link</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

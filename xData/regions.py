@@ -142,7 +142,8 @@ class Regions( baseModule.XDataFunctional ) :
 
     def append(self, curve):
         '''
-        Appends *curve* to the end of *self*. If *curve* is a **Regions** instance, then **append** is call for each region in curve.
+        Appends *curve* to the end of *self*. If *curve* is a **Regions** instance, then **append** is call for 
+        each region in curve.
         '''
 
         if isinstance(curve, Regions):
@@ -153,7 +154,8 @@ class Regions( baseModule.XDataFunctional ) :
 
     def prepend(self, curve):
         '''
-        Prepends *curve* to the beginning of *self*. If *curve* is a **Regions** instance, then **append** is call for each region in curve.
+        Prepends *curve* to the beginning of *self*. If *curve* is a **Regions** instance, then **append** is call 
+        for each region in curve.
         '''
 
         if isinstance(curve, Regions):
@@ -311,8 +313,9 @@ class Regions( baseModule.XDataFunctional ) :
     def integrate( self, **limits ):
         """
         Integrate a piecewise function. Supports limits for each axis.
-        Example:
-        >regions.integrate( energy_in = ('1e-5 eV', '10 eV'), energy_out = ('1 keV', '10 keV') )
+        Example::
+
+            regions.integrate( energy_in = ('1e-5 eV', '10 eV'), energy_out = ('1 keV', '10 keV') )
 
         :param limits: dictionary containing limits for each independent axis (keyed by axis label or index).
         If an independent axis is missing from the dictionary, integrate over the entire domain of that axis.

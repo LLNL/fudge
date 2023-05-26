@@ -1,0 +1,537 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoPs.decays.spectrum &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.decays.spectrum</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PoPs.decays.spectrum</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains classes for storing an outgoing energy spectrum for decay products.</span>
+<span class="sd">The spectrum may include a combination of discrete and continuum contributions.</span>
+
+<span class="sd">Spectral data are organized as follows::</span>
+
+<span class="sd">   - decayMode</span>
+<span class="sd">      - ...</span>
+<span class="sd">      - spectra</span>
+<span class="sd">         - spectrum (1 or more)</span>
+<span class="sd">            - discrete (0 or more)</span>
+<span class="sd">               - intensity</span>
+<span class="sd">               - energy</span>
+<span class="sd">               - ...</span>
+<span class="sd">            - continuum (0 or more)</span>
+
+<span class="sd">Each spectrum corresponds to one type of decay product (e.g. photon, positron or neutron).</span>
+<span class="sd">Sometimes a product is broken out into more than one spectrum sections, however. For example, photons</span>
+<span class="sd">may be divided into &#39;gamma&#39; and &#39;x-ray&#39; parts.</span>
+
+<span class="sd">Discrete radiations each have an associated intensity, indicating how often that discrete radiation is emitted</span>
+<span class="sd">per decay. The intensity may be &gt; 1, for example for 511 keV photons emitted by beta+ decay.</span>
+<span class="sd">Discrete radiation may be accompanied by internalConversionCoefficients, internalPairFormationCoefficients, etc.</span>
+
+<span class="sd">Continuum radiation is described by a probability distribution of outgoing energy.</span>
+<span class="sd">    FIXME is it really a probability distribution? Not always normalized...</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">physicalQuantity</span> <span class="k">as</span> <span class="n">physicalQuantityModule</span>
+<span class="kn">from</span> <span class="nn">xData.uncertainty.physicalQuantity</span> <span class="kn">import</span> <span class="n">uncertainty</span> <span class="k">as</span> <span class="n">uncertaintyModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">miscModule</span>
+
+<span class="n">gammaProduct</span> <span class="o">=</span> <span class="s2">&quot;gamma&quot;</span>
+<span class="n">betaMinusProduct</span> <span class="o">=</span> <span class="s2">&quot;beta-&quot;</span>
+<span class="n">betaPlusProduct</span> <span class="o">=</span> <span class="s2">&quot;beta+&quot;</span>
+<span class="n">betaPlusOrElectronCaptureProduct</span> <span class="o">=</span> <span class="s2">&quot;beta+ or electronCapture&quot;</span>
+<span class="n">alphaProduct</span> <span class="o">=</span> <span class="s2">&quot;alpha&quot;</span>
+<span class="n">neutronProduct</span> <span class="o">=</span> <span class="s2">&quot;neutron&quot;</span>
+<span class="n">SFProduct</span> <span class="o">=</span> <span class="s2">&quot;spontaneous fission fragments&quot;</span>
+<span class="n">protonProduct</span> <span class="o">=</span> <span class="s2">&quot;proton&quot;</span>
+<span class="n">discreteElectronProduct</span> <span class="o">=</span> <span class="s2">&quot;discrete electron&quot;</span>
+<span class="n">xRayProduct</span> <span class="o">=</span> <span class="s2">&quot;x-ray&quot;</span>
+<span class="n">antiNeutrinoProduct</span> <span class="o">=</span> <span class="s2">&quot;anti-neutrino&quot;</span>
+<span class="n">neutrinoProduct</span> <span class="o">=</span> <span class="s2">&quot;neutrino&quot;</span>
+
+<div class="viewcode-block" id="TransitionType"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.TransitionType">[docs]</a><span class="k">class</span> <span class="nc">TransitionType</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">none</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">allowed</span> <span class="o">=</span> <span class="s1">&#39;allowed&#39;</span>
+    <span class="n">firstForbidden</span> <span class="o">=</span> <span class="s1">&#39;first-forbidden&#39;</span>
+    <span class="n">secondForbidden</span> <span class="o">=</span> <span class="s1">&#39;second-forbidden&#39;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">ENDF_index</span><span class="p">(</span><span class="n">transitionType</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transitionType</span><span class="p">,</span> <span class="n">TransitionType</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;transitionType must be a TransitionType: got &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">transitionType</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">transitionType</span> <span class="o">==</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">transitionType</span> <span class="o">==</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">transitionType</span> <span class="o">==</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">firstForbidden</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">transitionType</span> <span class="o">==</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">secondForbidden</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">3</span>
+
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;This should never happen.&#39;</span><span class="p">)</span></div>
+
+<span class="c1">#</span>
+<span class="c1"># FIXME Need a PhysicalQuantity class that has keyName.</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="Unitless"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Unitless">[docs]</a><span class="k">class</span> <span class="nc">Unitless</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">PhysicalQuantity</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
+
+<div class="viewcode-block" id="Unitless.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Unitless.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">PhysicalQuantity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Unitless.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Unitless.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>              <span class="c1"># overrides required since this __init__ takes different arguments:</span>
+
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Unitless.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Unitless.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;value&#39;</span> <span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
+        <span class="n">_cls</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">uncertaintyModule</span><span class="o">.</span><span class="n">Uncertainty</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">_cls</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">uncertaintyModule</span><span class="o">.</span><span class="n">Uncertainty</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">_cls</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Intensity"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Intensity">[docs]</a><span class="k">class</span> <span class="nc">Intensity</span><span class="p">(</span> <span class="n">Unitless</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;intensity&#39;</span></div>
+
+<div class="viewcode-block" id="Energy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Energy">[docs]</a><span class="k">class</span> <span class="nc">Energy</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">PhysicalQuantity</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;energy&#39;</span></div>
+
+<div class="viewcode-block" id="Shell"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Shell">[docs]</a><span class="k">class</span> <span class="nc">Shell</span><span class="p">(</span><span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">PhysicalQuantity</span><span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;shell&#39;</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="s1">&#39;total&#39;</span>
+    <span class="n">KShell</span> <span class="o">=</span> <span class="s1">&#39;K&#39;</span>
+    <span class="n">LShell</span> <span class="o">=</span> <span class="s1">&#39;L&#39;</span></div>
+
+<div class="viewcode-block" id="InternalConversionCoefficients"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.InternalConversionCoefficients">[docs]</a><span class="k">class</span> <span class="nc">InternalConversionCoefficients</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;internalConversionCoefficients&#39;</span>
+
+<div class="viewcode-block" id="InternalConversionCoefficients.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.InternalConversionCoefficients.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span> <span class="n">Shell</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="PhotonEmissionProbabilities"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.PhotonEmissionProbabilities">[docs]</a><span class="k">class</span> <span class="nc">PhotonEmissionProbabilities</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;photonEmissionProbabilities&#39;</span>
+
+<div class="viewcode-block" id="PhotonEmissionProbabilities.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.PhotonEmissionProbabilities.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span> <span class="n">Shell</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="InternalPairFormationCoefficient"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.InternalPairFormationCoefficient">[docs]</a><span class="k">class</span> <span class="nc">InternalPairFormationCoefficient</span><span class="p">(</span> <span class="n">Unitless</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;internalPairFormationCoefficient&#39;</span></div>
+
+<div class="viewcode-block" id="PositronEmissionIntensity"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.PositronEmissionIntensity">[docs]</a><span class="k">class</span> <span class="nc">PositronEmissionIntensity</span><span class="p">(</span> <span class="n">Unitless</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;positronEmissionIntensity&#39;</span></div>
+
+<div class="viewcode-block" id="Discrete"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Discrete">[docs]</a><span class="k">class</span> <span class="nc">Discrete</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Stores a decay particle emitted with discrete energy&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;discrete&#39;</span>
+
+<div class="viewcode-block" id="Discrete.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Discrete.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_intensity</span><span class="p">,</span> <span class="n">_energy</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">_internalPairFormationCoefficient</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">_positronEmissionIntensity</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _intensity: relative intensity for emission of this discrete particle</span>
+<span class="sd">        :param _energy: outgoing product energy</span>
+<span class="sd">        :param type: optional type of transition (i.e. &#39;allowed&#39;, &#39;first-forbidden&#39;, etc.</span>
+<span class="sd">        :param _internalPairFormationCoefficient: optional coefficient for forming an electron/positron pair</span>
+<span class="sd">            Should only be used with electromagnetic decays</span>
+<span class="sd">        :param _positronEmissionIntensity: optional coefficient for emitting a positron</span>
+<span class="sd">            Should only be used with electron capture / beta+ decays</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_intensity</span><span class="p">,</span> <span class="n">Intensity</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;_intensity must be an instance of intensity&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__intensity</span> <span class="o">=</span> <span class="n">_intensity</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_energy</span><span class="p">,</span> <span class="n">Energy</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;_energy must be an instance of Energy&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__energy</span> <span class="o">=</span> <span class="n">_energy</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type</span> <span class="o">=</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__internalConversionCoefficients</span> <span class="o">=</span> <span class="n">InternalConversionCoefficients</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__internalConversionCoefficients</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">_internalPairFormationCoefficient</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_internalPairFormationCoefficient</span><span class="p">,</span> <span class="n">InternalPairFormationCoefficient</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;_internalPairFormationCoefficient must be an instance of InternalPairFormationCoefficient&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__internalPairFormationCoefficient</span> <span class="o">=</span> <span class="n">_internalPairFormationCoefficient</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">_positronEmissionIntensity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_positronEmissionIntensity</span><span class="p">,</span> <span class="n">PositronEmissionIntensity</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;_positronEmissionIntensity must be an instance of PositronEmissionIntensity&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__positronEmissionIntensity</span> <span class="o">=</span> <span class="n">_positronEmissionIntensity</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__energy</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">internalConversionCoefficients</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__internalConversionCoefficients</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">internalPairFormationCoefficient</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__internalPairFormationCoefficient</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">positronEmissionIntensity</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__positronEmissionIntensity</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">intensity</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__intensity</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__energy</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__intensity</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Discrete.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Discrete.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">_discrete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__intensity</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__energy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="nb">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type</span><span class="p">,</span> <span class="n">_internalPairFormationCoefficient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__internalPairFormationCoefficient</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">icc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalConversionCoefficients</span> <span class="p">:</span> <span class="n">_discrete</span><span class="o">.</span><span class="n">internalConversionCoefficients</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">icc</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_discrete</span></div>
+
+<div class="viewcode-block" id="Discrete.toXML_strList"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Discrete.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="nb">type</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">none</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="s1">&#39; type=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span>
+        <span class="n">XMLStringList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="nb">type</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__intensity</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__energy</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__internalConversionCoefficients</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__internalPairFormationCoefficient</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__internalPairFormationCoefficient</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__positronEmissionIntensity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span> <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__positronEmissionIntensity</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">XMLStringList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Discrete.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Discrete.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">none</span><span class="p">)}</span>
+        <span class="n">ICCelement</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">subclass</span> <span class="ow">in</span> <span class="p">(</span> <span class="n">Intensity</span><span class="p">,</span> <span class="n">Energy</span><span class="p">,</span> <span class="n">InternalPairFormationCoefficient</span><span class="p">,</span> <span class="n">PositronEmissionIntensity</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">subclass</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">subclass</span><span class="o">.</span><span class="n">moniker</span><span class="p">]</span> <span class="o">=</span> <span class="n">subclass</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">subclass</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">InternalConversionCoefficients</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                    <span class="n">ICCelement</span> <span class="o">=</span> <span class="n">child</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Encountered unexpected child element &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">_discrete</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ICCelement</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_discrete</span><span class="o">.</span><span class="n">internalConversionCoefficients</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">ICCelement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">_discrete</span></div></div>
+
+<div class="viewcode-block" id="Continuum"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum">[docs]</a><span class="k">class</span> <span class="nc">Continuum</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describes continuum particle emission&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;continuum&#39;</span>
+
+<div class="viewcode-block" id="Continuum.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">spectrum</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param spectrum: outgoing energy probability distribution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spectrum</span> <span class="o">=</span> <span class="n">spectrum</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spectrum</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spectrum</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Continuum.convertUnits"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spectrum</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Continuum.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: deep copy of self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spectrum</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Continuum.toXML_strList"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">XMLStringList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spectrum</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">XMLStringList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Continuum.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">_spectrum</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">Continuum</span><span class="p">(</span> <span class="n">_spectrum</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span> <span class="s2">&quot;P(energy_out)&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;1/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">energyUnit</span> <span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span> <span class="s1">&#39;energy_out&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Spectrum"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum">[docs]</a><span class="k">class</span> <span class="nc">Spectrum</span><span class="p">(</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains the outgoing spectrum for one type of decay product.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;spectrum&#39;</span>
+
+<div class="viewcode-block" id="Spectrum.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">pid</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param label: unique label for the outgoing product (i.e. &#39;x-ray&#39; or &#39;gamma&#39;)</span>
+<span class="sd">        :param pid: PoPs particle id (i.e. &#39;photon&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">pid</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;pid not str&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pid</span> <span class="o">=</span> <span class="n">pid</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">emissions</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the list of all discrete and continuum emissions&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span> <span class="p">)</span>      <span class="c1"># FIXME accesses mutable member</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pid</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pid</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Spectrum.append"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">emission</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add new emitted particle to self</span>
+<span class="sd">        :param emission: &#39;discrete&#39; or &#39;continuum&#39; instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">emission</span><span class="p">,</span> <span class="p">(</span> <span class="n">Discrete</span><span class="p">,</span> <span class="n">Continuum</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;emission must be instance of Discrete or Continuum&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">emission</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Spectrum.convertUnits"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">emission</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span> <span class="p">:</span> <span class="n">emission</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Spectrum.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: deep copy of self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_spectrum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">__emission</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span> <span class="p">:</span> <span class="n">_spectrum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">__emission</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">_spectrum</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Spectrum.toXML_strList"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">XMLStringList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot; pid=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">_emission</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span> <span class="p">:</span> <span class="n">XMLStringList</span> <span class="o">+=</span> <span class="n">_emission</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">XMLStringList</span> <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">[@label=&#39;</span><span class="si">%s</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">))</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">Discrete</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Discrete</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">Continuum</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Continuum</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Encountered unexpected child element &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Spectrum.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">[@label=&#39;</span><span class="si">%s</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">))</span> <span class="p">)</span>
+        <span class="n">_spectrum</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="n">_spectrum</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_spectrum</span></div></div>
+
+<div class="viewcode-block" id="Spectra"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectra">[docs]</a><span class="k">class</span> <span class="nc">Spectra</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Contains the outgoing spectrum list for a decayMode&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;spectra&#39;</span>
+
+<div class="viewcode-block" id="Spectra.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectra.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span> <span class="n">Spectrum</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Spectra.parseNode"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectra.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+<span class="c1">#</span>
+<span class="c1"># FIXME, this method is broken. What is product?</span>
+<span class="c1">#</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="n">_spectrum</span> <span class="o">=</span> <span class="n">Spectrum</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">_spectrum</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PoPs.decays.spectrum</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

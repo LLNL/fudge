@@ -10,13 +10,15 @@
     the function :math:`y(x)`.  That is, it is a numerical representation of :math:`f(x)`. The function :math:`y(x)` 
     is also called a 1-dimensional or univariant function. As an example, let 
     
-        .. math::
-            y_1(x) = a + b * x
+    .. math::
+
+        y_1(x) = a + b * x
 
     and
 
-        .. math::
-            y_2(x) = c * \exp( - d * x )
+    .. math::
+
+        y_2(x) = c * \exp( - d * x )
             
     then, :math:`y_1` and :math:`y_2` can be added, subtracted, multiplied and divided, for example. Similiarly, 
     two XYs1d instances can be added, subtracted, multiplied and divided. The only restriction on the :math:`(x_i, y_i)` 
@@ -24,12 +26,12 @@
 
     The ``XYs1d`` class uses the class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C` as a base class.
 
-    Members of an XYs1d instance of interest to most are:
+    Members of an XYs1d instance of interest to most are::
 
-        :infill:          see the base class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C`,
-        :axes:            Description of the x and y data attributes (e.g., label, units).
+        * infill:          see the base class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C`,
+        * axes:            Description of the x and y data attributes (e.g., label, units).
 
-    A ``XYs1d`` instance can be the ``XY`` instance of a 2-dimensional function (i.e., a ``XYs2d`` with
+    A :py:class:`XYs1d` instance can be the ``XY`` instance of a 2-dimensional function (i.e., a ``XYs2d`` with
     dimension of 2). In this case, the ``XYs1d`` instances are secondary instances.
 """
 
@@ -755,6 +757,7 @@ class XYs1d(baseModule.XDataFunctional):
         The argument ``xs`` is a list of x-values with ``xs[i] < xs[i+1]``. This function calculates the integrals
 
         .. math::
+
             \int_{xs[i]}^{xs[i+1]} dx \; { f(x) \over n[i] }
 
         where :math:`f(x)` is defined as
@@ -870,6 +873,7 @@ class XYs1d(baseModule.XDataFunctional):
         Definite integral of current ``XYs1d`` instance from ``domainMin`` to ``domainMax``:
         
         .. math::
+
             \int_{domainMin}^{domainMax} dx \; XYs(x)
 
         If ``domainMin`` or ``domainMax`` is unspecified, it is taken from the domain of the self.
@@ -905,6 +909,7 @@ class XYs1d(baseModule.XDataFunctional):
         Indefinite integral of self:
         
         .. math::
+
             \int_0^x dx \; XYs(x)
             
         The new ``XYs1d`` instance is defined on the range of the old one and the units are wrong.

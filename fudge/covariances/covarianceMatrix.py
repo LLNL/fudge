@@ -436,8 +436,17 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
         if columnData is not None or not info['checkUncLimits']:
             return warnings
 
-        # run eigenvalue checks on original matrix, relative or absolute:
+        # run variance and eigenvalue checks on original matrix, relative or absolute:
         A = self.matrix.array.constructArray()
+        variance = A.diagonal()
+        if any(variance < 0):
+            for badIndex in numpy.argwhere(variance < 0).flatten():
+                badValue = variance[badIndex]
+                warnings.append(warning.NegativeVariance(badIndex, badValue, obj=self))
+
+            # skip additional tests if negatives variances encountered
+            return warnings
+
         vals, vecs = numpy.linalg.eigh(A)
         if min(vals) < info['negativeEigenTolerance']:
             warnings.append(warning.NegativeEigenvalues(len(vals[vals < 0]), min(vals), self))

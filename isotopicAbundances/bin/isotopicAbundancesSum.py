@@ -13,9 +13,9 @@ import pathlib
 from PoPs.chemicalElements import misc as miscModule
 from isotopicAbundances import isotopicAbundances as isotopicAbundancesModule
 
-summaryDocStringIAM = '''Prints the isotopic abundance sum for each chemical element .'''
+summaryDocStringIAM = '''Reads in an isotopic abundance file (i.e., an isotopicAbundancesByChemicalElement node) and prints the isotopic abundance sum for each of its chemical element.'''
 
-description ='''Prints the isotopic abundance sum for each chemical element .'''
+description = summaryDocStringIAM
 
 parser = argparse.ArgumentParser(description=description)
 parser.add_argument('file', type=pathlib.Path,                  help='The isotopic abundance file.')

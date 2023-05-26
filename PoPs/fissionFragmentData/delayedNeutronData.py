@@ -10,8 +10,11 @@ from LUPY import ancestry as ancestryModule
 from . import multiplicity as multiplicityModule
 from . import decayConstant as decayConstantModule
 
+# FIXME CMM: class appears to be unused. Delete?
+
 class DelayedNeutronData(ancestryModule.AncestryIO):
 
+    # FIXME does not agree with GNDS-2.0 specs. Should just be 'delayedNeutron'?
     moniker = 'delayedNeutronData'
 
     def __init__( self ) :

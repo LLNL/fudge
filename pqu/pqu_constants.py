@@ -5,17 +5,36 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+'''
+This file contains the physical constants (e.g., speed of light, permeability of vacuum,
+electron mass) that are used in the **pqu** functions and classes.
+
+If ones wishes to employ different physical constants, then modify the values in this file.
+Or, better yet, import this module first, changes its values as desired and then import PQU.
+For example, the following lines change the elementary charge to '1.6 * C':
+
+>>> from pqu import pqu_constants
+>>> pqu_constants.e = '1.6 * C'
+>>> from pqu import PQU                 # This import does not work with doctest as PQU was previously imported.
+>>> my_eV = PQU.PQU( 1, 'eV' )
+>>> print(my_eV)
+1. eV
+>>> print(my_eV.copyToUnit( 'J' ))
+1.6 J
+
+'''
+
 # Values from CODATA 2014.
 c = '299792458. * m / s'                  # speed of light (exact)
 mu0 = '4.e-7 * pi * N / A**2'             # permeability of vacuum
 Grav = '6.67408e-11 * m**3 / kg / s**2'   # gravitational constant
-hplanck = '6.626070040e-34 * J * s'         # Planck constant
-e = '1.6021766208e-19 * C'                  # elementary charge
-me = '9.10938356e-31 * kg'                 # electron mass
-mp = '1.672621898e-27 * kg'                # proton mass
-Nav = '6.022140857e23 / mol'                # Avogadro number
-k = '1.38064852e-23 * J / K'               # Boltzmann constant
-amu = '1.660539040e-27 * kg'               # atomic mass unit
+hplanck = '6.626070040e-34 * J * s'       # Planck constant
+e = '1.6021766208e-19 * C'                # elementary charge
+me = '9.10938356e-31 * kg'                # electron mass
+mp = '1.672621898e-27 * kg'               # proton mass
+Nav = '6.022140857e23 / mol'              # Avogadro number
+k = '1.38064852e-23 * J / K'              # Boltzmann constant
+amu = '1.660539040e-27 * kg'              # atomic mass unit
 
 # Values from various other places.
 tsp = '4.92892159375 * ml'                # teaspoon

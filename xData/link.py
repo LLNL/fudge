@@ -10,23 +10,34 @@ from LUPY import ancestry as ancestryModule
 from . import base as baseModule
 
 class Link(baseModule.XDataCoreMembers):
-    """
+    '''
     This class contains the path to another element, that could be stored in a different file.
-    The 'follow' member function is used to get a pointer to the linked-to element,
+    The **follow** member function is used to get a pointer to the linked-to element,
     which will then be stored as self.link.
-    
-    Member data ::
-    
-        * label : the xml tag name (type: str)
-        * link  : actual pointer to other data (type: str)
-        * root  : file name where other data is stored, only needed if it's not the current file (type: str)
-        * path  : self.path is an xPath expression that uniquely identifies the other data (type: str)
 
-    sample links::
-    <element href='/reactionSuite/reaction[@label="102"]'>
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | label     | XML tag name.                                             |
+    +-----------+-----------------------------------------------------------+
+    | link      | Actual pointer to other data.                             |
+    +-----------+-----------------------------------------------------------+
+    | root      | File name where other data are stored, only needed if     |
+    |           | are not int current file.                                 |
+    +-----------+-----------------------------------------------------------+
+    | path      | An xPath expression that identifies the other data.       |
+    +-----------+-----------------------------------------------------------+
+    | relative  | FIXME.                                                    |
+    +-----------+-----------------------------------------------------------+
+    
+    example links::
+
+        <element href='/reactionSuite/reaction[@label="102"]'>
         or
-    <element href='/covariances.xml#covId'>
-    """
+        <element href='/covariances.xml#covId'>
+    '''
 
     moniker = 'link'
 
@@ -194,9 +205,10 @@ class Link2(ancestryModule.AncestryIO):
         * relative  : Whether to use relative xlink when writing out xPath (type: bool)
 
     sample links::
-    <element href='/reactionSuite/reaction[@label="102"]'/>
+
+        <element href='/reactionSuite/reaction[@label="102"]'/>
         or
-    <element href='/covariances.xml#covId'/>
+        <element href='/covariances.xml#covId'/>
     """
 
     moniker = 'link'

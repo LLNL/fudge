@@ -12,10 +12,10 @@ import traceback
 import argparse
 import pathlib
 
+from PoPs import database as databaseModule
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 from fudge import GNDS_file as GNDS_fileModule
 from fudge import reactionSuite as reactionSuiteModule
-from PoPs import database as databaseModule
 
 summaryDocStringFUDGE = '''Converts a GNDS file to a GNDS, allowing the new file to have different parameters (e.g., format, energyUnit).'''
 
@@ -42,6 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('--covarianceDir', type=pathlib.Path, default='Covariances',    help='Specifies the location of covariance files relative to reactionSuite file. Default is "Covariances".')
     parser.add_argument('--formatVersion', default=GNDS_formatVersionModule.default, choices=GNDS_formatVersionModule.allowed,
                                                                                         help='Specifies the GNDS format for the outputted file.  Default is "%s".' % GNDS_formatVersionModule.default)
+    parser.add_argument('--sortReactions', action='store_true',                         help='If present and file is a reactionSuite, reactions are sorted per FUDGE standard.')
     parser.add_argument('--significantDigits', type=int, default=15,                    help='Sets the number of significantDigits used by the Values.toXML_strList method.')
     parser.add_argument('--traceback', action='store_true', default=False,              help='Print traceback on exception')
 
@@ -96,17 +97,31 @@ if __name__ == '__main__':
             else:
                 covarianceOutput = output.parent / covarianceOutput
                 parent = pathlib.Path(len(args.covarianceDir.parents) * '../') / output.name
+            externalFileC = None
             for externalFileC in covariance.externalFiles:
                 externalFilePath = pathlib.Path(externalFileC.realpath())
                 if externalFilePath.exists() and pathlib.Path(gnds.sourcePath).samefile(externalFilePath):
                     break
-            externalFileC.path = str(parent)
+            if externalFileC is not None:
+                externalFileC.path = str(parent)
             covariance.saveToFile(covarianceOutput, formatVersion=args.formatVersion)
+
+    assert args.h5output is None, 'HDF5 output file listed without the --hybrid option!'
+    if args.sortReactions and isinstance(gnds, reactionSuiteModule.ReactionSuite):
+        reactions = {}
+        for reaction in gnds.reactions:
+            if reaction.ENDF_MT not in reactions:
+                reactions[reaction.ENDF_MT] = []
+            reactions[reaction.ENDF_MT].append(reaction)
+        sortedMTs = reactionSuiteModule.niceSortOfMTs(list(reactions.keys()))
+        gnds.reactions.clear()
+        for MT in sortedMTs:
+            for reaction in reactions[MT]:
+                gnds.reactions.add(reaction)
 
     if args.hybrid:
         gnds.saveToHybrid(output, hdfName=args.h5output, formatVersion=args.formatVersion, minLength=3, flatten=True)
         # FIXME support hybrid storage for covariances? Reenable compression?
     else:
-        assert args.h5output is None, 'HDF5 output file listed without the --hybrid option!'
         gnds.saveToFile(output, outline=args.outline, xs_pdf_cdf1d_singleLine=True, formatVersion=args.formatVersion, 
                 significantDigits=args.significantDigits)

@@ -1,0 +1,993 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>LUPY &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pqu" href="../pqu/modules.html" />
+    <link rel="prev" title="To Do" href="../todo.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pqu/modules.html" title="pqu"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../todo.html" title="To Do"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">LUPY</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="lupy">
+<h1>LUPY<a class="headerlink" href="#lupy" title="Permalink to this heading">¶</a></h1>
+<p>This sub-package contains functions and classes used by the other sub-packages of <strong>FUDGE</strong>.</p>
+<div class="toctree-wrapper compound">
+</div>
+<section id="module-LUPY.enums">
+<span id="lupy-enums-module"></span><h2>LUPY.enums module<a class="headerlink" href="#module-LUPY.enums" title="Permalink to this heading">¶</a></h2>
+<p>Module to store base enum class used by other class enums in <strong>FUDGE</strong>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.enums.Enum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.enums.</span></span><span class="sig-name descname"><span class="pre">Enum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/enums.html#Enum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.enums.Enum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>This is a base enum class used within <strong>FUDGE</strong>. If <code class="xref py py-func docutils literal notranslate"><span class="pre">enums.auto()</span></code> is called for a enum, 
+its value is assigned from its name per the <a href="#id1"><span class="problematic" id="id2">:py:method:`_generate_next_value_`</span></a> method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.enums.Enum.checkEnumOrString">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkEnumOrString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/enums.html#Enum.checkEnumOrString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.enums.Enum.checkEnumOrString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that <em>value</em> is a valid enum representation of <em>cls</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – An <a class="reference internal" href="#LUPY.enums.Enum" title="LUPY.enums.Enum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a> derived class.</p></li>
+<li><p><strong>value</strong> – Can be a string representing an enum of <em>cls</em> and an enum of <em>cls</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The enum of <em>cls</em> represented by <em>value</em>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <em>string</em> is not a python str instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.enums.Enum.fromString">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/enums.html#Enum.fromString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.enums.Enum.fromString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a enum for cls from the specified string representation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – An <a class="reference internal" href="#LUPY.enums.Enum" title="LUPY.enums.Enum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a> derived class.</p></li>
+<li><p><strong>string</strong> – A string representing one of the allowed values of <em>cls</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The enum of <em>cls</em> with value <em>string</em>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TypeError</strong> – If <em>string</em> is not a python str instance.</p></li>
+<li><p><strong>ValueError</strong> – If no match is found in <em>cls</em>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.enums.auto">
+<span class="sig-prename descclassname"><span class="pre">LUPY.enums.</span></span><span class="sig-name descname"><span class="pre">auto</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/enums.html#auto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.enums.auto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to wrap the <code class="xref py py-func docutils literal notranslate"><span class="pre">enum.auto()</span></code> function in the python <strong>enum</strong> module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Retuns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The returned value of <code class="xref py py-func docutils literal notranslate"><span class="pre">enum.auto()</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-LUPY.ancestry">
+<span id="lupy-ancestry-module"></span><h2>LUPY.ancestry module<a class="headerlink" href="#module-LUPY.ancestry" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">Ancestry</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>This class is designed to be a base class for a class (instance) that is a member of another
+class (instance). The function of this class is to aid in tracking a class’s ancestors and all
+of the ancestors members. That is, if an instance is part of a hierarchy, this class provides 
+methods, for example, that list the position of the instance within the hierarchy or give its 
+position relative to another member in the hierarchy using xlinks.</p>
+<p>This class defines the following members:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>moniker</p></td>
+<td><p>The name associated with the class type.</p></td>
+</tr>
+<tr class="row-even"><td><p>ancestor</p></td>
+<td><p>Instance which self is a child of.</p></td>
+</tr>
+<tr class="row-odd"><td><p>keyName</p></td>
+<td><p>The name of the key. The key’s value is used by a suite to indentify an element of a suite.</p></td>
+</tr>
+<tr class="row-even"><td><p>ancestryMembers</p></td>
+<td><p>Tuple of names of  the members of <em>self</em> that inherit from <strong>Ancestry</strong>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>legacyMemberNameMapping</p></td>
+<td><p>A map whose keys are legacy member names and whose associated values are the current memeber names.</p></td>
+</tr>
+<tr class="row-even"><td><p>monikerByFormat</p></td>
+<td><p>If the moniker had a different name for in a prior format version, then this is a dict of key/value where
+key it the format version and its associated value is the moniker used for that format version.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The main reason for the <strong>keyName</strong> is that is it used by a <strong>Suite</strong> instance to reference (i.e., uniquely identify) its children.</p>
+<p>For an instance, the xlink is ‘/the/list/of/ancestors/of/self’ if attribute is None or
+‘/the/list/of/ancestors/of/self[&#64;attribute=”value”]’ if attribute is not None. For example,
+for a hierarchy consisting of class A with moniker ‘nameA’ and member mB of class B, class B 
+with moniker ‘nameB’ and member mC of class C and class C with moniker ‘nameC’, then the xlink 
+for an instance of a C class in the hierarchy is ‘/nameA/nameB/nameC’. If the mC instance
+set attribute to be the member ‘greeting’ that, for this example as value ‘Hi’, then the
+xlink for the C class is ‘/nameA/nameB/nameC[&#64;greeting=”Hi”]’.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.ancestor">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ancestor</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.ancestor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self’s ancestor.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.ancestryMembers">
+<span class="sig-name descname"><span class="pre">ancestryMembers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></em><a class="headerlink" href="#LUPY.ancestry.Ancestry.ancestryMembers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.checkAncestry">
+<span class="sig-name descname"><span class="pre">checkAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.checkAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.checkAncestry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses deepcopy to make a copy of self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.findAttributeInAncestry">
+<span class="sig-name descname"><span class="pre">findAttributeInAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attributeName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.findAttributeInAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.findAttributeInAncestry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.findClassInAncestry">
+<span class="sig-name descname"><span class="pre">findClassInAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.findClassInAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.findClassInAncestry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.findEntity">
+<span class="sig-name descname"><span class="pre">findEntity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entityName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.findEntity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.findEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default findEntity method. In general, sub-classes should over-ride this method.
+This method uses the following algorithm to find entity. Firstly, if ‘attribute’ is None, then self is assumed
+to have an attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated
+over until an item with an attribute named attribute with value value is found. In either case, if
+an entity is found, its moniker value must be entityName. If no entity is found, raise AttributeError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.findInstancesOfClassInChildren">
+<span class="sig-name descname"><span class="pre">findInstancesOfClassInChildren</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9999</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.findInstancesOfClassInChildren"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.findInstancesOfClassInChildren" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds all instances of class <em>cls</em> in self’s children, grand-children, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.followXPath">
+<span class="sig-name descname"><span class="pre">followXPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.followXPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.followXPath" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xPath</strong> – string xPath, e.g. “/reactionSuite/reactions/reaction[&#64;label=’2’]”</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>class instance pointed to by xPath</p>
+</dd>
+</dl>
+<p>Uses Ancestry.findEntity to find each element</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.isChild">
+<span class="sig-name descname"><span class="pre">isChild</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">child</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.isChild"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.isChild" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.isParent">
+<span class="sig-name descname"><span class="pre">isParent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.isParent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.isParent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.keyName">
+<span class="sig-name descname"><span class="pre">keyName</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#LUPY.ancestry.Ancestry.keyName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.keyValue">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">keyValue</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.keyValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self’s keyValue. If keyName is <em>None</em>, then <em>None</em> is returned.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.legacyMemberNameMapping">
+<span class="sig-name descname"><span class="pre">legacyMemberNameMapping</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#LUPY.ancestry.Ancestry.legacyMemberNameMapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.moniker">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">moniker</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.monikerByFormat">
+<span class="sig-name descname"><span class="pre">monikerByFormat</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#LUPY.ancestry.Ancestry.monikerByFormat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.rootAncestor">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rootAncestor</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.rootAncestor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.setAncestor">
+<span class="sig-name descname"><span class="pre">setAncestor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ancestor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.setAncestor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.setAncestor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets self’s ancestor to ancestor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.toRelativeXLink">
+<span class="sig-name descname"><span class="pre">toRelativeXLink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.toRelativeXLink"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.toRelativeXLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string that is a relative xlink to another element (using XML xpath syntax).
+Both elements must reside in the same hierarchy.  For a description of xpath, see 
+<a class="reference external" href="http://en.wikipedia.org/wiki/XPath_1.0#Syntax_and_semantics">http://en.wikipedia.org/wiki/XPath_1.0#Syntax_and_semantics</a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.toXLink">
+<span class="sig-name descname"><span class="pre">toXLink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formatVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.toXLink"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.toXLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string that is an xlink to self (using XML xpath syntax).  The resulting 
+xlink starts at the root element. For a description of xpath, see 
+<a class="reference external" href="http://en.wikipedia.org/wiki/XPath_1.0#Syntax_and_semantics">http://en.wikipedia.org/wiki/XPath_1.0#Syntax_and_semantics</a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">AncestryIO</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#LUPY.ancestry.AncestryIO_base" title="LUPY.ancestry.AncestryIO_base"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO_base</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO.parseNodeUsingClass">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_bare">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">AncestryIO_bare</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_bare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_bare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#LUPY.ancestry.AncestryIO_base" title="LUPY.ancestry.AncestryIO_base"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO_base</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_bare.parseNode">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_bare.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_bare.parseNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">AncestryIO_base</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#LUPY.ancestry.Ancestry" title="LUPY.ancestry.Ancestry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ancestry</span></code></a></p>
+<p>This class adds methods to read and write <em>self</em> to a file. Currently, its supports reading and writing to an XML file.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.parseAncestryMembers">
+<span class="sig-name descname"><span class="pre">parseAncestryMembers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.parseAncestryMembers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.parseAncestryMembers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The method parses all member of <em>self.ancestryMembers</em> found in <em>node</em>. If <em>kwargs</em> contains the key <em>membersToSkip</em>
+then all members of <em>self</em> whose moniker is in the list <em>kwargs[‘membersToSkip’] are not parsed. This, for example,
+allows the calling instance to parse the *externalFiles</em> member and set up needed entries into <em>kwargs</em>.</p>
+<p>This method returns a dictionary and a list. The dictionary contains all child nodes of <em>node</em> not parsed, including 
+those specified by membersToSkip. The keys in the dictionary are the member monikers and the items are their associated 
+child node of <em>node</em>. The list contains all monikers for the <em>ancestryMembers</em> not in <em>node</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.parseCleanup">
+<span class="sig-name descname"><span class="pre">parseCleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.parseCleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.parseCleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method does nothing. A place holder incase the derived class needs one.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.parseXMLString">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseXMLString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.parseXMLString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.parseXMLString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a XML string using class <em>cls</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.readXML_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">readXML_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.readXML_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.readXML_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads and parses an XML file using class <em>cls</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.saveToFile">
+<span class="sig-name descname"><span class="pre">saveToFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.saveToFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.saveToFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes an XML representation of <em>self</em> to path <em>fileName</em>. This methods opens the file and calls <strong>saveToOpenedFile</strong> and then closes the file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.saveToHybrid">
+<span class="sig-name descname"><span class="pre">saveToHybrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">XML_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HDF_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HDF_subDir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minLength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.saveToHybrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.saveToHybrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves <em>self</em> to as two files, with most of the hierarchy in an XML file but most of the numerical data saved in an associated HDF file.
+To construct the file names, the best is to leave <em>HDF_name</em> as None. However, if the HDF file should be put into a sub-directory
+below where the XML file will be placed, then one can leave <em>HDF_name</em> as <strong>None</strong> and set <em>HDF_subDir</em>. For example, to
+place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The following example will write the XMl to the file
+‘path/to/n-Pu239.xml’ and the HDF data to the file ‘path/to/HDF/n-Pu239.h5’:</p>
+<p>node.saveToHybrid(‘path/to/n-Pu239.xml’, HDF_subDir=’HDF’)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>XML_name</strong> – Name of the XML file written.</p></li>
+<li><p><strong>HDF_name</strong> – Name of the HDF file written. If None, will be the same as XML_name with extension changed to .h5</p></li>
+<li><p><strong>HDF_subDir</strong> – If not None, this name is added as a directory to the front of the HDF_name.</p></li>
+<li><p><strong>minLength</strong> – Minimum number of numerical values in a <em>Values</em> node before writing the <em>Values</em> node to HDF.</p></li>
+<li><p><strong>flatten</strong> – If True, GNDS datasets are concatenated into flattened HDF5 datasets.</p></li>
+<li><p><strong>compress</strong> – Enable gzip + shuffle compression for HDF5 datasets.</p></li>
+<li><p><strong>kwargs</strong> – Extra keywork arguments passed to other functions.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.saveToOpenedFile">
+<span class="sig-name descname"><span class="pre">saveToOpenedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fOut</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.saveToOpenedFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.saveToOpenedFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes an XML representation of <em>self</em> to the opened file <em>fOut</em>. This method uses <em>self.toXML</em> to construct <em>self</em>’s XML representation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.toXML">
+<span class="sig-name descname"><span class="pre">toXML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.toXML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls self.toXML_strList and joins its returned list with ‘
+‘.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.toXML_strList">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.toXML_strList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="LUPY.ancestry.XPathNotFound">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">XPathNotFound</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#XPathNotFound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.XPathNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-LUPY.argumentsForScripts">
+<span id="lupy-argumentsforscripts-module"></span><h2>LUPY.argumentsForScripts module<a class="headerlink" href="#module-LUPY.argumentsForScripts" title="Permalink to this heading">¶</a></h2>
+<p>This module contains common argparse options used by some of the FUDGE scripts.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.argumentsForScripts.SingleProtareArguments">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.argumentsForScripts.</span></span><span class="sig-name descname"><span class="pre">SingleProtareArguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/argumentsForScripts.html#SingleProtareArguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.argumentsForScripts.SingleProtareArguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.argumentsForScripts.SingleProtareArguments.protare">
+<span class="sig-name descname"><span class="pre">protare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lazyParsing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/argumentsForScripts.html#SingleProtareArguments.protare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.argumentsForScripts.SingleProtareArguments.protare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a protare (i.e., “reactionSuite”) instance that has been read per the “mapOrProtareFileName”, “–pid” and “–tid” parameters.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-LUPY.checkPythonVersion">
+<span id="lupy-checkpythonversion-module"></span><h2>LUPY.checkPythonVersion module<a class="headerlink" href="#module-LUPY.checkPythonVersion" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-LUPY.checksums">
+<span id="lupy-checksums-module"></span><h2>LUPY.checksums module<a class="headerlink" href="#module-LUPY.checksums" title="Permalink to this heading">¶</a></h2>
+<p>Classes and static methods for computing checksums</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.checksums.MD5sum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.checksums.</span></span><span class="sig-name descname"><span class="pre">MD5sum</span></span><a class="reference internal" href="../_modules/LUPY/checksums.html#MD5sum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.MD5sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.checksums.MD5sum.algorithm">
+<span class="sig-name descname"><span class="pre">algorithm</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'md5'</span></em><a class="headerlink" href="#LUPY.checksums.MD5sum.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.checksums.MD5sum.from_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/checksums.html#MD5sum.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.MD5sum.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return MD5 checksum for a file.
+&#64;param filename:
+&#64;return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.checksums.MD5sum.from_string">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/checksums.html#MD5sum.from_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.MD5sum.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return MD5 checksum for a string.
+&#64;param string:
+&#64;return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.checksums.NoneSum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.checksums.</span></span><span class="sig-name descname"><span class="pre">NoneSum</span></span><a class="reference internal" href="../_modules/LUPY/checksums.html#NoneSum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.NoneSum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Dummy class to handle <em>None</em> as an algorithm.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.checksums.NoneSum.algorithm">
+<span class="sig-name descname"><span class="pre">algorithm</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#LUPY.checksums.NoneSum.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.checksums.NoneSum.from_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/checksums.html#NoneSum.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.NoneSum.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Always returns <em>None</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.checksums.NoneSum.from_string">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/checksums.html#NoneSum.from_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.NoneSum.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Always returns <em>None</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.checksums.Sha1sum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.checksums.</span></span><span class="sig-name descname"><span class="pre">Sha1sum</span></span><a class="reference internal" href="../_modules/LUPY/checksums.html#Sha1sum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.Sha1sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.checksums.Sha1sum.algorithm">
+<span class="sig-name descname"><span class="pre">algorithm</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sha1'</span></em><a class="headerlink" href="#LUPY.checksums.Sha1sum.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.checksums.Sha1sum.from_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/checksums.html#Sha1sum.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.Sha1sum.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return SHA1 checksum for a file.
+&#64;param filename:
+&#64;return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.checksums.Sha1sum.from_string">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/checksums.html#Sha1sum.from_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.checksums.Sha1sum.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return SHA1 checksum for a string.
+&#64;param string:
+&#64;return:</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-LUPY.commandlineArguments">
+<span id="lupy-commandlinearguments-module"></span><h2>LUPY.commandlineArguments module<a class="headerlink" href="#module-LUPY.commandlineArguments" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.commandlineArguments.commandLineArgumentsFromDocumentation">
+<span class="sig-prename descclassname"><span class="pre">LUPY.commandlineArguments.</span></span><span class="sig-name descname"><span class="pre">commandLineArgumentsFromDocumentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">codeName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documentation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/commandlineArguments.html#commandLineArgumentsFromDocumentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.commandlineArguments.commandLineArgumentsFromDocumentation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read command line arguments for computer code named <em>codeName</em> from documentation instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>codeName</strong> – String representing the computer code’s name. Must also match the label of a <strong>ComputerCode</strong> instance in documentation.computerCodes.</p></li>
+<li><p><strong>documentation</strong> – An xData Documentation instance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The execution arguments for the code as a string. None is returned if <em>codeName</em> is not in documentation.computerCodes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.commandlineArguments.commandLineArgumentsToDocumentation">
+<span class="sig-prename descclassname"><span class="pre">LUPY.commandlineArguments.</span></span><span class="sig-name descname"><span class="pre">commandLineArgumentsToDocumentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">codeName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commandLineArguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documentation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/commandlineArguments.html#commandLineArgumentsToDocumentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.commandlineArguments.commandLineArgumentsToDocumentation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a list of command line arguments and a note to a documentation instance’s computerCodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>codeName</strong> – String representing the computer code’s name.</p></li>
+<li><p><strong>currentArguments</strong> – List of command line arguments.</p></li>
+<li><p><strong>documentation</strong> – Documentation instance whose child nodes are populated.
+:type documentation:    xData.Documentation.documentation.Documentation</p></li>
+<li><p><strong>date</strong> – Date code was run.
+:type date:             xData.date.Date, optional</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.commandlineArguments.getArgparseArguments">
+<span class="sig-prename descclassname"><span class="pre">LUPY.commandlineArguments.</span></span><span class="sig-name descname"><span class="pre">getArgparseArguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excludeArguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/commandlineArguments.html#getArgparseArguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.commandlineArguments.getArgparseArguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return command line arguments of an <strong>argparse.ArgumentParser</strong> as a list of positional arguments and a list of optional
+arguments, excluding any arguments listed in <em>excludeArguments</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parser</strong> – An instance of the argparse.ArgumentsParser class.</p></li>
+<li><p><strong>args</strong> – Populated namespace returned by the argparse.ArgumentParser.parse_args() method.
+:type args:             argparse.Namespace</p></li>
+<li><p><strong>excludeArguments</strong> – List of command line arguments to ignore.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The tuple (positionalArguments, optionalArguments).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-LUPY.hdf5">
+<span id="lupy-hdf5-module"></span><h2>LUPY.hdf5 module<a class="headerlink" href="#module-LUPY.hdf5" title="Permalink to this heading">¶</a></h2>
+<p>Use this module to import h5py.
+If module not found, sets HDF5_present = False</p>
+<p>Also guards against Python interpreter crash that may occur on if MPI environment variable is set before importing h5py.</p>
+</section>
+<section id="module-LUPY.locateFudgeBin">
+<span id="lupy-locatefudgebin-module"></span><h2>LUPY.locateFudgeBin module<a class="headerlink" href="#module-LUPY.locateFudgeBin" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.locateFudgeBin.locateFileInBin">
+<span class="sig-prename descclassname"><span class="pre">LUPY.locateFudgeBin.</span></span><span class="sig-name descname"><span class="pre">locateFileInBin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileInBin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exceptionIfNotFound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/locateFudgeBin.html#locateFileInBin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.locateFudgeBin.locateFileInBin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the full path to a file located in the FUDGE bin folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fileInBin</strong> – The file for which the path is seeked.</p></li>
+<li><p><strong>exceptionIfNotFound</strong> – Option to raise a FileNotFoundError exception if the requested path is not found.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Full path to the requested file path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.locateFudgeBin.locateMerced">
+<span class="sig-prename descclassname"><span class="pre">LUPY.locateFudgeBin.</span></span><span class="sig-name descname"><span class="pre">locateMerced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exceptionIfNotFound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/locateFudgeBin.html#locateMerced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.locateFudgeBin.locateMerced" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Find the full path to the mercury executable.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exceptionIfNotFound</strong> – Option to raise a FileNotFoundError exception if no “mercury” executable is found.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Full path of the “merced” executable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-LUPY.misc">
+<span id="lupy-misc-module"></span><h2>LUPY.misc module<a class="headerlink" href="#module-LUPY.misc" title="Permalink to this heading">¶</a></h2>
+<p>This module contains general miscellaneous functions that do not fit in other LUPY modules.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.misc.isString">
+<span class="sig-prename descclassname"><span class="pre">LUPY.misc.</span></span><span class="sig-name descname"><span class="pre">isString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/misc.html#isString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.misc.isString" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function check if <em>value</em> is of type python str instance. If it is, <em>value</em> is returned. Otherwise, a TypeError raise
+is execute with message <em>message</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – The instance to check if it is a python str instance.</p></li>
+<li><p><strong>message</strong> – The message passed to <strong>TypeError</strong>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>value</em>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <em>value</em> is not a python str instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-LUPY.parallelprocessing">
+<span id="lupy-parallelprocessing-module"></span><h2>LUPY.parallelprocessing module<a class="headerlink" href="#module-LUPY.parallelprocessing" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.parallelprocessing.addProcess">
+<span class="sig-prename descclassname"><span class="pre">LUPY.parallelprocessing.</span></span><span class="sig-name descname"><span class="pre">addProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numberLaunched</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/parallelprocessing.html#addProcess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.parallelprocessing.addProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Added a process.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.parallelprocessing.execute">
+<span class="sig-prename descclassname"><span class="pre">LUPY.parallelprocessing.</span></span><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numberOfParallelProcesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentNotifications</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/parallelprocessing.html#execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.parallelprocessing.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loops over each item in <em>items</em> and processes it by calling user’s callback function. At most <em>numberOfParallelProcesses</em> of
+processes can run in parallel. The user’s callback must create a command to execute and call function <strong>executeOne</strong>.</p>
+<p>percentNotifications is in percent of number to do and for every percent of number done a message is sent to sys.syserr.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.parallelprocessing.executeMultiThreaded">
+<span class="sig-prename descclassname"><span class="pre">LUPY.parallelprocessing.</span></span><span class="sig-name descname"><span class="pre">executeMultiThreaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taskList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nThreads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleepTime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/parallelprocessing.html#executeMultiThreaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.parallelprocessing.executeMultiThreaded" title="Permalink to this definition">¶</a></dt>
+<dd><p>General-purpose multi-threading code. Applies ‘runner’ to each task in the taskList,
+returns list of completed runners once all tasks are complete.
+Note: order of returned list may not match order of submitted taskList.</p>
+<p>TODO: add index to each thread in case we need to sort results? Could use thread.name too…</p>
+<p>Due to the Python GIL, this should be most efficient for runners that spend most of their time
+in compiled code e.g. C extensions rather than in interpreted Python code.</p>
+<p>&#64;param taskList: list of tasks.
+&#64;param runner: class (inheriting from threading.Thread) with a run() method that completes each task.
+&#64;param nThreads: maximum number of concurrent threads.
+&#64;param sleepTime: how long (in seconds) to wait between polling for finished threads.
+&#64;param verbose: if True, print updates as each task starts.
+&#64;return list of finished tasks.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.parallelprocessing.executeOne">
+<span class="sig-prename descclassname"><span class="pre">LUPY.parallelprocessing.</span></span><span class="sig-name descname"><span class="pre">executeOne</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/parallelprocessing.html#executeOne"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.parallelprocessing.executeOne" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is mainly for an example of what the target argument of multiprocessing.Process may look.
+The main thing is to call sys.exit with a status and to properly handle the status returned by os.system.</p>
+</dd></dl>
+
+</section>
+<section id="module-LUPY.subprocessing">
+<span id="lupy-subprocessing-module"></span><h2>LUPY.subprocessing module<a class="headerlink" href="#module-LUPY.subprocessing" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.subprocessing.deleteFilesUsingGlob">
+<span class="sig-prename descclassname"><span class="pre">LUPY.subprocessing.</span></span><span class="sig-name descname"><span class="pre">deleteFilesUsingGlob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patterns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/subprocessing.html#deleteFilesUsingGlob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.subprocessing.deleteFilesUsingGlob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes file(s) matching patterns. Skips deleting directories.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.subprocessing.executeCommand">
+<span class="sig-prename descclassname"><span class="pre">LUPY.subprocessing.</span></span><span class="sig-name descname"><span class="pre">executeCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raiseOnError</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useExecutable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/subprocessing.html#executeCommand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.subprocessing.executeCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a command using subprocess. Supports redirecting stdout / stderr to files (or to each other).
+If stdout / stderr are strings, they will be treated as file names and output written to them.
+If they are pipes (default option), they will be returned as lists of strings along with the exit code.</p>
+<p>&#64;param args: list of arguments to be executed, e.g. [‘echo’, ‘Hello World!’]
+&#64;param raiseOnError: if True, raise Exception if the subprocess returns a non-zero exit code.
+&#64;param useExecutable: if True, replace the executable with absolute path before running.
+&#64;param stdout: where to send standard out. Options include file name, PIPE, or None (like sending to /dev/null).
+&#64;param stderr: where to send standard error. Same options as stdout.
+&#64;return: (return code, stdout, stderr)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.subprocessing.spawn">
+<span class="sig-prename descclassname"><span class="pre">LUPY.subprocessing.</span></span><span class="sig-name descname"><span class="pre">spawn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/subprocessing.html#spawn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.subprocessing.spawn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for launching a process with PYTHONPATH set. Returns process id.</p>
+</dd></dl>
+
+</section>
+<section id="module-LUPY.times">
+<span id="lupy-times-module"></span><h2>LUPY.times module<a class="headerlink" href="#module-LUPY.times" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the <a class="reference internal" href="#LUPY.times.Times" title="LUPY.times.Times"><code class="xref py py-class docutils literal notranslate"><span class="pre">Times</span></code></a> class that is useful for timing sections of a python code.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.times.Times">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.times.</span></span><span class="sig-name descname"><span class="pre">Times</span></span><a class="reference internal" href="../_modules/LUPY/times.html#Times"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.times.Times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is useful for timing sections of a python code. This class uses the python class <code class="xref py py-func docutils literal notranslate"><span class="pre">os.times()</span></code> 
+to measure time information. Five components of time are measured. They are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>user:         user cpu time.</p></li>
+<li><p>sys:          user system time.</p></li>
+<li><p>children:     total children cpu time.</p></li>
+<li><p>children sys: total children system time.</p></li>
+<li><p>wall:         wall time.</p></li>
+</ul>
+</div></blockquote>
+<p>All times are since <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> was called with the <a href="#id3"><span class="problematic" id="id4">:py:method:`Times.reset`</span></a> method calls.</p>
+<p>Example usage is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">times</span> <span class="k">as</span> <span class="n">timesModule</span>
+
+<span class="n">time</span> <span class="o">=</span> <span class="n">timesModule</span><span class="o">.</span><span class="n">Tiems</span><span class="p">()</span>
+<span class="c1"># Some python code to time.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span><span class="n">includeChildren</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following table list the primary members of this class:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Member</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>times</p></td>
+<td><p>The instance return by <code class="xref py py-func docutils literal notranslate"><span class="pre">os.times()</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.times.Times.delta">
+<span class="sig-name descname"><span class="pre">delta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/times.html#Times.delta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.times.Times.delta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns time information since the last time <a href="#id5"><span class="problematic" id="id6">:py:method:`Times.reset`</span></a> was called as a dictionary.
+The dictionary as the keys ‘user’, ‘sys’, ‘children’, ‘childrenSys’ and ‘wall’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reset</strong> – If <strong>True</strong>, <a href="#id7"><span class="problematic" id="id8">:py:method:`Times.reset`</span></a> is called after the delta time is determined.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A directory containing time components and their times.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.times.Times.delta_cpu">
+<span class="sig-name descname"><span class="pre">delta_cpu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeChildren</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeSystem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/times.html#Times.delta_cpu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.times.Times.delta_cpu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cpu component of the time for <em>self</em>. If <em>includeChildren</em> is <strong>True</strong> the cpu time of the child processes
+are include in the cpu time. If <em>includeSystem</em> is <strong>True</strong> the system time is include in the cpu time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reset</strong> – If <strong>True</strong>, <a href="#id9"><span class="problematic" id="id10">:py:method:`Times.reset`</span></a> is called after the delta time is determined.</p></li>
+<li><p><strong>includeChildren</strong> – If <strong>True</strong> the cpu time of the child processes are include.</p></li>
+<li><p><strong>includeSystem</strong> – If <strong>True</strong> the system time is include.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The requested time as a float.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.times.Times.delta_wall">
+<span class="sig-name descname"><span class="pre">delta_wall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/times.html#Times.delta_wall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.times.Times.delta_wall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the wall component of the time for <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reset</strong> – If <strong>True</strong>, <a href="#id11"><span class="problematic" id="id12">:py:method:`Times.reset`</span></a> is called after the delta time is determined.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The wall time as a float.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.times.Times.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/times.html#Times.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.times.Times.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset time to the current time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.times.Times.toString">
+<span class="sig-name descname"><span class="pre">toString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeChildren</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeSystem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/times.html#Times.toString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.times.Times.toString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> – A prefix string to add to the returned string.</p></li>
+<li><p><strong>reset</strong> – If <strong>True</strong>, <a href="#id13"><span class="problematic" id="id14">:py:method:`Times.reset`</span></a> is called after the delta time is determined.</p></li>
+<li><p><strong>includeChildren</strong> – If <strong>True</strong> the cpu time of the child processes are include.</p></li>
+<li><p><strong>includeSystem</strong> – If <strong>True</strong> the system time is include.</p></li>
+<li><p><strong>current</strong> – If <strong>True</strong>, the current date/time information is added to the returned string.</p></li>
+<li><p><strong>names</strong> – If <strong>True</strong>, the names of each component is added to the returned string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string representing the time information.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-LUPY.xmlNode">
+<span id="lupy-xmlnode-module"></span><h2>LUPY.xmlNode module<a class="headerlink" href="#module-LUPY.xmlNode" title="Permalink to this heading">¶</a></h2>
+<p>Wrapper for xml parsers (Etree, DOM, etc), in case we need to support multiple parsers. For now only supporting
+python’s xml.etree.  This is only for reading (not writing) xml; creating new elements should happen within fudge</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.xmlNode.</span></span><span class="sig-name descname"><span class="pre">XML_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsedXMLNode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/xmlNode.html#XML_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.xmlNode.XML_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.allowedParsers">
+<span class="sig-name descname"><span class="pre">allowedParsers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('etree',</span> <span class="pre">'dom')</span></em><a class="headerlink" href="#LUPY.xmlNode.XML_node.allowedParsers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.attrib">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">attrib</span></span><a class="headerlink" href="#LUPY.xmlNode.XML_node.attrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access node attributes as dictionary</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.dom">
+<span class="sig-name descname"><span class="pre">dom</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dom'</span></em><a class="headerlink" href="#LUPY.xmlNode.XML_node.dom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.etree">
+<span class="sig-name descname"><span class="pre">etree</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'etree'</span></em><a class="headerlink" href="#LUPY.xmlNode.XML_node.etree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/xmlNode.html#XML_node.find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.xmlNode.XML_node.find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches for child elements matching the path, and returns the first match.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.findall">
+<span class="sig-name descname"><span class="pre">findall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/xmlNode.html#XML_node.findall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.xmlNode.XML_node.findall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches for child elements matching the path, and returns all matches.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaultValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/xmlNode.html#XML_node.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.xmlNode.XML_node.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the specified attribute. If the attribute is not present, returns defaultValue.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.getchildren">
+<span class="sig-name descname"><span class="pre">getchildren</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/xmlNode.html#XML_node.getchildren"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.xmlNode.XML_node.getchildren" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all child elements.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.items">
+<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/xmlNode.html#XML_node.items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.xmlNode.XML_node.items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name and value of all attributes in this element, as a list of tuples.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/xmlNode.html#XML_node.keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.xmlNode.XML_node.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of all attributes in this element, as a list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="LUPY.xmlNode.XML_node.xpath">
+<span class="sig-name descname"><span class="pre">xpath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xpath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/xmlNode.html#XML_node.xpath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.xmlNode.XML_node.xpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches for child elements matching the xpath, and returns all matches.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">LUPY</a><ul>
+<li><a class="reference internal" href="#module-LUPY.enums">LUPY.enums module</a></li>
+<li><a class="reference internal" href="#module-LUPY.ancestry">LUPY.ancestry module</a></li>
+<li><a class="reference internal" href="#module-LUPY.argumentsForScripts">LUPY.argumentsForScripts module</a></li>
+<li><a class="reference internal" href="#module-LUPY.checkPythonVersion">LUPY.checkPythonVersion module</a></li>
+<li><a class="reference internal" href="#module-LUPY.checksums">LUPY.checksums module</a></li>
+<li><a class="reference internal" href="#module-LUPY.commandlineArguments">LUPY.commandlineArguments module</a></li>
+<li><a class="reference internal" href="#module-LUPY.hdf5">LUPY.hdf5 module</a></li>
+<li><a class="reference internal" href="#module-LUPY.locateFudgeBin">LUPY.locateFudgeBin module</a></li>
+<li><a class="reference internal" href="#module-LUPY.misc">LUPY.misc module</a></li>
+<li><a class="reference internal" href="#module-LUPY.parallelprocessing">LUPY.parallelprocessing module</a></li>
+<li><a class="reference internal" href="#module-LUPY.subprocessing">LUPY.subprocessing module</a></li>
+<li><a class="reference internal" href="#module-LUPY.times">LUPY.times module</a></li>
+<li><a class="reference internal" href="#module-LUPY.xmlNode">LUPY.xmlNode module</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../todo.html"
+                          title="previous chapter">To Do</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../pqu/modules.html"
+                          title="next chapter">pqu</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/LUPY/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pqu/modules.html" title="pqu"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../todo.html" title="To Do"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">LUPY</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

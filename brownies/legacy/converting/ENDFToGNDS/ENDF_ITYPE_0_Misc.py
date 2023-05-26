@@ -171,9 +171,12 @@ def calculateZA( ZACompound, ZAOther, minus = True ) :
     if( minus ) : return( ZACompound - ZAOther )
     return( ZACompound + ZAOther )
 
-def printAWR_mode( info, MT, MF, ZA, AWR ) :
+def printAWR_mode(info, MT, MF, line, ZA, AWR, addToInfo=True):
 
-    if( info.AWR_mode is not None ) : info.AWR_mode.write( "AWR_mode:: MT: %s: MF: %s: ZA: %s:  AWR: %s::\n" % ( MT, MF, ZA, AWR ) )
+    if addToInfo:
+        info.ZA_massLineInfo.add(ZA, AWR, MT, MF, line)
+    if info.AWR_mode is not None:
+        info.AWR_mode.write("AWR_mode:: MT: %s: MF: %s: ZA: %s:  AWR: %s::\n" % (MT, MF, ZA, AWR))
 
 def nudgeValue( value, sign ) :
 
@@ -235,10 +238,12 @@ def getMultiplicityPointwiseOrPieceWise( info, data, warningList ) :
             multiplicity.append( _region )
     return( multiplicity )
 
-def getTotalOrPromptFission( info, MT456Data, totalOrPrompt, warningList ) :
+def getTotalOrPromptFission( info, MT, MTDatas, totalOrPrompt, warningList ) :
 
+    MT456Data = MTDatas[MT][1]
     ZA, AWR, dummy, LNU, dummy, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MT456Data[0], logFile = info.logs )
     ZA = int( ZA )
+    info.ZA_massLineInfo.add(ZA, AWR, MT, 1, 0)
     info.addMassAWR( ZA, AWR )
     LNU = int( LNU )
     info.logs.write( '     %s fission neutron data: LNU = %d\n' % ( totalOrPrompt, LNU ) )
@@ -252,13 +257,15 @@ def getTotalOrPromptFission( info, MT456Data, totalOrPrompt, warningList ) :
         fissionMultiplicity = getMultiplicityPointwiseOrPieceWise( info, multiplicityRegions, warningList )
     return( fissionMultiplicity )
 
-def getDelayedFission( info, MT455Data, warningList ) :
+def getDelayedFission(info, MT, MTDatas, warningList):
 
     info.logs.write( '     Delayed fission neutron data (MT=455)' )
+    MT455Data = MTDatas[MT]
     MT455DataMF1 = MT455Data[1]
     ZA, AWR, LDG, LNU, dummy, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MT455DataMF1[0], logFile = info.logs )
     ZA = int( ZA )
     info.addMassAWR( ZA, AWR )
+    info.ZA_massLineInfo.add(ZA, AWR, MT, 1, 0)
     LDG, LNU = int( LDG ), int( LNU )
     info.logs.write( ' LDG=%s LNU=%s' % ( LDG, LNU ) )
     if( LDG != 0 ) : raise Exception( "Only energy-independent delayed fission neutrons are supported" )
@@ -364,6 +371,7 @@ def getFissionEnergies( info, domainMin, domainMax, warningList ) :
     MF1Data = info.fissionEnergyReleaseData[1]
     dataLine = 0
     ZA, AWR, dummy, LFC, dummy, NFC = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF1Data[dataLine], intIndices = [ 0, 5 ], logFile = info.logs )
+    info.ZA_massLineInfo.add(ZA, AWR, 458, 1, 0)
     ZA = int( ZA )
     info.addMassAWR( ZA, AWR )
 
@@ -688,7 +696,9 @@ def readMF2( info, MF2, warningList ) :
             resList = []
             negativeJs = False
             for lidx in range(NLS):
+                AWRI_lineNumber = mf2.index
                 AWRI, QX, L, LRX, tmp, NRS = funkyFI( mf2.next(), logFile = info.logs )
+                info.ZA_massLineInfo.add(-1, AWRI, 151, 2, AWRI_lineNumber)
                 if tmp!=6*NRS:
                     raise BadResonances( "incorrect values in resonance section line %d" % mf2.index )
                 for line in range(NRS):
@@ -736,7 +746,9 @@ def readMF2( info, MF2, warningList ) :
             LdependentAP = {}
             haveFission = False
             for lidx in range(NLS):
+                AWRI_lineNumber = mf2.index
                 AWRI, APL, L, dum, tmp, NRS = funkyFI( mf2.next(), logFile = info.logs )
+                info.ZA_massLineInfo.add(-1, AWRI, 151, 2, AWRI_lineNumber)
                 if tmp!=6*NRS:
                     raise BadResonances("incorrect values in resonance section line %d" % mf2.index)
                 if APL:
@@ -908,6 +920,7 @@ def readMF2( info, MF2, warningList ) :
             resonanceReactions = commonResonanceModule.ResonanceReactions()
             SHFs = []
             for idx in range(NPP):
+                MA_MB_lineNumber = mf2.index
                 MA, MB, ZA, ZB, IA, IB = funkyF( mf2.next(), logFile = info.logs )
                 Q, PNT, SHF, MT, PA, PB = funkyF( mf2.next(), logFile = info.logs )
                 MT = int(MT)
@@ -935,7 +948,9 @@ def readMF2( info, MF2, warningList ) :
                         if ZA_A > ZA_B: ZA_A, ZA_B = ZA_B, ZA_A
                         if MA > MB: MA, MB = MB, MA
                     info.addMassAWR(ZA_A, MA)
+                    info.ZA_massLineInfo.add(ZA_A, MA, MT, 2, MA_MB_lineNumber)
                     info.addMassAWR(ZA_B, MB)
+                    info.ZA_massLineInfo.add(ZA_B, MB, MT, 2, MA_MB_lineNumber)
 
                 gndsChannel, = [chan for chan in info.reactionSuite.reactions if chan.ENDF_MT == MT]
                 channelName = gndsChannel.label
@@ -1165,7 +1180,9 @@ def readMF2( info, MF2, warningList ) :
                 NLS = NE
                 for lidx in range(NLS):
                     J_list = unresolvedResonanceModule.Jsections()
+                    AWRI_lineNumber = mf2.index
                     AWRI, dum, L, dum, tmp, NJS = funkyFI( mf2.next(), logFile = info.logs )
+                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber)
                     if tmp!=6*NJS:
                         raise BadResonances("bad unresolved flag, line %d" % mf2.index)
                     for jidx in range(NJS):
@@ -1200,7 +1217,9 @@ def readMF2( info, MF2, warningList ) :
 
                 for lidx in range(NLS):
                     J_list = unresolvedResonanceModule.Jsections()
+                    AWRI_lineNumber = mf2.index
                     AWRI,dum,L,dum,NJS,dum = funkyFI( mf2.next(), logFile = info.logs )
+                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber)
                     for jidx in range(NJS):
                         dum,dum,L,MUF,tmp,dum = funkyFI( mf2.next(), logFile = info.logs )
                         if tmp!=NE+6:
@@ -1243,7 +1262,9 @@ def readMF2( info, MF2, warningList ) :
                 NLS = NE
                 for Lidx in range(NLS):
                     J_list = unresolvedResonanceModule.Jsections()
+                    AWRI_lineNumber = mf2.index
                     AWRI,dum,L,dum,NJS,dum = funkyFI( mf2.next(), logFile = info.logs )
+                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber)
                     for jidx in range(NJS):
                         resList = []
                         AJ,dum,INT,dum,tmp,NE = funkyFI( mf2.next(), logFile = info.logs )
@@ -1337,9 +1358,10 @@ def readMF2( info, MF2, warningList ) :
     unresolvedList = []
 
     # read MF2 header:
+    AWR_lineNumber = mf2.index
     ZAM, AWR, dum, dum, NIS, dum = funkyFI( mf2.next(), logFile = info.logs )
     ZAM = int( ZAM )
-    printAWR_mode( info, -1, 2, ZAM, AWR )
+    printAWR_mode(info, 151, 2, AWR_lineNumber, ZAM, AWR)
     info.addMassAWR( ZAM, AWR )
     if NIS!=1: info.logs.write( "careful, more than one isotope in MF2!" )
     ZAI, ABN, dum, LFW, NER, dum = funkyFI( mf2.next(), logFile = info.logs )
@@ -1404,6 +1426,7 @@ def readMF3( info, MT, MF3Data, warningList ) :
 
     ZA, AWR, dum, dum, dum, dum = funkyFI( MF3Data[0], info.logs )
     ZA = int( ZA )
+    info.ZA_massLineInfo.add(ZA, AWR, MT, 3, 0)
     info.addMassAWR( ZA, AWR )
     dataLine, TAB1, crossSectionRegions = endfFileToGNDSMiscModule.getTAB1Regions( 1, MF3Data, allowInterpolation6 = True,
             logFile = info.logs, axes = crossSectionAxes, cls = crossSectionModule.XYs1d )
@@ -1442,13 +1465,16 @@ def readMF4( info, product, MT, MF4Data, formClass, warningList ) :
     if( MT not in MTWithOnlyNeutonProducts ) : info.MF4ForNonNeutrons.append( MT )
     ZA, AWR, LVT, LTT, dummy, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF4Data[0], logFile = info.logs )
     ZA = int( ZA )
-    printAWR_mode( info, MT, 4, ZA, AWR )
+    printAWR_mode(info, MT, 4, 0, ZA, AWR)
     info.addMassAWR( ZA, AWR )
     LVT = int( LVT )                # 1: transformation matrix given. Must be 0 for endf/b6 format but not older formats.
     LTT = int( LTT )                # 0: isotropic, 1: Legendre, 2: table, 3: Legendre for low E and table for high E.
 
     dummy, AWR_, LI, LCT, NK, NM = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF4Data[1], logFile = info.logs )
-    if( AWR != AWR_ ) : printAWR_mode( info, MT, -4, ZA, AWR )
+    if AWR != AWR_:
+        printAWR_mode( info, MT, 4, 1, ZA, AWR )
+    else:
+        info.ZA_massLineInfo.add(ZA, AWR_, MT, 4, 1)
     LI = int( LI )                  # if 1, gammas isotropic
     LCT = int( LCT )                # 1 for lab frame, 2 for center of mass
     NK = int( NK )                  # number of entries in transformation matrix
@@ -1487,7 +1513,7 @@ def readMF5( info, MT, MF5Data, warningList, delayNeutrons = False, product = No
 
     ZA, AWR, dummy, dummy, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF5Data[0], logFile = info.logs )
     ZA = int( ZA )
-    printAWR_mode( info, MT, 5, ZA, AWR )
+    printAWR_mode( info, MT, 5, 0, ZA, AWR )
     info.addMassAWR( ZA, AWR )
     NK = int( NK )                 # number of partial energy distributions.
     dataLine = 1
@@ -1585,7 +1611,8 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
     twoBodyIndex = 0
     ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[0], logFile = info.logs )
     ZA = int( ZA )
-    printAWR_mode( info, MT, 6, ZA, AWR )
+    doInfo = not (ZA == 0 and AWP != 0)
+    printAWR_mode(info, MT, 6, 0, ZA, AWR, doInfo)
     info.addMassAWR( ZA, AWR )
     JPP=int(JP)//10
     JPN=int(JP)%10
@@ -1605,6 +1632,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
     missingMetaStable = []
     for outGoing in range( NK ) :
         isLegendreConvertedToEnergy = False
+        AWP_lineNumber = dataLine
         dataLine, productData, multiplicityRegions = endfFileToGNDSMiscModule.getTAB1Regions( dataLine, MF6Data, logFile = info.logs,
                 axes = multiplicityAxes )
             # ZAP is ZA for outgoing particle; AWP is its atomic mass, LIP: 0 for residual in ground state, 1 for first excited state, etc
@@ -1614,7 +1642,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
             ZAP = 0
             if( ( LAW == 8 ) or ( MT in [ 525, 526, 528 ] ) or ( MT >= 534 ) ) : ZAP = 9
             if( ZAP == 0 ) : warningList.append( 'photon most likely labelled as an electron (ZAP = 11), converting to ZAP = 0' )
-        printAWR_mode( info, MT, 6, ZAP, AWP )
+        printAWR_mode(info, MT, 6, AWP_lineNumber, ZAP, AWP)
         info.addMassAWR( ZAP, AWP, asTarget=False )
         LCTp = LCTLight
         if( ZAP % 1000 > 4 ) : LCTp = LCTWeight
@@ -1880,8 +1908,8 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
                 dataLine += 1 + ( NR - 1 ) // 3      # the next data is energy-angle distributions
 
                 EPrior = -1
-                energyAngularSubformRegion = energyAngularModule.XYs3d( axes = energyAngularAxes, interpolation = EinInterpolation,
-                            interpolationQualifier = interpolationQualifier )
+                energyAngularSubformRegion = energyAngularModule.XYs3d(axes=energyAngularAxes, interpolation=EinInterpolation,
+                            interpolationQualifier=interpolationQualifier)
 
                 muInterpolationQualifier, muInterpolation = endfFileToGNDSMiscModule.ENDFInterpolationToGNDS2plusd( LANG - 10 )
                 for EinCount in range( NE ) :
@@ -1903,12 +1931,12 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
                             logFile = info.logs, dimension = NA + 2 )
                     dataLine += 1 + ( NW -  1 ) // 6    # Offset for the next incident energy
 
-                    fOfMu_givenEp = energyAngularModule.XYs2d( outerDomainValue = Ein, interpolation = interpolationLEP )
+                    fOfMu_givenEp = energyAngularModule.XYs2d(outerDomainValue=Ein, interpolation=interpolationLEP, axes = energyAngularAxes)
                     for data in EpF0_fOfMu :
                         Ep = data.pop( 0 )
                         f0 = data.pop( 0 )
                         fOfMu = f0 * XYs1dModule.XYs1d( data, dataForm = 'list' )
-                        fOfMu = energyAngularModule.XYs1d( fOfMu, outerDomainValue = Ep, interpolation = muInterpolation )
+                        fOfMu = energyAngularModule.XYs1d(fOfMu, outerDomainValue=Ep, interpolation=muInterpolation, axes = energyAngularAxes)
                         fOfMu_givenEp.append( fOfMu )
 
                     energyAngularSubformRegion.append( fOfMu_givenEp )
@@ -2238,7 +2266,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
             residualZA -= int(particleZA(info, product.pid) * product.multiplicity.getConstant())
         if residualZA != 0:
             if residualZA < 0:
-                raise Except('Negative residual ZA calculated as %s.' % residualZA)
+                raise Exception('Negative residual ZA calculated as %s.' % residualZA)
             thisParticle = toGNDSMiscModule.getTypeNameGamma(info, residualZA)
             product = toGNDSMiscModule.newGNDSParticle( info, thisParticle, crossSection)
             productList.append(product)
@@ -2253,7 +2281,7 @@ def readMF8( info, MT, MTData, warningList ) :
         dataLine, MF8Data = 1, MTData[8]
         ZA, AWR, LIS, LISO, NS, NO = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF8Data[0], intIndices = [ 0, 2, 3, 4, 5 ], logFile = info.logs )
         info.addMassAWR( ZA, AWR )
-        printAWR_mode( info, MT, 8, ZA, AWR )
+        printAWR_mode( info, MT, 8, 0, ZA, AWR )
         MF9Data = readMF9or10( info, MT, MTData, 9, LIS, warningList )
         MF10Data = readMF9or10( info, MT, MTData, 10, LIS, warningList )
         metastables = {}
@@ -2351,7 +2379,7 @@ def readMF9or10( info, MT, MTData, MF, targetLIS, warningList ) :
     dataLine, MFData, MF9or10 = 1, MTData[MF], []
     ZA, AWR, LIS, dummy, NS, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MFData[0], intIndices = [ 0, 2, 4 ], logFile = info.logs )
     ZA = int( ZA )
-    printAWR_mode( info, MT, MF, ZA, AWR )
+    printAWR_mode( info, MT, MF, 0, ZA, AWR )
     info.addMassAWR( ZA, AWR )
     if( LIS != targetLIS ) :
         warningList.append( "residual's LIS = %s does not match target's LIS = %s: MT=%d, MF=%d" % ( LIS, targetLIS, MT, MF ) )
@@ -2421,7 +2449,7 @@ def readMF12_13( info, MT, MTData, productList, warningList, crossSection, _dumm
 
     MF12_13Data = MTData[MF]
     ZA, AWR, LO, LG, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF12_13Data[0], intIndices = [ 0, 2, 3, 4 ], logFile = info.logs )
-    printAWR_mode( info, MT, MF, ZA, AWR )
+    printAWR_mode( info, MT, MF, 0, ZA, AWR )
     info.addMassAWR( ZA, AWR )
     info.logs.write( ' : MF=%s LO=%s : ZAP=0 ' % ( MF, LO ) )
     dataLine, continuousGamma, discreteGammas, primaryGammas, branchingGammas = 1, [], [], [], []
@@ -2449,7 +2477,7 @@ def readMF12_13( info, MT, MTData, productList, warningList, crossSection, _dumm
     elif( ( MF == 12 ) and ( LO == 2 ) ) :
         dataLine, LO2 = endfFileToGNDSMiscModule.getList( dataLine, MF12_13Data, logFile = info.logs )
         LP = int(LO2['L1'])
-        if( ( LP == 2 ) and ( MT not in ( 91, 649, 699, 749, 799, 849 ) ) ) :
+        if LP == 2 and MT not in (91, 649, 699, 749, 799, 849, 999):
             warningList.append("Incorrect 'primary gamma' flag for MF12 MT%d" % MT)
         NT, LGp = LO2['N2'], LG + 1
         NK = NT
@@ -2522,7 +2550,7 @@ def readMF14( info, MT, MTData, MF, NK, warningList, discreteGammas, primaryGamm
     if( not( 14 in MTData ) ) : return
     MF14Data = MTData[14]
     ZA, AWR, LI, LTT, NK14, NI = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF14Data[0], intIndices = [ 0, 2, 3, 4, 5 ], logFile = info.logs )
-    printAWR_mode( info, MT, 14, ZA, AWR )
+    printAWR_mode( info, MT, 14, 0, ZA, AWR )
     info.addMassAWR( ZA, AWR )
     if( ( NK14 != NK ) and info.printBadNK14 ) :
         warningList.append( 'MF14 NK = %s != MF12/13 NK = %s for MT = %s' % ( NK14, NK, MT ) )
@@ -2551,7 +2579,7 @@ def readMF15( info, MT, MTData, continuousGamma, warningList ) :
         info.doRaise.append( warningList[-1] )
     MF15Data = MTData[15]
     ZA, AWR, dummy, dummy, NC, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF15Data[0], intIndices = [ 0, 4 ], logFile = info.logs )
-    printAWR_mode( info, MT, 15, ZA, AWR )
+    printAWR_mode( info, MT, 15, 0, ZA, AWR )
     info.addMassAWR( ZA, AWR )
     if( NC != 1 ) : raise Exception( 'NC = %s > 1 is not supported: MT=%s' % ( NC, MT ) )
 
@@ -2678,15 +2706,28 @@ def genID( cov_info, MT, MF, MT2=None, MF2=None, MAT2=None, QI=None, QI2=None, l
             link_.root = "$%s" % otherTarget
             link_.path = "/FIXME/path/to/MT%d" % MT2
         else:
-            if 850 < MT < 871: pass
-            elif MT==4: cov_info['MTL_2'][(MT,MF)] = zip(range(50,92),[33]*41)
-            elif MT==103: cov_info['MTL_2'][(MT,MF)] = zip(range(600,650),[33]*49)
-            elif MT==104: cov_info['MTL_2'][(MT,MF)] = zip(range(651,700),[33]*49)
-            elif MT==105: cov_info['MTL_2'][(MT,MF)] = zip(range(701,750),[33]*49)
-            elif MT==106: cov_info['MTL_2'][(MT,MF)] = zip(range(751,800),[33]*49)
-            elif MT==107: cov_info['MTL_2'][(MT,MF)] = zip(range(801,850),[33]*49)
-            elif MT==1: cov_info['MTL_2'][(MT,MF)] = zip(range(2,1000),[33]*998)
-            elif MT==3: cov_info['MTL_2'][(MT,MF)] = zip(range(4,1000),[33]*996)
+            if 850 < MT < 871:
+                pass
+            elif MT == 4:
+                cov_info['MTL_2'][(MT,MF)] =  [(smt, 33) for smt in range(50, 92)]
+            elif MT == 103:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(600, 650)]
+            elif MT == 104:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(650, 700)]
+            elif MT == 105:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(700, 750)]
+            elif MT == 106:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(750, 800)]
+            elif MT == 107:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(800, 850)]
+            elif MT == 102:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(900, 1000)]
+            elif MT == 16:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(875, 892)]
+            elif MT == 1:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(2, 1000)]
+            elif MT == 3:
+                cov_info['MTL_2'][(MT,MF)] = [(smt, 33) for smt in range(4, 1000)]
             if (MT,MF) not in cov_info['lumpedChannels']:
                 cov_info['lumpedChannels'][(MT,MF)] = sumsModule.CrossSectionSum( label=Id, ENDF_MT=MT )
             quant = cov_info['lumpedChannels'][(MT,MF)]
@@ -2785,8 +2826,10 @@ def readMF31_33( info, dat, mf, mt, cov_info, warningList ):
     # dat contains one MFMT section, but in gnds each cross-correlation gets its own section:
     sectionList, linkData = [], []
 
+    AWR_lineNumber = dat.index
     ZA, AWR, dum, MTL, dum, NL = funkyFI(dat.next(), logFile = info.logs)
     ZA = int( ZA )
+    info.ZA_massLineInfo.add(ZA, AWR, mt, mf, AWR_lineNumber)
     info.addMassAWR( ZA, AWR )
     if MTL!=0:
         # MTL!=0 implies section is a placeholder pointing to a lumped channel
@@ -2795,6 +2838,9 @@ def readMF31_33( info, dat, mf, mt, cov_info, warningList ):
         else: cov_info['MTL'][(MTL,mf)] = [(mt,mf)]
     for subsection in range(NL):
         XMF1, XLFS1, MAT1, MT1, NC, NI = funkyFI( dat.next(), logFile = info.logs)
+        if not 0 < MT1 < 1000:
+            print("    WARNING: invalid MT1 = %d" % MT1)
+            # FIXME should this be an error? Evaluations occasionally use MT1=0 to mean MT1==mt
         if MAT1 == info.MAT:
             # Some files explicitly give MAT1==MAT for internal covariance.
             # for simplicity, just set MAT1=0 unless it is actually a different material
@@ -2944,8 +2990,10 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
         return matrix
 
     dat = MyIter(dat)
+    AWR_lineNumber = dat.index
     ZA, AWR, dum, dum, NIS, dum = funkyFI(dat.next(), logFile = info.logs)
     ZA = int( ZA )
+    info.ZA_massLineInfo.add(ZA, AWR, mt, mf, AWR_lineNumber)
     info.addMassAWR( ZA, AWR )
     if (NIS!=1): raise BadCovariance( "Can't handle multi-isotope file 32!" )
     ZAI,ABN,dum,LFW,NER,dum = funkyFI(dat.next(), logFile = info.logs)
@@ -2991,7 +3039,9 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                     mf32_resonances, mf32_covars = [],[]
                     NRS = 0
                     for Lval in range(NLS):
+                        AWRI_lineNumber = dat.index
                         AWRI, dum, L, dum, tmp, nrs_ = funkyFI(dat.next(), logFile = info.logs)
+                        info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
                         NRS += nrs_
                         for i in range(nrs_):
                             mf32_resonances.append( funkyF(dat.next(), logFile = info.logs) )
@@ -3018,7 +3068,9 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                     matrixClass = arrayModule.Flattened
 
                 elif LCOMP==1:
+                    AWRI_lineNumber = dat.index
                     AWRI,dum,dum,dum,NSRS,NLRS = funkyFI(dat.next(), logFile = info.logs)
+                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
                     dum,dum,MPAR,dum,tmp,NRB = funkyFI(dat.next(), logFile = info.logs)
                     dim = NRB * MPAR  # num. of resonances * num. parameters per resonance
                     matrixSize = dim * (dim+1) // 2
@@ -3038,7 +3090,9 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
 
                 elif LCOMP==2:
                     ENDFconversionFlags.append( 'LCOMP=2' )
+                    AWRI_lineNumber = dat.index
                     AWRI, QX, dum, LRX, tmp, NRSA = funkyFI(dat.next(), logFile = info.logs)
+                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
                     # resonance parameters + uncertainties:
                     mf32_resonances = [funkyF(dat.next(), logFile = info.logs) for i in range(NRSA*2)]
                     if LRF in (1,2):
@@ -3196,7 +3250,9 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                 if ISR>0:
                     raise NotImplementedError("scattering radius uncertainty in MF32 LRF7")
                 if LCOMP==1:
+                    AWRI_lineNumber = dat.index
                     AWRI, dum, dum, dum, NSRS, NLRS = funkyFI(dat.next(), logFile=info.logs)
+                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
                     dum, dum, NJSX, dum, dum, dum = funkyFI(dat.next(), logFile=info.logs)
 
                     for jdx in range(NJSX):
@@ -3342,7 +3398,9 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
 
             SPI,AP,dum,dum,NLS,dum = funkyFI( dat.next(), logFile = info.logs )
             for lval in range(NLS):
+                AWRI_lineNumber = dat.index
                 AWRI,dum,L,dum,tmp,NJS = funkyFI( dat.next(), logFile = info.logs )
+                info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
                 if tmp!=6*NJS: raise BadCovariance( "Incorrect header in MF32 unresolved section!" )
                 for jval in range(NJS):
                     D,AJ,GNO,GG,GF,GX = funkyF( dat.next(), logFile = info.logs )
@@ -3426,8 +3484,10 @@ def readMF34( info, dat, mf, mt, cov_info, warningList ):
     dat = MyIter(dat)
     sectionList, linkData = [], []
 
+    AWR_lineNumber = dat.index
     ZA, AWR, dum, LTT, dum, NMT = funkyFI(dat.next(), logFile = info.logs)
     ZA = int( ZA )
+    info.ZA_massLineInfo.add(ZA, AWR, mt, mf, AWR_lineNumber)
     info.addMassAWR( ZA, AWR )
 
     for subsection in range(NMT):
@@ -3491,8 +3551,10 @@ def readMF35( info, dat, mf, mt, cov_info, warningList ):
     dat = MyIter(dat)
     sectionList, linkData = [], []
 
+    AWR_lineNumber = dat.index
     ZA, AWR, dum, dum, NK, dum = funkyFI(dat.next(), logFile = info.logs)
     ZA = int( ZA )
+    info.ZA_massLineInfo.add(ZA, AWR, mt, mf, AWR_lineNumber)
     info.addMassAWR( ZA, AWR )
 
     for subsection in range(NK):
@@ -3530,8 +3592,10 @@ def readMF40(info,dat,mf,mt,cov_info,warningList):
 
     dat = MyIter(dat)
     sectionList, linkData = [],[]
+    AWR_lineNumber = dat.index
     ZA, AWR, LIS, dum, NS, dum = funkyFI(dat.next(), logFile = info.logs)
     ZA = int( ZA )
+    info.ZA_massLineInfo.add(ZA, AWR, mt, mf, AWR_lineNumber)
     info.addMassAWR( ZA, AWR )
 
     # each subsection represents different excited state of residual
@@ -3624,25 +3688,27 @@ def readMF40(info,dat,mf,mt,cov_info,warningList):
         info.doRaise.append( warningList[-1] )
     return sectionList, linkData
 
-def parseMF6FissionData( info, MF6Data, fissionNeutronsAndGammasDataFromMF6, warningList ) :
+def parseMF6FissionData( info, MT, MF6Data, fissionNeutronsAndGammasDataFromMF6, warningList ) :
 
     print( "    WARNING: parseMF6FissionData function not complete." )
     dataLine = 0
     ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF6Data[dataLine], intIndices = [ 0, 2, 3, 4 ],
             logFile = info.logs )
+    info.ZA_massLineInfo.add(ZA, AWR, MT, 6, 0)
     dataLine += 1
 
     JPP = JP // 10
     JPN = JP - 10 * JPP
     for particleIndex in range( NK ) :
-        dataLine = parseMF6FissionParticle( info, dataLine, MF6Data, JPN, JPP, fissionNeutronsAndGammasDataFromMF6, warningList )
+        dataLine = parseMF6FissionParticle( info, dataLine, MT, MF6Data, JPN, JPP, fissionNeutronsAndGammasDataFromMF6, warningList )
 
-def parseMF6FissionParticle( info, dataLine, MF6Data, JPN, JPP, fissionNeutronsAndGammasDataFromMF6, warningList ) :
+def parseMF6FissionParticle( info, dataLine, MT, MF6Data, JPN, JPP, fissionNeutronsAndGammasDataFromMF6, warningList ) :
     # The work on this is incomplete.
 
     dataLine, productData, multiplicityRegions = endfFileToGNDSMiscModule.getTAB1Regions( dataLine, MF6Data, logFile = info.logs,
             axes = multiplicityAxes )
     ZAP, AWP, LIP, LAW, NP = int( productData['C1'] ), productData['C2'], productData['L1'], productData['L2'], productData['NR']
+    info.ZA_massLineInfo.add(ZAP, AWP, MT, 6, 0)
 
     energyDistribution = None
     JP = JPP
@@ -3699,7 +3765,7 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
 
     if( ( neutronMFs != [] ) and ( 6 in MFKeys ) ) :
         if( MT == 18 ) :
-            parseMF6FissionData( info, MTData[6], fissionNeutronsAndGammasDataFromMF6, warningList )
+            parseMF6FissionData( info, MT, MTData[6], fissionNeutronsAndGammasDataFromMF6, warningList )
             MFKeys.remove( 6 )
         else :
             raise Exception('MF 6 present and MF 4 and/or 5 present for MT %s: not allowed' % MT) # This should never happen!
@@ -3717,8 +3783,8 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
                 if( endfMTProductList.productCounts[product] > 0 ) : break
             ZAP = productNameToZA[product]
 
-    isUndefinedTwoBody = ( MT == 91 ) or ( 102 < MT <= 107 ) or ( MT in [ 649, 699, 749, 799, 849 ] )
-    isTwoBody = ( MT == 2 ) or ( 50 <= MT < 91 ) or ( ( 600 <= MT < 849 ) and not( isUndefinedTwoBody ) )
+    isUndefinedTwoBody = (102 < MT <= 107) or (MT in [91, 649, 699, 749, 799, 849, 999])
+    isTwoBody = MT == 2 or 50 <= MT < 91 or ((600 <= MT < 849 or 900 <= MT < 999) and not isUndefinedTwoBody)
 
     levelIndex, decayChannel, twoBodyResidualZA = None, None, None
     if(    50 <= MT < 91 ) :
@@ -3735,17 +3801,20 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
         levelIndex = MT - 800
     elif( 875 <= MT < 891 ) :
         levelIndex = MT - 875
+    elif( 900 <= MT < 999 ) :
+        levelIndex = MT - 900
     level = QM - QI                                                 # If level > 0., residual is in an excited state.
     if( breakupProducts is not None ) :
-        if( isTwoBody ) :
-            if( MT not in [ 50, 600, 650, 700, 750, 800 ] ) : level = -QI
-        elif( MT == 91 ) :
+        if isTwoBody:
+            if MT not in [50, 600, 650, 700, 750, 800, 900]:
+                level = -QI
+        elif MT == 91:
             pass
         else :
             print( '\nQM, QI', QM, QI )
             print( breakupProducts )
             raise NotImplementedError( 'breakup for MT %s is not supported' % MT )
-    elif( MT in [ 50, 650, 700, 750, 800, 850 ] ) :
+    elif MT in [50, 650, 700, 750, 800, 850, 900]:
         level = 0.0
 
     if( isTwoBody or isUndefinedTwoBody ) :
@@ -3849,11 +3918,11 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
         if( residualIndex > 0 ) : productList.insert( 0, productList.pop( residualIndex ) )
         if( not( gammaMissing ) ) : productList.append( toGNDSMiscModule.newGNDSParticle( info,
                 toGNDSMiscModule.getTypeNameENDF( info, 0, undefinedLevelInfo ), crossSection ) )
-        outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
+        outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=channelProcess)
         outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, QM, _crossSection ) )  # Q????? What about QI?
     elif( isTwoBody ) :
         if( ( QI == 0 ) and ( QM != 0 ) ) : raise Exception("QI = 0, QM = %f for MT=%d" % (QM,MT))
-        outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody)
+        outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody, process=channelProcess)
         outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, QI, _crossSection ) )
         if( len( [p for p in productList if p.pid != IDsPoPsModule.photon] ) == 0 ) :
             gammaProducts = productList
@@ -3877,7 +3946,7 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
         residualZA = calculateZA( compoundZA, ZA )
 
         if( LR == 1 ) :
-            if( ( MT not in [ 50, 600, 650, 700, 750, 800, 850 ] ) and ( residualZA not in LRProductZAs ) ) :
+            if (MT not in [50, 600, 650, 700, 750, 800, 850, 900]) and (residualZA not in LRProductZAs):
                 LRProductZAs = [ ZAP, residualZA ]
             else :
                 LRProductZAs = None
@@ -3945,7 +4014,7 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
 
     elif( endfMTProductList.isFission ) :
         useThisQM = QM
-        outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
+        outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=channelProcess)
         if( hasattr( info, 'fissionEnergyReleaseData' ) and ( MT == 18 ) ) :
                 FER = getFissionEnergies( info, crossSection.domainMin, crossSection.domainMax, warningList )
                 outputChannel.fissionFragmentData.fissionEnergyReleases.add( FER )
@@ -4017,7 +4086,7 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
     else :
         Q = QI
         if( isUndefinedTwoBody ) : Q = QM
-        outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process = channelProcess)
+        outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=channelProcess)
         outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, Q, _crossSection ) )
         if( isUndefinedTwoBody ) : info.ENDFconversionFlags.add( outputChannel.Q, "QI=%s" % QI )
 

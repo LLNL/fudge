@@ -27,17 +27,19 @@ def endfZAPFromMT( MT ) :
     """This function identifies the outgoing particle (i.e., ZAP) from the MT number. The outgoing 
     particle is almost always a neutron, except in a few cases."""
 
-    if  ( ( ( MT >= 600 ) and ( MT <= 649 ) ) or ( MT == 103 ) ) :   # proton
-        return( "H1" )
-    elif( ( ( MT >= 650 ) and ( MT <= 699 ) ) or ( MT == 104 ) ) :   # deuteron
-        return( "H2" )
-    elif( ( ( MT >= 700 ) and ( MT <= 749 ) ) or ( MT == 105 ) ) :   # triton
-        return( "H3" )
-    elif( ( ( MT >= 750 ) and ( MT <= 799 ) ) or ( MT == 106 ) ) :   # helium-3
-        return( "He3" )
-    elif( ( ( MT >= 800 ) and ( MT <= 849 ) ) or ( MT == 107 ) ) :   # helium-4
-        return( "He4" )
-    return( IDsPoPsModule.neutron )                                  # neutron
+    if   (MT >= 600 and MT <= 649) or MT == 103:                # proton
+        return "H1"
+    elif (MT >= 650 and MT <= 699) or MT == 104:                # deuteron
+        return "H2"
+    elif (MT >= 700 and MT <= 749) or MT == 105:                # triton
+        return "H3"
+    elif (MT >= 750 and MT <= 799) or MT == 106:                # helium-3
+        return "He3"
+    elif (MT >= 800 and MT <= 849) or MT == 107:                # helium-4
+        return "He4"
+    elif (MT >= 900 and MT <= 999) or MT == 102:                # gamma
+        return "photon"
+    return( IDsPoPsModule.neutron )                             # neutron
 
 def ZAAndMATFromParticleName( particleName ) :
 
@@ -291,6 +293,7 @@ endfMTtoC_ProductList_excitedStateInitializer( endfMTtoC_ProductLists, 750, 799,
 endfMTtoC_ProductList_excitedStateInitializer( endfMTtoC_ProductLists, 800, 849, 45, "a", He4s = 1 )
 endfMTtoC_ProductLists[851] = ENDF_MTtoC_ProductList( -1, "Lumped reaction covariances." )
 endfMTtoC_ProductList_excitedStateInitializer( endfMTtoC_ProductLists, 875, 891, 12, "2n", ns = 2 )
+endfMTtoC_ProductList_excitedStateInitializer(endfMTtoC_ProductLists, 900, 999, 46, "g")
 
 # also need dictionary of products for LR 'breakup' flags (product list excludes the initial 2-body product):
 endfLRtoC_ProductLists = {
@@ -377,6 +380,9 @@ def getCSFromMT( MT ) :
     if( MT == 504 ) : return( 72, 0 )       # photo-atomic incoherent
     if( MT == 516 ) : return( 74, 0 )       # photo-atomic pair production
     if( MT == 522 ) : return( 73, 0 )       # photo-atomic photo-electric
+    if 900 <= MT < 999:
+        return 46, 1
+
     raise Exception( 'MT = %d is not supported for conversion to C, S' % MT )
 
 def getMTFromC( C ) :
@@ -512,8 +518,10 @@ def ENDF_MTZAEquation( projectileZA, targetZA, MT ) :
     the outgoing particle ZA's are [1, 2004, 93238] and the reaction equation is 'n + Am242 -> n + He4 + Np238'.
     """
 
+    if 900 <= MT < 1000:
+        MT = 102
     if( ( MT < 0 ) or ( MT > 999 ) or ( MT in [ 1, 3, 5, 10, 18, 19, 20, 21, 27, 38, 101, 151 ] or ( 200 < MT < 600 ) or ( 850 < MT < 875 ) ) ) :
-        raise Exception( 'MT = %s is no supported' % MT )
+        raise Exception( 'MT = %s is not supported' % MT )
     elif( MT == 2 ) :
         productCounts = { chemicalElementMiscPoPsModule.idFromZA( projectileZA ) : 1 }
         level = None

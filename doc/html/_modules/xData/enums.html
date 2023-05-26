@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xData.enums &#8212; Fudge and GNDS 6.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.enums</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for xData.enums</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+
+<div class="viewcode-block" id="StorageOrder"><a class="viewcode-back" href="../../xData/index.html#xData.enums.StorageOrder">[docs]</a><span class="k">class</span> <span class="nc">StorageOrder</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    StorageOrder is an enum class representing the way data can be stored in a table or an array. The two values</span>
+<span class="sd">    for StorageOrder is &#39;row-major&#39; or &#39;column-major&#39; and are represented by the names rowMajor and columnMajor.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">rowMajor</span> <span class="o">=</span> <span class="s1">&#39;row-major&#39;</span>
+    <span class="n">columnMajor</span> <span class="o">=</span> <span class="s1">&#39;column-major&#39;</span></div>
+
+<div class="viewcode-block" id="ValueType"><a class="viewcode-back" href="../../xData/index.html#xData.enums.ValueType">[docs]</a><span class="k">class</span> <span class="nc">ValueType</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This enum spcifies the value types for the *Values* class.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">integer32</span> <span class="o">=</span> <span class="s1">&#39;Integer32&#39;</span>
+    <span class="n">float32</span> <span class="o">=</span> <span class="s1">&#39;Float32&#39;</span>
+    <span class="n">float64</span> <span class="o">=</span> <span class="s1">&#39;Float64&#39;</span></div>
+
+<div class="viewcode-block" id="Interpolation"><a class="viewcode-back" href="../../xData/index.html#xData.enums.Interpolation">[docs]</a><span class="k">class</span> <span class="nc">Interpolation</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This enum specifies the interpolation values for functions.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">linlin</span> <span class="o">=</span> <span class="s1">&#39;lin-lin&#39;</span>
+    <span class="n">linlog</span> <span class="o">=</span> <span class="s1">&#39;lin-log&#39;</span>
+    <span class="n">loglin</span> <span class="o">=</span> <span class="s1">&#39;log-lin&#39;</span>
+    <span class="n">loglog</span> <span class="o">=</span> <span class="s1">&#39;log-log&#39;</span>
+    <span class="n">flat</span> <span class="o">=</span> <span class="s1">&#39;flat&#39;</span>
+    <span class="n">chargedParticle</span> <span class="o">=</span> <span class="s1">&#39;charged-particle&#39;</span></div>
+
+<div class="viewcode-block" id="InterpolationQualifier"><a class="viewcode-back" href="../../xData/index.html#xData.enums.InterpolationQualifier">[docs]</a><span class="k">class</span> <span class="nc">InterpolationQualifier</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This enum specifies the interpolation qualifier values for functions.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># We also need direct, correspondingEnergies and correspondingEnergies-unscaled.</span>
+
+    <span class="n">none</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">unitBase</span> <span class="o">=</span> <span class="s1">&#39;unitbase&#39;</span>
+    <span class="n">unitBaseUnscaled</span> <span class="o">=</span> <span class="s1">&#39;unitbase-unscaled&#39;</span>
+    <span class="n">correspondingPoints</span> <span class="o">=</span> <span class="s1">&#39;correspondingPoints&#39;</span>
+    <span class="n">correspondingPointsUnscaled</span> <span class="o">=</span> <span class="s1">&#39;correspondingPoints-unscaled&#39;</span></div>
+
+<div class="viewcode-block" id="Frame"><a class="viewcode-back" href="../../xData/index.html#xData.enums.Frame">[docs]</a><span class="k">class</span> <span class="nc">Frame</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This enum specifies the allowed frame values.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">none</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">lab</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">centerOfMass</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">product</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FixDomain"><a class="viewcode-back" href="../../xData/index.html#xData.enums.FixDomain">[docs]</a><span class="k">class</span> <span class="nc">FixDomain</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This enum specifies if the lower, upper or both domains are to be fixed for a function.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">both</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Extrapolation"><a class="viewcode-back" href="../../xData/index.html#xData.enums.Extrapolation">[docs]</a><span class="k">class</span> <span class="nc">Extrapolation</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This enum specifies supported extrapolations for some functions.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">none</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">flat</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GridStyle"><a class="viewcode-back" href="../../xData/index.html#xData.enums.GridStyle">[docs]</a><span class="k">class</span> <span class="nc">GridStyle</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This enum specifies allowed styles for the Grid class.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">none</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">boundaries</span><span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">parameters</span><span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 6.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">xData.enums</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>
