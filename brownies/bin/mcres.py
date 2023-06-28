@@ -271,7 +271,7 @@ def get_DOFs(__spingroups, __config, __urr):
         if __urr is None:
             raise ValueError("Need URR region in evaluation to use ENDF file to initialize DOFs")
         return dict(__urr.DOFs)
-    return {find_matching_spingroup(cfgsg, __spingroups).lj: {'elastic': cfgsg["nDOF"], 'capture': 0}
+    return {find_matching_spingroup(cfgsg, __spingroups).lj: {'elastic': cfgsg["nDOF"], 'capture': cfgsg.get('gDOF', 0)}
             for cfgsg in __config['spingroups']}
 
 
