@@ -37,15 +37,33 @@ from . import tokens as tokensModule
 
 transportableIDs = (IDsModule.neutron, 'H1', 'H2', 'H3', 'He3', 'He4', IDsModule.photon)
 
+def findAddProductsWithPid(pid, outputChannel):
+    '''
+    Returns the list of all products in *outputChannel* with pid *pid*, including products nested in a product's outputChannel.
+
+    :param pid:              The pid of the requrest product.
+    :param outputChannel:    The output channel to search.
+    '''
+
+    products = []
+
+    if outputChannel is not None:
+        for product in outputChannel:
+            if product.pid == pid:
+                products.append(product)
+            products += findAddProductsWithPid(pid, product.outputChannel)
+
+    return products
+
 def toGridded1d(module, axesTemplate1d, data, label):
-    """
+    '''
     Creates a Gridded1d instance from the input arguments.
 
     :param module:              The FUDGE module containing the Gridded1d instance to create.
     :param axesTemplate1d:      An axes templated used to aid in constructing the axes.
     :param data:                The data.
     :param label:               The style label for the data.
-    """
+    '''
 
     for index, value in enumerate(data):
         if value != 0:
@@ -62,12 +80,13 @@ def toGridded1d(module, axesTemplate1d, data, label):
     return module.Gridded1d(axes=axes, array=array, label=label)
 
 def toGridded3d(axesTemplate3d, data, label):
-    """Creates a Gridded3d instance from the input arguments.
+    '''
+    Creates a Gridded3d instance from the input arguments.
 
     :param axesTemplate3d:      An axes templated used to aid in constructing the axes.
     :param data:                The data.
     :param label:               The style label for the data.
-    """
+    '''
 
     ndarray = data.array
 
@@ -107,44 +126,55 @@ def toGridded3d(axesTemplate3d, data, label):
 
     return multiGroupModule.Form(label, xDataEnumsModule.Frame.lab, gridded3d)
 
-def reactionMultiGrouping(protare, reactionOut, MG, MG_upscatter, temperatureInfo, axesTemplate1d, axesTemplate3d):
-    """
+def reactionMultiGrouping(protare, totalReaction, productsMissingData, MG, MG_upscatter, temperatureInfo, axesTemplate1d, axesTemplate3dByProduct):
+    '''
     For the specified temperature, sums the multi-group data.
 
-    :param protare:             The protare to process.
-    :param reactionOut:         The reaction which the summed, multi-group data will be added to.
-    :param MG:                  The multiGroupSettings.MG instance for non-upscatter data.
-    :param MG_upscatter:        The multiGroupSettings.MG instance for upscatter data.
-    :param temperatureInfo:     TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-    :param axesTemplate1d:      The axes template for 1d multi-group data.
-    :param axesTemplate3d:      The axes template for distribution multi-group data.
-    """
+    :param protare:                 The protare to process.
+    :param totalReaction:           The reaction which the summed, multi-group data will be added to.
+    :param MG:                      The multiGroupSettings.MG instance for non-upscatter data.
+    :param MG_upscatter:            The multiGroupSettings.MG instance for upscatter data.
+    :param temperatureInfo:         TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+    :param axesTemplate1d:          The axes template for 1d multi-group data.
+    :param axesTemplate3dByProduct: The axes template for distribution multi-group data.
+    '''
 
     label = temperatureInfo.heatedMultiGroup
 
     data = protare.multiGroupCrossSection(MG, temperatureInfo)
-    reactionOut.crossSection.add(toGridded1d(crossSectionModule, axesTemplate1d, data, label))
+    totalReaction.crossSection.add(toGridded1d(crossSectionModule, axesTemplate1d, data, label))
 
     data = protare.multiGroupAvailableEnergy(MG, temperatureInfo)
-    reactionOut.availableEnergy.add(toGridded1d(availableEnergyModule, axesTemplate1d, data, label))
+    totalReaction.availableEnergy.add(toGridded1d(availableEnergyModule, axesTemplate1d, data, label))
 
     data = protare.multiGroupAvailableMomentum(MG, temperatureInfo)
-    reactionOut.availableMomentum.add(toGridded1d(availableMomentumModule, axesTemplate1d, data, label))
+    totalReaction.availableMomentum.add(toGridded1d(availableMomentumModule, axesTemplate1d, data, label))
 
     data = protare.multiGroupQ(MG, temperatureInfo, True)
-    reactionOut.outputChannel.Q.add(toGridded1d(QModule, axesTemplate1d, data, label))
+    totalReaction.outputChannel.Q.add(toGridded1d(QModule, axesTemplate1d, data, label))
 
     for transportableID in transportableIDs:
+        MG.raiseOnError = True
+
+        products = totalReaction.outputChannel.products
         try:
             data = protare.multiGroupMultiplicity(MG, temperatureInfo, transportableID)
         except:
-            continue
+            products = productsMissingData
+            MG.raiseOnError = False
+            try:
+                data = protare.multiGroupMultiplicity(MG, temperatureInfo, transportableID)
+            except:
+                continue
+            if len(data) == 0:
+                continue
+
         if len(data) > 0:
             try:
-                product = reactionOut.outputChannel.products[transportableID]
+                product = products[transportableID]
             except:
                 product = productModule.Product(transportableID, transportableID)
-                reactionOut.outputChannel.products.add(product)
+                products.add(product)
 
             product.multiplicity.add(toGridded1d(multiplicityModule, axesTemplate1d, data, label))
 
@@ -155,7 +185,7 @@ def reactionMultiGrouping(protare, reactionOut, MG, MG_upscatter, temperatureInf
             product.averageProductMomentum.add(toGridded1d(averageProductMomentumModule, axesTemplate1d, data, label))
 
             data = protare.multiGroupProductArray(MG, temperatureInfo, None, transportableID)
-            product.distribution.add(toGridded3d(axesTemplate3d, data, label))
+            product.distribution.add(toGridded3d(axesTemplate3dByProduct[transportableID], data, label))
 
             upscatterLabel = temperatureInfo.SnElasticUpScatter
             if transportableID == IDsModule.neutron and upscatterLabel != '':
@@ -163,15 +193,15 @@ def reactionMultiGrouping(protare, reactionOut, MG, MG_upscatter, temperatureInf
                 product.averageProductEnergy.add(toGridded1d(averageProductEnergyModule, axesTemplate1d, data, upscatterLabel))
 
                 data = protare.multiGroupProductArray(MG_upscatter, temperatureInfo, None, transportableID)
-                product.distribution.add(toGridded3d(axesTemplate3d, data, upscatterLabel))
+                product.distribution.add(toGridded3d(axesTemplate3dByProduct[transportableID], data, upscatterLabel))
 
 def addMultiGroupSums(self, replace=False):
-    """
+    '''
     Calculates total and delayedNeutron multi-group sums for *self* and adds the results to the applicationData node as
     separate institutions with labels "LLNL::multiGroupReactions" and "LLNL::multiGroupDelayedNeutrons", respectivley.
 
     :param replace:           If summed multi-group data already present, then a raise is executed if *replace* is **False**, otherwise the old data are replaced.
-    """
+    '''
 
     if tokensModule.multiGroupReactions in self.applicationData:
         if not replace:
@@ -188,6 +218,7 @@ def addMultiGroupSums(self, replace=False):
     MG_delayedNeutrons = multiGroupSettingsModule.MG(self.projectile, transportingModule.Mode.multiGroup, delayedNeutrons=transportingModule.DelayedNeutrons.on)
 
     totalReaction = reactionModule.Reaction('total', enumsModule.Genre.NBody, 1)
+    productsMissingData = productModule.Products()
 
     fissionFragmentData = None
     fissionReaction = self.getReaction('fission')
@@ -202,20 +233,24 @@ def addMultiGroupSums(self, replace=False):
         if label != '':
             break
     axesTemplate1d = None
-    axesTemplate3d = None
-    for reaction in self.reactions:
-        if axesTemplate1d is None:
-            try:
-                axesTemplate1d = reaction.crossSection[label].axes
-            except:
-                pass
-        if axesTemplate3d is None:
-            for product in reaction.outputChannel.products:
+    axesTemplate3dByProduct = {}
+    for transportableID in transportableIDs:
+        axesTemplate3d = None
+        for reaction in list(self.reactions) + list(self.orphanProducts):
+            if axesTemplate1d is None:
                 try:
-                    axesTemplate3d = product.distribution[label].multiGroupSubform.axes
-                    break
+                    axesTemplate1d = reaction.crossSection[label].axes
                 except:
                     pass
+            if axesTemplate3d is None:
+                for product in findAddProductsWithPid(transportableID, reaction.outputChannel):
+                    try:
+                        axesTemplate3d = product.distribution[label].multiGroupSubform.axes
+                        break
+                    except:
+                        pass
+        if axesTemplate3d is not None:
+            axesTemplate3dByProduct[transportableID] = axesTemplate3d
 
     for temperatureInfo in self.styles.temperatures():
 
@@ -223,7 +258,7 @@ def addMultiGroupSums(self, replace=False):
         if label == '':
             continue
 
-        reactionMultiGrouping(self, totalReaction, MG, MG_upscatter, temperatureInfo, axesTemplate1d, axesTemplate3d)
+        reactionMultiGrouping(self, totalReaction, productsMissingData, MG, MG_upscatter, temperatureInfo, axesTemplate1d, axesTemplate3dByProduct)
 
         if fissionFragmentData is not None:
             try:
@@ -249,12 +284,17 @@ def addMultiGroupSums(self, replace=False):
                 productDelayedNeutrons.averageProductMomentum.add(toGridded1d(averageProductMomentumModule, axesTemplate1d, data, label))
 
                 data = fissionFragmentData.multiGroupProductArray(MG_delayedNeutrons, temperatureInfo, None, IDsModule.neutron)
-                productDelayedNeutrons.distribution.add(toGridded3d(axesTemplate3d, data, label))
+                productDelayedNeutrons.distribution.add(toGridded3d(axesTemplate3dByProduct[IDsModule.neutron], data, label))
 
     if len(totalReaction.crossSection) > 0:
         institution = institutionModule.Institution(tokensModule.multiGroupReactions)
         institution.append(totalReaction)
         self.applicationData.add(institution)
+
+        if len(productsMissingData) > 0:
+            institution = institutionModule.Institution(tokensModule.multiGroupIncompleteProducts)
+            institution.append(productsMissingData)
+            self.applicationData.add(institution)
 
     if fissionFragmentData is not None:
         if len(outputChannelDelayedNeutrons.Q) > 0:

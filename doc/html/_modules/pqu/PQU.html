@@ -564,7 +564,7 @@
 
 
 <div class="viewcode-block" id="compare"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.compare">[docs]</a><span class="k">def</span> <span class="nf">compare</span><span class="p">(</span> <span class="n">value1</span><span class="p">,</span> <span class="n">value2</span><span class="p">,</span> <span class="n">epsilonFactor</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function compares two floats (or objects that can be converted to floats) in a fuzzy way </span>
 <span class="sd">    where the fuzz factor is *epsilonFactor* * sys.float_info.epsilon. This function returns</span>
 
@@ -604,7 +604,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="valueOrPQ"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.valueOrPQ">[docs]</a><span class="k">def</span> <span class="nf">valueOrPQ</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">unitFrom</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">checkOrder</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function is designed as a convenience function for working with :py:class:`PQU`</span>
 <span class="sd">    and float instances. That is, instead of checking the type of value, let valueOrPQ handle some of the</span>
 <span class="sd">    details. The first argument can be either a :py:class:`PQU` or something</span>
@@ -664,7 +664,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_getUnit</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an instance of :py:class:`PhysicalUnit` based first on the argument &#39;unit&#39; and then &#39;default&#39;. &#39;unit&#39; </span>
 <span class="sd">        can only be a :py:class:`PhysicalUnit`, string (e.g., &#39;&#39;, &#39;MeV&#39;, &#39;b * eV&#39;) or None. Default must be either </span>
 <span class="sd">        a :py:class:`PQU instance` or None.</span>
@@ -698,7 +698,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="floatToShortestString"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.floatToShortestString">[docs]</a><span class="k">def</span> <span class="nf">floatToShortestString</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">trimZeros</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">keepPeriod</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">favorEFormBy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">includeSign</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function returns the shortest string representation of the float &#39;value&#39; that is accurate to </span>
 <span class="sd">    &#39;significantDigits&#39; digits when converted back to a float.</span>
 
@@ -737,7 +737,7 @@
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span><span class="p">:</span> <span class="k">return</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="nf">isfinite</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if value is neither infinite nor not-a-number (NaN) and **False** otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if value is neither infinite nor not-a-number (NaN) and **False** otherwise.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="ow">or</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
@@ -781,7 +781,7 @@
 <span class="n">toShortestString</span> <span class="o">=</span> <span class="n">floatToShortestString</span>    <span class="c1"># For legacy use. Deprecated: last date 1-April-2014 (no joke).</span>
 
 <div class="viewcode-block" id="PQU_float"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float">[docs]</a><span class="k">class</span> <span class="nc">PQU_float</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is used by the classes :py:class:`PQU` and :py:class:`PQU_uncertainty` to store more information about a float than</span>
 <span class="sd">    is provided by the python float class as well as methods to operator on this information. The main members are:</span>
 
@@ -794,7 +794,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">significantDigits</span><span class="p">,</span> <span class="n">isPercent</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">checkOrder</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a new :py:class:`PQU_float` instance with value, significantDigits and isPercent. Order is calculated from value.</span>
 <span class="sd">        If argument checkOrder is **True**, staticmethod *self*.fixFloatsOrder is called and its returned value and order</span>
 <span class="sd">        are used.</span>
@@ -950,7 +950,7 @@
     <span class="n">__nonzero__</span> <span class="o">=</span> <span class="fm">__bool__</span>      <span class="c1"># for python 2.x</span>
 
     <span class="k">def</span> <span class="nf">_setFrom</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Sets *self*&#39;s members from other. Other must be a :py:class:`PQU_float` instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets *self*&#39;s members from other. Other must be a :py:class:`PQU_float` instance.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PQU_float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;other type </span><span class="si">%s</span><span class="s2"> not supported&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
@@ -964,7 +964,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_float.getOrder"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.getOrder">[docs]</a>    <span class="k">def</span> <span class="nf">getOrder</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns *self*&#39;s order.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns *self*&#39;s order.</span>
 
 <span class="sd">        :rtype: `int`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -972,7 +972,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_float.getSignificantDigits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.getSignificantDigits">[docs]</a>    <span class="k">def</span> <span class="nf">getSignificantDigits</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns *self*&#39;s significant digits.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns *self*&#39;s significant digits.</span>
 
 <span class="sd">        :rtype: `int`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -980,7 +980,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_float.info"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="mi">17</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a detailed string of *self*. Mainly for debugging.</span>
 
 <span class="sd">        :rtype: `str`</span>
@@ -990,7 +990,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;value = </span><span class="si">%s</span><span class="s2">, significantDigits = </span><span class="si">%d</span><span class="s2">, order = </span><span class="si">%d</span><span class="s2">, isPercent = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isPercent</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_float.isPercent"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.isPercent">[docs]</a>    <span class="k">def</span> <span class="nf">isPercent</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* is a percent and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* is a percent and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -998,7 +998,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isPercent</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_float.setPercentFlag"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.setPercentFlag">[docs]</a>    <span class="k">def</span> <span class="nf">setPercentFlag</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">isPercent</span><span class="p">,</span> <span class="n">scaleValue</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If argument isPercent is **True** and *self* is not a percent, *self* is converted to a percent.</span>
 <span class="sd">        If argument isPercent is **False** and *self* is a percent, *self* is converted to non-percent.</span>
 <span class="sd">        Otherwise, a raise is executed.</span>
@@ -1023,7 +1023,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">+=</span> <span class="n">orderDelta</span></div>
 
 <div class="viewcode-block" id="PQU_float.setSignificantDigits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.setSignificantDigits">[docs]</a>    <span class="k">def</span> <span class="nf">setSignificantDigits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets *self*&#39;s significant digits to significantDigits.</span>
 
 <span class="sd">        :param significantDigits: see documentation.</span>
@@ -1033,7 +1033,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span> <span class="n">maxSignificantDigits</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span> <span class="n">significantDigits</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_float.toString"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">trimZeros</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">keepPeriod</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">includePercent</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">favorEFormBy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string representation of *self* (i.e., &#39;1.234e6&#39; or &#39;12%&#39;) using function :py:func:`floatToShortestString`.</span>
 
 <span class="sd">        :param bool trimZeros: See function :py:func:`floatToShortestString`</span>
@@ -1052,7 +1052,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">str1</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_float.truncate"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.truncate">[docs]</a>    <span class="k">def</span> <span class="nf">truncate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adjusts *self*&#39;s value so that only significantDigits are non-zero. For example, if value is 3.453983207834109</span>
 <span class="sd">        and significantDigits = 4 then the value is set to 3.454. If significantDigits is None, *self*&#39;s significantDigits</span>
 <span class="sd">        is used.</span>
@@ -1068,7 +1068,7 @@
 
 <div class="viewcode-block" id="PQU_float.calculateOrder"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.calculateOrder">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">calculateOrder</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the order of value. Value must be convertible to a float. A float&#39;s order is the exponent in the</span>
 <span class="sd">        representation &#39;m * 10**o&#39; where &#39;m&#39; is the mantissa and &#39;o&#39; is the exponent. For example, 1.234e43 has order 43.</span>
 
@@ -1085,7 +1085,7 @@
 
 <div class="viewcode-block" id="PQU_float.fixFloatsOrder"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.fixFloatsOrder">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">fixFloatsOrder</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Many numbers are not represented in IEEE floating point by there true value. For example, &#39;1e-12&#39; is </span>
 <span class="sd">        stored as the float 9.9999999999999998e-13. The order of the true value is -12 while the order of the floating </span>
 <span class="sd">        point representation is -13.  This function is implemented to help with this issue.  For example, for </span>
@@ -1112,7 +1112,7 @@
 
 <div class="viewcode-block" id="PQU_float.surmiseSignificantDigits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_float.surmiseSignificantDigits">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">surmiseSignificantDigits</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This factory function returns a :py:class:`PQU_float` instance given a float *value* and sets its significantDigits to</span>
 <span class="sd">        something &quot;reasonable&quot;. The significantDigits are determined by using PQU.floatToShortestString with trimZeros = True.</span>
 
@@ -1124,7 +1124,7 @@
 
 
 <div class="viewcode-block" id="PQU_uncertainty"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_uncertainty">[docs]</a><span class="k">class</span> <span class="nc">PQU_uncertainty</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is used by :py:class:`PQU` to store the style of uncertainty and information about its value.</span>
 <span class="sd">    The members are:</span>
 
@@ -1141,7 +1141,7 @@
     <span class="n">pqu_uncertaintyStyleParenthesis</span> <span class="o">=</span> <span class="s1">&#39;parenthesis&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">uncertaintyStyle</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">isPercent</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">checkOrder</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor method for the :py:class:`PQU_uncertainty` class. The arguments value, significantDigits, isPrecent</span>
 <span class="sd">        and checkOrder are passed onto :py:class:`PQU_float`. significantDigits will be forced to be 1 or 2.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1186,14 +1186,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_changeUncertaintyStyle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;For internal use.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;For internal use.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_okayToChangeUncertaintyStyleTo</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> 
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Cannot change uncertainty style from &quot;</span><span class="si">%s</span><span class="s1">&quot; to &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="n">style</span> <span class="p">)</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">style</span>
 
     <span class="k">def</span> <span class="nf">_okayToChangeUncertaintyStyleTo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">checkPercent</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;For internal use.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;For internal use.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">==</span> <span class="n">style</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">==</span> <span class="n">PQU_uncertainty</span><span class="o">.</span><span class="n">pqu_uncertaintyStyleNone</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
@@ -1204,7 +1204,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="PQU_uncertainty.getStyle"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_uncertainty.getStyle">[docs]</a>    <span class="k">def</span> <span class="nf">getStyle</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns *self*&#39;s style.</span>
 
 <span class="sd">        :rtype: One of the three uncertainty styles</span>
@@ -1213,7 +1213,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_uncertainty.getProperValue"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_uncertainty.getProperValue">[docs]</a>    <span class="k">def</span> <span class="nf">getProperValue</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns *self*&#39;s value. If value is a percent, returned result is multiplied by argument v first, where v</span>
 <span class="sd">        is expected to be the number associated the the percent value.</span>
 
@@ -1226,7 +1226,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_uncertainty.info"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_uncertainty.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="mi">17</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a detailed string of *self*. Mainly for debugging.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a detailed string of *self*. Mainly for debugging.</span>
 
 <span class="sd">        :rtype: `str`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1235,7 +1235,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">info</span><span class="p">(</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_uncertainty.isUncertainty"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_uncertainty.isUncertainty">[docs]</a>    <span class="k">def</span> <span class="nf">isUncertainty</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **False** is style is pqu_uncertaintyStyleNone and **True** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **False** is style is pqu_uncertaintyStyleNone and **True** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1243,7 +1243,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">!=</span> <span class="n">PQU_uncertainty</span><span class="o">.</span><span class="n">pqu_uncertaintyStyleNone</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_uncertainty.isPercent"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_uncertainty.isPercent">[docs]</a>    <span class="k">def</span> <span class="nf">isPercent</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* is a percent and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* is a percent and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1252,7 +1252,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_uncertainty.toString"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_uncertainty.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string representation of *self* (i.e., &#39;+/- 1.2%&#39;).</span>
 
 <span class="sd">        :param str prefix: A prefix for the &#39;+/-&#39; style</span>
@@ -1268,7 +1268,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span> <span class="mf">10.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getSignificantDigits</span><span class="p">(</span> <span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getOrder</span><span class="p">(</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="o">+</span> <span class="mf">1e-12</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU_uncertainty.truncate"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU_uncertainty.truncate">[docs]</a>    <span class="k">def</span> <span class="nf">truncate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adjusts *self*&#39;s value so that only the significant digits are non-zero. This is most useful when a :py:class:`PQU` instance is</span>
 <span class="sd">        calculated from other :py:class:`PQU` instance which can create an uncertainty with many non-zero digits. As example, adding two</span>
 <span class="sd">        :py:class:`PQU`s with uncertainties 1.3 and 3.2 each with two significant digits, produces the uncertainty sqrt( 1.3**2 + 3.2**2 ) </span>
@@ -1279,7 +1279,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">truncate</span><span class="p">(</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="PQU"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU">[docs]</a><span class="k">class</span> <span class="nc">PQU</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class supports a float value with an optional uncertainty and unit. Many basic math operations are supported </span>
 <span class="sd">    (e.g., +, -, *, /).  A :py:class:`PQU` is anything that the staticmethod :py:meth:`Parsers.parsePQUString` can parse.</span>
 
@@ -1513,7 +1513,7 @@
     <span class="n">__idiv__</span> <span class="o">=</span> <span class="fm">__itruediv__</span>
 
     <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Does not include uncertainty of other in calculation. Other must be an object convertible to a float. If it</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Does not include uncertainty of other in calculation. Other must be an object convertible to a float. If it</span>
 <span class="sd">        is a :py:class:`PQU` instance, it must be dimensionless.&quot;&quot;&quot;</span>
 
         <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getOtherAsPQU</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
@@ -1565,7 +1565,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_setFrom</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets *self*&#39;s members from other. Other must be an instance of :py:class:`PQU`.</span>
 
 <span class="sd">        :param other: The :py:class:`PQU` instance whose members are copied to *self*</span>
@@ -1578,7 +1578,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">uncertainty</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PQU.changeUncertaintyStyle"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.changeUncertaintyStyle">[docs]</a>    <span class="k">def</span> <span class="nf">changeUncertaintyStyle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Changes *self*.uncertainty&#39;s style. If style is the same as *self*.uncertainty&#39;s style nothing is done. If style</span>
 <span class="sd">        or *self*.uncertainty&#39;s style is PQU_uncertainty.pqu_uncertaintyStyleNone as raise is executed.</span>
 
@@ -1589,7 +1589,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">_changeUncertaintyStyle</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.changeUncertaintyPercent"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.changeUncertaintyPercent">[docs]</a>    <span class="k">def</span> <span class="nf">changeUncertaintyPercent</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">toPercent</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If *self*&#39;s style is not pqu_uncertaintyStylePlusMinus a raise is executed. Otherwise, if toPercent</span>
 <span class="sd">        is **True** (**False**) *self*&#39;s uncertainty will be converted to a percent (non-percent) if not already a percent</span>
 <span class="sd">        (non-percent).</span>
@@ -1612,7 +1612,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">PQU_uncertainty</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getUncertaintyValueAs</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getSignificantDigits</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.compare"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">epsilonFactor</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compares *self*&#39;s value and unit to other&#39;s value and unit (other&#39;s value is first converted to unit of *self*) </span>
 <span class="sd">        using the :py:func:`compare` function.</span>
 
@@ -1631,7 +1631,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">compare</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">valueOfOther</span><span class="p">,</span> <span class="n">epsilonFactor</span> <span class="o">=</span> <span class="n">epsilonFactor</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.convertToUnit"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.convertToUnit">[docs]</a>    <span class="k">def</span> <span class="nf">convertToUnit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Changes *self*&#39;s unit to unit and adjusts the value such that the new value/unit is equivalent to</span>
 <span class="sd">        the original value/unit. The new unit must be compatible with the original unit of *self*.</span>
 
@@ -1649,7 +1649,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.copyToUnit"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.copyToUnit">[docs]</a>    <span class="k">def</span> <span class="nf">copyToUnit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Like convertToUnit except a copy is made and returned. The copy unit is changed to unit. Self is left unchanged.</span>
 
 <span class="sd">        :param str unit: a unit equivalent</span>
@@ -1659,7 +1659,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">convertToUnit</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.equivalent"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.equivalent">[docs]</a>    <span class="k">def</span> <span class="nf">equivalent</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">factor</span> <span class="o">=</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method compares *self* to other and returns **True** if they are equivalent and **False** otherwise. The</span>
 <span class="sd">        two are considered equivalent if their bands overlap. The band for *self* (or other) is all</span>
 <span class="sd">        values within &#39;factor times uncertainty&#39; of its value. That is, the band for *self* is the ranges from</span>
@@ -1687,7 +1687,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.inUnitsOf"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.inUnitsOf">[docs]</a>    <span class="k">def</span> <span class="nf">inUnitsOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">units</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Express the quantity in different units. If one unit is specified, a new</span>
 <span class="sd">        :py:class:`PQU` object is returned that expresses the quantity</span>
 <span class="sd">        in that unit. If several units are specified, the return value is a tuple of</span>
@@ -1725,7 +1725,7 @@
             <span class="k">return</span><span class="p">(</span> <span class="nb">tuple</span><span class="p">(</span> <span class="n">result</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.getSignificantDigits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.getSignificantDigits">[docs]</a>    <span class="k">def</span> <span class="nf">getSignificantDigits</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of significant digits for self&#39;s value.</span>
 
 <span class="sd">        :rtype: `int`</span>
@@ -1734,7 +1734,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getSignificantDigits</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.getUnitAsString"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.getUnitAsString">[docs]</a>    <span class="k">def</span> <span class="nf">getUnitAsString</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string representation of self&#39;s unit.</span>
 
 <span class="sd">        :rtype: `str`</span>
@@ -1745,7 +1745,7 @@
     <span class="n">getUnitSymbol</span> <span class="o">=</span> <span class="n">getUnitAsString</span>         <span class="c1"># To be deprecated.</span>
 
 <div class="viewcode-block" id="PQU.getValueAs"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.getValueAs">[docs]</a>    <span class="k">def</span> <span class="nf">getValueAs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns *self*&#39;s value in units of unit. Unit must be compatible with *self*&#39;s unit.</span>
 
 <span class="sd">        :param unit: The unit to return *self*&#39;s value in</span>
@@ -1759,7 +1759,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.getUncertaintyValueAs"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.getUncertaintyValueAs">[docs]</a>    <span class="k">def</span> <span class="nf">getUncertaintyValueAs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a python float representing *self*&#39;s uncertainty value. If the uncertainty is a percent, the returned</span>
 <span class="sd">        float is *self*&#39;s value times *self*&#39;s uncertainty value.</span>
 
@@ -1771,12 +1771,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">value</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.getValue"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>      <span class="c1"># To be deprecated - replaced by __float__</span>
-        <span class="sd">&quot;&quot;&quot;Returns a python float representing *self*&#39;s value. This is equivalent to &#39;float( self )&#39;.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a python float representing *self*&#39;s value. This is equivalent to &#39;float( self )&#39;.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.inBaseUnits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.inBaseUnits">[docs]</a>    <span class="k">def</span> <span class="nf">inBaseUnits</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: A copy of *self* converted to base units, i.e. SI units in most cases</span>
 <span class="sd">        :rtype: :py:class:`PQU`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1805,7 +1805,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">num</span> <span class="o">+</span> <span class="n">denom</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.info"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="mi">17</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a detailed string of *self*. Mainly for debugging.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a detailed string of *self*. Mainly for debugging.</span>
 
 <span class="sd">        :rtype: `str`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1814,7 +1814,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isCompatible"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isCompatible">[docs]</a>    <span class="k">def</span> <span class="nf">isCompatible</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns **True** if *self*&#39;s unit is compatible with unit.</span>
 
 <span class="sd">        :param unit: a unit</span>
@@ -1826,7 +1826,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">isCompatible</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isPercent"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isPercent">[docs]</a>    <span class="k">def</span> <span class="nf">isPercent</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if value is a percent and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if value is a percent and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1834,7 +1834,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">isPercent</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isDimensionless"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isDimensionless">[docs]</a>    <span class="k">def</span> <span class="nf">isDimensionless</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* is dimensionless and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* is dimensionless and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1842,7 +1842,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">isDimensionless</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isLength"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isLength">[docs]</a>    <span class="k">def</span> <span class="nf">isLength</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of length and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of length and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1850,7 +1850,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isMass"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isMass">[docs]</a>    <span class="k">def</span> <span class="nf">isMass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of mass and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of mass and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1858,7 +1858,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isTime"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isTime">[docs]</a>    <span class="k">def</span> <span class="nf">isTime</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of time and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of time and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1866,7 +1866,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isCurrent"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isCurrent">[docs]</a>    <span class="k">def</span> <span class="nf">isCurrent</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of current and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of current and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1874,7 +1874,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isTemperature"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isTemperature">[docs]</a>    <span class="k">def</span> <span class="nf">isTemperature</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of temperature and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of temperature and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1882,7 +1882,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isMoles"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isMoles">[docs]</a>    <span class="k">def</span> <span class="nf">isMoles</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of mol and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of mol and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1890,7 +1890,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mol&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isLuminousIntensity"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isLuminousIntensity">[docs]</a>    <span class="k">def</span> <span class="nf">isLuminousIntensity</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of luminous intensity and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of luminous intensity and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1898,7 +1898,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;cd&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isAngle"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isAngle">[docs]</a>    <span class="k">def</span> <span class="nf">isAngle</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of angle and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of angle and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1906,7 +1906,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;rad&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isSolidAngle"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isSolidAngle">[docs]</a>    <span class="k">def</span> <span class="nf">isSolidAngle</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of solid angle and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of solid angle and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1914,7 +1914,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;sr&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isEnergy"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">isEnergy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of energy and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of energy and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1922,7 +1922,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;J&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isSpin"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isSpin">[docs]</a>    <span class="k">def</span> <span class="nf">isSpin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of spin (i.e., same as &#39;hbar&#39;) and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* has unit of spin (i.e., same as &#39;hbar&#39;) and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1930,7 +1930,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;hbar&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.isCharge"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isCharge">[docs]</a>    <span class="k">def</span> <span class="nf">isCharge</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns **True** if *self* has unit of charge and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
@@ -1939,7 +1939,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPhysicalUnitOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.setPercentFlag"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.setPercentFlag">[docs]</a>    <span class="k">def</span> <span class="nf">setPercentFlag</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">isPercent</span><span class="p">,</span> <span class="n">scaleValue</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Changes the percent flag only when *self* is dimensionless and isPercent != *self*.isPercent( ).</span>
 <span class="sd">        Otherwise, a raise is executed.  For scaleValue argument see :py:meth:`PQU_float.setPercentFlag`.</span>
 
@@ -1954,7 +1954,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">setPercentFlag</span><span class="p">(</span> <span class="kc">False</span><span class="p">,</span> <span class="ow">not</span><span class="p">(</span> <span class="n">isPercent</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.simplify"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.simplify">[docs]</a>    <span class="k">def</span> <span class="nf">simplify</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns a :py:class:`PQU` instance that is the same as *self* but with its units simplified. This is,</span>
 <span class="sd">        units that have the same base units are reduce to one of those units. For example, if *self* is equivalent to</span>
 <span class="sd">        &#39;1.2 km/m**3&#39; then the returned instance will be equivalent to &#39;1.2e3 / m**2&#39; or &#39;1.2e9 / km**2&#39;</span>
@@ -1967,7 +1967,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">simplifyUnitsFactor</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.toString"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">keepPeriod</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string representation of *self* (e.g., &#39;35 +/- 1.2% J&#39;).</span>
 
 <span class="sd">        :param significantDigits: Passed onto the methods :py:meth:`PQU_float.toString` and :py:meth:`PQU_uncertainty.toString`</span>
@@ -1995,7 +1995,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">str1</span> <span class="o">+</span> <span class="n">str2</span> <span class="o">+</span> <span class="n">str3</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.truncate"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.truncate">[docs]</a>    <span class="k">def</span> <span class="nf">truncate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If value is **True**, calls *self*.value&#39;s truncate method. If uncertainty is **True**, </span>
 <span class="sd">        calls *self*.uncertainty&#39;s truncate method.  See :py:meth:`PQU_float.truncate`</span>
 <span class="sd">        and :py:meth:`PQU_uncertainty.truncate`</span>
@@ -2010,31 +2010,31 @@
         <span class="k">if</span><span class="p">(</span> <span class="n">uncertainty</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">truncate</span><span class="p">(</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.sqrt"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.sqrt">[docs]</a>    <span class="k">def</span> <span class="nf">sqrt</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a :py:class:`PQU` of the square root of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a :py:class:`PQU` of the square root of *self*.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.sin"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.sin">[docs]</a>    <span class="k">def</span> <span class="nf">sin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a :py:class:`PQU` of the sin of *self*. Self must have unit of angle.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a :py:class:`PQU` of the sin of *self*. Self must have unit of angle.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">isAngle</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">conversionFactorTo</span><span class="p">(</span> <span class="n">_unit_table</span><span class="p">[</span><span class="s1">&#39;rad&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Argument of sin must be an angle.&#39;</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.cos"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.cos">[docs]</a>    <span class="k">def</span> <span class="nf">cos</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a :py:class:`PQU` of the cos of *self*. Self must have unit of angle.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a :py:class:`PQU` of the cos of *self*. Self must have unit of angle.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">isAngle</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">conversionFactorTo</span><span class="p">(</span> <span class="n">_unit_table</span><span class="p">[</span><span class="s1">&#39;rad&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Argument of cos must be an angle.&#39;</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.tan"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.tan">[docs]</a>    <span class="k">def</span> <span class="nf">tan</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a :py:class:`PQU` of the tan of *self*. Self must have unit of angle.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a :py:class:`PQU` of the tan of *self*. Self must have unit of angle.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">isAngle</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">conversionFactorTo</span><span class="p">(</span> <span class="n">_unit_table</span><span class="p">[</span><span class="s1">&#39;rad&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Argument of tan must be an angle.&#39;</span> <span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_getOtherAsPQU</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a :py:class:`PQU` representation of other. If other is a :py:class:`PQU`</span>
 <span class="sd">        instance, it is returned (i.e., no copy is made). Otherwise, the PQU.__init__ </span>
 <span class="sd">        method is called with only other as an argument and its return value returned.</span>
@@ -2048,7 +2048,7 @@
 
 <div class="viewcode-block" id="PQU.isPhysicalUnitOf"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isPhysicalUnitOf">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">isPhysicalUnitOf</span><span class="p">(</span> <span class="n">elf</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns **True** if elf has the same unit as the argument unit and **False** otherwise. Elf and unit can be an instance of string,</span>
 <span class="sd">        :py:class:`PhysicalUnit` or :py:class:`PQU`.</span>
 
@@ -2066,7 +2066,7 @@
 <span class="n">PhysicalQuantityWithUncertainty</span> <span class="o">=</span> <span class="n">PQU</span>           <span class="c1"># This is deprecated.</span>
 
 <div class="viewcode-block" id="Parsers"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.Parsers">[docs]</a><span class="k">class</span> <span class="nc">Parsers</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is use to parse the allowed **PQU** strings (e.g., &#39;1 m&#39;, &#39;1.32(3) kg).</span>
 <span class="sd">    See the table in the :py:meth:`parsePQUString.parsePQUString` doc string for allowed **PQU** strings.</span>
 <span class="sd">    This class is mainly for internal use.</span>
@@ -2099,7 +2099,7 @@
 
 <div class="viewcode-block" id="Parsers.parseFloat"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.Parsers.parseFloat">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parseFloat</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the beginning of str1 for a valid float. An arbitrary number of white spaces can exists before the </span>
 <span class="sd">        float characters. This method returns a tuple of length 3. The first item of the tuple is the float </span>
 <span class="sd">        value returned as a :py:class:`PQU_float` instance with significantDigits determined from the string.  The second </span>
@@ -2116,7 +2116,7 @@
 <span class="sd">        :rtype: ( PQU_float, integer | None, string )</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The following table list the components of the groups returned by the regular expression match.</span>
 
 <span class="sd">        Group |</span>
@@ -2142,7 +2142,7 @@
 
 <div class="viewcode-block" id="Parsers.parsePlusMinusUncertainty"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.Parsers.parsePlusMinusUncertainty">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parsePlusMinusUncertainty</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the beginning of str1 for the sub-string &#39;+/-&#39; followed by a float string. An arbitrary number of </span>
 <span class="sd">        white spaces can exists before the &#39;+/-&#39; sub-string and between it and the float string. This method</span>
 <span class="sd">        returns a tuple of length 2. The first item of the tuple is float value returned as a :py:class:`PQU_uncertainty`</span>
@@ -2166,7 +2166,7 @@
 
 <div class="viewcode-block" id="Parsers.parseParenthesisUncertainty"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.Parsers.parseParenthesisUncertainty">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parseParenthesisUncertainty</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the beginning of str1 for the sub-string &#39;(#)&#39; where &#39;#&#39; is a 1 or 2 digit</span>
 <span class="sd">        number.  This method returns a tuple of length 2. The first item of the tuple is the number returned as </span>
 <span class="sd">        a :py:class:`PQU_uncertainty` of style pqu_uncertaintyStyleParenthesis. Characters after the &#39;)&#39; are returned </span>
@@ -2189,7 +2189,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_parseFloatGroups</span><span class="p">(</span> <span class="n">groups</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For internal use. This method analyzes the groups to determine the properties of a float and returns its</span>
 <span class="sd">        value, order, significantDigits and significantDigitsForZero.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2212,7 +2212,7 @@
 
 <div class="viewcode-block" id="Parsers.parsePQUString"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.Parsers.parsePQUString">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parsePQUString</span><span class="p">(</span> <span class="n">str1</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of </span>
 <span class="sd">        :py:class:`PQU_float`, unit is an instance of :py:class:`PhysicalUnit` and uncertainty is an instance </span>
 <span class="sd">        of :py:class:`PQU_uncertainty`.</span>
@@ -2290,7 +2290,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="PhysicalUnit"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit">[docs]</a><span class="k">class</span> <span class="nc">PhysicalUnit</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    .. rubric:: PHYSICAL UNIT</span>
 
 <span class="sd">    A physical unit is defined by a symbol (possibly composite), a scaling factor, and</span>
@@ -2313,7 +2313,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">powers</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :param symbols: a dictionary mapping each symbol component to its associated integer</span>
 <span class="sd">                    power (e.g., ``{&#39;m&#39;: 1, &#39;s&#39;: -1}``) for `m/s`). As a shorthand, a string may be </span>
 <span class="sd">                    passed which is assigned an implicit power 1.</span>
@@ -2444,7 +2444,7 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Only integer and inverse integer exponents are allowed&#39;</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="PhysicalUnit.conversionFactorTo"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.conversionFactorTo">[docs]</a>    <span class="k">def</span> <span class="nf">conversionFactorTo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">ignoreTemperatureOffsets</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a float factor that can be used to scale a value in unit of *self* to unit of *other*.</span>
 
 <span class="sd">        :param other: another unit</span>
@@ -2468,7 +2468,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">/</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalUnit.conversionTupleTo"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.conversionTupleTo">[docs]</a>    <span class="k">def</span> <span class="nf">conversionTupleTo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the tuple (factor, offset) that can be used to convert a value in unit of *self* to unit of *other*.</span>
 <span class="sd">        Offset is 0.0 except with convert some temperature units.</span>
 
@@ -2498,7 +2498,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">factor</span><span class="p">,</span> <span class="n">offset</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalUnit.isCompatible"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.isCompatible">[docs]</a>    <span class="k">def</span> <span class="nf">isCompatible</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns **True** if *self* is compatible with other and **False** otherwise.</span>
 
 <span class="sd">        :param other: another unit</span>
@@ -2509,7 +2509,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalUnit.isDimensionless"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.isDimensionless">[docs]</a>    <span class="k">def</span> <span class="nf">isDimensionless</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* is dimensionless and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* is dimensionless and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2517,7 +2517,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="ow">not</span> <span class="n">reduce</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="ow">or</span> <span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalUnit.isAngle"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.isAngle">[docs]</a>    <span class="k">def</span> <span class="nf">isAngle</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns **True** if *self* is an angle and **False** otherwise.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns **True** if *self* is an angle and **False** otherwise.</span>
 
 <span class="sd">        :rtype: `bool`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2525,7 +2525,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">reduce</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="PhysicalUnit.setSymbol"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.setSymbol">[docs]</a>    <span class="k">def</span> <span class="nf">setSymbol</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets *self*&#39;s symbols to symbol with power 1.</span>
 
 <span class="sd">        :param symbol: </span>
@@ -2536,7 +2536,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="PhysicalUnit.simplifyUnitsFactor"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.simplifyUnitsFactor">[docs]</a>    <span class="k">def</span> <span class="nf">simplifyUnitsFactor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns a :py:class:`PQU` instance that can be used to simplify *self*&#39;s units.</span>
 <span class="sd">        That is, all units with the same base units are reduced to a single unit. For example,</span>
 <span class="sd">        if *self* has units of &#39;km/m&#39; then the returned :py:class:`PQU` is equivalent to &#39;1e3 m/km&#39;.</span>
@@ -2559,7 +2559,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">result</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalUnit.symbol"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.symbol">[docs]</a>    <span class="k">def</span> <span class="nf">symbol</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string representation of *self*.</span>
 
 <span class="sd">        :returns: a string representation of *self*.</span>
@@ -2880,7 +2880,7 @@
 <span class="k">del</span> <span class="n">Kelvin</span>
 
 <div class="viewcode-block" id="description"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.description">[docs]</a><span class="k">def</span> <span class="nf">description</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a string describing all available units.</span>
 
 <span class="sd">    :rtype: `str`</span>
@@ -2934,7 +2934,7 @@
     <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">units</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="convertUnits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.convertUnits">[docs]</a><span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This function converts *unit* to a new unit based on the key/value pairs in the dictionary *unitMap*,</span>
 <span class="sd">    and it determines the factor that converts *unit* to the new unit.</span>
 <span class="sd">    That is, it looks up each term in *unit* to see if it is a key in *unitMap*. If it is,</span>

@@ -50,7 +50,7 @@
 <span class="kn">import</span> <span class="nn">time</span>
 
 <div class="viewcode-block" id="executeOne"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.parallelprocessing.executeOne">[docs]</a><span class="k">def</span> <span class="nf">executeOne</span><span class="p">(</span> <span class="n">command</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function is mainly for an example of what the target argument of multiprocessing.Process may look.</span>
 <span class="sd">    The main thing is to call sys.exit with a status and to properly handle the status returned by os.system.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -60,7 +60,7 @@
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span> <span class="n">status</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="addProcess"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.parallelprocessing.addProcess">[docs]</a><span class="k">def</span> <span class="nf">addProcess</span><span class="p">(</span> <span class="n">numberLaunched</span><span class="p">,</span> <span class="n">processes</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">callback</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Added a process.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Added a process.&quot;&quot;&quot;</span>
 
     <span class="n">process</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span> <span class="n">target</span> <span class="o">=</span> <span class="n">callback</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="p">(</span> <span class="n">items</span><span class="p">[</span><span class="n">numberLaunched</span><span class="p">],</span> <span class="p">)</span> <span class="p">)</span>
     <span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">(</span> <span class="p">)</span>
@@ -68,7 +68,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">numberLaunched</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.parallelprocessing.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">numberOfParallelProcesses</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">percentNotifications</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function loops over each item in *items* and processes it by calling user&#39;s callback function. At most *numberOfParallelProcesses* of</span>
 <span class="sd">    processes can run in parallel. The user&#39;s callback must create a command to execute and call function **executeOne**.</span>
 
@@ -113,7 +113,7 @@
     <span class="k">return</span> <span class="n">numberOfFailures</span></div>
 
 <div class="viewcode-block" id="executeMultiThreaded"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.parallelprocessing.executeMultiThreaded">[docs]</a><span class="k">def</span> <span class="nf">executeMultiThreaded</span><span class="p">(</span><span class="n">taskList</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="n">nThreads</span><span class="o">=</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(),</span> <span class="n">sleepTime</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    General-purpose multi-threading code. Applies &#39;runner&#39; to each task in the taskList,</span>
 <span class="sd">    returns list of completed runners once all tasks are complete.</span>
 <span class="sd">    Note: order of returned list may not match order of submitted taskList.</span>

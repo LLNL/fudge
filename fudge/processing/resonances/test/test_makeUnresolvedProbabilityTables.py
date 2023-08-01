@@ -134,8 +134,9 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
             # Just above the lowerBound of the URR and the upper end of the RRR, by 1-2 units of mean level spacing
             for lj in lastResEnergies:
                 firstEnergy = fakeRR[lj].data[0][0]
+                levelDensity = 1/self.Zr90URR.levelSpacings[lj].evaluate(self.Zr90URR.lowerBound)
                 self.assertLess(
-                    (firstEnergy-max(lastResEnergies[lj], self.Zr90URR.lowerBound))*self.Zr90URR.levelDensities[lj].evaluate(self.Zr90URR.lowerBound), 3)
+                    (firstEnergy-max(lastResEnergies[lj], self.Zr90URR.lowerBound))*levelDensity, 3)
 
             # For next two tests, just work with one channel
             lj0 = list( fakeRR.keys() )[0]
@@ -144,7 +145,7 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
             energies = numpy.array(fakeRR[lj0].getColumn('energy'))
             spacings = energies[1:] - energies[:-1]
             aveE = 0.5 * (energies[1:] + energies[:-1])
-            lds = numpy.array([self.Zr90URR.levelDensities[lj0].evaluate(ee) for ee in aveE])
+            lds = numpy.array([1/self.Zr90URR.levelSpacings[lj0].evaluate(ee) for ee in aveE])
             diff_spacings = spacings - 1/lds
             correlation_matrix = numpy.corrcoef(numpy.array([diff_spacings[:-1], diff_spacings[1:]]))
 

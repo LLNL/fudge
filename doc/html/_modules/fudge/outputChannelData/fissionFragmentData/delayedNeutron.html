@@ -90,7 +90,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__product</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="DelayedNeutron.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate average product data.</span>
 
 <span class="sd">        :param style: The style to use.</span>
@@ -102,7 +102,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__product</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.check"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check delayed neutron rate, multiplicity and distribution</span>
 
 <span class="sd">        :param info: dict</span>
@@ -124,14 +124,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__product</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **product** member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__product</span><span class="o">.</span><span class="n">fixDomains</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__product</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">()</span></div>
 
@@ -146,7 +146,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__product</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.multiGroupMultiplicity"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupMultiplicity">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group multiplicity for the requested label for the request product of this output channel.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted multiplicity.</span>
@@ -159,7 +159,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupMultiplicity</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.multiGroupAverageEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupAverageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group, average energy for the requested label for the requested product.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted average energy.</span>
@@ -172,7 +172,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupAverageEnergy</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.multiGroupAverageMomentum"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupAverageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageMomentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group, average momentum for the requested label for the requested product. </span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted average momentum.</span>
@@ -185,7 +185,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupAverageMomentum</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.multiGroupProductMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -198,7 +198,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductMatrix</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.multiGroupProductArray"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the full multi-group, total product array for the requested label for the requested product id.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -210,7 +210,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductArray</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.removeStyles"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -263,7 +263,7 @@
         <span class="n">suitesModule</span><span class="o">.</span><span class="n">ExclusiveSuite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">allowedClasses</span> <span class="o">=</span> <span class="p">(</span> <span class="n">DelayedNeutron</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="DelayedNeutrons.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate average product data.</span>
 
 <span class="sd">        :param style: The style to use.</span>
@@ -275,7 +275,7 @@
         <span class="k">for</span> <span class="n">delayedNeutron1</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">delayedNeutron1</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutrons.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
 
         <span class="n">products</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">delayedNeutron1</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">delayedNeutron1</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">())</span>

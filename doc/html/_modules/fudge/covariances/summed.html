@@ -54,7 +54,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span>
 
 <div class="viewcode-block" id="SummedCovariance"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance">[docs]</a><span class="k">class</span> <span class="nc">SummedCovariance</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">Covariance</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    Covariance matrix stored as sum/difference of matrices from other reactions,</span>
 <span class="sd">    valid over a specified domain.</span>
 <span class="sd">    Note: summed matrices may sum over other summed matrices, which opens up the possibility of</span>
@@ -71,7 +71,7 @@
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">domainUnit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="n">summands</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param label: label of associated style</span>
 <span class="sd">        :param domainMin: lower domain limit for the sum</span>
 <span class="sd">        :param domainMax: upper domain limit for the sum</span>
@@ -143,7 +143,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">scalelabel</span><span class="o">=</span><span class="n">scalelabel</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span> <span class="n">xlog</span><span class="o">=</span><span class="n">xlog</span><span class="p">,</span> <span class="n">ylog</span><span class="o">=</span><span class="n">ylog</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SummedCovariance.rowBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance.rowBounds">[docs]</a>    <span class="k">def</span> <span class="nf">rowBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the bounds of the row.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the bounds of the row.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -151,7 +151,7 @@
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="SummedCovariance.columnBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance.columnBounds">[docs]</a>    <span class="k">def</span> <span class="nf">columnBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the bounds of the column.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the bounds of the column.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -162,7 +162,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">toCorrelationMatrix</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SummedCovariance.toCovarianceMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance.toCovarianceMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">toCovarianceMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;composed&quot;</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sum the parts to construct the covariance matrix on the domain of self.</span>
 <span class="sd">        Note: each part must be converted to absolute before summing, since the sum is over different reactions.</span>
 
@@ -184,7 +184,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">summands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">domainSlice</span><span class="p">(</span><span class="n">rowDomainBounds</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">getAbsoluteMatrix</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            helper function: for each summand &#39;p&#39;, first check if it overlaps</span>
 <span class="sd">            with self&#39;s domain. If not return None, otherwise convert it to an absolute matrix</span>
 <span class="sd">            on self&#39;s domain and return that</span>
@@ -283,7 +283,7 @@
         <span class="k">return</span> <span class="n">newCov</span></div>
 
 <div class="viewcode-block" id="SummedCovariance.toAbsolute"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance.toAbsolute">[docs]</a>    <span class="k">def</span> <span class="nf">toAbsolute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rescales self (if it is a relative covariance) using XYs1d rowData and columnData</span>
 <span class="sd">        to convert self into an absolute covariance matrix.</span>
 
@@ -301,7 +301,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">toAbsolute</span><span class="p">(</span><span class="n">rowData</span><span class="o">=</span><span class="n">rowData</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="n">colData</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SummedCovariance.toRelative"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance.toRelative">[docs]</a>    <span class="k">def</span> <span class="nf">toRelative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rescales self (if it is a absolute covariance) using XYs1d rowData and columnData</span>
 <span class="sd">        to convert self into a relative covariance matrix.</span>
 
@@ -319,7 +319,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">toRelative</span><span class="p">(</span><span class="n">rowData</span><span class="o">=</span><span class="n">rowData</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="n">colData</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SummedCovariance.toXML_strList"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param indent:</span>
 <span class="sd">        :param kwargs:</span>
@@ -337,7 +337,7 @@
         <span class="k">return</span> <span class="n">xmlString</span></div>
 
 <div class="viewcode-block" id="SummedCovariance.getReferredCovariance"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance.getReferredCovariance">[docs]</a>    <span class="k">def</span> <span class="nf">getReferredCovariance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">pointer</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        FIXME what&#39;s this for? It&#39;s not used anywhere in FUDGE... should it be removed?</span>
 
 <span class="sd">        :param pointer:</span>
@@ -349,7 +349,7 @@
         <span class="k">else</span> <span class="p">:</span>                                  <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Need reference to root node of &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span> <span class="n">pointer</span><span class="o">.</span><span class="n">path</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SummedCovariance.getUncertaintyVector"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.SummedCovariance.getUncertaintyVector">[docs]</a>    <span class="k">def</span> <span class="nf">getUncertaintyVector</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">theData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combine all subsections into single uncertainty vector, converting to relative if requested.</span>
 <span class="sd">        </span>
 <span class="sd">        :returns: an XYs1d instance </span>
@@ -381,7 +381,7 @@
         <span class="k">return</span> <span class="n">summed_</span></div></div>
 
 <div class="viewcode-block" id="Summand"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.summed.Summand">[docs]</a><span class="k">class</span> <span class="nc">Summand</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores one summand in the summed covariance. Consists of a link, an ENDF MF/MT and a coefficient</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

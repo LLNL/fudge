@@ -676,8 +676,14 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
         EU = self.energyUnit
         units = (EU,'','','',EU,EU,EU,EU,EU)
         data = [self.RR.resonanceParameters.table.getColumn( quant,unit ) for quant,unit in zip(params,units) ]
+        missingColumns = []
         for i in range(len(data)):
-            if data[i] is None: data[i] = [0]*nRes
+            if data[i] is None:
+                if params[i] in ('energy','L','J','neutronWidth','captureWidth'):
+                    missingColumns.append(params[i])
+                data[i] = [0]*nRes
+        if missingColumns:
+            raise KeyError(f"Required columns {', '.join(missingColumns)} missing from BreitWigner parameters table!")
         table = numpy.array( data )
 
         # sort resonances by L and J, store parameters in numpy arrays
@@ -2969,20 +2975,12 @@ class URRcrossSection(ResonanceReconstructionBaseClass):
         and the number of degrees of freedom, assuming that the widths are distributed by a chi^2
         probability density function with the given number of degrees of freedom.
 
-        However, later we'll need the level densities.  Below we'll construct them from the
-        average resonance spacing for each L, J.
-
         This function sets several member data as dicts (indexed by L & J) of data and interpolable functions::
 
             - levelSpacings::
 
                 ..math::
                     D_{L,J}(E)
-
-            - levelDensities: derived from level spacings::
-
-                ..math::
-                    \\rho_{L,J}(E)=1/D_{L,J}(E)
 
             - averageWidths, assigned simple labels like 'elastic' and 'capture' for convenience::
 
@@ -3010,7 +3008,6 @@ class URRcrossSection(ResonanceReconstructionBaseClass):
 
         self.levelSpacings = collections.OrderedDict()  # FIXME why OrderedDict? Does order matter?
         self.averageWidths = collections.OrderedDict()
-        self.levelDensities = collections.OrderedDict()
         self.DOFs = collections.OrderedDict()
         self.reactionLabels = collections.OrderedDict()
 
@@ -3030,7 +3027,6 @@ class URRcrossSection(ResonanceReconstructionBaseClass):
                 j = J.J
 
                 self.levelSpacings[(l,j)]=J.levelSpacing.data
-                self.levelDensities[(l,j)]=1/J.levelSpacing.data
                 self.averageWidths[(l,j)]={}
                 self.DOFs[(l,j)]={}
 
@@ -3348,13 +3344,13 @@ class URRcrossSection(ResonanceReconstructionBaseClass):
         for rxn in channelClass.keys():
             for lj in self.averageWidths:
                 if rxn=='elastic':
-                    tau=math.pi*redWidthFactor[lj[0]]*self.averageWidths[lj][rxn]/self.levelSpacings[lj] #*self.levelDensities[lj]
+                    tau=math.pi*redWidthFactor[lj[0]]*self.averageWidths[lj][rxn]/self.levelSpacings[lj]
                 elif rxn=='fission':
                     if skipFission: continue
                     if rxn not in self.averageWidths[lj]: continue
                     tau=math.pi*self.averageWidths[lj][rxn]/self.levelSpacings[lj]
                 else:
-                    tau=math.pi*self.averageWidths[lj][rxn]/self.levelSpacings[lj] #*self.levelDensities[lj]
+                    tau=math.pi*self.averageWidths[lj][rxn]/self.levelSpacings[lj]
                 c=ChannelDesignator(lj[0], lj[1], rxn, len(Tc), int(2.0*abs(lj[0]-lj[1])), gfact=None,
                                     particleA=None, particleB=None, isElastic=(rxn=='elastic'),
                                     channelClass=channelClass[rxn], useRelativistic=False, eliminated=False)

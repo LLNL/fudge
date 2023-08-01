@@ -5,6 +5,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+'''
+This module dismembers a continuous-energy photo-atomic ACE data file (identifier "p" is for continuous-energy photo-atomic tables.
+'''
+
 from brownies.LANL.dismemberACE import dismemberACE_misc as dismemberACE_miscModule
 
 def dismemberACE( args, NXS, JXS, XSS ) :

@@ -538,8 +538,9 @@ class Product( ancestryModule.AncestryIO ) :
 
         if self.outputChannel is None:
             if self.pid == productID:
-                form = multiGroupSettings.form(self.distribution, temperatureInfo).multiGroupSubform
-                productArray = productArrayModule.ProductArray(form.array.constructArray())
+                form = multiGroupSettings.form(self.distribution, temperatureInfo)
+                if form is not None:
+                    productArray = productArrayModule.ProductArray(form.multiGroupSubform.array.constructArray())
         else:
             productArray = self.outputChannel.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
 

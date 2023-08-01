@@ -125,23 +125,23 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Alias.toXML_strList"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Alias.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This method needs work. Actually, the class probably needs to be removed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method needs work. Actually, the class probably needs to be removed.&quot;&quot;&quot;</span>
 
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;This needs work.&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Alias.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Alias.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This method needs work. Actually, the class probably needs to be removed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method needs work. Actually, the class probably needs to be removed.&quot;&quot;&quot;</span>
 
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;This needs work.&#39;</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Particle"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle">[docs]</a><span class="k">class</span> <span class="nc">Particle</span><span class="p">(</span><span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithIDKey</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is the abstract base class for all particles.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Particle.__init__"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param id: The particle id. Every particle in a PoPs database must have a unique id.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -171,7 +171,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">isAnti</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: whether this is an anti-particle</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -179,7 +179,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">family</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: family name of the particle</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -187,7 +187,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: particle mass</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -195,7 +195,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: particle spin</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -203,7 +203,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">parity</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: particle parity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -211,7 +211,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">charge</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: particle charge</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -219,7 +219,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">halflife</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: particle halflife</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -227,7 +227,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">decayData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: particle decay information</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -240,7 +240,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">suite</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Particle.check"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Basic physics checking for particles.</span>
 
 <span class="sd">        Options &amp; defaults:</span>
@@ -256,7 +256,7 @@
         <span class="k">return</span> <span class="n">warnings</span></div>
 
 <div class="viewcode-block" id="Particle.buildFromRawData"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.buildFromRawData">[docs]</a>    <span class="k">def</span> <span class="nf">buildFromRawData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">spin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">parity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">halflife</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to conviniently add the common properties to a particle.</span>
 
 <span class="sd">        :param mass:  tuple(float value, string unit)</span>
@@ -287,7 +287,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">halflife</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">_halflife</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Particle.convertUnits"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; See convertUnits documentation in PoPs.database &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; See convertUnits documentation in PoPs.database &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__mass</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spin</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
@@ -297,7 +297,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__decayData</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Particle.copy"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: deep copy of self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -323,7 +323,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Particle.replicate"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.replicate">[docs]</a>    <span class="k">def</span> <span class="nf">replicate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copy data from other into self</span>
 
 <span class="sd">        :param other: another Particle instance</span>
@@ -337,7 +337,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__decayData</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">decayData</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Particle.getMass"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.getMass">[docs]</a>    <span class="k">def</span> <span class="nf">getMass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the particle mass in the desired unit.</span>
 
 <span class="sd">        :param unit: desired unit (string)</span>
@@ -359,7 +359,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Particle.sortCompare"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.sortCompare">[docs]</a>    <span class="k">def</span> <span class="nf">sortCompare</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;This should be defined in each sub-class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This should be defined in each sub-class.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid other.&#39;</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span>
@@ -367,7 +367,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Particle.particleCompare"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.particleCompare">[docs]</a>    <span class="k">def</span> <span class="nf">particleCompare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Compares *self* to particle *other* which can be from an particle family.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compares *self* to particle *other* which can be from an particle family.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span>
@@ -419,7 +419,7 @@
 
 <div class="viewcode-block" id="Particle.buildFromClassAndRawData"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.Particle.buildFromClassAndRawData">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">buildFromClassAndRawData</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">spin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">parity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">halflife</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to create a particle from class *cls* and to add common properties to the particle.</span>
 
 <span class="sd">        :param id:  the string id of the partical</span>
@@ -478,39 +478,39 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ParticleSorter"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.ParticleSorter">[docs]</a><span class="k">class</span> <span class="nc">ParticleSorter</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ParticleSorter.__init__"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.ParticleSorter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__overwrite</span> <span class="o">=</span> <span class="n">overwrite</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__particles</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="ParticleSorter.__len__"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.ParticleSorter.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of particles in *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of particles in *self*.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__particles</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ParticleSorter.__getitem__"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.ParticleSorter.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the particle(s) specified by *index*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the particle(s) specified by *index*.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particles</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="ParticleSorter.__iter__"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.ParticleSorter.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Iterates over the particles in *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterates over the particles in *self*.&quot;&quot;&quot;</span>
 
         <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n1</span><span class="p">):</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particles</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">overwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the value of self.__overwrite.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of self.__overwrite.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__overwrite</span>
 
 <div class="viewcode-block" id="ParticleSorter.add"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.particle.ParticleSorter.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Determines the location of *particle* in *self* and inserts it at that location.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines the location of *particle* in *self* and inserts it at that location.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">Particle</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid particle of type &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">particle</span><span class="p">))</span>

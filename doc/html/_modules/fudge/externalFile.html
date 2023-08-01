@@ -55,7 +55,7 @@
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">checksums</span> <span class="k">as</span> <span class="n">checksumsModule</span>
 
 <div class="viewcode-block" id="ExternalFile"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.externalFile.ExternalFile">[docs]</a><span class="k">class</span> <span class="nc">ExternalFile</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An externalFile contains a unique label,</span>
 <span class="sd">    and the relative path to another file (unix path representation).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -110,7 +110,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="ExternalFile.updateChecksum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.externalFile.ExternalFile.updateChecksum">[docs]</a>    <span class="k">def</span> <span class="nf">updateChecksum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">algorithm</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Recompute checksum from external file, update checksum and algorithm fields.</span>
 <span class="sd">        @param algorithm: &#39;sha1&#39; or &#39;md5&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -120,7 +120,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm</span> <span class="o">=</span> <span class="n">algorithm</span></div>
 
 <div class="viewcode-block" id="ExternalFile.realpath"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.externalFile.ExternalFile.realpath">[docs]</a>    <span class="k">def</span> <span class="nf">realpath</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the realpath to the external file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the realpath to the external file.&quot;&quot;&quot;</span>
 
         <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>

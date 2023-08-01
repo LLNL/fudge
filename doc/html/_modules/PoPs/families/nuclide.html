@@ -48,7 +48,6 @@
 <span class="sd">This module contains the nuclear level classes.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">miscModule</span>
 <span class="kn">from</span> <span class="nn">..chemicalElements</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">chemicalElementMiscModule</span>
 <span class="kn">from</span> <span class="nn">..fissionFragmentData</span> <span class="kn">import</span> <span class="n">fissionFragmentData</span> <span class="k">as</span> <span class="n">fissionFragmentDataModule</span>
 
@@ -82,7 +81,14 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">energy</span> <span class="p">)</span></div>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">energy</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="Alias.intid"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Alias.intid">[docs]</a>    <span class="k">def</span> <span class="nf">intid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intidDB</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">intid</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="Particle"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle">[docs]</a><span class="k">class</span> <span class="nc">Particle</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Particle</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -192,6 +198,15 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Recursion detected as ground-state does not have a mass: ID = </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">unit</span> <span class="o">+</span> <span class="s1">&#39; * c**2&#39;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Particle.intid"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.intid">[docs]</a>    <span class="k">def</span> <span class="nf">intid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intidDB</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isAnti</span> <span class="k">else</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">sign</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">parseExtraXMLElement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
@@ -211,7 +226,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Particle.particleCompare"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nuclide.Particle.particleCompare">[docs]</a>    <span class="k">def</span> <span class="nf">particleCompare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Compares *self* to particle *other* which can be from an particle family.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compares *self* to particle *other* which can be from an particle family.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span>

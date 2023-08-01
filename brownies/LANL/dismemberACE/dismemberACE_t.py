@@ -5,7 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""This module dismembers an ACE TNSL data file."""
+'''
+This module dismembers a TNSL ACE data file (identifier t is for TNSL tables).
+'''
 
 from brownies.LANL.dismemberACE import dismemberACE_misc as dismemberACE_miscModule
 

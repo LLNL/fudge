@@ -52,7 +52,7 @@
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 
 <div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for holding a list of objects that can be indexed by an integer or a string.</span>
 <span class="sd">    For integer indexing, the indexing is by order in which an object was put into the array or,</span>
 <span class="sd">    if a sortedSuite instance, by the index assigned when the object was added to the suite.</span>
@@ -64,7 +64,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">allowedClasses</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param allowedClasses: tuple of classes. Only instances of these classes can be added to the suite.</span>
 <span class="sd">        :param replace: boolean (default=True). If False, the add method can only add objects with keys</span>
 <span class="sd">            not already present in the suite. If True, the original object will be replaced by the new object</span>
@@ -110,7 +110,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allowedClasses</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the tuple of classes that are allowed in this suite.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the tuple of classes that are allowed in this suite.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">)</span>     <span class="c1"># No fear, user cannot alter as __allowedClasses is a tuple.</span>
 
@@ -120,7 +120,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__replace</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Suite.add"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Attempt to add item to self.</span>
 <span class="sd">        Raises TypeError if item is not an instance of any class in self.allowedClasses</span>
 <span class="sd">        Raises KeyError if self.replace == False and the item shares a key with another item already in the suite.</span>
@@ -141,7 +141,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.addIndex"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.addIndex">[docs]</a>    <span class="k">def</span> <span class="nf">addIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the index at which item will be added to self.</span>
 <span class="sd">        Raises KeyError if self.replace == False and the item shares a key with another item already in the suite.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -154,7 +154,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">index</span><span class="p">,</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.check"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;See documentation in database.check&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation in database.check&quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">warning</span> <span class="k">as</span> <span class="n">warningModule</span>
 
@@ -166,17 +166,17 @@
         <span class="k">return</span> <span class="n">warnings</span></div>
 
 <div class="viewcode-block" id="Suite.convertUnits"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See documentation in database.convertUnits&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation in database.convertUnits&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.keys"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns the list of all keys in *self*.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the list of all keys in *self*.&#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">keyValue</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Suite.pop"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Removes item with key *key* and returns it. If item is not found, a raise KeyError is executed.</span>
 
 <span class="sd">        :param key:       The key of the item to pop.</span>
@@ -191,7 +191,7 @@
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.remove"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Remove object with specified key from the suite.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove object with specified key from the suite.&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
@@ -200,7 +200,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.replicate"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.replicate">[docs]</a>    <span class="k">def</span> <span class="nf">replicate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add copies of all items in other to self.</span>
 <span class="sd">        :param other: suite or other iterable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -226,7 +226,7 @@
         <span class="k">return</span> <span class="n">xmlString</span></div>
 
 <div class="viewcode-block" id="Suite.uniqueLabel"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.Suite.uniqueLabel">[docs]</a>    <span class="k">def</span> <span class="nf">uniqueLabel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If item&#39;s key is the same as another item&#39;s key in self, construct a new unique key</span>
 <span class="sd">        based on item&#39;s key appended with &#39;__&#39; and one or more lower case letters (i.e., &#39;a&#39; to &#39;z&#39;).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -283,7 +283,7 @@
 <div class="viewcode-block" id="SortedSuite"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.SortedSuite">[docs]</a><span class="k">class</span> <span class="nc">SortedSuite</span><span class="p">(</span> <span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
 
 <div class="viewcode-block" id="SortedSuite.addIndex"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.suite.SortedSuite.addIndex">[docs]</a>    <span class="k">def</span> <span class="nf">addIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the location to insert item into a sorted suite.</span>
 <span class="sd">        :param item: instance to add. Must define a &#39;sortCompare&#39; method (used to determine insertion point).</span>
 <span class="sd">        :return: tuple(insertion index (int), whether to replace existing item at that index (boolean))</span>

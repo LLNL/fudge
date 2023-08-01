@@ -103,13 +103,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span> <span class="o">=</span> <span class="n">multiplicity</span></div>
 
 <div class="viewcode-block" id="ReactionProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts">[docs]</a><span class="k">class</span> <span class="nc">ReactionProducts</span><span class="p">(</span> <span class="nb">dict</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class used to store a unique list of products for a reaction in a dictionary-like object. The key for each item in the dictionary</span>
 <span class="sd">    is a product&#39;s particle id or an outputChannel&#39;s process.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ReactionProducts.asSortedList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts.asSortedList">[docs]</a>    <span class="k">def</span> <span class="nf">asSortedList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">,</span> <span class="n">excludePhotons</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">particles</span> <span class="o">=</span> <span class="p">[]</span>
@@ -140,7 +140,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">particles</span><span class="p">,</span> <span class="n">intermediates</span><span class="p">,</span> <span class="n">processes</span><span class="p">,</span> <span class="n">reaction</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionProducts.cullPhotons"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts.cullPhotons">[docs]</a>    <span class="k">def</span> <span class="nf">cullPhotons</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a copy of self but with photons removed from the list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -149,7 +149,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">culled</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionProducts.specialReactionLabel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionProducts.ReactionProducts.specialReactionLabel">[docs]</a>    <span class="k">def</span> <span class="nf">specialReactionLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputMode</span><span class="p">,</span> <span class="n">pops</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">specialNuclearParticleID_PoPsModule</span><span class="o">.</span><span class="n">Mode</span><span class="o">.</span><span class="n">familiar</span><span class="p">,</span> <span class="n">recalled</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the special label for the ReactionProducts that is unique.</span>
 
 <span class="sd">        :param outputMode           A value from the Mode enum.</span>

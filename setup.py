@@ -95,7 +95,9 @@ setup(
         'fudge.vis',
         'fudge.vis.gnuplot',
         'fudge.vis.matplotlib',
-        'LUPY'
+        'LUPY',
+        'isotopicAbundances',
+        'isotopicAbundances.bin'
     ],
     package_dir = {'': '.'},
     scripts = glob.glob('bin/*.py'),

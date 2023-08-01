@@ -36,7 +36,7 @@ floatFormatOthers = '%20.12E'
 floatFormatEnergyGrid = '%21.13E'
 floatFormatEnergyGrid = floatFormatOthers
 
-def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, delayedNeutronRateAndDatas, addAnnotation ) :
+def toACE(self, styleLabel, cdf_style, fileName, evaluationId, productData, delayedNeutronRateAndDatas, addAnnotation, skipURR=False, skipILF_logic=False, verbose=0):
 
     style = self.styles[styleLabel]
     if not isinstance( style, stylesModule.GriddedCrossSection ):
@@ -79,7 +79,7 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
     NU_prompt = None
     NU_total = None
     LQR = []
-    TYP = []
+    TYR = []
     SigData = {}
     neutronAngular = []
     neutronEnergies = []
@@ -99,16 +99,33 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
     totalXSec = Ys1dModule.Ys1d(Ys=valuesModule.Values([]))
     absorptionXSec = Ys1dModule.Ys1d(Ys=valuesModule.Values([]))
 
-    sortedMTs = sorted( [ [ MT_MTData[0], i1 ] for i1, MT_MTData in enumerate( productData ) ] ) # Sort MTs like NJOY.
+    sortedMTs = list(sorted([[MT_MTData[0], i1] for i1, MT_MTData in enumerate(productData)]))  # Sort MTs like NJOY.
+    extraMTs = []
+    extraData = {}
+
+    if skipURR:
+        ILF, IOA, URRPT = 0, 0, []
+    else:
+        ILF, IOA, URRPT = URR_probabilityTablesModule.URR_probabilityTable(self, styleLabel, fromPDF=False)
+        if ILF == 4:
+            crossSectionSum4 = None
+            for crossSectionSum in self.sums.crossSectionSums:
+                if crossSectionSum.ENDF_MT == 4:
+                    crossSectionSum4 = crossSectionSum
+            if crossSectionSum4 is None:
+                print('WARNING: need missing MT 4 cross section to URRPT tables.')
+            else:
+                extraMTs.append(4)
+                extraData[4] = {'ESZ': crossSectionSum4.crossSection[styleLabel], 'Q_initial': 0, IDsPoPsModule.neutron: []}
 
     for MT, i1 in sortedMTs :
+        printMessage(verbose > 0, 'Processing MT %s' % MT)
         _MT, MTData = productData[i1]
         XSec = MTData['ESZ']
         neutronDatas = MTData[IDsPoPsModule.neutron]
         multiplicity = 0
 
-        XSec2 = Ys1dModule.Ys1d(Ys=XSec.Ys)     # This is a kludge as copying axes nodes, which the next line does implicitly, takes very long.
-        totalXSec = totalXSec + XSec2
+        totalXSec += XSec
 
         if MT == 2:
             elasticXSec = XSec
@@ -119,7 +136,7 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
             LQR.append( MTData['Q_initial'] )
             SigData[MT] = XSec
             if len( neutronDatas ) == 0:
-                absorptionXSec = absorptionXSec + XSec2
+                absorptionXSec += XSec
                 neutronMultiplicity = 0
             else :
                 NXS[5-1] += 1
@@ -142,7 +159,7 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
                         neutronMultiplicity = int( neutronMultiplicity )
                     if not isinstance( neutronMultiplicity, int ):
                         nonFissionEnergyDependentNeutronMultiplicitiesIndex += 1
-                        nonFissionEnergyDependentNeutronMultiplicities[MT] = [ len( TYP ), nonFissionEnergyDependentNeutronMultiplicitiesIndex, neutronMultiplicity, 0 ]
+                        nonFissionEnergyDependentNeutronMultiplicities[MT] = [len(TYR), nonFissionEnergyDependentNeutronMultiplicitiesIndex, neutronMultiplicity, 0]
                         neutronMultiplicity = nonFissionEnergyDependentNeutronMultiplicitiesIndex
  
                     if frame == xDataEnumsModule.Frame.centerOfMass:
@@ -156,8 +173,16 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
                         if isinstance( energyData, energyModule.NBodyPhaseSpace ): angularData = None
                 neutronAngular.append( ( MT, angularData ) )
                 neutronEnergies.append( [ MT, energyGrid[XSec.Ys.start], energyGrid[-1], energyData ] )
-            TYP.append( neutronMultiplicity )
+            TYR.append(neutronMultiplicity)
 
+    for MT in extraMTs:
+        MTData = extraData[MT]
+        MTR.append(MT)
+        LQR.append( MTData['Q_initial'] )
+        TYR.append(0)
+        SigData[MT] = MTData['ESZ']
+
+    printMessage(verbose > 0, 'Processing delayed neutrons.')
     delayedNeutronDatas = []
     delayedNeutronRates = []
     for delayedNeutronRate, delayedNeutronData in delayedNeutronRateAndDatas :
@@ -186,7 +211,7 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
     if len( absorptionXSec ) == 0:
         updateXSSInfo( 'absorption cross section', annotates, XSS, len( energyGrid ) * [ 0. ] )
     else:
-        updateXSSInfo( 'absorption cross section', annotates, XSS, mapCrossSectionToGrid( absorptionXSec ) )
+        updateXSSInfo( 'absorption cross section', annotates, XSS, mapCrossSectionToGrid(absorptionXSec) )
     updateXSSInfo( 'elastic cross section', annotates, XSS, elasticXSec )
     averageHeating = len( energyGrid ) * [ 0. ]
     updateXSSInfo( 'average heating', annotates, XSS, averageHeating )
@@ -210,15 +235,17 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
     JXS[4-1] = len( XSS ) + 1
     updateXSSInfo( 'LQR', annotates, XSS, LQR )
 
-# 5) Add the TYP block.
+# 5) Add the TYR block.
     JXS[5-1] = len( XSS ) + 1
-    updateXSSInfo( 'TYP', annotates, XSS, TYP )
+    updateXSSInfo( 'TYR', annotates, XSS, TYR )
 
 # 6 and 7) Add the LSIG and SIG blocks.
     SIG = []
-    for MT, i1 in sortedMTs :
-        _MT, MTData = productData[i1]
-        if( MT not in [ 2 ] ) : addSigData( MT, SIG, SigData[MT] )
+    for MT, i1 in sortedMTs:
+        if MT not in [2]:
+            addSigData(MT, SIG, SigData[MT])
+    for MT in extraMTs:
+        addSigData(MT, SIG, SigData[MT])
     JXS[6-1] = len( XSS ) + 1
     LSIG = [ 1 ]
     for MT, firstNonZero, reactionSIG in SIG[:-1] : LSIG.append( LSIG[-1] + len( reactionSIG ) + 2 )
@@ -267,15 +294,14 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
     JXS[11-1] = len( XSS ) + 1
     for MT, DLW in MT_DLW : updateXSSInfo( 'DLW(MT=%s)' % MT, annotates, XSS, DLW )
     for MT in nonFissionEnergyDependentNeutronMultiplicities :
-        TYPIndex, index, multiplicity, offset = nonFissionEnergyDependentNeutronMultiplicities[MT]
+        TYR_index, index, multiplicity, offset = nonFissionEnergyDependentNeutronMultiplicities[MT]
         offset += 101
         JXS5 = JXS[5-1]
-        if XSS[JXS5+TYPIndex-1] < 0: offset *= -1
-        XSS[JXS5+TYPIndex-1] = offset
+        if XSS[JXS5+TYR_index-1] < 0: offset *= -1
+        XSS[JXS5+TYR_index-1] = offset
 
 # 23) Add LUNR block - URR probability tables.
 
-    URRPT = URR_probabilityTablesModule.URR_probabilityTable( self )
     if len( URRPT ) > 0:
         JXS[23-1] = len( XSS ) + 1
         updateXSSInfo( 'UNR', annotates, XSS, URRPT )
@@ -364,6 +390,7 @@ def toACE( self, styleLabel, cdf_style, fileName, evaluationId, productData, del
     strRecords += XSSToStrings( annotates, XSS, addAnnotation, len( energyGrid ) )
 
     strRecords.append( '' )
+    printMessage(verbose > 0, 'Writing ACE file.')
     with open( fileName, 'w' ) as fOut:
         fOut.write( '\n'.join( strRecords ) )
 
@@ -414,10 +441,10 @@ def XSSToStrings( annotates, XSS, addAnnotation, numberOfEnergiesInGrid ) :
     if( record ) : strData.append( ''.join( record ) )
     return strData
 
-def mapCrossSectionToGrid( XSec ) :
+def mapCrossSectionToGrid(XSec):
 
     Ys = XSec.Ys
-    return Ys.start * [ 0.0 ] + Ys.values
+    return Ys.start * [0] + Ys.values
 
 def addSigData( MT, SIG, SigData ) :
 
@@ -442,10 +469,10 @@ def processEnergyData( massUnit, neutronMass, energyDatas, JXS, XSS, nonFissionE
     LDLW, MT_DLW, length = [], [], 0
     for MT, EMin, EMax, energyData in energyDatas :
         n_multiplicity = []
-        if MT in nonFissionEnergyDependentNeutronMultiplicities:        # Fixup the TYP data whose abs( value ) is greater than 100.
-            TYPIndex, index, multiplicity, dummy = nonFissionEnergyDependentNeutronMultiplicities[MT]
+        if MT in nonFissionEnergyDependentNeutronMultiplicities:        # Fixup the TYR data whose abs( value ) is greater than 100.
+            TYR_index, index, multiplicity, dummy = nonFissionEnergyDependentNeutronMultiplicities[MT]
             JXS5 = JXS[5-1]
-            if abs( XSS[JXS5+TYPIndex-1] ) != index: raise Exception( 'Neutron multiplicity for index %s not found in TYP table' % index )
+            if abs( XSS[JXS5+TYR_index-1] ) != index: raise Exception( 'Neutron multiplicity for index %s not found in TYR table' % index )
             n_multiplicity = multiplicity.toACE( )
             LNU, n_multiplicity = n_multiplicity[0], n_multiplicity[1:]
             if LNU != 2: raise Exception( 'Only tabular neutron multiplicity is allowed, not LNU = %d' % LNU )
@@ -458,3 +485,10 @@ def processEnergyData( massUnit, neutronMass, energyDatas, JXS, XSS, nonFissionE
         MT_DLW.append( ( MT, n_multiplicity + _DLW ) )
         length += len( _DLW )
     return (LDLW, MT_DLW)
+
+
+def printMessage(doPrint, message):
+    '''Prints *message* if *doPrint* is **True**.'''
+
+    if doPrint:
+        print(message)

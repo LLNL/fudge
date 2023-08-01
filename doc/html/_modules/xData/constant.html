@@ -96,7 +96,7 @@
 
     <span class="nd">@domainMin</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Sets self&#39;s domainMin to *domainMin*. *domainMin* must be less than self.domainMax or a **raise** is executed.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Sets self&#39;s domainMin to *domainMin*. *domainMin* must be less than self.domainMax or a **raise** is executed.&#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">domainMin</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;domainMin = %.17 &gt;= self.domainMax = </span><span class="si">%.17e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">))</span>
@@ -109,7 +109,7 @@
 
     <span class="nd">@domainMax</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Sets self&#39;s domainMax to *domainMax*. *domainMax* must be greater than self.domainMin or a **raise** is executed.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Sets self&#39;s domainMax to *domainMax*. *domainMax* must be greater than self.domainMin or a **raise** is executed.&#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">domainMax</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;domainMax = %.17 &lt;= self.domainMin = </span><span class="si">%.17e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">))</span>
@@ -143,7 +143,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Constant.fixDomains"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets *domainMin* and *domainMax* per the arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -211,7 +211,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiplying Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Constant1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        unitMap is a dictionary of the for { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 

@@ -57,7 +57,7 @@
 <span class="kn">from</span> <span class="nn">..families</span> <span class="kn">import</span> <span class="n">nucleus</span> <span class="k">as</span> <span class="n">nucleusModule</span>
 
 <div class="viewcode-block" id="Isotope"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.isotope.Isotope">[docs]</a><span class="k">class</span> <span class="nc">Isotope</span><span class="p">(</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithSymbolKey</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An isotope that contains a list of nuclides. The symbol is of the form  *SA[_anti]*</span>
 <span class="sd">    where *S* is the istopes&#39;s chemical element symbol and *A* is the isotope&#39;s nucleon number.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -65,7 +65,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;isotope&#39;</span>
 
 <div class="viewcode-block" id="Isotope.__init__"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.isotope.Isotope.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">A</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param symbol: string consisting of the chemical symbol + total number of nucleons, e.g. &#39;Mn55&#39;</span>
 <span class="sd">        :param A: integer equal to the total number of nucleons, e.g. 55</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -106,7 +106,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Isotope.__getitem__"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.isotope.Isotope.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get child particle by id or by integer index.</span>
 <span class="sd">        :param key: may be a string (corresponding to a nuclide or nucleus inside the isotope) or an integer.</span>
 <span class="sd">        :return: nuclide or nucleus instance, or returns KeyError if key not found</span>
@@ -124,7 +124,7 @@
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;key &quot;</span><span class="si">%s</span><span class="s1">&quot; not found&#39;</span> <span class="o">%</span> <span class="n">key</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Isotope.__iter__"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.isotope.Isotope.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Iterates over nuclides, but not over the nuclei contained inside each nucleus &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Iterates over nuclides, but not over the nuclei contained inside each nucleus &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">nuclide</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span> <span class="p">:</span> <span class="k">yield</span> <span class="n">nuclide</span></div>
 
@@ -157,11 +157,17 @@
         <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">warning</span> <span class="k">as</span> <span class="n">warningModule</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
 
+        <span class="c1"># FIXME check that ground-state nuclide defines a mass</span>
+
         <span class="n">emax</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">for</span> <span class="n">nuclide</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="n">nuclideWarnings</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">nuclideWarnings</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warningModule</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s1">&#39;nuclide </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nuclideWarnings</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warningModule</span><span class="o">.</span><span class="n">UnknownEnergy</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">nucleus</span><span class="p">))</span>
+                <span class="k">continue</span>
 
             <span class="n">enow</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="s1">&#39;eV&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">enow</span> <span class="o">&lt;=</span> <span class="n">emax</span><span class="p">:</span>

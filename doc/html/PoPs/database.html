@@ -91,6 +91,24 @@ for one or more particles).</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.database.</span></span><span class="sig-name descname"><span class="pre">Database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2.0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../LUPY/index.html#LUPY.ancestry.AncestryIO" title="LUPY.ancestry.AncestryIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO</span></code></a></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="PoPs.database.Database.QValue">
+<span class="sig-name descname"><span class="pre">QValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ingoingParticles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgoingParticles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MeV'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.QValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.QValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Q value from the list of ingoing and outgoing particle ids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ingoingParticles</strong> – List of ingoing particle ids.</p></li>
+<li><p><strong>outgoingParticles</strong> – List of outgoing particle ids.</p></li>
+<li><p><strong>unit</strong> – Unit of returned Q-value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Q-value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="PoPs.database.Database.add">
 <span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a particle to the database, inside the appropriate particle family.</p>

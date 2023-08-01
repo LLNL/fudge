@@ -28,6 +28,8 @@ from PoPs.families import unorthodox as unorthodoxModule
 from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
 from xData import enums as xDataEnumsModule
+from xData import XYs1d as XYs1dModule
+
 from fudge.core.utilities import brb
 from fudge.core.math import fudgemath
 
@@ -182,16 +184,24 @@ def newGNDSParticle(info, particle, crossSection, multiplicity=1, outputChannel=
     """
 
     name = particle
-    if( not( isinstance( particle, str ) ) ) : name = particle.id
-    if( name in info.PoPs.aliases ) : name = info.PoPs.aliases[name].pid
-    if name != IDsPoPsModule.photon: name = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(name, info.specialNuclearParticleID)
+    if not isinstance(particle, str):
+        name = particle.id
+    if name in info.PoPs.aliases:
+        name = info.PoPs.aliases[name].pid
+    if name != IDsPoPsModule.photon:
+        name = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(name, info.specialNuclearParticleID)
+
     product = productModule.Product(name, label=name, outputChannel=outputChannel)
-    if( isinstance( multiplicity, ( int, float ) ) ) :
+
+    if isinstance(multiplicity, XYs1dModule.XYs1d):
+        if multiplicity.rangeMin == multiplicity.rangeMax == 1.0:
+            multiplicity = multiplicity.rangeMin
+    if isinstance(multiplicity, (int, float)):
         axes = multiplicityModule.defaultAxes( crossSection.domainUnit )
-        multiplicity = multiplicityModule.Constant1d( multiplicity, crossSection.domainMin,
-                crossSection.domainMax, axes = axes, label = info.style )
-    product.multiplicity.add( multiplicity )
-    return( product )
+        multiplicity = multiplicityModule.Constant1d(multiplicity, crossSection.domainMin, crossSection.domainMax, axes=axes, label=info.style)
+    product.multiplicity.add(multiplicity)
+
+    return product
 
 def getTypeNameGamma( info, ZA, level = None, levelIndex = None ) :
 

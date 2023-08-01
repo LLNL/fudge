@@ -150,7 +150,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cdf</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Xs_pdf_cdf1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.xs_pdf_cdf.Xs_pdf_cdf1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
 
         <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">axes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>      <span class="c1"># BRB FIXME, the prior line should have worked.</span>
@@ -170,7 +170,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">_pdf</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Xs_pdf_cdf1d.to_pdf_and_cdf"><a class="viewcode-back" href="../../xData/index.html#xData.xs_pdf_cdf.Xs_pdf_cdf1d.to_pdf_and_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">to_pdf_and_cdf</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns two XYs1d instances. One for the pdf and one for the cdf. The interpolation is the same as self&#39;s interpolation.</span>
 <span class="sd">        Ergo, the interpolation for the cdf is not correct as, in general, the correct cdf interpolation is not defined in GNDS.</span>
 <span class="sd">        The units for the cdf will be correct but not the label.</span>
@@ -223,7 +223,7 @@
 
 <div class="viewcode-block" id="Xs_pdf_cdf1d.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.xs_pdf_cdf.Xs_pdf_cdf1d.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses *node* into class *cls*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -255,7 +255,7 @@
 
 <div class="viewcode-block" id="Xs_pdf_cdf1d.fromXYs"><a class="viewcode-back" href="../../xData/index.html#xData.xs_pdf_cdf.Xs_pdf_cdf1d.fromXYs">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromXYs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">xys</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thinEpsilon</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Creates an **Xs_pdf_cdf1d** instance for an **XYs1d** instance. If *thinEpsilon* is not None, then points are</span>
 <span class="sd">        thinned so that the returned cdf has cdf[i+1] - cdf[i] &gt; *thinEpsilon*.</span>
 

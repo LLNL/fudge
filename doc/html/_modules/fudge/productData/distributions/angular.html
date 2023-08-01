@@ -275,14 +275,14 @@
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Not supported&#39;</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.Subform">[docs]</a><span class="k">class</span> <span class="nc">Subform</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">Subform</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Abstract base class for angular subforms.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for angular subforms.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Subform.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.Subform.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Subform.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.Subform.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The method does nothing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -462,7 +462,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;recoil&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Distributions for this particle can be computed from its recoil partner using kinematics.</span>
 <span class="sd">        Only meant for angular 2-body reactions.</span>
 <span class="sd">        The &#39;root&#39; and &#39;path&#39; usually do not need to be specified: they will be computed from the link.</span>
@@ -486,13 +486,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the domainMin.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the domainMin.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">domainMin</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the domainMax.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the domainMax.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">domainMax</span>
 
@@ -560,7 +560,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolateAtValue</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">extrapolation</span><span class="o">=</span><span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Extrapolation</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs2d.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.XYs2d.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">,</span> <span class="n">tweakLower</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method call **fixDomains* on the *self* via the **probabilitiesModule.PofX1GivenX2** class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -673,7 +673,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">aveEnergies</span><span class="p">,</span> <span class="n">aveMomenta</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Regions2d.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.Regions2d.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method call **fixDomains* on the *self* via the **regionsModule.Regions2d** class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -814,7 +814,7 @@
 
 <div class="viewcode-block" id="Form.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.Form.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">angularElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;angular&gt; element from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;angular&gt; element from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">angularElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="n">subformClass</span> <span class="o">=</span> <span class="p">{</span>
@@ -841,13 +841,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Temporary method until I redo all the classes that have a data-like member.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Temporary method until I redo all the classes that have a data-like member.&#39;&#39;&#39;</span>
 
         <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="p">)</span>
 
     <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Temporary method until I redo all the classes that have a data-like member. Need to check data type.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Temporary method until I redo all the classes that have a data-like member. Need to check data type.&#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span> <span class="o">=</span> <span class="n">data</span>
 
@@ -866,12 +866,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TwoBody.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.TwoBody.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TwoBody.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.TwoBody.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the energy spectrum in the lab frame for the specified incident energy.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the energy spectrum in the lab frame for the specified incident energy.&quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">productModule</span>
         <span class="kn">from</span> <span class="nn">...</span> <span class="kn">import</span> <span class="n">outputChannel</span> <span class="k">as</span> <span class="n">outputChannelModule</span>
@@ -985,7 +985,7 @@
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link2</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">item</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">path</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TwoBody.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.TwoBody.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method call \*\*fixDomains\* on the \*\*angularSubform\* member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1141,7 +1141,7 @@
 
 <div class="viewcode-block" id="TwoBody.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.TwoBody.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Translate &lt;angularTwoBody&gt; element from xml. Returns instance of angular.TwoBody.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1163,7 +1163,7 @@
 
 <div class="viewcode-block" id="TwoBody.productMuInCOM_fromProductMuInLab"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.TwoBody.productMuInCOM_fromProductMuInLab">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">productMuInCOM_fromProductMuInLab</span><span class="p">(</span><span class="n">muLab</span><span class="p">,</span> <span class="n">COM_speed</span><span class="p">,</span> <span class="n">productCOM_speed</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This function returns the tuple (mu1, mu2, isTangent) where mu1 and mu2 are the center-of-</span>
 <span class="sd">        mass (COM) frame mus for an outgoing particle (product) that correspond to the lab frame mu *muLab*.</span>
 <span class="sd">        The interaction is two-body, *COM_speed* is the COM mass speed and *productCOM_speed*</span>
@@ -1200,7 +1200,7 @@
 
 <div class="viewcode-block" id="TwoBody.productMuInCOM_fromProductMusInLab"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.TwoBody.productMuInCOM_fromProductMusInLab">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">productMuInCOM_fromProductMusInLab</span><span class="p">(</span><span class="n">muMinLab</span><span class="p">,</span> <span class="n">muMaxLab</span><span class="p">,</span> <span class="n">COM_speed</span><span class="p">,</span> <span class="n">productCOM_speed</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This function determines all center-of-mass (COM) frame mu domains (i.e., [mu1, mu2] pairs) that lay </span>
 <span class="sd">        between the lab frame mus *muMinLab* and *muMaxLab*. The returned objects is a list that can contain 0, </span>
 <span class="sd">        1 or 2 pairs of mu values. Note if *muMinLab* &gt;= *muMaxLab* an empty list is returned. If </span>
@@ -1228,7 +1228,7 @@
         <span class="k">return</span> <span class="p">[[</span><span class="n">mu3</span><span class="p">,</span> <span class="n">mu1</span><span class="p">],</span> <span class="p">[</span><span class="n">mu2</span><span class="p">,</span> <span class="n">mu4</span><span class="p">]]</span></div></div>
 
 <div class="viewcode-block" id="calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angular.calculateAverageProductData">[docs]</a><span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function calculates average product data for two-body reactions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

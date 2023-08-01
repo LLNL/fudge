@@ -52,7 +52,7 @@
 <span class="kn">from</span> <span class="nn">xData.Documentation</span> <span class="kn">import</span> <span class="n">documentation</span> <span class="k">as</span> <span class="n">documentationModule</span>
 
 <div class="viewcode-block" id="Styles"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Styles">[docs]</a><span class="k">class</span> <span class="nc">Styles</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_base</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores the list of PoPs styles that appear inside a database.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># FIXME merge with fudge.styles class?</span>
@@ -88,7 +88,7 @@
         <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span> <span class="s1">&#39;No style labelled == &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">label</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Styles.add"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Styles.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_style</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Append a style to the list of styles.</span>
 
 <span class="sd">        :param _style: style instance</span>
@@ -103,12 +103,12 @@
         <span class="n">_style</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Styles.convertUnits"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Styles.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See database.convertUnits&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See database.convertUnits&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">_style</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">_style</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Styles.remove"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Styles.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_style</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove the specified style. Raises KeyError if specified style not found.</span>
 <span class="sd">        :param _style: may be a string or a style instance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -155,12 +155,12 @@
         <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Style"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Style">[docs]</a><span class="k">class</span> <span class="nc">Style</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Abstract base class for all &#39;style&#39; classes in PoPs &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Abstract base class for all &#39;style&#39; classes in PoPs &quot;&quot;&quot;</span>
 
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param label: string identifying this style</span>
 <span class="sd">        :param derivedFrom: may be a string (equal to another style&#39;s label), or None if this is an original evaluation</span>
 <span class="sd">        :param date: optional date when style was generated. Defaults to today&#39;s date</span>
@@ -181,25 +181,25 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">date</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns date when style was generated&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns date when style was generated&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__date</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">derivedFrom</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns string label of the style that self derives from&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns string label of the style that self derives from&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__derivedFrom</span> <span class="p">)</span>
 
     <span class="nd">@derivedFrom</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">derivedFrom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Sets *self*&#39;s derivedFrom to *derivedFrom*.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Sets *self*&#39;s derivedFrom to *derivedFrom*.&#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__derivedFrom</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">derivedFrom</span><span class="p">,</span> <span class="s1">&#39;derivedFrom must be a string.&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">derivedFromStyle</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns style instance that self derives from&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns style instance that self derives from&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">_style</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">_style</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__derivedFrom</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">_style</span> <span class="p">)</span>
@@ -215,7 +215,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Style.findFormMatchingDerivedStyle"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Style.findFormMatchingDerivedStyle">[docs]</a>    <span class="k">def</span> <span class="nf">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">styleFilter</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method searches backwards through the chain of derived styles to find a matching form in</span>
 <span class="sd">        the specified component. It starts with the style that self derives from, then the style that derives from, etc.</span>
 <span class="sd">        The first form matching one of those styles is returned (unless styleFilter is used to screen out some styles).</span>
@@ -239,7 +239,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span></div>
         
 <div class="viewcode-block" id="Style.findDerivedFromStyle"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Style.findDerivedFromStyle">[docs]</a>    <span class="k">def</span> <span class="nf">findDerivedFromStyle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method searches backwards through the chain of derived styles to find an instance of the specified</span>
 <span class="sd">        class (which should inherit from the base style class).</span>
 
@@ -254,7 +254,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Style.sibling"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Style.sibling">[docs]</a>    <span class="k">def</span> <span class="nf">sibling</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the sibling of self with label.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the sibling of self with label.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="p">)</span></div>
 
@@ -263,7 +263,7 @@
         <span class="k">pass</span>
 
 <div class="viewcode-block" id="Style.XMLCommonAttributes"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Style.XMLCommonAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XMLCommonAttributes</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper function for writing to XML&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for writing to XML&quot;&quot;&quot;</span>
 
         <span class="n">XMLCommon</span> <span class="o">=</span> <span class="s1">&#39;label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">derivedFrom</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">XMLCommon</span> <span class="o">+=</span> <span class="s1">&#39; derivedFrom=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">derivedFrom</span>
@@ -272,7 +272,7 @@
 
 <div class="viewcode-block" id="Style.parseBaseNodeCommons"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.styles.Style.parseBaseNodeCommons">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parseBaseNodeCommons</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parse *label*, *derivedFrom* and *date* that are common to all style nodes. Also, set xPath.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -289,7 +289,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;evaluated&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">,</span> <span class="n">library</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param label: a unique string identifying this style</span>
 <span class="sd">        :param derivedFrom: may be a string (equal to another style&#39;s label). For an original evaluation use an empty string.</span>
 <span class="sd">        :param library: optional string identifying the library, e.g. &#39;ENSDF&#39;</span>

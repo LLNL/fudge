@@ -65,7 +65,7 @@
 
 
 <div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Store warnings in context. This class contains location information (reactionSuite, reaction, etc)</span>
 <span class="sd">    plus a nested list of warnings or other context instances</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -89,7 +89,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">message</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">warningList</span>
 
 <div class="viewcode-block" id="Context.filter"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter warning list to only include (or exclude) specific classes of warning. For example:</span>
 
 <span class="sd">        &gt;&gt;&gt; newWarnings = warnings.filter( exclude=[DiscreteLevelsOutOfOrder] )</span>
@@ -112,7 +112,7 @@
         <span class="k">return</span> <span class="n">Context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">newWarningList</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Context.flatten"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        From a nested hierarchy of warnings, get back a flat list for easier searching:</span>
 
 <span class="sd">        &gt;&gt;&gt; w = PoPs.check()</span>
@@ -130,7 +130,7 @@
         <span class="k">return</span> <span class="n">List</span></div>
 
 <div class="viewcode-block" id="Context.toStringList"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dIndent</span><span class="o">=</span><span class="s1">&#39;    &#39;</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Format warnings for printing. Returns a list of warning strings with indentation. &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Format warnings for printing. Returns a list of warning strings with indentation. &quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)]</span>
         <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">+=</span> <span class="n">warning</span><span class="o">.</span><span class="n">toStringList</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">dIndent</span><span class="p">)</span>
@@ -138,7 +138,7 @@
 
 
 <div class="viewcode-block" id="Warning"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Warning">[docs]</a><span class="k">class</span> <span class="nc">Warning</span><span class="p">:</span>  <span class="c1"># FIXME make abstract base class?</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    General warning class. Contains link to problem object,</span>
 <span class="sd">    xpath in case the object leaves memory,</span>
 <span class="sd">    and information about the warning or error.</span>
@@ -165,17 +165,28 @@
 <span class="c1">#</span>
 
 <div class="viewcode-block" id="NotImplemented"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.NotImplemented">[docs]</a><span class="k">class</span> <span class="nc">NotImplemented</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Checking not yet implemented for </span><span class="si">%s</span><span class="s2"> type data&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">form</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">form</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span></div>
 
-<div class="viewcode-block" id="DiscreteLevelsOutOfOrder"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.DiscreteLevelsOutOfOrder">[docs]</a><span class="k">class</span> <span class="nc">DiscreteLevelsOutOfOrder</span><span class="p">(</span> <span class="ne">Warning</span> <span class="p">):</span>
+
+<div class="viewcode-block" id="UnknownEnergy"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.UnknownEnergy">[docs]</a><span class="k">class</span> <span class="nc">UnknownEnergy</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nucleus</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nucleus</span> <span class="o">=</span> <span class="n">nucleus</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Could not determine excitation energy for nucleus &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">id</span></div>
+
+
+<div class="viewcode-block" id="DiscreteLevelsOutOfOrder"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.DiscreteLevelsOutOfOrder">[docs]</a><span class="k">class</span> <span class="nc">DiscreteLevelsOutOfOrder</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lidx</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lidx</span> <span class="o">=</span> <span class="n">lidx</span>
@@ -184,9 +195,10 @@
         <span class="k">return</span> <span class="s2">&quot;Discrete level </span><span class="si">%s</span><span class="s2"> is out of order&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">lidx</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lidx</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lidx</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lidx</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lidx</span></div>
 
-<div class="viewcode-block" id="UnnormalizedDecayProbabilities"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.UnnormalizedDecayProbabilities">[docs]</a><span class="k">class</span> <span class="nc">UnnormalizedDecayProbabilities</span><span class="p">(</span> <span class="ne">Warning</span> <span class="p">):</span>
+
+<div class="viewcode-block" id="UnnormalizedDecayProbabilities"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.UnnormalizedDecayProbabilities">[docs]</a><span class="k">class</span> <span class="nc">UnnormalizedDecayProbabilities</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">branchingSum</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">branchingSum</span> <span class="o">=</span> <span class="n">branchingSum</span>
@@ -197,17 +209,18 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">branchingSum</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">branchingSum</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="AliasToNonExistentParticle"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.AliasToNonExistentParticle">[docs]</a><span class="k">class</span> <span class="nc">AliasToNonExistentParticle</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">pid</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Alias &#39;</span><span class="si">%s</span><span class="s2">&#39; points to non-existant particle &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;Alias &#39;</span><span class="si">%s</span><span class="s2">&#39; points to non-existent particle &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pid</span></div>
 </pre></div>
 
             <div class="clearer"></div>

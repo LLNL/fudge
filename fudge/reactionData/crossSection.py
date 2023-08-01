@@ -813,6 +813,10 @@ class ThermalNeutronScatteringLaw1d(Reference):
 
 
 class URR_probabilityTables1d(BaseCrossSectionForm, xDataBaseModule.XDataFunctional):
+    """
+    FIXME: name is misleading, these are actually cross section pdfs/cdfs rather than probability tables.
+    Stores P(sigma | E) and CDF(sigma | E) in an XYs2d container, where incident energy E spans the unresolved region.
+    """
 
     moniker = 'URR_probabilityTables1d'
     dimension = 1
@@ -820,6 +824,7 @@ class URR_probabilityTables1d(BaseCrossSectionForm, xDataBaseModule.XDataFunctio
     def __init__(self, label, URR_probabilityTables):
 
         BaseCrossSectionForm.__init__(self)
+        # FIXME Doesn't really make sense to have this inherit XDataFunctional...
         xDataBaseModule.XDataFunctional.__init__(self, axes=None, label=label)
 
         if not isinstance(URR_probabilityTables, URR_probabilityTablesModule.XYs2d):
@@ -1032,14 +1037,13 @@ class Component(abstractClassesModule.Component):
                     if abs(thresh-lower) > PQUModule.PQU(info['dThreshold']):
                         warnings.append(warning.Threshold_mismatch(lower, thresh, self))
                 elif lower != PQUModule.PQU(info['crossSectionEnergyMin']):
-                    # ignore 2nd,3rd,4th-chance fission (they have Q>0 but are still threshold reactions):
-                    parent = self.ancestor
-                    if not hasattr(parent, 'outputChannel') or parent.fissionGenre in (
-                            enumsModule.FissionGenre.none,
-                            enumsModule.FissionGenre.total,
-                            enumsModule.FissionGenre.firstChance):
-                        warnings.append(warning.Threshold_mismatch(
-                            lower, PQUModule.PQU(info['crossSectionEnergyMin']), self))
+                    reaction = self.ancestor
+                    hasFissionGenre = False
+                    if hasattr(reaction, 'fissionGenre'):       # Ignore 2nd, 3rd and 4th-chance fission (they have Q>0 but are still threshold reactions).
+                        hasFissionGenre = reaction.fissionGenre in (enumsModule.FissionGenre.none, enumsModule.FissionGenre.total, 
+                                enumsModule.FissionGenre.firstChance)
+                    if not hasattr(reaction, 'outputChannel') or hasFissionGenre:
+                        warnings.append(warning.Threshold_mismatch(lower, PQUModule.PQU(info['crossSectionEnergyMin']), self))
             else:
                 # charged-particle reaction generally doesn't 'turn on' right at threshold due to Coulomb barrier.
                 # In this case, just ensure the cross-section stays zero until at or above threshold:

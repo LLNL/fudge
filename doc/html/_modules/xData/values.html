@@ -78,7 +78,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__values</span> <span class="o">=</span> <span class="n">_values</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of stored values in *self*. The actual number of values that *self* represents is returned by **self.length** which</span>
 <span class="sd">        includes leading and trailing zeros not stored by *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -90,7 +90,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Values.copy"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">untrimZeros</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a **values** instance that is a copy of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a **values** instance that is a copy of *self*.&quot;&quot;&quot;</span>
 
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
         <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
@@ -106,13 +106,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of values not including the trailing zeros that are not stored.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of values not including the trailing zeros that are not stored.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the actual number of values represent by *self* which includes leading and trailing zeros not stored by *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -120,7 +120,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the index represent by the first value of *self*. All values before *start* are zeros and are not store by *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the index represent by the first value of *self*. All values before *start* are zeros and are not store by *self*.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span>
 
@@ -272,7 +272,7 @@
 
 <div class="viewcode-block" id="Values.sortAndThin"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.sortAndThin">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">sortAndThin</span><span class="p">(</span><span class="n">_values</span><span class="p">,</span> <span class="n">rel_tol</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function sorts the list of _values into an ascending order and then thins the list. </span>
 <span class="sd">        If there are 2 or fewer points in _values, nothing is done.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -299,7 +299,7 @@
 
 <div class="viewcode-block" id="Values.valuesWithTrimmedZeros"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.valuesWithTrimmedZeros">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">valuesWithTrimmedZeros</span><span class="p">(</span><span class="n">values1</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method determines the *start* and *end* of the non-zero data in *values1* and returns a **values** instance with</span>
 <span class="sd">        *start* and *length* set accordingly.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

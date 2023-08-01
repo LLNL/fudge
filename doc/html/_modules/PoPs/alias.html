@@ -101,6 +101,18 @@
 <div class="viewcode-block" id="Alias"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.Alias">[docs]</a><span class="k">class</span> <span class="nc">Alias</span><span class="p">(</span><span class="n">BaseAlias</span><span class="p">):</span>
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;alias&#39;</span>
 
+<div class="viewcode-block" id="Alias.intid"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.Alias.intid">[docs]</a>    <span class="k">def</span> <span class="nf">intid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intidDB</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">database</span> <span class="k">as</span> <span class="n">databaseModule</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">databaseModule</span><span class="o">.</span><span class="n">Database</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">intid</span><span class="p">()</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Alias &quot;</span><span class="si">%s</span><span class="s1">&quot; for &quot;</span><span class="si">%s</span><span class="s1">&quot; does not have a defined intid.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">))</span></div>
+
 <div class="viewcode-block" id="Alias.parseNodeUsingClass"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.Alias.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
@@ -136,6 +148,19 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metaStableIndex</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="MetaStable.intid"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.MetaStable.intid">[docs]</a>    <span class="k">def</span> <span class="nf">intid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intidDB</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">database</span> <span class="k">as</span> <span class="n">databaseModule</span>
+
+        <span class="n">nuclide</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">databaseModule</span><span class="o">.</span><span class="n">Database</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span>
+        <span class="n">intid1</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">intid</span><span class="p">()</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">intid1</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">sign</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000000</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metaStableIndex</span> <span class="o">+</span> <span class="mi">480</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">intid1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000000</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="MetaStable.parseNodeUsingClass"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.MetaStable.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
@@ -162,7 +187,7 @@
 
 <div class="viewcode-block" id="MetaStable.nuclideNameAndMetaStableIndexFromName"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.MetaStable.nuclideNameAndMetaStableIndexFromName">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">nuclideNameAndMetaStableIndexFromName</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function returns the nuclide name and meta-stable index from its argument name. If name does not appear to be a </span>
 <span class="sd">        meta-stable, ( name, 0 ) are returned. This function splits on the string &#39;_m&#39;. If the number of sub-strings returned </span>
 <span class="sd">        is not 2, the name is considered not to be a meta-stable and ( name, 0 ) are returned. For example, name = &#39;O16&#39; will </span>
@@ -186,7 +211,7 @@
         <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">BaseAlias</span><span class="p">,))</span>
 
 <div class="viewcode-block" id="Suite.has_pid"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.Suite.has_pid">[docs]</a>    <span class="k">def</span> <span class="nf">has_pid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ParticleID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns True if one of the aliases has pid equal to ParticleID and False otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if one of the aliases has pid equal to ParticleID and False otherwise.&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">alias</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">ParticleID</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>

@@ -57,7 +57,7 @@
     <span class="n">allowedParsers</span> <span class="o">=</span> <span class="p">(</span><span class="n">etree</span><span class="p">,</span> <span class="n">dom</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsedXMLNode</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Keep track of which parser is used (&#39;etree&#39;,&#39;dom&#39;, etc). &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep track of which parser is used (&#39;etree&#39;,&#39;dom&#39;, etc). &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">parser</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">allowedParsers</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> xml parser not supported&quot;</span> <span class="o">%</span> <span class="n">parser</span><span class="p">)</span>
@@ -69,14 +69,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tag</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of child elements.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of child elements.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;&lt;Element &#39;</span><span class="si">%s</span><span class="s2">&#39; at 0x</span><span class="si">%x</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return one or more child elements. The index could be a slice.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one or more child elements. The index could be a slice.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
                 <span class="c1"># can&#39;t slice an iterator, must call getchildren() first:</span>
@@ -85,32 +85,32 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">attrib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Access node attributes as dictionary&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access node attributes as dictionary&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrib</span>
 
 <div class="viewcode-block" id="XML_node.get"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.xmlNode.XML_node.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">defaultValue</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the value of the specified attribute. If the attribute is not present, returns defaultValue.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the specified attribute. If the attribute is not present, returns defaultValue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="n">defaultValue</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="XML_node.keys"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.xmlNode.XML_node.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the name of all attributes in this element, as a list.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of all attributes in this element, as a list.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="XML_node.items"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.xmlNode.XML_node.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the name and value of all attributes in this element, as a list of tuples.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name and value of all attributes in this element, as a list of tuples.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="XML_node.getchildren"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.xmlNode.XML_node.getchildren">[docs]</a>    <span class="k">def</span> <span class="nf">getchildren</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of all child elements.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of all child elements.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">XML_node</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">getchildren</span><span class="p">()]</span></div>
 
 <div class="viewcode-block" id="XML_node.find"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.xmlNode.XML_node.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Searches for child elements matching the path, and returns the first match.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Searches for child elements matching the path, and returns the first match.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="n">findResult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">findResult</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -118,12 +118,12 @@
             <span class="k">return</span> <span class="n">XML_node</span><span class="p">(</span><span class="n">findResult</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="XML_node.findall"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.xmlNode.XML_node.findall">[docs]</a>    <span class="k">def</span> <span class="nf">findall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Searches for child elements matching the path, and returns all matches.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Searches for child elements matching the path, and returns all matches.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">XML_node</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="XML_node.xpath"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.xmlNode.XML_node.xpath">[docs]</a>    <span class="k">def</span> <span class="nf">xpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xpath</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Searches for child elements matching the xpath, and returns all matches.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Searches for child elements matching the xpath, and returns all matches.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">==</span> <span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">:</span>
             <span class="c1"># etree doesn&#39;t currently have native support for xpath.</span>
             <span class="c1"># Make my own, using regex for xpath expressions like &quot;reaction[@label=&#39;2&#39;]&quot;:</span>

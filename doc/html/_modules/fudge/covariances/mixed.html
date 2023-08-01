@@ -55,7 +55,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">covarianceEnumsModule</span>
 
 <div class="viewcode-block" id="MixedForm"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm">[docs]</a><span class="k">class</span> <span class="nc">MixedForm</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">Covariance</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Covariance for a single quantity, stored as several separate matrices that must be summed together.</span>
 <span class="sd">    In general, the energy bounds for these matrices can overlap (unlike Regions1d cross section data). </span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -101,7 +101,7 @@
         <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="MixedForm.rowBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.rowBounds">[docs]</a>    <span class="k">def</span> <span class="nf">rowBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the bounds of the row. If unit is specified, return the bounds in that unit.</span>
 <span class="sd">        Otherwise, take unit from first sub-matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -110,7 +110,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="nb">min</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">allbounds</span><span class="p">]),</span><span class="nb">max</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">allbounds</span><span class="p">]))</span></div>
     
 <div class="viewcode-block" id="MixedForm.columnBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.columnBounds">[docs]</a>    <span class="k">def</span> <span class="nf">columnBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the bounds of the column.  If unit is specified, return the bounds in that unit.</span>
 <span class="sd">        Otherwise, take unit from the first sub-matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -147,12 +147,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">scalelabel</span><span class="o">=</span><span class="n">scalelabel</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span> <span class="n">xlog</span><span class="o">=</span><span class="n">xlog</span><span class="p">,</span> <span class="n">ylog</span><span class="o">=</span><span class="n">ylog</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MixedForm.addComponent"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.addComponent">[docs]</a>    <span class="k">def</span> <span class="nf">addComponent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">covariance</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;:param covariance: an instance of covariance (or inherited class)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;:param covariance: an instance of covariance (or inherited class)&quot;&quot;&quot;</span>
         <span class="n">covariance</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">covariance</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="MixedForm.getMatchingComponent"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.getMatchingComponent">[docs]</a>    <span class="k">def</span> <span class="nf">getMatchingComponent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">rowBounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">columnBounds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param rowBounds:</span>
 <span class="sd">        :param columnBounds:</span>
@@ -167,7 +167,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;No component with column bounds matching </span><span class="si">%s</span><span class="s2"> found&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">columnBounds</span><span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MixedForm.makeSafeBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.makeSafeBounds">[docs]</a>    <span class="k">def</span> <span class="nf">makeSafeBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Go through all the components and make sure the bounds don&#39;t overlap.  If they do, it is likely a bug.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">fudge.covariances</span> <span class="kn">import</span> <span class="n">covarianceMatrix</span>
@@ -195,7 +195,7 @@
                              <span class="p">(</span><span class="n">ic</span><span class="p">,</span><span class="n">ic</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">rowBounds</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">])))</span></div>
 
 <div class="viewcode-block" id="MixedForm.getUncertaintyVector"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.getUncertaintyVector">[docs]</a>    <span class="k">def</span> <span class="nf">getUncertaintyVector</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">theData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combines all subsections into single uncertainty vector, converting to relative if requested.</span>
 
 <span class="sd">        :returns: an XYs1d instance</span>
@@ -206,7 +206,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">getCorrelationMatrix</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MixedForm.toCovarianceMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.toCovarianceMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">toCovarianceMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;composed&quot;</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sum all parts together to build a single matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span>
@@ -288,7 +288,7 @@
         <span class="n">newCov</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">newCov</span></div>
 
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    def toAbsolute( self, rowData=None, colData=None ):</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 <span class="sd">        Rescales self (if it is a relative covariance) using XYs1d rowData and colData</span>
@@ -341,7 +341,7 @@
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="MixedForm.toAbsolute"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.toAbsolute">[docs]</a>    <span class="k">def</span> <span class="nf">toAbsolute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rescales self (if it is a relative covariance) using XYs1d rowData and columnData</span>
 <span class="sd">        to convert self into an absolute covariance matrix.</span>
 
@@ -359,7 +359,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">toAbsolute</span><span class="p">(</span><span class="n">rowData</span><span class="o">=</span><span class="n">rowData</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="n">colData</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MixedForm.toRelative"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.toRelative">[docs]</a>    <span class="k">def</span> <span class="nf">toRelative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rescales self (if it is a absolute covariance) using XYs1d rowData and columnData</span>
 <span class="sd">        to convert self into a relative covariance matrix.</span>
 
@@ -388,7 +388,7 @@
 
 <div class="viewcode-block" id="MixedForm.parseNodeUsingClass"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.mixed.MixedForm.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;mixed&gt; element from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;mixed&gt; element from xml.&quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">fudge.covariances</span> <span class="kn">import</span> <span class="n">covarianceMatrix</span><span class="p">,</span> <span class="n">summed</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>

@@ -53,7 +53,7 @@
 <span class="n">timeIndicesNames</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="s1">&#39;sys&#39;</span><span class="p">,</span> <span class="mi">2</span> <span class="p">:</span> <span class="s1">&#39;children&#39;</span><span class="p">,</span> <span class="mi">3</span> <span class="p">:</span> <span class="s1">&#39;childrenSys&#39;</span><span class="p">,</span> <span class="mi">4</span> <span class="p">:</span> <span class="s1">&#39;wall&#39;</span> <span class="p">}</span>
 
 <div class="viewcode-block" id="Times"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times">[docs]</a><span class="k">class</span> <span class="nc">Times</span> <span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This class is useful for timing sections of a python code. This class uses the python class :py:func:`os.times` </span>
 <span class="sd">    to measure time information. Five components of time are measured. They are:</span>
 
@@ -87,12 +87,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;Calls :py:meth:`self.toString` with no arguments.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Calls :py:meth:`self.toString` with no arguments.&#39;&#39;&#39;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Times.delta"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.delta">[docs]</a>    <span class="k">def</span> <span class="nf">delta</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns time information since the last time :py:method:`Times.reset` was called as a dictionary.</span>
 <span class="sd">        The dictionary as the keys &#39;user&#39;, &#39;sys&#39;, &#39;children&#39;, &#39;childrenSys&#39; and &#39;wall&#39;.</span>
 
@@ -107,7 +107,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">ts</span> <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_delta_cpu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return the cpu component of the time form *times*. If *includeChildren* is **True** the cpu </span>
 <span class="sd">        time of the child processes are include in the cpu time. If *includeSystem* is **True** the </span>
 <span class="sd">        system time is include in the cpu time.</span>
@@ -129,7 +129,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">t</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Times.delta_cpu"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.delta_cpu">[docs]</a>    <span class="k">def</span> <span class="nf">delta_cpu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return the cpu component of the time for *self*. If *includeChildren* is **True** the cpu time of the child processes</span>
 <span class="sd">        are include in the cpu time. If *includeSystem* is **True** the system time is include in the cpu time.</span>
 
@@ -144,7 +144,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_cpu</span><span class="p">(</span> <span class="n">times</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="n">includeChildren</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="n">includeSystem</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Times.delta_wall"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.delta_wall">[docs]</a>    <span class="k">def</span> <span class="nf">delta_wall</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return the wall component of the time for *self*.</span>
 
 <span class="sd">        :param reset:       If **True**, :py:method:`Times.reset` is called after the delta time is determined.</span>
@@ -155,12 +155,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span> <span class="n">reset</span> <span class="p">)[</span><span class="s1">&#39;wall&#39;</span><span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Times.reset"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;Reset time to the current time.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reset time to the current time.&#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">times</span><span class="p">(</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Times.toString"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">current</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a string representation of *self*.</span>
 
 <span class="sd">        :param prefix:              A prefix string to add to the returned string.</span>

@@ -66,7 +66,7 @@
 <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span>
 
 <div class="viewcode-block" id="CovarianceMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix">[docs]</a><span class="k">class</span> <span class="nc">CovarianceMatrix</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">Covariance</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simplest form of covariance. covarianceMatrix contains a label, a covariance &#39;type&#39; which might be &#39;absolute&#39;,</span>
 <span class="sd">    &#39;relative&#39; or &#39;correlation&#39;, and an optional &#39;productFrame&#39; (for covariances on outgoing distributions).</span>
 <span class="sd">    Matrix data is stored in an :py:class:`xData.gridded.Gridded2d` class. May be diagonal, symmetric, sparse, etc</span>
@@ -76,7 +76,7 @@
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">covarianceEnumsModule</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">absolute</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">productFrame</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param label: refers either to a style (i.e., &#39;eval&#39;), or to the index inside a &#39;mixed&#39; covariance</span>
 <span class="sd">        :param type: &#39;relative&#39;, &#39;absolute&#39; or &#39;correlation&#39;</span>
@@ -135,14 +135,14 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()[</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.rowBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.rowBounds">[docs]</a>    <span class="k">def</span> <span class="nf">rowBounds</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the bounds of the row.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the bounds of the row.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
         <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">unit</span><span class="p">:</span>
             <span class="n">factor</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.columnBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.columnBounds">[docs]</a>    <span class="k">def</span> <span class="nf">columnBounds</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the bounds of the column.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the bounds of the column.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowBounds</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">unit</span><span class="p">:</span>
@@ -150,7 +150,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.isSymmetric"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.isSymmetric">[docs]</a>    <span class="k">def</span> <span class="nf">isSymmetric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple test to determine if an underlying matrix is symmetric</span>
 <span class="sd">        :return: boolean</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -163,7 +163,7 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span> <span class="n">arr</span><span class="o">==</span><span class="n">arr</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.convertAxesToUnits"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.convertAxesToUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertAxesToUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">units</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts all the axes&#39; units.</span>
 <span class="sd">        The parameter ``units`` should be a list of units with the same length as self.axes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -184,7 +184,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.domainSlice"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.domainSlice">[docs]</a>    <span class="k">def</span> <span class="nf">domainSlice</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">rowDomainBounds</span><span class="p">,</span> <span class="n">columnDomainBounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;&quot;</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return copy with a revised domain for rows and columns.</span>
 <span class="sd">        If requested domain extends beyond limits of self, add rows/columns of zeros to the new matrix.</span>
 
@@ -204,7 +204,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">def</span> <span class="nf">getNewBinBoundaries</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">rowDomainBounds</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Get revised bin boundaries between domain min/max. Also determine whether to pad matrix with zeros&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Get revised bin boundaries between domain min/max. Also determine whether to pad matrix with zeros&quot;&quot;&quot;</span>
             <span class="n">matrixIndices</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rowDomainBounds</span><span class="p">):</span>
@@ -268,7 +268,7 @@
         <span class="k">return</span> <span class="n">CovarianceMatrix</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="n">gridded</span><span class="p">,</span> <span class="n">productFrame</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.toCovarianceMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.toCovarianceMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">toCovarianceMatrix</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return copy of self (for consistency with toCovarianceMatrix behavior in summed.py / mixed.py)</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -277,7 +277,7 @@
         <span class="k">return</span> <span class="n">cm</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.getCorrelationMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.getCorrelationMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getCorrelationMatrix</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the correlation matrix generated from self&#39;s covariance matrix.  This is</span>
 <span class="sd">        essentially a copy of self, but renormalized by the uncertainty:</span>
 
@@ -313,7 +313,7 @@
         <span class="k">return</span> <span class="n">correlation</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.toAbsolute"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.toAbsolute">[docs]</a>    <span class="k">def</span> <span class="nf">toAbsolute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rescales self (if it is a relative covariance) using XYs1d rowData and colData</span>
 <span class="sd">        to convert self into an absolute covariance matrix.</span>
 
@@ -387,7 +387,7 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.toRelative"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.toRelative">[docs]</a>    <span class="k">def</span> <span class="nf">toRelative</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rescales self (if it is a absolute covariance) using XYs1d rowData and colData</span>
 <span class="sd">        to convert self into a relative covariance matrix.</span>
 
@@ -461,7 +461,7 @@
         <span class="k">return</span> <span class="n">CovarianceMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check if relative uncertainty is in the bounds passed into the checker,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if relative uncertainty is in the bounds passed into the checker,</span>
 <span class="sd">        and checks for negative eigenvalues or other issues.&quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
@@ -492,7 +492,7 @@
 
         <span class="c1"># Check that the condition number of the matrix is reasonable</span>
         <span class="c1"># FIXME disabled this warning for now. Better option: add severity to each warning and make this low severity</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        minpos, maxpos = min(vals[vals &gt;= 0]), max(vals[vals &gt;= 0])</span>
 <span class="sd">        if A.size != 1 and minpos / maxpos &lt; info[&#39;eigenvalueRatioTolerance&#39;]:</span>
 <span class="sd">            warnings.append(warning.BadEigenvalueRatio(minpos / maxpos, self))</span>
@@ -524,7 +524,7 @@
         <span class="k">return</span> <span class="n">warnings</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span> 
-        <span class="sd">&quot;&quot;&quot;Fix uncertainty using the bounds passed into the fixer.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fix uncertainty using the bounds passed into the fixer.</span>
 <span class="sd">        Requires specification of the data (&quot;theData&quot;) if the covariance is not relative.</span>
 <span class="sd">        I was not creative when I coded this, so it will fail when theData.getValue( x )</span>
 <span class="sd">        doesn&#39;t exist or is a function of more than one value. &quot;&quot;&quot;</span>
@@ -576,7 +576,7 @@
         <span class="k">return</span> <span class="n">warnings</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span> <span class="o">**</span><span class="n">kw</span> <span class="p">)</span></div>
         
 <div class="viewcode-block" id="CovarianceMatrix.group"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.group">[docs]</a>    <span class="k">def</span> <span class="nf">group</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">groupBoundaries</span> <span class="o">=</span> <span class="p">(</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span> <span class="p">),</span> <span class="n">groupUnit</span> <span class="o">=</span> <span class="p">(</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Group the matrix in self</span>
 
 <span class="sd">        :param groupBoundaries: a 2 element list containing the group boundaries for the rows</span>
@@ -709,7 +709,7 @@
         <span class="k">return</span> <span class="n">grouped</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.removeExtraZeros"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.removeExtraZeros">[docs]</a>    <span class="k">def</span> <span class="nf">removeExtraZeros</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove all extra zeros from the underlying matrix</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -745,7 +745,7 @@
                                              <span class="n">symmetry</span><span class="o">=</span><span class="n">arrayModule</span><span class="o">.</span><span class="n">Symmetry</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.getUncertaintyVector"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.getUncertaintyVector">[docs]</a>    <span class="k">def</span> <span class="nf">getUncertaintyVector</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">theData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Get an XYs1d object containing uncertainty for this matrix.</span>
 <span class="sd">        Convert relative/absolute if requested (if so, must also pass central values as theData)</span>
 
@@ -793,7 +793,7 @@
         <span class="k">return</span> <span class="n">uncert</span></div>
         
 <div class="viewcode-block" id="CovarianceMatrix.plot"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scalelabel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ylog</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param title:</span>
 <span class="sd">        :param scalelabel:</span>
@@ -861,7 +861,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CovarianceMatrix.toXML_strList"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param indent:</span>
 <span class="sd">        :param kwargs:</span>
@@ -882,7 +882,7 @@
 
 <div class="viewcode-block" id="CovarianceMatrix.parseNodeUsingClass"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceMatrix.CovarianceMatrix.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;covarianceMatrix&gt; element from xml into python class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;covarianceMatrix&gt; element from xml into python class.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
 

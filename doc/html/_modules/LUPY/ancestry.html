@@ -59,7 +59,7 @@
 <span class="n">XML_declaration</span> <span class="o">=</span> <span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
 <div class="viewcode-block" id="Ancestry"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry">[docs]</a><span class="k">class</span> <span class="nc">Ancestry</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is designed to be a base class for a class (instance) that is a member of another</span>
 <span class="sd">    class (instance). The function of this class is to aid in tracking a class&#39;s ancestors and all</span>
 <span class="sd">    of the ancestors members. That is, if an instance is part of a hierarchy, this class provides </span>
@@ -115,20 +115,20 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ancestor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns self&#39;s ancestor.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s ancestor.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">keyValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns self&#39;s keyValue. If keyName is *None*, then *None* is returned.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s keyValue. If keyName is *None*, then *None* is returned.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyName</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rootAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None.&quot;&quot;&quot;</span>
 
         <span class="n">ancestor</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">while</span><span class="p">(</span><span class="n">ancestor</span><span class="o">.</span><span class="n">__ancestor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span> <span class="n">ancestor</span> <span class="o">=</span> <span class="n">ancestor</span><span class="o">.</span><span class="n">__ancestor</span>
@@ -165,7 +165,7 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING from checkAncestry: </span><span class="si">%s</span><span class="s1"> does not have member &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(),</span> <span class="n">member</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Ancestry.copy"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses deepcopy to make a copy of self.</span>
 
 <span class="sd">        :return: copy of self</span>
@@ -181,7 +181,7 @@
         <span class="k">return</span> <span class="n">theCopy</span></div>
 
     <span class="k">def</span> <span class="nf">_copyPost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For internal use only. Recursively fixes up the ancestor stuff in self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -217,7 +217,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">class_</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ancestry.findEntity"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default findEntity method. In general, sub-classes should over-ride this method.</span>
 <span class="sd">        This method uses the following algorithm to find entity. Firstly, if &#39;attribute&#39; is None, then self is assumed</span>
 <span class="sd">        to have an attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated</span>
@@ -252,7 +252,7 @@
         <span class="k">return</span> <span class="n">entity</span></div>
 
 <div class="viewcode-block" id="Ancestry.findInstancesOfClassInChildren"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.findInstancesOfClassInChildren">[docs]</a>    <span class="k">def</span> <span class="nf">findInstancesOfClassInChildren</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">9999</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finds all instances of class *cls* in self&#39;s children, grand-children, etc.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -281,12 +281,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span> <span class="o">==</span> <span class="n">parent</span></div>
 
 <div class="viewcode-block" id="Ancestry.setAncestor"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.setAncestor">[docs]</a>    <span class="k">def</span> <span class="nf">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ancestor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets self&#39;s ancestor to ancestor.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets self&#39;s ancestor to ancestor.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span> <span class="o">=</span> <span class="n">ancestor</span> </div>
 
 <div class="viewcode-block" id="Ancestry.toRelativeXLink"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.toRelativeXLink">[docs]</a>    <span class="k">def</span> <span class="nf">toRelativeXLink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">formatVersion</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string that is a relative xlink to another element (using XML xpath syntax).</span>
 <span class="sd">        Both elements must reside in the same hierarchy.  For a description of xpath, see </span>
 <span class="sd">        http://en.wikipedia.org/wiki/XPath_1.0#Syntax_and_semantics.</span>
@@ -309,7 +309,7 @@
             <span class="k">return</span> <span class="n">relativePath</span></div>
 
 <div class="viewcode-block" id="Ancestry.toXLink"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.toXLink">[docs]</a>    <span class="k">def</span> <span class="nf">toXLink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formatVersion</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string that is an xlink to self (using XML xpath syntax).  The resulting </span>
 <span class="sd">        xlink starts at the root element. For a description of xpath, see </span>
 <span class="sd">        http://en.wikipedia.org/wiki/XPath_1.0#Syntax_and_semantics.</span>
@@ -327,7 +327,7 @@
         <span class="k">return</span> <span class="n">ancestorXLink</span> <span class="o">+</span> <span class="s1">&#39;/</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">moniker1</span><span class="p">,</span> <span class="n">attribute</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ancestry.followXPath"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.followXPath">[docs]</a>    <span class="k">def</span> <span class="nf">followXPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xPath</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param xPath: string xPath, e.g. &quot;/reactionSuite/reactions/reaction[@label=&#39;2&#39;]&quot;</span>
 
 <span class="sd">        :return: class instance pointed to by xPath</span>
@@ -336,7 +336,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">follow2</span><span class="p">(</span><span class="n">xPathList</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;For internal use. Recursive helper function: descend the path to find the correct element.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;For internal use. Recursive helper function: descend the path to find the correct element.&quot;&quot;&quot;</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xPathList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">node</span>
 
@@ -374,21 +374,21 @@
             <span class="k">raise</span> <span class="n">XPathNotFound</span><span class="p">(</span><span class="s2">&quot;Cannot locate path &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">xPath</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="AncestryIO_base"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base">[docs]</a><span class="k">class</span> <span class="nc">AncestryIO_base</span><span class="p">(</span><span class="n">Ancestry</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This class adds methods to read and write *self* to a file. Currently, its supports reading and writing to an XML file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class adds methods to read and write *self* to a file. Currently, its supports reading and writing to an XML file.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AncestryIO_base.toXML"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calls self.toXML_strList and joins its returned list with &#39;\n&#39;.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self.toXML_strList and joins its returned list with &#39;\n&#39;.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="AncestryIO_base.toXML_strList"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.toXML_strList">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of *self*.&quot;&quot;&quot;</span>
 
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="AncestryIO_base.saveToOpenedFile"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.saveToOpenedFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToOpenedFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fOut</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes an XML representation of *self* to the opened file *fOut*. This method uses *self.toXML* to construct *self*&#39;s XML representation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -396,18 +396,18 @@
         <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AncestryIO_base.saveToFile"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.saveToFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes an XML representation of *self* to path *fileName*. This methods opens the file and calls **saveToOpenedFile** and then closes the file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span> <span class="p">:</span>
             <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">XML_declaration</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">saveToOpenedFile</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AncestryIO_base.saveToHybrid"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.saveToHybrid">[docs]</a>    <span class="k">def</span> <span class="nf">saveToHybrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">XML_name</span><span class="p">,</span> <span class="n">HDF_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">HDF_subDir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minLength</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves *self* to as two files, with most of the hierarchy in an XML file but most of the numerical data saved in an associated HDF file.</span>
 <span class="sd">        To construct the file names, the best is to leave *HDF_name* as None. However, if the HDF file should be put into a sub-directory</span>
 <span class="sd">        below where the XML file will be placed, then one can leave *HDF_name* as **None** and set *HDF_subDir*. For example, to</span>
@@ -479,7 +479,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;HDF&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AncestryIO_base.parseAncestryMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.parseAncestryMembers">[docs]</a>    <span class="k">def</span> <span class="nf">parseAncestryMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The method parses all member of *self.ancestryMembers* found in *node*. If *kwargs* contains the key *membersToSkip*</span>
 <span class="sd">        then all members of *self* whose moniker is in the list *kwargs[&#39;membersToSkip&#39;] are not parsed. This, for example,</span>
 <span class="sd">        allows the calling instance to parse the *externalFiles* member and set up needed entries into *kwargs*.</span>
@@ -506,7 +506,7 @@
         <span class="k">return</span> <span class="n">childNodes</span><span class="p">,</span> <span class="n">membersNotFoundInNode</span></div>
 
 <div class="viewcode-block" id="AncestryIO_base.parseCleanup"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.parseCleanup">[docs]</a>    <span class="k">def</span> <span class="nf">parseCleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method does nothing. A place holder incase the derived class needs one.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -514,7 +514,7 @@
 
 <div class="viewcode-block" id="AncestryIO_base.parseXMLString"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.parseXMLString">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseXMLString</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses a XML string using class *cls*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -530,7 +530,7 @@
 
 <div class="viewcode-block" id="AncestryIO_base.readXML_file"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.readXML_file">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">readXML_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads and parses an XML file using class *cls*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -556,7 +556,7 @@
 <div class="viewcode-block" id="AncestryIO.parseNodeUsingClass"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method must be overrwritten by the derived class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -566,7 +566,7 @@
 
 <div class="viewcode-block" id="AncestryIO_bare.parseNode"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_bare.parseNode">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method must be overrwritten by the derived class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 

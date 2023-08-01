@@ -441,6 +441,41 @@ class Database(ancestryModule.AncestryIO):
             return parentDB.hasAlias(id)
         return False
 
+    def QValue(self, ingoingParticles, outgoingParticles, unit='MeV'):
+        '''
+        Calculates the Q value from the list of ingoing and outgoing particle ids.
+
+        :param ingoingParticles:    List of ingoing particle ids.
+        :param outgoingParticles:   List of outgoing particle ids.
+        :param unit:                Unit of returned Q-value.
+
+        :return:                    Q-value.
+        '''
+
+        Q = 0.0
+
+        ingoingParticles = list(ingoingParticles)
+        outgoingParticles = list(outgoingParticles)
+
+        removeDuplicates = True
+        while(removeDuplicates):
+            removeDuplicates = False
+            for particle in ingoingParticles:
+                if particle in outgoingParticles:
+                    removeDuplicates = True
+                    break
+            if removeDuplicates:
+                ingoingParticles.remove(particle)
+                outgoingParticles.remove(particle)
+
+        for particle in ingoingParticles:
+            Q += self[particle].getMass(unit + '/c**2')
+
+        for particle in outgoingParticles:
+            Q -= self[particle].getMass(unit + '/c**2')
+
+        return Q
+
     def saveToFile( self, fileName, **kwargs ) :
 
         dirname = os.path.dirname( fileName )

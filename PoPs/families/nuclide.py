@@ -9,7 +9,6 @@
 This module contains the nuclear level classes.
 """
 
-from .. import misc as miscModule
 from ..chemicalElements import misc as chemicalElementMiscModule
 from ..fissionFragmentData import fissionFragmentData as fissionFragmentDataModule
 
@@ -44,6 +43,13 @@ class Alias( particleModule.Alias ) :
     def energy( self ) :
 
         return( self.__particle.energy )
+
+    def intid(self, intidDB={}):
+        '''
+        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).
+        '''
+
+        return self.__particle.intid()
 
 class Particle( particleModule.Particle ) :
 
@@ -152,6 +158,15 @@ class Particle( particleModule.Particle ) :
         if self.index == 0:
             raise Exception('Recursion detected as ground-state does not have a mass: ID = %s.' % self.id)
         return self.ancestor[0].mass[0].float(unit) + self.energy[0].float(unit + ' * c**2')
+
+    def intid(self, intidDB={}):
+        '''
+        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).
+        '''
+
+        sign = -1 if self.isAnti else 1
+
+        return sign * (1000 * (1000 * self.index + self.Z) + self.A)
 
     def parseExtraXMLElement(self, element, xPath, linkData, **kwargs):
 

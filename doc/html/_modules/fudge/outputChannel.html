@@ -87,13 +87,13 @@
     <span class="n">inclusive</span> <span class="o">=</span> <span class="s1">&#39;inclusive&#39;</span></div>
 
 <div class="viewcode-block" id="OutputChannel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel">[docs]</a><span class="k">class</span> <span class="nc">OutputChannel</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;This is the GNDS outputChannel which is a Q value and a list of products (i.e., product objects).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the GNDS outputChannel which is a Q value and a list of products (i.e., product objects).&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;outputChannel&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span> <span class="s1">&#39;fissionFragmentData&#39;</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Constructor for outputChannel.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for outputChannel.&quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">productModule</span>
         <span class="kn">from</span> <span class="nn">.outputChannelData.fissionFragmentData</span> <span class="kn">import</span> <span class="n">fissionFragmentData</span> <span class="k">as</span> <span class="n">fissionFragmentDataModule</span>
@@ -119,22 +119,22 @@
             <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the i^th product in the channel.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the i^th product in the channel.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of products for this channel.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of products for this channel.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Converts channel object to a string representation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts channel object to a string representation.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Compares self to other.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compares self to other.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">other</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
         <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
@@ -196,7 +196,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="OutputChannel.checkProductFrame"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.checkProductFrame">[docs]</a>    <span class="k">def</span> <span class="nf">checkProductFrame</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Calls checkProductFrame for self&#39;s products.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls checkProductFrame for self&#39;s products.&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">product</span><span class="o">.</span><span class="n">checkProductFrame</span><span class="p">(</span> <span class="p">)</span></div>
 
@@ -259,7 +259,7 @@
                         <span class="n">product1</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">product2</span><span class="p">,</span> <span class="n">diffResults</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OutputChannel.getFinalProductList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.getFinalProductList">[docs]</a>    <span class="k">def</span> <span class="nf">getFinalProductList</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of [ multiplicity, name ] in order for the final products of this channel.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of [ multiplicity, name ] in order for the final products of this channel.&quot;&quot;&quot;</span>
 
         <span class="n">mP</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
@@ -274,12 +274,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">mP</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="OutputChannel.getProductsWithName"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.getProductsWithName">[docs]</a>    <span class="k">def</span> <span class="nf">getProductsWithName</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of all the channel&#39;s products with given name (&#39;gamma&#39;,&#39;n&#39;, etc).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of all the channel&#39;s products with given name (&#39;gamma&#39;,&#39;n&#39;, etc).&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="p">[</span> <span class="n">prod</span> <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">prod</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">name</span> <span class="p">]</span></div>
 
 <div class="viewcode-block" id="OutputChannel.getProductWithName"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.getProductWithName">[docs]</a>    <span class="k">def</span> <span class="nf">getProductWithName</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the product with given name. If no such product is found, or if more than one are found, raise an Exception.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -294,7 +294,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="OutputChannel.fixDomains"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the *Q*, *products* and *fissionFragmentDat* members.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -305,7 +305,7 @@
         <span class="k">return</span> <span class="n">numberOfFixes</span></div>
 
 <div class="viewcode-block" id="OutputChannel.listOfProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for *self*.&quot;&quot;&quot;</span>
 
         <span class="n">products</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="p">:</span> <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">())</span>
@@ -351,7 +351,7 @@
         <span class="k">return</span> <span class="n">Q</span></div>
 
 <div class="viewcode-block" id="OutputChannel.calculateAverageProductData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate average product data.</span>
 
 <span class="sd">        :param style: The style to use.</span>
@@ -403,7 +403,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="OutputChannel.multiGroupQ"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupQ">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">includeFinalProducts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group, Q for the requested label for the this output channel. This is a cross section weighted Q.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -422,7 +422,7 @@
         <span class="k">return</span> <span class="n">Q</span></div>
 
 <div class="viewcode-block" id="OutputChannel.multiGroupMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupMultiplicity">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group multiplicity for the requested label for the request product of this output channel. This is a cross section weighted multiplicity.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -439,7 +439,7 @@
         <span class="k">return</span> <span class="n">multiplicity</span></div>
 
 <div class="viewcode-block" id="OutputChannel.multiGroupAverageEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupAverageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group, average energy for the requested label for the requested product. This is a cross section weighted average energy.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -456,7 +456,7 @@
         <span class="k">return</span> <span class="n">averageEnergy</span></div>
 
 <div class="viewcode-block" id="OutputChannel.multiGroupAverageMomentum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupAverageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageMomentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group, average momentum for the requested label for the requested product. This is a cross section weighted average momentum.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -473,7 +473,7 @@
         <span class="k">return</span> <span class="n">averageMomentum</span></div>
 
 <div class="viewcode-block" id="OutputChannel.multiGroupProductMatrix"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -492,7 +492,7 @@
         <span class="k">return</span> <span class="n">productMatrix</span></div>
 
 <div class="viewcode-block" id="OutputChannel.multiGroupProductArray"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the full multi-group, total product array for the requested label for the requested product id.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -539,7 +539,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="o">+</span> <span class="n">suffix</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="OutputChannel.toStandardString"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.toStandardString">[docs]</a>    <span class="k">def</span> <span class="nf">toStandardString</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a more standard nuclear, but less informative, string representation for the channel.</span>
 <span class="sd">        For output channel it is list of &quot;products)Residual&quot; (e.g., &quot;2n)Pu_238&quot;).&quot;&quot;&quot;</span>
 
@@ -559,7 +559,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="OutputChannel.toString"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">exposeGammaMultiplicity</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">MT</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a string representation of self. If simpleString is True, the string contains only the initial</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string representation of self. If simpleString is True, the string contains only the initial</span>
 <span class="sd">        products, and not any decay products.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Genre</span><span class="o">.</span><span class="n">sumOfRemainingOutputChannels</span><span class="p">:</span>
@@ -598,7 +598,7 @@
 
 <div class="viewcode-block" id="OutputChannel.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &#39;&lt;outputChannel&gt;&#39; from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &#39;&lt;outputChannel&gt;&#39; from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
 

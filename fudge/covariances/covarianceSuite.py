@@ -56,6 +56,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
     """
 
     moniker = 'covarianceSuite'
+    ancestryMembers = ('externalFiles', 'styles', 'covarianceSections', 'parameterCovariances')
     childNodeOrder = {
             GNDS_formatVersionModule.version_1_10 :       (  suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
                                                              CovarianceSections.moniker,                         ParameterCovariances.moniker ),
@@ -152,7 +153,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
 
         if value is None:
             value = enumsModule.Interaction.nuclear
-            print('Need to specify interaction when calling reactionSuite.__init__. Setting it to "%s". Please update your code as in the future this will execute a raise.' % value)
+            print('Need to specify interaction when calling CovarianceSuite.__init__. Setting it to "%s". Please update your code as in the future this will execute a raise.' % value)
 
         self.__interaction = enumsModule.Interaction.checkEnumOrString(value)
 

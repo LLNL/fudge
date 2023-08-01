@@ -358,7 +358,7 @@ def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, produc
 
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
-def discreteGammaAngularData( style, tempInfo, gammaEnergy, crossSection, angularData, multiplicity, comment = None ) :
+def discreteGammaAngularData(style, tempInfo, gammaEnergy, crossSection, angularData, multiplicity, comment = None):
     """Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
     for pair-production which pass angularData as None."""
 
@@ -370,30 +370,32 @@ def discreteGammaAngularData( style, tempInfo, gammaEnergy, crossSection, angula
     productName = tempInfo['productName']
     productGroupBoundaries = style.transportables[productName].group.boundaries.values
 
-    nProj = len( projectileGroupBoundaries ) - 1
-    nProd = len( productGroupBoundaries ) - 1
+    nProj = len(projectileGroupBoundaries) - 1
+    nProd = len(productGroupBoundaries) - 1
     TM_1, TM_E = {}, {}
-    for i1 in range( nProj ) :
+    for i1 in range(nProj):
         TM_1_i1, TM_E_i1 = {}, {}
-        for i2 in range( nProd ) :
-            TM_1_i1[i2] = [ 0. ]
-            TM_E_i1[i2] = [ 0. ]
+        for i2 in range(nProd):
+            TM_1_i1[i2] = [0.]
+            TM_E_i1[i2] = [0.]
         TM_1[i1] = TM_1_i1
         TM_E[i1] = TM_E_i1
 
     indexEp = -1
     for Ep in productGroupBoundaries :
-        if( gammaEnergy <= Ep ) : break
+        if gammaEnergy <= Ep:
+            break
         indexEp += 1
-    indexEp = min( max( indexEp, 0 ), nProd - 1 )
-    xsecTimesMult = miscellaneousModule.groupTwoFunctionsAndFlux( style, tempInfo, crossSection, multiplicity,
-            norm = tempInfo['groupedFlux'] )
-    for indexE in range( nProj ) :
-        x = xsecTimesMult[indexE]
-        TM_1[indexE][indexEp] = [ x ]
-        TM_E[indexE][indexEp] = [ x * gammaEnergy ]
+    indexEp = min(max(indexEp, 0), nProd - 1)
 
-    return( TM_1, TM_E )
+    if multiplicity.domainMin < productGroupBoundaries[-1]:
+        xsecTimesMult = miscellaneousModule.groupTwoFunctionsAndFlux(style, tempInfo, crossSection, multiplicity, norm = tempInfo['groupedFlux'])
+        for indexE in range(nProj):
+            x = xsecTimesMult[indexE]
+            TM_1[indexE][indexEp] = [x]
+            TM_E[indexE][indexEp] = [x * gammaEnergy]
+
+    return TM_1, TM_E
 
 def primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularData, multiplicity = 1, comment = None ) :
     """

@@ -47,7 +47,7 @@
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 
 <div class="viewcode-block" id="StorageOrder"><a class="viewcode-back" href="../../xData/index.html#xData.enums.StorageOrder">[docs]</a><span class="k">class</span> <span class="nc">StorageOrder</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    StorageOrder is an enum class representing the way data can be stored in a table or an array. The two values</span>
 <span class="sd">    for StorageOrder is &#39;row-major&#39; or &#39;column-major&#39; and are represented by the names rowMajor and columnMajor.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -56,7 +56,7 @@
     <span class="n">columnMajor</span> <span class="o">=</span> <span class="s1">&#39;column-major&#39;</span></div>
 
 <div class="viewcode-block" id="ValueType"><a class="viewcode-back" href="../../xData/index.html#xData.enums.ValueType">[docs]</a><span class="k">class</span> <span class="nc">ValueType</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This enum spcifies the value types for the *Values* class.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -65,7 +65,7 @@
     <span class="n">float64</span> <span class="o">=</span> <span class="s1">&#39;Float64&#39;</span></div>
 
 <div class="viewcode-block" id="Interpolation"><a class="viewcode-back" href="../../xData/index.html#xData.enums.Interpolation">[docs]</a><span class="k">class</span> <span class="nc">Interpolation</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This enum specifies the interpolation values for functions.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -77,7 +77,7 @@
     <span class="n">chargedParticle</span> <span class="o">=</span> <span class="s1">&#39;charged-particle&#39;</span></div>
 
 <div class="viewcode-block" id="InterpolationQualifier"><a class="viewcode-back" href="../../xData/index.html#xData.enums.InterpolationQualifier">[docs]</a><span class="k">class</span> <span class="nc">InterpolationQualifier</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This enum specifies the interpolation qualifier values for functions.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="c1"># We also need direct, correspondingEnergies and correspondingEnergies-unscaled.</span>
@@ -86,10 +86,12 @@
     <span class="n">unitBase</span> <span class="o">=</span> <span class="s1">&#39;unitbase&#39;</span>
     <span class="n">unitBaseUnscaled</span> <span class="o">=</span> <span class="s1">&#39;unitbase-unscaled&#39;</span>
     <span class="n">correspondingPoints</span> <span class="o">=</span> <span class="s1">&#39;correspondingPoints&#39;</span>
-    <span class="n">correspondingPointsUnscaled</span> <span class="o">=</span> <span class="s1">&#39;correspondingPoints-unscaled&#39;</span></div>
+    <span class="n">correspondingPointsUnscaled</span> <span class="o">=</span> <span class="s1">&#39;correspondingPoints-unscaled&#39;</span>
+    <span class="n">cumulativePoints</span> <span class="o">=</span> <span class="s1">&#39;cumulativePoints&#39;</span>
+    <span class="n">cumulativePointsUnscaled</span> <span class="o">=</span> <span class="s1">&#39;cumulativePointsUnscaled&#39;</span></div>
 
 <div class="viewcode-block" id="Frame"><a class="viewcode-back" href="../../xData/index.html#xData.enums.Frame">[docs]</a><span class="k">class</span> <span class="nc">Frame</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This enum specifies the allowed frame values.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -99,7 +101,7 @@
     <span class="n">product</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="FixDomain"><a class="viewcode-back" href="../../xData/index.html#xData.enums.FixDomain">[docs]</a><span class="k">class</span> <span class="nc">FixDomain</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This enum specifies if the lower, upper or both domains are to be fixed for a function.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -108,7 +110,7 @@
     <span class="n">both</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Extrapolation"><a class="viewcode-back" href="../../xData/index.html#xData.enums.Extrapolation">[docs]</a><span class="k">class</span> <span class="nc">Extrapolation</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This enum specifies supported extrapolations for some functions.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -116,7 +118,7 @@
     <span class="n">flat</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="GridStyle"><a class="viewcode-back" href="../../xData/index.html#xData.enums.GridStyle">[docs]</a><span class="k">class</span> <span class="nc">GridStyle</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This enum specifies allowed styles for the Grid class.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 

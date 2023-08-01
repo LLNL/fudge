@@ -40,6 +40,7 @@ class CovarianceSection(suitesModule.Suite):
     moniker = 'covarianceSection'
     monikerByFormat = {GNDS_formatVersionModule.version_1_10: 'section'}
     keyName = 'label'
+    ancestryMembers = ('rowData', 'columnData')
 
     def __init__(self, label, rowData=None, columnData=None):
         """
@@ -53,8 +54,13 @@ class CovarianceSection(suitesModule.Suite):
 
         suitesModule.Suite.__init__( self, [Covariance] )
         self.label = label
+
         self.rowData = rowData
+        self.rowData.setAncestor(self)
+
         self.columnData = columnData
+        if self.columnData is not None:
+            self.columnData.setAncestor(self)
 
     @property
     def crossTerm(self):
@@ -87,6 +93,13 @@ class CovarianceSection(suitesModule.Suite):
                 warnings.append( warning.Context( "Form '%s':" % form.label, formWarnings ) )
 
         return warnings
+
+    def findInstancesOfClassInChildren(self, cls, level = 9999):
+
+        foundInstances = ancestryModule.Ancestry.findInstancesOfClassInChildren(self, cls, level)
+        foundInstances += suitesModule.Suite.findInstancesOfClassInChildren(self, cls, level)
+
+        return foundInstances
     
     def fix( self, **kw ): 
         """assemble some useful info, to be handed down to children's check() functions"""
@@ -184,8 +197,9 @@ class DataLink( linkModule.Link, abc.ABC ):
     def toXML_strList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
 
-        if kwargs['formatVersion'] == GNDS_formatVersionModule.version_1_10:
+        if formatVersion == GNDS_formatVersionModule.version_1_10:
             attributeStr = ''
             if self.ENDF_MFMT is not None:
                 attributeStr = ' ENDF_MFMT="%s"' % self.ENDF_MFMT

@@ -71,13 +71,13 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
 
 <div class="viewcode-block" id="Reaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction">[docs]</a><span class="k">class</span> <span class="nc">Reaction</span><span class="p">(</span><span class="n">baseModule</span><span class="o">.</span><span class="n">Base_reaction2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This is the class for a normal gnds reaction.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the class for a normal gnds reaction.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;reaction&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">Base_reaction2</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;availableEnergy&#39;</span><span class="p">,</span> <span class="s1">&#39;availableMomentum&#39;</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">ENDF_MT</span><span class="p">,</span> <span class="n">fissionGenre</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">none</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new reaction object. Reaction is two-body or uncorrelated-body, depending on</span>
 <span class="sd">        the outputChannel genre. This class is only meant to be used for &#39;distinct&#39; reactions (distinct reactions</span>
 <span class="sd">        do not overlap any other reactions; altogether they sum up to total).</span>
@@ -101,7 +101,7 @@
             <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span> <span class="p">)</span> <span class="p">)</span>
     
     <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Test if self is &lt;, == or &gt; other.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test if self is &lt;, == or &gt; other.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">isGNDSReaction</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="n">fudgeExceptions</span><span class="o">.</span><span class="n">FUDGE_Exception</span><span class="p">(</span> <span class="s2">&quot;Other not an reaction object.&quot;</span> <span class="p">)</span>
         <span class="n">selfParent</span><span class="p">,</span> <span class="n">otherParent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">(</span> <span class="p">),</span> <span class="n">other</span><span class="o">.</span><span class="n">getReactionSuite</span><span class="p">(</span> <span class="p">)</span>
@@ -190,7 +190,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reactionProducts</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reaction.specialReactionLabel"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.specialReactionLabel">[docs]</a>    <span class="k">def</span> <span class="nf">specialReactionLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputMode</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">specialNuclearParticleID_PoPsModule</span><span class="o">.</span><span class="n">Mode</span><span class="o">.</span><span class="n">familiar</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the special label for *self*. The special label is a unique label for the reaction that is meant to </span>
 <span class="sd">        be the same for the same reaction type.</span>
 
@@ -212,7 +212,7 @@
                 <span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">temperatures</span><span class="p">(</span> <span class="n">temperatures</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reaction.multiGroupQ"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.multiGroupQ">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">includeFinalProducts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total Q for the requested label. This is a cross section weighted Q summed over all reactions.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -223,7 +223,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">multiGroupQ</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">includeFinalProducts</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reaction.multiGroupAvailableEnergy"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.multiGroupAvailableEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAvailableEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total available energy for the requested label. This is a cross section weighted available energy.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -233,7 +233,7 @@
         <span class="k">return</span>  <span class="n">multiGroupSettings</span><span class="o">.</span><span class="n">formAsVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reaction.multiGroupAvailableMomentum"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.multiGroupAvailableMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAvailableMomentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total available momentum for the requested label. This is a cross section weighted available momentum.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -243,7 +243,7 @@
         <span class="k">return</span>  <span class="n">multiGroupSettings</span><span class="o">.</span><span class="n">formAsVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reaction.multiGroupGain"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.multiGroupGain">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupGain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">projectileID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns multi-group, gain for the requested particle and label.</span>
 
 <span class="sd">        This is a cross section weighted gain summed over all reactions. If productID and projectileID are the same, then the multi-group </span>
@@ -262,7 +262,7 @@
         <span class="k">return</span> <span class="n">particleGain</span></div>
 
 <div class="viewcode-block" id="Reaction.multiGroupFissionMatrix"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.reaction.Reaction.multiGroupFissionMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupFissionMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, fission neutron transfer matrix for the requested label for the requested Legendre order.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>

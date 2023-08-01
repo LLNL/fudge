@@ -57,9 +57,8 @@ nuclide id.  The familiar ids are “p”, “d”, “t”, “h” and “a”
 atom is “a” (for alpha particle). The nucleus id for “a” is “he4” and the nuclide id is “He4”.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="PoPs.specialNuclearParticleID.Mode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.specialNuclearParticleID.</span></span><span class="sig-name descname"><span class="pre">Mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/specialNuclearParticleID.html#Mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.specialNuclearParticleID.Mode" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.specialNuclearParticleID.</span></span><span class="sig-name descname"><span class="pre">Mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/specialNuclearParticleID.html#Mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.specialNuclearParticleID.Mode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../LUPY/index.html#LUPY.enums.Enum" title="LUPY.enums.Enum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>An enumeration.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -437,6 +436,12 @@ based on item’s key appended with ‘__’ and one or more lower case letters 
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.alias.</span></span><span class="sig-name descname"><span class="pre">Alias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/alias.html#Alias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.alias.Alias" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#PoPs.alias.BaseAlias" title="PoPs.alias.BaseAlias"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseAlias</span></code></a></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="PoPs.alias.Alias.intid">
+<span class="sig-name descname"><span class="pre">intid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intidDB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/alias.html#Alias.intid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.alias.Alias.intid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="PoPs.alias.Alias.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/alias.html#Alias.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.alias.Alias.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method must be overrwritten by the derived class.</p>
@@ -480,6 +485,12 @@ based on item’s key appended with ‘__’ and one or more lower case letters 
 <dd class="field-odd"><p>copy of self</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.alias.MetaStable.intid">
+<span class="sig-name descname"><span class="pre">intid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intidDB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/alias.html#MetaStable.intid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.alias.MetaStable.intid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</p>
 </dd></dl>
 
 <dl class="py method">
@@ -641,6 +652,12 @@ plus a nested list of warnings or other context instances</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="PoPs.warning.NotImplemented">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.warning.</span></span><span class="sig-name descname"><span class="pre">NotImplemented</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/warning.html#NotImplemented"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.warning.NotImplemented" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PoPs.warning.Warning" title="PoPs.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PoPs.warning.UnknownEnergy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.warning.</span></span><span class="sig-name descname"><span class="pre">UnknownEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nucleus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/warning.html#UnknownEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.warning.UnknownEnergy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#PoPs.warning.Warning" title="PoPs.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
 </dd></dl>
 

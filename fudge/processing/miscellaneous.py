@@ -11,18 +11,19 @@ from xData import enums as xDataEnumsModule
 from xData import link as linkModule
 from xData import axes as axesModule
 from xData import XYs1d as XYs1dModule
+from xData import constant as constantModule
 from xData import regions as regionsModule
 
 from . import group as groupModule
 
-def _toLinear( func ) :
+def _toLinear(func):
 
-    if( isinstance( func, XYs1dModule.XYs1d ) ) :
+    if isinstance(func, XYs1dModule.XYs1d):
         if func.interpolation == xDataEnumsModule.Interpolation.linlin:
             return func
         func = func.copy( )
         return( func.toPointwise_withLinearXYs( accuracy = accuracy, upperEps = 1e-8 ) )
-    elif( isinstance( func, regionsModule.Regions1d ) ) :
+    elif isinstance(func, (regionsModule.Regions1d, constantModule.Constant1d)):
         return( func.toPointwise_withLinearXYs( accuracy = accuracy, upperEps = 1e-8 ) )
 
     print(type(func))

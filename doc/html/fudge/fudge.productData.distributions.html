@@ -2308,6 +2308,11 @@ when calculating the momentum deposition for isotropic scattering in the lab fra
 <dd><p>Returns the xml string representation of self.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.productData.distributions.energy.WeightedFunctionals.to_xs_pdf_cdf1d">
+<span class="sig-name descname"><span class="pre">to_xs_pdf_cdf1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/distributions/energy.html#WeightedFunctionals.to_xs_pdf_cdf1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.productData.distributions.energy.WeightedFunctionals.to_xs_pdf_cdf1d" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -2384,7 +2389,7 @@ when calculating the momentum deposition for isotropic scattering in the lab fra
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.productData.distributions.energy.XYs2d.evaluate">
-<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domainValue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrapolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Extrapolation.none</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/distributions/energy.html#XYs2d.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.productData.distributions.energy.XYs2d.evaluate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domainValue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrapolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Extrapolation.none</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/distributions/energy.html#XYs2d.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.productData.distributions.energy.XYs2d.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates the function at the domain point domainValue.
 Interpolation is used if domainValue is between two sub-functions. However, if one of the
 sub-functions is within domainValue * epsilon of domainValue then that sub-function is returned.

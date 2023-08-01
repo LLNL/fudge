@@ -52,13 +52,13 @@
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 
 <div class="viewcode-block" id="Nuclides"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.nuclides.Nuclides">[docs]</a><span class="k">class</span> <span class="nc">Nuclides</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Stores a list of PoPs particle ids. The order (and length) must match the values in the</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores a list of PoPs particle ids. The order (and length) must match the values in the</span>
 <span class="sd">    corresponding fissionFragmentData.yields.Yields.values.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;nuclides&#39;</span>
         
 <div class="viewcode-block" id="Nuclides.__init__"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.nuclides.Nuclides.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_nuclides</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructs a Nuclides container from a list of product ids.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a Nuclides container from a list of product ids.</span>
 
 <span class="sd">        :param _nuclides: list or tuple of string PoPs particle ids.&quot;&quot;&quot;</span>
     
@@ -70,7 +70,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span> <span class="n">nuclide</span> <span class="k">for</span> <span class="n">nuclide</span> <span class="ow">in</span> <span class="n">_nuclides</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Nuclides.__len__"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.nuclides.Nuclides.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of nuclides.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of nuclides.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span><span class="p">)</span></div>
 
@@ -85,7 +85,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Nuclides.__eq__"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.nuclides.Nuclides.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns True iff self and other contain the same list of nuclides in the same order.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True iff self and other contain the same list of nuclides in the same order.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">Nuclides</span><span class="p">)):</span> <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
@@ -100,18 +100,18 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nuclides</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Accesses the list of nuclides.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Accesses the list of nuclides.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Alternate method for accessing the list of nuclides.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Alternate method for accessing the list of nuclides.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nuclides</span>
 
 <div class="viewcode-block" id="Nuclides.toXML_strList"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.nuclides.Nuclides.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.</span>
@@ -137,7 +137,7 @@
 
 <div class="viewcode-block" id="Nuclides.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.nuclides.Nuclides.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
 
 <span class="sd">        :param cls: FUDGE Python class to return.</span>
 <span class="sd">        :param node: **nuclides** node to parse.</span>

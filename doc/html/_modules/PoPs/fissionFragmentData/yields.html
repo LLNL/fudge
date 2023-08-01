@@ -62,13 +62,13 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;nuclides&#39;</span></div>
 
 <div class="viewcode-block" id="Values"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Values">[docs]</a><span class="k">class</span> <span class="nc">Values</span><span class="p">(</span><span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Stores a list of fission product yield values. The length and order must be consistent</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores a list of fission product yield values. The length and order must be consistent</span>
 <span class="sd">    with the corresponding **Nuclides** list.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;values&#39;</span>
 
 <div class="viewcode-block" id="Values.__init__"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Values.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_values</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Construct a **Values** instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a **Values** instance.</span>
 
 <span class="sd">        :param _values: list of floating-point fission product yields.&quot;&quot;&quot;</span>
 
@@ -86,7 +86,7 @@
         <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n1</span><span class="p">):</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Values.toXML_strList"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Values.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.</span>
@@ -105,7 +105,7 @@
 
 <div class="viewcode-block" id="Values.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Values.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
 
 <span class="sd">        :param cls: FUDGE Python class to return.</span>
 <span class="sd">        :param node: **values** node to parse.</span>
@@ -119,7 +119,7 @@
         <span class="k">return</span> <span class="n">values_</span></div></div>
 
 <div class="viewcode-block" id="Covariance"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Covariance">[docs]</a><span class="k">class</span> <span class="nc">Covariance</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class storing the fission product yield covariance matrix. If yields are given for N nuclides,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class storing the fission product yield covariance matrix. If yields are given for N nuclides,</span>
 <span class="sd">    the matrix has dimension NxN and correlates the yields for outgoing nuclide at the given elapsed time.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;covariance&#39;</span>
@@ -134,7 +134,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrix</span>
 
 <div class="viewcode-block" id="Covariance.toXML_strList"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Covariance.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.</span>
@@ -154,7 +154,7 @@
 
 <div class="viewcode-block" id="Covariance.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Covariance.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
 
 <span class="sd">        :param cls: FUDGE Python class to return.</span>
 <span class="sd">        :param node: **covariance** node to parse.</span>
@@ -172,7 +172,7 @@
         <span class="k">return</span> <span class="n">covar_</span></div></div>
 
 <div class="viewcode-block" id="Uncertainty"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Uncertainty">[docs]</a><span class="k">class</span> <span class="nc">Uncertainty</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class containing the fission product yield uncertainty. Uncertainty could be stored various ways,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class containing the fission product yield uncertainty. Uncertainty could be stored various ways,</span>
 <span class="sd">    but in practice it is currently always stored as a covariance matrix (although the matrix typically</span>
 <span class="sd">    has no non-zero terms off the diagonal.&quot;&quot;&quot;</span>
 
@@ -185,12 +185,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__form</span> <span class="o">=</span> <span class="n">form</span></div>
 
 <div class="viewcode-block" id="Uncertainty.form"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Uncertainty.form">[docs]</a>    <span class="k">def</span> <span class="nf">form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the uncertainty form, typically a Covariance instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the uncertainty form, typically a Covariance instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__form</span></div>
 
 <div class="viewcode-block" id="Uncertainty.toXML_strList"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Uncertainty.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.</span>
@@ -209,7 +209,7 @@
 
 <div class="viewcode-block" id="Uncertainty.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Uncertainty.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
 
 <span class="sd">        :param cls: FUDGE Python class to return.</span>
 <span class="sd">        :param node: **Uncertainty** node to parse.</span>
@@ -227,7 +227,7 @@
         <span class="k">return</span> <span class="n">uncert_</span></div></div>
 
 <div class="viewcode-block" id="Yields"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Yields">[docs]</a><span class="k">class</span> <span class="nc">Yields</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class storing product yields for an elapsed time. Class contains a list of nuclides (may be a link),</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class storing product yields for an elapsed time. Class contains a list of nuclides (may be a link),</span>
 <span class="sd">    a list of values storing the product yield for each nuclide, and an optional uncertainty.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;yields&#39;</span>
@@ -242,7 +242,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nuclides</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the list of nuclides, or a link if the nuclides are defined elsewhere.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the list of nuclides, or a link if the nuclides are defined elsewhere.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nuclides</span>
 
@@ -256,7 +256,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the fission product yield values.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the fission product yield values.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span>
 
@@ -269,7 +269,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">uncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the fission product yield uncertainty (may be None).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the fission product yield uncertainty (may be None).&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span>
 
@@ -281,7 +281,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Yields.toXML_strList"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Yields.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.</span>
@@ -321,7 +321,7 @@
 
 <div class="viewcode-block" id="Yields.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.yields.Yields.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
 
 <span class="sd">        :param cls: FUDGE Python class to return.</span>
 <span class="sd">        :param node: **yields** node to parse.</span>

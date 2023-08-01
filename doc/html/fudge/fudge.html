@@ -474,6 +474,24 @@ they be well-formed xml. Codes reading in GNDS files are free to ignore any unre
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fudge.institution.Institution.parseAndReplace">
+<span class="sig-name descname"><span class="pre">parseAndReplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#Institution.parseAndReplace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.Institution.parseAndReplace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces the unknown item at <em>index</em> with a parsed version of its self using class <em>cls</em>.
+The parsed instance is also returned.  This currently assumes that the data are from XML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – The index of <em>self.__data</em> of the data to parse and replace.</p></li>
+<li><p><strong>cls</strong> – The class used to parse the data at <em>index</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parsed instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fudge.institution.Institution.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#Institution.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.Institution.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method must be overrwritten by the derived class.</p>
@@ -520,6 +538,11 @@ they be well-formed xml. Codes reading in GNDS files are free to ignore any unre
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fudge.institution.UnknownInstitution.parseNodeWithInstitutionClass">
+<span class="sig-name descname"><span class="pre">parseNodeWithInstitutionClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#UnknownInstitution.parseNodeWithInstitutionClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.UnknownInstitution.parseNodeWithInstitutionClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fudge.institution.UnknownInstitution.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#UnknownInstitution.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.UnknownInstitution.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returng the XML text that was not parsed.</p>
@@ -536,6 +559,11 @@ they be well-formed xml. Codes reading in GNDS files are free to ignore any unre
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#fudge.institution.UnknownInstitutionXML_node.label" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returng the XML text that was not parsed.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.institution.UnknownInstitutionXML_node.parseNodeWithInstitutionClass">
+<span class="sig-name descname"><span class="pre">parseNodeWithInstitutionClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#UnknownInstitutionXML_node.parseNodeWithInstitutionClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.UnknownInstitutionXML_node.parseNodeWithInstitutionClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="fudge.institution.UnknownInstitutionXML_node.stringList">
@@ -2202,9 +2230,8 @@ based on product’s name appended with ‘__’ and one or more lower case lett
 <p>This module contains the ReactionProducts class which is used to store a unique list of products for a reaction in a dictionary-like object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.reactionProducts.Category">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.reactionProducts.</span></span><span class="sig-name descname"><span class="pre">Category</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionProducts.html#Category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionProducts.Category" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.reactionProducts.</span></span><span class="sig-name descname"><span class="pre">Category</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionProducts.html#Category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionProducts.Category" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../LUPY/index.html#LUPY.enums.Enum" title="LUPY.enums.Enum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>An enumeration.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fudge.reactionProducts.Category.intermediate">
 <span class="sig-name descname"><span class="pre">intermediate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'intermediate'</span></em><a class="headerlink" href="#fudge.reactionProducts.Category.intermediate" title="Permalink to this definition">¶</a></dt>
@@ -2224,9 +2251,8 @@ based on product’s name appended with ‘__’ and one or more lower case lett
 
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.reactionProducts.Mode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.reactionProducts.</span></span><span class="sig-name descname"><span class="pre">Mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionProducts.html#Mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionProducts.Mode" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.reactionProducts.</span></span><span class="sig-name descname"><span class="pre">Mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionProducts.html#Mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionProducts.Mode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../LUPY/index.html#LUPY.enums.Enum" title="LUPY.enums.Enum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>An enumeration.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fudge.reactionProducts.Mode.familiar">
 <span class="sig-name descname"><span class="pre">familiar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'familiar'</span></em><a class="headerlink" href="#fudge.reactionProducts.Mode.familiar" title="Permalink to this definition">¶</a></dt>
@@ -4375,6 +4401,12 @@ If newItem is not an allowed class, a TypeError is raised.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fudge.suites.Suite.parseNodeUsingClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Suite.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Suite.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be overrwritten by the derived class.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fudge.suites.Suite.pop">
 <span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Suite.pop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Suite.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove item by label, and return it. If the label is not found, raise KeyError
@@ -5022,6 +5054,12 @@ proper unitbase treatment is unclear. Distribution should end with exactly one P
 </dd></dl>
 
 <dl class="py exception">
+<dt class="sig sig-object py" id="fudge.warning.MissingInterpolationQualifier">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">MissingInterpolationQualifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#MissingInterpolationQualifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.MissingInterpolationQualifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
 <dt class="sig sig-object py" id="fudge.warning.MissingRecoilDistribution">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">MissingRecoilDistribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#MissingRecoilDistribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.MissingRecoilDistribution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
@@ -5072,6 +5110,12 @@ proper unitbase treatment is unclear. Distribution should end with exactly one P
 <dl class="py exception">
 <dt class="sig sig-object py" id="fudge.warning.NegativeVariance">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">NegativeVariance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#NegativeVariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.NegativeVariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fudge.warning.NonConstantMultiplicity">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">NonConstantMultiplicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#NonConstantMultiplicity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.NonConstantMultiplicity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
 </dd></dl>
 

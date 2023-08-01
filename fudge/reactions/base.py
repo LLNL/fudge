@@ -16,6 +16,7 @@ from xData import enums as xDataEnumsModule
 from xData import vector as vectorModule
 from xData import matrix as matrixModule
 from xData import productArray as productArrayModule
+from xData.Documentation import documentation as documentationModule
 
 from .. import enums as enumsModule
 from .. import outputChannel as outputChannelModule 
@@ -35,6 +36,7 @@ class Base_reaction(ancestryModule.AncestryIO):
         ancestryModule.AncestryIO.__init__( self )
         self.__label = label
 
+        self.__documentation = None
         self.ENDF_MT = int( ENDF_MT )
 
         self.__crossSection = crossSectionModule.Component( )
@@ -46,6 +48,17 @@ class Base_reaction(ancestryModule.AncestryIO):
     def __str__( self ) :
 
         return( self.label )
+
+    @property
+    def documentation(self):
+        return self.__documentation
+
+    @documentation.setter
+    def documentation(self, _documentation):
+        assert isinstance(_documentation, (documentationModule.Documentation, type(None)))
+        if _documentation is not None:
+            _documentation.setAncestor(self)
+        self.__documentation = _documentation
 
     @property
     def crossSection( self ) :
@@ -197,8 +210,14 @@ class Base_reaction(ancestryModule.AncestryIO):
             # check that ZA balances:
             ZAsum = 0
             for product in self.__outputChannel:
-                if( product.pid == IDsPoPsModule.photon ) : continue
-                ZAsum += particleZA( product.pid ) * product.multiplicity.getConstant()
+                if product.pid == IDsPoPsModule.photon: continue
+                try:
+                    mult = product.multiplicity.getConstant()
+                except Exception as ex:
+                    warnings.append(warning.NonConstantMultiplicity(self))
+                    # likely also causes ZAbalanceWarning
+                else:
+                    ZAsum += particleZA(product.pid) * mult
             if info['elementalTarget']:
                 ZAsum = (ZAsum // 1000) * 1000
             if ZAsum != info['compoundZA']:
@@ -714,6 +733,9 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         xmlString = [ '%s<%s label="%s"' % ( indent, self.moniker, self.label ) ]
         xmlString[-1] += attributeString + '>'
+
+        if self.documentation is not None:
+            xmlString += self.documentation.toXML_strList( indent2, **kwargs )
 
         if hasattr(self, 'doubleDifferentialCrossSection'):
             xmlString += self.doubleDifferentialCrossSection.toXML_strList( indent2, **kwargs )

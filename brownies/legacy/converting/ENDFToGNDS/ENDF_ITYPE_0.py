@@ -158,6 +158,7 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
     SpecialLRProducts = []
 
     for MT in MTList :
+        crossSection = None
         if( MT in MTs2Skip ) : continue
         if( ( singleMTOnly is not None ) and ( MT != singleMTOnly ) ) : continue
 
@@ -252,9 +253,10 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
             ELFS = radioactiveData[1]
             LFS = radioactiveData[2]
 
-            Q = outputChannel.Q[info.style]
             if( LMF in [ 9, 10 ] ) :
                 Q = toGNDSMiscModule.returnConstantQ( info.style, radioactiveData[6], productionCrossSection )
+            else:
+                Q = outputChannel.Q[info.style]
 
             if MT==18:
                 outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
@@ -280,6 +282,9 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
                 multiplicity = radioactiveData[3]
 
             try :
+                if crossSection is None:
+                    crossSectionData = [[reactionSuite.styles[0].projectileEnergyDomain.min, 1.0], [reactionSuite.styles[0].projectileEnergyDomain.max, 1.0]]
+                    crossSection = crossSectionModule.XYs1d(data=crossSectionData, axes=crossSectionModule.defaultAxes(reactionSuite.styles[0].projectileEnergyDomain.unit))
                 residual = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeNameGamma( info, ZAP, level = ELFS, levelIndex = LFS ),
                         crossSection, multiplicity = multiplicity )
             except :
@@ -332,7 +337,7 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
     if 1 in summedReactions:
         if 2 in MTList:
             summedReactionsInfo[1] = [ 2 ] + nonElastic
-        elif info.projectile == IDsPoPsModule.photon:   # photo-nuclear evaluations usually omit MT2
+        else:
             summedReactionsInfo[1] = nonElastic
     summedReactionMTs = endfFileToGNDSMiscModule.niceSortOfMTs( list(summedReactions.keys( )), verbose = 0, logFile = info.logs )
     for MT in ( 4, 3, 1 ) :
@@ -406,6 +411,8 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
             incompleteReactions.append(incompleteReaction)
             if verbose > 0:
                 print()     # put messages for each extraMT on a separate line
+        elif MT in range(851, 871):
+            continue    # dealt with while parsing covariances
         else:
             unprocessedMTs.append(MT)
     if len(unprocessedMTs) > 0:
@@ -987,4 +994,3 @@ def ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSec
         residual.energy[0].value = Q - QI
 
     return( covarianceSuite )
-

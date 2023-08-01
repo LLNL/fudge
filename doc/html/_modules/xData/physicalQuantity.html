@@ -74,7 +74,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If other is not a PhysicalQuantity instance, False is returned. Otherwise, calls self&#39;s compare with epsilonFactor = 5 and test return value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -83,7 +83,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If other is not a PhysicalQuantity instance, False is returned. Otherwise, calls self&#39;s compare with epsilonFactor = 5 and test return value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -92,27 +92,27 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="PhysicalQuantity.compare"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">epsilonFactor</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalQuantity</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;other not instance of PhysicalQuantity&#39;</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">__PQ</span><span class="p">,</span> <span class="n">epsilonFactor</span> <span class="p">)</span> <span class="p">)</span></div>

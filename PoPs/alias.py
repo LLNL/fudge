@@ -62,6 +62,18 @@ class BaseAlias(miscModule.ClassWithIDKey, abc.ABC):
 class Alias(BaseAlias):
     moniker = 'alias'
 
+    def intid(self, intidDB={}):
+        '''
+        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).
+        '''
+
+        from . import database as databaseModule
+
+        if self.id in ['d', 't', 'h', 'a']:
+            return self.findClassInAncestry(databaseModule.Database)[self.pid].intid()
+
+        raise ValueError('Alias "%s" for "%s" does not have a defined intid.' % (self.id, self.pid))
+
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         xPath.append(node.tag)
@@ -96,6 +108,19 @@ class MetaStable(BaseAlias):
     def copy(self):
 
         return self.__class__(self.id, self.pid, self.metaStableIndex)
+
+    def intid(self, intidDB={}):
+        '''
+        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).
+        '''
+
+        from . import database as databaseModule
+
+        nuclide = self.findClassInAncestry(databaseModule.Database)[self.pid]
+        intid1 = nuclide.intid()
+        sign = -1 if intid1 < 0 else 1
+
+        return sign * (1000000 * (self.metaStableIndex + 480) + abs(intid1) % 1000000)
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):

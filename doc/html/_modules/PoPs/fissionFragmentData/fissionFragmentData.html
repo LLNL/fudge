@@ -59,7 +59,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">productYield</span> <span class="k">as</span> <span class="n">productYieldModule</span>
 
 <div class="viewcode-block" id="FissionFragmentData"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.fissionFragmentData.FissionFragmentData">[docs]</a><span class="k">class</span> <span class="nc">FissionFragmentData</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This class stores information about spontaneous fission fragments and their decays.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class stores information about spontaneous fission fragments and their decays.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;fissionFragmentData&#39;</span>
 
@@ -78,19 +78,19 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delayedNeutronData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;This accesses the delayed neutron data within a **FissionFragmentData** instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This accesses the delayed neutron data within a **FissionFragmentData** instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutronData</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">productYields</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;This accesses the fission product yield data within a **FissionFragmentData** instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This accesses the fission product yield data within a **FissionFragmentData** instance.&quot;&quot;&quot;</span>
 
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__productYields</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="FissionFragmentData.convertUnits"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.fissionFragmentData.FissionFragmentData.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The convertUnits method recursively searches the **FissionFragmentData** and child classes</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The convertUnits method recursively searches the **FissionFragmentData** and child classes</span>
 <span class="sd">        for each unit in the **unitMap** dictionary and converts to the desired new unit.</span>
 
 <span class="sd">        :param unitMap: dict storing {&#39;oldUnit&#39;: &#39;newUnit&#39;} key-value pairs. Units must be compatible,</span>
@@ -109,7 +109,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__productYields</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="FissionFragmentData.toXML_strList"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.fissionFragmentData.FissionFragmentData.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.</span>
@@ -131,7 +131,7 @@
 
 <div class="viewcode-block" id="FissionFragmentData.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.fissionFragmentData.FissionFragmentData.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Parse node from a file, returning a new **FissionFragmentData** instance unless errors were encountered during parsing.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse node from a file, returning a new **FissionFragmentData** instance unless errors were encountered during parsing.</span>
 
 <span class="sd">        :param cls: FUDGE Python class to return.</span>
 <span class="sd">        :param node: **FissionFragmentData** node to parse.</span>

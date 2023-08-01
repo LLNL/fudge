@@ -71,7 +71,7 @@
 <span class="n">orderedLightParticles</span> <span class="o">=</span> <span class="p">(</span><span class="n">IDsModule</span><span class="o">.</span><span class="n">photon</span><span class="p">,</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">neutron</span><span class="p">,</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">proton</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="sortLightParticle"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.specialNuclearParticleID.sortLightParticle">[docs]</a><span class="k">def</span> <span class="nf">sortLightParticle</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    From a list of particle *ids*, this function returns the ids sorted. The sorting order is &#39;n&#39;, &#39;p&#39;, &#39;d&#39;, &#39;t&#39;, &#39;a&#39;, &#39;g&#39;, </span>
 <span class="sd">    (i.e., &#39;photon&#39;). Other ids in the list are return after the ones mentioned and in the order they appear in the list.</span>
 <span class="sd">    Note, an id will only appear once in the list even it appears more than once in *ids*.</span>
@@ -96,7 +96,7 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">mapping</span><span class="p">[</span><span class="n">id1</span><span class="p">]</span> <span class="k">for</span> <span class="n">id1</span> <span class="ow">in</span> <span class="n">orderedIDs</span> <span class="o">+</span> <span class="n">photon</span> <span class="o">+</span> <span class="n">ids</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="findID"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.specialNuclearParticleID.findID">[docs]</a><span class="k">def</span> <span class="nf">findID</span><span class="p">(</span><span class="n">a_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For internal use. Returns the dictionary from *lightParticleIDs* that contain *a_id* as a key. </span>
 <span class="sd">    If no match is found **None** is returned.</span>
 
@@ -111,7 +111,7 @@
     <span class="k">return</span> <span class="kc">None</span></div>
     
 <div class="viewcode-block" id="familiarID"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.specialNuclearParticleID.familiarID">[docs]</a><span class="k">def</span> <span class="nf">familiarID</span><span class="p">(</span><span class="n">a_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the &quot;familiar&quot; id for *a_id*. If no match is found, **None** is returned. Mainly for internal use.</span>
 
 <span class="sd">    :param a_id:    The GNDS PoPs id of the particle to look up in the *lightParticleIDs* data set.</span>
@@ -125,7 +125,7 @@
         <span class="k">if</span> <span class="n">lightPartcleID</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">familiar</span><span class="p">:</span> <span class="k">return</span> <span class="n">pid</span></div>
 
 <div class="viewcode-block" id="nucleusID"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.specialNuclearParticleID.nucleusID">[docs]</a><span class="k">def</span> <span class="nf">nucleusID</span><span class="p">(</span><span class="n">a_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the &quot;nucleus&quot; id for *a_id*. If no match is found, **None** is returned. Mainly for internal use.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the &quot;nucleus&quot; id for *a_id*. If no match is found, **None** is returned. Mainly for internal use.</span>
 
 <span class="sd">    :param a_id:    The GNDS PoPs id of the particle to look up in the *lightParticleIDs* data set.</span>
 
@@ -138,7 +138,7 @@
         <span class="k">if</span> <span class="n">lightPartcleID</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">nucleus</span><span class="p">:</span> <span class="k">return</span> <span class="n">pid</span></div>
 
 <div class="viewcode-block" id="nuclideID"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.specialNuclearParticleID.nuclideID">[docs]</a><span class="k">def</span> <span class="nf">nuclideID</span><span class="p">(</span><span class="n">a_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the &quot;nuclide&quot; id for *a_id*. If no match is found, **None** is returned. Mainly for internal use.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the &quot;nuclide&quot; id for *a_id*. If no match is found, **None** is returned. Mainly for internal use.</span>
 
 <span class="sd">    :param a_id:    The GNDS PoPs id of the particle to look up in the *lightParticleIDs* data set.</span>
 
@@ -151,7 +151,7 @@
         <span class="k">if</span> <span class="n">lightPartcleID</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">nuclide</span><span class="p">:</span> <span class="k">return</span> <span class="n">pid</span></div>
 
 <div class="viewcode-block" id="specialNuclearParticleID"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.specialNuclearParticleID.specialNuclearParticleID">[docs]</a><span class="k">def</span> <span class="nf">specialNuclearParticleID</span><span class="p">(</span><span class="n">a_id</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">Mode</span><span class="o">.</span><span class="n">familiar</span><span class="p">,</span> <span class="n">pops</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the special nuclear particle id per the specified *a_id* and *mode*. Note, if *pops* is not **None** </span>
 <span class="sd">    and *a_id* is the id for a nuclide or nucleus, then the id specified by *mode* is returned. For example, if</span>
 <span class="sd">    *a_id* is &quot;O16&quot; and *mode* is **Mode.nucleus**, the &quot;o16&quot; is returned.</span>
@@ -191,7 +191,7 @@
     <span class="k">return</span> <span class="n">pid</span></div>
 
 <div class="viewcode-block" id="sameSpecialNuclearParticle"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.specialNuclearParticleID.sameSpecialNuclearParticle">[docs]</a><span class="k">def</span> <span class="nf">sameSpecialNuclearParticle</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns **True** is *id1* specified the same particle as *id2*. The function **specialNuclearParticleID** is called with **Mode.familiar**</span>
 <span class="sd">    for path partcile.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

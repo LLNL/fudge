@@ -199,6 +199,10 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
         totalMultiplicityRegions = multiplicityModule.Regions1d( axes = totalMultiplicity.axes )
         totalMultiplicityRegions.append( totalMultiplicity.copy( ) )
 
+    energies = []
+    for region in totalMultiplicityRegions:
+        energies += region.domainGrid
+
 # This data was originally a Legendre expansions with only L=0 terms, was converted to uncorrelated.
 # Also, original data stored one multiplicity for all gammas, with weights for individual gammas.
 # Convert back to Legendre.
@@ -216,7 +220,11 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
         if( isinstance( multiplicity, multiplicityModule.Regions1d ) ) :
             multiplicityRegions = multiplicity.copy( )
         else :
-            if( isinstance( multiplicity, multiplicityModule.XYs1d ) ) :
+            if isinstance(multiplicity, multiplicityModule.Constant1d):
+                multiplicityRegions = multiplicityModule.Regions1d(axes=multiplicity.axes)
+                data = [[energy, multiplicity.value] for energy in energies]
+                multiplicityRegions.append(multiplicityModule.XYs1d(axes=multiplicity.axes, data=data))
+            elif( isinstance( multiplicity, multiplicityModule.XYs1d ) ) :
                 multiplicityRegions = multiplicityModule.Regions1d( axes = multiplicity.axes )
                 multiplicityRegions.append( multiplicity.copy( ) )
             else :
@@ -393,12 +401,15 @@ def upDateENDF_MT_MF8Data( MT, endfMFList, targetInfo ) :
     crossSection_ = getForm( targetInfo['style'], firstReaction.crossSection )  # LMF determines which MF section to write to.
     if( isinstance( crossSection_, crossSectionModule.Reference ) ) : 
         multiplicity = getForm( targetInfo['style'], residual.multiplicity )
-        if(   isinstance( multiplicity, multiplicityModule.Constant1d ) ) :
-            LMF = 3
-        elif( isinstance( multiplicity, multiplicityModule.Reference ) ) :
-            LMF = 6
-        else :
-            LMF = 9
+        LMF = None
+        if   isinstance(multiplicity, multiplicityModule.Constant1d):
+            if multiplicity.value == 1.0:
+                LMF = 3
+        if LMF is None:
+            if( isinstance( multiplicity, multiplicityModule.Reference ) ) :
+                LMF = 6
+            else :
+                LMF = 9
     else :
         LMF = 10
 

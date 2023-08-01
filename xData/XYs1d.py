@@ -482,8 +482,111 @@ class XYs1d(baseModule.XDataFunctional):
         dulled = self.nf_pointwiseXY.dullEdges( lowerEps = lowerEps, upperEps = upperEps, positiveXOnly = positiveXOnly )
         return( self.returnAsClass( self, dulled ) )
 
+    def cumulativeBins(self, other):
+        """Returns two lists of bins that are determined by two sets of evaluations to perform cumulative points interpolation."""
+
+        if (self.rangeMin < 0.0 or other.rangeMin < 0.0): raise Exception('Cannot calculate cumulative bins for functions with negative values.')
+
+        selfTrimmed = self.trim()
+        otherTrimmed = other.trim()
+        if (len(selfTrimmed) == 0 or len(otherTrimmed) == 0): raise Exception('Function does not have any area - 1.')
+
+        selfRunningIntegrals = selfTrimmed.runningIntegral()
+        otherRunningIntegrals = otherTrimmed.runningIntegral()
+        selfRunningIntegralMax = selfRunningIntegrals[-1]
+        otherRunningIntegralMax = otherRunningIntegrals[-1]
+
+        if (selfRunningIntegrals == 0.0 or otherRunningIntegrals == 0.0): raise Exception('Function does not have any area - 2.')
+
+        normalizedSelfRunningIntegrals = [x / selfRunningIntegralMax for x in selfRunningIntegrals]
+        normalizedOtherRunningIntegrals = [x / otherRunningIntegralMax for x in otherRunningIntegrals]
+
+        jointedCdfList = sorted(normalizedSelfRunningIntegrals+normalizedOtherRunningIntegrals)
+        cleanedCdfList = []
+        [cleanedCdfList.append(x) for x in jointedCdfList if x not in cleanedCdfList]
+
+        selfUnnormalizedCdfList = [x * selfRunningIntegralMax for x in cleanedCdfList]
+        otherUnnormalizedCdfList = [x * otherRunningIntegralMax for x in cleanedCdfList]
+
+        cumuBins1 = [ selfTrimmed[0][0] ]
+        indexOfBin = 1
+        numberOfBins = len(selfUnnormalizedCdfList)-1
+        integral = selfUnnormalizedCdfList[1]
+        for index, runningIntegral in enumerate(selfTrimmed.runningIntegral()):
+            if indexOfBin >= numberOfBins: break
+            x2, y2 = selfTrimmed[index]
+            if index > 0:
+                while integral <= runningIntegral:
+                    deltaArea = integral - priorRunningIntegral
+                    if deltaArea == 0.0:
+                        nextX = x2
+                    else:
+                        if y1 == y2:
+                            if y1 == 0.0:
+                                nextX = None
+                            else:
+                                nextX = x1 + deltaArea / y1
+                        else:
+                            if self.interpolation == enumsModule.Interpolation.flat:
+                                nextX = x1 + deltaArea / y1
+                            elif self.interpolation == enumsModule.Interpolation.linlin:
+                                slope = ( y2 - y1 ) / ( x2 - x1 )
+                                sqrtArgument = y1 * y1 + 2.0 * slope * deltaArea
+                                if sqrtArgument <= 0:
+                                    nextX = x2
+                                else:
+                                    nextX = x1 + 2.0 * deltaArea / ( y1 + math.sqrt( sqrtArgument ) )
+                            else: raise NotImplementedError( 'cumulativeBins is not implemented for '+ str(self.interpolation) )
+                    if nextX is not None: cumuBins1.append(nextX)
+                    indexOfBin += 1
+                    if indexOfBin >= numberOfBins: break
+                    integral = selfUnnormalizedCdfList[indexOfBin]
+            x1 = x2
+            y1 = y2
+            priorRunningIntegral = runningIntegral
+        cumuBins1.append(selfTrimmed[-1][0])
+
+        cumuBins2 = [ otherTrimmed[0][0] ]
+        indexOfBin = 1
+        integral = otherUnnormalizedCdfList[1]
+        for index, runningIntegral in enumerate(otherTrimmed.runningIntegral()):
+            if indexOfBin >= numberOfBins: break
+            x2, y2 = otherTrimmed[index]
+            if index > 0:
+                while integral <= runningIntegral:
+                    deltaArea = integral - priorRunningIntegral
+                    if deltaArea == 0.0:
+                        nextX = x2
+                    else:
+                        if y1 == y2:
+                            if y1 == 0.0:
+                                nextX = None
+                            else:
+                                nextX = x1 + deltaArea / y1
+                        else:
+                            if other.interpolation == enumsModule.Interpolation.flat:
+                                nextX = x1 + deltaArea / y1
+                            elif other.interpolation == enumsModule.Interpolation.linlin:
+                                slope = ( y2 - y1 ) / ( x2 - x1 )
+                                sqrtArgument = y1 * y1 + 2.0 * slope * deltaArea
+                                if sqrtArgument <= 0:
+                                    nextX = x2
+                                else:
+                                    nextX = x1 + 2.0 * deltaArea / ( y1 + math.sqrt( sqrtArgument ) )
+                            else: raise NotImplementedError( 'cumulativeBins is not implemented for '+ str(other.interpolation) )
+                    if nextX is not None: cumuBins2.append(nextX)
+                    indexOfBin += 1
+                    if indexOfBin >= numberOfBins: break
+                    integral = otherUnnormalizedCdfList[indexOfBin]
+            x1 = x2
+            y1 = y2
+            priorRunningIntegral = runningIntegral  
+        cumuBins2.append(otherTrimmed[-1][0])
+
+        return cumuBins1, cumuBins2
+
     def equalProbableBins(self, numberOfBins):
-        """Returns a list that that are equal probable bins of self. Currently, only supports lin-lin interpolation."""
+        """Returns a list that that are equal probable bins of self. Currently, only supports lin-lin and histogram interpolation."""
 
         if self.rangeMin < 0.0: raise Exception('Cannot calculate equal probable bins for a function with negative values.')
 
@@ -492,11 +595,10 @@ class XYs1d(baseModule.XDataFunctional):
         runningIntegrals = trimmed.runningIntegral()
         runningIntegralMax = runningIntegrals[-1]
         if runningIntegralMax == 0.0: raise Exception('Self does not have any area - 2.')
-
         epbs = [ trimmed[0][0] ]
         indexOfBin = 1
         integral = runningIntegralMax / numberOfBins
-        absDomainMax = max(abs(trimmed[0][0]), abs(trimmed[-1][0]))
+        absDomainMax = max(abs(trimmed[0][0]), abs(trimmed[-1][0])) # This variable is never used. Should be removed?
         for index, runningIntegral in enumerate(runningIntegrals):
             if indexOfBin >= numberOfBins: break
             x2, y2 = trimmed[index]
@@ -512,12 +614,16 @@ class XYs1d(baseModule.XDataFunctional):
                             else:
                                 nextX = x1 + deltaArea / y1
                         else:
-                            slope = ( y2 - y1 ) / ( x2 - x1 )
-                            sqrtArgument = y1 * y1 + 2.0 * slope * deltaArea
-                            if sqrtArgument <= 0:
-                                nextX = x2
-                            else:
-                                nextX = x1 + 2.0 * deltaArea / ( y1 + math.sqrt( sqrtArgument ) )
+                            if self.interpolation == enumsModule.Interpolation.flat:
+                                nextX = x1 + deltaArea / y1
+                            elif self.interpolation == enumsModule.Interpolation.linlin:
+                                slope = ( y2 - y1 ) / ( x2 - x1 )
+                                sqrtArgument = y1 * y1 + 2.0 * slope * deltaArea
+                                if sqrtArgument <= 0:
+                                    nextX = x2
+                                else:
+                                    nextX = x1 + 2.0 * deltaArea / ( y1 + math.sqrt( sqrtArgument ) )
+                            else: raise NotImplementedError( 'equalProbableBins is not implemented for '+ str(self.interpolation) )
                     if nextX is not None: epbs.append(nextX)
                     indexOfBin += 1
                     if indexOfBin >= numberOfBins: break
@@ -662,8 +768,11 @@ class XYs1d(baseModule.XDataFunctional):
         return( accuracyMid, self.returnAsClass( self, midSelf ) )
 
     def trim( self ) :
-
-        return( self.returnAsClass( self, self.nf_pointwiseXY.trim( ) ) )
+        trimmed = self.returnAsClass( self, self.nf_pointwiseXY.trim( ) )
+        if (self.interpolation == enumsModule.Interpolation.flat):
+            while trimmed[0][1] == 0:
+                trimmed = trimmed[1:]
+        return trimmed
 
     def union( self, other, fillWithSelf = 1, trim = 0 ) :
 

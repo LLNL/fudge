@@ -17,11 +17,9 @@ from . import base
 #
 def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 
-
     MT = self.ENDF_MT
 
     if MT == 18:  # sub-actinide fission, write back to MF 8/10
-
         if flags['verbosity'] >= 10:
             print('%sincompleteReaction: %s' % (verbosityIndent, self.outputChannel.toString(simpleString=True)))
         ZA, mass = targetInfo['ZA'], targetInfo['mass']
@@ -38,14 +36,15 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         endfMFList[LMF][MT] += endfFormatsModule.endfInterpolationList(interpolationFlatData)
         endfMFList[LMF][MT] += endfFormatsModule.endfDataList(flatData)
 
-
         endfMFList[LMF][MT].append(endfFormatsModule.endfSENDLineNumber())
 
     elif MT in list(range(201,208)) + [525]:
-
         base.toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent )
 
     else:
+        if MT == 102:
+            return
+
         raise NotImplementedError("incompleteReaction only supports fission right now")
 
 incompleteReactionModule.IncompleteReaction.toENDF6 = toENDF6

@@ -9,6 +9,8 @@ from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 from PoPs import IDs as IDsPoPsModule
 
 from xData import enums as xDataEnumsModule
+
+from fudge import enums as enumsModule
 from fudge import product as productModule
 from fudge.productData import multiplicity as multiplicityModule
 from fudge.productData.distributions import unspecified as unspecifiedModule
@@ -67,7 +69,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
                 self.distribution.toENDF6( MT, endfMFList, flags, targetInfo )
         if MT in (527, 528) and targetInfo['style'] in self.averageProductEnergy:
             energyLoss(self, MT, endfMFList, flags, targetInfo)
-    if( self.outputChannel is not None ) :
+    if processOutputChannel(self, targetInfo):
         priorIndex, priorToken, priorLabel = targetInfo['productIndex'], targetInfo['productToken'], targetInfo['productLabel']
         for index, product in enumerate( self.outputChannel ) :
             if( product.pid == IDsPoPsModule.photon ) :
@@ -81,6 +83,18 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     targetInfo['doMF4AsMF6'] = priorMF6flag
 
 productModule.Product.toENDF6 = toENDF6
+
+def processOutputChannel(self, targetInfo):
+
+    if self.outputChannel is None:
+        return False
+
+    for product in self.outputChannel.products:
+        form = gndsToENDF6Module.getForm(targetInfo['style'], product.multiplicity)
+        if isinstance(form, multiplicityModule.Branching1d):
+            return False
+
+    return True
 
 def energyLoss( self, MT, endfMFList, flags, targetInfo ) :
 

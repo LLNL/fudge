@@ -98,7 +98,7 @@
 <span class="n">domainEpsilon</span> <span class="o">=</span> <span class="mf">1e-15</span>
 
 <div class="viewcode-block" id="return_pointwiseXY_AsXYs1d"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.return_pointwiseXY_AsXYs1d">[docs]</a><span class="k">def</span> <span class="nf">return_pointwiseXY_AsXYs1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">units</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Self must be an instance of XYs1d.&#39;</span> <span class="p">)</span>
 
@@ -112,7 +112,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">xys1d</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="otherToSelfsUnits"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.otherToSelfsUnits">[docs]</a><span class="k">def</span> <span class="nf">otherToSelfsUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">checkXOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;For internal use only.&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;For internal use only.&#39;&#39;&#39;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">XYs1d</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;other instance not XYs1d instance; is type &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
@@ -134,7 +134,7 @@
     <span class="k">return</span> <span class="n">other</span></div>
 
 <div class="viewcode-block" id="getValueAsUnit"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.getValueAsUnit">[docs]</a><span class="k">def</span> <span class="nf">getValueAsUnit</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">quantity</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Quantity is not an instance of PQUModule.PQU&#39;</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">quantity</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span></div>
@@ -144,7 +144,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">getValueAsUnit</span><span class="p">(</span> <span class="n">axis</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">quantity</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="getOtherAndUnit"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.getOtherAndUnit">[docs]</a><span class="k">def</span> <span class="nf">getOtherAndUnit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For internal use only. This function is used by the multiply and divide methods. Other must be a XYs1d instance,</span>
 <span class="sd">    a pointwiseXY instance or an object convertible to a PQU object. The first item returned ia a pointwiseXY instance </span>
 <span class="sd">    or number is returned.</span>
@@ -163,7 +163,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">yUnit</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="allow_XYsWithSameUnits_orNumberWithSameUnit"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.allow_XYsWithSameUnits_orNumberWithSameUnit">[docs]</a><span class="k">def</span> <span class="nf">allow_XYsWithSameUnits_orNumberWithSameUnit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For internal use only. Returns a pointwiseXY instance or a number.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -183,7 +183,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataForm</span><span class="o">=</span><span class="s2">&quot;xys&quot;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
             <span class="n">initialSize</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">overflowSize</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">infill</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">safeDivide</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor for XYs1d class. dataForm can be &#39;xys&#39;, &#39;xsandys&#39; or &#39;list&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -367,7 +367,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nf_pointwiseXY</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a reference to self&#39;s hidden nf_pointwiseXY member.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a reference to self&#39;s hidden nf_pointwiseXY member.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nf_pointwiseXY</span> <span class="p">)</span>
 
@@ -383,7 +383,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">setInterpolation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">interpolation</span><span class="p">))</span>
 
 <div class="viewcode-block" id="XYs1d.applyFunction"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.applyFunction">[docs]</a>    <span class="k">def</span> <span class="nf">applyFunction</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">biSectionMax</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">checkForRoots</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method maps the function &#39;f&#39; onto each y-value in an XYs1d object, returning a new XYs1d object.</span>
 <span class="sd">        Additional points may be added to preserve the desired accuracy.</span>
 
@@ -410,7 +410,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="n">interpolation</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.changeInterpolationIfNeeded"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.changeInterpolationIfNeeded">[docs]</a>    <span class="k">def</span> <span class="nf">changeInterpolationIfNeeded</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">allowedInterpolations</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">cls</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If self&#39;s interpolation is one in list of allowedInterpolations, self is returned unchaged. Otherwise</span>
 <span class="sd">        the returned instances is self&#39;s data converted to the interpolation allowedInterpolations[0].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -426,7 +426,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        unitMap is a dictionary of the form { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -442,7 +442,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span> <span class="n">rangeMin</span><span class="p">,</span> <span class="n">rangeMax</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.commonDomainGrid"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.commonDomainGrid">[docs]</a>    <span class="k">def</span> <span class="nf">commonDomainGrid</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">others</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns copies of self and others that are mapped to the same X-grid. That is, a union is made</span>
 <span class="sd">        of all the x-values for self and others and all XYs1d-type instances are mapped to it. Others must be</span>
 <span class="sd">        a list of instances of XYs1d. All XYs1d instances must have the same domain.</span>
@@ -493,7 +493,7 @@
         <span class="k">return</span> <span class="n">copy_</span>
 
 <div class="viewcode-block" id="XYs1d.copyDataToNestedLists"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.copyDataToNestedLists">[docs]</a>    <span class="k">def</span> <span class="nf">copyDataToNestedLists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This is the same as the method copyDataToXYs.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
@@ -512,7 +512,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nf_pointwiseXY</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.domain"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.domain">[docs]</a>    <span class="k">def</span> <span class="nf">domain</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;This should be deprecated.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This should be deprecated.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">domain</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
@@ -521,8 +521,111 @@
         <span class="n">dulled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">dullEdges</span><span class="p">(</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="n">upperEps</span><span class="p">,</span> <span class="n">positiveXOnly</span> <span class="o">=</span> <span class="n">positiveXOnly</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">dulled</span> <span class="p">)</span> <span class="p">)</span></div>
 
+<div class="viewcode-block" id="XYs1d.cumulativeBins"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.cumulativeBins">[docs]</a>    <span class="k">def</span> <span class="nf">cumulativeBins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns two lists of bins that are determined by two sets of evaluations to perform cumulative points interpolation.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">other</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cannot calculate cumulative bins for functions with negative values.&#39;</span><span class="p">)</span>
+
+        <span class="n">selfTrimmed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trim</span><span class="p">()</span>
+        <span class="n">otherTrimmed</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">trim</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">selfTrimmed</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">otherTrimmed</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Function does not have any area - 1.&#39;</span><span class="p">)</span>
+
+        <span class="n">selfRunningIntegrals</span> <span class="o">=</span> <span class="n">selfTrimmed</span><span class="o">.</span><span class="n">runningIntegral</span><span class="p">()</span>
+        <span class="n">otherRunningIntegrals</span> <span class="o">=</span> <span class="n">otherTrimmed</span><span class="o">.</span><span class="n">runningIntegral</span><span class="p">()</span>
+        <span class="n">selfRunningIntegralMax</span> <span class="o">=</span> <span class="n">selfRunningIntegrals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">otherRunningIntegralMax</span> <span class="o">=</span> <span class="n">otherRunningIntegrals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">selfRunningIntegrals</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">otherRunningIntegrals</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Function does not have any area - 2.&#39;</span><span class="p">)</span>
+
+        <span class="n">normalizedSelfRunningIntegrals</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">/</span> <span class="n">selfRunningIntegralMax</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selfRunningIntegrals</span><span class="p">]</span>
+        <span class="n">normalizedOtherRunningIntegrals</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">/</span> <span class="n">otherRunningIntegralMax</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">otherRunningIntegrals</span><span class="p">]</span>
+
+        <span class="n">jointedCdfList</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">normalizedSelfRunningIntegrals</span><span class="o">+</span><span class="n">normalizedOtherRunningIntegrals</span><span class="p">)</span>
+        <span class="n">cleanedCdfList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="p">[</span><span class="n">cleanedCdfList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">jointedCdfList</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cleanedCdfList</span><span class="p">]</span>
+
+        <span class="n">selfUnnormalizedCdfList</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="n">selfRunningIntegralMax</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cleanedCdfList</span><span class="p">]</span>
+        <span class="n">otherUnnormalizedCdfList</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="n">otherRunningIntegralMax</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cleanedCdfList</span><span class="p">]</span>
+
+        <span class="n">cumuBins1</span> <span class="o">=</span> <span class="p">[</span> <span class="n">selfTrimmed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">indexOfBin</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">numberOfBins</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">selfUnnormalizedCdfList</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">integral</span> <span class="o">=</span> <span class="n">selfUnnormalizedCdfList</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">runningIntegral</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selfTrimmed</span><span class="o">.</span><span class="n">runningIntegral</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">indexOfBin</span> <span class="o">&gt;=</span> <span class="n">numberOfBins</span><span class="p">:</span> <span class="k">break</span>
+            <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">selfTrimmed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">integral</span> <span class="o">&lt;=</span> <span class="n">runningIntegral</span><span class="p">:</span>
+                    <span class="n">deltaArea</span> <span class="o">=</span> <span class="n">integral</span> <span class="o">-</span> <span class="n">priorRunningIntegral</span>
+                    <span class="k">if</span> <span class="n">deltaArea</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="n">nextX</span> <span class="o">=</span> <span class="n">x2</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">y1</span> <span class="o">==</span> <span class="n">y2</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">y1</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                                <span class="n">nextX</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="n">y1</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
+                                <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="n">y1</span>
+                            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">:</span>
+                                <span class="n">slope</span> <span class="o">=</span> <span class="p">(</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="p">)</span>
+                                <span class="n">sqrtArgument</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">deltaArea</span>
+                                <span class="k">if</span> <span class="n">sqrtArgument</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">nextX</span> <span class="o">=</span> <span class="n">x2</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="p">(</span> <span class="n">y1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">sqrtArgument</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="s1">&#39;cumulativeBins is not implemented for &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">)</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">nextX</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">cumuBins1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nextX</span><span class="p">)</span>
+                    <span class="n">indexOfBin</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">indexOfBin</span> <span class="o">&gt;=</span> <span class="n">numberOfBins</span><span class="p">:</span> <span class="k">break</span>
+                    <span class="n">integral</span> <span class="o">=</span> <span class="n">selfUnnormalizedCdfList</span><span class="p">[</span><span class="n">indexOfBin</span><span class="p">]</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="n">x2</span>
+            <span class="n">y1</span> <span class="o">=</span> <span class="n">y2</span>
+            <span class="n">priorRunningIntegral</span> <span class="o">=</span> <span class="n">runningIntegral</span>
+        <span class="n">cumuBins1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selfTrimmed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">cumuBins2</span> <span class="o">=</span> <span class="p">[</span> <span class="n">otherTrimmed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">indexOfBin</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">integral</span> <span class="o">=</span> <span class="n">otherUnnormalizedCdfList</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">runningIntegral</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">otherTrimmed</span><span class="o">.</span><span class="n">runningIntegral</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">indexOfBin</span> <span class="o">&gt;=</span> <span class="n">numberOfBins</span><span class="p">:</span> <span class="k">break</span>
+            <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">otherTrimmed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">integral</span> <span class="o">&lt;=</span> <span class="n">runningIntegral</span><span class="p">:</span>
+                    <span class="n">deltaArea</span> <span class="o">=</span> <span class="n">integral</span> <span class="o">-</span> <span class="n">priorRunningIntegral</span>
+                    <span class="k">if</span> <span class="n">deltaArea</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="n">nextX</span> <span class="o">=</span> <span class="n">x2</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">y1</span> <span class="o">==</span> <span class="n">y2</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">y1</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                                <span class="n">nextX</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="n">y1</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
+                                <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="n">y1</span>
+                            <span class="k">elif</span> <span class="n">other</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">:</span>
+                                <span class="n">slope</span> <span class="o">=</span> <span class="p">(</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="p">)</span>
+                                <span class="n">sqrtArgument</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">deltaArea</span>
+                                <span class="k">if</span> <span class="n">sqrtArgument</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">nextX</span> <span class="o">=</span> <span class="n">x2</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="p">(</span> <span class="n">y1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">sqrtArgument</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="s1">&#39;cumulativeBins is not implemented for &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">interpolation</span><span class="p">)</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">nextX</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">cumuBins2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nextX</span><span class="p">)</span>
+                    <span class="n">indexOfBin</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">indexOfBin</span> <span class="o">&gt;=</span> <span class="n">numberOfBins</span><span class="p">:</span> <span class="k">break</span>
+                    <span class="n">integral</span> <span class="o">=</span> <span class="n">otherUnnormalizedCdfList</span><span class="p">[</span><span class="n">indexOfBin</span><span class="p">]</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="n">x2</span>
+            <span class="n">y1</span> <span class="o">=</span> <span class="n">y2</span>
+            <span class="n">priorRunningIntegral</span> <span class="o">=</span> <span class="n">runningIntegral</span>  
+        <span class="n">cumuBins2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">otherTrimmed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">cumuBins1</span><span class="p">,</span> <span class="n">cumuBins2</span></div>
+
 <div class="viewcode-block" id="XYs1d.equalProbableBins"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.equalProbableBins">[docs]</a>    <span class="k">def</span> <span class="nf">equalProbableBins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numberOfBins</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list that that are equal probable bins of self. Currently, only supports lin-lin interpolation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list that that are equal probable bins of self. Currently, only supports lin-lin and histogram interpolation.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cannot calculate equal probable bins for a function with negative values.&#39;</span><span class="p">)</span>
 
@@ -531,11 +634,10 @@
         <span class="n">runningIntegrals</span> <span class="o">=</span> <span class="n">trimmed</span><span class="o">.</span><span class="n">runningIntegral</span><span class="p">()</span>
         <span class="n">runningIntegralMax</span> <span class="o">=</span> <span class="n">runningIntegrals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">runningIntegralMax</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Self does not have any area - 2.&#39;</span><span class="p">)</span>
-
         <span class="n">epbs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">trimmed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
         <span class="n">indexOfBin</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">integral</span> <span class="o">=</span> <span class="n">runningIntegralMax</span> <span class="o">/</span> <span class="n">numberOfBins</span>
-        <span class="n">absDomainMax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">trimmed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">trimmed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">absDomainMax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">trimmed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">trimmed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span> <span class="c1"># This variable is never used. Should be removed?</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">runningIntegral</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">runningIntegrals</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">indexOfBin</span> <span class="o">&gt;=</span> <span class="n">numberOfBins</span><span class="p">:</span> <span class="k">break</span>
             <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">trimmed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -551,12 +653,16 @@
                             <span class="k">else</span><span class="p">:</span>
                                 <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="n">y1</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">slope</span> <span class="o">=</span> <span class="p">(</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="p">)</span>
-                            <span class="n">sqrtArgument</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">deltaArea</span>
-                            <span class="k">if</span> <span class="n">sqrtArgument</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                                <span class="n">nextX</span> <span class="o">=</span> <span class="n">x2</span>
-                            <span class="k">else</span><span class="p">:</span>
-                                <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="p">(</span> <span class="n">y1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">sqrtArgument</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
+                                <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="n">y1</span>
+                            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">:</span>
+                                <span class="n">slope</span> <span class="o">=</span> <span class="p">(</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="p">)</span>
+                                <span class="n">sqrtArgument</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">deltaArea</span>
+                                <span class="k">if</span> <span class="n">sqrtArgument</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">nextX</span> <span class="o">=</span> <span class="n">x2</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">nextX</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">deltaArea</span> <span class="o">/</span> <span class="p">(</span> <span class="n">y1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">sqrtArgument</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="s1">&#39;equalProbableBins is not implemented for &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">)</span> <span class="p">)</span>
                     <span class="k">if</span> <span class="n">nextX</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">epbs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nextX</span><span class="p">)</span>
                     <span class="n">indexOfBin</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">indexOfBin</span> <span class="o">&gt;=</span> <span class="n">numberOfBins</span><span class="p">:</span> <span class="k">break</span>
@@ -579,7 +685,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nf_pointwiseXY</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.fixDomains"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets domain minimum and maximum per the arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -606,7 +712,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nf_pointwiseXY</span><span class="o">.</span><span class="n">lowerIndexBoundingX</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.mutualify"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.mutualify">[docs]</a>    <span class="k">def</span> <span class="nf">mutualify</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">lowerEps1</span><span class="p">,</span> <span class="n">upperEps1</span><span class="p">,</span> <span class="n">positiveXOnly1</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">lowerEps2</span><span class="p">,</span> <span class="n">upperEps2</span><span class="p">,</span> <span class="n">positiveXOnly2</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        .. note:: Need to check that x units are the same.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
@@ -614,7 +720,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">m1</span> <span class="p">),</span> <span class="n">other</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">m2</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.normalize"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">insitu</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The dimension argument is ignored. Only here to be compatable with calling from XYsnd.normalize.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -623,14 +729,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xys</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.setData"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.setData">[docs]</a>    <span class="k">def</span> <span class="nf">setData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">points</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replaces the points in *self* with *points*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span> <span class="n">points</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.setDataFromList"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.setDataFromList">[docs]</a>    <span class="k">def</span> <span class="nf">setDataFromList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointsAsList</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Replaces the points in *self* the list of values in *pointsAsList*. *pointsAsList* must have an even number of points</span>
 <span class="sd">        of [x1, y1, x2, y2, ... xn, yn] values.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -638,7 +744,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">setDataFromList</span><span class="p">(</span><span class="n">pointsAsList</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.setDataFromXsAndYs"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.setDataFromXsAndYs">[docs]</a>    <span class="k">def</span> <span class="nf">setDataFromXsAndYs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Replaces the points in *self* the list of *xs* and *ys*.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
@@ -649,7 +755,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span> <span class="n">xValue</span><span class="p">,</span> <span class="n">yValue</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.thicken"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.thicken">[docs]</a>    <span class="k">def</span> <span class="nf">thicken</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">sectionSubdivideMax</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dDomainMax</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">fDomainMax</span> <span class="o">=</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. note:: Need unit for dDomainMax.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -661,7 +767,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">thin</span><span class="p">(</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.thinToNumberOfPoints"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.thinToNumberOfPoints">[docs]</a>    <span class="k">def</span> <span class="nf">thinToNumberOfPoints</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">maximumNumber</span><span class="p">,</span> <span class="n">numberFraction</span> <span class="o">=</span> <span class="mf">0.95</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a tuple containing an accuracy and a new instance of self that hopefully has no more than </span>
 <span class="sd">        maximumNumber points.  The returned accuracy is the one passed to the thin method that obtained the </span>
 <span class="sd">        returned XYs1d instance.  No thinning is performed if the number of points in self is less than 6.</span>
@@ -701,8 +807,11 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">accuracyMid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">midSelf</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.trim"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="n">trimmed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">flat</span><span class="p">):</span>
+            <span class="k">while</span> <span class="n">trimmed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">trimmed</span> <span class="o">=</span> <span class="n">trimmed</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="n">trimmed</span></div>
 
 <div class="viewcode-block" id="XYs1d.union"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.union">[docs]</a>    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">fillWithSelf</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">trim</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -756,12 +865,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;1 &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeUnit</span> <span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.range"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.range">[docs]</a>    <span class="k">def</span> <span class="nf">range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns the list (rangeMin, rangeMax).&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the list (rangeMin, rangeMax).&#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">range</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="XYs1d.domainSlice"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.domainSlice">[docs]</a>    <span class="k">def</span> <span class="nf">domainSlice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dullEps</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a new instance with self sliced between ``domainMin`` and ``domainMax``.</span>
 
 <span class="sd">        :param domainMin:   [optional] the lower x-value of the slice, default is domain minimum of self,</span>
@@ -783,7 +892,7 @@
     <span class="k">def</span> <span class="nf">__exp__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="s1">&#39;Currently, __exp__ is not implemented&#39;</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="XYs1d.convolute"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.convolute">[docs]</a>    <span class="k">def</span> <span class="nf">convolute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">func</span> <span class="p">)</span> <span class="p">:</span> 
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses pointwiseXY&#39;s convolute function to do the grunt work.  </span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -792,7 +901,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">convolute</span><span class="p">(</span> <span class="n">func</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.group"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.group">[docs]</a>    <span class="k">def</span> <span class="nf">group</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">f2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">f3</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">asXYs</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The argument ``xs`` is a list of x-values with ``xs[i] &lt; xs[i+1]``. This function calculates the integrals</span>
 
 <span class="sd">        .. math::</span>
@@ -856,7 +965,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">grouped</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.groupOneFunction"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.groupOneFunction">[docs]</a>    <span class="k">def</span> <span class="nf">groupOneFunction</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;.. note:: Need unit of xs.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;.. note:: Need unit of xs.&#39;&#39;&#39;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">xs</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">boundaries</span> <span class="o">=</span> <span class="n">xs</span>
@@ -870,7 +979,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">groupOneFunction</span><span class="p">(</span> <span class="n">boundaries</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.groupTwoFunctions"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.groupTwoFunctions">[docs]</a>    <span class="k">def</span> <span class="nf">groupTwoFunctions</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;.. note:: Need unit of xs.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;.. note:: Need unit of xs.&#39;&#39;&#39;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">xs</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">boundaries</span> <span class="o">=</span> <span class="n">xs</span>
@@ -885,7 +994,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">groupTwoFunctions</span><span class="p">(</span> <span class="n">boundaries</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.groupThreeFunctions"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.groupThreeFunctions">[docs]</a>    <span class="k">def</span> <span class="nf">groupThreeFunctions</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;.. note:: Need unit of xs.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;.. note:: Need unit of xs.&#39;&#39;&#39;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">xs</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">boundaries</span> <span class="o">=</span> <span class="n">xs</span>
@@ -901,14 +1010,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">groupThreeFunctions</span><span class="p">(</span>  <span class="n">boundaries</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.hasData"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.hasData">[docs]</a>    <span class="k">def</span> <span class="nf">hasData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns True if self&#39;s len is greater than 1 and False otherwise.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="XYs1d.integrate"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Definite integral of current ``XYs1d`` instance from ``domainMin`` to ``domainMax``:</span>
 <span class="sd">        </span>
 <span class="sd">        .. math::</span>
@@ -944,7 +1053,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nf_pointwiseXY</span><span class="o">.</span><span class="n">integrateWithWeight_sqrt_x</span><span class="p">(</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.indefiniteIntegral"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.indefiniteIntegral">[docs]</a>    <span class="k">def</span> <span class="nf">indefiniteIntegral</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Indefinite integral of self:</span>
 <span class="sd">        </span>
 <span class="sd">        .. math::</span>
@@ -964,7 +1073,7 @@
         <span class="k">return</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">myData</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">myAxes</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.integrateTwoFunctions"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.integrateTwoFunctions">[docs]</a>    <span class="k">def</span> <span class="nf">integrateTwoFunctions</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param f2:</span>
 <span class="sd">        :param domainMin:</span>
@@ -988,7 +1097,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupTwoFunctions</span><span class="p">([</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">],</span> <span class="n">f2</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="XYs1d.integrateThreeFunctions"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.integrateThreeFunctions">[docs]</a>    <span class="k">def</span> <span class="nf">integrateThreeFunctions</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param f2:</span>
 <span class="sd">        :param f3:</span>
@@ -1021,7 +1130,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.pdfOfY"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.pdfOfY">[docs]</a>    <span class="k">def</span> <span class="nf">pdfOfY</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;     </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;     </span>
 <span class="sd">        This method calculates the pdf of the y-values of self (i.e., pdf(y)).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1121,7 +1230,7 @@
         <span class="k">return</span> <span class="n">xys</span></div>
 
 <div class="viewcode-block" id="XYs1d.splitInTwo"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.splitInTwo">[docs]</a>    <span class="k">def</span> <span class="nf">splitInTwo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="n">domainEpsilon</span> <span class="p">)</span> <span class="p">:</span> 
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Splits self at domainValue into two XYs1d instances. Returns either None if domainValue not in</span>
 <span class="sd">        domain or two XYs1d instances.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1136,7 +1245,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.toPointwiseLinear"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a new instance, converted to lin-lin interpolation with added points to maintain desired accuracy.</span>
 <span class="sd">        For more details see toPointwise_withLinearXYs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1144,7 +1253,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a new instance, converted to lin-lin interpolation with added points to maintain desired accuracy.</span>
 
 <span class="sd">        Optional (key-word) arguments:</span>
@@ -1253,7 +1362,7 @@
 
 <div class="viewcode-block" id="XYs1d.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Translate an XYs1d node into the python XYs1d class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1279,7 +1388,7 @@
 
 <div class="viewcode-block" id="XYs1d.returnAsClass"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.returnAsClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">returnAsClass</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns other as a class of cls. Other must be a sub-class pointwiseXY. cls must be a sub-class of XYs1d. </span>
 <span class="sd">        If index and axes are not specified, they are taken from self. The main use of this classmethod is for </span>
 <span class="sd">        methods like __add__ where the addends may be a class derived from XYs1d. For example, the crossSection.XYs1d</span>
@@ -1305,7 +1414,7 @@
 
 <div class="viewcode-block" id="XYs1d.createFromFunction"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.createFromFunction">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">createFromFunction</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">Xs</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">biSectionMax</span><span class="p">,</span> <span class="n">checkForRoots</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">infill</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">safeDivide</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given an ascending list of x-values (Xs) and a function (func), create a linear pointwise </span>
 <span class="sd">        representation of the function over the domain of Xs. There must be at least 2 values in Xs.</span>
 <span class="sd">        See pointwiseXY_C.createFromFunction for all other arguments.</span>
@@ -1321,7 +1430,7 @@
 
 <div class="viewcode-block" id="XYs1d.multiPlot"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.multiPlot">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">multiPlot</span><span class="p">(</span> <span class="n">curve1ds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plots a list of 1d curves on the same plot. Uses each curve&#39;s &#39;plotLabel&#39; as the legend key. Each curve must have a copyDataToXsAndYs method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1368,7 +1477,7 @@
         <span class="n">multiplotModule</span><span class="o">.</span><span class="n">MultiPlotWithPyQt5</span><span class="p">(</span> <span class="n">plotOptions</span><span class="p">,</span> <span class="n">plotData</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.checkEqualProbableBinsResult"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.checkEqualProbableBinsResult">[docs]</a>    <span class="k">def</span> <span class="nf">checkEqualProbableBinsResult</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epbs</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">printResults</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This method checks the results of XYs1d.equalProbableBins and executes a raise if it finds an issue.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method checks the results of XYs1d.equalProbableBins and executes a raise if it finds an issue.</span>
 
 <span class="sd">            :param self:            The XYs1d instance that equalProbableBins was call for.</span>
 <span class="sd">            :param epbs:            The results returned by equalProbableBins.</span>

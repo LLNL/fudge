@@ -51,37 +51,37 @@
 <div class="viewcode-block" id="EqualProbableBinnedData"><a class="viewcode-back" href="../../../../fudge/fudge.processing.montecarlo.html#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData">[docs]</a><span class="k">class</span> <span class="nc">EqualProbableBinnedData</span> <span class="p">:</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Constructor for the EqualProbableBinnedData class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for the EqualProbableBinnedData class.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the (i+1)^th element of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the (i+1)^th element of self.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Sets the (i+1)^th element of self to value.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the (i+1)^th element of self to value.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of data points in self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of data points in self.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="EqualProbableBinnedData.getData"><a class="viewcode-back" href="../../../../fudge/fudge.processing.montecarlo.html#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData.getData">[docs]</a>    <span class="k">def</span> <span class="nf">getData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the data of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the data of self.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EqualProbableBinnedData.getEnd"><a class="viewcode-back" href="../../../../fudge/fudge.processing.montecarlo.html#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData.getEnd">[docs]</a>    <span class="k">def</span> <span class="nf">getEnd</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of data points in self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of data points in self.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EqualProbableBinnedData.getStart"><a class="viewcode-back" href="../../../../fudge/fudge.processing.montecarlo.html#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData.getStart">[docs]</a>    <span class="k">def</span> <span class="nf">getStart</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Always returns 0.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Always returns 0.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span></div></div>
 

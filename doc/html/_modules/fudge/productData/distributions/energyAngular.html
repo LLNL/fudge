@@ -117,7 +117,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">XYs1d</span><span class="p">,</span> <span class="n">Legendre</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energyAngular.Subform">[docs]</a><span class="k">class</span> <span class="nc">Subform</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">Subform</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Abstract base class for energyAngular subforms.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for energyAngular subforms.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
 
@@ -377,7 +377,7 @@
             <span class="k">return</span> <span class="n">energyModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">energyModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">xys2d</span><span class="o">.</span><span class="n">interpolation</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energyAngular.Form.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method call *fixDomains* on the *energyAngularSubform* member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -462,7 +462,7 @@
 
 <div class="viewcode-block" id="Form.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energyAngular.Form.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;energyAngular&gt; element from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;energyAngular&gt; element from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="n">subformElement</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

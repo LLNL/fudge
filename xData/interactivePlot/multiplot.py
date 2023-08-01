@@ -1,7 +1,7 @@
 # <<BEGIN-copyright>>
 # Copyright 2022, Lawrence Livermore National Security, LLC.
 # See the top-level COPYRIGHT file for details.
-#
+# 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
@@ -93,9 +93,9 @@ class MainWindow(QMainWindow):
         # window dimensions from default pyplot parameters
         dpi = 100
         widthInches, heightInches = pyplot.rcParams["figure.figsize"]
-        width = widthInches*dpi*magnification
-        height = heightInches*dpi*magnification
-        self.setGeometry(0, 0, int(width), int(height))
+        width = int(widthInches*dpi*magnification)
+        height = int(heightInches*dpi*magnification)
+        self.setGeometry(0, 0, width, height)
 
         # generate plot
         self.plotInstance = PlotCanvas(self, widthInches, heightInches, plotAttributes, plotData, dpi, plotType)
@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         self.dialogWindow = DialogWindow(width, height, plotAttributes, plotObject=self.plotInstance, plotType=plotType,
                                          parent=self)
 
-        self.dialogWindow.setGeometry(int(x0), int(y0), int(width), int(height))
+        self.dialogWindow.setGeometry(x0, y0, width, height)
         self.dialogWindow.show()
 
     def closeEvent(self, event):
@@ -162,7 +162,7 @@ class PlotCanvas(FigureCanvas):
         if plotType == '2d':
             self.plot2d(plotData, plotAttributes)
             assert self.plotAxis is not None
-
+        
             self.legendDraggableNotScrollable = len(self.plotAxis.lines) < 10
             self.percentPlotWidth = 1.0 if self.legendDraggableNotScrollable else 0.8
             self.legend = self.addLegend(self.legendDraggableNotScrollable)
@@ -175,7 +175,7 @@ class PlotCanvas(FigureCanvas):
     def plot2d(self, plotData, plotAttributes):
         self.plotAxis = self.figure.add_subplot(111)
 
-        floatInfo = numpy.finfo(float(0))
+        floatInfo = numpy.finfo(numpy.float64())
         self.dataLimits = {'x': [floatInfo.max, floatInfo.min], 'y': [floatInfo.max, floatInfo.min]}
         for plotLegend in plotData.keys():
             if (not isinstance(plotData[plotLegend], (list, tuple))) or (len(plotData[plotLegend]) != 2):

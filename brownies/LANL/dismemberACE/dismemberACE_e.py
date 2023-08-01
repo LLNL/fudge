@@ -5,6 +5,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+'''
+This module dismembers an continuous-energy electron ACE data file (identifier "e" is for continuous-energy electron tables).
+'''
+
 # Description of format per http://resource.npl.co.uk/docs/science_technology/ionising%20radiation/clubs_groups/monte_carlo/2004/workshop/electron_upgrade_paper.pdf.
 
 from brownies.LANL.dismemberACE import dismemberACE_misc as dismemberACE_miscModule
