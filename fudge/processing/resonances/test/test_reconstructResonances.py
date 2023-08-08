@@ -2777,7 +2777,6 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
         for i,D in enumerate(levelSpacingAnswer):
             self.assertTrue( floatsAlmostEqual( self.Zr90URR.levelSpacings[(1, 0.5)][i][1], D ) )
             self.assertTrue( floatsAlmostEqual( self.Zr90URR.levelSpacings[(1, 0.5)].evaluate( egrid[i] ), D ) )
-            self.assertTrue( floatsAlmostEqual( self.Zr90URR.levelDensities[(1, 0.5)].evaluate(egrid[i]), 1.0 / D ) )
 
         # Test DOFs
         self.assertEqual(self.Zr90URR.DOFs[(2, 1.5)],{'capture': 0, 'elastic': 1})

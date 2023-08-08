@@ -696,6 +696,17 @@ class NegativeMultiplicity(Warning):
         return self.xpath == other.xpath and self.value == other.value
 
 
+class NonConstantMultiplicity(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, obj)
+
+    def __str__(self):
+        return "Multiplicity should be constant but is energy-dependant!"
+
+    def __eq__(self, other):
+        return self.xpath == other.xpath
+
+
 class Domain_mismatch(Warning):
     def __init__(self, lowBound, highBound, xscLowBound, xscHighBound, obj=None):
         Warning.__init__(self, obj)
@@ -773,6 +784,11 @@ class UncorrelatedFramesMismatch(Warning):
 class FlatIncidentEnergyInterpolation(Warning):
     def __str__(self):
         return "For distributions, flat interpolation along incident energy is unphysical!"
+
+
+class MissingInterpolationQualifier(Warning):
+    def __str__(self):
+        return "Missing interpolationQualifier for outgoing energy spectrum (should be 'unitBase', 'correspondingPoints', etc.)"
 
 
 class EnergyDistributionBadU(Warning):

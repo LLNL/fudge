@@ -78,14 +78,14 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.Subform">[docs]</a><span class="k">class</span> <span class="nc">Subform</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">Subform</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Abstract base class for LLNLLegendre forms.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for LLNLLegendre forms.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">baseModule</span><span class="o">.</span><span class="n">Subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LLNLPointwise"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.LLNLPointwise">[docs]</a><span class="k">class</span> <span class="nc">LLNLPointwise</span><span class="p">(</span> <span class="n">Subform</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is for ENDL I = 4 data with l &gt; 0.</span>
 <span class="sd">    This is a temporary class, to be removed once testing is done and all coefficients in endl99, H2(n,2n)p data are filled in.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -192,7 +192,7 @@
         <span class="k">return</span> <span class="n">muFactor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">energyIn</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LLNLPointwise.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.LLNLPointwise.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for each entry in *self.data*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -292,7 +292,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">lpw</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Form"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.Form">[docs]</a><span class="k">class</span> <span class="nc">Form</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">Form</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is for ENDL I = 4 data with l &gt; 0.</span>
 <span class="sd">    This is a temporary class, to be removed once testing is done and all coefficients in endl99, H2(n,2n)p data are filled in.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -326,7 +326,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Legendre</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span><span class="n">energyIn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.Legendre.Form.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **Legendre** members.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 

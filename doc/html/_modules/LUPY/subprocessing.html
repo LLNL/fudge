@@ -50,7 +50,7 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 
 <span class="k">def</span> <span class="nf">_getSTDStreamOpen</span><span class="p">(</span><span class="n">stdStream</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    If stdStream is a string, open file of that name and return file handle.</span>
 <span class="sd">    Otherwise check that it&#39;s an allowed type (int, buffer or None) and return as-is.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -68,7 +68,7 @@
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unsupported stream = &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">stdStream</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">_getSTDStreamClose</span><span class="p">(</span><span class="n">stdStream</span><span class="p">,</span> <span class="n">stdStream2</span><span class="p">,</span> <span class="n">processStd</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Close stream. If output is a file, write results and close the file. If output is a pipe, get result and decode to list of strings.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -81,7 +81,7 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="executeCommand"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.subprocessing.executeCommand">[docs]</a><span class="k">def</span> <span class="nf">executeCommand</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">raiseOnError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">useExecutable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Executes a command using subprocess. Supports redirecting stdout / stderr to files (or to each other).</span>
 <span class="sd">    If stdout / stderr are strings, they will be treated as file names and output written to them.</span>
 <span class="sd">    If they are pipes (default option), they will be returned as lists of strings along with the exit code.</span>
@@ -123,7 +123,7 @@
     <span class="k">return</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">stdout_results</span><span class="p">,</span> <span class="n">stderr_results</span></div>
 
 <div class="viewcode-block" id="spawn"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.subprocessing.spawn">[docs]</a><span class="k">def</span> <span class="nf">spawn</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shortcut for launching a process with PYTHONPATH set. Returns process id.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -132,7 +132,7 @@
     <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">pid</span></div>
 
 <div class="viewcode-block" id="deleteFilesUsingGlob"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.subprocessing.deleteFilesUsingGlob">[docs]</a><span class="k">def</span> <span class="nf">deleteFilesUsingGlob</span><span class="p">(</span><span class="n">patterns</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Deletes file(s) matching patterns. Skips deleting directories.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

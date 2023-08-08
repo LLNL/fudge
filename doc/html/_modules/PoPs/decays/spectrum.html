@@ -192,13 +192,13 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;positronEmissionIntensity&#39;</span></div>
 
 <div class="viewcode-block" id="Discrete"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Discrete">[docs]</a><span class="k">class</span> <span class="nc">Discrete</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Stores a decay particle emitted with discrete energy&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores a decay particle emitted with discrete energy&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;discrete&#39;</span>
 
 <div class="viewcode-block" id="Discrete.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Discrete.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_intensity</span><span class="p">,</span> <span class="n">_energy</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">TransitionType</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">_internalPairFormationCoefficient</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                   <span class="n">_positronEmissionIntensity</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param _intensity: relative intensity for emission of this discrete particle</span>
 <span class="sd">        :param _energy: outgoing product energy</span>
 <span class="sd">        :param type: optional type of transition (i.e. &#39;allowed&#39;, &#39;first-forbidden&#39;, etc.</span>
@@ -317,12 +317,12 @@
         <span class="k">return</span> <span class="n">_discrete</span></div></div>
 
 <div class="viewcode-block" id="Continuum"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum">[docs]</a><span class="k">class</span> <span class="nc">Continuum</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Describes continuum particle emission&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Describes continuum particle emission&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;continuum&#39;</span>
 
 <div class="viewcode-block" id="Continuum.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">spectrum</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param spectrum: outgoing energy probability distribution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -335,12 +335,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spectrum</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Continuum.convertUnits"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__spectrum</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Continuum.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Continuum.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: deep copy of self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -373,14 +373,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Spectrum"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum">[docs]</a><span class="k">class</span> <span class="nc">Spectrum</span><span class="p">(</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Contains the outgoing spectrum for one type of decay product.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;spectrum&#39;</span>
 
 <div class="viewcode-block" id="Spectrum.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">pid</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param label: unique label for the outgoing product (i.e. &#39;x-ray&#39; or &#39;gamma&#39;)</span>
 <span class="sd">        :param pid: PoPs particle id (i.e. &#39;photon&#39;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -402,7 +402,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">emissions</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the list of all discrete and continuum emissions&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the list of all discrete and continuum emissions&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span> <span class="p">)</span>      <span class="c1"># FIXME accesses mutable member</span>
 
@@ -412,7 +412,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pid</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Spectrum.append"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">emission</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add new emitted particle to self</span>
 <span class="sd">        :param emission: &#39;discrete&#39; or &#39;continuum&#39; instance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -421,12 +421,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">emission</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Spectrum.convertUnits"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">emission</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emissions</span> <span class="p">:</span> <span class="n">emission</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Spectrum.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectrum.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: deep copy of self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -469,7 +469,7 @@
         <span class="k">return</span> <span class="n">_spectrum</span></div></div>
 
 <div class="viewcode-block" id="Spectra"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.spectrum.Spectra">[docs]</a><span class="k">class</span> <span class="nc">Spectra</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Contains the outgoing spectrum list for a decayMode&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Contains the outgoing spectrum list for a decayMode&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;spectra&#39;</span>
 

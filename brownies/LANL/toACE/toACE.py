@@ -38,12 +38,17 @@ parser.add_argument( '-s', '--style', type = str, default = None,               
 parser.add_argument( '--NILm1', type = int, default = 20,                           help = 'Number of angular equal probable bins for TNSL inelastic scattering. Note this is NIL - 1.' )
 parser.add_argument( '--NCL', type = int, default = 20,                             help = 'Number of angular equal probable bins for TNSL elastic scattering.' )
 parser.add_argument( '-v', '--verbose', action = 'count', default = 0,              help = 'Verbose mode.' )
+parser.add_argument( '--skipURR', action='store_true',                              help = 'Do not write URR probability tables even if they are present in GNDS.' )
+parser.add_argument('--skipILF_logic', action='store_true',                         help = 'If present, the URR ILF and ILO flags are only set to -1. This is mainly for testing.')
 parser.add_argument( 'gnds', type = str,                                            help = 'gnds file to convert to ACE.' )
 parser.add_argument( 'output', type = str,                                          help = 'name of the outputted ACE file.' )
 
 args = parser.parse_args( )
 
-gnds = reactionSuiteModule.ReactionSuite.readXML_file(args.gnds)
+if args.verbose > 0:
+    print('Reading GNDS file.')
+gnds = reactionSuiteModule.read(args.gnds, lazyParsing=True)
+
 if args.style is None:
     styleOptions = []
     for style in gnds.styles :
@@ -62,4 +67,6 @@ path = pathlib.Path(args.output)
 if not path.parent.exists():
     path.parent.mkdir(parents=True)
 
-gnds.toACE( args, args.style, args.output, args.ID, addAnnotation = args.annotate, verbose = args.verbose )
+if args.verbose > 0:
+    print('Calling toACE.')
+gnds.toACE(args, args.style, args.output, args.ID, addAnnotation=args.annotate, verbose=args.verbose, skipURR=args.skipURR, skipILF_logic=args.skipILF_logic)

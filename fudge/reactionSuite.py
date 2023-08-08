@@ -1962,7 +1962,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
         self.styles.remove( style )
 
     def saveAllToFile(self, fileName, hybrid=False, **kwargs):
-        '''
+        """
         Writes *self* and its covariance data to files. The name of the covariance file will be the same as the *fileName* but
         it will be put into a "Covariance" sub-directory inside the directory where *self* is written and "-covar" will be
         added before the extension. If hybrid is *True*, self will be written out in default hybrid mode with the HDF5 data 
@@ -1971,46 +1971,58 @@ class ReactionSuite(ancestryModule.AncestryIO):
         :param fileName:        The name of the file to write *self* to.
         :param hybrid:          If *True* data are written in hybrid XML/HDF5 files.
         :param kwargs:          Additional key-word arguments that are passed to internal calls.
-        '''
+        """
 
-        covarianceDir = pathlib.Path('Covariances')
+        from . import externalFile as externalFileModule
+        covarianceDir = pathlib.Path(kwargs.get('covarianceDir', 'Covariances'))
+
         fileName = pathlib.Path(fileName)
         covarianceName = covarianceDir / (fileName.stem + '-covar' + fileName.suffix)
         covariancePath = fileName.parent / covarianceName
 
         covariances = self.loadCovariances()
         originalPaths = {}
-        for covariance in covariances:
-            sourcePathC = pathlib.Path(covariance.sourcePath)
-            externalPath = None
-            for externalFile in self.externalFiles:                             # Find externalFile for this convariance.
-                if sourcePathC.samefile(externalFile.realpath()):
-                    externalPath = pathlib.Path(externalFile.path)
-                    break
+        if covariances and self.sourcePath is None:
+            # self was generated directly, not parsed from a ReactionSuite file. Add externalFiles before saving:
+            covariances[0].externalFiles.add(externalFileModule.ExternalFile("reactions", path=os.path.join("..", fileName)))
+            covariances[0].saveToFile(covariancePath)
 
-            if externalPath is None:
-                print('WARNING: could not find externalFile for covariance "%s".' % sourcePathC)
-            elif not externalPath.is_absolute():                                # Only write if not absolute.
-                if externalFile not in originalPaths:
-                    originalPaths[externalFile] = externalFile.path             # Needs to be reset back to original name before this method exits..
-                externalFile.path = str(covarianceName)
-                if covariancePath is None:
-                    covariancePath = fileName.parent / covarianceDir / sourcePathC.name
-                    print('WARNING: multiple covariance files, using "%s".' % covariancePath)
+            sha1sum = checksumsModule.Sha1sum.from_file(covariancePath)
+            self.externalFiles.add(externalFileModule.ExternalFile("covariances", covariancePath, checksum=sha1sum))
 
-                externalPathC = None
-                selfSourcePath = pathlib.Path(self.sourcePath)
-                for externalFileC in covariance.externalFiles:
-                    externalFilePath = pathlib.Path(externalFileC.realpath())
-                    if externalFilePath.exists() and selfSourcePath.samefile(externalFilePath):
-                        externalPathC = externalFileC
+        else:
+            # locate and update the ExternalFiles pointing between the two files
+            for covariance in covariances:
+                externalPath = None
+                sourcePathC = pathlib.Path(covariance.sourcePath)
+                for externalFile in self.externalFiles:                             # Find externalFile for this covariance.
+                    if sourcePathC.samefile(externalFile.realpath()):
+                        externalPath = pathlib.Path(externalFile.path)
                         break
-                if externalPathC is None:
-                    print('WARNING: could not find externalFile in covariance for reactionSuite.')
-                else:
-                    if externalFileC not in originalPaths:
-                        originalPaths[externalFileC] = externalFileC.path             # Needs to be reset back to original name before this method exits..
-                    externalPathC.path = str(pathlib.Path('../') / fileName.name)
+
+                if externalPath is None:
+                    print('WARNING: could not find externalFile for covariance "%s".' % sourcePathC)
+                elif not externalPath.is_absolute():                                # Only write if not absolute.
+                    if externalFile not in originalPaths:
+                        originalPaths[externalFile] = externalFile.path             # Needs to be reset back to original name before this method exits..
+                    externalFile.path = str(covarianceName)
+                    if covariancePath is None:
+                        covariancePath = fileName.parent / covarianceDir / sourcePathC.name
+                        print('WARNING: multiple covariance files, using "%s".' % covariancePath)
+
+                    externalPathC = None
+                    selfSourcePath = pathlib.Path(self.sourcePath)
+                    for externalFileC in covariance.externalFiles:
+                        externalFilePath = pathlib.Path(externalFileC.realpath())
+                        if externalFilePath.exists() and selfSourcePath.samefile(externalFilePath):
+                            externalPathC = externalFileC
+                            break
+                    if externalPathC is None:
+                        print('WARNING: could not find externalFile in covariance for reactionSuite.')
+                    else:
+                        if externalFileC not in originalPaths:
+                            originalPaths[externalFileC] = externalFileC.path             # Needs to be reset back to original name before this method exits..
+                        externalPathC.path = str(pathlib.Path('../') / fileName.name)
                 covariance.saveToFile(covariancePath, **kwargs)
                 covariancePath = None
 

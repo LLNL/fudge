@@ -69,7 +69,15 @@
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrderLessThan</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>        <span class="c1"># Also checks isinstance of other.</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">familyOrder</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">familyOrder</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span></div></div>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">intid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intidDB</span><span class="o">=</span><span class="p">{}):</span>
+
+        <span class="n">unorthodoxIndex</span> <span class="o">=</span> <span class="n">intidDB</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unorthodoxIndex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unorthodox &quot;</span><span class="si">%s</span><span class="s1">&quot; does not have a defined intid.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">unorthodoxIndex</span></div>
 
 <div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.unorthodox.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
 

@@ -145,12 +145,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="ArrayBase.offsetScaleValues"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.offsetScaleValues">[docs]</a>    <span class="k">def</span> <span class="nf">offsetScaleValues</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Modify every element in the array: multiply by scale and add offset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Modify every element in the array: multiply by scale and add offset.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">offsetScaleValues</span><span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ArrayBase.constructVector"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.constructVector">[docs]</a>    <span class="k">def</span> <span class="nf">constructVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secondIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert the output of the xData.xDataArray.arrayBase.constructArray() to an instancce of xData.vector.Vector.</span>
 
 <span class="sd">        :param secondIndex: Index along the third dimension from which to extract 1d-array.</span>
@@ -173,7 +173,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The method constructVector is only defined for 1D or 2D arrays&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ArrayBase.constructMatrix"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.constructMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">constructMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thirdIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate an xData.matrix.Matrix object from an xData.xDataArray.arrayBase instance.</span>
 
 <span class="sd">        :param thirdIndex: Index along the third dimension from which to extract 2d-array.</span>
@@ -579,7 +579,7 @@
 
 <div class="viewcode-block" id="Flattened.fromNumpyArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.fromNumpyArray">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">fromNumpyArray</span><span class="p">(</span> <span class="n">array</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">nzeroes</span> <span class="o">=</span> <span class="mi">4</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a sparse flattened array that represents an arbitrary numpy array.</span>
 <span class="sd">        Only supports &#39;full&#39; or &#39;lower-symmetric&#39; matrices, with row-major data storage.</span>
 <span class="sd">        :param array: input numpy array</span>
@@ -688,7 +688,7 @@
         <span class="k">return</span> <span class="n">array1</span></div>
 
 <div class="viewcode-block" id="Embedded.offsetScaleValues"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.offsetScaleValues">[docs]</a>    <span class="k">def</span> <span class="nf">offsetScaleValues</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Modify every sub-array: multiply by scale and add offset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Modify every sub-array: multiply by scale and add offset.&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">subarray</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span><span class="p">:</span> <span class="n">subarray</span><span class="o">.</span><span class="n">offsetScaleValues</span><span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">)</span></div>
 

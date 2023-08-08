@@ -49,10 +49,10 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">vector</span> <span class="k">as</span> <span class="n">vectorModule</span>
 
 <div class="viewcode-block" id="Matrix"><a class="viewcode-back" href="../../xData/index.html#xData.matrix.Matrix">[docs]</a><span class="k">class</span> <span class="nc">Matrix</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Class to store mathematical matrix that perform several matrix operations.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to store mathematical matrix that perform several matrix operations.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numberRows</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">numberColumns</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize an instance of Matrix.</span>
 
 <span class="sd">        The input arguments are optional and the default behaviour is and instance of Matrix with self.matrix = None.</span>
@@ -101,12 +101,12 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid &quot;values&quot; named argument to </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1">. Either provide a list of lists, a 2-dimensional Numpy ndarray or another instance of </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of rows of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of rows of *self*.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexTuple</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return value of self.matrix at location specified by the input tuple.</span>
 
 <span class="sd">        :indexTuple: Row and column indices of the self.matrix value to return.</span>
@@ -116,7 +116,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">[</span><span class="n">indexTuple</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexTuple</span><span class="p">,</span> <span class="n">newScalarValue</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replace value at specified location of self.matrix.</span>
 
 <span class="sd">        :indexTuple: Row and column indices of the self.matrix value to replace.</span>
@@ -130,7 +130,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">otherMatrixOrScalar</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add the matrix or scalar given in the input argument to self.matrix.</span>
 
 <span class="sd">        :otherMatrixOrScalar: Vector or scalar to add.</span>
@@ -157,7 +157,7 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Adding a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">otherMatrixOrScalar</span><span class="p">)</span><span class="si">}</span><span class="s1"> to a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1"> is not allowed.&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">otherMatrixOrScalar</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In-place addition.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">otherMatrixOrScalar</span><span class="p">)</span>
@@ -167,7 +167,7 @@
     <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
 
     <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">otherMatrixOrScalar</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Subtract the matrix or scalar given in the input argument from self.matrix.</span>
 
 <span class="sd">        :otherMatrixOrScalar: Matrix or scalar to subract.</span>
@@ -176,13 +176,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="o">-</span><span class="n">otherMatrixOrScalar</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">otherMatrixOrScalar</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Subtract self.matrix from the matrix given in the input argument.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="n">otherMatrixOrScalar</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Negation of self.matrix.</span>
 
 <span class="sd">        :returns: A new instance of Matrix.</span>
@@ -190,7 +190,7 @@
         <span class="k">return</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">values</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalarValue</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Multiply a scalar to self.matrix.</span>
 
 <span class="sd">        :scalarValue: Multiplication scalar.</span>
@@ -203,7 +203,7 @@
     <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
     <span class="k">def</span> <span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalarValue</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In-place multiplication</span>
 
 <span class="sd">        :scalarValue: Multiplication scalar.</span>
@@ -213,7 +213,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalarValue</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        True division of self.matrix by the input scalar argument.</span>
 
 <span class="sd">        :scalarValue: Division scalar.</span>
@@ -224,7 +224,7 @@
             <span class="k">return</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">/</span><span class="n">scalarValue</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalarValue</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In-place true division.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">(</span><span class="n">scalarValue</span><span class="p">)</span>
@@ -232,14 +232,14 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a string representation of self.matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the shape of self.matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -247,20 +247,20 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">numberOfRows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the number of rows of self.matrix. This is the same as len(self).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">numberOfColumns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the number of columns of self.matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Matrix.append"><a class="viewcode-back" href="../../xData/index.html#xData.matrix.Matrix.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newRow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Append row to self.matrix.</span>
 
 <span class="sd">        :newRow: New vector to append as a new row to self.matrix.</span>
@@ -282,7 +282,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rowToAppend</span><span class="p">,</span> <span class="n">ndmin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Matrix.transpose"><a class="viewcode-back" href="../../xData/index.html#xData.matrix.Matrix.transpose">[docs]</a>    <span class="k">def</span> <span class="nf">transpose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transpose self.matrix.</span>
 
 <span class="sd">        :returns: A new instance of Matrix</span>
@@ -290,7 +290,7 @@
         <span class="k">return</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Matrix.reverse"><a class="viewcode-back" href="../../xData/index.html#xData.matrix.Matrix.reverse">[docs]</a>    <span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reverse the order of elements long both the row and column dimensions.</span>
 
 <span class="sd">        :returns: A new instance of Matrix</span>

@@ -92,7 +92,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="Subform.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainsToFix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the *fixDomains* method on the *data* member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -114,7 +114,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Subform.findEntity"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Override ancestry.findEntity for angularSubform and energySubform</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -144,7 +144,7 @@
         <span class="n">Subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">energyModule</span><span class="o">.</span><span class="n">Subform</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form">[docs]</a><span class="k">class</span> <span class="nc">Form</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">Form</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Contains uncorrelated distributions for outgoing angle and outgoing energy. Use when the correlations</span>
 <span class="sd">    between angle and energy are unknown.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -188,7 +188,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">aveEnergy</span> <span class="p">],</span> <span class="p">[</span> <span class="n">aveMomentum</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the energy spectrum at projectile energy *energyIn* in frame *frame*. Currently,</span>
 <span class="sd">        if frame=&#39;lab&#39; and the product is a photon then its data are treated as being in the lab frame.</span>
 <span class="sd">        The domain of angular integration can be set with the muMin and muMax keys in *kwargs*. Default angular integration</span>
@@ -231,7 +231,7 @@
             <span class="k">return</span> <span class="n">energySpectrum</span></div>
 
 <div class="viewcode-block" id="Form.getSpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.getSpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">getSpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This method is deprecated, please use energySpectrumAtEnergy instead.</span>
 <span class="sd">        Returns the energy spectrum for self at projectile energy in the lab frame.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -239,7 +239,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">lab</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.findEntity"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overrides ancestry.findEntity. uncorrelated contains both energy and angular form,</span>
 <span class="sd">        need to check both to find desired entity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -249,7 +249,7 @@
         <span class="k">return</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">Ancestry</span><span class="o">.</span><span class="n">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainsToFix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the *fixDomains* method on the *energy* and *angular* members.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -432,7 +432,7 @@
 
 <div class="viewcode-block" id="Form.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;uncorrelated&gt; element from xml. Must contain one &lt;angular&gt; and one &lt;energy&gt; component.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;uncorrelated&gt; element from xml. Must contain one &lt;angular&gt; and one &lt;energy&gt; component.&quot;&quot;&quot;</span>
         
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>

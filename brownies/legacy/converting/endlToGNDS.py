@@ -1578,6 +1578,7 @@ def toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=GNDS_format
 
     if covarianceSuite is not None:
         covarianceSuite.styles.add(evaluatedStyle.copy())   # don't include documentation in covariances
+        reactionSuite._loadedCovariances = [covarianceSuite]
 
     documentation = self.getDocumentation( )
     if( documentation is None ) : documentation = "From ENDL: no documentation specified."

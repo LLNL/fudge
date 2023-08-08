@@ -97,7 +97,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__productYields</span><span class="o">.</span><span class="n">amendForPatch</span><span class="p">(</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate average product data.</span>
 
 <span class="sd">        :param style: The style to use.</span>
@@ -109,7 +109,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutrons</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.check"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check for problems in delayed fission products, product yields and energy release data</span>
 
 <span class="sd">        :param info:</span>
@@ -133,14 +133,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__productYields</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **delayedNeutrons** member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutrons</span><span class="o">.</span><span class="n">fixDomains</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutrons</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">()</span></div>
 
@@ -154,7 +154,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__fissionEnergyReleases</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.multiGroupQ"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupQ">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group, Q for the requested label for the this output channel. This is a cross section weighted Q.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -170,7 +170,7 @@
         <span class="k">return</span> <span class="n">Q</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.multiGroupMultiplicity"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupMultiplicity">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group multiplicity for the requested label for the request product of this output channel. This is a cross section weighted multiplicity.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -186,7 +186,7 @@
         <span class="k">return</span> <span class="n">multiplicity</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.multiGroupAverageEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupAverageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group, average energy for the requested label for the requested product. This is a cross section weighted average energy.</span>
 <span class="sd">        </span>
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -201,7 +201,7 @@
         <span class="k">return</span> <span class="n">averageEnergy</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.multiGroupAverageMomentum"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupAverageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageMomentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of the multi-group, average momentum for the requested label for the requested product. This is a cross section weighted average momentum.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -217,7 +217,7 @@
         <span class="k">return</span> <span class="n">averageMomentum</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.multiGroupProductMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -235,7 +235,7 @@
         <span class="k">return</span> <span class="n">productMatrix</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.multiGroupProductArray"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the full multi-group, total product array for the requested label for the requested product id.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -264,7 +264,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__productYields</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.removeStyles"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 

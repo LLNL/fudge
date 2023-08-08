@@ -90,3 +90,15 @@ class Transportables( suitesModule.Suite ) :
     def __init__( self ) :
 
         suitesModule.Suite.__init__( self, ( Transportable, ), allow_href = True )
+
+    def parseNode(self, node, xPath, linkData, **kwargs):
+        '''
+        This is a temporary kludge and should be in suitesModule.Suite.parseNode.
+        '''
+# FIXME
+
+        href = node.get('href')
+        if href is None:
+            suitesModule.Suite.parseNode(self, node, xPath, linkData, **kwargs)
+        else:
+            self.set_href(href)

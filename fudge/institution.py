@@ -20,6 +20,7 @@ from LUPY import ancestry as ancestryModule
 
 from fudge.reactions import reaction as reactionModule
 from fudge import outputChannel as outputChannelModule
+from fudge import product as productModule
 from fudge.processing import nuclearPlusCoulombInterference as nuclearPlusCoulombInterferenceModule
 from fudge.processing.deterministic import tokens as deterministicTokensModule
 
@@ -54,6 +55,21 @@ class Institution(ancestryModule.AncestryIO):
         for item in self :
             if( hasattr( item, 'findLinks' ) ) : getattr( item, 'findLinks' )( links )
 
+    def parseAndReplace(self, index, cls):
+        '''
+        Replaces the unknown item at *index* with a parsed version of its self using class *cls*.
+        The parsed instance is also returned.  This currently assumes that the data are from XML.
+
+        :param index:       The index of *self.__data* of the data to parse and replace.
+        :param cls:         The class used to parse the data at *index*.
+
+        :return:            The parsed instance.
+        '''
+
+        self.__data[index] = cls.parseXMLString('\n'.join(self.__data[index].node.stringList))
+
+        return self.__data[index]
+
     def toXML_strList( self, indent='', **kwargs ):
 
         indent2 = indent + kwargs.get('incrementalIndent','  ')
@@ -69,7 +85,7 @@ class Institution(ancestryModule.AncestryIO):
         label = node.get('label')
         xPath.append('%s[@label="%s"]' % (node.tag, label))
 
-        if node.get('label') == "LLNL":
+        if label == 'LLNL':
             institution = cls(label)
             for child in node:
                 if child.tag == nuclearPlusCoulombInterferenceModule.NuclearPlusCoulombInterference.moniker:
@@ -81,6 +97,15 @@ class Institution(ancestryModule.AncestryIO):
             for child in node:
                 if child.tag == reactionModule.Reaction.moniker:
                     institution.append(reactionModule.Reaction.parseNodeUsingClass(child, xPath, linkData))
+                else:                       # This should not happen.
+                    raise Exception('Unsupported child "%s" for institution "%s".' % (child.tag, label))
+        elif label == deterministicTokensModule.multiGroupIncompleteProducts:
+            institution = cls(label)
+            for child in node:
+                if child.tag == productModule.Products.moniker:
+                    products = productModule.Products()
+                    products.parseNode(child, xPath, linkData)
+                    institution.append(products)
                 else:                       # This should not happen.
                     raise Exception('Unsupported child "%s" for institution "%s".' % (child.tag, label))
         elif label == deterministicTokensModule.multiGroupDelayedNeutrons:
@@ -126,6 +151,10 @@ class UnknownInstitution(ancestryModule.AncestryIO):
 
         return self.__node.toXML_strList(indent = indent, **kwargs)
 
+    def parseNodeWithInstitutionClass(self, cls, **kwargs):
+
+        return self.__node.parseNodeWithInstitutionClass(cls, **kwargs)
+
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         return cls(UnknownInstitutionXML_node(node))
@@ -156,6 +185,14 @@ class UnknownInstitutionXML_node:
         if( len( strings ) > 0 ) : strings[0] = indent + strings[0]
 
         return( self.stringList )
+
+    def parseNodeWithInstitutionClass(self, cls, **kwargs):
+
+        string = '\n'.join(self.__stringList)
+        string = string[string.find('>')+1:]
+        string = string[:string.find('</institution>')]
+
+        return cls.parseXMLString(string, **kwargs)
 
 class UnknownLLNL_child(ancestryModule.Ancestry):
     """

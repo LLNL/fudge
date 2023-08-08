@@ -169,7 +169,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     if hasattr(self, 'doubleDifferentialCrossSection'):
         self.doubleDifferentialCrossSection.toENDF6(MT, endfMFList, targetInfo)
 
-    doMF4AsMF6 = False
+    doMF4AsMF6 = 900 <= MT <= 999
     if reactionSuite.projectile not in (IDsPoPsModule.neutron, IDsPoPsModule.photon): doMF4AsMF6 = True
     for product in outputChannel:
         if len(product.distribution) and not isinstance(product.distribution.evaluated, unspecifiedModule.Form):

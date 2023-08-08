@@ -96,7 +96,7 @@
 <span class="n">decayModeTypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">decayModesIT</span><span class="p">,</span> <span class="n">decayModesSF</span><span class="p">,</span> <span class="n">decayModesParticle</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Decay"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.Decay">[docs]</a><span class="k">class</span> <span class="nc">Decay</span><span class="p">(</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithIndexKey</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Describes one step in a multi-step decay. For example, in beta-delayed 2-n emission</span>
 <span class="sd">    the first &lt;decay&gt; is for the beta-decay, and the 2nd and 3rd &lt;decay&gt; elements describe the two neutrons</span>
 <span class="sd">    being emitted sequentially.</span>
@@ -105,7 +105,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;decay&#39;</span>
 
 <div class="viewcode-block" id="Decay.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.Decay.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">complete</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param index: int, identifies the position of this decay within the decayPath. 0 = first, 1 = second, etc.</span>
 <span class="sd">        :param mode: string identifying a decay mode, such as &quot;isomeric transition&quot;</span>
 <span class="sd">        :param complete: boolean, whether all outgoing products are listed</span>
@@ -139,7 +139,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Decay.convertUnits"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.Decay.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See documentation in PoPs.database.convertUnits&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation in PoPs.database.convertUnits&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
@@ -192,7 +192,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="DecayPath"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayPath">[docs]</a><span class="k">class</span> <span class="nc">DecayPath</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores all &lt;decay&gt; steps involved in a decayMode</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -213,7 +213,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="DecayMode"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayMode">[docs]</a><span class="k">class</span> <span class="nc">DecayMode</span><span class="p">(</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Describes one way a particle can decay. The description includes the probability, Q-value, outgoing products</span>
 <span class="sd">    and spectra. For electro-magnetic decays, may also include a set of internal conversion coefficients</span>
 <span class="sd">    and/or photon emission probabilities.</span>
@@ -222,7 +222,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;decayMode&#39;</span>
 
 <div class="viewcode-block" id="DecayMode.__init__"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayMode.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">mode</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param label: string, must be unique within this &lt;decayModes&gt; section</span>
 <span class="sd">        :param mode: string, describes the decay mode. Examples: &quot;beta+ or e.c.&quot;, &quot;beta-,n&quot;, &quot;alpha&quot;, etc.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -290,7 +290,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spectra</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="DecayMode.convertUnits"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayMode.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__probability</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
@@ -298,7 +298,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__spectra</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DecayMode.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayMode.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: deep copy of self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -373,7 +373,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="DecayModes"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayModes">[docs]</a><span class="k">class</span> <span class="nc">DecayModes</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Contains a list of decayMode instances</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -394,7 +394,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="DecayData"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayData">[docs]</a><span class="k">class</span> <span class="nc">DecayData</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Contains all decay information for a particle, including average energies for decay products</span>
 <span class="sd">    and a list of decay modes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -422,13 +422,13 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__averageEnergies</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="DecayData.convertUnits"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayData.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See convertUnits documentation in PoPs.database&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__decayModes</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__averageEnergies</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DecayData.copy"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayData.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: deep copy of self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -437,7 +437,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">_decayData</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DecayData.copyItems"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.decayData.DecayData.copyItems">[docs]</a>    <span class="k">def</span> <span class="nf">copyItems</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copy all items in self to other</span>
 <span class="sd">        :param other: decayData instance where contents of self will be copied</span>
 <span class="sd">        &quot;&quot;&quot;</span>

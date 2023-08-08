@@ -32,6 +32,14 @@ class Particle( particleModule.Particle ) :
         if( self.familyOrder != other.familyOrder ) : return( False )
         return( self.id < other.id )
 
+    def intid(self, intidDB={}):
+
+        unorthodoxIndex = intidDB.get(self.id)
+        if unorthodoxIndex is None:
+            ValueError('Unorthodox "%s" does not have a defined intid.' % (self.id))
+
+        return unorthodoxIndex
+
 class Suite( particleModule.Suite ) :
 
     moniker = 'unorthodoxes'

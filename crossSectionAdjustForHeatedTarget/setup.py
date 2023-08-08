@@ -5,8 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import setuptools
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 import os, glob, shutil
 
 libs = glob.glob(os.path.join('build', 'lib*', 'crossSectionAdjustForHeatedTarget*'))

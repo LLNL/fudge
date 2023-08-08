@@ -92,7 +92,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add two Ys1d instances, checking to ensure they are on the same x grid.</span>
 <span class="sd">        @param other: must be Ys1d instance or 0</span>
 <span class="sd">        @return: new Ys1d instance</span>
@@ -101,8 +101,9 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Ys1d</span><span class="p">),</span> <span class="s2">&quot;Adding Ys1d to </span><span class="si">%s</span><span class="s2"> not supported&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">grid</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Adding Ys1d with different grids&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">axes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">grid</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Adding Ys1d with different grids&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ys</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">Ys</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;self.Ys.length = </span><span class="si">%d</span><span class="s1"> != other.Ys.length = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ys</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">Ys</span><span class="o">.</span><span class="n">length</span><span class="p">))</span>
 
@@ -122,7 +123,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Access the X-grid (following link if necessary). Raises AttributeError if no grid found.</span>
 <span class="sd">        @return: axesModule.Grid</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -136,7 +137,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">Ys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Access the Values container storing y-values</span>
 <span class="sd">        @return: xData.values.Values instance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -144,7 +145,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span>
 
 <div class="viewcode-block" id="Ys1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        unitMap is a dictionary of the form { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -240,7 +241,7 @@
 
 <div class="viewcode-block" id="Ys1d.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Translates XML Ys1d into a Ys1d instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -265,7 +266,7 @@
 
 <div class="viewcode-block" id="Ys1d.defaultAxes"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.defaultAxes">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span><span class="n">labelsUnits</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param labelsUnits: dictionary of form { 0 : ( &#39;dependent label&#39;,   &#39;dependent unit&#39; ),</span>
 <span class="sd">                                                 1 : ( &#39;independent label&#39;, &#39;independent unit&#39; ) }</span>
 <span class="sd">        :return: new axes instance</span>

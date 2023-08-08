@@ -84,7 +84,6 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     targetZA, targetMass, LRP, LFI, NLIB, NMOD = \
         endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][0], logFile=logFile)
     targetZA = int(targetZA)  # Target's ZA
-    info.ZA_massLineInfo.add(targetZA, targetMass, 451, 1, 0)
     LRP = int(LRP)            # Resonance parameter data info
     LFI = int(LFI)            # Is fission present
     NLIB = int(NLIB)          # What library (e.g., 0 = ENDF/B
@@ -104,6 +103,9 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     if (NFOR != 6):
         print ("    WARNING: endfFileToGNDS only supports ENDF-6 format. This file has unsupported NFOR=%d" % NFOR)
 
+    info.ZA_massLineInfo.targetZA = targetZA
+    info.ZA_massLineInfo.targetLIS = LIS
+    info.ZA_massLineInfo.add(targetZA, targetMass, 451, 1, 0)
     # Line #3
     projectileMass, EMAX, LREL, dummy, NSUB, NVER = \
         endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][2], logFile=logFile)
@@ -204,6 +206,13 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
 
     return info
 
+def printMassHistoryAndReturn(printMassHistory, info, stuffToReturn):
+
+    if printMassHistory:
+        info.massTracker.printHistory()
+        info.ZA_massLineInfo.printInfo()
+
+    return stuffToReturn
 
 def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation=None,
                     MTs2Skip=None, parseCrossSectionOnly=False, formatVersion=GNDS_formatVersionModule.default,
@@ -231,17 +240,20 @@ def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation
         if option not in options: raise DeprecationWarning('invalid or deprecated option "%s"' % option)
         setattr(info, option, kwargs[option])
 
-    if( info.ITYPE == 1 ) :                                                         # NFY
-        return( ENDF_ITYPE_1Module.ITYPE_1( MTDatas, info, verbose = verbose ) )
-    elif( info.ITYPE == 2 ) :                                                       # Thermal scattering law data
-        return(ENDF_ITYPE_2.ITYPE_2(fileName, MAT, MTDatas, info, evaluation, verbose = verbose))
-    elif( info.ITYPE == 4 ) :                                                       # Decay data
-        return(ENDF_ITYPE_4.ITYPE_4(MTDatas, info, verbose = verbose))
-    elif( info.ITYPE == 5 ) :                                                       # SFY
-        return( ENDF_ITYPE_5Module.ITYPE_5( MTDatas, info, verbose = verbose ) )
-    elif( info.ITYPE == 6 )  :                                                      # Atomic relaxation data
-        if( info.NSUB not in [ 6 ] ) : raise ValueError( 'For ITYPE = %d, invalid NSUB = %s' % ( info.ITYPE, info.NSUB ) )
-        return(ENDF_ITYPE_6.ITYPE_6(info.targetZA // 1000, MTDatas, info, verbose = verbose))
+    printMassHistory = kwargs.get('printMassHistory', False)
+
+    if info.ITYPE == 1:                                                         # NFY
+        return printMassHistoryAndReturn(printMassHistory, info, ENDF_ITYPE_1Module.ITYPE_1(MTDatas, info, verbose = verbose))
+    elif info.ITYPE == 2:                                                       # Thermal scattering law data
+        return printMassHistoryAndReturn(printMassHistory, info, ENDF_ITYPE_2.ITYPE_2(fileName, MAT, MTDatas, info, evaluation, verbose = verbose))
+    elif info.ITYPE == 4:                                                       # Decay data
+        return printMassHistoryAndReturn(printMassHistory, info, ENDF_ITYPE_4.ITYPE_4(MTDatas, info, verbose = verbose))
+    elif info.ITYPE == 5:                                                       # SFY
+        return printMassHistoryAndReturn(printMassHistory, info, ENDF_ITYPE_5Module.ITYPE_5(MTDatas, info, verbose = verbose))
+    elif info.ITYPE == 6:                                                       # Atomic relaxation data
+        if info.NSUB not in [6]:
+            raise ValueError('For ITYPE = %d, invalid NSUB = %s' % (info.ITYPE, info.NSUB))
+        return printMassHistoryAndReturn(printMassHistory, info, ENDF_ITYPE_6.ITYPE_6(info.targetZA // 1000, MTDatas, info, verbose = verbose))
 
     # Second batch of ITYPE's are general transport data
     if( info.LIS  != 0 ) : levelIndex = info.LIS
@@ -366,6 +378,7 @@ def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation
         # FIXME what if covariances span smaller domain than reactions?
         covarianceSuite.styles[info.style].projectileEnergyDomain.min = domainMin
         covarianceSuite.styles[info.style].projectileEnergyDomain.max = domainMax
+        reactionSuite._loadedCovariances = [covarianceSuite]
 
     # Fill up the reactionSuite
     for reaction in reactionSuite.reactions : addUnspecifiedDistributions( info, reaction.outputChannel )
@@ -433,7 +446,8 @@ def endfFileToGNDS(fileName, useFilesQAlways=True, singleMTOnly=None, evaluation
         for missingRadioactiveProduct in info.missingRadioactiveProduct:
             print('     ========', missingRadioactiveProduct)
 
-    if kwargs.get('printMassHistory', False):
+    printMassHistory = kwargs.get('printMassHistory', False)
+    if printMassHistory:
         info.massTracker.printHistory()
         info.ZA_massLineInfo.printInfo()
 

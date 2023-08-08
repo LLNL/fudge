@@ -63,7 +63,7 @@
 <span class="kn">from</span> <span class="nn">.summed</span> <span class="kn">import</span> <span class="n">SummedCovariance</span>
 
 <div class="viewcode-block" id="CovarianceSection"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.CovarianceSection">[docs]</a><span class="k">class</span> <span class="nc">CovarianceSection</span><span class="p">(</span><span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A covarianceSuite contains sections, where each section represents either a self-covariance for one quantity,</span>
 <span class="sd">    or a cross-covariance between two quantities</span>
 
@@ -79,9 +79,10 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;covarianceSection&#39;</span>
     <span class="n">monikerByFormat</span> <span class="o">=</span> <span class="p">{</span><span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span> <span class="s1">&#39;section&#39;</span><span class="p">}</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;rowData&#39;</span><span class="p">,</span> <span class="s1">&#39;columnData&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Defines one rectangular block of the full covariance matrix. Contains one or more forms</span>
 <span class="sd">        (each form inherits from base.covarianceMatrix)</span>
 
@@ -92,8 +93,13 @@
 
         <span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">Covariance</span><span class="p">]</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">rowData</span> <span class="o">=</span> <span class="n">rowData</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rowData</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">columnData</span> <span class="o">=</span> <span class="n">columnData</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">columnData</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">crossTerm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -101,7 +107,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">evaluated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to grab evaluated style</span>
 <span class="sd">        FIXME method should be inherited, but abstractClasses.Component defines methods that don&#39;t make sense for covariances</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -116,7 +122,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <div class="viewcode-block" id="CovarianceSection.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.CovarianceSection.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; check each section &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; check each section &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
@@ -126,9 +132,16 @@
                 <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span> <span class="s2">&quot;Form &#39;</span><span class="si">%s</span><span class="s2">&#39;:&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">formWarnings</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="CovarianceSection.findInstancesOfClassInChildren"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.CovarianceSection.findInstancesOfClassInChildren">[docs]</a>    <span class="k">def</span> <span class="nf">findInstancesOfClassInChildren</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">9999</span><span class="p">):</span>
+
+        <span class="n">foundInstances</span> <span class="o">=</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">Ancestry</span><span class="o">.</span><span class="n">findInstancesOfClassInChildren</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+        <span class="n">foundInstances</span> <span class="o">+=</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="n">findInstancesOfClassInChildren</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">foundInstances</span></div>
     
 <div class="viewcode-block" id="CovarianceSection.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.CovarianceSection.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span> 
-        <span class="sd">&quot;&quot;&quot;assemble some useful info, to be handed down to children&#39;s check() functions&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;assemble some useful info, to be handed down to children&#39;s check() functions&quot;&quot;&quot;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowData</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="n">info</span><span class="p">[</span><span class="s1">&#39;rowENDF_MFMT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -158,7 +171,7 @@
 
 <div class="viewcode-block" id="CovarianceSection.parseNodeUsingClass"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.CovarianceSection.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;section&gt; element from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;section&gt; element from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@label=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
@@ -185,7 +198,7 @@
         <span class="k">return</span> <span class="n">section_</span></div></div>
 
 <div class="viewcode-block" id="DataLink"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.DataLink">[docs]</a><span class="k">class</span> <span class="nc">DataLink</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for RowData and ColumnData. Both are links but with some additional attributes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -209,7 +222,7 @@
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="sd">&quot;&quot;&quot; # not sure we need this anymore...</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; # not sure we need this anymore...</span>
 <span class="sd">    def __deepcopy__( self, memodict={} ):</span>
 
 <span class="sd">        copy_ = super().__deepcopy__()</span>
@@ -223,8 +236,9 @@
 <div class="viewcode-block" id="DataLink.toXML_strList"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.DataLink.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+        <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">formatVersion</span> <span class="o">==</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span>
             <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MFMT</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39; ENDF_MFMT=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MFMT</span>
@@ -286,7 +300,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;columnData&#39;</span></div>
 
 <div class="viewcode-block" id="Slice"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.Slice">[docs]</a><span class="k">class</span> <span class="nc">Slice</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Used inside covariances for multi-dimensional functions.</span>
 <span class="sd">    Each Slice fixes a value or range along one dimension of the multi-dimensional function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

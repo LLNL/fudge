@@ -154,7 +154,7 @@
                                                      <span class="n">lowerEps</span><span class="o">=</span><span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="n">upperEps</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.effectiveThreshold"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.XYs1d.effectiveThreshold">[docs]</a>    <span class="k">def</span> <span class="nf">effectiveThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Some reactions have a cross section with multiple zero values at their beginning. In such a case, the effective threshold is the point</span>
 <span class="sd">        before the first non-zero cross section value. Otherwise, it is the energy of the first point.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -189,7 +189,7 @@
 <div class="viewcode-block" id="XYs1d.heat"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.XYs1d.heat">[docs]</a>    <span class="k">def</span> <span class="nf">heat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">currentTemperature</span><span class="p">,</span> <span class="n">newTemperature</span><span class="p">,</span> <span class="n">massRatio</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">lowerlimit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upperlimit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">interpolationAccuracy</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">heatAllPoints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">doNotThin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">heatBelowThreshold</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
              <span class="n">heatAllEDomain</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">setThresholdToZero</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a linear version of the cross-section heated to &#39;newTemperature&#39;. If the current temperature of the</span>
 <span class="sd">        cross-section, given by &#39;currentTemperature&#39;, is greater than &#39;newTemperature&#39; a raise is executed.</span>
 <span class="sd">        If lowerlimit is None, it is set to &#39;oneOverV&#39; except when the reaction is determined to be a threshold reaction,</span>
@@ -307,7 +307,7 @@
 
 
 <div class="viewcode-block" id="Regions1d"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Regions1d">[docs]</a><span class="k">class</span> <span class="nc">Regions1d</span><span class="p">(</span><span class="n">BaseCrossSectionForm</span><span class="p">,</span> <span class="n">regionsModule</span><span class="o">.</span><span class="n">Regions1d</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class stores a cross-section in two or more regions, which may have different interpolations.</span>
 <span class="sd">    Each region must contain at least two points. Each pair of adjacent regions must overlap at exactly one point.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -318,7 +318,7 @@
         <span class="n">regionsModule</span><span class="o">.</span><span class="n">Regions1d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Regions1d.effectiveThreshold"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Regions1d.effectiveThreshold">[docs]</a>    <span class="k">def</span> <span class="nf">effectiveThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Some reactions have a cross section with multiple zero values at their beginning. In such a case, the effective threshold is the point</span>
 <span class="sd">        before the first non-zero cross section value. Otherwise, it is the energy of the first point.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -413,7 +413,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BackgroundTerm.fixDomains"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.BackgroundTerm.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">ancestorReference</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **data** member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -544,7 +544,7 @@
                 <span class="n">term_</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Background.fixDomains"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Background.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the *fastRegion* member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -563,7 +563,7 @@
         <span class="k">return</span> <span class="n">counter</span></div>
 
 <div class="viewcode-block" id="Background.toRegions"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Background.toRegions">[docs]</a>    <span class="k">def</span> <span class="nf">toRegions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Merge all background terms into a single Regions1d</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -631,7 +631,7 @@
 
 
 <div class="viewcode-block" id="ResonancesWithBackground"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.ResonancesWithBackground">[docs]</a><span class="k">class</span> <span class="nc">ResonancesWithBackground</span><span class="p">(</span><span class="n">BaseCrossSectionForm</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class stores cross-sections that include resonances along with a background contribution.</span>
 <span class="sd">    Contains a link to the resonances, and the &#39;background&#39; which consists of up to three terms:</span>
 <span class="sd">    resolved, unresolved and fast regions.</span>
@@ -704,12 +704,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">domainUnit</span>
 
 <div class="viewcode-block" id="ResonancesWithBackground.backgroundAsRegions1d"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.ResonancesWithBackground.backgroundAsRegions1d">[docs]</a>    <span class="k">def</span> <span class="nf">backgroundAsRegions1d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;This methods returns the backgroup cross sections as a Regions1d instance.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;This methods returns the backgroup cross sections as a Regions1d instance.&#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">toRegions</span><span class="p">()</span></div>
         
 <div class="viewcode-block" id="ResonancesWithBackground.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.ResonancesWithBackground.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
         <span class="c1"># FIXME skipping uncertainties for now</span>
@@ -725,7 +725,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ResonancesWithBackground.fixDomains"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.ResonancesWithBackground.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the *background* member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -773,7 +773,7 @@
 
 
 <div class="viewcode-block" id="Reference"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Reference">[docs]</a><span class="k">class</span> <span class="nc">Reference</span><span class="p">(</span><span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">,</span> <span class="n">BaseCrossSectionForm</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This cross section form consists of a reference to another cross section.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This cross section form consists of a reference to another cross section.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;reference&#39;</span>
 
@@ -804,12 +804,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainUnit</span>
 
 <div class="viewcode-block" id="Reference.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Reference.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
 
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="Reference.fixDomains"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Reference.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This method does nothing.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method does nothing.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="mi">0</span></div>
 
@@ -840,18 +840,22 @@
 
 
 <div class="viewcode-block" id="CoulombPlusNuclearElastic"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.CoulombPlusNuclearElastic">[docs]</a><span class="k">class</span> <span class="nc">CoulombPlusNuclearElastic</span><span class="p">(</span><span class="n">Reference</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Special type of link to doubleDifferentialCrossSection/chargedParticleElastic.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Special type of link to doubleDifferentialCrossSection/chargedParticleElastic.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;CoulombPlusNuclearElastic&quot;</span></div>
 
 
 <div class="viewcode-block" id="ThermalNeutronScatteringLaw1d"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.ThermalNeutronScatteringLaw1d">[docs]</a><span class="k">class</span> <span class="nc">ThermalNeutronScatteringLaw1d</span><span class="p">(</span><span class="n">Reference</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Special type of link to doubleDifferentialCrossSection/thermalNeutronScatteringLaw.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Special type of link to doubleDifferentialCrossSection/thermalNeutronScatteringLaw.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;thermalNeutronScatteringLaw1d&#39;</span></div>
 
 
 <div class="viewcode-block" id="URR_probabilityTables1d"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.URR_probabilityTables1d">[docs]</a><span class="k">class</span> <span class="nc">URR_probabilityTables1d</span><span class="p">(</span><span class="n">BaseCrossSectionForm</span><span class="p">,</span> <span class="n">xDataBaseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FIXME: name is misleading, these are actually cross section pdfs/cdfs rather than probability tables.</span>
+<span class="sd">    Stores P(sigma | E) and CDF(sigma | E) in an XYs2d container, where incident energy E spans the unresolved region.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;URR_probabilityTables1d&#39;</span>
     <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
@@ -859,6 +863,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">URR_probabilityTables</span><span class="p">):</span>
 
         <span class="n">BaseCrossSectionForm</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># FIXME Doesn&#39;t really make sense to have this inherit XDataFunctional...</span>
         <span class="n">xDataBaseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">URR_probabilityTables</span><span class="p">,</span> <span class="n">URR_probabilityTablesModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="p">):</span>
@@ -871,7 +876,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span>
 
 <div class="viewcode-block" id="URR_probabilityTables1d.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.URR_probabilityTables1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts each axis units.</span>
 <span class="sd">        unitMap is a dictionary of mapping old units to new units (e.g., { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -967,7 +972,7 @@
                                 <span class="n">crossSection1</span><span class="o">.</span><span class="n">domainUnit</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">toXLink</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="Component.effectiveThreshold"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Component.effectiveThreshold">[docs]</a>    <span class="k">def</span> <span class="nf">effectiveThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Some reactions have a cross section with multiple zero values at their beginning.</span>
 <span class="sd">        In such a case, the effective threshold is the point before the first non-zero cross-section value.</span>
 <span class="sd">        If an effective threshold cannot be determined, then domainMin is returned.</span>
@@ -992,7 +997,7 @@
 <div class="viewcode-block" id="Component.heat"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Component.heat">[docs]</a>    <span class="k">def</span> <span class="nf">heat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">lowerlimit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upperlimit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interpolationAccuracy</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
              <span class="n">heatAllPoints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">doNotThin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">heatBelowThreshold</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">heatAllEDomain</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
              <span class="n">setThresholdToZero</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">addToSuite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the result of self.toPointwise_withLinearXYs( ).heat( ... ).</span>
 <span class="sd">        See method crossSection.XYs1d.heat for more information.</span>
 <span class="sd">        If setThresholdToZero is True and self&#39;s cross section at the first point is 0., the heated cross-section&#39;s</span>
@@ -1033,7 +1038,7 @@
         <span class="k">return</span> <span class="n">heated</span></div>
 
 <div class="viewcode-block" id="Component.check"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Component.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check cross section data for correct threshold, negative cross-sections, etc.</span>
 <span class="sd">        Returns a list of any warnings encountered during checking.</span>
 
@@ -1071,14 +1076,13 @@
                     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">thresh</span><span class="o">-</span><span class="n">lower</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;dThreshold&#39;</span><span class="p">]):</span>
                         <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Threshold_mismatch</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">thresh</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
                 <span class="k">elif</span> <span class="n">lower</span> <span class="o">!=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionEnergyMin&#39;</span><span class="p">]):</span>
-                    <span class="c1"># ignore 2nd,3rd,4th-chance fission (they have Q&gt;0 but are still threshold reactions):</span>
-                    <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;outputChannel&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">parent</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="ow">in</span> <span class="p">(</span>
-                            <span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">none</span><span class="p">,</span>
-                            <span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">total</span><span class="p">,</span>
-                            <span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">firstChance</span><span class="p">):</span>
-                        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Threshold_mismatch</span><span class="p">(</span>
-                            <span class="n">lower</span><span class="p">,</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionEnergyMin&#39;</span><span class="p">]),</span> <span class="bp">self</span><span class="p">))</span>
+                    <span class="n">reaction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span>
+                    <span class="n">hasFissionGenre</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">reaction</span><span class="p">,</span> <span class="s1">&#39;fissionGenre&#39;</span><span class="p">):</span>       <span class="c1"># Ignore 2nd, 3rd and 4th-chance fission (they have Q&gt;0 but are still threshold reactions).</span>
+                        <span class="n">hasFissionGenre</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="ow">in</span> <span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">total</span><span class="p">,</span> 
+                                <span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">firstChance</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">reaction</span><span class="p">,</span> <span class="s1">&#39;outputChannel&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">hasFissionGenre</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Threshold_mismatch</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionEnergyMin&#39;</span><span class="p">]),</span> <span class="bp">self</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># charged-particle reaction generally doesn&#39;t &#39;turn on&#39; right at threshold due to Coulomb barrier.</span>
                 <span class="c1"># In this case, just ensure the cross-section stays zero until at or above threshold:</span>
@@ -1146,7 +1150,7 @@
         <span class="k">return</span> <span class="n">pointwise</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">energyIn</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Component.evaluateWithUncertainty"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Component.evaluateWithUncertainty">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateWithUncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">useCovariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">covariance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">covarianceSuite</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param E:</span>
 <span class="sd">        :param useCovariance: use this to override covarance usage</span>
@@ -1207,7 +1211,7 @@
 <span class="c1">#        return( PQUModule.PQU( meanValue, unit = ptwise.rangeUnit(), uncertainty = uncertainty.evaluate(EinDomainUnit) ) )</span>
 
 <div class="viewcode-block" id="Component.getMatchingCovariance"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Component.getMatchingCovariance">[docs]</a>    <span class="k">def</span> <span class="nf">getMatchingCovariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">covariance</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">covarianceSuite</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the uncertainty that goes with this cross-section, if we can find it</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1232,7 +1236,7 @@
 
 <div class="viewcode-block" id="Component.integrateTwoFunctionsWithUncertainty"><a class="viewcode-back" href="../../../fudge/fudge.reactionData.html#fudge.reactionData.crossSection.Component.integrateTwoFunctionsWithUncertainty">[docs]</a>    <span class="k">def</span> <span class="nf">integrateTwoFunctionsWithUncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">domainMin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">useCovariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                              <span class="n">covariance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">covarianceSuite</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the spectrum (i.e. weighted) integral of self with the spectrum (i.e. weight)</span>
 <span class="sd">        specified by ``spectrum``  optionally from Emin to Emax.  If the covariance is</span>
 <span class="sd">        provided, the uncertainty on the spectrum integral will be computed.</span>

@@ -60,7 +60,7 @@
 <span class="c1">#from . import QMatrix as QMatrixModule</span>
 
 <div class="viewcode-block" id="ElapsedTime"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.elapsedTime.ElapsedTime">[docs]</a><span class="k">class</span> <span class="nc">ElapsedTime</span><span class="p">(</span><span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Contains fission product yields at a specified time, measured since fission.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Contains fission product yields at a specified time, measured since fission.</span>
 
 <span class="sd">    Class contents:</span>
 <span class="sd">     - time (elapsed time value and unit. Use time=0 for prompt yields)</span>
@@ -69,7 +69,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;elapsedTime&#39;</span>
 
 <div class="viewcode-block" id="ElapsedTime.__init__"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.elapsedTime.ElapsedTime.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Construct an ElapsedTime with the given label.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an ElapsedTime with the given label.</span>
 <span class="sd">        The label is arbitrary but must be unique within the parent ElapsedTimes suite.&quot;&quot;&quot;</span>
 
         <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">)</span>
@@ -89,7 +89,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns string label corresponding to this elapsedTime.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns string label corresponding to this elapsedTime.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span>
 
@@ -103,7 +103,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__yields</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    @property</span>
 <span class="sd">    def QMatrix(self):</span>
 
@@ -116,7 +116,7 @@
         <span class="k">return</span> <span class="mi">1</span>
 
 <div class="viewcode-block" id="ElapsedTime.toXML_strList"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.elapsedTime.ElapsedTime.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of self.</span>
 
 <span class="sd">        :param indent:    The amount of indentation for each line. Child nodes and text may be indented more.</span>
@@ -150,7 +150,7 @@
 
 <div class="viewcode-block" id="ElapsedTime.parseNodeUsingClass"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.elapsedTime.ElapsedTime.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new instance of class **cls** and parse contents of node into the instance.</span>
 
 <span class="sd">        :param cls: FUDGE Python class to return.</span>
 <span class="sd">        :param node: **elapsedTime** node to parse.</span>
@@ -167,7 +167,7 @@
 
 
 <div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../../PoPs/fissionFragmentData.html#PoPs.fissionFragmentData.elapsedTime.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">SortedSuite</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Contains a list of ElapsedTime instances.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Contains a list of ElapsedTime instances.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;elapsedTimes&#39;</span>
 

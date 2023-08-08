@@ -126,17 +126,28 @@ class Warning:  # FIXME make abstract base class?
 #
 
 class NotImplemented(Warning):
-    def __init__( self, form, obj=None ):
+    def __init__(self, form, obj=None):
         Warning.__init__(self, obj)
         self.form = form
 
-    def __str__( self ):
+    def __str__(self):
         return "Checking not yet implemented for %s type data" % self.form
 
-    def __eq__( self, other ):
-        return (self.form == other.form and self.xpath == other.xpath)
+    def __eq__(self, other):
+        return self.form == other.form and self.xpath == other.xpath
 
-class DiscreteLevelsOutOfOrder( Warning ):
+
+class UnknownEnergy(Warning):
+
+    def __init__(self, nucleus):
+        Warning.__init__(self)
+        self.nucleus = nucleus
+
+    def __str__(self):
+        return "Could not determine excitation energy for nucleus '%s'" % self.nucleus.id
+
+
+class DiscreteLevelsOutOfOrder(Warning):
     def __init__(self, lidx, obj=None):
         Warning.__init__(self, obj)
         self.lidx = lidx
@@ -145,9 +156,10 @@ class DiscreteLevelsOutOfOrder( Warning ):
         return "Discrete level %s is out of order" % self.lidx
 
     def __eq__(self, other):
-        return (self.lidx == other.lidx)
+        return self.lidx == other.lidx
 
-class UnnormalizedDecayProbabilities( Warning ):
+
+class UnnormalizedDecayProbabilities(Warning):
     def __init__(self, branchingSum, obj=None):
         Warning.__init__(self, obj)
         self.branchingSum = branchingSum
@@ -158,14 +170,15 @@ class UnnormalizedDecayProbabilities( Warning ):
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.branchingSum == other.branchingSum)
 
+
 class AliasToNonExistentParticle(Warning):
-    def __init__( self, id, pid, obj=None ):
+    def __init__(self, id, pid, obj=None):
         Warning.__init__(self, obj)
         self.id = id
         self.pid = pid
 
     def __str__(self):
-        return "Alias '%s' points to non-existant particle '%s'" % (self.id, self.pid)
+        return "Alias '%s' points to non-existent particle '%s'" % (self.id, self.pid)
 
     def __eq__(self, other):
-        return (self.id == other.id and self.pid == other.pid)
+        return self.id == other.id and self.pid == other.pid

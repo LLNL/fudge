@@ -362,7 +362,7 @@ class AncestryIO_base(Ancestry):
         """
 
         dirname = os.path.dirname(fileName)
-        if len(dirname) > 0 and not os.path.exists(dirname): os.makedirs(dirname)
+        if len(dirname) > 0 and not os.path.exists(dirname): os.makedirs(dirname, exist_ok=True)
         with open(fileName, "w") as fout :
             fout.write(XML_declaration)
             self.saveToOpenedFile(fout, **kwargs)

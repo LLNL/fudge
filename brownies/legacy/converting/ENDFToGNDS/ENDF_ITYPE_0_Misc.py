@@ -171,10 +171,10 @@ def calculateZA( ZACompound, ZAOther, minus = True ) :
     if( minus ) : return( ZACompound - ZAOther )
     return( ZACompound + ZAOther )
 
-def printAWR_mode(info, MT, MF, line, ZA, AWR, addToInfo=True):
+def printAWR_mode(info, MT, MF, line, ZA, AWR, addToInfo=True, LIS=None):
 
     if addToInfo:
-        info.ZA_massLineInfo.add(ZA, AWR, MT, MF, line)
+        info.ZA_massLineInfo.add(ZA, AWR, MT, MF, line, LIS=LIS)
     if info.AWR_mode is not None:
         info.AWR_mode.write("AWR_mode:: MT: %s: MF: %s: ZA: %s:  AWR: %s::\n" % (MT, MF, ZA, AWR))
 
@@ -698,7 +698,7 @@ def readMF2( info, MF2, warningList ) :
             for lidx in range(NLS):
                 AWRI_lineNumber = mf2.index
                 AWRI, QX, L, LRX, tmp, NRS = funkyFI( mf2.next(), logFile = info.logs )
-                info.ZA_massLineInfo.add(-1, AWRI, 151, 2, AWRI_lineNumber)
+                info.ZA_massLineInfo.add(-1, AWRI, 151, 2, AWRI_lineNumber, column=0)
                 if tmp!=6*NRS:
                     raise BadResonances( "incorrect values in resonance section line %d" % mf2.index )
                 for line in range(NRS):
@@ -748,7 +748,7 @@ def readMF2( info, MF2, warningList ) :
             for lidx in range(NLS):
                 AWRI_lineNumber = mf2.index
                 AWRI, APL, L, dum, tmp, NRS = funkyFI( mf2.next(), logFile = info.logs )
-                info.ZA_massLineInfo.add(-1, AWRI, 151, 2, AWRI_lineNumber)
+                info.ZA_massLineInfo.add(-1, AWRI, 151, 2, AWRI_lineNumber, column=0)
                 if tmp!=6*NRS:
                     raise BadResonances("incorrect values in resonance section line %d" % mf2.index)
                 if APL:
@@ -1182,7 +1182,7 @@ def readMF2( info, MF2, warningList ) :
                     J_list = unresolvedResonanceModule.Jsections()
                     AWRI_lineNumber = mf2.index
                     AWRI, dum, L, dum, tmp, NJS = funkyFI( mf2.next(), logFile = info.logs )
-                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber)
+                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber, column=0)
                     if tmp!=6*NJS:
                         raise BadResonances("bad unresolved flag, line %d" % mf2.index)
                     for jidx in range(NJS):
@@ -1219,7 +1219,7 @@ def readMF2( info, MF2, warningList ) :
                     J_list = unresolvedResonanceModule.Jsections()
                     AWRI_lineNumber = mf2.index
                     AWRI,dum,L,dum,NJS,dum = funkyFI( mf2.next(), logFile = info.logs )
-                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber)
+                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber, column=0)
                     for jidx in range(NJS):
                         dum,dum,L,MUF,tmp,dum = funkyFI( mf2.next(), logFile = info.logs )
                         if tmp!=NE+6:
@@ -1264,7 +1264,7 @@ def readMF2( info, MF2, warningList ) :
                     J_list = unresolvedResonanceModule.Jsections()
                     AWRI_lineNumber = mf2.index
                     AWRI,dum,L,dum,NJS,dum = funkyFI( mf2.next(), logFile = info.logs )
-                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber)
+                    info.ZA_massLineInfo.add(-1, AWRI, MT, 2, AWRI_lineNumber, column=0)
                     for jidx in range(NJS):
                         resList = []
                         AJ,dum,INT,dum,tmp,NE = funkyFI( mf2.next(), logFile = info.logs )
@@ -1472,7 +1472,7 @@ def readMF4( info, product, MT, MF4Data, formClass, warningList ) :
 
     dummy, AWR_, LI, LCT, NK, NM = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF4Data[1], logFile = info.logs )
     if AWR != AWR_:
-        printAWR_mode( info, MT, 4, 1, ZA, AWR )
+        printAWR_mode(info, MT, 4, 1, ZA, AWR)
     else:
         info.ZA_massLineInfo.add(ZA, AWR_, MT, 4, 1)
     LI = int( LI )                  # if 1, gammas isotropic
@@ -1611,7 +1611,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
     twoBodyIndex = 0
     ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[0], logFile = info.logs )
     ZA = int( ZA )
-    doInfo = not (ZA == 0 and AWP != 0)
+    doInfo = not (ZA == 0 and AWR != 0)
     printAWR_mode(info, MT, 6, 0, ZA, AWR, doInfo)
     info.addMassAWR( ZA, AWR )
     JPP=int(JP)//10
@@ -1642,7 +1642,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
             ZAP = 0
             if( ( LAW == 8 ) or ( MT in [ 525, 526, 528 ] ) or ( MT >= 534 ) ) : ZAP = 9
             if( ZAP == 0 ) : warningList.append( 'photon most likely labelled as an electron (ZAP = 11), converting to ZAP = 0' )
-        printAWR_mode(info, MT, 6, AWP_lineNumber, ZAP, AWP)
+        printAWR_mode(info, MT, 6, AWP_lineNumber, ZAP, AWP, LIS=LIP)
         info.addMassAWR( ZAP, AWP, asTarget=False )
         LCTp = LCTLight
         if( ZAP % 1000 > 4 ) : LCTp = LCTWeight
@@ -2281,7 +2281,7 @@ def readMF8( info, MT, MTData, warningList ) :
         dataLine, MF8Data = 1, MTData[8]
         ZA, AWR, LIS, LISO, NS, NO = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF8Data[0], intIndices = [ 0, 2, 3, 4, 5 ], logFile = info.logs )
         info.addMassAWR( ZA, AWR )
-        printAWR_mode( info, MT, 8, 0, ZA, AWR )
+        printAWR_mode(info, MT, 8, 0, ZA, AWR, LIS=LIS)
         MF9Data = readMF9or10( info, MT, MTData, 9, LIS, warningList )
         MF10Data = readMF9or10( info, MT, MTData, 10, LIS, warningList )
         metastables = {}
@@ -2379,7 +2379,7 @@ def readMF9or10( info, MT, MTData, MF, targetLIS, warningList ) :
     dataLine, MFData, MF9or10 = 1, MTData[MF], []
     ZA, AWR, LIS, dummy, NS, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MFData[0], intIndices = [ 0, 2, 4 ], logFile = info.logs )
     ZA = int( ZA )
-    printAWR_mode( info, MT, MF, 0, ZA, AWR )
+    printAWR_mode(info, MT, MF, 0, ZA, AWR, LIS=LIS)
     info.addMassAWR( ZA, AWR )
     if( LIS != targetLIS ) :
         warningList.append( "residual's LIS = %s does not match target's LIS = %s: MT=%d, MF=%d" % ( LIS, targetLIS, MT, MF ) )
@@ -3041,7 +3041,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                     for Lval in range(NLS):
                         AWRI_lineNumber = dat.index
                         AWRI, dum, L, dum, tmp, nrs_ = funkyFI(dat.next(), logFile = info.logs)
-                        info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
+                        info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber, column=0)
                         NRS += nrs_
                         for i in range(nrs_):
                             mf32_resonances.append( funkyF(dat.next(), logFile = info.logs) )
@@ -3070,7 +3070,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                 elif LCOMP==1:
                     AWRI_lineNumber = dat.index
                     AWRI,dum,dum,dum,NSRS,NLRS = funkyFI(dat.next(), logFile = info.logs)
-                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
+                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber, column=0)
                     dum,dum,MPAR,dum,tmp,NRB = funkyFI(dat.next(), logFile = info.logs)
                     dim = NRB * MPAR  # num. of resonances * num. parameters per resonance
                     matrixSize = dim * (dim+1) // 2
@@ -3092,7 +3092,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                     ENDFconversionFlags.append( 'LCOMP=2' )
                     AWRI_lineNumber = dat.index
                     AWRI, QX, dum, LRX, tmp, NRSA = funkyFI(dat.next(), logFile = info.logs)
-                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
+                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber, column=0)
                     # resonance parameters + uncertainties:
                     mf32_resonances = [funkyF(dat.next(), logFile = info.logs) for i in range(NRSA*2)]
                     if LRF in (1,2):
@@ -3252,7 +3252,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                 if LCOMP==1:
                     AWRI_lineNumber = dat.index
                     AWRI, dum, dum, dum, NSRS, NLRS = funkyFI(dat.next(), logFile=info.logs)
-                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
+                    info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber, column=0)
                     dum, dum, NJSX, dum, dum, dum = funkyFI(dat.next(), logFile=info.logs)
 
                     for jdx in range(NJSX):
@@ -3400,7 +3400,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
             for lval in range(NLS):
                 AWRI_lineNumber = dat.index
                 AWRI,dum,L,dum,tmp,NJS = funkyFI( dat.next(), logFile = info.logs )
-                info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber)
+                info.ZA_massLineInfo.add(ZA, AWRI, mt, mf, AWRI_lineNumber, column=0)
                 if tmp!=6*NJS: raise BadCovariance( "Incorrect header in MF32 unresolved section!" )
                 for jval in range(NJS):
                     D,AJ,GNO,GG,GF,GX = funkyF( dat.next(), logFile = info.logs )
@@ -3595,7 +3595,7 @@ def readMF40(info,dat,mf,mt,cov_info,warningList):
     AWR_lineNumber = dat.index
     ZA, AWR, LIS, dum, NS, dum = funkyFI(dat.next(), logFile = info.logs)
     ZA = int( ZA )
-    info.ZA_massLineInfo.add(ZA, AWR, mt, mf, AWR_lineNumber)
+    info.ZA_massLineInfo.add(ZA, AWR, mt, mf, AWR_lineNumber, LIS=LIS)
     info.addMassAWR( ZA, AWR )
 
     # each subsection represents different excited state of residual
@@ -3894,14 +3894,6 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
 
     for MF in [ 12, 13, 14, 15 ] :
         if( MF in MFKeys ) : MFKeys.remove( MF )
-
-    """ # FIXME: doesn't appear to be used anymore
-    specialBe9n2nExcited, specialBe9n2nExcitedLevel = False, 0
-    if( 875 <= MT < 892 ) :                                         # Special case for (z,2n[?])
-        if( targetZA == 4009 ) :                                    # Special case for Be9(n,2n[?]He4)He4
-            specialBe9n2nExcited = True
-            specialBe9n2nExcitedLevel = ( QM - QI ) / 1e6
-    """
 
     if( MT == 5 ) :
         if( QM != QI ) : info.logs.write( '    --QM %s != QI = %s\n' % ( QM, QI ) )
@@ -4244,27 +4236,26 @@ def parseCovariances( info, MTDatas, MTdict, singleMTOnly = None, resonances = N
     summedReactions.update( cov_info['MTL_2'] )
     for (mt,mf) in sorted(summedReactions):
         try:
-            lumpedChannels = cov_info['lumpedChannels'][(mt,mf)]
+            lumpedChannels = cov_info['lumpedChannels'][(mt, mf)]
         except KeyError as e:
-            warningList.append("Cannot find lumped channel %s" %str(e) )
+            warningList.append("Cannot find lumped channel %s" % str(e))
             continue
 
         Qs = []
-        for (mt2,mf2) in summedReactions[(mt,mf)]:
-            if mt not in range(851,872) and mt2 not in cov_info['MTdict']: continue
+        for (mt2, mf2) in summedReactions[(mt, mf)]:
+            if mt not in range(851, 872) and mt2 not in cov_info['MTdict']: continue
             reacs = [r1 for r1 in info.reactionSuite.reactions if r1.ENDF_MT == mt2]
             if len(reacs) != 1: continue
             reac = reacs[0]
             xsc = reac.crossSection
-            lumpedChannels.summands.append( sumsModule.Add( link = xsc ) )
-            Qs.append( reac.thresholdQAs( 'eV' ) )
-        if len( lumpedChannels.summands ) == 0:
+            lumpedChannels.summands.append(sumsModule.Add(link=xsc))
+            Qs.append(reac.thresholdQAs('eV'))
+        if len(lumpedChannels.summands) == 0:
             warningList.append("MT%d: trying to sum over empty list (may be caused by earlier errors)" % mt)
-            info.doRaise.append( warningList[-1] )
+            info.doRaise.append(warningList[-1])
         else:
             # mean value is not specified but can be computed (may require resonance reconstruction first)
-            warningList.append("Covariance listed without corresponding mean value for MT=%d" % mt)
-            if lumpedChannels.ENDF_MT in (1,3) and info.reactionSuite.supportsResonanceReconstruction():
+            if lumpedChannels.ENDF_MT in (1, 3) and info.reactionSuite.supportsResonanceReconstruction():
                 # need to generate resonancesWithBackground as 'evaluated' form.
                 resWithBkg, other = [], []
                 for summand in lumpedChannels.summands:
@@ -4274,12 +4265,12 @@ def parseCovariances( info, MTDatas, MTdict, singleMTOnly = None, resonances = N
                     else:
                         other.append(evaluated)
 
-                def accumulateSum( term1, term2 ):
+                def accumulateSum(term1, term2):
                     term2 = term2.toPointwise_withLinearXYs(lowerEps=1e-8)
-                    term1, term2 = term1.mutualify( 0, 1e-8, 0, term2, 0, 1e-8, 0 )
+                    term1, term2 = term1.mutualify(0, 1e-8, 0, term2, 0, 1e-8, 0)
                     return term1 + term2
 
-                backgrounds = [None,None,None]
+                backgrounds = [None, None, None]
                 for rwb in resWithBkg:
                     for idx, region in enumerate(('resolvedRegion', 'unresolvedRegion', 'fastRegion')):
                         regionData = getattr(rwb.background, region)
@@ -4287,11 +4278,11 @@ def parseCovariances( info, MTDatas, MTdict, singleMTOnly = None, resonances = N
                         if backgrounds[idx] is None:
                             backgrounds[idx] = regionData.data.toPointwise_withLinearXYs(lowerEps=1e-8)
                         else:
-                            backgrounds[idx] = accumulateSum( backgrounds[idx], regionData.data )
+                            backgrounds[idx] = accumulateSum(backgrounds[idx], regionData.data)
 
                 sum_ = other[0].toPointwise_withLinearXYs(lowerEps=1e-8)
-                for idx in range(1,len(other)):
-                    sum_ = accumulateSum( sum_, other[idx] )
+                for idx in range(1, len(other)):
+                    sum_ = accumulateSum(sum_, other[idx])
                 sum_ = sum_.trim()  # remove extra zeros
 
                 if sum_.domainMin >= 0.999 * backgrounds[2].domainMin:  # allow for round-off error

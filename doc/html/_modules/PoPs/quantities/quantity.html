@@ -61,7 +61,7 @@
 <span class="kn">from</span> <span class="nn">xData.uncertainty.physicalQuantity</span> <span class="kn">import</span> <span class="n">uncertainty</span> <span class="k">as</span> <span class="n">uncertaintyModule</span>
 
 <div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">(</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">ClassWithLabelKey</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is used to represent a physical quantity (e.g., mass, spin or halflife).</span>
 <span class="sd">    A quantity has required members label, value and unit and optional members documentation and uncertainty.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -71,7 +71,7 @@
     <span class="n">baseUnit</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Quantity.__init__"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Quantity.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">documentation</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param label: label for this quantity. Must be unique within the containing suite</span>
 <span class="sd">        :param value: quantity value</span>
 <span class="sd">        :param unit: unit (string)</span>
@@ -143,7 +143,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__documentation</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Quantity.convertUnits"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Quantity.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; See convertUnits documentation in PoPs.database &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; See convertUnits documentation in PoPs.database &quot;&quot;&quot;</span>
 
         <span class="n">unit</span><span class="p">,</span> <span class="n">factor</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">factor</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">sys</span><span class="o">.</span><span class="n">float_info</span><span class="o">.</span><span class="n">epsilon</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
@@ -151,7 +151,7 @@
                     <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Quantity.copy"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Quantity.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: deep copy of self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -225,7 +225,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__valueType</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="String"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.String">[docs]</a><span class="k">class</span> <span class="nc">String</span><span class="p">(</span> <span class="n">Quantity</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is an abstract base class for string quantities.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -243,12 +243,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__valueType</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Number"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Number">[docs]</a><span class="k">class</span> <span class="nc">Number</span><span class="p">(</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is an abstract base class for numberic quantities. This class adds the pqu and float methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Number.pqu"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Number.pqu">[docs]</a>    <span class="k">def</span> <span class="nf">pqu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a PQU instance of self&#39;s value in units of unit. If unit is None, self&#39;s unit is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -257,7 +257,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">pqu</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Number.float"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Number.float">[docs]</a>    <span class="k">def</span> <span class="nf">float</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a float instance of self&#39;s value in units of unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -265,7 +265,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pqu</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Integer"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Integer">[docs]</a><span class="k">class</span> <span class="nc">Integer</span><span class="p">(</span> <span class="n">Number</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is used to represent a (physical) quantity whose value must be an integer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -283,7 +283,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__valueType</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Double"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Double">[docs]</a><span class="k">class</span> <span class="nc">Double</span><span class="p">(</span> <span class="n">Number</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is used to represent a (physical) quantity whose value must be a float.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -301,7 +301,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__valueType</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Double.convertUnits"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Double.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; See convertUnits documentation in PoPs.database &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; See convertUnits documentation in PoPs.database &quot;&quot;&quot;</span>
 
         <span class="n">unit</span><span class="p">,</span> <span class="n">factor</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="n">stringToPhysicalUnit</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span>
@@ -318,7 +318,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__valueType</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Fraction"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.Fraction">[docs]</a><span class="k">class</span> <span class="nc">Fraction</span><span class="p">(</span> <span class="n">Number</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is used to represent a (physical) quantity whose value must be a rational number</span>
 <span class="sd">    (e.g., a fraction like 1/2, 3, 5/6).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -350,12 +350,12 @@
         <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allowedClasses</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="NumberSuite"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.NumberSuite">[docs]</a><span class="k">class</span> <span class="nc">NumberSuite</span><span class="p">(</span> <span class="n">Suite</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is an abstract base class for a number suite. This class adds the pqu and float methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NumberSuite.pqu"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.NumberSuite.pqu">[docs]</a>    <span class="k">def</span> <span class="nf">pqu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a PQU instance of self&#39;s recommended value in units of unit. If unit is None, self&#39;s unit is used.</span>
 <span class="sd">        :param unit: desired unit (string)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -363,7 +363,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pqu</span><span class="p">(</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="NumberSuite.float"><a class="viewcode-back" href="../../../PoPs/quantities.html#PoPs.quantities.quantity.NumberSuite.float">[docs]</a>    <span class="k">def</span> <span class="nf">float</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a float instance of self&#39;s recommended value in units of unit.</span>
 <span class="sd">        :param unit: desired unit (string)</span>
 <span class="sd">        &quot;&quot;&quot;</span>

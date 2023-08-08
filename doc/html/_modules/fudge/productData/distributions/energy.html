@@ -117,7 +117,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Subform">[docs]</a><span class="k">class</span> <span class="nc">Subform</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">Subform</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Abstract base class for energy forms.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for energy forms.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Subform.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Subform.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -186,7 +186,7 @@
     <span class="n">__copy__</span> <span class="o">=</span> <span class="n">copy</span>
 
 <div class="viewcode-block" id="DiscretePrimaryGamma.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.DiscretePrimaryGamma.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">discreteGammaResolution</span> <span class="o">=</span> <span class="mf">1e-2</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the energy spectrum in the lab frame for the specified incident energy.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the energy spectrum in the lab frame for the specified incident energy.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">&gt;</span> <span class="n">energy</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">&lt;</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">defaultAxes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
@@ -197,7 +197,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">energy1</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">],</span> <span class="p">[</span> <span class="n">photonEnergy</span><span class="p">,</span> <span class="n">height</span> <span class="p">],</span> <span class="p">[</span> <span class="n">energy2</span><span class="p">,</span> <span class="mf">0.0</span> <span class="p">]</span> <span class="p">],</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">defaultAxes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DiscretePrimaryGamma.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.DiscretePrimaryGamma.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets *domainMin* and *domainMax* per the arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -295,7 +295,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;primaryGamma&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">finalState</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor.</span>
 
 <span class="sd">        :param value:           The neutron binding energy.</span>
 <span class="sd">        :param domainMin:       The minimum projectile energy that the primary photon is emitted.</span>
@@ -311,7 +311,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">finalState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the finalState.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the finalState.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__finalState</span>
 
@@ -365,7 +365,7 @@
 <div class="viewcode-block" id="XYs2d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.XYs2d">[docs]</a><span class="k">class</span> <span class="nc">XYs2d</span><span class="p">(</span> <span class="n">Subform</span><span class="p">,</span> <span class="n">probabilitiesModule</span><span class="o">.</span><span class="n">PofX1GivenX2</span> <span class="p">)</span> <span class="p">:</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &gt;pointwise = XYs2d( )</span>
 <span class="sd">        followed by:</span>
 <span class="sd">        &gt;pointwise[ 0 ] = XYs_data_1</span>
@@ -377,25 +377,31 @@
         <span class="n">probabilitiesModule</span><span class="o">.</span><span class="n">PofX1GivenX2</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
         <span class="n">Subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="XYs2d.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.XYs2d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">extrapolation</span><span class="o">=</span><span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Extrapolation</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="XYs2d.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.XYs2d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">extrapolation</span><span class="o">=</span><span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Extrapolation</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span> <span class="n">probabilitiesModule</span><span class="o">.</span><span class="n">PofX1GivenX2</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">extrapolation</span> <span class="o">=</span> <span class="n">extrapolation</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span><span class="p">,</span> 
-                <span class="n">interpolationQualifier</span><span class="o">=</span><span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">InterpolationQualifier</span><span class="o">.</span><span class="n">unitBase</span><span class="p">)</span></div>
+        <span class="c1"># FIXME silently converting InterpolationQualifier.none to unitbase.</span>
+        <span class="n">interpolationQualifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolationQualifier</span>
+        <span class="k">if</span> <span class="n">interpolationQualifier</span> <span class="ow">is</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">InterpolationQualifier</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+            <span class="n">interpolationQualifier</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">InterpolationQualifier</span><span class="o">.</span><span class="n">unitBase</span>
+
+        <span class="k">return</span> <span class="n">probabilitiesModule</span><span class="o">.</span><span class="n">PofX1GivenX2</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">extrapolation</span> <span class="o">=</span> <span class="n">extrapolation</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span><span class="p">,</span>
+                                                         <span class="n">interpolationQualifier</span><span class="o">=</span><span class="n">interpolationQualifier</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="XYs2d.getAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.XYs2d.getAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">getAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;This method is deprecated, use getSpectrumAtEnergy.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method is deprecated, use getSpectrumAtEnergy.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSpectrumAtEnergy</span><span class="p">(</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs2d.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.XYs2d.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the energy spectrum in the lab frame for the specified incident energy.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the energy spectrum in the lab frame for the specified incident energy.&quot;&quot;&quot;</span>
 
         <span class="n">spectrum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">extrapolation</span><span class="o">=</span><span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Extrapolation</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">spectrum</span><span class="p">,</span> <span class="n">Regions1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">spectrum</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-6</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">spectrum</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs2d.getSpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.XYs2d.getSpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">getSpectrumAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the energy spectrum for self at projectile energy.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the energy spectrum for self at projectile energy.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">)</span></div>
 
@@ -432,8 +438,11 @@
 
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="ow">is</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">FlatIncidentEnergyInterpolation</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolationQualifier</span> <span class="ow">is</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">InterpolationQualifier</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">MissingInterpolationQualifier</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="n">integral</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
@@ -648,7 +657,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">Es</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FunctionalBase.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.FunctionalBase.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **parameter1** member and if *self* is a **Watt** spectrum the **parameter2** member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -658,7 +667,7 @@
         <span class="k">return</span> <span class="n">numberOfFixes</span></div>
 
 <div class="viewcode-block" id="FunctionalBase.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.FunctionalBase.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
@@ -682,7 +691,7 @@
         <span class="n">FunctionalBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">thetas</span><span class="p">,</span> <span class="n">gs</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="GeneralEvaporation.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.GeneralEvaporation.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overriding method from base class due to a processing error</span>
 <span class="sd">        (axes for &#39;g&#39; parameter not copied during processing).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -709,7 +718,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">spectrum</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GeneralEvaporation.isLinear"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.GeneralEvaporation.isLinear">[docs]</a>    <span class="k">def</span> <span class="nf">isLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">qualifierOk</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">flatIsOk</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the results of isLinear called on the axes of g(E&#39;|E).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -736,7 +745,7 @@
 
 <div class="viewcode-block" id="GeneralEvaporation.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.GeneralEvaporation.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;generalEvaporation&gt; element from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;generalEvaporation&gt; element from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="n">theta_</span> <span class="o">=</span> <span class="n">Theta</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">Theta</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -981,7 +990,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Watt.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Watt.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">extrapolation</span><span class="o">=</span><span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Extrapolation</span><span class="o">.</span><span class="n">none</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an XYs1d instance of self evaluated at the incident energy **energyIn**.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an XYs1d instance of self evaluated at the incident energy **energyIn**.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">A</span><span class="p">(</span> <span class="n">energyOut</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1036,7 +1045,7 @@
 
 <div class="viewcode-block" id="Watt.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Watt.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">WattElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;Watt&gt; element from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;Watt&gt; element from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">WattElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="n">_a</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">WattElement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1089,7 +1098,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energyIn</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MadlandNix.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.MadlandNix.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">extrapolation</span><span class="o">=</span><span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Extrapolation</span><span class="o">.</span><span class="n">none</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an XYs1d instance of self evaluated at the incident energy **energyIn**.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an XYs1d instance of self evaluated at the incident energy **energyIn**.&quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">numericalFunctions</span> <span class="kn">import</span> <span class="n">specialFunctions</span>
 
@@ -1154,7 +1163,7 @@
 
 <div class="viewcode-block" id="MadlandNix.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.MadlandNix.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">MNelement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;MadlandNix&gt; element from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;MadlandNix&gt; element from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">MNelement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="n">tm</span> <span class="o">=</span> <span class="n">T_M</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">MNelement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">T_M</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1194,7 +1203,7 @@
         <span class="k">return</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="NBodyPhaseSpace.averageEp"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.NBodyPhaseSpace.averageEp">[docs]</a>    <span class="k">def</span> <span class="nf">averageEp</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">massUnit</span><span class="p">,</span> <span class="n">projectileMass</span><span class="p">,</span> <span class="n">targetMass</span><span class="p">,</span> <span class="n">productMass</span><span class="p">,</span> <span class="n">Q</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the average energy of the product in the center-of-mass frame for projectile energy E. This method only works for</span>
 <span class="sd">        a one-step reaction.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1204,7 +1213,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">Ea</span> <span class="o">*</span> <span class="p">(</span> <span class="n">M</span> <span class="o">-</span> <span class="n">productMass</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">numberOfProducts</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="NBodyPhaseSpace.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.NBodyPhaseSpace.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This method does nothing.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method does nothing.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="mi">0</span></div>
 
@@ -1276,7 +1285,7 @@
         <span class="k">return</span> <span class="n">pwl</span></div>
 
 <div class="viewcode-block" id="NBodyPhaseSpace.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.NBodyPhaseSpace.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
@@ -1392,7 +1401,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">Weighted1d</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energy</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Weighted.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Weighted.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **weight** and **functional** members.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1410,7 +1419,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">energyArray</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Weighted.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Weighted.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
@@ -1516,7 +1525,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">xys1d</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="WeightedFunctionals.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.WeightedFunctionals.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for each **weight** of *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1526,7 +1535,7 @@
         <span class="k">return</span>  <span class="n">numberOfFixes</span></div>
 
 <div class="viewcode-block" id="WeightedFunctionals.sqrtEp_AverageAtE"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.WeightedFunctionals.sqrtEp_AverageAtE">[docs]</a>    <span class="k">def</span> <span class="nf">sqrtEp_AverageAtE</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method has not been implemented. It returns None so the method uncorrelated.calculateAverageProductData will still work</span>
 <span class="sd">        when calculating the momentum deposition for isotropic scattering in the lab frame, but will execute a raise otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1541,6 +1550,22 @@
                 <span class="k">if</span><span class="p">(</span> <span class="n">energy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">energyArray</span> <span class="p">)</span> <span class="p">:</span> <span class="n">energyArray</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">energy</span> <span class="p">)</span>
         <span class="n">energyArray</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">energyArray</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="WeightedFunctionals.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.WeightedFunctionals.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span><span class="p">):</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">1</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weighted</span><span class="o">.</span><span class="n">functional</span><span class="p">,</span> <span class="n">XYs2d</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">weighted</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;This needs work!.&#39;</span><span class="p">)</span>
+
+        <span class="n">weightedFunctionals</span> <span class="o">=</span> <span class="n">WeightedFunctionals</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">weighted</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">:</span>
+            <span class="n">functional</span> <span class="o">=</span> <span class="n">weighted</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span><span class="p">)</span>
+            <span class="n">weightedFunctionals</span><span class="o">.</span><span class="n">addWeight</span><span class="p">(</span><span class="n">Weighted</span><span class="p">(</span><span class="n">weighted</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="n">functional</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">weightedFunctionals</span></div>
 
 <div class="viewcode-block" id="WeightedFunctionals.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.WeightedFunctionals.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1572,7 +1597,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">pwl</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="WeightedFunctionals.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.WeightedFunctionals.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the xml string representation of self.&quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
@@ -1679,7 +1704,7 @@
 
 <div class="viewcode-block" id="Form.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Form.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">energyElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate energy component from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate energy component from xml.&quot;&quot;&quot;</span>
 
         <span class="n">subformClass</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">DiscreteGamma</span><span class="o">.</span><span class="n">moniker</span> <span class="p">:</span>             <span class="n">DiscreteGamma</span><span class="p">,</span>

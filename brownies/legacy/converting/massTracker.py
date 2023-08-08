@@ -198,23 +198,29 @@ class ZA_massLineInfo:
 
     def  __init__(self):
 
+        self.targetZA = 0           # Dummy value until it is set later.
         self.ZAs = {}
 
-    def add(self, ZA, mass, MT, MF, line):
+    def add(self, ZA, mass, MT, MF, line, LIS=None, column=1):
 
         ZA = int(ZA)
         if ZA not in self.ZAs:
             self.ZAs[ZA] = []
 
-        self.ZAs[ZA].append([mass, MT, MF, line])
+        if LIS is None and ZA == self.targetZA:
+            LIS = self.targetLIS
+        if LIS is None:
+            LIS = 0
+
+        self.ZAs[ZA].append([mass, MT, MF, line, column, LIS])
 
     def printInfo(self):
 
         print('    ZA mass line info:')
-        print('        ZA               mass     MT   MF   line')
-        print('    -----------------------------------------------------')
+        print('        ZA               mass     MT   MF   line column LIS')
+        print('    ---------------------------------------------------------')
         for ZA in sorted(self.ZAs):
             print('    %6s:' % ZA)
-            for mass, MT, MF, line in self.ZAs[ZA]:
-                print('    %25s %4d %4d %8s' % (mass, MT, MF, line))
-        print('    -----------------------------------------------------')
+            for mass, MT, MF, line, column, LIS in self.ZAs[ZA]:
+                print('    %25s %4d %4d %8d %6d %3d' % (mass, MT, MF, line, column, LIS))
+        print('    ---------------------------------------------------------')

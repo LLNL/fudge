@@ -45,10 +45,22 @@ class Resolved(abstractClassesModule.Component):
 
         return self.__domainMin
 
+    @domainMin.setter
+    def domainMin(self, value):
+        if not isinstance(value, (float, int)):
+            raise TypeError("domainMin must be numeric, got %s" % type(value))
+        self.__domainMin = value
+
     @property
     def domainMax(self):
 
         return self.__domainMax
+
+    @domainMax.setter
+    def domainMax(self, value):
+        if not isinstance(value, (float, int)):
+            raise TypeError("domainMax must be numeric, got %s" % type(value))
+        self.__domainMax = value
 
     @property
     def domainUnit(self):
@@ -255,6 +267,10 @@ class BreitWigner(ancestryModule.AncestryIO):
                 raise TypeError("PoPs can't be set to type '%s'" % type(value))
             self.__PoPs.setAncestor(self)
 
+    def getLocalPoPs(self):
+        """ Returns None unless a local PoPs database is defined. """
+        return self.__PoPs
+
     def toXML_strList(self, indent='', **kwargs):
 
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
@@ -442,6 +458,10 @@ class RMatrix(ancestryModule.AncestryIO):
             if not isinstance(value, PoPsDatabaseModule.Database):
                 raise TypeError("PoPs can't be set to type '%s'" % type(value))
             self.__PoPs.setAncestor(self)
+
+    def getLocalPoPs(self):
+        """ Returns None unless a local PoPs database is defined. """
+        return self.__PoPs
 
     def check(self, info):
         return _resonance_checker(self, info, [self.resonanceReactions] + list(self.spinGroups))

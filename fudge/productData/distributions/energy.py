@@ -338,10 +338,16 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         probabilitiesModule.PofX1GivenX2.__init__( self, **kwargs )
         Subform.__init__( self )
 
-    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, epsilon = 0 ) :
+    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, epsilon = 0, **kwargs ) :
 
-        return probabilitiesModule.PofX1GivenX2.evaluate(self, domainValue, extrapolation = extrapolation, epsilon = epsilon, 
-                interpolationQualifier=xDataEnumsModule.InterpolationQualifier.unitBase)
+        # FIXME silently converting InterpolationQualifier.none to unitbase.
+        interpolationQualifier = self.interpolationQualifier
+        if interpolationQualifier is xDataEnumsModule.InterpolationQualifier.none:
+            interpolationQualifier = xDataEnumsModule.InterpolationQualifier.unitBase
+
+        return probabilitiesModule.PofX1GivenX2.evaluate(self, domainValue, extrapolation = extrapolation, epsilon = epsilon,
+                                                         interpolationQualifier=interpolationQualifier, **kwargs)
+
 
     def getAtEnergy( self, energy ) :
         """This method is deprecated, use getSpectrumAtEnergy."""
@@ -393,8 +399,11 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
 
         warnings = []
 
-        if self.interpolation == xDataEnumsModule.Interpolation.flat:
+        if self.interpolation is xDataEnumsModule.Interpolation.flat:
             warnings.append( warning.FlatIncidentEnergyInterpolation( ) )
+
+        if self.interpolationQualifier is xDataEnumsModule.InterpolationQualifier.none:
+            warnings.append( warning.MissingInterpolationQualifier( ) )
 
         for idx in range(len(self)):
             integral = self[idx].integrate()
@@ -1502,6 +1511,22 @@ class WeightedFunctionals( Subform ) :
                 if( energy not in energyArray ) : energyArray.append( energy )
         energyArray.sort( )
         return( energyArray )
+
+    def to_xs_pdf_cdf1d(self, style, tempInfo, indent):
+
+        count = sum([1 if isinstance(weighted.functional, XYs2d) else 0 for weighted in self.weights])
+        if count == 0:
+            return None
+
+        if count != len(self.weights):
+            raise Exception('This needs work!.')
+
+        weightedFunctionals = WeightedFunctionals()
+        for weighted in self.weights:
+            functional = weighted.functional.to_xs_pdf_cdf1d(style, tempInfo, indent)
+            weightedFunctionals.addWeight(Weighted(weighted.weight.copy( ), functional))
+
+        return weightedFunctionals
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
 

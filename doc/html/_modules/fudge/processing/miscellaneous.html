@@ -50,18 +50,19 @@
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">constant</span> <span class="k">as</span> <span class="n">constantModule</span>
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">regions</span> <span class="k">as</span> <span class="n">regionsModule</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">group</span> <span class="k">as</span> <span class="n">groupModule</span>
 
-<span class="k">def</span> <span class="nf">_toLinear</span><span class="p">(</span> <span class="n">func</span> <span class="p">)</span> <span class="p">:</span>
+<span class="k">def</span> <span class="nf">_toLinear</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
 
-    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">func</span><span class="p">,</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">func</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">func</span>
         <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">func</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span> <span class="p">)</span>
-    <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">func</span><span class="p">,</span> <span class="n">regionsModule</span><span class="o">.</span><span class="n">Regions1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="p">(</span><span class="n">regionsModule</span><span class="o">.</span><span class="n">Regions1d</span><span class="p">,</span> <span class="n">constantModule</span><span class="o">.</span><span class="n">Constant1d</span><span class="p">)):</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">func</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">func</span><span class="p">))</span>

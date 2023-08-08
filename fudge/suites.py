@@ -399,7 +399,21 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         if len(nodesNotParsed) > 0: raise Exception("Encountered unexpected child nodes '%s'!" % ', '.join(nodesNotParsed))
 
-        xPath.pop() 
+        xPath.pop()
+
+    @classmethod
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        This method must be overrwritten by the derived class.
+        """
+
+        xPath.append(node.tag)
+        instance = cls( )
+        xPath.pop()
+
+        instance.parseNode(node, xPath, linkData, **kwargs)
+
+        return instance
 
 class ExclusiveSuite(Suite):
 

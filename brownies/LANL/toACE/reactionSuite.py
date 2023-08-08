@@ -16,7 +16,7 @@ from fudge import reactionSuite as reactionSuiteModule
 from . import gndsToACE as gndsToACEModule
 from . import GNDS_toACE_TNSL as GNDS_toACE_TNSL_Module
 
-def toACE( self, args, styleName, fileName, evaluationId, addAnnotation = False, verbose = 0 ) :
+def toACE(self, args, styleName, fileName, evaluationId, addAnnotation=False, verbose=0, skipURR=False, skipILF_logic=False):
     """
     Produce an ACE file with data from self.
 
@@ -39,6 +39,7 @@ def toACE( self, args, styleName, fileName, evaluationId, addAnnotation = False,
         ACE_data = []
         delayedNeutronRateAndDatas = []
         for reaction in self.reactions : reaction.toACE( styleName, cdf_style, ACE_data, delayedNeutronRateAndDatas, verbose )
-        gndsToACEModule.toACE( self, styleName, cdf_style, fileName, evaluationId, ACE_data, delayedNeutronRateAndDatas, addAnnotation = addAnnotation )
+        gndsToACEModule.toACE(self, styleName, cdf_style, fileName, evaluationId, ACE_data, delayedNeutronRateAndDatas, 
+                addAnnotation=addAnnotation, skipURR=skipURR, skipILF_logic=skipILF_logic)
 
 reactionSuiteModule.ReactionSuite.toACE = toACE

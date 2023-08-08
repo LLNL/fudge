@@ -90,6 +90,13 @@ def toIntegers( values ) :
 
     return( [ int( value ) for value in values ] )
 
+def outputList(name, values):
+
+    fOut = openFile(-1, name)
+    for value in values:
+        fOut.write('%s\n' % value)
+    fOut.close( )
+
 def outputXYs1d( MT, name, xs, ys, offset = 0, length = -1, subDir = None, MTP = None ) :
 
     if( length == -1 ) : length = len( xs )

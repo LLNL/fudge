@@ -55,6 +55,7 @@
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">vector</span> <span class="k">as</span> <span class="n">vectorModule</span>
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">matrix</span> <span class="k">as</span> <span class="n">matrixModule</span>
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">productArray</span> <span class="k">as</span> <span class="n">productArrayModule</span>
+<span class="kn">from</span> <span class="nn">xData.Documentation</span> <span class="kn">import</span> <span class="n">documentation</span> <span class="k">as</span> <span class="n">documentationModule</span>
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">outputChannel</span> <span class="k">as</span> <span class="n">outputChannelModule</span> 
@@ -64,7 +65,7 @@
 <span class="kn">from</span> <span class="nn">..reactionData</span> <span class="kn">import</span> <span class="n">availableMomentum</span> <span class="k">as</span> <span class="n">availableMomentumModule</span>
 
 <div class="viewcode-block" id="Base_reaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction">[docs]</a><span class="k">class</span> <span class="nc">Base_reaction</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class for all types of reaction.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all types of reaction.&quot;&quot;&quot;</span>
 
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;crossSection&#39;</span><span class="p">,</span> <span class="s1">&#39;outputChannel&#39;</span><span class="p">)</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
@@ -74,6 +75,7 @@
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__documentation</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">ENDF_MT</span> <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span> <span class="o">=</span> <span class="n">crossSectionModule</span><span class="o">.</span><span class="n">Component</span><span class="p">(</span> <span class="p">)</span>
@@ -87,6 +89,17 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">documentation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__documentation</span>
+
+    <span class="nd">@documentation</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">documentation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_documentation</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_documentation</span><span class="p">,</span> <span class="p">(</span><span class="n">documentationModule</span><span class="o">.</span><span class="n">Documentation</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">_documentation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_documentation</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__documentation</span> <span class="o">=</span> <span class="n">_documentation</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">crossSection</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span> <span class="p">)</span>
@@ -98,13 +111,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the reaction&#39;s label.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the reaction&#39;s label.&quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateLabel</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Base_reaction.updateLabel"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.updateLabel">[docs]</a>    <span class="k">def</span> <span class="nf">updateLabel</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Sets the reaction&#39;s label from outputChannel products.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the reaction&#39;s label from outputChannel products.&quot;&quot;&quot;</span>
 
         <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">MT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;fissionGenre&#39;</span><span class="p">):</span>
@@ -147,14 +160,14 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="Base_reaction.isPairProduction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.isPairProduction">[docs]</a>    <span class="k">def</span> <span class="nf">isPairProduction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a boolean indicating whether the reaction is pair production. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">515</span><span class="p">,</span> <span class="mi">517</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Base_reaction.check"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method is usually not called directly. Use reactionSuite.check() instead.</span>
 
 <span class="sd">        Checks cross section and outputChannel (and differential cross sections if available). Checks include:</span>
@@ -236,15 +249,21 @@
             <span class="c1"># check that ZA balances:</span>
             <span class="n">ZAsum</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
-                <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
-                <span class="n">ZAsum</span> <span class="o">+=</span> <span class="n">particleZA</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span> <span class="o">*</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">mult</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">NonConstantMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+                    <span class="c1"># likely also causes ZAbalanceWarning</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ZAsum</span> <span class="o">+=</span> <span class="n">particleZA</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="o">*</span> <span class="n">mult</span>
             <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;elementalTarget&#39;</span><span class="p">]:</span>
                 <span class="n">ZAsum</span> <span class="o">=</span> <span class="p">(</span><span class="n">ZAsum</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
             <span class="k">if</span> <span class="n">ZAsum</span> <span class="o">!=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compoundZA&#39;</span><span class="p">]:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">ZAbalanceWarning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="c1"># disabling for now: only complain if distributions are missing for transportables:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        if (not any( [product.distributions.components for product in self.__outputChannel] ) and not any(</span>
 <span class="sd">                [dProd.distributions.components for prod in [p for p in self.__outputChannel</span>
 <span class="sd">                    if p.outputChannel is not None] for dProd in prod.outputChannel] ) ):</span>
@@ -313,7 +332,7 @@
                 <span class="n">Qsum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Qs</span><span class="p">)</span>
 
                 <span class="k">def</span> <span class="nf">energyDepositedPerProduct</span><span class="p">(</span> <span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span> <span class="p">):</span>
-                    <span class="sd">&quot;&quot;&quot; if energy doesn&#39;t balance, determine how much is deposited in each product &quot;&quot;&quot;</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot; if energy doesn&#39;t balance, determine how much is deposited in each product &quot;&quot;&quot;</span>
                     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">availableEnergy</span> <span class="o">=</span> <span class="n">ein</span> <span class="o">+</span> <span class="n">Qsum</span>
                     <span class="k">if</span> <span class="n">availableEnergy</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">availableEnergy</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span><span class="n">edep</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ein</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span><span class="n">edep</span> <span class="ow">in</span> <span class="n">energyDep</span><span class="p">]</span> <span class="p">)</span>
@@ -393,7 +412,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainUnitConversionFactor</span><span class="p">(</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Base_reaction.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
 
@@ -425,7 +444,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Base_reaction.effectiveThreshold"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.effectiveThreshold">[docs]</a>    <span class="k">def</span> <span class="nf">effectiveThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Some reactions have a cross section with multiple zero values at their beginning. In such a case, the effective </span>
 <span class="sd">        threshold is the point before the first non-zero cross section value. Otherwise, it is the energy of the first point.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -433,7 +452,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">effectiveThreshold</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Base_reaction.fixDomains"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** method on the members *crossSection*, *doubleDifferentialCrossSection* and *outputChannel*.</span>
 <span class="sd">        The *energyMin* argument is ignored. Instead, it is calculated from the minimum energy from the cross sections.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -465,7 +484,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="n">final</span><span class="p">,</span> <span class="n">pops</span><span class="o">=</span><span class="n">pops</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Base_reaction.getQ"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.getQ">[docs]</a>    <span class="k">def</span> <span class="nf">getQ</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the Q-value for this reaction. Converted to float if possible, otherwise a string value is returned.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Q-value for this reaction. Converted to float if possible, otherwise a string value is returned.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="n">final</span> <span class="p">)</span> <span class="p">)</span></div>
 
@@ -475,7 +494,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">ReactionSuite</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Base_reaction.cullStyles"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; See documentation for reactionSuite.cullStyles. &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; See documentation for reactionSuite.cullStyles. &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
 
@@ -488,7 +507,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Base_reaction.calculateAverageProductData"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate average product data.</span>
 
 <span class="sd">        :param style: The style to use.</span>
@@ -519,7 +538,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">availableMomentum</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">availableMomentum</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Base_reaction.listOfProducts"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for *self*.&quot;&quot;&quot;</span>
 
         <span class="n">products</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;doubleDifferentialCrossSection&#39;</span><span class="p">):</span>
@@ -559,7 +578,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">processGriddedCrossSections</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">incrementalIndent</span><span class="p">,</span> <span class="n">isPhotoAtomic</span> <span class="o">=</span> <span class="n">isPhotoAtomic</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Base_reaction.processMultiGroup"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; See documentation for reactionSuite.processMultiGroup. &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; See documentation for reactionSuite.processMultiGroup. &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
 
@@ -598,7 +617,7 @@
         <span class="k">del</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Base_reaction.multiGroupCrossSection"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.multiGroupCrossSection">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupCrossSection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, cross section for the requested label in the reaction.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -610,7 +629,7 @@
         <span class="k">return</span> <span class="n">crossSection</span></div>
 
 <div class="viewcode-block" id="Base_reaction.multiGroupMultiplicity"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.multiGroupMultiplicity">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total multiplicity for the requested label for the requested product.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted multiplicity.</span>
@@ -632,7 +651,7 @@
         <span class="k">return</span> <span class="n">multiplicity</span></div>
 
 <div class="viewcode-block" id="Base_reaction.multiGroupAverageEnergy"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.multiGroupAverageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total average energy for the requested label for the requested product.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted average energy summed over all products for this reaction.</span>
@@ -654,7 +673,7 @@
         <span class="k">return</span> <span class="n">averageEnergy</span></div>
 
 <div class="viewcode-block" id="Base_reaction.multiGroupAverageMomentum"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.multiGroupAverageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageMomentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total average momentum for the requested label for the requested product.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted average momentum.</span>
@@ -672,7 +691,7 @@
         <span class="k">return</span> <span class="n">averageMomentum</span></div>
 
 <div class="viewcode-block" id="Base_reaction.multiGroupProductMatrix"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, product matrix for the requested label for the requested productID for the requested Legendre order.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -701,7 +720,7 @@
         <span class="k">return</span> <span class="n">productMatrix</span></div>
 
 <div class="viewcode-block" id="Base_reaction.multiGroupProductArray"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the full multi-group, total product array for the requested label for the requested product id.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -754,6 +773,9 @@
         <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">]</span>
         <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">attributeString</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;doubleDifferentialCrossSection&#39;</span><span class="p">):</span>
             <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">doubleDifferentialCrossSection</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
         <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
@@ -805,7 +827,7 @@
         <span class="k">return</span> <span class="n">reaction</span></div></div>
 
 <div class="viewcode-block" id="Base_reaction1"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction1">[docs]</a><span class="k">class</span> <span class="nc">Base_reaction1</span><span class="p">(</span><span class="n">Base_reaction</span><span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Base class for all types of reaction.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all types of reaction.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">ENDF_MT</span><span class="p">,</span> <span class="n">fissionGenre</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">none</span><span class="p">):</span>
 
@@ -820,7 +842,7 @@
 
     <span class="nd">@fissionGenre</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">fissionGenre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets the fission genre to *value* for *self*.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the fission genre to *value* for *self*.</span>
 
 <span class="sd">        :param value:   One of the allowed values in **FissionGenre**.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -828,7 +850,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__fissionGenre</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">FissionGenre</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Base_reaction2"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction2">[docs]</a><span class="k">class</span> <span class="nc">Base_reaction2</span><span class="p">(</span><span class="n">Base_reaction1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class for all types of reaction.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all types of reaction.&quot;&quot;&quot;</span>
 
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;doubleDifferentialCrossSection&#39;</span><span class="p">,</span> <span class="p">)</span> <span class="o">+</span> <span class="n">Base_reaction1</span><span class="o">.</span><span class="n">ancestryMembers</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
@@ -846,7 +868,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doubleDifferentialCrossSection</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="isGNDSReaction"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.isGNDSReaction">[docs]</a><span class="k">def</span> <span class="nf">isGNDSReaction</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Returns True if o is an instance of base_reaction or of a subclass thereof. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns True if o is an instance of base_reaction or of a subclass thereof. &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Base_reaction</span><span class="p">)</span></div>
 </pre></div>

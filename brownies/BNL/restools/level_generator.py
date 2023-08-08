@@ -3,7 +3,7 @@ import numpy
 
 from fudge.core.math.pdf import UnivariatePDF, WignerDistribution, PoissonDistribution, \
     BrodyDistribution, GOEDistribution
-from xData import XYs1d as XYs1d
+from xData import XYs1d
 
 """
 Collection of fake level sequence generators, including the One True Generator: getGOEFakeLevelSequence

@@ -124,6 +124,10 @@ class Isotope( miscModule.ClassWithSymbolKey ) :
             if nuclideWarnings:
                 warnings.append(warningModule.Context('nuclide %s' % nuclide.id, nuclideWarnings))
 
+            if len(nuclide.nucleus.energy) == 0:
+                warnings.append(warningModule.UnknownEnergy(nuclide.nucleus))
+                continue
+
             enow = nuclide.nucleus.energy.float('eV')
             if enow <= emax:
                 warnings.append(warningModule.DiscreteLevelsOutOfOrder(nuclide.nucleus.index, nuclide))

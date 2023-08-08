@@ -1232,18 +1232,11 @@ the RRR tables P.A. Moldauer Phys. Rev. Lett. 19, 1047-1048 (1967).  The equatio
 <dd><p>URR tables give us the average resonance parameters, the average resonance spacing
 and the number of degrees of freedom, assuming that the widths are distributed by a chi^2
 probability density function with the given number of degrees of freedom.</p>
-<p>However, later we’ll need the level densities.  Below we’ll construct them from the
-average resonance spacing for each L, J.</p>
 <p>This function sets several member data as dicts (indexed by L &amp; J) of data and interpolable functions:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">levelSpacings</span><span class="p">::</span>
 
     <span class="o">..</span><span class="n">math</span><span class="p">::</span>
         <span class="n">D_</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">}(</span><span class="n">E</span><span class="p">)</span>
-
-<span class="o">-</span> <span class="n">levelDensities</span><span class="p">:</span> <span class="n">derived</span> <span class="kn">from</span> <span class="nn">level</span> <span class="n">spacings</span><span class="p">::</span>
-
-    <span class="o">..</span><span class="n">math</span><span class="p">::</span>
-        \<span class="n">rho_</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">}(</span><span class="n">E</span><span class="p">)</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">D_</span><span class="p">{</span><span class="n">L</span><span class="p">,</span><span class="n">J</span><span class="p">}(</span><span class="n">E</span><span class="p">)</span>
 
 <span class="o">-</span> <span class="n">averageWidths</span><span class="p">,</span> <span class="n">assigned</span> <span class="n">simple</span> <span class="n">labels</span> <span class="n">like</span> <span class="s1">&#39;elastic&#39;</span> <span class="ow">and</span> <span class="s1">&#39;capture&#39;</span> <span class="k">for</span> <span class="n">convenience</span><span class="p">::</span>
 
@@ -1399,33 +1392,33 @@ of the unresolved region, so we can draw realizations extending to higher/lower 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.generatePDFs">
-<span class="sig-name descname"><span class="pre">generatePDFs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resClass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nSamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatures</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'goe'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolateWidths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyUnit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eV'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureUnit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'K'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotSamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotDir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'realizationPlots'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/makeUnresolvedProbabilityTables.html#ProbabilityTableGenerator.generatePDFs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.generatePDFs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generatePDFs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nSamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatures</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'goe'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makePDFs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolateWidths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureUnit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'K'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotSamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotDir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'realizationPlots'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/makeUnresolvedProbabilityTables.html#ProbabilityTableGenerator.generatePDFs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.generatePDFs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate multiple resonance parameter realizations, reconstruct cross sections, optionally heat to one or
 more temperatures, and generate cross section PDFs at several incident energies.
 The PDFs from each sample are summed together, and only normalized after all samples are completed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>resClass</strong> – The class instance to use for reconstructing realizations of the cross section set.</p></li>
 <li><p><strong>nSamples</strong> – number of realizations generated and averaged to create the PDFs</p></li>
 <li><p><strong>temperatures</strong> – list of temperatures for generating heated cross section PDFs.</p></li>
 <li><p><strong>style</strong> – style of resonance realization generation (see sampleRR method for style options)</p></li>
+<li><p><strong>makePDFs</strong> – generate cross section PDFs in addition to probability tables</p></li>
 <li><p><strong>interpolateWidths</strong> – interpolate the URR widths or not (just say “True”)</p></li>
-<li><p><strong>energyUnit</strong> – unit to use for energy grid in reconstructed cross sections</p></li>
 <li><p><strong>temperatureUnit</strong> – unit for the list of temperatures. Default = ‘K’</p></li>
 <li><p><strong>verbose</strong> – enable verbose output</p></li>
 <li><p><strong>plotSamples</strong> – number of cross section realizations to plot (helpful for debugging)</p></li>
+<li><p><strong>debugFile</strong> – optional file name to save realizations (will be saved as pickled dictionary)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>dictionary with probability tables (stored as XYs2d) for each temperature / reaction</p>
+<dd class="field-even"><p>dictionary with probability tables and optionally also pdfs</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.getLastResolvedResonanceEnergy">
-<span class="sig-name descname"><span class="pre">getLastResolvedResonanceEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/makeUnresolvedProbabilityTables.html#ProbabilityTableGenerator.getLastResolvedResonanceEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.getLastResolvedResonanceEnergy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getLastResolvedResonanceEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/makeUnresolvedProbabilityTables.html#ProbabilityTableGenerator.getLastResolvedResonanceEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.getLastResolvedResonanceEnergy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the last resonance energy from the resolved region, that will start all the ladders in the URR</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1478,7 +1471,32 @@ but a few (notably Pu239 in ENDF-VII.1) break the RRR into several regions.</p>
 <span class="sig-name descname"><span class="pre">truncateResolvedRegion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domainMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/makeUnresolvedProbabilityTables.html#ProbabilityTableGenerator.truncateResolvedRegion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.truncateResolvedRegion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all resolved resonances with energies above domainMax.
 If domainMax is None, use self.lowerBound  (i.e. lower limit of the unresolved region).
-Modifies the local copy of the resolved parameters (self.RRR)</p>
+This method modifies the local copy of the resolved parameters (self.RRR).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.verbose">
+<span class="sig-name descname"><span class="pre">verbose</span></span><a class="headerlink" href="#fudge.processing.resonances.makeUnresolvedProbabilityTables.ProbabilityTableGenerator.verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p># disabled: adding background cross section to realizations biases samples
+# obtain background cross sections (will be added to each realization).
+self.backgrounds = {}
+if not self.URR.URR.useForSelfShieldingOnly:</p>
+<blockquote>
+<div><dl>
+<dt>for reaction in self.URR.URR.resonanceReactions:</dt><dd><p>xsc = reaction.link.link.crossSection.evaluated
+assert isinstance(xsc, crossSectionModule.ResonancesWithBackground)
+key = reaction.label
+for simpleKey in (‘elastic’, ‘capture’, ‘fission’, ‘total’):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>if reaction.link.link is reactionSuite.getReaction(simpleKey):</dt><dd><p>key = simpleKey</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>self.backgrounds[key] = xsc.background.unresolvedRegion.data</p>
+</dd>
+</dl>
+</div></blockquote>
 </dd></dl>
 
 </dd></dl>

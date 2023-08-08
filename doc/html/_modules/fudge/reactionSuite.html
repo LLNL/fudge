@@ -105,12 +105,12 @@
 <span class="kn">import</span> <span class="nn">fudge</span>
 
 <div class="viewcode-block" id="NullDevice"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.NullDevice">[docs]</a><span class="k">class</span> <span class="nc">NullDevice</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;For internal use. Used in methods to set logFile when one is not entered.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;For internal use. Used in methods to set logFile when one is not entered.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NullDevice.write"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.NullDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span> <span class="k">pass</span></div></div>
 
 <div class="viewcode-block" id="ReactionSuite"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite">[docs]</a><span class="k">class</span> <span class="nc">ReactionSuite</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is the main class for a gnds projectile/target object. It contains</span>
 <span class="sd">        * optional external files (e.g. for covariances or binary data stored in another file)</span>
 <span class="sd">        * a &#39;styles&#39; section describing all evaluated and processed data styles, documentation, etc.</span>
@@ -144,7 +144,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">interaction</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">style</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">projectileFrame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">lab</span><span class="p">,</span> <span class="n">MAT</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">PoPs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sourcePath</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new reactionSuite object, containing all reaction data for a projectile/target combination.</span>
 
 <span class="sd">        :param projectile:      Projectile ID (string)</span>
@@ -233,7 +233,7 @@
         <span class="k">for</span> <span class="n">reaction</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incompleteReactions</span> <span class="p">:</span> <span class="k">yield</span> <span class="n">reaction</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;See method toString.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See method toString.&quot;&quot;&quot;</span>
 
         <span class="n">string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputParticlesToReactionString</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39; (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span>  <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span> <span class="p">)</span>
         
@@ -241,7 +241,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">compound_nucleus</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the compound nucleus id corresponding to this reaction.</span>
 
 <span class="sd">        Note, we don&#39;t check to see if the compound nucleus is a valid concept, so</span>
@@ -260,13 +260,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">projectile</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns self&#39;s projectile.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s projectile.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projectile</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">target</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns self&#39;s target.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s target.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__target</span> <span class="p">)</span>
 
@@ -277,13 +277,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">evaluation</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns self&#39;s evaluation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s evaluation.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">interaction</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns self&#39;s interaction.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s interaction.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__interaction</span> <span class="p">)</span>
 
@@ -299,38 +299,38 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">guessedInteraction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;Returns the guessedInteraction value. This is for pre GNDS 2.0 use only and should not be used with GNDS 2.0 or higher</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the guessedInteraction value. This is for pre GNDS 2.0 use only and should not be used with GNDS 2.0 or higher</span>
 <span class="sd">        (i.e., it should always be False for GNDS 2.0 or higher.&#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__guessedInteraction</span>
 
     <span class="nd">@guessedInteraction</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">guessedInteraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39;Set self&#39;s guessedInteraction member. This is for pre GNDS 2.0 use only and should not be used with GNDS 2.0 or higher.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Set self&#39;s guessedInteraction member. This is for pre GNDS 2.0 use only and should not be used with GNDS 2.0 or higher.&#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__guessedInteraction</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sourcePath</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the sourcePath member which is the path to the reactionSuite file for self if self is from a file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the sourcePath member which is the path to the reactionSuite file for self if self is from a file.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">externalFiles</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the externalFiles instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the externalFiles instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">styles</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the PoPs instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the PoPs instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">PoPs</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the PoPs instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the PoPs instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PoPs</span> <span class="p">)</span>
 
@@ -340,7 +340,7 @@
 
     <span class="nd">@resonances</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">resonances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resonances</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set resonances to the specified resonances instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set resonances to the specified resonances instance.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resonances</span><span class="p">,</span> <span class="n">resonancesModule</span><span class="o">.</span><span class="n">Resonances</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Must be Resonances instance, not &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">resonances</span><span class="p">))</span>
@@ -349,43 +349,43 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">reactions</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the reactions instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the reactions instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reactions</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">orphanProducts</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the orphanProducts instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the orphanProducts instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orphanProducts</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sums</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the sums instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the sums instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sums</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">productions</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the productions instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the productions instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__productions</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">incompleteReactions</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the incompleteReactions instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the incompleteReactions instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__incompleteReactions</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fissionComponents</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the fissionComponents instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the fissionComponents instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionComponents</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">applicationData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the applicationData instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the applicationData instance.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__applicationData</span>
 
@@ -411,7 +411,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.photonBranchingData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.photonBranchingData">[docs]</a>    <span class="k">def</span> <span class="nf">photonBranchingData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        For each isotope in *self.PoPs*, calls decaysMiscPoPsModule.photonBranchingData.</span>
 
 <span class="sd">        :return:        Dictionary with keys being each isotope in *self.PoPs* and their values being that returned by </span>
@@ -425,7 +425,7 @@
         <span class="k">return</span> <span class="n">branchingData</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.convertUnits"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Recursively searches for units within all sections, converting units that appear in the unitMap.</span>
 <span class="sd">        unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -440,7 +440,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fissionComponents</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.fixDomains"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For each reaction type and summed data, makes all projectile energy domains be consistent. This only modifies *evaluated* data and</span>
 <span class="sd">        not any *processed* data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -456,7 +456,7 @@
         <span class="k">return</span> <span class="n">numberOfFixes</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.check"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check all data in the reactionSuite, returning a gnds.warning.context object with list of warnings.</span>
 
 <span class="sd">        Currently supported options::</span>
@@ -709,14 +709,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">diffResults1</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.elasticReactionLabel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.elasticReactionLabel">[docs]</a>    <span class="k">def</span> <span class="nf">elasticReactionLabel</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the label for the elastic channel. When constructing the label, if target is an alias, use the alias&#39; pid; otherwise, use the target id.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> + </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetID</span><span class="p">(</span> <span class="n">protareID</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.targetID"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.targetID">[docs]</a>    <span class="k">def</span> <span class="nf">targetID</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">protareID</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the ID for the target. If the target is a nuclear meta-stable, then the target ID as listed by the &#39;target&#39; attribute for the</span>
 <span class="sd">        reactionSuite (i.e., protare) will be the meta-stable&#39;s ID while everywhere else it will be the nuclide excitation ID. Otherwise,</span>
 <span class="sd">        the target ID as listed by the &#39;target&#39; attribute for the reactionSuite is the same as it is everywhere else. For example, for the</span>
@@ -730,7 +730,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">final</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="p">)</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.findEntity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overrides ancestry.findEntity. reactionSuite contains several different lists,</span>
 <span class="sd">        so may need to descend into those to find desired entity.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -825,7 +825,7 @@
 
 <span class="c1"># BRB6 This does not belong here.</span>
 <div class="viewcode-block" id="ReactionSuite.getIsotopeName"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.getIsotopeName">[docs]</a>    <span class="k">def</span> <span class="nf">getIsotopeName</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return name of compound nucleus formed by nuc1+nuc2+...</span>
 <span class="sd">        if a nucleus in &#39;args&#39; starts with &#39;-&#39;, subtract instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -862,7 +862,7 @@
 
 <span class="c1"># BRB6 many hardwired in this method.</span>
 <div class="viewcode-block" id="ReactionSuite.getReaction"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.getReaction">[docs]</a>    <span class="k">def</span> <span class="nf">getReaction</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">channel</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search list of reactions for a specified channel.</span>
 <span class="sd">        The &#39;channel&#39; argument should be either a reaction type (&#39;elastic&#39;,&#39;capture&#39;,&#39;fission&#39;, etc) or</span>
 <span class="sd">        the list of outgoing particles (&#39;n + Pu239&#39; for example).</span>
@@ -963,7 +963,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.calculateAverageProductData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">additionalReactions</span> <span class="o">=</span> <span class="p">[],</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate average energy and momentum data for all products of all reactions.</span>
 <span class="sd">        Resulting data are stored within each product. Example usage is:</span>
 
@@ -1019,7 +1019,7 @@
         <span class="k">for</span> <span class="n">reaction</span> <span class="ow">in</span> <span class="n">additionalReactions</span> <span class="p">:</span> <span class="n">reaction</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.buildCrossSectionSum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.buildCrossSectionSum">[docs]</a>    <span class="k">def</span> <span class="nf">buildCrossSectionSum</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">sumLabel</span><span class="p">,</span> <span class="n">ENDF_MT</span><span class="p">,</span> <span class="n">styleLabel</span><span class="p">,</span> <span class="n">reactionKeys</span><span class="p">,</span> <span class="n">Q</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For the list of indices and/or labels in reactionKeys, calcualate the summed crosstions and create a crossSectionSum</span>
 <span class="sd">        for it. If insert is True, the crossSectionSum is added to self&#39;s sums/crossSectionSums node. If N keys match the</span>
 <span class="sd">        same reaction in this, that reaction will be added N times.</span>
@@ -1058,7 +1058,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2"> + </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">suffix</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.cullStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleName</span><span class="p">,</span> <span class="n">removeDocumentation</span><span class="p">,</span> <span class="n">removeApplicationData</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes all forms from each component except for the requested style or, if it is not present</span>
 <span class="sd">        its nearest derived from style.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1098,7 +1098,7 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.listOfProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
 
         <span class="n">products</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">reaction</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">:</span> <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">reaction</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">())</span>
@@ -1110,7 +1110,7 @@
         <span class="k">return</span> <span class="n">products</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.covarianceExternalFiles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.covarianceExternalFiles">[docs]</a>    <span class="k">def</span> <span class="nf">covarianceExternalFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a list of all ExternalFile instanaces in *self* that point to covariance files.</span>
 
 <span class="sd">        :return:    The list of ExternalFile instanaces that point to covariance files.</span>
@@ -1133,7 +1133,7 @@
         <span class="k">return</span> <span class="n">externalFiles</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.loadCovariances"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.loadCovariances">[docs]</a>    <span class="k">def</span> <span class="nf">loadCovariances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load all external files of type &#39;covarianceSuite&#39;, and resolve links between self and covarianceSuites.</span>
 
 <span class="sd">        :return: list of loaded covarianceSuites</span>
@@ -1247,7 +1247,7 @@
             <span class="n">newReference</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">referenceInstance</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span> <span class="n">newReference</span><span class="o">.</span><span class="n">label</span> <span class="p">]</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.processGriddedCrossSections"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.processGriddedCrossSections">[docs]</a>    <span class="k">def</span> <span class="nf">processGriddedCrossSections</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span><span class="p">,</span> <span class="n">additionalReactions</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a union grid for all cross sections, for faster continuous energy Monte Carlo sampling.</span>
 <span class="sd">        The grid spans the same domain as the elastic scattering cross section.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1345,7 +1345,7 @@
 
 <div class="viewcode-block" id="ReactionSuite.processMultiGroup"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">legendreMax</span><span class="p">,</span> <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span><span class="p">,</span> <span class="n">logFile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">restart</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">additionalReactions</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate multi-group processed data, including cross sections, weighted multiplicities and Q-values and transfer matrices.</span>
 <span class="sd">        Processed results will be stored as new forms inside the reactionSuite.</span>
 
@@ -1437,7 +1437,7 @@
         <span class="k">if</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;failures&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;kwargs[&#39;failures&#39;] = </span><span class="si">%d</span><span class="s2">  &gt; 0&quot;</span> <span class="o">%</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;failures&#39;</span><span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupVector"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupVector">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">childSuite</span><span class="p">,</span> <span class="n">multiGroupVectorMethod</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        General method to return multiGroupVector output from a specified multiGroupVectorMethod for specified reactionSuite child nodes.</span>
 
 <span class="sd">        :param childSuite: Suite which to iterate over.</span>
@@ -1455,7 +1455,7 @@
         <span class="k">return</span> <span class="n">vectorResult</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupMatrix"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">childSuite</span><span class="p">,</span> <span class="n">multiGroupMatrixMethod</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        General method to return multiGroupMatrix output from a specified multiGroupVectorMethod for specified reactionSuite child nodes.</span>
 
 <span class="sd">        :param childSuite: Suite which to iterate over.</span>
@@ -1473,7 +1473,7 @@
         <span class="k">return</span> <span class="n">matrixResult</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupCrossSection">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupCrossSection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total cross section for the requested label. This is summed over all reactions.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -1483,7 +1483,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiGroupVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">,</span> <span class="s1">&#39;multiGroupCrossSection&#39;</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupInverseSpeed"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupInverseSpeed">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupInverseSpeed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the inverse speeds for the requested label. The label must be for a heated multi-group style.</span>
 
 <span class="sd">        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</span>
@@ -1493,7 +1493,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="n">styleLabel</span><span class="p">]</span><span class="o">.</span><span class="n">inverseSpeed</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">constructVector</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupQ"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupQ">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">includeFinalProducts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total Q for the requested label. This is a cross section weighted multiplicity summed over all reactions.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -1504,7 +1504,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiGroupVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">,</span> <span class="s1">&#39;multiGroupQ&#39;</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">includeFinalProducts</span><span class="o">=</span><span class="n">includeFinalProducts</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupMultiplicity">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total multiplicity for the requested label for the requested product. This is a cross section weighted multiplicity.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -1518,7 +1518,7 @@
         <span class="k">return</span> <span class="n">multiplicity</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupFissionNeutronMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupFissionNeutronMultiplicity">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupFissionNeutronMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total fission neutron multiplicity for the requested label. This is a cross section weighted multiplicity.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -1533,7 +1533,7 @@
         <span class="k">return</span> <span class="n">multiplicity</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupAvailableEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupAvailableEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAvailableEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total available energy for the requested label. This is a cross section weighted available energy summed over all reactions.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -1543,7 +1543,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiGroupVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">,</span> <span class="s1">&#39;multiGroupAvailableEnergy&#39;</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupAverageEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupAverageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total average energy for the requested label for the requested product. This is a cross section weighted average energy summed over all reactions.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted average energy summed over all products for this reaction.</span>
@@ -1559,7 +1559,7 @@
         <span class="k">return</span> <span class="n">averageEnergy</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupDepositionEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupDepositionEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupDepositionEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total deposition energy for the requested label.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted deposition energy summed over all reactions. The deposition energy is calculated by subtracting </span>
@@ -1578,7 +1578,7 @@
         <span class="k">return</span> <span class="n">depositionEnergy</span> </div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupAvailableMomentum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupAvailableMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAvailableMomentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total available momentum for the requested label.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted available momentum summed over all reactions.</span>
@@ -1590,7 +1590,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiGroupVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">,</span> <span class="s1">&#39;multiGroupAvailableMomentum&#39;</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupAverageMomentum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupAverageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupAverageMomentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total average momentum for the requested label for the requested product.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted average momentum summed over all reactions.</span>
@@ -1606,7 +1606,7 @@
         <span class="k">return</span> <span class="n">averageMomentum</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupDepositionMomentum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupDepositionMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupDepositionMomentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total deposition momentum for the requested label.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted deposition momentum summed over all reactions. The deposition momentum is calculated by </span>
@@ -1625,7 +1625,7 @@
         <span class="k">return</span> <span class="n">depositionMomentum</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupGain"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupGain">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupGain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, gain for the requested particle and label.</span>
 <span class="sd">        </span>
 <span class="sd">        This is a cross section weighted gain summed over all reactions.</span>
@@ -1642,7 +1642,7 @@
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupTransportCorrection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupTransportCorrection">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupTransportCorrection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">,</span> \
         <span class="n">temperature</span><span class="p">,</span> <span class="n">transportCorrectionType</span><span class="o">=</span><span class="n">transportingModule</span><span class="o">.</span><span class="n">TransportCorrectionType</span><span class="o">.</span><span class="n">none</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group transport correction for the requested label.</span>
 <span class="sd">        </span>
 <span class="sd">        The transport correction is calculated from the transfer matrix for the projectile id for the Legendre order of legendreOrder + 1.</span>
@@ -1671,7 +1671,7 @@
         <span class="k">return</span> <span class="n">transportCorrection</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupProductMatrix"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, total product matrix for the requested label for the requested product id for the requested Legendre order.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -1696,7 +1696,7 @@
         <span class="k">return</span> <span class="n">fissionMatrix</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.multiGroupProductArray"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the full multi-group, total product array for the requested label for the requested product id.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
@@ -1782,7 +1782,7 @@
         <span class="n">averageProductEnergy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">toMultiGroup1d</span><span class="p">(</span> <span class="n">averageProductEnergyModule</span><span class="o">.</span><span class="n">Gridded1d</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">averageEnergy</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">grouped</span><span class="p">,</span> <span class="n">zeroPerTNSL</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;zeroPerTNSL&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1795,7 +1795,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__sums</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.supportsResonanceReconstruction"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.supportsResonanceReconstruction">[docs]</a>    <span class="k">def</span> <span class="nf">supportsResonanceReconstruction</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks whether self.resonances contains any resonance parameters that can be reconstructed into</span>
 <span class="sd">        cross sections and/or product distributions.</span>
 <span class="sd">        :return: boolean</span>
@@ -1804,7 +1804,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resonances</span><span class="o">.</span><span class="n">reconstructCrossSection</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.reconstructResonances"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.reconstructResonances">[docs]</a>    <span class="k">def</span> <span class="nf">reconstructResonances</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">thin</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Turn resonance parameters into pointwise cross sections, then merge the results with</span>
 <span class="sd">        tabulated pointwise cross sections. Resulting pointwise cross sections are stored</span>
 <span class="sd">        alongside the original &#39;resonancesWithBackground&#39; data in the reactionSuite.</span>
@@ -1904,7 +1904,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.reconstructResonancesAngularDistributions"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.reconstructResonancesAngularDistributions">[docs]</a>    <span class="k">def</span> <span class="nf">reconstructResonancesAngularDistributions</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleName</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">thin</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Turn resonance parameters into Legendre-expanded angular distributions, then merge the results with</span>
 <span class="sd">        tabulated angular distributions (overwriting original values in the resonance region). Resulting pointwise</span>
 <span class="sd">        angular distributions are stored alongside the original angular distributions in the reactionSuite.</span>
@@ -1973,7 +1973,7 @@
         <span class="k">if</span> <span class="n">newStyle</span><span class="o">.</span><span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">newStyle</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.removeStyle"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.removeStyle">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove the given style everywhere it appears in this reactionSuite</span>
 <span class="sd">        :param style: may be a style instance or its name</span>
 <span class="sd">        :return:</span>
@@ -2001,7 +2001,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">style</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.saveAllToFile"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.saveAllToFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveAllToFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">hybrid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes *self* and its covariance data to files. The name of the covariance file will be the same as the *fileName* but</span>
 <span class="sd">        it will be put into a &quot;Covariance&quot; sub-directory inside the directory where *self* is written and &quot;-covar&quot; will be</span>
 <span class="sd">        added before the extension. If hybrid is *True*, self will be written out in default hybrid mode with the HDF5 data </span>
@@ -2010,46 +2010,58 @@
 <span class="sd">        :param fileName:        The name of the file to write *self* to.</span>
 <span class="sd">        :param hybrid:          If *True* data are written in hybrid XML/HDF5 files.</span>
 <span class="sd">        :param kwargs:          Additional key-word arguments that are passed to internal calls.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">covarianceDir</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;Covariances&#39;</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">externalFile</span> <span class="k">as</span> <span class="n">externalFileModule</span>
+        <span class="n">covarianceDir</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;covarianceDir&#39;</span><span class="p">,</span> <span class="s1">&#39;Covariances&#39;</span><span class="p">))</span>
+
         <span class="n">fileName</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
         <span class="n">covarianceName</span> <span class="o">=</span> <span class="n">covarianceDir</span> <span class="o">/</span> <span class="p">(</span><span class="n">fileName</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s1">&#39;-covar&#39;</span> <span class="o">+</span> <span class="n">fileName</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span>
         <span class="n">covariancePath</span> <span class="o">=</span> <span class="n">fileName</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">covarianceName</span>
 
         <span class="n">covariances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadCovariances</span><span class="p">()</span>
         <span class="n">originalPaths</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">covariance</span> <span class="ow">in</span> <span class="n">covariances</span><span class="p">:</span>
-            <span class="n">sourcePathC</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">covariance</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">)</span>
-            <span class="n">externalPath</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">externalFile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>                             <span class="c1"># Find externalFile for this convariance.</span>
-                <span class="k">if</span> <span class="n">sourcePathC</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">realpath</span><span class="p">()):</span>
-                    <span class="n">externalPath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-                    <span class="k">break</span>
+        <span class="k">if</span> <span class="n">covariances</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcePath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># self was generated directly, not parsed from a ReactionSuite file. Add externalFiles before saving:</span>
+            <span class="n">covariances</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">externalFileModule</span><span class="o">.</span><span class="n">ExternalFile</span><span class="p">(</span><span class="s2">&quot;reactions&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="n">fileName</span><span class="p">)))</span>
+            <span class="n">covariances</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">saveToFile</span><span class="p">(</span><span class="n">covariancePath</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">externalPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: could not find externalFile for covariance &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">sourcePathC</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="n">externalPath</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>                                <span class="c1"># Only write if not absolute.</span>
-                <span class="k">if</span> <span class="n">externalFile</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">originalPaths</span><span class="p">:</span>
-                    <span class="n">originalPaths</span><span class="p">[</span><span class="n">externalFile</span><span class="p">]</span> <span class="o">=</span> <span class="n">externalFile</span><span class="o">.</span><span class="n">path</span>             <span class="c1"># Needs to be reset back to original name before this method exits..</span>
-                <span class="n">externalFile</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">covarianceName</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">covariancePath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">covariancePath</span> <span class="o">=</span> <span class="n">fileName</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">covarianceDir</span> <span class="o">/</span> <span class="n">sourcePathC</span><span class="o">.</span><span class="n">name</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: multiple covariance files, using &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">covariancePath</span><span class="p">)</span>
+            <span class="n">sha1sum</span> <span class="o">=</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">covariancePath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">externalFileModule</span><span class="o">.</span><span class="n">ExternalFile</span><span class="p">(</span><span class="s2">&quot;covariances&quot;</span><span class="p">,</span> <span class="n">covariancePath</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">sha1sum</span><span class="p">))</span>
 
-                <span class="n">externalPathC</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">selfSourcePath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">externalFileC</span> <span class="ow">in</span> <span class="n">covariance</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>
-                    <span class="n">externalFilePath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">externalFileC</span><span class="o">.</span><span class="n">realpath</span><span class="p">())</span>
-                    <span class="k">if</span> <span class="n">externalFilePath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">selfSourcePath</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">externalFilePath</span><span class="p">):</span>
-                        <span class="n">externalPathC</span> <span class="o">=</span> <span class="n">externalFileC</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># locate and update the ExternalFiles pointing between the two files</span>
+            <span class="k">for</span> <span class="n">covariance</span> <span class="ow">in</span> <span class="n">covariances</span><span class="p">:</span>
+                <span class="n">externalPath</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">sourcePathC</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">covariance</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">externalFile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>                             <span class="c1"># Find externalFile for this covariance.</span>
+                    <span class="k">if</span> <span class="n">sourcePathC</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">realpath</span><span class="p">()):</span>
+                        <span class="n">externalPath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">externalFile</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
                         <span class="k">break</span>
-                <span class="k">if</span> <span class="n">externalPathC</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: could not find externalFile in covariance for reactionSuite.&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">externalFileC</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">originalPaths</span><span class="p">:</span>
-                        <span class="n">originalPaths</span><span class="p">[</span><span class="n">externalFileC</span><span class="p">]</span> <span class="o">=</span> <span class="n">externalFileC</span><span class="o">.</span><span class="n">path</span>             <span class="c1"># Needs to be reset back to original name before this method exits..</span>
-                    <span class="n">externalPathC</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">fileName</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">externalPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: could not find externalFile for covariance &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">sourcePathC</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">externalPath</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>                                <span class="c1"># Only write if not absolute.</span>
+                    <span class="k">if</span> <span class="n">externalFile</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">originalPaths</span><span class="p">:</span>
+                        <span class="n">originalPaths</span><span class="p">[</span><span class="n">externalFile</span><span class="p">]</span> <span class="o">=</span> <span class="n">externalFile</span><span class="o">.</span><span class="n">path</span>             <span class="c1"># Needs to be reset back to original name before this method exits..</span>
+                    <span class="n">externalFile</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">covarianceName</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">covariancePath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">covariancePath</span> <span class="o">=</span> <span class="n">fileName</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">covarianceDir</span> <span class="o">/</span> <span class="n">sourcePathC</span><span class="o">.</span><span class="n">name</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: multiple covariance files, using &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">covariancePath</span><span class="p">)</span>
+
+                    <span class="n">externalPathC</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">selfSourcePath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">externalFileC</span> <span class="ow">in</span> <span class="n">covariance</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>
+                        <span class="n">externalFilePath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">externalFileC</span><span class="o">.</span><span class="n">realpath</span><span class="p">())</span>
+                        <span class="k">if</span> <span class="n">externalFilePath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">selfSourcePath</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">externalFilePath</span><span class="p">):</span>
+                            <span class="n">externalPathC</span> <span class="o">=</span> <span class="n">externalFileC</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="n">externalPathC</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: could not find externalFile in covariance for reactionSuite.&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">externalFileC</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">originalPaths</span><span class="p">:</span>
+                            <span class="n">originalPaths</span><span class="p">[</span><span class="n">externalFileC</span><span class="p">]</span> <span class="o">=</span> <span class="n">externalFileC</span><span class="o">.</span><span class="n">path</span>             <span class="c1"># Needs to be reset back to original name before this method exits..</span>
+                        <span class="n">externalPathC</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">fileName</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
                 <span class="n">covariance</span><span class="o">.</span><span class="n">saveToFile</span><span class="p">(</span><span class="n">covariancePath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="n">covariancePath</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -2062,7 +2074,7 @@
             <span class="n">externalFile</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">originalPaths</span><span class="p">[</span><span class="n">externalFile</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.saveToHybrid"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.saveToHybrid">[docs]</a>    <span class="k">def</span> <span class="nf">saveToHybrid</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xmlName</span><span class="p">,</span> <span class="n">hdfName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hdfSubDir</span><span class="o">=</span><span class="s1">&#39;HDF5&#39;</span><span class="p">,</span> <span class="n">minLength</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save the reactionSuite to a hybrid layout, with the data hierarchy in xml</span>
 <span class="sd">        but most actual data saved in an associated HDF file</span>
 
@@ -2150,7 +2162,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">temperatures</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of GNDS/XML strings representing self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of GNDS/XML strings representing self.&quot;&quot;&quot;</span>
 
         <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
@@ -2189,7 +2201,7 @@
         <span class="k">return</span> <span class="n">xmlString</span></div>
 
 <div class="viewcode-block" id="ReactionSuite.toString"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a string representation of an reactionSuite.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string representation of an reactionSuite.&quot;&quot;&quot;</span>
 
         <span class="n">s</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputParticlesToReactionString</span><span class="p">(</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39; --&gt; &#39;</span> <span class="p">)</span>
         <span class="n">indent2</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span>
@@ -2201,7 +2213,7 @@
 
 <div class="viewcode-block" id="ReactionSuite.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translates a &lt;reactionSuite&gt; xml node into a reactionSuite instance. Users should use the &#39;readXML_file&#39; function instead.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translates a &lt;reactionSuite&gt; xml node into a reactionSuite instance. Users should use the &#39;readXML_file&#39; function instead.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>   <span class="c1"># Keep track of location in the tree, in case errors come up.</span>
 
@@ -2312,26 +2324,26 @@
 
 <div class="viewcode-block" id="ReactionSuite.read"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.ReactionSuite.read">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads in the file name *fileName* and returns a **ReactionSuite** instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">ReactionSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="read"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads in the file name *fileName* and returns a **ReactionSuite** instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">ReactionSuite</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="niceSortOfMTs"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.reactionSuite.niceSortOfMTs">[docs]</a><span class="k">def</span> <span class="nf">niceSortOfMTs</span><span class="p">(</span><span class="n">MTs</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">logFile</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Sorts the list of ENDF MTs into a sensible, defined order.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">removeGetIfPresent</span><span class="p">(</span><span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        For internal use only.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 

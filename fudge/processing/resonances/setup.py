@@ -7,7 +7,7 @@
 
 import os
 import numpy
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 
 # find numpy include path:
 numpyPath = os.path.split(numpy.__file__)[0]

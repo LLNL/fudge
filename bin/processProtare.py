@@ -124,6 +124,7 @@ parser.add_argument( '--fluxID',    type=str, required=multigroupPresent,       
 parser.add_argument( '--groupFile', type=str, required=multigroupPresent,                               help = 'File containing a "groups" node with a suite of group nodes. If specified, bdfls file is ignored.' )
 parser.add_argument( '-g', '--gid', type=str, required=multigroupPresent, action='append',              help = 'Specifies a multi-group ID for a specific particle as <particle>=multiGroupID (e.g., --gid n=LLNL_gid_7).' )
 
+parser.add_argument( '--hybrid', action='store_true',                                                   help='If present, output data are stored in XML/HDF5 hybrid files.')
 parser.add_argument( '--formatVersion', default = GNDS_formatVersionModule.default, choices = GNDS_formatVersionModule.allowed,
                                                                                                         help = 'Specifies the GNDS format for the outputted file. Default = "%s".' % GNDS_formatVersionModule.default )
 
@@ -380,7 +381,7 @@ if( processedFileName is None ) :
     filetype = reactionSuite.sourcePath.split( '.' )[-1]
     processedFileName = reactionSuite.sourcePath[:-len(filetype)] + '%s.%s' % ( args.tag, filetype )
 if( outputDefault != args.output ) : processedFileName = os.path.join( args.output, os.path.basename( processedFileName ) )
-reactionSuite.saveToFile( processedFileName, xs_pdf_cdf1d_singleLine = True, formatVersion = args.formatVersion )
+reactionSuite.saveAllToFile(processedFileName, xs_pdf_cdf1d_singleLine=True, formatVersion=args.formatVersion, hybrid=args.hybrid)
 
 logFile.write( '\nTotal elapsed time:\n  %s\n' % timer )
 logFile.close( )

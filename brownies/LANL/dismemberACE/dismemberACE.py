@@ -15,6 +15,28 @@ outputDefault = 'dismemberACE.out'
 ACE_format_1_0 = '1.0'
 ACE_format_2_0 = '2.0'
 
+'''
+The following is the definition of the ZAID name as described in the the MCNP manaul in Appendix F for the old ACE format:
+
+    "This is usually the ZAID:
+        3 characters for Z,
+        3 characters for A,
+        a decimal point,
+        2 characters for evaluation identification,
+        and a tenth character used to identify 
+            continuous-energy neutron tables by the letter C,
+            discrete-reaction neutron tables by D,
+            dosimetry tables by Y,
+            S(a,b) thermal tables by T,
+            continuous-energy photoatomic tables by P,
+            continuous-energy photonuclear tables by U,
+            continuous-energy electron tables by E,
+            multigroup neutron tables by M,
+            and multigroup photon tables by G.
+
+    For the S(a,B) tables, the first 6 characters contain a mnemonic character string, such as LWTR.01T."
+'''
+
 from brownies.LANL.dismemberACE  import dismemberACE_misc as dismemberACE_miscModule
 from brownies.LANL.dismemberACE import dismemberACE_c as dismemberACE_c_Module
 from brownies.LANL.dismemberACE import dismemberACE_p as dismemberACE_p_Module

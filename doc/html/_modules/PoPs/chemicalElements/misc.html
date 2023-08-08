@@ -146,7 +146,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="chemicalElementALevelIDsAndAnti"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.chemicalElementALevelIDsAndAnti">[docs]</a><span class="k">def</span> <span class="nf">chemicalElementALevelIDsAndAnti</span><span class="p">(</span> <span class="nb">id</span><span class="p">,</span> <span class="n">qualifierAllowed</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse a particle id to extract the following information:</span>
 <span class="sd">        baseId: particle id with any qualifiers removed</span>
 <span class="sd">        chemicalElementSymbol: symbol if id is a chemical element, isotope, nuclide or nucleus. None otherwise</span>
@@ -206,7 +206,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">baseID</span><span class="p">,</span> <span class="n">chemicalElementSymbol</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">levelID</span><span class="p">,</span> <span class="n">isNucleus</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ZAInfo"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.ZAInfo">[docs]</a><span class="k">def</span> <span class="nf">ZAInfo</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute Z, A, ZA and level index for a particle instance.</span>
 
 <span class="sd">    :param particle: PoPs particle instance. If the particle is not a baryon, isotope, nuclide or nucleus,</span>
@@ -257,7 +257,7 @@
         <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="ZAInfo_fromString"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.ZAInfo_fromString">[docs]</a><span class="k">def</span> <span class="nf">ZAInfo_fromString</span><span class="p">(</span> <span class="n">particleName</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parses an isotope name (e.g., &#39;Mn55_e3&#39;) to get its Z, A, ZA and nuclear level index.</span>
 <span class="sd">    If the level is negative, the particle is a metastable name (e.g., &#39;Am242_m1&#39;).</span>
 <span class="sd">    The name can be an isotope which returns ( Z, A, 1000 * Z + A, level ) (e.g., &#39;O16&#39; returns (8, 16, 8016, 0)), </span>
@@ -316,14 +316,14 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">Z</span> <span class="o">+</span> <span class="n">A</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ZA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.ZA">[docs]</a><span class="k">def</span> <span class="nf">ZA</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Uses ZAInfo to compute the particle ZA. See ZAInfo for more detail</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">ZAInfo</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="idFromZAndA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.idFromZAndA">[docs]</a><span class="k">def</span> <span class="nf">idFromZAndA</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the PoPs id for a particle given Z and A</span>
 <span class="sd">    :param Z: atomic number (int)</span>
 <span class="sd">    :param A: nucleon number (int)</span>
@@ -336,7 +336,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">isotopeSymbolFromChemicalElementIDAndA</span><span class="p">(</span> <span class="n">symbolFromZ</span><span class="p">[</span><span class="n">Z</span><span class="p">],</span> <span class="n">A</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="idFromZA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.idFromZA">[docs]</a><span class="k">def</span> <span class="nf">idFromZA</span><span class="p">(</span> <span class="n">ZA</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the PoPs id for a particle given ZA</span>
 <span class="sd">    :param ZA: 1000 * Z + A  (int)</span>
 <span class="sd">    :return: string particle id</span>
@@ -345,13 +345,13 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">idFromZAndA</span><span class="p">(</span> <span class="n">ZA</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">ZA</span> <span class="o">%</span> <span class="mi">1000</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="nucleusIDFromZAndA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nucleusIDFromZAndA">[docs]</a><span class="k">def</span> <span class="nf">nucleusIDFromZAndA</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Equivalent to calling nucleusIDFromNuclideID( idFromZAndA( Z, A ) ) &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Equivalent to calling nucleusIDFromNuclideID( idFromZAndA( Z, A ) ) &quot;&quot;&quot;</span>
 
     <span class="n">nucleusID</span> <span class="o">=</span> <span class="n">idFromZAndA</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">nucleusID</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="n">nucleusID</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="hasNucleus"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.hasNucleus">[docs]</a><span class="k">def</span> <span class="nf">hasNucleus</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="n">nucleusReturnsTrue</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks whether particle contains a nucleus.</span>
 
 <span class="sd">    :param particle: PoPs particle instance</span>
@@ -378,17 +378,17 @@
     <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_e</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">isotopeSymbol</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="nucleusIDFromNuclideID"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nucleusIDFromNuclideID">[docs]</a><span class="k">def</span> <span class="nf">nucleusIDFromNuclideID</span><span class="p">(</span> <span class="n">nuclideID</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; The nucleus id is computed from nuclide id by converting 1st letter to lower case &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The nucleus id is computed from nuclide id by converting 1st letter to lower case &quot;&quot;&quot;</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">nuclideID</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="n">nuclideID</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="nuclideIDFromNucleusID"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nuclideIDFromNucleusID">[docs]</a><span class="k">def</span> <span class="nf">nuclideIDFromNucleusID</span><span class="p">(</span> <span class="n">nucleusID</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; The nuclide id is computed from nucleus id by converting 1st letter to upper case &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The nuclide id is computed from nucleus id by converting 1st letter to upper case &quot;&quot;&quot;</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">nucleusID</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="n">nucleusID</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="nuclearBindingEnergyPerNucleonSemiEmpirical"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nuclearBindingEnergyPerNucleonSemiEmpirical">[docs]</a><span class="k">def</span> <span class="nf">nuclearBindingEnergyPerNucleonSemiEmpirical</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Returns the nuclear binding energy per nucleon from a semi empirical formula (see https://en.wikipedia.org/wiki/Nuclear_binding_energy).</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 

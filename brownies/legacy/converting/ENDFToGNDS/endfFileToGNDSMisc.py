@@ -340,7 +340,7 @@ def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile =
         interpolationRegions = []
         for x2, i2 in interpolationRegions2[1:] :                       # Now combine adjacent linear regions if possible
             if( ( i1 == 2 ) and ( i2 == 2 ) ) :
-                if( data[x1][0] == data[x1+1][0] ) : interpolationRegions.append( [ x1, i1 ] )
+                if( data[x1-1][0] == data[x1][0] ) : interpolationRegions.append( [ x1, i1 ] )
             else :
                 interpolationRegions.append( [ x1, i1 ] )
             x1, i1 = x2, i2
@@ -348,7 +348,7 @@ def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile =
     else :
         interpolationRegions = TAB1['interpolationInfo']
 
-    if( interpolationRegions != TAB1['interpolationInfo'] ) :           # Print a warning message if number of regions were reduced.
+    if len(interpolationRegions) != len(TAB1['interpolationInfo']):     # Print a warning message if number of regions were reduced.
 # BRB, check this with real data.
         if( not( ( len( TAB1['interpolationInfo'] ) == 1 ) and ( TAB1['interpolationInfo'][0][1] == 1 ) and ( interpolationRegions[0][1] == 2 ) ) ) :
             logFile.write( ' reduced regions from %s to %s' % ( len( TAB1['interpolationInfo'] ), len( interpolationRegions ) ) )

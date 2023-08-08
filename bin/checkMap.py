@@ -81,12 +81,25 @@ hdf5ExternalFiles = set()
 hdf5Directories = set()
 covarianceExternalFiles = set()
 missingExternalFiles = set()
+covarianceExternalDoesNotPointToProtare = set()
 unsupportedExternalFileTypes = set()
 missingRIS_files = set()
 
 masterMap = None
 protareFormatMisMatch = set()
 mapFormatMisMatch = set()
+
+def checkCovarianceExternals(covariancePath, protareRealPath):
+
+    covariance = GNDS_fileModule.preview(covariancePath, haltParsingMoniker=suitesModule.ExternalFiles.moniker)
+    matchFound = False
+    for externalFile in covariance.externalFiles:
+        realpath = externalFile.realpath()
+        if realpath == protareRealPath:
+            matchFound = True
+
+    if not matchFound:
+        covarianceExternalDoesNotPointToProtare.add(covariancePath)
 
 def checkProtare( protareFileName, map, entry ) :
 
@@ -95,7 +108,7 @@ def checkProtare( protareFileName, map, entry ) :
     protaresInMap.add( protareFileName )
     protareDirectories.add( os.path.dirname( protareFileName ) )
     if( os.path.exists( protareFileName ) ) :
-        protare = GNDS_fileModule.preview(protareFileName, haltParsingMoniker = suitesModule.ExternalFiles.moniker)
+        protare = GNDS_fileModule.preview(protareFileName, haltParsingMoniker=suitesModule.ExternalFiles.moniker)
 
         if protare.format != masterMap.format:
             protareFormatMisMatch.add(protareFileName)
@@ -112,19 +125,20 @@ def checkProtare( protareFileName, map, entry ) :
             if protare.interaction != interaction:
                 print('''    map's interaction "%s" does not match protare's interaction "%s".''' % (interaction, protare.interaction))
             print()
-        for externalFile in protare.externalFiles :
-            realpath = externalFile.realpath( )
-            if( os.path.exists( realpath ) ) :
+        for externalFile in protare.externalFiles:
+            realpath = externalFile.realpath()
+            if os.path.exists(realpath):
                 name, dummy = GNDS_fileModule.type(realpath)
-                if( name == GNDS_fileModule.HDF5_values) :  
-                    hdf5ExternalFiles.add( realpath )
-                    hdf5Directories.add( os.path.dirname( realpath ) )
-                elif( name == covarianceSuiteModule.CovarianceSuite.moniker ) :
-                    covarianceExternalFiles.add( realpath )
-                else :
-                    unsupportedExternalFileTypes.add( realpath )
-            else :
-                missingExternalFiles.add( ','.join( [ externalFile.path, protareFileName, realpath ] ) )
+                if name == GNDS_fileModule.HDF5_values:
+                    hdf5ExternalFiles.add(realpath)
+                    hdf5Directories.add(os.path.dirname(realpath))
+                elif name == covarianceSuiteModule.CovarianceSuite.moniker:
+                    covarianceExternalFiles.add(realpath)
+                    checkCovarianceExternals(realpath, protareFileName)
+                else:
+                    unsupportedExternalFileTypes.add(realpath)
+            else:
+                missingExternalFiles.add(','.join([externalFile.path, protareFileName, realpath]))
 
 mapFileInfo = []
 missingTNSL_standardTarget = set()
@@ -242,6 +256,7 @@ if not args.skipRIS:
     printSet('Map files with missing RIS files', missingRIS_files)
 printSet('Maps with format that does not match that of the master map file', mapFormatMisMatch)
 printSet('Protares with format that does not match that of the master map file', protareFormatMisMatch)
+printSet('Covariances with externalFile not pointing to protare', covarianceExternalDoesNotPointToProtare)
 
 unreferenceCovarianceFiles = set()
 for covarianceInDirectories in covariancesInDirectories:

@@ -65,7 +65,7 @@
 <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span>
 
 <div class="viewcode-block" id="DependenceOnProcessedGroupWidth"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.shortRangeSelfScalingVariance.DependenceOnProcessedGroupWidth">[docs]</a><span class="k">class</span> <span class="nc">DependenceOnProcessedGroupWidth</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Defines enums of processed width dependencies.&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Defines enums of processed width dependencies.&#39;&#39;&#39;</span>
 
     <span class="n">inverse</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">direct</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
@@ -137,7 +137,7 @@
     <span class="k">def</span> <span class="nf">gridded2d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span>     <span class="c1"># convenience method</span>
 
 <div class="viewcode-block" id="ShortRangeSelfScalingVariance.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check that matrix is diagonal and all elements &gt;= 0</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
@@ -156,14 +156,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ShortRangeSelfScalingVariance.rowBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.rowBounds">[docs]</a>    <span class="k">def</span> <span class="nf">rowBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the bounds of the row.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the bounds of the row.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
         <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">unit</span><span class="p">:</span>
             <span class="n">factor</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ShortRangeSelfScalingVariance.columnBounds"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.columnBounds">[docs]</a>    <span class="k">def</span> <span class="nf">columnBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the bounds of the column.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the bounds of the column.  If unit is specified, return the bounds in that unit.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowBounds</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">unit</span><span class="p">:</span>

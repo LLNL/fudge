@@ -234,6 +234,16 @@ class Link2(ancestryModule.AncestryIO):
 
         return( "%s" % self.__href )
 
+    def __deepcopy__(self, memo = {}):
+
+        if self.path is None:
+            self.updateXPath()
+        theCopy = self.__class__(moniker=self.moniker, instance=self.instance, root=self.root,
+                                 href=self.href, relative=self.relative, keyName=self.keyName,
+                                 label=self.label )
+
+        return theCopy
+
     @property
     def moniker( self ) :
 
@@ -412,7 +422,7 @@ class Link2(ancestryModule.AncestryIO):
                 keyName = key
                 keyValue = node.get( key )
 
-        if( '#' in href ) : root, href = href.split( '#' )
+        if '#' in href: root, href = href.split('#')
 
         _link = cls( node.tag, instance = None, root = root, href = href, relative = href[0] != '/', keyName = keyName, keyValue = keyValue, label = label )
 

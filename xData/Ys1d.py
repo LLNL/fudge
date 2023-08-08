@@ -62,8 +62,9 @@ class Ys1d(baseModule.XDataFunctional):
         if len(self.__Ys) == 0: return other.copy()
 
         assert isinstance(other, Ys1d), "Adding Ys1d to %s not supported" % type(other)
-        if self.grid != other.grid:
-            raise NotImplementedError("Adding Ys1d with different grids")
+        if self.axes is not None and other.axes is not None:
+            if self.grid != other.grid:
+                raise NotImplementedError("Adding Ys1d with different grids")
         if self.Ys.length != other.Ys.length:
             raise Exception('self.Ys.length = %d != other.Ys.length = %d' % (self.Ys.length, other.Ys.length))
 

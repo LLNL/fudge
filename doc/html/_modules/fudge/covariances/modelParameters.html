@@ -56,7 +56,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">covarianceSection</span> <span class="k">as</span> <span class="n">sectionModule</span>
 
 <div class="viewcode-block" id="ParameterLink"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterLink">[docs]</a><span class="k">class</span> <span class="nc">ParameterLink</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Establishes a link between one or more rows of a parameterCovariance and corresponding parameter(s).</span>
 <span class="sd">    Supports linking to specific parameters inside a table or list.</span>
 
@@ -75,7 +75,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;parameterLink&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">nParameters</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matrixStartIndex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">parameterStartIndex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">parameterStride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param label:               unique label for this parameter link</span>
 <span class="sd">        :param link:                reference to parameter, table or list</span>
 <span class="sd">        :param nParameters:         number of parameters linked to</span>
@@ -114,7 +114,7 @@
 
 
 <div class="viewcode-block" id="ParameterCovariance"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovariance">[docs]</a><span class="k">class</span> <span class="nc">ParameterCovariance</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For storing unresolved resonance parameter covariances. Very similar to covariances for cross section, nubar, etc.:</span>
 <span class="sd">    they require an energy grid + matrix.</span>
 
@@ -137,7 +137,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">evaluated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to grab evaluated style</span>
 <span class="sd">        FIXME method should be inherited, but abstractClasses.Component defines methods that don&#39;t make sense for covariances</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -152,7 +152,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <div class="viewcode-block" id="ParameterCovariance.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovariance.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; check each section &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; check each section &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
@@ -180,7 +180,7 @@
 
 <div class="viewcode-block" id="ParameterCovariance.parseNodeUsingClass"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovariance.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Translate &lt;section&gt; element from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;section&gt; element from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@label=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)))</span>
 
@@ -206,7 +206,7 @@
 
 
 <div class="viewcode-block" id="ParameterCovarianceMatrix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix">[docs]</a><span class="k">class</span> <span class="nc">ParameterCovarianceMatrix</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Form</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Store covariances (or correlations, depending on &#39;type&#39;) between model parameters</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -214,7 +214,7 @@
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">parameters_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">covarianceEnumsModule</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">relative</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param label:</span>
 <span class="sd">        :param type:        &#39;relative&#39; or &#39;absolute&#39;</span>
@@ -311,7 +311,7 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="ParameterCovarianceMatrix.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;assemble some useful info, to be handed down to children&#39;s fix() functions&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;assemble some useful info, to be handed down to children&#39;s fix() functions&#39;&#39;&#39;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;rowENDF_MFMT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;columnENDF_MFMT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -319,7 +319,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span> <span class="o">**</span><span class="n">info</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ParameterCovarianceMatrix.plot"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.ParameterCovarianceMatrix.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scalelabel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ylog</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param title:</span>
 <span class="sd">        :param scalelabel:</span>
@@ -335,7 +335,7 @@
         <span class="n">_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span>
 
         <span class="k">def</span> <span class="nf">covariance_to_correlation</span><span class="p">(</span><span class="n">__matrix</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Convert a covariance matrix to a correlation matrix&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Convert a covariance matrix to a correlation matrix&quot;&quot;&quot;</span>
             <span class="n">diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">__matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">())</span>
             <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
                 <span class="n">corr</span> <span class="o">=</span> <span class="n">__matrix</span> <span class="o">/</span> <span class="n">diag</span> <span class="o">/</span> <span class="n">diag</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
@@ -377,7 +377,7 @@
 
 
 <div class="viewcode-block" id="AverageParameterCovariance"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.modelParameters.AverageParameterCovariance">[docs]</a><span class="k">class</span> <span class="nc">AverageParameterCovariance</span><span class="p">(</span><span class="n">sectionModule</span><span class="o">.</span><span class="n">CovarianceSection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For storing unresolved resonance parameter covariances. Very similar to covariances for cross section, nubar, etc.:</span>
 <span class="sd">    they require an energy grid + matrix.</span>
 

@@ -57,7 +57,7 @@
 <span class="kn">from</span> <span class="nn">PoPs.families</span> <span class="kn">import</span> <span class="n">particle</span> <span class="k">as</span> <span class="n">particleModule</span>
 
 <div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for a class member that is list like. For example, the lists inside the class </span>
 <span class="sd">    reactionSuite (&#39;reactions&#39;, &#39;sums&#39;, &#39;productions&#39; and &#39;fissionComponents&#39;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -147,7 +147,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_href</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Suite.add"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newItem</span><span class="p">,</span> <span class="n">setAncestor</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">addLazyParsingHelper</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds newItem to the suite. If another item in the suite has the same label as newItem, a KeyError is raised.</span>
 <span class="sd">        If newItem is not an allowed class, a TypeError is raised.</span>
 
@@ -239,7 +239,7 @@
                 <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link2</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">item</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">path</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.fixDomains"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class **fixDomains** for each entry of *self* if it has a **fixDomains** method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -271,7 +271,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">href</span></div>
 
 <div class="viewcode-block" id="Suite.pop"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove item by label, and return it. If the label is not found, raise KeyError</span>
 <span class="sd">        :param label:</span>
 <span class="sd">        :param args:</span>
@@ -292,7 +292,7 @@
             <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span><span class="n">styleList</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.labels"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.labels">[docs]</a>    <span class="k">def</span> <span class="nf">labels</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the list of all the labels in self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -302,7 +302,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.remove"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove item by label. Returns True if label was present, otherwise returns False</span>
 <span class="sd">        :param label: str</span>
 <span class="sd">        :return: bool</span>
@@ -317,7 +317,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -326,7 +326,7 @@
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">removeStyles</span><span class="p">(</span> <span class="n">styleLabels</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.replace"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.replace">[docs]</a>    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">newItem</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replace an existing item with newItem. If no item in the suite has the same label as newItem, a KeyError is raised.</span>
 <span class="sd">        If newItem is not an allowed class, a TypeError is raised.</span>
 
@@ -354,7 +354,7 @@
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;item with label = &quot;</span><span class="si">%s</span><span class="s1">&quot; not present in suite&#39;</span> <span class="o">%</span> <span class="n">newItem</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.clear"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove all members of the suite</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -384,7 +384,7 @@
         <span class="k">return</span> <span class="n">xmlString</span></div>
 
 <div class="viewcode-block" id="Suite.uniqueLabel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.uniqueLabel">[docs]</a>    <span class="k">def</span> <span class="nf">uniqueLabel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If item&#39;s label is the same as another item&#39;s label in self, construct a new unique label</span>
 <span class="sd">        based on item&#39;s label appended with &#39;__&#39; and one or more lower case letters (i.e., &#39;a&#39; to &#39;z&#39;).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -438,12 +438,26 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodesNotParsed</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Encountered unexpected child nodes &#39;</span><span class="si">%s</span><span class="s2">&#39;!&quot;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nodesNotParsed</span><span class="p">))</span>
 
-        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> </div></div>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Suite.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Suite.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method must be overrwritten by the derived class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="n">instance</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">instance</span></div></div>
 
 <div class="viewcode-block" id="ExclusiveSuite"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.ExclusiveSuite">[docs]</a><span class="k">class</span> <span class="nc">ExclusiveSuite</span><span class="p">(</span><span class="n">Suite</span><span class="p">):</span>
 
 <div class="viewcode-block" id="ExclusiveSuite.fixDomains"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.ExclusiveSuite.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for each entry in self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -473,7 +487,7 @@
         <span class="n">ExclusiveSuite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">reactionModule</span><span class="o">.</span><span class="n">Reaction</span> <span class="p">]</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Reactions.asSortedList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.suites.Reactions.asSortedList">[docs]</a>    <span class="k">def</span> <span class="nf">asSortedList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">PoPs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of the reactions sorted. This method uses a reaction&#39;s reactionProducts method to determine sorting order.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of the reactions sorted. This method uses a reaction&#39;s reactionProducts method to determine sorting order.&quot;&quot;&quot;</span>
 
         <span class="k">class</span> <span class="nc">Particle</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Particle</span> <span class="p">)</span> <span class="p">:</span>
 

@@ -1,7 +1,7 @@
 import numpy
 
 from xData import table as tableModule
-from xData import XYs as XYs1dModule
+from xData import XYs1d as XYs1dModule
 
 from . import level_generator
 

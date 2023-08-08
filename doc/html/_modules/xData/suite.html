@@ -51,7 +51,7 @@
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 
 <div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for holding a list of objects that can be indexed by an integer or a string.</span>
 <span class="sd">    For integer indexing, the indexing is by order in which an object was put into the array or,</span>
 <span class="sd">    if a sortedSuite instance, by its sort order in the suite.  For string indexing, this class acts </span>
@@ -84,7 +84,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns True if the suite has an item whose **keyValue** is *key* and False otherwise.</span>
 
 <span class="sd">        :param str key: The key.</span>
@@ -98,7 +98,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes an element from self&#39;s list. If *key* is an **int**, the item at that index is removed.</span>
 <span class="sd">        If *key* is a **str**, the item with that **keyValue** is removed.</span>
 
@@ -115,7 +115,7 @@
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">status</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;key not in suite&#39;</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an item from the suite. If *key* is an int, the item at that index is returned.</span>
 <span class="sd">        If *key* is a str, the item with that keyValue is returned.</span>
 
@@ -131,13 +131,13 @@
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;key &quot;</span><span class="si">%s</span><span class="s1">&quot; not found in suite &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Iterates over self using the index order of items (i.e. int indexing).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterates over self using the index order of items (i.e. int indexing).&quot;&quot;&quot;</span>
 
         <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of items in self.</span>
 
 <span class="sd">        :rtype:     int</span>
@@ -147,12 +147,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allowedClasses</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the tuple of allowed classes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the tuple of allowed classes.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">)</span>     <span class="c1"># Ok to let user touch this since it cannot be alter as __allowedClasses is a tuple.</span>
 
 <div class="viewcode-block" id="Suite.add"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds **item** to the suite. **item** must be an allowed class, otherwise a **TypeError** exception is raised.</span>
 
 <span class="sd">        If another item in the suite has the same keyValue a **KeyError** exception is raised.</span>
@@ -175,7 +175,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.addIndex"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.addIndex">[docs]</a>    <span class="k">def</span> <span class="nf">addIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the index at which *item* will be added to *self*.</span>
 
 <span class="sd">        :param item:    The item to add to the suite.</span>
@@ -200,14 +200,14 @@
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">checkAncestry</span><span class="p">(</span> <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="n">level</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.clear"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove all members of the suite.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="Suite.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls each items convertUnits function.</span>
 
 <span class="sd">        :param unitMap:     A dictionary of keys of &quot;from&quot; units and values of &quot;to&quot; units.</span>
@@ -238,7 +238,7 @@
                         <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;    Method &quot;diff&quot; missing for object </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.pop"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">default</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes *item* with **keyValue** *key*, and returns it. If *key* is not found, *default* is returned if given, </span>
 <span class="sd">        otherwise **KeyError** is raised.</span>
 
@@ -257,7 +257,7 @@
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.remove"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes item by with keyValue *key*. Returns True if key was present, otherwise returns False.</span>
 
 <span class="sd">        :param key: str</span>
@@ -273,7 +273,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.replace"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.replace">[docs]</a>    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replace an existing item with *item*. If no item in the suite has the same keyValue as *item*, a KeyError is raised.</span>
 <span class="sd">        If *item* is not an allowed class, a TypeError is raised.</span>
 
@@ -300,7 +300,7 @@
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;item with </span><span class="si">%s</span><span class="s1"> = &quot;</span><span class="si">%s</span><span class="s1">&quot; not present in suite&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">keyName</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">keyValue</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.replicate"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.replicate">[docs]</a>    <span class="k">def</span> <span class="nf">replicate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clear self and then makes a copy of all items in *other* and adds the copy to *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -308,7 +308,7 @@
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">other</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an list of XML strings representing *self* and its items.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -323,7 +323,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">XML_stringList</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.uniqueKey"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.uniqueKey">[docs]</a>    <span class="k">def</span> <span class="nf">uniqueKey</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If item&#39;s keyValue is the same as another item&#39;s keyValue in self, construct a new unique key</span>
 <span class="sd">        based on item&#39;s keyValue appended with &#39;__&#39; and one or more lower case letters (i.e., &#39;a&#39; to &#39;z&#39;).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -378,13 +378,13 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="SortedSuite"><a class="viewcode-back" href="../../xData/index.html#xData.suite.SortedSuite">[docs]</a><span class="k">class</span> <span class="nc">SortedSuite</span><span class="p">(</span> <span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Like the **suite** class except the index at which an *item* is added is determined by the</span>
 <span class="sd">    *item*&#39;s **sortCompare** method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SortedSuite.addIndex"><a class="viewcode-back" href="../../xData/index.html#xData.suite.SortedSuite.addIndex">[docs]</a>    <span class="k">def</span> <span class="nf">addIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses *item*&#39;s **sortCompare** method to determine the index in *self* at which *item* will be added.</span>
 <span class="sd">        Overrides the **addIndex** method in the **suite** class.</span>
 
@@ -403,14 +403,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">),</span> <span class="kc">False</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Suite2"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite2">[docs]</a><span class="k">class</span> <span class="nc">Suite2</span><span class="p">(</span> <span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Like the **suite** class except the method **toXML** are added.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="SortedSuite2"><a class="viewcode-back" href="../../xData/index.html#xData.suite.SortedSuite2">[docs]</a><span class="k">class</span> <span class="nc">SortedSuite2</span><span class="p">(</span> <span class="n">SortedSuite</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Like the **sortSuite** class except the method **toXML** are added.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

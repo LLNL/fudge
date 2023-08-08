@@ -184,12 +184,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__valueType</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Number"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Number">[docs]</a><span class="k">class</span> <span class="nc">Number</span><span class="p">(</span> <span class="n">Quantity</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is an abstract base class for number quantities. This class adds the pqu and float methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Number.pqu"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Number.pqu">[docs]</a>    <span class="k">def</span> <span class="nf">pqu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a PQU instance of self&#39;s value in units of unit. If unit is None, self&#39;s unit is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -203,7 +203,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">pqu</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Number.float"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Number.float">[docs]</a>    <span class="k">def</span> <span class="nf">float</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a float instance of self&#39;s value in units of unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -211,7 +211,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pqu</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Double"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Double">[docs]</a><span class="k">class</span> <span class="nc">Double</span><span class="p">(</span> <span class="n">Number</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is used to represent a (uncertainty) quantity whose value must be a float.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

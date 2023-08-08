@@ -100,7 +100,7 @@ parser.add_argument('-v', '--verbose', action='count', default=0,               
 args = parser.parse_args()
 
 def particleSortIndex(name):
-    """
+    '''
     Returns a tuple of length 5 integers with the following meanings:
 
         +-----------+---------------------------------------------------+
@@ -123,43 +123,62 @@ def particleSortIndex(name):
         | 4         | If index 0 is 0 this represents the nuclide's     |
         |           | metastable index.  Otherwise it is 0.             |
         +-----------+---------------------------------------------------+
-    """
+    '''
 
     nuclideName, metaStableLevel = PoPsAliasModule.MetaStable.nuclideNameAndMetaStableIndexFromName(name)
-    if( metaStableLevel != 0 ) : name = nuclideName
+    if metaStableLevel != 0:
+        name = nuclideName
 
-    if( name == PoPsIDsModule.neutron ) :
-        return( 0, 0, 1, 0, 0 )
-    elif( name == PoPsIDsModule.photon ) :
-        return( 1, 0, 0, 0, 0 )
-    elif( name == PoPsIDsModule.electron ) :
-        return( 2, 0, 0, 0, 0 )
+    if name == PoPsIDsModule.neutron:
+        return 0, 0, 1, 0, 0
+    elif name == PoPsIDsModule.photon:
+        return 1, 0, 0, 0, 0
+    elif name == PoPsIDsModule.electron:
+        return 2, 0, 0, 0, 0
 
-    info = PoPsGroupsMiscModule.chemicalElementALevelIDsAndAnti( str( name ) )
-    if args.verbose > 4: print('    ', name, info)
-    if( info[1] is None ) : return( 1, 0, 0, 0, 0 )
-    return( 0, PoPsGroupsMiscModule.ZFromSymbol[info[1]], info[2], info[3], metaStableLevel )
+    info = list(PoPsGroupsMiscModule.chemicalElementALevelIDsAndAnti(str(name)))
+    if args.verbose > 4:
+        print('    ', name, info)
 
-def interactionSortIndex( interaction ) :
+    if info[1] is None:             # This is the chemical symbol.
+        return 1, 0, 0, 0, 0
+    if info[2] is None:             # This is A.
+        info[2] = 0
+    if info[3] is None:             # This is nuclear level index.
+        info[3] = 0
 
-    if( interaction == enumsModule.Interaction.nuclear ) : return( 0 )
-    if( interaction == enumsModule.Interaction.TNSL ) : return( 1 )
-    if( interaction == enumsModule.Interaction.atomic ) : return( 2 )
-    if( interaction == enumsModule.Interaction.LLNL_TNSL ) : return( 3 )
-    return( 3 )
+    return 0, PoPsGroupsMiscModule.ZFromSymbol[info[1]], info[2], info[3], metaStableLevel
 
-def sortFiles( files ) :
+def interactionSortIndex(interaction):
+
+    if interaction is None:
+        interaction = args.interaction
+
+    interaction = enumsModule.Interaction.checkEnumOrString(interaction)
+    if interaction == enumsModule.Interaction.nuclear:
+        return 0
+    if interaction == enumsModule.Interaction.TNSL:
+        return 1
+    if interaction == enumsModule.Interaction.atomic:
+        return 2
+    if interaction == enumsModule.Interaction.LLNL_TNSL:
+        return 3
+
+    return 4
+
+def sortFiles(files):
 
     _files = []
 
-    for file, data in files :
-        if args.verbose > 4: print(file, data)
-        interaction = interactionSortIndex( data['interaction'] )
-        projectile = particleSortIndex( data['projectile'] )
-        target = particleSortIndex( data['target'] )
-        _files.append( ( interaction, projectile, target, file, data ) )
+    for file, data in files:
+        if args.verbose > 4:
+            print(file, data)
+        interaction = interactionSortIndex(data['interaction'])
+        projectile = particleSortIndex(data['projectile'])
+        target = particleSortIndex(data['target'])
+        _files.append((interaction, projectile, target, file, data ))
 
-    return( sorted( _files ) )
+    return sorted(_files)
 
 standards = {}
 if( args.standards is not None ) :
@@ -176,7 +195,7 @@ if( args.nonMetaStablesMapFile is not None ) :
 elif( args.ignoreMetaStables ) :
     mode = 'non-metastables'
 
-type = None
+fileType = None
 groups = []
 for file in args.files :
     try :
@@ -191,23 +210,22 @@ for file in args.files :
     else :
         if args.verbose > 2: print('    WARNING: Ignoring file of type %s.' % name)
         continue
-    if( type != name ) :
-        if( type is not None ) : groups.append( [ type, files ] )
-        type = name
+    if( fileType != name ) :
+        if( fileType is not None ) : groups.append( [ fileType, files ] )
+        fileType = name
         files = []
     files.append( [ file, data ] )
-if( type is not None ) : groups.append( [ type, files ] )
+if( fileType is not None ) : groups.append( [ fileType, files ] )
 
 map = mapModule.Map( args.library, args.path )
-if args.nonMetaStablesMapFile is not None:
-    # ensure file exists and is a map file
-    ftype, info = GNDS_fileModule.type(args.nonMetaStablesMapFile)
-    assert ftype == 'map', "nonMetaStablesMapFile argument must be a map file! Received %s instead" % type
-    map.append( mapModule.Import( args.nonMetaStablesMapFile ) )
+if args.nonMetaStablesMapFile is not None:                              # ensure file exists and is a map file
+    fileType, info = GNDS_fileModule.type(args.nonMetaStablesMapFile)
+    assert fileType == 'map', "nonMetaStablesMapFile argument must be a map file! Received %s instead" % fileType
+    map.append(mapModule.Import(args.nonMetaStablesMapFile))
 
 TNSL_missingStandardTargets = []
-for type, files in groups :
-    if( type == mapModule.Map.moniker ) :
+for fileType, files in groups :
+    if( fileType == mapModule.Map.moniker ) :
         for file, data in files : map.append( mapModule.Import( file ) )
     else :
         for interaction, projectile, target, file, data in sortFiles( files ) :

@@ -456,9 +456,8 @@ Leptons include electrons, neutrinos, etc.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="PoPs.families.lepton.Generation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.families.lepton.</span></span><span class="sig-name descname"><span class="pre">Generation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/families/lepton.html#Generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.families.lepton.Generation" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
-</dd></dl>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.families.lepton.</span></span><span class="sig-name descname"><span class="pre">Generation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/families/lepton.html#Generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.families.lepton.Generation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="PoPs.families.lepton.Particle">
@@ -541,7 +540,13 @@ Baryons include the neutron and proton.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="PoPs.families.nuclide.Alias">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PoPs.families.nuclide.</span></span><span class="sig-name descname"><span class="pre">Alias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/families/nuclide.html#Alias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.families.nuclide.Alias" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="PoPs.families.nuclide.Alias.intid">
+<span class="sig-name descname"><span class="pre">intid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intidDB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/families/nuclide.html#Alias.intid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.families.nuclide.Alias.intid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</p>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="PoPs.families.nuclide.Particle">
@@ -600,6 +605,12 @@ Baryons include the neutron and proton.</p>
 <dd class="field-even"><p>mass (float)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.families.nuclide.Particle.intid">
+<span class="sig-name descname"><span class="pre">intid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intidDB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/families/nuclide.html#Particle.intid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.families.nuclide.Particle.intid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</p>
 </dd></dl>
 
 <dl class="py method">
@@ -683,6 +694,12 @@ For the compound particle formed of a nucleus + electrons, see the <cite>nuclide
 but not for electron masses / binding energy.
 :param unit: desired unit (string)
 :return: mass (float)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PoPs.families.nucleus.Particle.intid">
+<span class="sig-name descname"><span class="pre">intid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intidDB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/families/nucleus.html#Particle.intid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.families.nucleus.Particle.intid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the particle id into a unique integer dubbed an INTeger ID (INTID).</p>
 </dd></dl>
 
 <dl class="py method">

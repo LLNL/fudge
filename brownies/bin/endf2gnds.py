@@ -83,24 +83,16 @@ except Exception as err:
 if covariance:
     if args.energyUnit != covariance.domainUnit:
         covariance.convertUnits({covariance.domainUnit: args.energyUnit})
-    try:
-        covariance.externalFiles.add(externalFileModule.ExternalFile("reactions", path=os.path.basename(outFile)))
-        covariance.saveToFile( outCovFile )
-
-        sha1sum = checksumsModule.Sha1sum.from_file(outCovFile)
-        reactionSuite.externalFiles.add(externalFileModule.ExternalFile("covariances", path=os.path.basename(outCovFile), checksum=sha1sum))
-    except Exception as err:
-        sys.stderr.write('WARNING: covariance ENDF write error: %s\n' % err)
-        if args.traceback:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_tb(exc_traceback)
 
 try:
     for topLevel in (fissionFragmentData, reactionSuite, pops):
         if topLevel is not None:
             if hasattr(topLevel, 'convertUnits') and args.energyUnit != 'eV':
                 topLevel.convertUnits({'eV': args.energyUnit})
-            topLevel.saveToFile(outFile)
+            if hasattr(topLevel, 'saveAllToFile'):
+                topLevel.saveAllToFile(outFile)
+            else:
+                topLevel.saveToFile(outFile)
             break
 except Exception as err:
     sys.stderr.write('WARNING: ENDF write error: %s\n' % err)

@@ -126,7 +126,7 @@
     <span class="vm">__slots__</span><span class="o">=</span><span class="p">[</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;J&#39;</span><span class="p">,</span> <span class="s1">&#39;reaction&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;gfact&#39;</span><span class="p">,</span> <span class="s1">&#39;particleA&#39;</span><span class="p">,</span> <span class="s1">&#39;particleB&#39;</span><span class="p">,</span> <span class="s1">&#39;Xi&#39;</span><span class="p">,</span> <span class="s1">&#39;isElastic&#39;</span><span class="p">,</span> <span class="s1">&#39;channelClass&#39;</span><span class="p">,</span> <span class="s1">&#39;useRelativistic&#39;</span><span class="p">,</span> <span class="s1">&#39;eliminated&#39;</span> <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">gfact</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">particleA</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">particleB</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Xi</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">isElastic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">channelClass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">useRelativistic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">eliminated</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple widget to specify a channel</span>
 
 <span class="sd">        RRBaseClass.setResonanceParametersByChannel() creates these mostly and getAllowedTotalSpins() is used to determine the spins in there.</span>
@@ -216,7 +216,7 @@
 
 
 <div class="viewcode-block" id="getAllowedTotalSpins"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.getAllowedTotalSpins">[docs]</a><span class="k">def</span> <span class="nf">getAllowedTotalSpins</span><span class="p">(</span> <span class="n">L</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">useFactor2Trick</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a list of allowed J values from summing angular momenta L and S, where</span>
 <span class="sd">    :math:`\\vec{J}=\\vec{L}+\\vec{S}`</span>
 <span class="sd">    which implies :math:`|L-S| \\leq J \\leq L+S`</span>
@@ -232,7 +232,7 @@
 
 
 <div class="viewcode-block" id="reconstructResonances"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.reconstructResonances">[docs]</a><span class="k">def</span> <span class="nf">reconstructResonances</span><span class="p">(</span><span class="n">reactionSuite</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">significantDigits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disableUnresolvedWidthInterpolation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reconstruct all resonance cross sections (resolved and unresolved) in reactionSuite,</span>
 <span class="sd">    and add results together for full (resonance region) pointwise cross section.</span>
 
@@ -258,7 +258,7 @@
     <span class="n">egrids</span><span class="p">,</span> <span class="n">xsecs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">resolvedReconstruct</span><span class="p">(</span> <span class="n">resolvedForm</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to reconstruct one region, used for single &amp; multiple regions as well as URR ensembles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -335,7 +335,7 @@
     <span class="k">return</span> <span class="n">xsecs_final</span></div>
 
 <div class="viewcode-block" id="reconstructAngularDistributions"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.reconstructAngularDistributions">[docs]</a><span class="k">def</span> <span class="nf">reconstructAngularDistributions</span><span class="p">(</span><span class="n">reactionSuite</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reconstruct all pure two-body angular distributions from the resonance region.</span>
 <span class="sd">    For MLBW and RM, that means &#39;elastic&#39; channel only, but R-Matrix evaluations can support additional channels.</span>
 <span class="sd">    SLBW cannot be used for angular distributions.</span>
@@ -494,7 +494,7 @@
 
 
 <div class="viewcode-block" id="ResonanceReconstructionBaseClass"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass">[docs]</a><span class="k">class</span> <span class="nc">ResonanceReconstructionBaseClass</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class common to resolved and unresolved resonance reconstruction.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class common to resolved and unresolved resonance reconstruction.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">resonanceForm</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -540,14 +540,14 @@
     <span class="k">def</span> <span class="nf">getCrossSection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span> <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="ResonanceReconstructionBaseClass.k"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.k">[docs]</a>    <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the wave number for the projectile in the center of mass given the projectile energy in the lab frame.</span>
 <span class="sd">        The returned value is in b**-1/2.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kConstant2</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
 
-    <span class="sd">&quot;&quot;&quot; refer to SAMMY manual page 9 for penetration/shift/phase factor equations: &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; refer to SAMMY manual page 9 for penetration/shift/phase factor equations: &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="ResonanceReconstructionBaseClass.penetrationFactor"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.penetrationFactor">[docs]</a>    <span class="k">def</span> <span class="nf">penetrationFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">L</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">rho</span>
         <span class="k">elif</span> <span class="n">L</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="n">rho</span><span class="o">**</span><span class="mi">3</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">rho</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
@@ -561,7 +561,7 @@
             <span class="k">return</span> <span class="n">rho</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">P_Lminus1</span> <span class="o">/</span> <span class="p">((</span><span class="n">L</span><span class="o">-</span><span class="n">S_Lminus1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">P_Lminus1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ResonanceReconstructionBaseClass.shiftFactor"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.shiftFactor">[docs]</a>    <span class="k">def</span> <span class="nf">shiftFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; calculate shift factor used in SLBW and MLBW formalisms &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; calculate shift factor used in SLBW and MLBW formalisms &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">L</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="mf">0.0</span><span class="o">*</span><span class="n">rho</span>   <span class="c1"># rho may be an array</span>
         <span class="k">elif</span> <span class="n">L</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">rho</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">L</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="mf">18.0</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">rho</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">9</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">rho</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">rho</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
@@ -588,7 +588,7 @@
 
     <span class="c1"># for use after the cross section has been calculated on the initial grid:</span>
 <div class="viewcode-block" id="ResonanceReconstructionBaseClass.refineInterpolation"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.ResonanceReconstructionBaseClass.refineInterpolation">[docs]</a>    <span class="k">def</span> <span class="nf">refineInterpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">egrid</span><span class="p">,</span> <span class="n">xsecs</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">significantDigits</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; generateEnergyGrid may not give a fine enough grid to linearly interpolate to desired tolerance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; generateEnergyGrid may not give a fine enough grid to linearly interpolate to desired tolerance.</span>
 <span class="sd">        My solution to that: for all consecutive points (x0,y0), (x1,y1) and (x2,y2) do a linear interpolation between</span>
 <span class="sd">        (x0,y0) and (x2,y2). If the interpolation doesn&#39;t agree with (x1,y1) within tolerance,</span>
 <span class="sd">        subdivide up the region by adding two more calculated points.  Iterate until interpolation agrees within tolerance.</span>
@@ -597,7 +597,7 @@
 <span class="sd">        The results can be thinned (thinning implemented in xData.XYs1d)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">checkInterpolation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Does a linear interpolation of each point from its two nearest neighbors,</span>
 <span class="sd">            checks where the interpolation grid is insufficient and returns a list of indices (in array x)</span>
 <span class="sd">            where additional points are needed.</span>
@@ -693,7 +693,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolvedForm</span><span class="p">,</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="n">upperBound</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
 
         <span class="n">ResonanceReconstructionBaseClass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolvedForm</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
-        <span class="sd">&quot;&quot;&quot; store resonance parameters in convenient structure for quick cross section calculations: &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; store resonance parameters in convenient structure for quick cross section calculations: &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">RR</span> <span class="o">=</span> <span class="n">resolvedForm</span>
 
@@ -703,7 +703,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">removeNegatives</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># set to False to allow returning negative cross section values</span>
 
 <div class="viewcode-block" id="RRBaseClass.sortLandJ"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.sortLandJ">[docs]</a>    <span class="k">def</span> <span class="nf">sortLandJ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        SLBW, MLBW and Reich_Moore formalisms have similar structure</span>
 <span class="sd">        it&#39;s convenient to sort their resonances by L and J</span>
 <span class="sd">        This method should NOT be used for R-Matrix Limited</span>
@@ -715,8 +715,14 @@
         <span class="n">EU</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energyUnit</span>
         <span class="n">units</span> <span class="o">=</span> <span class="p">(</span><span class="n">EU</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">EU</span><span class="p">,</span><span class="n">EU</span><span class="p">,</span><span class="n">EU</span><span class="p">,</span><span class="n">EU</span><span class="p">,</span><span class="n">EU</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">RR</span><span class="o">.</span><span class="n">resonanceParameters</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">getColumn</span><span class="p">(</span> <span class="n">quant</span><span class="p">,</span><span class="n">unit</span> <span class="p">)</span> <span class="k">for</span> <span class="n">quant</span><span class="p">,</span><span class="n">unit</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="n">units</span><span class="p">)</span> <span class="p">]</span>
+        <span class="n">missingColumns</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">nRes</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">,</span><span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="s1">&#39;J&#39;</span><span class="p">,</span><span class="s1">&#39;neutronWidth&#39;</span><span class="p">,</span><span class="s1">&#39;captureWidth&#39;</span><span class="p">):</span>
+                    <span class="n">missingColumns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">nRes</span>
+        <span class="k">if</span> <span class="n">missingColumns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Required columns </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missingColumns</span><span class="p">)</span><span class="si">}</span><span class="s2"> missing from BreitWigner parameters table!&quot;</span><span class="p">)</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
 
         <span class="c1"># sort resonances by L and J, store parameters in numpy arrays</span>
@@ -773,7 +779,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_widths</span> <span class="o">=</span> <span class="n">totalWidths</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getAPByChannel"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getAPByChannel">[docs]</a>    <span class="k">def</span> <span class="nf">getAPByChannel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">trueOrEffective</span><span class="o">=</span><span class="s1">&#39;true&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;get the channel radius, rho. If L is specified try to get L-dependent value&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;get the channel radius, rho. If L is specified try to get L-dependent value&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">RR</span><span class="o">.</span><span class="n">calculateChannelRadius</span><span class="p">:</span>
             <span class="n">a</span> <span class="o">=</span> <span class="mf">0.123</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetMass_amu</span><span class="o">**</span><span class="p">(</span> <span class="mf">1.</span> <span class="o">/</span> <span class="mf">3.</span> <span class="p">)</span> <span class="o">+</span> <span class="mf">0.08</span>  <span class="c1"># eq. D.14 in ENDF manual, a in b^-1/2</span>
         <span class="k">else</span><span class="p">:</span>
@@ -784,7 +790,7 @@
         <span class="k">return</span> <span class="n">a</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.rho"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.rho">[docs]</a>    <span class="k">def</span> <span class="nf">rho</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">forceUseTabulated</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the channel radius rho. May be computed from a simple expression or from the tabulated scattering radius.</span>
 
 <span class="sd">        :param E: incident energy grid, necessary if the tabulated scattering radius is energy-dependent</span>
@@ -802,7 +808,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span> <span class="c1"># dimensionless</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.generateEnergyGrid"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.generateEnergyGrid">[docs]</a>    <span class="k">def</span> <span class="nf">generateEnergyGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lowBound</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">highBound</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Create an initial energy grid by merging a rough mesh for the entire region (~10 points / decade)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create an initial energy grid by merging a rough mesh for the entire region (~10 points / decade)</span>
 <span class="sd">        with a denser grid around each resonance. For the denser grid, multiply the total resonance width by</span>
 <span class="sd">        the &#39;resonancePos&#39; array defined below. &quot;&quot;&quot;</span>
         <span class="n">energies</span><span class="p">,</span> <span class="n">widths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_widths</span>
@@ -863,7 +869,7 @@
         <span class="k">return</span> <span class="n">grid</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.setResonanceParametersByChannel"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.setResonanceParametersByChannel">[docs]</a>    <span class="k">def</span> <span class="nf">setResonanceParametersByChannel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">multipleSScheme</span><span class="o">=</span><span class="s1">&#39;ENDF&#39;</span><span class="p">,</span> <span class="n">useReichMooreApproximation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Ein</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">warnOnly</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reorganize member data into channels (relies heavily on groundwork in sortLandJ).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nResonances</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">RR</span><span class="o">.</span><span class="n">resonanceParameters</span><span class="o">.</span><span class="n">table</span> <span class="p">)</span>
@@ -1013,7 +1019,7 @@
 <div class="viewcode-block" id="RRBaseClass.getAMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getAMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getAMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span> <span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="s2">&quot;Override in derived classes if used&quot;</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getL0Matrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getL0Matrix">[docs]</a>    <span class="k">def</span> <span class="nf">getL0Matrix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the L0 matrix of Froehner:</span>
 
 <span class="sd">            ..math::</span>
@@ -1039,7 +1045,7 @@
         <span class="k">return</span> <span class="n">L0</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getXMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getXMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getXMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the X matrix for use in computing W.  X is:</span>
 
 <span class="sd">            ..math::</span>
@@ -1070,7 +1076,7 @@
         <span class="k">return</span> <span class="n">X</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getWMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getWMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getWMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the W matrix for use in computing U.  W is:</span>
 
 <span class="sd">            ..math::</span>
@@ -1082,7 +1088,7 @@
         <span class="k">return</span> <span class="n">W</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getEiPhis"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getEiPhis">[docs]</a>    <span class="k">def</span> <span class="nf">getEiPhis</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">,</span> <span class="n">useTabulatedScatteringRadius</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enableExtraCoulombPhase</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The phase factor for the collision matrix:</span>
 
 <span class="sd">            ..math::</span>
@@ -1107,7 +1113,7 @@
         <span class="k">return</span> <span class="n">eiphis</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getScatteringMatrixU"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getScatteringMatrixU">[docs]</a>    <span class="k">def</span> <span class="nf">getScatteringMatrixU</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">,</span> <span class="n">useTabulatedScatteringRadius</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enableExtraCoulombPhase</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the scattering matrix using</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Make sure all channels are open at all requested energies</span>
@@ -1140,7 +1146,7 @@
         <span class="k">return</span> <span class="n">T</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getLMax"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getLMax">[docs]</a>    <span class="k">def</span> <span class="nf">getLMax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">maxLmax</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        LMax is determined by the behavior of the Blatt-Biedenharn Zbar coefficients.  Inside each one, there is</span>
 <span class="sd">        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this::</span>
 
@@ -1153,7 +1159,7 @@
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span> <span class="nb">max</span><span class="p">(</span> <span class="p">[</span> <span class="mi">2</span><span class="o">*</span><span class="n">xL</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">xL</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ls</span> <span class="p">]</span> <span class="p">),</span> <span class="n">maxLmax</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getParticleParities"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getParticleParities">[docs]</a>    <span class="k">def</span> <span class="nf">getParticleParities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">rxn</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wrapper around getParticleSpinParities to extract just the parities</span>
 
 <span class="sd">        :param rxn: the reaction string for this resonanceReaction (or equivalent).  We&#39;ll process this string to</span>
@@ -1165,7 +1171,7 @@
         <span class="k">return</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getParticleSpins"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getParticleSpins">[docs]</a>    <span class="k">def</span> <span class="nf">getParticleSpins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">rxn</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wrapper around getParticleSpinParities to extract just the spins</span>
 
 <span class="sd">        :param rxn: the reaction string for this resonanceReaction (or equivalent).  We&#39;ll process this string to</span>
@@ -1177,7 +1183,7 @@
         <span class="k">return</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getParticleSpinParities"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getParticleSpinParities">[docs]</a>    <span class="k">def</span> <span class="nf">getParticleSpinParities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        6 cases:</span>
 <span class="sd">            rxn==&#39;capture&#39;</span>
 <span class="sd">            rxn==&#39;elastic&#39; (equivalent to &#39;projectile + target&#39;)</span>
@@ -1267,7 +1273,7 @@
 <div class="viewcode-block" id="RRBaseClass.getAngularDistribution"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getAngularDistribution">[docs]</a>    <span class="nd">@blockwise</span>
     <span class="k">def</span> <span class="nf">getAngularDistribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">keepL0Term</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">renormalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outChannelNames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                <span class="n">useTabulatedScatteringRadius</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enableExtraCoulombPhase</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param numpy.array(type=float) E:</span>
 <span class="sd">        :param bool keepL0Term:</span>
@@ -1367,7 +1373,7 @@
         <span class="k">return</span> <span class="n">results</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getAverageQuantities"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getAverageQuantities">[docs]</a>    <span class="k">def</span> <span class="nf">getAverageQuantities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nBins</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">binScheme</span><span class="o">=</span><span class="s1">&#39;linspacing&#39;</span><span class="p">,</span> <span class="n">computeUncertainty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes average widths and level spacings from the set of resonance parameters in self, on a per-channel basis</span>
 
 <span class="sd">        The averages are computed in equal lethargy bins starting at the lowest resonance energy in a sequence up to the</span>
@@ -1451,7 +1457,7 @@
         <span class="k">return</span> <span class="n">results</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getTransmissionCoefficients"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getTransmissionCoefficients">[docs]</a>    <span class="k">def</span> <span class="nf">getTransmissionCoefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resonancesPerBin</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">computeUncertainty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;weakCoupling&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the effective transmission coefficient in the resolved resonance regime.</span>
 <span class="sd">        The method argument controls the schemes to do this.</span>
 
@@ -1526,7 +1532,7 @@
         <span class="k">return</span> <span class="n">results</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getPoleStrength"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getPoleStrength">[docs]</a>    <span class="k">def</span> <span class="nf">getPoleStrength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">computeUncertainty</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the (usu. neutron) pole strength from Eq. (209) from JEFF Report 18::</span>
 
 <span class="sd">            ..math::</span>
@@ -1560,7 +1566,7 @@
         <span class="k">return</span> <span class="n">results</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getScatteringLength"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getScatteringLength">[docs]</a>    <span class="k">def</span> <span class="nf">getScatteringLength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Said Mughabghab (Atlas of Neutron Resonances, 5th edition (2006) p. 19, eq. (1.54))</span>
 <span class="sd">        defines R&#39; as the s-wave scattering length, calculable from the potential</span>
 <span class="sd">        scattering cross section sigPot = 4 Pi (R&#39;)^2.</span>
@@ -1600,7 +1606,7 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigPot</span><span class="o">/</span><span class="mf">4.0</span><span class="o">/</span><span class="n">numpy</span><span class="o">.</span><span class="n">pi</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getReducedWidths"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getReducedWidths">[docs]</a>    <span class="k">def</span> <span class="nf">getReducedWidths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">Emin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Emax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert the widths corresponding to `channel` to reduced widths in the usual way (JEFF Report 18, Eq. (174))::</span>
 
 <span class="sd">            ..math::</span>
@@ -1628,7 +1634,7 @@
         <span class="k">return</span> <span class="n">reducedWidthList</span></div>
 
 <div class="viewcode-block" id="RRBaseClass.getPorterThomasFitToWidths"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RRBaseClass.getPorterThomasFitToWidths">[docs]</a>    <span class="k">def</span> <span class="nf">getPorterThomasFitToWidths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Emin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Emax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform a channel-by-channel fit of the histogram of widths to a Porter-Thomas distribution.</span>
 
 <span class="sd">        :param verbose:</span>
@@ -1679,7 +1685,7 @@
                     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">hist</span><span class="p">):</span>
 
                         <span class="k">def</span> <span class="nf">PorterThomasDistribution</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">nu</span><span class="p">):</span>
-                            <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">                            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">                            Porter-Thomas distribution</span>
 <span class="sd">                            Froehner&#39;s eq. (277).</span>
 <span class="sd">                            Really just a chi^2 distribution with nu degrees of freedom</span>
@@ -1706,7 +1712,7 @@
 
 <span class="c1">#### Single-level Breit-Wigner ###</span>
 <div class="viewcode-block" id="SLBWcrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.SLBWcrossSection">[docs]</a><span class="k">class</span> <span class="nc">SLBWcrossSection</span><span class="p">(</span><span class="n">RRBaseClass</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Resonance reconstructor for Singe-level Breit Wigner.</span>
 
 <span class="sd">    Note, the resonances in the SLBW format each correspond to different &quot;levels&quot; and so do not</span>
@@ -1727,7 +1733,7 @@
         <span class="k">if</span> <span class="n">enableAngDists</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">setResonanceParametersByChannel</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SLBWcrossSection.setResonanceParametersByChannel"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.SLBWcrossSection.setResonanceParametersByChannel">[docs]</a>    <span class="k">def</span> <span class="nf">setResonanceParametersByChannel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">multipleSScheme</span><span class="o">=</span><span class="s1">&#39;ENDF&#39;</span><span class="p">,</span> <span class="n">useReichMooreApproximation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Ein</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">warnOnly</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reorganize member data into channels (relies heavily on groundwork in sortLandJ).</span>
 
 <span class="sd">        Note, unlike the getResonanceParametersByChannel() function in MLBW, RM or RML,</span>
@@ -1822,7 +1828,7 @@
         <span class="k">if</span> <span class="n">warnOnly</span><span class="p">:</span> <span class="k">return</span> <span class="n">warnings</span></div>
 
 <div class="viewcode-block" id="SLBWcrossSection.getScatteringMatrixU"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.SLBWcrossSection.getScatteringMatrixU">[docs]</a>    <span class="k">def</span> <span class="nf">getScatteringMatrixU</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">,</span> <span class="n">useTabulatedScatteringRadius</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enableExtraCoulombPhase</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the scattering matrix</span>
 
 <span class="sd">        Note, unlike the getScatteringMatrixU() function in other resonance classes,</span>
@@ -1923,7 +1929,7 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="SLBWcrossSection.getScatteringLength"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.SLBWcrossSection.getScatteringLength">[docs]</a>    <span class="k">def</span> <span class="nf">getScatteringLength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute R&#39; in b^2/2, should be close to AP.</span>
 <span class="sd">        The potential scattering cross section sigPot = 4 Pi (R&#39;)^2, so we compute the potential scattering cross section at E=1e-5 eV.</span>
 <span class="sd">        :param kwargs:</span>
@@ -1941,7 +1947,7 @@
 
 <span class="c1">#### Multi-level Breit-Wigner ###</span>
 <div class="viewcode-block" id="MLBWcrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.MLBWcrossSection">[docs]</a><span class="k">class</span> <span class="nc">MLBWcrossSection</span><span class="p">(</span><span class="n">RRBaseClass</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Resonance reconstructor for Multi-level Breit-Wigner parameters.</span>
 <span class="sd">    Only the elastic channel differs from SLBW.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1957,14 +1963,14 @@
         <span class="k">if</span> <span class="n">enableAngDists</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">setResonanceParametersByChannel</span><span class="p">()</span>
 
 <div class="viewcode-block" id="MLBWcrossSection.getChannelConstantsBc"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.MLBWcrossSection.getChannelConstantsBc">[docs]</a>    <span class="k">def</span> <span class="nf">getChannelConstantsBc</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For ENDF&#39;s MLBW, should be :math:`B_c = S_\\ell(|E_\\lambda|)`</span>
 <span class="sd">        where :math:`\\ell` is the channel angular momentum and :math:`\\lambda` is the resonances index for the channel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="s2">&quot;write me&quot;</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MLBWcrossSection.getScatteringMatrixU"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.MLBWcrossSection.getScatteringMatrixU">[docs]</a>    <span class="k">def</span> <span class="nf">getScatteringMatrixU</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">,</span> <span class="n">useTabulatedScatteringRadius</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enableExtraCoulombPhase</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the scattering matrix.  We could have used the generic U function in the base class,</span>
 <span class="sd">        but Froehner has &quot;simplifications&quot; that we took advantage of here (that and I don&#39;t know what the</span>
 <span class="sd">        R matrix is exactly in the case of MLBW).</span>
@@ -2084,7 +2090,7 @@
 <span class="c1"># some helper functions:</span>
 
 <div class="viewcode-block" id="getR_S"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.getR_S">[docs]</a><span class="k">def</span> <span class="nf">getR_S</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Eres</span><span class="p">,</span> <span class="n">captureWidth</span><span class="p">,</span> <span class="n">widths</span><span class="p">,</span> <span class="n">penetrabilities</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Both versions of Reich_Moore formalisms (LRF=3 and 7) rely on building the complex matrix &#39;R&#39;.</span>
 <span class="sd">    Here we break it up into the real component R and the imaginary component S,</span>
 <span class="sd">    which represent symmetric and anti-symmetric scattering respectively</span>
@@ -2145,7 +2151,7 @@
 
 
 <div class="viewcode-block" id="invertMatrices"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.invertMatrices">[docs]</a><span class="k">def</span> <span class="nf">invertMatrices</span><span class="p">(</span> <span class="n">R</span><span class="p">,</span> <span class="n">S</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    find RI and SI such that (I+R+jS)*(I+RI+jSI) = I,</span>
 <span class="sd">    where I is the identity matrix, and j = sqrt(-1)</span>
 
@@ -2222,7 +2228,7 @@
 
 <span class="c1">#### R-Matrix Limited ####</span>
 <div class="viewcode-block" id="RMatrixLimitedcrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection">[docs]</a><span class="k">class</span> <span class="nc">RMatrixLimitedcrossSection</span><span class="p">(</span><span class="n">RRBaseClass</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    extended Reich_Moore (LRF=7 in ENDF)</span>
 <span class="sd">    Here, resonances are sorted primarily by J: within each &#39;spin group&#39;, total J is conserved</span>
 <span class="sd">    One or more competitive channels may be used in this case.</span>
@@ -2329,7 +2335,7 @@
         <span class="k">return</span> <span class="n">rs</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">reactionDesignator</span><span class="p">)</span> <span class="o">==</span> <span class="n">rs</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="s1">&#39;elastic&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.getLMax"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getLMax">[docs]</a>    <span class="k">def</span> <span class="nf">getLMax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxLmax</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        LMax is determined by the behavior of the Blatt-Biedenharn Zbar coefficients.  Inside each one, there is</span>
 <span class="sd">        a Racah coefficient and a Clebsh-Gordon coefficient.  The CG coefficient looks like this::</span>
 
@@ -2342,7 +2348,7 @@
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span> <span class="nb">max</span><span class="p">(</span> <span class="p">[</span> <span class="mi">2</span><span class="o">*</span><span class="n">c</span><span class="o">.</span><span class="n">l</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="p">]</span> <span class="p">),</span> <span class="n">maxLmax</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.setResonanceParametersByChannel"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.setResonanceParametersByChannel">[docs]</a>    <span class="k">def</span> <span class="nf">setResonanceParametersByChannel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">multipleSScheme</span><span class="o">=</span><span class="s1">&#39;ENDF&#39;</span><span class="p">,</span> <span class="n">useReichMooreApproximation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Ein</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">warnOnly</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reorganize member data into channels</span>
 <span class="sd">        :param multipleSScheme:  ignored, kept so has same signature as overridden function</span>
 <span class="sd">        :param useReichMooreApproximation:  ignored, kept so has same signature as overridden function</span>
@@ -2478,7 +2484,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">setResonanceParametersByChannel</span><span class="p">(</span> <span class="n">multipleSScheme</span><span class="o">=</span><span class="n">multipleSScheme</span><span class="p">,</span> <span class="n">useReichMooreApproximation</span><span class="o">=</span><span class="n">useReichMooreApproximation</span><span class="p">,</span> <span class="n">Ein</span><span class="o">=</span><span class="n">Ein</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.getChannelConstantsBc"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getChannelConstantsBc">[docs]</a>    <span class="k">def</span> <span class="nf">getChannelConstantsBc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For ENDF&#39;s Reich-Moore, should be :math:`B_c = -\\ell`</span>
 <span class="sd">        where :math:`\\ell` is the channel angular momentum, but the ENDF manual says nothing about it.</span>
 
@@ -2521,7 +2527,7 @@
         <span class="k">return</span> <span class="n">APE</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.rho"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.rho">[docs]</a>    <span class="k">def</span> <span class="nf">rho</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute :math:`\\rho_c(E) = a_c * k_c(E)`, using the true scattering radius.</span>
 <span class="sd">        ENDF uses it for calculating shift and penetrabilities.</span>
 
@@ -2534,7 +2540,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_competitive</span><span class="p">(</span><span class="n">Ein</span><span class="p">,</span> <span class="n">pA</span><span class="p">,</span> <span class="n">pB</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatteringRadiiTrue</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="c1"># dimensionless</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.rhohat"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.rhohat">[docs]</a>    <span class="k">def</span> <span class="nf">rhohat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute :math:`\\hat{\\rho}_c(E) = a_c * k_c(E)`, using the effective scattering radius</span>
 <span class="sd">        ENDF uses it for calculating the phase (but in truth, there should be no effective scattering radius).</span>
 <span class="sd">        (Caleb uses self.k below, but I think it should be self.k_competitive for the sake of consistency)</span>
@@ -2552,7 +2558,7 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">eta</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.getL0Matrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getL0Matrix">[docs]</a>    <span class="k">def</span> <span class="nf">getL0Matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the :math:`L^0` matrix of Froehner, :math:`{\\bf L^0}_{cc&#39;} = \\delta_{cc&#39;} (L_c-B_c)`</span>
 <span class="sd">        where :math:`L_c = S_c + i P_c`</span>
 
@@ -2585,7 +2591,7 @@
         <span class="k">return</span> <span class="n">L0</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.getRMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getRMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getRMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The R matrix in the Reich-Moore approximation is</span>
 <span class="sd">        :math:`R_{cc&#39;}=\\sum_\\lambda{\\frac{\\gamma_{\\lambda c}\\gamma_{\\lambda c&#39;}}{E_\\lambda - E - i\\Gamma_{\\lambda\\gamma}/2}}`</span>
 
@@ -2646,7 +2652,7 @@
         <span class="k">return</span> <span class="n">R</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.getScatteringMatrixT"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getScatteringMatrixT">[docs]</a>    <span class="k">def</span> <span class="nf">getScatteringMatrixT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">,</span> <span class="n">useTabulatedScatteringRadius</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enableExtraCoulombPhase</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param Ein:</span>
 <span class="sd">        :type Ein: numpy.array(type=float)</span>
@@ -2679,7 +2685,7 @@
         <span class="k">return</span> <span class="n">T</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.getEiPhis"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getEiPhis">[docs]</a>    <span class="k">def</span> <span class="nf">getEiPhis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span><span class="p">,</span> <span class="n">useTabulatedScatteringRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">enableExtraCoulombPhase</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The phase factor for the collision matrix, :math:`\\Omega_c=e^{\\omega_c-\\varphi_c}`</span>
 
 <span class="sd">        :param Ein:</span>
@@ -2715,7 +2721,7 @@
         <span class="k">return</span> <span class="n">eiphis</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.k_competitive"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.k_competitive">[docs]</a>    <span class="k">def</span> <span class="nf">k_competitive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ex</span><span class="p">,</span> <span class="n">pA</span><span class="p">,</span> <span class="n">pB</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate k for any 2-body output channel.</span>
 
 <span class="sd">        Note that if pA and pB are target and neutron, this reduces to self.k(E) as defined above</span>
@@ -2737,7 +2743,7 @@
                 <span class="n">targ_mass</span> <span class="o">/</span> <span class="p">(</span><span class="n">targ_mass</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectileMass_amu</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ex</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.eta"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.eta">[docs]</a>    <span class="k">def</span> <span class="nf">eta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ex</span><span class="p">,</span> <span class="n">pA</span><span class="p">,</span> <span class="n">pB</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        eta, the  Sommerfeld parameter, given by :math:`\\eta = Z_A Z_B m_{red} \\alpha / ( \\hbar c k )`</span>
 
 <span class="sd">        for competitive channels with 2 charged particles, parameter eta is used to find penetrability.</span>
@@ -2768,7 +2774,7 @@
 
 <div class="viewcode-block" id="RMatrixLimitedcrossSection.getCrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.RMatrixLimitedcrossSection.getCrossSection">[docs]</a>    <span class="nd">@blockwise</span>
     <span class="k">def</span> <span class="nf">getCrossSection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return reconstructed cross sections at incident energy E</span>
 <span class="sd">        :param E: incident energy (unit = self.energyUnit).  May be scalar or vector</span>
 <span class="sd">        :return: dictionary with cross sections for each reaction.</span>
@@ -2781,7 +2787,7 @@
         <span class="n">competitiveSum</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,]</span> <span class="o">*</span> <span class="n">nCompetitive</span>
 
         <span class="n">eliminatedReaction</span> <span class="o">=</span> <span class="p">[</span><span class="n">rr</span> <span class="k">for</span> <span class="n">rr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">RR</span><span class="o">.</span><span class="n">resonanceReactions</span> <span class="k">if</span> <span class="n">rr</span><span class="o">.</span><span class="n">eliminated</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eliminatedReaction</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">RR</span><span class="o">.</span><span class="n">approximation</span> <span class="ow">is</span> <span class="n">resolvedModule</span><span class="o">.</span><span class="n">RMatrix</span><span class="o">.</span><span class="n">Approximation</span><span class="o">.</span><span class="n">ReichMoore</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">eliminatedReaction</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Only 1 reaction can be eliminated in Reich-Moore approximation!&quot;</span><span class="p">)</span>
         <span class="n">haveEliminated</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># only set to true if at least one non-zero width is present</span>
 
@@ -2978,7 +2984,7 @@
 <div class="viewcode-block" id="URRcrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.URRcrossSection">[docs]</a><span class="k">class</span> <span class="nc">URRcrossSection</span><span class="p">(</span><span class="n">ResonanceReconstructionBaseClass</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">URRform</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the URR management class</span>
 
 <span class="sd">        :param URRform: The tabulatedWidths class to be reconstructed</span>
@@ -3003,13 +3009,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">egrid</span><span class="o">=</span><span class="kc">None</span>
 
 <div class="viewcode-block" id="URRcrossSection.getWidthsAndSpacings"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.URRcrossSection.getWidthsAndSpacings">[docs]</a>    <span class="k">def</span> <span class="nf">getWidthsAndSpacings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        URR tables give us the average resonance parameters, the average resonance spacing</span>
 <span class="sd">        and the number of degrees of freedom, assuming that the widths are distributed by a chi^2</span>
 <span class="sd">        probability density function with the given number of degrees of freedom.</span>
-
-<span class="sd">        However, later we&#39;ll need the level densities.  Below we&#39;ll construct them from the</span>
-<span class="sd">        average resonance spacing for each L, J.</span>
 
 <span class="sd">        This function sets several member data as dicts (indexed by L &amp; J) of data and interpolable functions::</span>
 
@@ -3017,11 +3020,6 @@
 
 <span class="sd">                ..math::</span>
 <span class="sd">                    D_{L,J}(E)</span>
-
-<span class="sd">            - levelDensities: derived from level spacings::</span>
-
-<span class="sd">                ..math::</span>
-<span class="sd">                    \\rho_{L,J}(E)=1/D_{L,J}(E)</span>
 
 <span class="sd">            - averageWidths, assigned simple labels like &#39;elastic&#39; and &#39;capture&#39; for convenience::</span>
 
@@ -3049,7 +3047,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">levelSpacings</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>  <span class="c1"># FIXME why OrderedDict? Does order matter?</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">levelDensities</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">DOFs</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reactionLabels</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
 
@@ -3069,7 +3066,6 @@
                 <span class="n">j</span> <span class="o">=</span> <span class="n">J</span><span class="o">.</span><span class="n">J</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">levelSpacings</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span><span class="o">=</span><span class="n">J</span><span class="o">.</span><span class="n">levelSpacing</span><span class="o">.</span><span class="n">data</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">levelDensities</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">J</span><span class="o">.</span><span class="n">levelSpacing</span><span class="o">.</span><span class="n">data</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span><span class="o">=</span><span class="p">{}</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">DOFs</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span><span class="o">=</span><span class="p">{}</span>
 
@@ -3083,7 +3079,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">DOFs</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span> <span class="n">j</span><span class="p">)][</span><span class="n">simpleLabel</span><span class="p">]</span> <span class="o">=</span> <span class="n">wid</span><span class="o">.</span><span class="n">degreesOfFreedom</span></div>
 
 <div class="viewcode-block" id="URRcrossSection.rho"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.URRcrossSection.rho">[docs]</a>    <span class="k">def</span> <span class="nf">rho</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The dimensionless parameter rho::</span>
 
 <span class="sd">            ..math::</span>
@@ -3098,7 +3094,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span></div>
 
 <div class="viewcode-block" id="URRcrossSection.getFluctuationIntegrals"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.URRcrossSection.getFluctuationIntegrals">[docs]</a>    <span class="k">def</span> <span class="nf">getFluctuationIntegrals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">widths</span><span class="p">,</span> <span class="n">DOF</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        From subroutine GNRL3 in RECENT. If possible, this will be replaced</span>
 <span class="sd">        with more basic approach (rather than using lookup table)... not finding</span>
 <span class="sd">        appropriate equations right now</span>
@@ -3212,7 +3208,7 @@
         <span class="k">return</span> <span class="n">RE</span><span class="p">,</span><span class="n">RC</span><span class="p">,</span><span class="n">RF</span></div>
 
 <div class="viewcode-block" id="URRcrossSection.generateEnergyGrid"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.URRcrossSection.generateEnergyGrid">[docs]</a>    <span class="k">def</span> <span class="nf">generateEnergyGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolateWidths</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the energy grid for reconstructing unresolved resonances. Usually this is just the energy grid</span>
 <span class="sd">        chosen by the evaluator for storing energy-dependent widths.</span>
 
@@ -3257,7 +3253,7 @@
 
 <div class="viewcode-block" id="URRcrossSection.getCrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.URRcrossSection.getCrossSection">[docs]</a>    <span class="nd">@blockwise</span>
     <span class="k">def</span> <span class="nf">getCrossSection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return unresolved region reconstructed cross sections at incident energy E</span>
 <span class="sd">        :param E: incident energy (unit = self.energyUnit).  May be scalar or vector</span>
 <span class="sd">        :return: dictionary with cross sections for each reaction.</span>
@@ -3319,7 +3315,7 @@
         <span class="k">return</span> <span class="n">xscs</span></div>
 
 <div class="viewcode-block" id="URRcrossSection.getTransmissionCoefficients"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.URRcrossSection.getTransmissionCoefficients">[docs]</a>    <span class="k">def</span> <span class="nf">getTransmissionCoefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skipFission</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;weakCoupling&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the effective transmission coefficient in the resolved resonance regime.</span>
 <span class="sd">        The method argument controls the schemes to do this.</span>
 
@@ -3387,13 +3383,13 @@
         <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">channelClass</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">lj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">rxn</span><span class="o">==</span><span class="s1">&#39;elastic&#39;</span><span class="p">:</span>
-                    <span class="n">tau</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">redWidthFactor</span><span class="p">[</span><span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">rxn</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">levelSpacings</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span> <span class="c1">#*self.levelDensities[lj]</span>
+                    <span class="n">tau</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">redWidthFactor</span><span class="p">[</span><span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">rxn</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">levelSpacings</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span>
                 <span class="k">elif</span> <span class="n">rxn</span><span class="o">==</span><span class="s1">&#39;fission&#39;</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">skipFission</span><span class="p">:</span> <span class="k">continue</span>
                     <span class="k">if</span> <span class="n">rxn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">]:</span> <span class="k">continue</span>
                     <span class="n">tau</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">rxn</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">levelSpacings</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">tau</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">rxn</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">levelSpacings</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span> <span class="c1">#*self.levelDensities[lj]</span>
+                    <span class="n">tau</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">averageWidths</span><span class="p">[</span><span class="n">lj</span><span class="p">][</span><span class="n">rxn</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">levelSpacings</span><span class="p">[</span><span class="n">lj</span><span class="p">]</span>
                 <span class="n">c</span><span class="o">=</span><span class="n">ChannelDesignator</span><span class="p">(</span><span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lj</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rxn</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">Tc</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="nb">abs</span><span class="p">(</span><span class="n">lj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">lj</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">gfact</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                     <span class="n">particleA</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">particleB</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">isElastic</span><span class="o">=</span><span class="p">(</span><span class="n">rxn</span><span class="o">==</span><span class="s1">&#39;elastic&#39;</span><span class="p">),</span>
                                     <span class="n">channelClass</span><span class="o">=</span><span class="n">channelClass</span><span class="p">[</span><span class="n">rxn</span><span class="p">],</span> <span class="n">useRelativistic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">eliminated</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>

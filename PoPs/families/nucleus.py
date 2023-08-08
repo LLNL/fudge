@@ -143,6 +143,15 @@ class Particle( particleModule.Particle ) :
         if len(self.mass) > 0: return self.mass[0].float(unit)
         return self.nuclide.getMass(unit)
 
+    def intid(self, intidDB={}):
+        '''
+        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).
+        '''
+
+        sign = -1 if self.isAnti else 1
+
+        return sign * (1000 * (1000 * (self.index + 500) + self.Z) + self.A)
+
     def replicate( self, other ) :
         """
         Copy data from other into self

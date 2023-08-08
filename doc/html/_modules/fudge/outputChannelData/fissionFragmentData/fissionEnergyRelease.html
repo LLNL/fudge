@@ -106,7 +106,7 @@
     <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="FissionEnergyReleaseTerm"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm">[docs]</a><span class="k">class</span> <span class="nc">FissionEnergyReleaseTerm</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Base class for all types of fission energy release. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Base class for all types of fission energy release. &quot;&quot;&quot;</span>
 
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="p">)</span>
 
@@ -206,7 +206,7 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;totalEnergy&#39;</span></div>
 
 <div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Descriptor to ensure ancestry is set when adding energy release terms</span>
 <span class="sd">    to fissionEnergyRelease class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -225,7 +225,7 @@
         <span class="nb">setattr</span><span class="p">(</span> <span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FissionEnergyRelease"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease">[docs]</a><span class="k">class</span> <span class="nc">FissionEnergyRelease</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Store average energy released to different types of fission products.</span>
 <span class="sd">    (prompt and delayed neutrons, prompt / delayed gammas, betas, neutrinos, etc.)</span>
 <span class="sd">    Each term is currently (when translating from ENDF) stored as a polynomial expansion,</span>
@@ -285,7 +285,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">FissionEnergyRelease</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FissionEnergyRelease.multiGroupQ"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.multiGroupQ">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group Q-value.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
@@ -315,7 +315,7 @@
 
 <div class="viewcode-block" id="FissionEnergyRelease.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Parse &lt;fissionEnergyRelease&gt; node from xml.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse &lt;fissionEnergyRelease&gt; node from xml.&quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
 

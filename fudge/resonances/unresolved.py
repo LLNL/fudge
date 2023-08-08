@@ -268,6 +268,10 @@ class TabulatedWidths(ancestryModule.AncestryIO):
                 raise TypeError("PoPs can't be set to type '%s'" % type(value))
             self.__PoPs.setAncestor(self)
 
+    def getLocalPoPs(self):
+        """ Returns None unless a local PoPs database is defined. """
+        return self.__PoPs
+
     def convertUnits(self, unitMap):
         for child in self.__PoPs, self.__scatteringRadius, self.__hardSphereRadius:
             if child is not None:

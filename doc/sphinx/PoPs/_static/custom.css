@@ -1,0 +1,11 @@
+
+/* -- override default body text (was rendered as all italics on Safari */
+body {
+    font-family: Georgia, serif;
+    font-size: 17px;
+    background-color: white;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+

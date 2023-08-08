@@ -62,7 +62,7 @@
 
 
 <div class="viewcode-block" id="Sums"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Sums">[docs]</a><span class="k">class</span> <span class="nc">Sums</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Contains all summed quantities. Currently supports summed cross sections and multiplicities,</span>
 <span class="sd">    could extend to other types of sums later.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -106,7 +106,7 @@
         <span class="k">for</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span> <span class="n">item</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Sums.fixDomains"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Sums.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **crossSectionSums** and **multiplicitySums** members.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -116,7 +116,7 @@
         <span class="k">return</span> <span class="n">numberOfFixes</span></div>
 
 <div class="viewcode-block" id="Sums.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Sums.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -157,7 +157,7 @@
         <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="CrossSectionSum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.CrossSectionSum">[docs]</a><span class="k">class</span> <span class="nc">CrossSectionSum</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores a summed quantity (cross section, multiplicity, etc.) along with the list of what&#39;s being summed over</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -166,7 +166,7 @@
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">ENDF_MT</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a &#39;sum&#39; instance</span>
 <span class="sd">        :param label: unique string identifying this sum</span>
 <span class="sd">        :param ENDF_MT: for converting back to ENDF</span>
@@ -216,7 +216,7 @@
         <span class="k">for</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span> <span class="n">item</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CrossSectionSum.fixDomains"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.CrossSectionSum.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** method on the **Q** and **crossSection** members.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -237,7 +237,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CrossSectionSum.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.CrossSectionSum.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -253,7 +253,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__crossSection</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CrossSectionSum.sumSummands"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.CrossSectionSum.sumSummands">[docs]</a>    <span class="k">def</span> <span class="nf">sumSummands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the sum by looping over summands. If a style is specified, use that style if available.</span>
 <span class="sd">        Otherwise sum the evaluated style.</span>
 <span class="sd">        :param style: optional string identifying what style of data to sum (&#39;eval&#39;, &#39;recon&#39;, etc.)</span>
@@ -271,7 +271,7 @@
         <span class="k">return</span> <span class="n">sums</span></div>
 
 <div class="viewcode-block" id="CrossSectionSum.scaleSummandsToMatchSum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.CrossSectionSum.scaleSummandsToMatchSum">[docs]</a>    <span class="k">def</span> <span class="nf">scaleSummandsToMatchSum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        rescale the cross sections in the summands list so that their sum matches the cross section in self</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -299,7 +299,7 @@
 
 
 <div class="viewcode-block" id="CrossSectionSum.scaleSumToMatchSummands"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.CrossSectionSum.scaleSumToMatchSummands">[docs]</a>    <span class="k">def</span> <span class="nf">scaleSumToMatchSummands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sum the summands cross section list, then set the sum to the cross section in self.</span>
 <span class="sd">        If a style is specified, the sum will be stored under that style. Otherwise it replaces the</span>
 <span class="sd">        evaluated style.</span>
@@ -371,7 +371,7 @@
         <span class="k">return</span> <span class="n">sums</span></div></div>
 
 <div class="viewcode-block" id="MultiplicitySum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.MultiplicitySum">[docs]</a><span class="k">class</span> <span class="nc">MultiplicitySum</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores a summed multiplicity along with the list of what&#39;s being summed over</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -380,7 +380,7 @@
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">ENDF_MT</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a &#39;sum&#39; instance</span>
 <span class="sd">        :param name: descriptive string</span>
 <span class="sd">        :param label: unique string identifying this sum</span>
@@ -422,7 +422,7 @@
         <span class="k">for</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="p">:</span> <span class="n">item</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MultiplicitySum.fixDomains"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.MultiplicitySum.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **multiplicity** member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -469,7 +469,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MultiplicitySum.removeStyles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.MultiplicitySum.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes all forms whose label matches one of the labels in removeStyles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -547,12 +547,12 @@
             <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link2</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">item</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">path</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Summands.index"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the index of item in self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the index of item in self.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">index</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Summands.pop"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Summands.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Removes and return item at index. Default is the last item.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes and return item at index. Default is the last item.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summands</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span> <span class="p">)</span></div>
 
@@ -577,7 +577,7 @@
         <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Add"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.sums.Add">[docs]</a><span class="k">class</span> <span class="nc">Add</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Link representing one of the quantities that is added to the sum.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Link representing one of the quantities that is added to the sum.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;add&#39;</span></div>
 </pre></div>

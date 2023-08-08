@@ -5,6 +5,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+'''
+This module dismembers a continuous-energy neutron ACE data file (identifier "c" is for continuous-energy neutron table).
+'''
+
 from brownies.LANL.dismemberACE import dismemberACE_misc as dismemberACE_miscModule
 
 def dismemberACE( args, NXS, JXS, XSS ) :
@@ -33,10 +37,18 @@ def dismemberACE( args, NXS, JXS, XSS ) :
 
     MTR = JXS[3]                    # Location of MT array.
     MTs = dismemberACE_miscModule.toIntegers( dismemberACE_miscModule.getData( 'MTs', XSS, MTR, NTR ) )
+    dismemberACE_miscModule.outputList('MTR', MTs)
+
     LQR = JXS[4]                    # Location of Q-value array.
     Qs = dismemberACE_miscModule.getData( 'Qs', XSS, LQR ,NTR )
+    dismemberACE_miscModule.outputList('LQR', Qs)
+
     TYR = JXS[5]                    # Location of reaction type array.
     Types = dismemberACE_miscModule.toIntegers( dismemberACE_miscModule.getData( 'Types', XSS, TYR, NTR ) )
+    dismemberACE_miscModule.outputList('TYR', Types)
+
+    values = ['%6s %6s %-20s' % (MT, Types[index], Qs[index]) for index, MT in enumerate(MTs)]
+    dismemberACE_miscModule.outputList('MTR_LQR_TYR', values)
 
     LSIG = JXS[6]                   # Location of table of cross section locators.
     crossSectionLocators = dismemberACE_miscModule.toIntegers( dismemberACE_miscModule.getData( 'crossSectionLocators', XSS, LSIG, NTR ) )
@@ -173,7 +185,7 @@ def dismemberACE( args, NXS, JXS, XSS ) :
         for energy in energies : fOut.write( '%20.12e\n' % energy )
 
         Ps = dismemberACE_miscModule.getData( 'P(i,j,k) (URR)', XSS, offset, N * 6 * M )
-        fOut.write( '\n\n### Probality tables\n' )
+        fOut.write( '\n\n### Probability tables\n' )
         URR_offset = 0
         for energyIndex in range(N):
             enetryStr = ' at energy %s' % energies[energyIndex]

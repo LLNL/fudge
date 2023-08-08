@@ -6,4 +6,5 @@
 # <<END-copyright>>
 
 multiGroupReactions = 'LLNL::multiGroupReactions'
+multiGroupIncompleteProducts = 'LLNL::multiGroupIncompleteProducts'
 multiGroupDelayedNeutrons = 'LLNL::multiGroupDelayedNeutrons'
