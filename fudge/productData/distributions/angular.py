@@ -580,8 +580,8 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
             if abs(integral - 1.0) > info['normTolerance']:
                 warnings.append( warning.UnnormalizedDistribution( PQUModule.PQU( function.outerDomainValue, self.axes[-1].unit ), idx, integral, function ) )
 
-            if( xys.rangeMin < 0.0 ) :
-                warnings.append( warning.NegativeProbability( PQUModule.PQU( function.outerDomainValue, self.axes[-1].unit), value = xys.rangeMin, obj=function ) )
+            if xys.rangeMin < 0.0:
+                warnings.append(warning.NegativeProbability(xys.rangeMin, PQUModule.PQU(function.outerDomainValue, self.axes[-1].unit), obj=function))
 
         return warnings
 

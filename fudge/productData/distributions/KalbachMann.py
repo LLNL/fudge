@@ -173,17 +173,17 @@ class Form( baseModule.Form ) :
                           if term.data is not None])
         if len(domainMins) != 1 or len(domainMaxes) != 1:
             warnings.append( warning.KalbachMannDomainMismatch(self) )
-        for index, F in enumerate( self.fSubform.data ):    # F is like P(E' | E), must be normalized for each incident energy
+        for index, F in enumerate(self.fSubform.data):    # F is like P(E' | E), must be normalized for each incident energy
             integral = F.integrate()
             if abs(integral - 1.0) > info['normTolerance']:
                 warnings.append( warning.UnnormalizedKMDistribution( PQUModule.PQU( F.outerDomainValue, F.axes[-1].unit), index, integral, F ) )
             if F.rangeMin < 0:
-                warnings.append( warning.NegativeProbability( PQUModule.PQU( F.outerDomainValue, F.axes[-1].unit), obj=F ) )
+                warnings.append(warning.NegativeProbability(F.rangeMin, PQUModule.PQU(F.outerDomainValue, F.axes[-1].unit), obj=F))
         for R in self.rSubform.data:    # R = pre-compound fraction, must be between 0 and 1
             if R.rangeMin < 0  or  R.rangeMax > 1:
                 badR = R.rangeMin if (0.5-R.rangeMin > R.rangeMax - 0.5) else R.rangeMax
-                warnings.append( warning.ValueOutOfRange("Invalid 'r' in KalbachMann distribution at incident energy %s"
-                    % PQUModule.PQU( R.outerDomainValue, R.axes[-1].unit), badR, 0, 1, R ) )
+                warnings.append(warning.ValueOutOfRange("Invalid 'r' in KalbachMann distribution at incident energy %s"
+                    % PQUModule.PQU(R.outerDomainValue, R.axes[-1].unit), badR, 0, 1, R))
 
         return warnings
 

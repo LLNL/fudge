@@ -13,6 +13,7 @@ Leptons include electrons, neutrinos, etc.
 from LUPY import enums as enumsModule
 
 from .. import misc as miscModule
+from .. import intId as intIdModule
 from . import particle as particleModule
 
 class Generation(enumsModule.Enum):
@@ -70,14 +71,12 @@ class Particle( particleModule.Particle ) :
 
     def intid(self, intidDB={}):
 
-        sign = -1 if self.isAnti else 1
-
         base, anti, qualifier = miscModule.baseAntiQualifierFromID(self.id)
         leptonIndex = {'e-': 0}.get(base)
         if leptonIndex is None:
-            ValueError('Baryon "%s" does not have a defined intid.' % (self.id))
+            raise ValueError('Baryon "%s" does not have a defined intid.' % (self.id))
 
-        return sign * (2**30 + 2**26 + leptonIndex)
+        return intIdModule.intidHelper(anti, intIdModule.Family.lepton, leptonIndex)
 
 class Suite( particleModule.Suite ) :
 

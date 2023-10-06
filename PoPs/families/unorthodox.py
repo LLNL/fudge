@@ -14,6 +14,9 @@ Currently used to store average fission product particles
 In the future, may also be used for 'thermal scattering law' particles.
 """
 
+from .. import IDs as IDsModule
+from .. import intId as intIdModule
+
 from . import particle as particleModule
 
 class Alias( particleModule.Alias ) :
@@ -34,11 +37,17 @@ class Particle( particleModule.Particle ) :
 
     def intid(self, intidDB={}):
 
-        unorthodoxIndex = intidDB.get(self.id)
-        if unorthodoxIndex is None:
-            ValueError('Unorthodox "%s" does not have a defined intid.' % (self.id))
+        if self.id == IDsModule.FissionProductENDL99120:
+            unorthodoxIndex = 99120
+        elif self.id == IDsModule.FissionProductENDL99125:
+            unorthodoxIndex = 99125
+        else:
+            unorthodoxIndex = intidDB.get(self.id)
+            if unorthodoxIndex is None:
+                unorthodoxIndex = -1
+            return unorthodoxIndex
 
-        return unorthodoxIndex
+        return intIdModule.intidHelper(False, intIdModule.Family.ENDL_fissionProduct, unorthodoxIndex)            # Only for FissionProductENDL9912[05].
 
 class Suite( particleModule.Suite ) :
 

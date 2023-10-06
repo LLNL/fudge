@@ -494,7 +494,8 @@
         <span class="n">Q</span> <span class="o">=</span> <span class="mf">0.0</span>
 
         <span class="n">ingoingParticles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ingoingParticles</span><span class="p">)</span>
-        <span class="n">outgoingParticles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">outgoingParticles</span><span class="p">)</span>
+        <span class="n">ingoingParticles</span> <span class="o">=</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">parseParticleList</span><span class="p">(</span><span class="n">ingoingParticles</span><span class="p">)</span>
+        <span class="n">outgoingParticles</span> <span class="o">=</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">parseParticleList</span><span class="p">(</span><span class="n">outgoingParticles</span><span class="p">)</span>
 
         <span class="n">removeDuplicates</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">while</span><span class="p">(</span><span class="n">removeDuplicates</span><span class="p">):</span>

@@ -123,11 +123,12 @@ class XYs3d( baseModule.Subform, multiD_XYsModule.XYs3d ) :
             if( energy_in.domainMin != -1 ) or ( energy_in.domainMax != 1 ) :
                 warnings.append( warning.IncompleteDistribution( PQU.PQU( energy_in.outerDomainValue, self.axes[0].unit ), energy_in.domainMin, energy_in.domainMax, energy_in ) )
             for mu in energy_in:
-                if( mu.domainMin < 0 ) :
-                    warnings.append( warning.ValueOutOfRange("Negative outgoing energy for energy_in=%s!"
-                        % PQU.PQU( energy_in.outerDomainValue, self.axes[0].unit ), mu.domainMin, 0, 'inf', self.toXLink() ) )
-                if( mu.rangeMin < 0 ) :
-                    warnings.append( warning.NegativeProbability( PQU.PQU( energy_in.outerDomainValue, self.axes[-1].unit ), mu=mu.outerDomainValue, obj=mu ) )
+                if mu.domainMin < 0:
+                    warnings.append(warning.ValueOutOfRange("Negative outgoing energy for energy_in=%s!"
+                        % PQU.PQU(energy_in.outerDomainValue, self.axes[0].unit), mu.domainMin, 0, 'inf', self.toXLink()))
+                if mu.rangeMin < 0:
+                    warnings.append(warning.NegativeProbability(
+                        mu.rangeMin, PQU.PQU(energy_in.outerDomainValue, self.axes[-1].unit), mu=mu.outerDomainValue, obj=mu))
 
         return warnings
 
@@ -303,8 +304,9 @@ class LLNLAngularOfAngularEnergySubform( baseModule.Subform ) :
             if abs(integral - 1.0) > info['normTolerance']:
                 warnings.append( warning.UnnormalizedDistribution( PQUModule.PQU( function.outerDomainValue, self.data.axes[-1].unit ), idx, integral, function ) )
 
-            if( function.rangeMin < 0.0 ) :
-                warnings.append( warning.NegativeProbability( PQUModule.PQU( function.outerDomainValue, self.data.axes[-1].unit ), value = function.rangeMin, obj=function ) )
+            if function.rangeMin < 0.0:
+                warnings.append(warning.NegativeProbability(
+                    function.rangeMin, PQUModule.PQU(function.outerDomainValue, self.data.axes[-1].unit), obj=function))
 
         return warnings
 
@@ -377,8 +379,8 @@ class LLNLAngularEnergyOfAngularEnergySubform( baseModule.Subform ) :
                     energy_in_warnings.append( warning.UnnormalizedDistributionAtMu( XYs1d.outerDomainValue, integral, obj=XYs1d ) )
 
                 if( XYs1d.rangeMin < 0.0 ) :
-                    energy_in_warnings.append( warning.NegativeProbability(
-                            energy_in = XYs2d.outerDomainValue, mu=XYs1d.outerDomainValue, value = XYs1d.rangeMin, obj=XYs1d) )
+                    energy_in_warnings.append(warning.NegativeProbability(
+                        XYs1d.rangeMin, energy_in=XYs2d.outerDomainValue, mu=XYs1d.outerDomainValue, obj=XYs1d))
 
             if energy_in_warnings:
                 warnings.append( warning.Context("Incident energy %s (index %d)" % ( PQUModule.PQU( XYs2d.outerDomainValue, self.data.axes[-1].unit ), idx ),

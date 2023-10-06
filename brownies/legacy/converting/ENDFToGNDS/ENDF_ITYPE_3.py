@@ -187,6 +187,8 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             if( MT == 527 ) : productsNeeded.insert( 0, IDsPoPsModule.photon )
         else :
             if( MT in [ 515, 517 ] ) : EPE = -crossSection.domainMin
+            if MT == 515:               # Threshold is -2 * Q for pair production off an electron.
+                EPE /= 2
             outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=process)
             outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, EPE, crossSection ) )
             if( MT in MT_AtomicConfigurations ) :

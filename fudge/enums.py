@@ -18,7 +18,7 @@ class Interaction(enumsModule.Enum):
     legacyTNSL = 'TNSL'
 
     @staticmethod
-    def getTNSLInteration(formatVersion):
+    def getTNSL_interaction(formatVersion):
         '''
         Returns the interation string based on the GNDS version format.
 

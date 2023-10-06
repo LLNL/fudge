@@ -5,7 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+import functools
 from fudge import styles as stylesModule
+from LUPY import enums as enumsModule
 
 """
 Store and report warnings and errors in GNDS data, in order to discover problems in the library.
@@ -23,6 +25,27 @@ Or, for easier searching you may wish to flatten the list (to get warnings alone
 
     >>> flat = warnings.flatten()
 """
+
+
+@functools.total_ordering
+class Level(enumsModule.Enum):
+    """
+    Define severity levels for warnings.
+    """
+    Pedantic = enumsModule.auto()
+    Minor = enumsModule.auto()
+    Moderate = enumsModule.auto()
+    Severe = enumsModule.auto()
+    Fatal = enumsModule.auto()
+
+    def __le__(self, other):
+        if not isinstance(other, Level):
+            return NotImplemented
+
+        return self._positions[self] < self._positions[other]
+
+
+Level._positions = {x: i for i, x in enumerate(Level)}
 
 
 class Context:
@@ -49,26 +72,57 @@ class Context:
     def __eq__(self, other):
         return self.message == other.message and self.warningList == other.warningList
 
-    def filter(self, include=None, exclude=None):
-        """Filter warning list to only include (or exclude) specific classes of Warning. For example:
+    def filter(self, threshold=None, include=None, exclude=None):
+        """
+        Filter warning list to only include warnings at or greater than specified threshold,
+        or to include (or exclude) specific classes of Warning.
+        Returns new Context instance with screened list, plus dictionary indicating how many warnings were screened.
+        Examples:
 
-            >>> newWarnings = warnings.filter( exclude=[Warning.EnergyImbalance, Warning.Q_mismatch] )
+            >>> context = Context()
+            >>> newWarnings, screened = context.filter( threshold=Level.Moderate )
+            # or
+            >>> newWarnings, screened = context.filter( exclude=[Warning.EnergyImbalance, Warning.Q_mismatch] )
 
-        Note that if both 'include' and 'exclude' lists are provided, exclude is ignored."""
+        'include' takes precedence over 'exclude', 'threshold' can be used with either 'include' or 'exclude'
+        """
 
-        if include is None and exclude is None: return self
+        if threshold is None and include is None and exclude is None: return self
         newWarningList = []
+        screened = {}
         for warning in self.warningList:
             if isinstance(warning, Context):
-                newContext = warning.filter(include, exclude)
+                newContext, newScreened = warning.filter(threshold, include, exclude)
                 if newContext: newWarningList.append(newContext)
+                for key in newScreened:
+                    screened[key] = screened.get(key, 0) + newScreened[key]
+            elif threshold is not None:
+                if warning.level >= threshold:
+                    if include is not None:
+                        if warning.__class__ in include:
+                            newWarningList.append(warning)
+                        else:
+                            screened[warning.__class__] = screened.get(warning.__class__, 0) + 1
+                    elif exclude is not None:
+                        if warning.__class__ not in exclude:
+                            newWarningList.append(warning)
+                        else:
+                            screened[warning.__class__] = screened.get(warning.__class__, 0) + 1
+                    else:
+                        newWarningList.append(warning)
+                else:
+                    screened[warning.level] = screened.get(warning.level, 0) + 1
             elif include is not None:
                 if warning.__class__ in include:
                     newWarningList.append(warning)
+                else:
+                    screened[warning.__class__] = screened.get(warning.__class__, 0) + 1
             else:  # exclude is not None:
                 if warning.__class__ not in exclude:
                     newWarningList.append(warning)
-        return Context(self.message, newWarningList)
+                else:
+                    screened[warning.__class__] = screened.get(warning.__class__, 0) + 1
+        return Context(self.message, newWarningList), screened
 
     def flatten(self):
         """From a nested hierarchy of warnings, get back a flat list for easier searching:
@@ -203,7 +257,8 @@ class Warning(BaseException):
     and information about the warning or error.
     """
 
-    def __init__(self, obj=None):
+    def __init__(self, level: Level, obj=None):
+        self.level = level
         self.obj = obj
         self.xpath = ''
         if hasattr(obj, 'toXLink'):
@@ -216,7 +271,7 @@ class Warning(BaseException):
         return self.xpath == other.xpath
 
     def toStringList(self, indent=''):
-        return ['%sWARNING: %s' % (indent, self)]
+        return ['%s%s warning: %s' % (indent, self.level, self)]
 
 
 #
@@ -225,7 +280,7 @@ class Warning(BaseException):
 
 class NotImplemented(Warning):
     def __init__(self, form, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Moderate, obj)
         self.form = form
 
     def __str__(self):
@@ -237,7 +292,7 @@ class NotImplemented(Warning):
 
 class UnorthodoxParticleNotImplemented(Warning):
     def __init__(self, particleId, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Moderate, obj)
         self.particleId = particleId
 
     def __str__(self):
@@ -249,7 +304,7 @@ class UnorthodoxParticleNotImplemented(Warning):
 
 class ElementalTarget(Warning):
     def __init__(self, particleId, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.particleId = particleId
 
     def __str__(self):
@@ -263,8 +318,8 @@ class ElementalTarget(Warning):
 # external files:
 
 class MissingExternalFile(Warning):
-    def __init__(self, path):
-        Warning.__init__(self)
+    def __init__(self, path, obj=None):
+        Warning.__init__(self, Level.Fatal, obj)
         self.path = path
 
     def __str__(self):
@@ -273,8 +328,8 @@ class MissingExternalFile(Warning):
 
 class WrongExternalFileChecksum(Warning):
 
-    def __init__(self, path, expected, computed):
-        Warning.__init__(self)
+    def __init__(self, path, expected, computed, obj=None):
+        Warning.__init__(self, Level.Moderate, obj)
         self.path = path
         self.expected = expected
         self.computed = computed
@@ -290,9 +345,12 @@ class WrongExternalFileChecksum(Warning):
 
 class BadScatteringRadius(Warning):
 
-    def __init__(self, factor=3.0, gotAP=None, expectedAP=None, L=None, E=None):
+    def __init__(self, factor=3.0, gotAP=None, expectedAP=None, L=None, E=None, obj=None):
 
-        Warning.__init__(self)
+        level = Level.Moderate
+        if factor >= 10:
+            level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.factor = factor
         self.gotAP = gotAP
         self.expectedAP = expectedAP
@@ -313,7 +371,11 @@ class BadSpinStatisticalWeights(Warning):
 
     def __init__(self, L, gJ, expectedgJ, reaction=None):
 
-        Warning.__init__(self)
+        diff = abs(abs(gJ) - abs(2.0 * L + 1))
+        level = Level.Minor
+        if diff > 0.1: level = Level.Moderate
+        if diff > 0.5: level = Level.Severe
+        Warning.__init__(self, level, reaction)
         self.L = L
         self.gJ = gJ
         self.expectedgJ = expectedgJ
@@ -331,8 +393,8 @@ class BadSpinStatisticalWeights(Warning):
 
 class InvalidAngularMomentaCombination(Warning):
 
-    def __init__(self, L, S, J, name):
-        Warning.__init__(self)
+    def __init__(self, L, S, J, name, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
         self.L = L
         self.S = S
         self.J = J
@@ -345,8 +407,8 @@ class InvalidAngularMomentaCombination(Warning):
 
 class InvalidParity(Warning):
 
-    def __init__(self, L, S, J, Pi, name):
-        Warning.__init__(self)
+    def __init__(self, L, S, J, Pi, name, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
         self.L = L
         self.S = S
         self.J = J
@@ -360,8 +422,8 @@ class InvalidParity(Warning):
 
 class UnknownMass(Warning):
 
-    def __init__(self, particle):
-        Warning.__init__(self)
+    def __init__(self, particle, obj=None):
+        Warning.__init__(self, Level.Minor, obj)
         self.particle = particle
 
     def __str__(self):
@@ -370,8 +432,8 @@ class UnknownMass(Warning):
 
 class UnknownSpinParity(Warning):
 
-    def __init__(self, reaction):
-        Warning.__init__(self)
+    def __init__(self, reaction, obj=None):
+        Warning.__init__(self, Level.Moderate, obj)
         self.reaction = reaction
 
     def __str__(self):
@@ -380,8 +442,8 @@ class UnknownSpinParity(Warning):
 
 class MissingResonanceChannel(Warning):
 
-    def __init__(self, L, S, J, name):
-        Warning.__init__(self)
+    def __init__(self, L, S, J, name, obj=None):
+        Warning.__init__(self, Level.Moderate, obj)
         self.L = L
         self.S = S
         self.J = J
@@ -394,8 +456,8 @@ class MissingResonanceChannel(Warning):
 
 class InvalidSpinCombination(Warning):
 
-    def __init__(self, Ia, Ib, S, name):
-        Warning.__init__(self)
+    def __init__(self, Ia, Ib, S, name, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
         self.Ia = Ia
         self.Ib = Ib
         self.S = S
@@ -408,8 +470,13 @@ class InvalidSpinCombination(Warning):
 
 class PotentialScatteringNotConverged(Warning):
 
-    def __init__(self, L, E, fom, fomTarget):
-        Warning.__init__(self)
+    def __init__(self, L, E, fom, fomTarget, obj=None):
+        level = Level.Minor
+        if fom > 0.1:
+            level = Level.Moderate
+        if fom > 0.5:
+            level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.L = L
         self.E = E
         self.fom = fom
@@ -424,7 +491,7 @@ class PotentialScatteringNotConverged(Warning):
 class RRmultipleRegions(Warning):
 
     def __init__(self, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Moderate, obj)
 
     def __str__(self):
         return "Use of more than one resolved resonance regions is deprecated"
@@ -433,7 +500,7 @@ class RRmultipleRegions(Warning):
 class URRdomainMismatch(Warning):
 
     def __init__(self, Lval, Jval, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Fatal, obj)
         self.Lval = Lval
         self.Jval = Jval
 
@@ -447,7 +514,7 @@ class URRdomainMismatch(Warning):
 class URRinsufficientEnergyGrid(Warning):
 
     def __init__(self, Lval, Jval, eLow, eHigh, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.Lval = Lval
         self.Jval = Jval
         self.eLow = eLow
@@ -465,7 +532,7 @@ class URRinsufficientEnergyGrid(Warning):
 class URRunphysicalLevelSpacing(Warning):
 
     def __init__(self, Lval, Jval, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.Lval = Lval
         self.Jval = Jval
 
@@ -479,7 +546,7 @@ class URRunphysicalLevelSpacing(Warning):
 class URRunphysicalWidth(Warning):
 
     def __init__(self, Lval, Jval, resonanceReaction, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.Lval = Lval
         self.Jval = Jval
         self.resonanceReaction = resonanceReaction
@@ -495,11 +562,11 @@ class URRunphysicalWidth(Warning):
 class UnresolvedLink(Warning):
 
     def __init__(self, link):
-        Warning.__init__(self, link)
+        Warning.__init__(self, Level.Fatal, link)
         self.link = link
 
     def __str__(self):
-        return "Unresolved link to %s" % (str(self.link))
+        return "Unresolved link to %s" % str(self.link)
 
 
 # reaction objects:
@@ -507,7 +574,7 @@ class UnresolvedLink(Warning):
 class WicksLimitError(Warning):
 
     def __init__(self, percentErr, energy_in, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.percentErr = percentErr
         self.energy_in = energy_in
 
@@ -520,6 +587,9 @@ class WicksLimitError(Warning):
 
 class ZAbalanceWarning(Warning):
 
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Fatal, obj)
+
     def __str__(self):
         return "ZA doesn't balance for this reaction!"
 
@@ -527,7 +597,16 @@ class ZAbalanceWarning(Warning):
 class Q_mismatch(Warning):
 
     def __init__(self, Qcalc, Qactual, obj=None):
-        Warning.__init__(self, obj)
+        if Qactual.value != 0:
+            ratio = Qcalc / Qactual
+            if ratio > 1: ratio = 1/ratio
+            level = Level.Pedantic
+            if ratio < 0.999: level = Level.Minor
+            if ratio < 0.99: level = Level.Moderate
+            if ratio < 0.95: level = Level.Severe
+        else:
+            level = Level.Severe  # 0 vs non-zero
+        Warning.__init__(self, level, obj)
         self.Qcalc = Qcalc
         self.Qactual = Qactual
 
@@ -541,7 +620,7 @@ class Q_mismatch(Warning):
 class BadFissionEnergyRelease(Warning):
 
     def __init__(self, worstCase, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.worstCase = worstCase
 
     def __str__(self):
@@ -554,7 +633,7 @@ class BadFissionEnergyRelease(Warning):
 class NegativeDelayedRate(Warning):
 
     def __init__(self, rate, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Fatal, obj)
         self.rate = rate
 
     def __str__(self):
@@ -567,7 +646,13 @@ class NegativeDelayedRate(Warning):
 class Threshold_mismatch(Warning):
 
     def __init__(self, threshold, thresholdCalc, obj=None):
-        Warning.__init__(self, obj)
+        ratio = threshold / thresholdCalc
+        if ratio > 1: ratio = 1/ratio
+        level = Level.Pedantic
+        if ratio < 0.999: level = Level.Minor
+        if ratio < 0.99: level = Level.Moderate
+        if ratio < 0.95: level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.threshold = threshold
         self.thresholdCalc = thresholdCalc
 
@@ -581,6 +666,11 @@ class Threshold_mismatch(Warning):
 
 class Coulomb_threshold_mismatch(Threshold_mismatch):
 
+    def __init__(self, threshold, thresholdCalc, obj=None):
+        Warning.__init__(self, Level.Moderate, obj)
+        self.threshold = threshold
+        self.thresholdCalc = thresholdCalc
+
     def __str__(self):
         return "Tabulated threshold %s below calculated threshold %s!" % (self.threshold, self.thresholdCalc)
 
@@ -588,7 +678,7 @@ class Coulomb_threshold_mismatch(Threshold_mismatch):
 class NonZero_crossSection_at_threshold(Warning):
 
     def __init__(self, value, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.value = value
 
     def __str__(self):
@@ -601,7 +691,7 @@ class NonZero_crossSection_at_threshold(Warning):
 class GapInCrossSection(Warning):
 
     def __init__(self, minGapEnergy, maxGapEnergy, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Fatal, obj)
         self.minGapEnergy = minGapEnergy
         self.maxGapEnergy = maxGapEnergy
 
@@ -613,10 +703,16 @@ class GapInCrossSection(Warning):
                 and self.maxGapEnergy == other.maxGapEnergy)
 
 
-class NegativeCrossSection(Warning):
+class CrossSectionFlatInterpolation(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Moderate, obj)
 
+    def __str__(self):
+        return "Cross section uses unphysical flat interpolation"
+
+class NegativeCrossSection(Warning):
     def __init__(self, energy_in, index, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.energy_in = energy_in
         self.index = index
 
@@ -630,6 +726,9 @@ class NegativeCrossSection(Warning):
 
 class BadCrossSectionReference(Warning):
 
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "Cross section reference outside of current reactionSuite not allowed!"
 
@@ -637,7 +736,13 @@ class BadCrossSectionReference(Warning):
 class SummedCrossSectionMismatch(Warning):
 
     def __init__(self, maxPercentDiff, obj=None):
-        Warning.__init__(self, obj)
+        ratio = maxPercentDiff / 100
+        if ratio > 1: ratio = 1/ratio
+        level = Level.Pedantic
+        if ratio < 0.999: level = Level.Minor
+        if ratio < 0.99: level = Level.Moderate
+        if ratio < 0.95: level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.maxPercentDiff = maxPercentDiff
 
     def __str__(self):
@@ -650,11 +755,17 @@ class SummedCrossSectionMismatch(Warning):
 
 class SummedCrossSectionDomainMismatch(Warning):
 
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "Cross section domain does not match domain of linked reaction cross section sum"
 
 
 class SummedCrossSectionZeroDivision(Warning):
+
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
 
     def __str__(self):
         return "Divide by 0 error when comparing summed cross section to components!"
@@ -663,7 +774,13 @@ class SummedCrossSectionZeroDivision(Warning):
 class SummedMultiplicityMismatch(Warning):
 
     def __init__(self, maxPercentDiff, obj=None):
-        Warning.__init__(self, obj)
+        ratio = maxPercentDiff / 100
+        if ratio > 1: ratio = 1/ratio
+        level = Level.Pedantic
+        if ratio < 0.999: level = Level.Minor
+        if ratio < 0.99: level = Level.Moderate
+        if ratio < 0.95: level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.maxPercentDiff = maxPercentDiff
 
     def __str__(self):
@@ -675,18 +792,25 @@ class SummedMultiplicityMismatch(Warning):
 
 
 class SummedMultiplicityDomainMismatch(Warning):
+
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "Multiplicity domain does not match domain of linked product multiplicity sum"
 
 
 class SummedMultiplicityZeroDivision(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "Divide by 0 error when comparing summed multiplicity to components!"
 
 
 class NegativeMultiplicity(Warning):
     def __init__(self, value, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.value = value
 
     def __str__(self):
@@ -698,7 +822,7 @@ class NegativeMultiplicity(Warning):
 
 class NonConstantMultiplicity(Warning):
     def __init__(self, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
 
     def __str__(self):
         return "Multiplicity should be constant but is energy-dependant!"
@@ -709,7 +833,7 @@ class NonConstantMultiplicity(Warning):
 
 class Domain_mismatch(Warning):
     def __init__(self, lowBound, highBound, xscLowBound, xscHighBound, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.lowBound, self.highBound = lowBound, highBound
         self.xscLowBound, self.xscHighBound = xscLowBound, xscHighBound
 
@@ -724,7 +848,7 @@ class Domain_mismatch(Warning):
 
 class MissingDistribution(Warning):
     def __init__(self, productName, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.productName = productName
 
     def __str__(self):
@@ -743,13 +867,16 @@ class NoDistributions(Warning):
 
 
 class MissingRecoilDistribution(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "Recoil distribution type specified, but recoil partner has unsupported distribution type!"
 
 
 class WrongDistributionComponent(Warning):
     def __init__(self, component, reactionType='2-body', obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.component = component
         self.reactionType = reactionType
 
@@ -762,13 +889,16 @@ class WrongDistributionComponent(Warning):
 
 
 class Wrong2BodyFrame(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "2-body reaction not in center-of-mass frame!"
 
 
 class UncorrelatedFramesMismatch(Warning):
     def __init__(self, angleFrame, energyFrame, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.angleFrame = angleFrame
         self.energyFrame = energyFrame
 
@@ -782,21 +912,33 @@ class UncorrelatedFramesMismatch(Warning):
 
 
 class FlatIncidentEnergyInterpolation(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "For distributions, flat interpolation along incident energy is unphysical!"
 
 
 class MissingInterpolationQualifier(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Moderate, obj)
+
     def __str__(self):
         return "Missing interpolationQualifier for outgoing energy spectrum (should be 'unitBase', 'correspondingPoints', etc.)"
 
 
 class EnergyDistributionBadU(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "For energy distribution functional form, parameter 'U' results in negative outgoing energies!"
 
 
 class NegativeDiscreteGammaEnergy(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "Discrete gamma energy <= 0"
 
@@ -805,7 +947,7 @@ class PrimaryGammaEnergyTooLarge(Warning):
     """Primary gamma energy should be <= available energy (depending on which discrete level it ends up in)"""
 
     def __init__(self, energy, fraction, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.energy = energy
         self.fraction = fraction
 
@@ -820,7 +962,7 @@ class PrimaryGammaEnergyTooLarge(Warning):
 
 class MadlandNixBadParameters(Warning):
     def __init__(self, EFL, EFH, minTm, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.EFL = EFL
         self.EFH = EFH
         self.minTm = minTm
@@ -835,13 +977,21 @@ class MadlandNixBadParameters(Warning):
 
 
 class WeightsDontSumToOne(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
     def __str__(self):
         return "Weights don't sum to 1.0!"
 
 
 class UnnormalizedDistribution(Warning):
     def __init__(self, energy_in, index, integral, obj=None):
-        Warning.__init__(self, obj)
+        ratio = integral if integral < 1 else 1/integral
+        level = Level.Pedantic
+        if ratio < 0.99: level = Level.Minor
+        if ratio < 0.9: level = Level.Moderate
+        if ratio < 0.5: level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.energy_in = energy_in
         self.index = index
         self.integral = integral
@@ -861,7 +1011,12 @@ class UnnormalizedDistributionAtMu(Warning):
     """
 
     def __init__(self, mu, integral, obj=None):
-        Warning.__init__(self, obj)
+        ratio = integral if integral < 1 else 1/integral
+        level = Level.Pedantic
+        if ratio < 0.99: level = Level.Minor
+        if ratio < 0.9: level = Level.Moderate
+        if ratio < 0.5: level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.mu = mu
         self.integral = integral
 
@@ -879,7 +1034,7 @@ class UnnormalizedKMDistribution(UnnormalizedDistribution):
 
 class KalbachMannDomainMismatch(Warning):
     def __init__(self, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
 
     def __str__(self):
         return "Kalbach-Mann terms do not span the same incident energy domain!"
@@ -887,7 +1042,7 @@ class KalbachMannDomainMismatch(Warning):
 
 class IncompleteDistribution(Warning):
     def __init__(self, energy_in, lowerMu, upperMu, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.energy_in = energy_in
         self.lowerMu = lowerMu
         self.upperMu = upperMu
@@ -903,8 +1058,11 @@ class IncompleteDistribution(Warning):
 
 class NegativeProbability(Warning):
 
-    def __init__(self, energy_in, energy_out=None, mu=None, value=None, obj=None):
-        Warning.__init__(self, obj)
+    def __init__(self, value, energy_in, energy_out=None, mu=None, obj=None):
+        level = Level.Minor
+        if value < -0.05: level = Level.Moderate
+        if value < -0.1: level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.energy_in = energy_in
         self.energy_out = energy_out
         self.mu = mu
@@ -924,11 +1082,13 @@ class NegativeProbability(Warning):
 
 
 class ExtraOutgoingEnergy(Warning):
-    """If an outgoing energy distribution ends with more than one energy with probability=0,
-    proper unitbase treatment is unclear. Distribution should end with exactly one P=0 point."""
+    """
+    If an outgoing energy distribution ends with more than one energy with probability=0,
+    proper unitbase/correspondingPoints treatment is unclear. Distribution should end with exactly one P=0 point.
+    """
 
     def __init__(self, energy_in, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Moderate, obj)
         self.energy_in = energy_in
 
     def __str__(self):
@@ -941,7 +1101,7 @@ class ExtraOutgoingEnergy(Warning):
 
 class MissingCoulombIdenticalParticlesFlag(Warning):
     def __init__(self, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
 
     def __str__(self):
         return "Need 'identicalParticles=\"true\"' when target==projectile"
@@ -949,7 +1109,7 @@ class MissingCoulombIdenticalParticlesFlag(Warning):
 
 class IncorrectCoulombIdenticalParticlesFlag(Warning):
     def __init__(self, projectile, target, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.projectile = projectile
         self.target = target
 
@@ -963,17 +1123,25 @@ class IncorrectCoulombIdenticalParticlesFlag(Warning):
 
 class EnergyImbalance(Warning):
     def __init__(self, energy_in, index, availableEnergy, deposition_per_product, obj=None):
-        Warning.__init__(self, obj)
+        total_deposited = sum([val[1] for val in deposition_per_product])
+        ratio = total_deposited / 100
+        # note: using stricter threshold if we're exceeding available energy
+        level = Level.Pedantic
+        if 0.95 < ratio < 1.01: level = Level.Minor
+        elif 0.9 < ratio < 1.05: level = Level.Moderate
+        elif ratio < 0.9 or ratio > 1.05: level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.energy_in = energy_in
         self.index = index
         self.availableEnergy = availableEnergy
         self.deposition_per_product = deposition_per_product
-        self.total_deposited = sum([val[1] for val in deposition_per_product])
+        self.total_deposited = total_deposited
         if self.availableEnergy == 0: self.total_deposited = float('inf')
 
     def __str__(self):
-        per_product = ', '.join(["%s = %.4g%%" % (key, val) for key, val in self.deposition_per_product[:5]])
-        if len(self.deposition_per_product) > 5: per_product += ', ...'
+        non_zero_products = [(key, val) for key, val in self.deposition_per_product if val]
+        per_product = ', '.join(["%s = %.4g%%" % (key, val) for key, val in non_zero_products[:5]])
+        if len(non_zero_products) > 5: per_product += ', ...'
         return ("Energy imbalance at incident energy %s (index %i). Total deposited = %.4g%% (%s)" %
                 (self.energy_in, self.index, self.total_deposited, per_product))
 
@@ -995,7 +1163,7 @@ class FissionEnergyImbalance(EnergyImbalance):
 
 class ValueOutOfRange(Warning):
     def __init__(self, contextMessage, value, lowerBound, upperBound, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.contextMessage = contextMessage
         self.value = value
         self.lowerBound = lowerBound
@@ -1015,7 +1183,7 @@ class TestSkipped(Warning):
     """ indicate if test was skipped due to missing information """
 
     def __init__(self, testName, reason, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Moderate, obj)
         self.testName = testName
         self.reason = reason
 
@@ -1030,7 +1198,7 @@ class ExceptionRaised(Warning):
     """If we run into an exception when running check(), try to exit gracefully and return this warning."""
 
     def __init__(self, Exception_String, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.Exception_String = Exception_String
 
     def __str__(self):
@@ -1046,6 +1214,9 @@ class EnergyDepositionExceptionRaised(ExceptionRaised):
 
 
 class SkippedCoulombElasticEnergyDeposition(Warning):
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Pedantic, obj)
+
     def __str__(self):
         return "Energy/momentum deposition cannot be computed for charged-particle elastic"
 
@@ -1053,7 +1224,7 @@ class SkippedCoulombElasticEnergyDeposition(Warning):
 # <editor-fold desc="covarianceSuite warnings">
 class CyclicDependency(Warning):
     def __init__(self, cycle, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.cycle = tuple(cycle)
 
     def __str__(self):
@@ -1068,7 +1239,7 @@ class CyclicDependency(Warning):
 
 class NegativeVariance(Warning):
     def __init__(self, index, value, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.index = index
         self.value = value
 
@@ -1082,7 +1253,7 @@ class NegativeVariance(Warning):
 
 class VarianceTooSmall(Warning):
     def __init__(self, index, relativeUncertainty, absoluteUncertainty, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Moderate, obj)
         self.index = index
         self.relativeUncertainty = relativeUncertainty
         self.absoluteUncertainty = absoluteUncertainty
@@ -1102,7 +1273,7 @@ class VarianceTooSmall(Warning):
 
 class VarianceTooLarge(Warning):
     def __init__(self, index, relativeUncertainty, absoluteUncertainty, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Moderate, obj)
         self.index = index
         self.relativeUncertainty = relativeUncertainty
         self.absoluteUncertainty = absoluteUncertainty
@@ -1121,7 +1292,7 @@ class VarianceTooLarge(Warning):
 
 class CorrelationsOutOfRange(Warning):
     def __init__(self, badCount, worstCase, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Moderate, obj)
         self.badCount = badCount
         self.worstCase = worstCase
 
@@ -1135,7 +1306,11 @@ class CorrelationsOutOfRange(Warning):
 
 class NegativeEigenvalues(Warning):
     def __init__(self, negativeCount, worstCase, obj=None):
-        Warning.__init__(self, obj)
+        level = Level.Pedantic
+        if worstCase < -0.001: level = Level.Minor
+        if worstCase < -0.1: level = Level.Moderate
+        if worstCase < -0.5: level = Level.Severe
+        Warning.__init__(self, level, obj)
         self.negativeCount = negativeCount
         self.worstCase = worstCase
 
@@ -1149,7 +1324,7 @@ class NegativeEigenvalues(Warning):
 
 class BadEigenvalueRatio(Warning):
     def __init__(self, ratio, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Minor, obj)
         self.ratio = ratio
 
     def __str__(self):
@@ -1161,7 +1336,7 @@ class BadEigenvalueRatio(Warning):
 
 class InvalidShortRangeVarianceData(Warning):
     def __init__(self, matrixType, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Severe, obj)
         self.matrixType = matrixType
 
     def __str__(self):
@@ -1173,7 +1348,7 @@ class InvalidShortRangeVarianceData(Warning):
 
 class ParameterCovarianceMismatch(Warning):
     def __init__(self, nParams, matrixShape, obj=None):
-        Warning.__init__(self, obj)
+        Warning.__init__(self, Level.Fatal, obj)
         self.nParams = nParams
         self.matrixShape = matrixShape
 

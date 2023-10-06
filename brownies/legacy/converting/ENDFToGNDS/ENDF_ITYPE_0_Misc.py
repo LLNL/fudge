@@ -463,7 +463,8 @@ def angularLegendreToPointwiseOrPiecewiseLegendre( MT, angularData, warningList,
             subformLegendre.append( LegendreRegion )
         if( subformPointwise is not None ) :
             if( isinstance( subformPointwise, angularModule.Regions2d ) ) :
-                raise NotImplementedError("Angular distribution subform broken into multiple regions")
+                for region in subformPointwise:
+                    subformLegendre.append( region )
             else :
                 region = angularModule.XYs2d( interpolation = subformPointwise.interpolation,
                     interpolationQualifier = subformPointwise.interpolationQualifier, axes = angularAxes )
@@ -497,22 +498,22 @@ def convertNuclearPlusInterferenceDataToPiecewise( MT, angularData, warningList,
                 region_IntReal.append( angularModule.Legendre( coefficients = interference_termReal, outerDomainValue = lastRegion, axes = axes ) )
                 region_IntImaginary.append( angularModule.Legendre( coefficients = interference_termImaginary, outerDomainValue = lastRegion, axes = axes ) )
         for idx in range( start, end ) :
-            list = lists[idx]
-            energy = list['C2']
+            listNow = lists[idx]
+            energy = listNow['C2']
             if( energy == priorEnergy ) :                           # This fixes a problem with some data having two same energy values.
                 energy += FUDGE_EPS * energy
                 warningList.append( 'same energies, second one being incremented for MT = %d, MF = %d, %s' % ( MT, MF, msg ) )
             priorEnergy = energy
             if( identicalParticles ) :
-                splitPoint = list['N2'] + 1
+                splitPoint = listNow['N2'] + 1
             else :
-                splitPoint = list['N2'] * 2 + 1
-            nuclear_term = list['data'][:splitPoint]
+                splitPoint = listNow['N2'] * 2 + 1
+            nuclear_term = listNow['data'][:splitPoint]
             if( identicalParticles ) :  # nuclear_term only stores even-L coefficients. Add extra zeros for odd-L:
                 newList = [nuclear_term[0]]
                 for coef in nuclear_term[1:]: newList.extend([0,coef])
                 nuclear_term = newList
-            interference_term, interference_termReal, interference_termImaginary = list['data'][splitPoint:], [], []
+            interference_term, interference_termReal, interference_termImaginary = listNow['data'][splitPoint:], [], []
             for jdx in range( 0, len( interference_term ), 2 ) :
                 interference_termReal.append( interference_term[jdx] )
                 interference_termImaginary.append( interference_term[jdx+1] )
@@ -576,19 +577,19 @@ def convertAngularToPointwiseOrPiecewiseFromTAB2_List( MT, LANG, angularList, wa
     interpolation = endfFileToGNDSMiscModule.ENDFInterpolationToGNDS1d( interpolation )
     subform = angularModule.XYs2d( axes = angularAxes )
     e_in_Prior = -1
-    for i1, list in enumerate( angularData ) :
-        LANG_e_in = int( list['L1'] )
+    for i1, listNow in enumerate( angularData ) :
+        LANG_e_in = int( listNow['L1'] )
         if( LANG_e_in != LANG_e_in ) : raise NotImplementedError( 'hell - need to implement this' )
-        e_in = list['C2']
+        e_in = listNow['C2']
         if( e_in == e_in_Prior ) : raise NotImplementedError( 'hell - need to implement this' )
-        data = list['data']
+        data = listNow['data']
         if( MT == 526 ) :        # Some MT 526 have data like '0.999998+0 2.046010+5 0.999998+0 2.870580+5' which this fixes.
             j1, j2 = None, None
             for j3 in range( 0, len( data ), 2 ) :
                 if( j2 is not None ) :
                     if( data[j2] == data[j3] ) : data[j2] -= 0.5 * ( data[j2] - data[j1] )
                 j1, j2 = j2, j3
-        xys = angularModule.XYs1d( data = list['data'], dataForm = 'list', axes = angularAxes, interpolation = interpolation, outerDomainValue = e_in )
+        xys = angularModule.XYs1d( data = listNow['data'], dataForm = 'list', axes = angularAxes, interpolation = interpolation, outerDomainValue = e_in )
         subform.append( xys )
         e_in_Prior = e_in
     return( subform )
@@ -896,6 +897,7 @@ def readMF2( info, MF2, warningList ) :
 
         elif LRU==1 and LRF==7:     # R-Matrix Limited
             dum,dum,IFG,KRM,NJS,KRL = funkyFI( mf2.next(), logFile = info.logs )
+            assert IFG==0, f"IFG={IFG} not supported"
             if KRM==3:
                 approximation = resolvedResonanceModule.RMatrix.Approximation.ReichMoore
             elif KRM==4:
@@ -1058,8 +1060,7 @@ def readMF2( info, MF2, warningList ) :
                                                  ('linearLogarithmicCoefficient', S1, '1/eV'),
                                                  ('singularityEnergyBelow', ED, 'eV'),
                                                  ('singularityEnergyAbove', EU, 'eV')):
-                            if val != 0:
-                                params[label] = quantityModule.Double(label, val, unit)
+                            params[label] = quantityModule.Double(label, val, unit)
                         external = externalRMatrixModule.SAMMY( **params )
                     elif LBK == 3:
                         ED, EU, dum, dum, three, dum = funkyFI( mf2.next(), logFile = info.logs )
@@ -1141,7 +1142,8 @@ def readMF2( info, MF2, warningList ) :
                 raise Exception("Can't decipher boundary condition!")
 
             # end of spin groups. write RMatrix class:
-            return AP, resolvedResonanceModule.RMatrix(info.style, approximation, resonanceReactions, spinGroups,                                             relativisticKinematics=bool(KRL), reducedWidthAmplitudes=bool(IFG),
+            return AP, resolvedResonanceModule.RMatrix(info.style, approximation, resonanceReactions, spinGroups,
+                                            relativisticKinematics=bool(KRL), reducedWidthAmplitudes=bool(IFG),
                                             calculateChannelRadius=not(NAPS), boundaryCondition=boundaryCondition,
                                             boundaryConditionValue=boundaryConditionValue,
                                             supportsAngularReconstruction=True)
@@ -2122,12 +2124,14 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
                 productList.append( product )
                 return( product )       # May be required for LAW = 4 logic.
 
-            def addPrimaryOrDiscreteGamma( distinctType, Eg, ELegendres, totalGammaMultiplicity, frame ) :
+            def addPrimaryOrDiscreteGamma(distinctType, Eg, ELegendres, totalGammaMultiplicity, frame):
 
-                if( distinctType == 'discrete' ) :
-                    energySubform = discreteOrPrimaryGamma( energyModule.DiscreteGamma, Eg, crossSection.domainMin, crossSection.domainMax )
-                else :
-                    energySubform = discreteOrPrimaryGamma( energyModule.PrimaryGamma, Eg, crossSection.domainMin, crossSection.domainMax )
+                domainMin = ELegendres[0][0]
+                domainMax = ELegendres[-1][0]
+                if distinctType == 'discrete':
+                    energySubform = discreteOrPrimaryGamma(energyModule.DiscreteGamma, Eg, domainMin, domainMax)
+                else:
+                    energySubform = discreteOrPrimaryGamma(energyModule.PrimaryGamma, Eg, domainMin, domainMax)
 
                 angularSubform = angularModule.XYs2d( axes = angularAxes )
                 EPrior = -1
@@ -2274,10 +2278,10 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
     return( isTwoBody )
 
 def readMF8( info, MT, MTData, warningList ) :
-    "Regular decay data."
+    """Regular decay data."""
 
     firstLMF, radioactiveDatas = None, []
-    if( 8 in MTData ) :
+    if 8 in MTData:
         dataLine, MF8Data = 1, MTData[8]
         ZA, AWR, LIS, LISO, NS, NO = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF8Data[0], intIndices = [ 0, 2, 3, 4, 5 ], logFile = info.logs )
         info.addMassAWR( ZA, AWR )
@@ -2286,7 +2290,8 @@ def readMF8( info, MT, MTData, warningList ) :
         MF10Data = readMF9or10( info, MT, MTData, 10, LIS, warningList )
         metastables = {}
         for idx in range( NS ) :
-            ZAP, ELFS, LMF, LFS, ND6, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF8Data[dataLine], intIndices = [ 0, 2, 3, 4 ], logFile = info.logs )
+            ZAP, ELFS, LMF, LFS, ND6, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+                MF8Data[dataLine], intIndices = [ 0, 2, 3, 4 ], logFile = info.logs )
 
             if LMF in (9,10):
                 if LMF == 9:
@@ -2301,7 +2306,7 @@ def readMF8( info, MT, MTData, warningList ) :
                     info.doRaise.append(warningList[-1])
                     return (None, [])
 
-            if( MT==18 ) :
+            if MT==18:
                 if MF9Data is None and MF10Data is None:    # meaningless section, appears in many JENDL-5 evaluations
                     return (None, [])
                 if ZAP != -1:
@@ -2311,22 +2316,22 @@ def readMF8( info, MT, MTData, warningList ) :
                 radioactiveDatas.append([0, 0, 0, None, MF10Data[0][-1], 0, ELFS])
                 return (10, radioactiveDatas)
 
-            if( ZAP not in metastables ) : metastables[ZAP] = 0
-            if( LFS == 0 and ELFS != 0 ) :
+            if ZAP not in metastables: metastables[ZAP] = 0
+            if LFS == 0 and ELFS != 0:
                 warningList.append( "MF8 claims non-zero ELFS = %s for the ground state, MT = %s. Converting ELFS to 0" % (ELFS, MT ) )
                 info.doRaise.append( warningList[-1] )
                 ELFS = 0
-            if( ELFS != 0 ) : metastables[ZAP] += 1
+            if ELFS != 0: metastables[ZAP] += 1
 
-            if( firstLMF is None ) : firstLMF = LMF
-            if( LMF != firstLMF ) : raise Exception( 'LMF changing from %s to %s is not allowed' % ( firstLMF, LMF ) )
+            if firstLMF is None: firstLMF = LMF
+            if LMF != firstLMF: raise Exception( 'LMF changing from %s to %s is not allowed' % ( firstLMF, LMF ) )
             dataLine += 1
 
             crossSection, multiplicity = None, 1
             QM, QI = None, None
-            if( LMF == 3 ) :
+            if LMF == 3:
                 pass
-            elif( LMF == 6 ) :  # multiplicity in MF6, which hasn't been read. Set multiplicity to 'unspecified', to be overridden later.
+            elif LMF == 6:  # multiplicity in MF6, which hasn't been read. Set multiplicity to 'unspecified', to be overridden later.
                 multiplicity = multiplicityModule.Unspecified( info.style )
             elif( LMF in [ 9, 10 ] ) :
                 if( ( ( LMF == 9 ) and not( MF9Data ) ) or ( ( LMF == 10 ) and not( MF10Data ) ) ) :    # BRB ????? Why are we checking for bad data.
@@ -2337,10 +2342,10 @@ def readMF8( info, MT, MTData, warningList ) :
                         # neither MF9 or MF10 exist.
                         continue
                     LMF = LMF1
-                if( LMF == 9 ) :
+                if LMF == 9:
                     TAB1, multiplicity = MF9Data[idx]
                     multiplicity = getMultiplicityPointwiseOrPieceWise( info, multiplicity, warningList )
-                else :
+                else:
                     TAB1, crossSection = MF10Data[idx]
                 QM, QI, IZAP, LFS9or10 = TAB1['C1'], TAB1['C2'], int( TAB1['L1'] ), int( TAB1['L2'] )
                 ELFS9or10 = QM - QI
@@ -2349,7 +2354,7 @@ def readMF8( info, MT, MTData, warningList ) :
                         warningList.append('''MF8 residual level energy = %s for level %s of ZA = %d not close to MF%s's value = %s for MT = %s'''
                                 % (ELFS, LIS, ZAP, LMF, ELFS9or10, MT))
                         info.doRaise.append( warningList[-1] )
-                if( LFS != LFS9or10 ):
+                if LFS != LFS9or10:
                     warningList.append("For MT%d, MF8 claims level index = %d but MF9/10 claim level index = %d"
                                        % (MT, LFS, LFS9or10))
                     info.doRaise.append( warningList[-1] )
@@ -2367,11 +2372,11 @@ def readMF8( info, MT, MTData, warningList ) :
 
                 isotopeName = residual.isotope.key
                 aliasName = PoPsAliasModule.MetaStable.metaStableNameFromNuclearLevelNameAndMetaStableIndex(isotopeName, metastables[ZAP])
-                if( not( aliasName in info.PoPs ) ) :
+                if aliasName not in info.PoPs:
                     info.PoPs.add(PoPsAliasModule.MetaStable(aliasName, residual.id, metastables[ZAP]))
 
-            if( NO == 0 ) : dataLine += ( ND6 + 5 ) // 6
-    return( firstLMF, radioactiveDatas )
+            if NO == 0: dataLine += ( ND6 + 5 ) // 6
+    return firstLMF, radioactiveDatas
 
 def readMF9or10( info, MT, MTData, MF, targetLIS, warningList ) :
 
@@ -2399,132 +2404,139 @@ def readMF9or10( info, MT, MTData, MF, targetLIS, warningList ) :
         MF9or10.append( [ TAB1, XSec ] )
     return( MF9or10  )
 
-def readMF12_13( info, MT, MTData, productList, warningList, crossSection, _dummyCrossSection, gammaBRTolerance = 1e-6 ) :
 
-    def addMF12_13GammaToList( gList, EGk, ESk, LP, LF, regions ) :
+def readMF12_13(info, MT, MTData, productList, warningList, crossSection, _dummyCrossSection, gammaBRTolerance = 1e-6):
+
+    def addMF12_13GammaToList(gList, EGk, ESk, LP, LF, regions):
         """EGk is the gamma's energy and ESk is the gamma's origination level energy."""
 
-        if( EGk in gList ) : raise ValueError( 'Gammas with the same energy (%s) are not supported: MT=%s' % ( EGk, MT ) )
-        gList.append( { 'EGk' : EGk, 'ESk' : ESk, 'LP' : LP, 'LF' : LF, 'yield' : regions, 'angularSubform' : None, 'energySubform' : None } )
+        if EGk in gList: raise ValueError('Gammas with the same energy (%s) are not supported: MT=%s' % (EGk, MT))
+        gList.append({'EGk': EGk, 'ESk': ESk, 'LP': LP, 'LF': LF, 'yield': regions, 'angularSubform': None, 'energySubform': None})
 
-    def checkAngularData( gamma ) :
+    def checkAngularData(gamma):
 
         angularSubform = gamma['angularSubform']
-        if( angularSubform is None ) : angularSubform = angularModule.Isotropic2d( )
+        if angularSubform is None: angularSubform = angularModule.Isotropic2d()
         gamma['angularSubform'] = angularSubform
 
-    def addGammaProduct( info, MF, gamma, productList, warningList, ESk ) :
+    def addGammaProduct(info, MF, gamma, productList, warningList, ESk):
 
         yields = gamma['yield']
         conversionFlags = []
-        multiplicity = getMultiplicityPointwiseOrPieceWise( info, yields, warningList )
-        if( MF == 13 ) :
+        multiplicity = getMultiplicityPointwiseOrPieceWise(info, yields, warningList)
+        if MF == 13:
             conversionFlags.append('MF13')
             multiplicity._temp_divideByCrossSection = True
-        if( gamma['ESk'] != 0 ) :
-            conversionFlags.append( 'ESk=%s' % ESk )
+        if gamma['ESk'] != 0:
+            conversionFlags.append('ESk=%s' % ESk)
 
-        product = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeNameENDF( info, 0, None ), multiplicity,
-                multiplicity = multiplicity )
+        pid = toGNDSMiscModule.getTypeNameENDF(info, 0, None)
+        product = toGNDSMiscModule.newGNDSParticle(info, pid, multiplicity, multiplicity=multiplicity)
 
         angularSubform = gamma['angularSubform']
         energySubform = gamma['energySubform']
-        form = uncorrelated( info.style, frames[1], angularSubform, energySubform )
-        product.distribution.add( form )
-        if conversionFlags : info.ENDFconversionFlags.add(product, ','.join(conversionFlags))
-        productList.append( product )
+        form = uncorrelated(info.style, frames[1], angularSubform, energySubform)
+        product.distribution.add(form)
+        if conversionFlags: info.ENDFconversionFlags.add(product, ','.join(conversionFlags))
+        productList.append(product)
 
-    if( 12 in MTData ) :
-        if( 13 in MTData ) :
-            raise Exception( 'MF = 12 and 13 present for MT=%s, this is not supported' % MT )
+    if 12 in MTData:
+        if 13 in MTData:
+            raise Exception('MF = 12 and 13 present for MT=%s, this is not supported' % MT)
         MF = 12
-    elif( 13 in MTData ) :
+    elif 13 in MTData:
         MF = 13
-    elif( ( 14 in MTData ) or ( 15 in MTData ) ) :
-        warningList.append('MF 14 and/or 15 data and no MF 12 or 13 data: MT=%s MFs=%s' % ( MT, MTData.keys( ) ) )
-        info.doRaise.append( warningList[-1] )
+    elif (14 in MTData) or (15 in MTData):
+        warningList.append('MF 14 and/or 15 data and no MF 12 or 13 data: MT=%s MFs=%s' % (MT, MTData.keys()))
+        info.doRaise.append(warningList[-1])
         return
-    else :
+    else:
         return
 
     MF12_13Data = MTData[MF]
-    ZA, AWR, LO, LG, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF12_13Data[0], intIndices = [ 0, 2, 3, 4 ], logFile = info.logs )
-    printAWR_mode( info, MT, MF, 0, ZA, AWR )
-    info.addMassAWR( ZA, AWR )
-    info.logs.write( ' : MF=%s LO=%s : ZAP=0 ' % ( MF, LO ) )
-    dataLine, continuousGamma, discreteGammas, primaryGammas, branchingGammas = 1, [], [], [], []
-    if( ( ( MF == 12 ) and ( LO == 1 ) ) or ( ( MF == 13 ) and ( LO == 0 ) ) ) :
-        if( MF == 12 ) :
+    ZA, AWR, LO, LG, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+        MF12_13Data[0], intIndices=[0, 2, 3, 4], logFile=info.logs)
+    printAWR_mode(info, MT, MF, 0, ZA, AWR)
+    info.addMassAWR(ZA, AWR)
+    info.logs.write(' : MF=%s LO=%s : ZAP=0 ' % (MF, LO))
+    dataLine, continuousGamma, discreteGammas, primaryGammas, branchingGammas, regions = 1, [], [], [], [], None
+    if ((MF == 12) and (LO == 1)) or ((MF == 13) and (LO == 0)):
+        if MF == 12:
             axes = multiplicityAxes
-        else :
+        else:
             axes = crossSectionAxes
-        if( NK > 1 ) :
-            dataLine, TAB1, regions = endfFileToGNDSMiscModule.getTAB1Regions( dataLine, MF12_13Data, axes = axes, logFile = info.logs )
-            info.totalMF6_12_13Gammas[MT] = [ MF, getMultiplicityPointwiseOrPieceWise( info, regions, warningList ) ]
-        for i in range( NK ) :
-            dataLine, TAB1, regions = endfFileToGNDSMiscModule.getTAB1Regions( dataLine, MF12_13Data, axes = axes, logFile = info.logs )
-            EGk, ESk, LP, LF = TAB1['C1'], TAB1['C2'], int( TAB1['L1'] ), int( TAB1['L2'] )
-            if( EGk == 0. ) :
-                if( LP not in [ 0, 1 ] ) : raise Exception( 'LP = %s != 0 for continuous gamma for MT = %s' % ( LP, MT ) )
-                if( len( continuousGamma ) == 0 ) :
-                    addMF12_13GammaToList( continuousGamma, EGk, ESk, LP, LF, regions )
-                else :
-                    raise Exception( 'continuous gamma information for MF=%s, MT = %s already exist' % ( MF, MT ) )
-            elif( LP == 2 ) :
-                addMF12_13GammaToList( primaryGammas, EGk, ESk, LP, LF, regions )
-            else :
-                addMF12_13GammaToList( discreteGammas, EGk, ESk, LP, LF, regions )
-    elif( ( MF == 12 ) and ( LO == 2 ) ) :
-        dataLine, LO2 = endfFileToGNDSMiscModule.getList( dataLine, MF12_13Data, logFile = info.logs )
+        if NK > 1:
+            dataLine, TAB1, regions = endfFileToGNDSMiscModule.getTAB1Regions(
+                dataLine, MF12_13Data, axes=axes, logFile=info.logs)
+            info.totalMF6_12_13Gammas[MT] = [MF, getMultiplicityPointwiseOrPieceWise(info, regions, warningList)]
+        for i in range(NK):
+            dataLine, TAB1, regions = endfFileToGNDSMiscModule.getTAB1Regions(
+                dataLine, MF12_13Data, axes=axes, logFile=info.logs)
+            EGk, ESk, LP, LF = TAB1['C1'], TAB1['C2'], int(TAB1['L1']), int(TAB1['L2'])
+            if EGk == 0.:
+                if LP not in [0, 1]: raise Exception('LP = %s != 0 for continuous gamma for MT = %s' % (LP, MT))
+                if len(continuousGamma) == 0:
+                    addMF12_13GammaToList(continuousGamma, EGk, ESk, LP, LF, regions)
+                else:
+                    raise Exception('continuous gamma information for MF=%s, MT = %s already exist' % (MF, MT))
+            elif LP == 2:
+                addMF12_13GammaToList(primaryGammas, EGk, ESk, LP, LF, regions)
+            else:
+                addMF12_13GammaToList(discreteGammas, EGk, ESk, LP, LF, regions)
+    elif (MF == 12) and (LO == 2):
+        dataLine, LO2 = endfFileToGNDSMiscModule.getList(dataLine, MF12_13Data, logFile = info.logs)
         LP = int(LO2['L1'])
         if LP == 2 and MT not in (91, 649, 699, 749, 799, 849, 999):
             warningList.append("Incorrect 'primary gamma' flag for MF12 MT%d" % MT)
         NT, LGp = LO2['N2'], LG + 1
         NK = NT
-        for idx in range( NT ) :
+        for idx in range(NT):
             parentEnergy, finalEnergy = LO2['C1'], LO2['data'][idx*LGp]
-            if parentEnergy==0:
+            if parentEnergy == 0:
                 raise Exception("Gamma decay from ground state in MF12 MT%d" % MT)
-            if abs((parentEnergy-finalEnergy)/parentEnergy)<0.0001:
-                raise Exception("Zero-energy gamma from %f eV to %f eV in MF12 MT%d" % (parentEnergy,finalEnergy,MT))
-            branchingGammas.append( {'ES' : LO2['C1'], 'EGk' : 0, 'ESk' : LO2['data'][idx*LGp], 'angularSubform' : None,
-                                     'LG' : LG, 'branching' : LO2['data'][idx*LGp+1:idx*LGp+LGp]} )
-        gammaBRList = [ g['branching'][0] for g in branchingGammas ]
-        sumGammaBRList = sum( gammaBRList )
-        if abs( sumGammaBRList - 1.0 ) > gammaBRTolerance:
-            warningList.append( "sum of gamma BR's for MT="+str(MT)+" MF=12 is " + str(sumGammaBRList)+' != 1.0' )
+            if abs((parentEnergy-finalEnergy)/parentEnergy) < 0.0001:
+                raise Exception("Zero-energy gamma from %f eV to %f eV in MF12 MT%d" % (parentEnergy, finalEnergy, MT))
+            branchingGammas.append({'ES': LO2['C1'], 'EGk': 0, 'ESk': LO2['data'][idx*LGp], 'angularSubform': None,
+                                     'LG': LG, 'branching': LO2['data'][idx*LGp+1:idx*LGp+LGp]})
+        gammaBRList = [g['branching'][0] for g in branchingGammas]
+        sumGammaBRList = sum(gammaBRList)
+        if abs(sumGammaBRList - 1.0) > gammaBRTolerance:
+            warningList.append("sum of gamma BR's for MT="+str(MT)+" MF=12 is " + str(sumGammaBRList)+' != 1.0')
         info.MF12_LO2[MT] = branchingGammas
-    else :
-        raise Exception( 'LO=%s is not valid for MF=%s, MT=%s' % ( LO, MF, MT ) )
+    else:
+        raise Exception('LO=%s is not valid for MF=%s, MT=%s' % (LO, MF, MT))
 
-    readMF14( info, MT, MTData, MF, NK, warningList, discreteGammas, primaryGammas, continuousGamma, branchingGammas )
-    readMF15( info, MT, MTData, continuousGamma, warningList )
+    readMF14(info, MT, MTData, MF, NK, warningList, discreteGammas, primaryGammas, continuousGamma, branchingGammas)
+    readMF15(info, MT, MTData, continuousGamma, warningList)
 
-    for gamma in branchingGammas :
-        if( not( gamma['angularSubform'] is None ) ) :
-            info.logs.write( 'NON-isotropic gamma' )
+    for gamma in branchingGammas:
+        if gamma['angularSubform'] is not None:
+            info.logs.write('NON-isotropic gamma')
             break
-    if( 14 in MTData ) : info.logs.write( ': MF=14 ' )
-    if( 15 in MTData ) : info.logs.write( ': MF=15 ' )
+    if 14 in MTData: info.logs.write(': MF=14 ')
+    if 15 in MTData: info.logs.write(': MF=15 ')
 
-    if( len( continuousGamma ) ) :
+    if len(continuousGamma):
         gamma = continuousGamma[0]
-        checkAngularData( gamma )
-        addGammaProduct( info, MF, gamma, productList, warningList, gamma['ESk'] )
+        checkAngularData(gamma)
+        addGammaProduct(info, MF, gamma, productList, warningList, gamma['ESk'])
 
-    if( crossSection is None ) :
-        crossSection = DummyCrossSection( regions[0].domainMin, regions[-1].domainMax, 'eV' )
-        _dummyCrossSection.append( crossSection )
+    if crossSection is None and regions is not None:
+        crossSection = DummyCrossSection(regions[0].domainMin, regions[-1].domainMax, 'eV')
+        _dummyCrossSection.append(crossSection)
 
-    for gamma in discreteGammas :
-        checkAngularData( gamma )
-        gamma['energySubform'] = discreteOrPrimaryGamma( energyModule.DiscreteGamma, gamma['EGk'], crossSection.domainMin, crossSection.domainMax )
-        addGammaProduct( info, MF, gamma, productList, warningList, gamma['ESk'] )
-    for gamma in primaryGammas :
-        checkAngularData( gamma )
-        gamma['energySubform'] = discreteOrPrimaryGamma( energyModule.PrimaryGamma, gamma['EGk'], crossSection.domainMin, crossSection.domainMax )
-        addGammaProduct( info, MF, gamma, productList, warningList, gamma['ESk'] )
-    for gamma in branchingGammas : checkAngularData( gamma )
+    if crossSection is not None:
+        for gamma in discreteGammas:
+            checkAngularData(gamma)
+            gamma['energySubform'] = discreteOrPrimaryGamma(energyModule.DiscreteGamma, gamma['EGk'],
+                                                            crossSection.domainMin, crossSection.domainMax)
+            addGammaProduct(info, MF, gamma, productList, warningList, gamma['ESk'])
+        for gamma in primaryGammas:
+            checkAngularData(gamma)
+            gamma['energySubform'] = discreteOrPrimaryGamma(energyModule.PrimaryGamma, gamma['EGk'],
+                                                             crossSection.domainMin, crossSection.domainMax)
+            addGammaProduct(info, MF, gamma, productList, warningList, gamma['ESk'])
+        for gamma in branchingGammas: checkAngularData(gamma)
 
 def readMF14( info, MT, MTData, MF, NK, warningList, discreteGammas, primaryGammas, continuousGamma, branchingGammas ) :
 
@@ -3192,7 +3204,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                     for i1 in range(len(mf2_elist)):
                         swaprows(matrix, MPAR * i1 + 1, MPAR * i1 + 2, 1)
 
-                if DAP: # scattering radius uncertainty was specified. Expand matrix to include it:
+                if DAP:     # scattering radius uncertainty was specified. Expand matrix to include it:
                     if len(DAP) > 1:
                         raise BadCovariance("Energy-dependent scat. radius uncertainty not yet handled!")
                     dim = len(matrix) + len(DAP)
@@ -3247,6 +3259,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
 
             elif LRF==7:
                 dum,dum,IFG,LCOMP,NJS,ISR = funkyFI(dat.next(), logFile = info.logs)
+                assert IFG==0, f"IFG={IFG} not supported"
                 if ISR>0:
                     raise NotImplementedError("scattering radius uncertainty in MF32 LRF7")
                 if LCOMP==1:

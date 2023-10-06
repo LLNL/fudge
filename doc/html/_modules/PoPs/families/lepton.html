@@ -52,6 +52,7 @@
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">miscModule</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">intId</span> <span class="k">as</span> <span class="n">intIdModule</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">particle</span> <span class="k">as</span> <span class="n">particleModule</span>
 
 <div class="viewcode-block" id="Generation"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.lepton.Generation">[docs]</a><span class="k">class</span> <span class="nc">Generation</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
@@ -109,14 +110,12 @@
 
     <span class="k">def</span> <span class="nf">intid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intidDB</span><span class="o">=</span><span class="p">{}):</span>
 
-        <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isAnti</span> <span class="k">else</span> <span class="mi">1</span>
-
         <span class="n">base</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="o">=</span> <span class="n">miscModule</span><span class="o">.</span><span class="n">baseAntiQualifierFromID</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         <span class="n">leptonIndex</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;e-&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">leptonIndex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Baryon &quot;</span><span class="si">%s</span><span class="s1">&quot; does not have a defined intid.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Baryon &quot;</span><span class="si">%s</span><span class="s1">&quot; does not have a defined intid.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">sign</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">30</span> <span class="o">+</span> <span class="mi">2</span><span class="o">**</span><span class="mi">26</span> <span class="o">+</span> <span class="n">leptonIndex</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">intIdModule</span><span class="o">.</span><span class="n">intidHelper</span><span class="p">(</span><span class="n">anti</span><span class="p">,</span> <span class="n">intIdModule</span><span class="o">.</span><span class="n">Family</span><span class="o">.</span><span class="n">lepton</span><span class="p">,</span> <span class="n">leptonIndex</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.lepton.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
 

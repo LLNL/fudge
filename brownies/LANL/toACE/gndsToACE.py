@@ -106,7 +106,7 @@ def toACE(self, styleLabel, cdf_style, fileName, evaluationId, productData, dela
     if skipURR:
         ILF, IOA, URRPT = 0, 0, []
     else:
-        ILF, IOA, URRPT = URR_probabilityTablesModule.URR_probabilityTable(self, styleLabel, fromPDF=False)
+        ILF, IOA, URRPT = URR_probabilityTablesModule.URR_probabilityTable(self, styleLabel, fromPDF=False, verbose=verbose)
         if ILF == 4:
             crossSectionSum4 = None
             for crossSectionSum in self.sums.crossSectionSums:

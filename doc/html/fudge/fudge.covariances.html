@@ -146,10 +146,12 @@ of which contains one section of the full covariance matrix.</p>
 <li><p><strong>checkUncLimits</strong> (<em>bool</em>) – Should we check the uncertainty limits? (default: True)</p></li>
 <li><p><strong>minRelUnc</strong> (<em>float</em>) – Minimum allowable relative uncertainty (default: 0.0)</p></li>
 <li><p><strong>maxRelUnc</strong> (<em>float</em>) – Maximum allowable relative uncertainty (default: 10.0)</p></li>
-<li><p><strong>theData</strong> – A reference to the data for this covariance.  This is useful for converting between relative and absolute covariance (default: None)</p></li>
+<li><p><strong>theData</strong> – A reference to the data for this covariance.
+This is useful for converting between relative and absolute covariance (default: None)</p></li>
 <li><p><strong>negativeEigenTolerance</strong> (<em>float</em>) – Ignore negative eigenvalues smaller than this (default: -1e-6)</p></li>
 <li><p><strong>eigenvalueRatioTolerance</strong> (<em>float</em>) – Warn if smallest eigenvalue &lt; this value * biggest (default: 1e-8)</p></li>
 <li><p><strong>eigenvalueAbsoluteTolerance</strong> (<em>float</em>) – Warn if smallest eigenvalue &lt; this value (default: 1e-14)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Be verbose while running checks</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

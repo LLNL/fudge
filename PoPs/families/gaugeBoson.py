@@ -11,6 +11,7 @@ Gauge bosons include the photon, gluon, W and Z particles
 """
 
 from .. import misc as miscModule
+from .. import intId as intIdModule
 from . import particle as particleModule
 
 class Alias( particleModule.Alias ) :
@@ -32,11 +33,11 @@ class Particle( particleModule.Particle ) :
     def intid(self, intidDB={}):
 
         base, anti, qualifier = miscModule.baseAntiQualifierFromID(self.id)
-        baryonIndex = {'photon': 0}.get(base)
-        if baryonIndex is None:
-            ValueError('Gauge boson "%s" does not have a defined intid.' % (self.id))
+        gaugeBosonIndex = {'photon': 0}.get(base)
+        if gaugeBosonIndex is None:
+            raise ValueError('Gauge boson "%s" does not have a defined intid.' % (self.id))
 
-        return 2**30
+        return intIdModule.intidHelper(anti, intIdModule.Family.gaugeBoson, gaugeBosonIndex)
 
 class Suite( particleModule.Suite ) :
 

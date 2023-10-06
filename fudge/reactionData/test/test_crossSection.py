@@ -155,9 +155,15 @@ class TestCrossSection( unittest.TestCase ):
 
     def test_check(self):
         from pqu import PQU
-        info = {'Q':1.0,'kinematicFactor':1.0,'dThreshold':PQU.PQU('1e-4 b'),
-                'crossSectionEnergyMin':PQU.PQU('1.0e-5 eV'), 'crossSectionEnergyMax':PQU.PQU('20.0 MeV'),
-                'CoulombChannel':False}
+        info = {
+            'Q': 1.0,
+            'kinematicFactor': 1.0,
+            'dThreshold': PQU.PQU('1e-4 b'),
+            'crossSectionEnergyMin': PQU.PQU('1.0e-5 eV'),
+            'crossSectionEnergyMax': PQU.PQU('20.0 MeV'),
+            'CoulombChannel': False,
+            'ContinuumOutputChannel': False
+            }
         self.assertEqual( self.xs_const.check(info), [] )
 
     def test_xml_output(self):

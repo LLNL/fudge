@@ -119,7 +119,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
 
     # principal scattering atom:
     atom1 = self.getPrimaryScatterer()
-    freeAtomCrossSection = atom1.boundAtomCrossSection.value * atom1.mass.value**2 / (atom1.mass.value + neutronMass)
+    freeAtomCrossSection = atom1.boundAtomCrossSection.value * (atom1.mass.value / (atom1.mass.value + neutronMass))**2
     endf += [endfFormatsModule.endfDataLine( [freeAtomCrossSection * atom1.numberPerMolecule,
         atom1.e_critical.value, atom1.mass.value / neutronMass, atom1.e_max.value, 0, atom1.numberPerMolecule] )]
     for atom in list(self.scatteringAtoms):
@@ -129,7 +129,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
             incoherentInelastic.FreeGasApproximation: 1.0
             # note: 'diffusive motion' (a1 = 2.0) appears to be unused and isn't supported by GNDS-2.0
         }[type(atom.selfScatteringKernel.kernel)]
-        freeAtomCrossSection = atom.boundAtomCrossSection.value * atom.mass.value**2 / (atom.mass.value + neutronMass)
+        freeAtomCrossSection = atom.boundAtomCrossSection.value * (atom.mass.value / (atom.mass.value + neutronMass))**2
         endf += [endfFormatsModule.endfDataLine( [a1, freeAtomCrossSection * atom.numberPerMolecule,
             atom.mass.value / neutronMass, 0, 0, atom.numberPerMolecule] )]
 

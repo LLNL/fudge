@@ -50,3 +50,7 @@ familiarDeuteron = 'd'
 familiarTriton = 't'
 familiarHelion = 'h'
 familiarAlpha = 'a'
+
+# Special legacy ENDL fission products.
+FissionProductENDL99120 = 'FissionProductENDL99120'
+FissionProductENDL99125 = 'FissionProductENDL99125'

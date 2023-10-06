@@ -61,6 +61,7 @@
 
 <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">miscModule</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsModule</span>
 
 <span class="n">chemicalElementZSymbolNames</span> <span class="o">=</span> <span class="p">(</span>
     <span class="p">(</span>   <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span>  <span class="s2">&quot;Hydrogen&quot;</span> <span class="p">),</span>      <span class="p">(</span>   <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;He&quot;</span><span class="p">,</span> <span class="s2">&quot;Helium&quot;</span> <span class="p">),</span>        <span class="p">(</span>   <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Li&quot;</span><span class="p">,</span> <span class="s2">&quot;Lithium&quot;</span> <span class="p">),</span>
@@ -242,10 +243,10 @@
             <span class="n">Z</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">A</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="p">(</span> <span class="n">unorthodoxModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;FissionProductENDL99120&#39;</span> <span class="o">==</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">FissionProductENDL99120</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">Z</span> <span class="o">=</span> <span class="mi">99</span>
             <span class="n">A</span> <span class="o">=</span> <span class="mi">120</span>
-        <span class="k">elif</span><span class="p">(</span> <span class="s1">&#39;FissionProductENDL99125&#39;</span> <span class="o">==</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">FissionProductENDL99125</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">Z</span> <span class="o">=</span> <span class="mi">99</span>
             <span class="n">A</span> <span class="o">=</span> <span class="mi">125</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">charge</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -274,9 +275,9 @@
 
     <span class="kn">import</span> <span class="nn">re</span>
 
-    <span class="k">if</span>   <span class="n">particleName</span> <span class="o">==</span> <span class="s1">&#39;FissionProductENDL99120&#39;</span><span class="p">:</span>
+    <span class="k">if</span>   <span class="n">particleName</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">FissionProductENDL99120</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">99120</span><span class="p">,</span> <span class="mi">0</span>
-    <span class="k">elif</span> <span class="n">particleName</span> <span class="o">==</span> <span class="s1">&#39;FissionProductENDL99125&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">particleName</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">FissionProductENDL99125</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">125</span><span class="p">,</span> <span class="mi">99125</span><span class="p">,</span> <span class="mi">0</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">particleName</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">particleName</span> <span class="o">=</span> <span class="n">particleName</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(</span> <span class="p">)</span>

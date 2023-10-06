@@ -161,7 +161,7 @@
 
     <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
-    <span class="k">def</span> <span class="nf">_div__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__div__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns a new series that is each coefficient of self divided by value. Value must be convertible to a float.&#39;&#39;&#39;</span>
 
         <span class="n">value_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -170,20 +170,25 @@
             <span class="n">c_ls</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">/=</span> <span class="n">value</span>
         <span class="k">return</span> <span class="n">c_ls</span> 
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if self and other have the same coefficients, domain and lowerIndex.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">areDomainsMutual</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerIndex</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lowerIndex</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">coefficients</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string representation of the coefficients of self.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">c_l</span> <span class="k">for</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">c_l</span> <span class="k">for</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">])</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span>
 
     <span class="nd">@coefficients</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="nb">float</span><span class="p">,</span> <span class="n">coefficients</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Series1d.areDomainsMutual"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.areDomainsMutual">[docs]</a>    <span class="k">def</span> <span class="nf">areDomainsMutual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>

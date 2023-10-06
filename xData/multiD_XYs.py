@@ -263,42 +263,42 @@ class XYsnd( baseModule.XDataFunctional ) :
         if extrapolation not in enumsModule.Extrapolation:
             raise ValueError( 'Invalid extrapolation outerDomainValue = "%s"' % extrapolation )
         position, function1, function2, frac, interpolation, interpolationQualifier2 = self.getBoundingSubFunctions( domainValue )
-        if( function2 is not None and function1.interpolation != function2.interpolation ) : 
-            raise NotImplementedError( "Interpolation between two functions with different interpolation rules" )
         if( position is None ) : raise Exception( "No data to interpolate" )
 
         fracRel = frac
-        if function2 is not None: fracRel = abs((function1.outerDomainValue / function2.outerDomainValue - 1))
+        if function2 is not None: fracRel = abs(function1.outerDomainValue / function2.outerDomainValue - 1)
         fracRel = min(frac, fracRel)
 
-        if( fracRel <= epsilon ) :             # If close to first point pick it.
-            function = function1.copy( )
-        elif( abs( 1 - fracRel ) <= epsilon ) :     # If close to second point pick it.
-            function = function2.copy( )
+        if fracRel <= epsilon:                # If close to first point pick it.
+            function = function1.copy()
+        elif abs(1 - fracRel) <= epsilon:     # If close to second point pick it.
+            function = function2.copy()
         else :
-            if( position in ( '=', '<', '>' ) ) :
-                if( position != '=' ) :
+            if position in ('=', '<', '>'):
+                if position != '=':
                     if extrapolation != enumsModule.Extrapolation.flat:
                         index = { '<' : 0, '>' : -1 }[position]
                         raise Exception( "evaluation point = %s %s than %s" % 
-                                ( outerDomainValue, { '<' : 'less', '>' : 'greater' }[position], self[index].outerDomainValue ) )
-                function = function1.copy( )
-            else :
+                                (outerDomainValue, { '<' : 'less', '>' : 'greater' }[position], self[index].outerDomainValue))
+                function = function1.copy()
+            else:
                 if isinstance(function1, series1dModule.Series1d):
                     function = ( 1.0 - frac ) * function1 + frac * function2
                     function.outerDomainValue = outerDomainValue
                     return function
                 else:
-                    if( not( isinstance( function1, XYs1dModule.XYs1d ) ) ) :      # FIXME, accuracy, lowerEps and upperEps should not be hardwired.
-                        if( hasattr( function1, 'toPointwiseLinear' ) ) :
-                            function1 = function1.toPointwiseLinear( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
-                        else :
-                            function1 = function1.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
-                    if( not( isinstance( function2, XYs1dModule.XYs1d ) ) ) :
-                        if( hasattr( function1, 'toPointwiseLinear' ) ) :
-                            function2 = function2.toPointwiseLinear( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
-                        else :
+                    if not isinstance(function1, XYs1dModule.XYs1d):      # FIXME, accuracy, lowerEps and upperEps should not be hardwired.
+                        if hasattr(function1, 'toPointwiseLinear'):
+                            function1 = function1.toPointwiseLinear(accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6)
+                        else:
+                            function1 = function1.toPointwise_withLinearXYs(accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6)
+                    if not isinstance(function2, XYs1dModule.XYs1d):
+                        if hasattr(function1, 'toPointwiseLinear'):
+                            function2 = function2.toPointwiseLinear(accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6)
+                        else:
                             function2 = function2.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
+                    if function1.interpolation != function2.interpolation:
+                        raise NotImplementedError("Interpolation between two functions with different interpolation rules")
                     if interpolationQualifier == enumsModule.InterpolationQualifier.unitBase: 
                         if( function1.dimension == 1 ) :
                             if (self.interpolation == enumsModule.Interpolation.linlin):

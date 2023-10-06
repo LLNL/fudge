@@ -53,7 +53,10 @@ class ProbabilityTableGenerator:
         self.reactionSuite = reactionSuite
         self.RRR = None
         if self.reactionSuite.resonances.resolved:
-            self.RRR = self.reactionSuite.resonances.resolved.evaluated.copy()
+            # FIXME hacky way to copy
+            original = self.reactionSuite.resonances.resolved.evaluated
+            self.RRR = original.__class__.parseXMLString(original.toXML())
+            self.RRR.setAncestor(original.ancestor)
         self.URR = reconstructResonances.URRcrossSection(reactionSuite.resonances.unresolved.evaluated)
 
         # currently always use SLBW for URR
@@ -323,14 +326,15 @@ class ProbabilityTableGenerator:
         """
 
         if plotSamples:
-            from matplotlib import pyplot as plt
+            from matplotlib import pyplot
             if not os.path.isdir(plotDir):
                 os.mkdir(plotDir)
 
         if temperatures is None:
             temperatures = [0]
+
         temperaturesEnergy = sorted(
-            [PQUModule.PQU(T, temperatureUnit + '*k').getValueAs(self.URR.energyUnit) for T in temperatures])
+            [PQUModule.PQU(T, temperatureUnit).getValueAs(f'{self.URR.energyUnit}/k') for T in temperatures])
 
         # Initialize the widths, DOFs and level spacings.
         # Also setup the main egrid for cross section reconstruction.
@@ -433,17 +437,7 @@ class ProbabilityTableGenerator:
 
         self.patchLimits = patchLimits
 
-        # Loop through the samples to build the PDFs
-        parameterRealizations = []
-        crossSectionSamples = []
-        thePDFs = {T: {} for T in temperatures}
-
-        theProbabilityTables = {
-            'egrid': egrid,
-            'samplePoints': [None] * len(patchLimits),
-            'temperatures': {T: {} for T in temperatures}
-        }
-
+        # <editor-fold desc="helper functions" defaultstate="collapsed">
         def smoothPDF(pdf, maxPoints=200):
             """
             Ruthlessly smooth pdf to desired number of points by integrating over intervals.
@@ -490,19 +484,32 @@ class ProbabilityTableGenerator:
                     newPDFs.setdefault(T, {})[rxn] = probabilityTable
 
             return newPDFs
+        # </editor-fold>
 
         if nSamples == 0:
             return  # go through setup but don't draw any samples, useful for debugging
 
+        # Loop through the samples to build PTs and optionally PDFs
+        parameterRealizations = []
+        crossSectionRealizations = []
+        crossSectionSamples = {}
+        thePDFs = {T: {} for T in temperatures}
+
+        sampleTimer = time.time()
         for iSample in range(nSamples):
-            print("Sample %d of %d" % (iSample + 1, nSamples))
+            elapsed = ""
+            if iSample > 0:
+                elapsed = f", {time.time() - sampleTimer:.1f}s elapsed"
+
+            print("Sample %d of %d%s" % (iSample + 1, nSamples, elapsed))
+            sampleTimer = time.time()
 
             # random points where cross section will be sampled:
             samplePoints = numpy.sort(numpy.random.random(10000))
 
             # Generate a realization of the resonances
             start = time.time()
-            thisSample = self.sampleRR(lastResonances, style=style, lowerBound=self.lowerBound, verbose=verbose)
+            thisSample = self.sampleRR(lastResonances, style=style, lowerBound=self.lowerBound, verbose=verbose>1)
 
             # convert sample into GNDS resolved resonance:
             # FIXME currently only works for BreitWigner
@@ -524,7 +531,8 @@ class ProbabilityTableGenerator:
             combinedData.sort(key=lambda res: res[0])
             combinedTable = tableModule.Table(columns=columnHeaders, data=combinedData)
 
-            parameterRealizations.append(combinedData)
+            if debugFile is not None:
+                parameterRealizations.append(combinedData)
 
             # FIXME following necessary since BreitWigner and URR use different naming conventions:
             renameColumns = {
@@ -572,7 +580,7 @@ class ProbabilityTableGenerator:
 
             zeroK_xscs = resonanceReconstructor.getCrossSection(revisedGrid)
             if verbose:
-                print("  reconstructed at 0 K, elapsed time = %.3fs" % (time.time() - start))
+                print("  reconstructed %d points at 0 K, elapsed time = %.3fs" % (len(egridNow), time.time() - start))
 
             # convert to XYs1d
             zeroK_xscs = {key: crossSectionModule.XYs1d(
@@ -602,15 +610,15 @@ class ProbabilityTableGenerator:
                 zeroK_xscs['total'] = resummed
 
             if iSample < plotSamples:
-                crossSectionSamples.append(zeroK_xscs)
+                crossSectionRealizations.append(zeroK_xscs)
 
             if plotSamples and iSample == plotSamples - 1:  # plot zero-K realizations
                 figs = []
-                for reaction in crossSectionSamples[0].keys():
-                    if crossSectionSamples[0][reaction].rangeMax == 0:
+                for reaction in crossSectionRealizations[0].keys():
+                    if crossSectionRealizations[0][reaction].rangeMax == 0:
                         continue
-                    fig, ax = plt.subplots(figsize=(10,6))
-                    for ridx, sample in enumerate(crossSectionSamples):
+                    fig, ax = pyplot.subplots(figsize=(10,6))
+                    for ridx, sample in enumerate(crossSectionRealizations):
                         ax.loglog(*sample[reaction].copyDataToXsAndYs(), label=str(ridx), linewidth=0.5)
                     if self.reactionSuite.getReaction(reaction):
                         ax.loglog(*self.reactionSuite.getReaction(
@@ -624,91 +632,20 @@ class ProbabilityTableGenerator:
                     fig.savefig(os.path.join(plotDir, "%s.png" % reaction))
                     figs.append(fig)
                 if debug:
-                    plt.show()
+                    pyplot.show()
                 for fig in figs:
-                    plt.close(fig)
+                    pyplot.close(fig)
 
             # next step: divide 0K cross sections into small regions, heat each region to desired temperature(s)
             # convert result to pdf(crossSection) and add to 'running total' pdf
 
-            def heatAndMakePDFs(xs, ys, temperaturesEnergy, domainMin, domainMax, massRatio, **plotOptions):
-                """
-                Called for each cross section / incident energy range.
-                Heats to all desired temperatures and computes pdf(crossSection) at each temperature.
-                """
-                initialXsc = crossSectionModule.XYs1d(
-                    axes=crossSectionModule.defaultAxes(self.URR.energyUnit),
-                    data=(xs, ys), dataForm="XsAndYs")
-
-                initialTemperature = 0
-                results = []
-                figs = []
-                for nextTemp in temperaturesEnergy:
-                    heatedXsc = initialXsc.heat(initialTemperature, nextTemp, massRatio, EMin=PQUModule.PQU(1e-5, 'eV'),
-                                                lowerlimit='constant', upperlimit=None, interpolationAccuracy=0.001,
-                                                heatAllPoints=False, doNotThin=True,
-                                                heatBelowThreshold=True, heatAllEDomain=True, setThresholdToZero=False)
-
-                    xscSamplePoints = domainMin + samplePoints * (domainMax - domainMin)
-                    xscVals = [heatedXsc.evaluate(x) for x in xscSamplePoints]
-                    pdfNow = None
-                    if makePDFs:
-                        pdfNow = heatedXsc.pdfOfY(epsilon=1e-8, domainMin=domainMin, domainMax=domainMax)
-                    results.append((xscVals, pdfNow))
-
-                    if makePDFs and plotOptions:
-                        fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
-                        ax[0].semilogy(*heatedXsc.copyDataToXsAndYs())
-                        ax[0].set_xlabel("Incident energy (%s)" % plotOptions['energyUnit'])
-                        ax[0].set_ylabel("Cross section (b)")
-                        ax[0].axvline(domainMin, color='r', linewidth=1)
-                        ax[0].axvline(domainMax, color='r', linewidth=1)
-
-                        if 'elastic' in plotOptions['title'] or 'total' in plotOptions['title']:
-                            c1 = ax[1].semilogy(*pdfNow.copyDataToXsAndYs(), label="pdf")
-                        else:
-                            c1 = ax[1].loglog(*pdfNow.copyDataToXsAndYs(), label="pdf")
-                        ax[1].set_xlabel("Cross section (b)")
-                        ax[1].set_ylabel("PDF(crossSection)")
-                        ax2 = ax[1].twinx()
-                        ax2.set_ylabel("CDF(crossSection)")
-                        cdfNow = pdfNow.indefiniteIntegral()
-                        if 'elastic' in plotOptions['title'] or 'total' in plotOptions['title']:
-                            c2 = ax2.plot(*cdfNow.copyDataToXsAndYs(), color="g", label="cdf")
-                        else:
-                            c2 = ax2.semilogx(*cdfNow.copyDataToXsAndYs(), color="g", label="cdf")
-                        curves = c1 + c2
-                        ax[1].legend(curves, [c.get_label() for c in curves], loc=7)
-
-                        fig.suptitle("%s - %g %s/k" % (plotOptions['title'], nextTemp, plotOptions['energyUnit']))
-                        fig.tight_layout()
-                        fig.subplots_adjust(top=0.93)
-                        fig.savefig(
-                            "%s_%g_%s_per_k.png" % (plotOptions['savePrefix'], nextTemp, plotOptions['energyUnit']))
-                        figs.append(fig)
-
-                    # heat incrementally rather than restarting at 0K each time:
-                    initialTemperature = nextTemp
-                    initialXsc = heatedXsc
-
-                if plotOptions and debug:
-                    plt.show()
-                for fig in figs:
-                    plt.close(fig)
-
-                return results
-
-            def unpackResults(index, label, results):
+            def unpackResults(iSample, index, label, results):
                 """
                 heatAndMakePDFs returns a list containing a pdfOfY and probTable at each temperature.
                 Unpack those and add them to thePDFs and theProbabilityTables
                 """
-                for temperature, (resultPT, resultPDF) in zip(temperatures, results):
-                    patches = theProbabilityTables['temperatures'][temperature].setdefault(label, [None] * len(patchLimits))
-                    if patches[index] is None:  # 1st realization
-                        patches[index] = [resultPT]
-                    else:
-                        patches[index].append(resultPT)
+                for tidx, (temperature, (resultPT, resultPDF)) in enumerate(zip(temperatures, results)):
+                    crossSectionSamples[label][index, tidx, iSample] = resultPT
 
                     if makePDFs:
                         patches = thePDFs[temperature].setdefault(label, [None] * len(patchLimits))
@@ -729,17 +666,25 @@ class ProbabilityTableGenerator:
             if 'fission' in zeroK_xscs and zeroK_xscs['fission'].rangeMax == 0:
                 reactionsToHeat.discard('fission')
 
-            # save incident energy grids for each realization (for debugging only)
-            for index, (Elo_heating, Elo, Ehi, Ehi_heating) in enumerate(patchLimits):
-                if theProbabilityTables['samplePoints'][index] is None:
-                    theProbabilityTables['samplePoints'][index] = []
-                theProbabilityTables['samplePoints'][index].append(
-                    Elo + samplePoints * (Ehi - Elo) 
-                )
+            if iSample == 0:
+                for reaction in reactionsToHeat:
+                    # allocate arrays for storing sampled cross sections
+                    crossSectionSamples[reaction] = numpy.zeros((len(egrid), len(temperatures), nSamples, len(samplePoints)))
+
+            if debugFile is not None:
+                # save incident energy grids for each realization (for debugging only)
+                if 'samplePoints' not in crossSectionSamples:
+                    crossSectionSamples['samplePoints'] = [None] * len(patchLimits)
+
+                for index, (Elo_heating, Elo, Ehi, Ehi_heating) in enumerate(patchLimits):
+                    if crossSectionSamples['samplePoints'][index] is None:
+                        crossSectionSamples['samplePoints'][index] = []
+                    crossSectionSamples['samplePoints'][index].append(
+                        Elo + samplePoints * (Ehi - Elo)
+                    )
 
             parameters = [(index, label, Elo_heating, Elo, Ehi, Ehi_heating) for index, (Elo_heating, Elo, Ehi, Ehi_heating) in enumerate(patchLimits)
                           for label in reactionsToHeat]
-            njobs = len(parameters)
 
             plotOptions = {}
             if iSample < plotSamples:  # plot realizations
@@ -754,69 +699,35 @@ class ProbabilityTableGenerator:
 
                     xs, ys = zeroK_xscs[label].domainSlice(Elo_heating, Ehi_heating).copyDataToXsAndYs()
                     results = heatAndMakePDFs(xs, ys, temperaturesEnergy, Elo, Ehi, self.massRatio, **plotOptions)
-                    unpackResults(index, label, results)
+                    unpackResults(iSample, index, label, results)
 
             else:
-                from multiprocessing import Process, Queue
+                import multiprocessing
                 from fudge.defaults import numTasks
-                queue = Queue()
+                numTasks = numTasks // 2
 
-                # helper functions for running in parallel:
-                def runAndEnqueue(queue, index, label, xs, ys, temperaturesEnergy, domainMin, domainMax, massRatio,
-                                  plotOptions):
-                    try:
-                        results = heatAndMakePDFs(xs, ys, temperaturesEnergy, domainMin, domainMax, massRatio,
-                                                  **plotOptions)
-                        queue.put((index, label, results))
-                    except Exception as err:
-                        print(f"Error encountered for heatAndMakePDFs for {index}, {label}, {domainMin}, {domainMax}, {xs[:4]}, {xs[-4:]}")
-                        queue.put((index, label, err))
+                pool = multiprocessing.Pool(processes=numTasks)
+                tasks = []
 
-                def startJob(job_index):
-                    index, label, Elo_heating, Elo, Ehi, Ehi_heating = parameters[job_index]
+                for index, label, Elo_heating, Elo, Ehi, Ehi_heating in parameters:
                     if plotOptions:
                         plotOptions['title'] = "%s patch %d" % (label, index)
                         plotOptions['savePrefix'] = os.path.join(plotDir, "r%d_patch%d_%s" % (iSample, index, label))
 
                     xs, ys = zeroK_xscs[label].domainSlice(Elo_heating, Ehi_heating).copyDataToXsAndYs()
-                    p = Process(target=runAndEnqueue, args=(queue, index, label, xs, ys, temperaturesEnergy, Elo, Ehi, self.massRatio, plotOptions))
-                    p.start()
-                    return p
+                    tasks.append(pool.apply_async(
+                        heatAndMakePDFs,
+                        (xs, ys, temperaturesEnergy, Elo, Ehi, self.URR.energyUnit, samplePoints, self.massRatio, makePDFs),
+                        plotOptions))
 
-                job_index = 0
-                jobs = []
-                for i1 in range(min(njobs, numTasks)):
-                    jobs.append(startJob(job_index))
-                    job_index += 1
-
-                done = 0
-                errors = []
-                while (done < njobs):
-                    while not queue.empty():
-                        index, label, results = queue.get()
-                        if isinstance(results, Exception):
-                            print("Error encountered in child process!")
-                            errors.append(results)
-                            continue
-
-                        unpackResults(index, label, results)
-                    new_jobs = []
-                    for process in jobs:
-                        if process.is_alive():
-                            new_jobs.append(process)
-                        else:
-                            done += 1
-                            if process.exitcode != 0:
-                                print("Job failed!")
-                            if job_index < njobs:
-                                new_jobs.append(startJob(job_index))
-                                job_index += 1
-                    time.sleep(0.5)
-                    jobs = new_jobs
-
+                [t.wait() for t in tasks]
+                errors = [task for task in tasks if not task.successful()]
                 if len(errors) > 0:
                     print("%d child processes failed:" % len(errors))
-                    raise errors[0]
+                    raise errors[0].get()[-1]
+
+                for p, task in zip(parameters, tasks):
+                    unpackResults(iSample, p[0], p[1], task.get())
 
             if False and iSample % 10 == 0:  # save intermediate results for debugging
                 outDir = os.path.join(plotDir, "intermediateResults")
@@ -832,34 +743,20 @@ class ProbabilityTableGenerator:
             if verbose:
                 print("  heat and accumulate probabilities, elapsed time = %.3fs\n" % (time.time() - start))
 
-        # convert probability table samples to numpy arrays for convenience
-        for key in ('egrid', 'samplePoints'):
-            theProbabilityTables[key] = numpy.array(theProbabilityTables[key])
-        for temperature in theProbabilityTables['temperatures'].values():
-            for label in temperature:
-                temperature[label] = numpy.array(temperature[label])
-
-        if debugFile is not None:
-            theProbabilityTables['parameterRealizations'] = parameterRealizations
-            import pickle
-            with open(debugFile, "wb") as fout:
-                pickle.dump(theProbabilityTables, fout)
-
-        def genPTs(egrid, theProbabilityTables, normalize=True):
+        def genPTs(egrid, crossSectionSamples, normalize, nbins=50):
             resultPTs = {}
-            nbins = 50
             probs = [1 / nbins] * nbins
-            for temperature, probTable in theProbabilityTables['temperatures'].items():
-                resultPTs[temperature] = []
-                for eidx, incidentEnergy in enumerate(egrid):
-                    total = probTable['total'][eidx].flatten()
+            for eidx, incidentEnergy in enumerate(egrid):
+                for tidx, temperature in enumerate(temperatures):
+                    resultPTs[temperature] = []
+                    total = crossSectionSamples['total'][eidx][tidx].flatten()
                     order = numpy.argsort(total)
                     # sort all reactions in ascending order by total cross section:
                     total = total[order]
                     conditionals = {}
-                    for key in probTable:
+                    for key in crossSectionSamples:
                         if key == 'total': continue
-                        conditionals[key] = probTable[key][eidx].flatten()[order]
+                        conditionals[key] = crossSectionSamples[key][eidx][tidx].flatten()[order]
 
                     step = len(total) // nbins
                     PTs = {'total': []}
@@ -877,13 +774,99 @@ class ProbabilityTableGenerator:
             
             return resultPTs
 
-        resultPTs = genPTs(egrid, theProbabilityTables, normalize=True)
+        # FIXME: should only normalize if 'useForSelfShieldingOnly' flag is set, but need to check downstream tools first
+        #normalize = self.URR.URR.useForSelfShieldingOnly
+        normalize = True
+        resultPTs = genPTs(egrid, crossSectionSamples, normalize=normalize)
         if makePDFs:
-            thePDFs = to_XYs2ds(thePDFs, normalize=True, smooth=True)
+            thePDFs = to_XYs2ds(thePDFs, normalize=normalize, smooth=True)
 
         # all realizations complete, return probability tables and optionally cross section PDFs
         result = {
+            'normalize': normalize,
             'probabilityTables': resultPTs,
             'pdfs': thePDFs
         }
+
+        if debugFile is not None:
+            crossSectionSamples['egrid'] = numpy.array(egrid)
+            crossSectionSamples['samplePoints'] = numpy.array(crossSectionSamples['samplePoints'])
+            crossSectionSamples['parameterRealizations'] = parameterRealizations
+            import pickle
+            with open(debugFile, "wb") as fout:
+                pickle.dump(crossSectionSamples, fout)
+
         return result
+
+
+# Function must be declared at module level for use in multiprocessing.Pool.apply_async:
+def heatAndMakePDFs(xs, ys, temperaturesEnergy, domainMin, domainMax, energyUnit, samplePoints, massRatio,
+                    makePDFs, **plotOptions):
+    """
+    Called for each cross section / incident energy range.
+    Heats to all desired temperatures and draws cross section samples for probability table generation.
+    Also optionally computes pdf(crossSection) at each temperature.
+    """
+    if plotOptions:
+        from matplotlib import pyplot
+
+    initialXsc = crossSectionModule.XYs1d(
+        axes=crossSectionModule.defaultAxes(energyUnit),
+        data=(xs, ys), dataForm="XsAndYs")
+
+    initialTemperature = 0
+    xscSamplePoints = domainMin + samplePoints * (domainMax - domainMin)
+    results = []
+    figs = []
+    for nextTemp in temperaturesEnergy:
+        heatedXsc = initialXsc.heat(initialTemperature, nextTemp, massRatio, EMin=PQUModule.PQU(1e-5, 'eV'),
+                                    lowerlimit='constant', upperlimit=None, interpolationAccuracy=0.001,
+                                    heatAllPoints=False, doNotThin=True,
+                                    heatBelowThreshold=True, heatAllEDomain=True, setThresholdToZero=False)
+
+        xscVals = [heatedXsc.evaluate(x) for x in xscSamplePoints]
+        pdfNow = None
+        if makePDFs:
+            pdfNow = heatedXsc.pdfOfY(epsilon=1e-8, domainMin=domainMin, domainMax=domainMax)
+        results.append((xscVals, pdfNow))
+
+        if makePDFs and plotOptions:
+            fig, ax = pyplot.subplots(nrows=1, ncols=2, figsize=(14, 6))
+            ax[0].semilogy(*heatedXsc.copyDataToXsAndYs())
+            ax[0].set_xlabel("Incident energy (%s)" % plotOptions['energyUnit'])
+            ax[0].set_ylabel("Cross section (b)")
+            ax[0].axvline(domainMin, color='r', linewidth=1)
+            ax[0].axvline(domainMax, color='r', linewidth=1)
+
+            if 'elastic' in plotOptions['title'] or 'total' in plotOptions['title']:
+                c1 = ax[1].semilogy(*pdfNow.copyDataToXsAndYs(), label="pdf")
+            else:
+                c1 = ax[1].loglog(*pdfNow.copyDataToXsAndYs(), label="pdf")
+            ax[1].set_xlabel("Cross section (b)")
+            ax[1].set_ylabel("PDF(crossSection)")
+            ax2 = ax[1].twinx()
+            ax2.set_ylabel("CDF(crossSection)")
+            cdfNow = pdfNow.indefiniteIntegral()
+            if 'elastic' in plotOptions['title'] or 'total' in plotOptions['title']:
+                c2 = ax2.plot(*cdfNow.copyDataToXsAndYs(), color="g", label="cdf")
+            else:
+                c2 = ax2.semilogx(*cdfNow.copyDataToXsAndYs(), color="g", label="cdf")
+            curves = c1 + c2
+            ax[1].legend(curves, [c.get_label() for c in curves], loc=7)
+
+            fig.suptitle("%s - %g %s/k" % (plotOptions['title'], nextTemp, plotOptions['energyUnit']))
+            fig.tight_layout()
+            fig.subplots_adjust(top=0.93)
+            fig.savefig(
+                "%s_%g_%s_per_k.png" % (plotOptions['savePrefix'], nextTemp, plotOptions['energyUnit']))
+
+        # heat incrementally rather than restarting at 0K each time:
+        initialTemperature = nextTemp
+        initialXsc = heatedXsc
+
+    if plotOptions and debug:
+        pyplot.show()
+    for fig in figs:
+        pyplot.close(fig)
+
+    return results

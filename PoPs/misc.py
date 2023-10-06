@@ -22,6 +22,25 @@ def toLimitedString( object, maxLength = maxLength ) :
     if( len( string ) <= maxLength ) : return( string )
     return( string[:maxLength-4] + ' ...' )
 
+def parseParticleList(particleList):
+    '''
+    Breaks a particle list where each particle id can have a leading integer multiplicity into an equivalen list of 
+    particle ids.  That is, each particle in *particleList* to be of the form "id" or "#id" where "#" is an integer.
+    Examples of the form "#id" include "2n" and "3n". For example, the paticle list ["2n", "Pu238"] is returned as ["n", "n", "Pu238"].
+    '''
+
+    particles = []
+    for outgoingParticle in particleList:
+        outgoingParticleId = outgoingParticle.lstrip('0123456789')
+        multiplicity = outgoingParticle[:len(outgoingParticle)-len(outgoingParticleId)]
+        if multiplicity == '':
+            multiplicity = 1;
+        multiplicity = int(multiplicity)
+        particles += multiplicity * [outgoingParticleId]
+
+    return particles
+
+
 def baseAntiQualifierFromID( id, qualifierAllowed = False ) :
 
     if( not( isinstance( id, str ) ) ) : raise TypeError( 'id is not a str: %s' % type( id ) )

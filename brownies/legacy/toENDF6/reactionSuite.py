@@ -294,10 +294,11 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
         except Exception:
             print('Could not extract NVER/LREL/NMOD from version "%s". Defaulting to "0"' % version)
             NVER, LREL, NMOD = 0,0,0
-        NLIB = { "ENDF/B" :  0,     "ENDF/A" :  1,      "JEFF"                 :  2,    "EFF"      :  3,    "ENDF/B (HE)" :  4,
-                 "CENDL"  :  5,     "JENDL"  :  6,      "SG-23"                : 21,    "INDL/V"   : 31,    "INDL/A"      : 32,
-                 "FENDL"  : 33,     "IRDF"   : 34,      "BROND (IAEA version)" : 35,    "INGDB-90" : 36,    "FENDL/A"     : 37,
-                 "BROND"  : 41 }.get( library, -1 )
+
+        NLIB = -1
+        for key, value in endf_endlModule.NLIBs.items():
+            if value == library:
+                NLIB = key
 
     NFOR = 6    # ENDF-6 format
     NSUB = 10 * IPART + ITYPE
@@ -328,32 +329,28 @@ def addDecayGamma(reactionSuite, particle, baseMT, endfMFList, flags, targetInfo
     MF = 12
     LP = 0
     MT = baseMT + particle.index
-    doMT = False
-    for reaction in reactionSuite.reactions:
-        if reaction.ENDF_MT == MT: doMT = True
-    if doMT:
-        gammaData = []
-        levelEnergy_eV = particle.energy[0].float( 'eV' )
-        for decayMode in particle.decayData.decayModes :
-            IDs = [ product.pid for decay in decayMode.decayPath for product in decay.products ]
-            IDs.remove( IDsPoPsModule.photon )
-            if( len( IDs ) != 1 ) : raise Exception( 'Do not know how to handle this.' )
-            probability = decayMode.probability[0].value
-            finalEnergy_eV = reactionSuite.PoPs[IDs[0]].energy[0].float( 'eV' )
-            _data = [finalEnergy_eV, probability]
-            if decayMode.photonEmissionProbabilities:
-                _data.append( decayMode.photonEmissionProbabilities[0].value )
-            gammaData.append( _data )
+    gammaData = []
+    levelEnergy_eV = particle.energy[0].float( 'eV' )
+    for decayMode in particle.decayData.decayModes :
+        IDs = [ product.pid for decay in decayMode.decayPath for product in decay.products ]
+        IDs.remove( IDsPoPsModule.photon )
+        if( len( IDs ) != 1 ) : raise Exception( 'Do not know how to handle this.' )
+        probability = decayMode.probability[0].value
+        finalEnergy_eV = reactionSuite.PoPs[IDs[0]].energy[0].float( 'eV' )
+        _data = [finalEnergy_eV, probability]
+        if decayMode.photonEmissionProbabilities:
+            _data.append( decayMode.photonEmissionProbabilities[0].value )
+        gammaData.append( _data )
 
-        gammaData.sort( reverse = True )
-        nGammas = len( gammaData )
-        LGp = len( gammaData[0] )
-        endfMFList[MF][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 2, LGp - 1, MT - baseMT, 0 ),
-            endfFormatsModule.endfHeadLine( levelEnergy_eV, 0., LP, 0, LGp * nGammas, nGammas ) ]
+    gammaData.sort( reverse = True )
+    nGammas = len( gammaData )
+    LGp = len( gammaData[0] )
+    endfMFList[MF][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 2, LGp - 1, MT - baseMT, 0 ),
+        endfFormatsModule.endfHeadLine( levelEnergy_eV, 0., LP, 0, LGp * nGammas, nGammas ) ]
 
-        endfMFList[MF][MT] += endfFormatsModule.endfNdDataList( gammaData )
-        endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
+    endfMFList[MF][MT] += endfFormatsModule.endfNdDataList( gammaData )
+    endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
 
-            # Currently, assume all distributions are isotropic
-        endfMFList[14][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 1, 0, nGammas, 0 ) ]
-        endfMFList[14][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
+    # Currently, assume all distributions are isotropic
+    endfMFList[14][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 1, 0, nGammas, 0 ) ]
+    endfMFList[14][MT].append( endfFormatsModule.endfSENDLineNumber( ) )

@@ -22,6 +22,7 @@ import math
 
 from pqu import PQU as PQUModule
 from .. import misc as miscModule
+from .. import IDs as IDsModule
 
 chemicalElementZSymbolNames = (
     (   1, "H",  "Hydrogen" ),      (   2, "He", "Helium" ),        (   3, "Li", "Lithium" ),
@@ -203,10 +204,10 @@ def ZAInfo( particle ) :
             Z = 1
             A = 1
     elif( isinstance( particle, ( unorthodoxModule.Particle, ) ) ) :
-        if( 'FissionProductENDL99120' == particle.id ) :
+        if( particle.id == IDsModule.FissionProductENDL99120 ) :
             Z = 99
             A = 120
-        elif( 'FissionProductENDL99125' == particle.id ) :
+        elif( particle.id == IDsModule.FissionProductENDL99125 ) :
             Z = 99
             A = 125
         elif len(particle.charge) > 0:
@@ -235,9 +236,9 @@ def ZAInfo_fromString( particleName ):
 
     import re
 
-    if   particleName == 'FissionProductENDL99120':
+    if   particleName == IDsModule.FissionProductENDL99120:
         return 99, 120, 99120, 0
-    elif particleName == 'FissionProductENDL99125':
+    elif particleName == IDsModule.FissionProductENDL99125:
         return 99, 125, 99125, 0
 
     if( len( particleName ) > 1 ) : particleName = particleName.capitalize( )

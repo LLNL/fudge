@@ -219,37 +219,41 @@ class DiscretePrimaryGamma( Subform ) :
         else:
             return cls(value, domainMin, domainMax, axes=axes)
 
-    def getEnergyArray( self, EMin = None, EMax = None ) :
+    def getEnergyArray(self, Emin=None, EMax=None):
 
-        return( [ EMin, EMax ] )
+        return [self.domainMin, self.domainMax]
 
-class DiscreteGamma( DiscretePrimaryGamma ) :
+
+class DiscreteGamma(DiscretePrimaryGamma):
 
     moniker = 'discreteGamma'
 
-    def check( self, info ) :
+    def check(self, info):
 
         from fudge import warning
 
         warnings = []
-        if( self.value <= 0 ) : warnings.append( warning.NegativeDiscreteGammaEnergy() )
-        return( warnings )
+        if self.value <= 0: warnings.append(warning.NegativeDiscreteGammaEnergy())
+        return warnings
 
-    def averageEp( self, E ) :
+    def averageEp(self, E):
 
-        return( self.value )
+        return self.energyAtEnergy(E)
 
-    def energyAtEnergy( self, energyIn ) :
+    def energyAtEnergy(self, energyIn):
 
-        return( self.value )
+        if energyIn < self.domainMin:
+            return 0
+        return self.value
 
-    def integrate( self, energyIn, energyOut ) :
+    def integrate(self, energyIn, energyOut):
 
-        if( self.domainMin <= energyIn <= self.domainMax ) :
-            domainMin, domainMax = miscellaneousModule.domainLimits( energyOut, self.value, self.value )
-            if( domainMin <= self.value <= domainMax ) : return( 1.0 )
+        if self.domainMin <= energyIn <= self.domainMax:
+            domainMin, domainMax = miscellaneousModule.domainLimits(energyOut, self.value, self.value)
+            if domainMin <= self.value <= domainMax: return 1.0
 
-        return( 0.0 )
+        return 0.0
+
 
 class PrimaryGamma(DiscretePrimaryGamma):
 
@@ -285,43 +289,45 @@ class PrimaryGamma(DiscretePrimaryGamma):
         self.__finalState = value
 
     @property
-    def massRatio( self ) :
+    def massRatio(self):
 
-        if( self.__massRatio is None ) :
-            self.__massRatio = self.findAttributeInAncestry( "getMassRatio" )( )
+        if self.__massRatio is None:
+            self.__massRatio = self.findAttributeInAncestry("getMassRatio")()
         return self.__massRatio
 
-    def check( self, info ) :
+    def check(self, info):
 
         from fudge import warning
 
         warnings = []
         Qvalue = self.findAttributeInAncestry('getQ')('eV')
-        if isinstance( self.value, PQUModule.PQU ) :
-            testValue = self.value.getValueAs( 'eV' )
+        if isinstance(self.value, PQUModule.PQU):
+            testValue = self.value.getValueAs('eV')
         else:
             testValue = self.value
         if testValue > Qvalue:
-            warnings.append( warning.PrimaryGammaEnergyTooLarge( self.value,
-                            100 * testValue / Qvalue ) )
+            warnings.append(warning.PrimaryGammaEnergyTooLarge(self.value, 100 * testValue / Qvalue))
         return warnings
 
-    def averageEp( self, energyIn ) :
+    def averageEp(self, energyIn):
 
-        return( self.energyAtEnergy( energyIn ) )
+        return self.energyAtEnergy(energyIn)
 
-    def energyAtEnergy( self, energyIn ) :
+    def energyAtEnergy(self, energyIn):
 
-        return( float( self.value ) + self.massRatio * energyIn )
+        if energyIn < self.domainMin:
+            return 0
+        return float(self.value) + self.massRatio * energyIn
 
-    def integrate( self, energyIn, energyOut ) :
+    def integrate(self, energyIn, energyOut):
 
-        gammaEnergy = float( self.value ) + self.massRatio * energyIn
-        if( self.domainMin <= energyIn <= self.domainMax ) :
-            domainMin, domainMax = miscellaneousModule.domainLimits( energyOut, gammaEnergy, gammaEnergy )
-            if( domainMin <= gammaEnergy <= domainMax ) : return( 1.0 )
+        gammaEnergy = float(self.value) + self.massRatio * energyIn
+        if self.domainMin <= energyIn <= self.domainMax:
+            domainMin, domainMax = miscellaneousModule.domainLimits(energyOut, gammaEnergy, gammaEnergy)
+            if domainMin <= gammaEnergy <= domainMax: return 1.0
 
-        return( 0.0 )
+        return 0.0
+
 
 class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
 
@@ -408,11 +414,10 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         for idx in range(len(self)):
             integral = self[idx].integrate()
             if abs(integral - 1.0) > info['normTolerance']:
-                warnings.append( warning.UnnormalizedDistribution( PQUModule.PQU( self[idx].outerDomainValue, self.axes[-1].unit ), idx, integral, self[idx] ) )
+                warnings.append(warning.UnnormalizedDistribution(PQUModule.PQU(self[idx].outerDomainValue, self.axes[-1].unit), idx, integral, self[idx]))
 
             if( self[idx].rangeMin < 0.0 ) :
-                warnings.append( warning.NegativeProbability( PQUModule.PQU( self[idx].outerDomainValue, self.axes[-1].unit ),
-                    value=self[idx].rangeMin, obj=self[idx] ) )
+                warnings.append(warning.NegativeProbability(self[idx].rangeMin, PQUModule.PQU(self[idx].outerDomainValue, self.axes[-1].unit), obj=self[idx]))
 
         return warnings
 

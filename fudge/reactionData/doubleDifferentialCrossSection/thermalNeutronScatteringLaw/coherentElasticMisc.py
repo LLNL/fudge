@@ -45,6 +45,21 @@ def calculatePofMu( energy, index, SofE, epsilon ) :
 
     if( index == 0 ) : index = 1
 
+    priorMu = 2.0
+    smallestEpsilon = 1.0
+    for i1 in range(index):
+        energy_i = SofE[i1][0]
+        mu_i = 1 - 2 * energy_i / energy
+        epsilon_i = (priorMu - mu_i) / (abs(priorMu) + abs(mu_i))
+        smallestEpsilon = min(smallestEpsilon, epsilon_i)
+        priorMu = mu_i
+
+    if smallestEpsilon < epsilon:
+        newEpsilon = 0.5 * smallestEpsilon
+        print('    WARNING: In function calculatePofMu in coherentElasticMisc.py, changing epsilon from %s to %.2e at energy %s.' % 
+                (epsilon, newEpsilon, energy))
+        epsilon = newEpsilon
+
     PofMu = []
     S_im1 = 0
     for i1 in range( index ) :

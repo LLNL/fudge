@@ -122,7 +122,7 @@ class Series1d( baseModule.XDataFunctional ) :
 
     __rmul__ = __mul__
 
-    def _div__(self, value):
+    def __div__(self, value):
         '''Returns a new series that is each coefficient of self divided by value. Value must be convertible to a float.'''
 
         value_ = float(value)
@@ -131,20 +131,25 @@ class Series1d( baseModule.XDataFunctional ) :
             c_ls[l] /= value
         return c_ls 
 
-    def __str__( self ) :
+    def __eq__(self, other):
+        """Returns true if self and other have the same coefficients, domain and lowerIndex."""
+
+        return self.areDomainsMutual(other) and self.lowerIndex == other.lowerIndex and self.coefficients == other.coefficients
+
+    def __str__(self):
         """Returns a string representation of the coefficients of self."""
 
-        return( ' '.join( [ "%g" % c_l for c_l in self.__coefficients ] ) )
+        return ' '.join(["%g" % c_l for c_l in self.__coefficients])
 
     @property
-    def coefficients( self ) :
+    def coefficients(self):
 
-        return( self.__coefficients )
+        return self.__coefficients
 
     @coefficients.setter
-    def coefficients( self, coefficients ) :
+    def coefficients(self, coefficients):
 
-        self.__coefficients = list( map( float, coefficients ) )
+        self.__coefficients = list(map(float, coefficients))
 
     def areDomainsMutual(self, other):
         '''

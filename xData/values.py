@@ -217,7 +217,7 @@ class Values(baseModule.XDataCoreMembers):
             data = HDF[datasetName]
             if count == -1: count = len(data)
 
-            return Values(data[startIndex:startIndex+count], **attrs)
+            return Values(data[startIndex:startIndex+count].tolist(), **attrs)
 
         else:
             if len(extraAttributes) > 0: raise TypeError('Invalid attributes:"%s"' % ' '.join([ str(key) for key in extraAttributes ]))

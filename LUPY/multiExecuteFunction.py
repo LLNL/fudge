@@ -98,7 +98,7 @@ class MultiExecuteFunction:
         for index, functionToRun in enumerate(self.functionsToRun):
             outputFile = outputDir
             if outputFile is not None:
-                outputFile = outputDir / ('%.6d.out' % index)
+                outputFile = outputDir / ('%.6d.out' % (index + 1))
             processesToRun.append(multiprocessing.Process(target=runProcess, args=(functionToRun[0], outputFile), kwargs=functionToRun[2]))
         processesActive = {}
         processesToPrint = {}
@@ -132,7 +132,7 @@ class MultiExecuteFunction:
 
             time.sleep(0.01)
 
-if __name__=='__main__':
+if __name__ == '__main__':
 
     def myFunction(**kwargs):
 

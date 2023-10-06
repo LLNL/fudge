@@ -503,23 +503,23 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
         Q = kwargs['reaction'].getQ( energyUnit, final = False )
         energySubform = NBodyPhaseSpace( energySubform, massUnit, projectileMass, targetMass, productMass, Q )
 
-    if( kwargs['isInfiniteTargetMass'] ) :
+    if kwargs['isInfiniteTargetMass']:
         aveEnergy = [ [ functional1d.outerDomainValue, functional1d.integrateWithWeight_x( ) ] for functional1d in energySubform ]
-    else :
-        Es = energySubform.getEnergyArray( )
-        if( Es[0] is None ) : Es[0] = EMin
-        if( Es[-1] is None ) : Es[-1] = EMax
-        if( EMin < Es[0] ) : EMin = Es[0]
-        if( EMax > Es[-1] ) : EMax = Es[-1]
-        Es = sorted( set( energySubform.getEnergyArray( EMin, EMax ) + multiplicity.domainGrid ) )
-        Es = fixLimits( EMin, EMax, Es )
-        massRatio = projectileMass * productMass / ( projectileMass + targetMass )**2
-        calculationData = CalculateDepositionInfo( productFrame, productMass, massRatio, angularSubform, energySubform, multiplicity )
-        calculationData.setEvaluateAtX( calculateAverageEnergy )
-        aveEnergy = [ [ E, calculationData.evaluateAtX( E ) ] for E in Es ]
-        absoluteTolerance = 1e-3 * energyAccuracy * max( [ Ep for E, Ep in aveEnergy ] )
-        calculationData.setTolerances( energyAccuracy, absoluteTolerance )
-        aveEnergy = fudgemath.thickenXYList( aveEnergy, calculationData )
+    else:
+        Es = energySubform.getEnergyArray()
+        if Es[0] is None: Es[0] = EMin
+        if Es[-1] is None: Es[-1] = EMax
+        if EMin < Es[0]: EMin = Es[0]
+        if EMax > Es[-1]: EMax = Es[-1]
+        Es = sorted(set(Es + multiplicity.domainGrid))
+        Es = fixLimits(EMin, EMax, Es)
+        massRatio = projectileMass * productMass / (projectileMass + targetMass)**2
+        calculationData = CalculateDepositionInfo(productFrame, productMass, massRatio, angularSubform, energySubform, multiplicity)
+        calculationData.setEvaluateAtX(calculateAverageEnergy)
+        aveEnergy = [[E, calculationData.evaluateAtX(E)] for E in Es]
+        absoluteTolerance = 1e-3 * energyAccuracy * max([Ep for E, Ep in aveEnergy])
+        calculationData.setTolerances(energyAccuracy, absoluteTolerance)
+        aveEnergy = fudgemath.thickenXYList(aveEnergy, calculationData)
 
     if isinstance(angularSubform, angularModule.Isotropic2d) and productFrame == xDataEnumsModule.Frame.lab:
         aveMomentum = [ [ aveEnergy[0][0], 0. ], [ aveEnergy[-1][0], 0. ] ]

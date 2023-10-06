@@ -10,8 +10,8 @@
 import numpy
 import argparse
 
-from fudge import GNDS_file
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
+from fudge import reactionSuite as reactionSuiteModule
 from fudge import styles as stylesModule
 from fudge import institution as institutionModule
 from fudge.reactionData import crossSection as crossSectionModule
@@ -34,13 +34,14 @@ parser.add_argument("-g", "--generator", default="wigner", help="level generator
 parser.add_argument("-f", "--formatVersion", default=GNDS_formatVersionModule.default,
                     help="GNDS format version to write out")
 parser.add_argument("--skipPDFs", action="store_true", help="Generate probability tables but not PDFs. A bit faster.")
+parser.add_argument("--hybrid", action="store_true", help="Write hybrid XML/HDF5 files.")
 parser.add_argument("-v", "--verbose", action="store_true", help="enable verbose output")
 args = parser.parse_args()
 
 if args.output is None:
     args.output = args.gnds + "_urr.xml"
 
-RS = GNDS_file.read(args.gnds)
+RS = reactionSuiteModule.read(args.gnds)
 
 energyUnit = RS.styles.getEvaluatedStyle().projectileEnergyDomain.unit
 urrStyles = RS.styles.getStylesOfClass(stylesModule.URR_probabilityTables)
@@ -110,4 +111,7 @@ institution = institutionModule.Institution(probabilityTablesModule.LLNLProbabil
 institution.append(probabilityTables)
 RS.applicationData.add(institution)
 
-RS.saveToFile(args.output, formatVersion=args.formatVersion)
+if args.hybrid:
+    RS.saveAllToFile(args.output, hybrid=True, formatVersion=args.formatVersion)
+else:
+    RS.saveToFile(args.output, formatVersion=args.formatVersion)
