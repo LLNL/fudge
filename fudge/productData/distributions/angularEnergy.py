@@ -115,11 +115,11 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
             if( energy_in.domainMin != -1 ) or ( energy_in.domainMax != 1 ) :
                 warnings.append( warning.IncompleteDistribution( PQU.PQU( energy_in.outerDomainValue, self.axes[0].unit ), energy_in.domainMin, energy_in.domainMax, energy_in ) )
             for mu in energy_in:
-                if( mu.domainMin < 0 ) :
-                    warnings.append( warning.ValueOutOfRange("Negative outgoing energy for energy_in=%s!"
-                        % PQU.PQU( energy_in.outerDomainValue, self.axes[0].unit ), mu.domainMin, 0, 'inf', self.toXLink() ) )
-                if( mu.rangeMin < 0 ) :
-                    warnings.append( warning.NegativeProbability( PQU.PQU( energy_in.outerDomainValue, self.axes[-1].unit ), mu=mu.outerDomainValue, obj=mu ) )
+                if mu.domainMin < 0:
+                    warnings.append(warning.ValueOutOfRange("Negative outgoing energy for energy_in=%s!"
+                        % PQU.PQU(energy_in.outerDomainValue, self.axes[0].unit), mu.domainMin, 0, 'inf', self.toXLink()))
+                if mu.rangeMin < 0:
+                    warnings.append(warning.NegativeProbability(mu.rangeMin, PQU.PQU(energy_in.outerDomainValue, self.axes[-1].unit), mu=mu.outerDomainValue, obj=mu))
 
         return warnings
 

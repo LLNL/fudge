@@ -416,7 +416,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         return numberOfFixes
 
-    def check( self, **kwargs ) :
+    def check(self, **kwargs):
         """
         Check all data in the reactionSuite, returning a gnds.warning.context object with list of warnings.
 
@@ -438,6 +438,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
             'fissionEnergyBalanceLimit'  0.15        # at least 85% of available energy should go to fission products
             'failOnException'            False       # if True, crash instead of converting exceptions to warnings
             'cleanUpTempFiles'           True        # remove derived data that was produced during checking
+            'verbose'                    False       # be verbose while running checks
 
         Currently unused options::
 
@@ -470,6 +471,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
                 'fissionEnergyBalanceLimit': 0.15,
                 'failOnException': False,
                 'cleanUpTempFiles': True,
+                'verbose': False,
                 # currently unused options:
                 'checkForEnDepData': False,
                 'allowZeroE': False,
@@ -575,13 +577,13 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
             self.styles.add( averageProductDataStyle )
             info['averageProductDataStyle'] = averageProductDataStyle
-            info['averageProductDataArgs'] = { 'verbosity':1,   # additional required arguments
-                        'incrementalIndent':'  ', 'energyAccuracy':1e-6, 'momentumAccuracy':1e-6,
-                        'incidentEnergyUnit': incidentEnergyUnit, 'massUnit': massUnit,
-                        'momentumUnit': incidentEnergyUnit + '/c',
-                        'projectileMass': projectileMass, 'targetMass': targetMass,
-                        'reactionSuite':self, 'photonBranchingData': self.photonBranchingData(),
-                        'isInfiniteTargetMass' : isinstance( target, chemicalElementPoPsModule.ChemicalElement ) }
+            info['averageProductDataArgs'] = {
+                'verbosity': 1 if options['verbose'] else 0,   # additional required arguments
+                'incrementalIndent': '  ', 'energyAccuracy' :1e-6, 'momentumAccuracy': 1e-6,
+                'incidentEnergyUnit': incidentEnergyUnit, 'massUnit': massUnit,
+                'momentumUnit': incidentEnergyUnit + '/c', 'projectileMass': projectileMass, 'targetMass': targetMass,
+                'reactionSuite':self, 'photonBranchingData': self.photonBranchingData(),
+                'isInfiniteTargetMass' : isinstance(target, chemicalElementPoPsModule.ChemicalElement)}
 
         if self.projectile == 'n' and self.target != 'n':
             # test Wick's limit: 0-degree elastic xsc >= ( total xsc * k/4pi )^2
@@ -1069,6 +1071,23 @@ class ReactionSuite(ancestryModule.AncestryIO):
         for reaction in self.incompleteReactions: products.update(reaction.listOfProducts())
 
         return products
+
+    def addCovariance(self, covarianceSuite):
+        '''
+        Addes a CovarianceSuite instance to *self*'s internal *_loadedCovariances* member.
+
+        :param covarianceSuite:     CovarianceSuite instance to add to member *_loadedCovariances*.
+        '''
+
+        from fudge.covariances import covarianceSuite as covarianceSuiteModule
+
+        if not isinstance(covarianceSuite, covarianceSuiteModule.CovarianceSuite):
+            raise TypeError('Instance not a CovarianceSuite instance.')
+
+        if self._loadedCovariances is None:
+            self._loadedCovariances = []
+
+        self._loadedCovariances.append(covarianceSuite)
 
     def covarianceExternalFiles(self):
         '''
@@ -1971,60 +1990,67 @@ class ReactionSuite(ancestryModule.AncestryIO):
         :param fileName:        The name of the file to write *self* to.
         :param hybrid:          If *True* data are written in hybrid XML/HDF5 files.
         :param kwargs:          Additional key-word arguments that are passed to internal calls.
+
+        :return:                The list of paths for all covariance files written.
         """
 
         from . import externalFile as externalFileModule
         covarianceDir = pathlib.Path(kwargs.get('covarianceDir', 'Covariances'))
+        if covarianceDir.is_absolute():
+            raise Exception('Absolute covariance directory path not supported.')
 
         fileName = pathlib.Path(fileName)
-        covarianceName = covarianceDir / (fileName.stem + '-covar' + fileName.suffix)
-        covariancePath = fileName.parent / covarianceName
+        covariancePathRelative = covarianceDir / (fileName.stem + '-covar' + fileName.suffix)
+        covariancePath = fileName.parent / covariancePathRelative                       # Path relative to self's path.
+        selfsPathInCovarianceFile = os.path.relpath(fileName.parent, covariancePath.parent) / fileName
 
         covariances = self.loadCovariances()
         originalPaths = {}
-        if covariances and self.sourcePath is None:
-            # self was generated directly, not parsed from a ReactionSuite file. Add externalFiles before saving:
-            covariances[0].externalFiles.add(externalFileModule.ExternalFile("reactions", path=os.path.join("..", fileName)))
-            covariances[0].saveToFile(covariancePath)
+        covariancePaths = []
+        if len(covariances) > 0:
+            if self.sourcePath is None:                 # Self was generated directly, not parsed from a file. Add externalFiles before saving.
+                covariances[0].externalFiles.add(externalFileModule.ExternalFile("reactions", path=selfsPathInCovarianceFile))
+                covariances[0].saveToFile(covariancePath)
+                covariancePaths.append(covariancePath)
 
-            sha1sum = checksumsModule.Sha1sum.from_file(covariancePath)
-            self.externalFiles.add(externalFileModule.ExternalFile("covariances", covariancePath, checksum=sha1sum))
-
-        else:
-            # locate and update the ExternalFiles pointing between the two files
-            for covariance in covariances:
-                externalPath = None
-                sourcePathC = pathlib.Path(covariance.sourcePath)
-                for externalFile in self.externalFiles:                             # Find externalFile for this covariance.
-                    if sourcePathC.samefile(externalFile.realpath()):
-                        externalPath = pathlib.Path(externalFile.path)
-                        break
-
-                if externalPath is None:
-                    print('WARNING: could not find externalFile for covariance "%s".' % sourcePathC)
-                elif not externalPath.is_absolute():                                # Only write if not absolute.
-                    if externalFile not in originalPaths:
-                        originalPaths[externalFile] = externalFile.path             # Needs to be reset back to original name before this method exits..
-                    externalFile.path = str(covarianceName)
-                    if covariancePath is None:
-                        covariancePath = fileName.parent / covarianceDir / sourcePathC.name
-                        print('WARNING: multiple covariance files, using "%s".' % covariancePath)
-
-                    externalPathC = None
-                    selfSourcePath = pathlib.Path(self.sourcePath)
-                    for externalFileC in covariance.externalFiles:
-                        externalFilePath = pathlib.Path(externalFileC.realpath())
-                        if externalFilePath.exists() and selfSourcePath.samefile(externalFilePath):
-                            externalPathC = externalFileC
+                sha1sum = checksumsModule.Sha1sum.from_file(covariancePath)
+                self.externalFiles.add(externalFileModule.ExternalFile("covariances", covariancePath, checksum=sha1sum))
+            else:                                       # Locate and update the ExternalFiles pointing between the two files.
+                for covariance in covariances:
+                    externalPath = None
+                    sourcePathC = pathlib.Path(covariance.sourcePath)
+                    for externalFile in self.externalFiles:                             # Find self's externalFile for this covariance.
+                        if sourcePathC.samefile(externalFile.realpath()):
+                            externalPath = pathlib.Path(externalFile.path)
                             break
-                    if externalPathC is None:
-                        print('WARNING: could not find externalFile in covariance for reactionSuite.')
-                    else:
-                        if externalFileC not in originalPaths:
-                            originalPaths[externalFileC] = externalFileC.path             # Needs to be reset back to original name before this method exits..
-                        externalPathC.path = str(pathlib.Path('../') / fileName.name)
-                covariance.saveToFile(covariancePath, **kwargs)
-                covariancePath = None
+
+                    if externalPath is None:
+                        print('WARNING: could not find externalFile for covariance "%s".' % sourcePathC)
+                    elif not externalPath.is_absolute():                                # Only write if not absolute.
+                        if externalFile not in originalPaths:
+                            originalPaths[externalFile] = externalFile.path             # Needs to be reset back to original name before this method exits.
+
+                        externalFile.path = str(covariancePathRelative)                 # Path relative to self's path.
+                        if covariancePath is None:
+                            covariancePath = fileName.parent / covarianceDir / sourcePathC.name
+                            print('WARNING: multiple covariance files, using "%s".' % covariancePath)
+
+                        externalPathC = None                            # ExternalFile in covarianceSuite that points to self.
+                        selfSourcePath = pathlib.Path(self.sourcePath)
+                        for externalFileC in covariance.externalFiles:
+                            externalFilePath = pathlib.Path(externalFileC.realpath())
+                            if externalFilePath.exists() and selfSourcePath.samefile(externalFilePath):
+                                externalPathC = externalFileC
+                                break
+                        if externalPathC is None:
+                            print('WARNING: could not find externalFile in covariance for reactionSuite.')
+                        else:
+                            if externalFileC not in originalPaths:
+                                originalPaths[externalFileC] = externalFileC.path             # Needs to be reset back to original name before this method exits.
+                            externalPathC.path = selfsPathInCovarianceFile
+                    covariance.saveToFile(covariancePath, **kwargs)
+                    covariancePaths.append(covariancePath)
+                    covariancePath = None
 
         if hybrid:
             self.saveToHybrid(fileName, **kwargs)
@@ -2033,6 +2059,8 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         for externalFile in originalPaths:
             externalFile.path = originalPaths[externalFile]
+
+        return covariancePaths
 
     def saveToHybrid( self, xmlName, hdfName=None, hdfSubDir='HDF5', minLength=3, flatten=True, compress=False, **kwargs ):
         """
@@ -2139,7 +2167,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         interaction = self.interaction
         if interaction == enumsModule.Interaction.TNSL:
-            interaction = enumsModule.Interaction.getTNSLInteration(formatVersion)
+            interaction = enumsModule.Interaction.getTNSL_interaction(formatVersion)
         xmlString = ['%s<%s projectile="%s" target="%s" evaluation="%s" format="%s" projectileFrame="%s" interaction="%s">'
             % (indent, self.moniker, self.projectile, self.target, self.evaluation, formatVersion, self.projectileFrame, interaction)]
 

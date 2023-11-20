@@ -53,9 +53,9 @@ if __name__ == '__main__':
     covariances = []
     name, dummy = GNDS_fileModule.type(fileName)
     if name == databaseModule.Database.moniker:
-        gnds = GNDS_fileModule.read(fileName)
+        gnds = GNDS_fileModule.read(fileName, lazyParsing=False)
     else:
-        gnds = GNDS_fileModule.read(fileName)
+        gnds = GNDS_fileModule.read(fileName, lazyParsing=False)
         if name == reactionSuiteModule.ReactionSuite.moniker:
             if not args.skipCovariances:
                 try:
@@ -106,7 +106,6 @@ if __name__ == '__main__':
                 externalFileC.path = str(parent)
             covariance.saveToFile(covarianceOutput, formatVersion=args.formatVersion)
 
-    assert args.h5output is None, 'HDF5 output file listed without the --hybrid option!'
     if args.sortReactions and isinstance(gnds, reactionSuiteModule.ReactionSuite):
         reactions = {}
         for reaction in gnds.reactions:
@@ -123,5 +122,6 @@ if __name__ == '__main__':
         gnds.saveToHybrid(output, hdfName=args.h5output, formatVersion=args.formatVersion, minLength=3, flatten=True)
         # FIXME support hybrid storage for covariances? Reenable compression?
     else:
+        assert args.h5output is None, 'HDF5 output file listed without the --hybrid option!'
         gnds.saveToFile(output, outline=args.outline, xs_pdf_cdf1d_singleLine=True, formatVersion=args.formatVersion, 
                 significantDigits=args.significantDigits)

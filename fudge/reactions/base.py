@@ -141,7 +141,8 @@ class Base_reaction(ancestryModule.AncestryIO):
         """
 
         from fudge import warning
-        from . import production as productionModule
+        from . import production as productionModule, orphanProduct as orphanProductModule, \
+            incompleteReaction as incompleteReactionModule
         from fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic.CoulombPlusNuclearElastic \
             import CoulombDepositionNotSupported
         warnings = []
@@ -162,6 +163,7 @@ class Base_reaction(ancestryModule.AncestryIO):
             pass
         cpcount = sum( [ ( particleZA( prod.pid ) // 1000 ) > 0 for prod in self.__outputChannel ] )
         info['CoulombOutputChannel'] = cpcount > 1
+        info['ContinuumOutputChannel'] = self.outputChannel.process is outputChannelModule.Processes.continuum
 
         if hasattr(self, 'doubleDifferentialCrossSection'):
             differentialCrossSectionWarnings = self.doubleDifferentialCrossSection.check(info)
@@ -174,6 +176,7 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         if 'Q' in info: del info['Q']
         del info['CoulombOutputChannel']
+        del info['ContinuumOutputChannel']
 
         if info['crossSectionOnly']:
             return warnings             # otherwise continue to check outputs
@@ -205,8 +208,8 @@ class Base_reaction(ancestryModule.AncestryIO):
             except ValueError:
                 pass    # this test only works if multiplicity and Q are both constant for all non-gamma products
 
-        if not (self.__outputChannel.genre == enumsModule.Genre.sumOfRemainingOutputChannels or
-                    self.isFission( ) or isinstance( self, productionModule.Production) ):
+        if not (self.__outputChannel.genre == enumsModule.Genre.sumOfRemainingOutputChannels or self.isFission() or
+                isinstance(self, (productionModule.Production, orphanProductModule.OrphanProduct, incompleteReactionModule.IncompleteReaction))):
             # check that ZA balances:
             ZAsum = 0
             for product in self.__outputChannel:
@@ -292,15 +295,15 @@ class Base_reaction(ancestryModule.AncestryIO):
                 else: totalEDep = []
                 Qsum = sum(Qs)
 
-                def energyDepositedPerProduct( energyDep, ein ):
+                def energyDepositedPerProduct(energyDep, ein):
                     """ if energy doesn't balance, determine how much is deposited in each product """
                     result = []
                     availableEnergy = ein + Qsum
-                    if availableEnergy == 0: availableEnergy = sum( [edep.evaluate(ein) for p,edep in energyDep] )
+                    if availableEnergy == 0: availableEnergy = sum([edep.evaluate(ein) for p, edep in energyDep])
                     for prod, edep in energyDep:
-                        edep = edep.evaluate( ein )
-                        if edep is None: result.append( (prod, 0) )
-                        else: result.append( ( prod, 100.0 * edep/availableEnergy ) )
+                        edep = edep.evaluate(ein)
+                        if edep is None: result.append((prod, 0))
+                        else: result.append((prod, 100.0 * edep/availableEnergy))
                     return sorted(result, key=lambda foo: foo[1])[::-1]
 
                 # now we have total energy deposition for all particles, use to check energy balance.
@@ -329,10 +332,17 @@ class Base_reaction(ancestryModule.AncestryIO):
                                 i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
 
                 if edepWarnings:
+                    productList = [prod.pid for prod in products]
+                    photons = productList.count("photon")
+                    if photons > 2:
+                        # simplify context message if many photons are produced
+                        photon1 = productList.index('photon')
+                        productList[productList.index("photon")] = f"{photons}*photon"
+                        productList = [p for p in productList if p != "photon"]
                     context = "Energy balance"
                     if decay: context += " (after decay)"
-                    context += " for products: " + ', '.join( [prod.pid for prod in products] )
-                    warnings.append( warning.Context( context, edepWarnings ) )
+                    context += " for products: " + ', '.join(productList)
+                    warnings.append(warning.Context(context, edepWarnings))
 
                 # now recursively check decay products, if any:
                 for pidx, currentProd in enumerate(products):

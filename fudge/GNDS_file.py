@@ -27,6 +27,8 @@ from fudge import suites as suitesModule
 from fudge import styles as stylesModule
 from fudge import reactionSuite as reactionSuiteModule
 from fudge.covariances import covarianceSuite as covarianceSuiteModule
+from fudge.processing import flux as fluxModule
+from fudge.processing import group as groupModule
 from fudge.outputChannelData.fissionFragmentData import fissionFragmentData as fissionFragmentDataModule
 
 HDF5_values = 'HDF5_values'
@@ -66,6 +68,10 @@ class GNDSTypeHandler(xml.sax.handler.ContentHandler):
             self.data = {'library': attributes['library'], 'format': attributes['format']}
         elif name == fissionFragmentDataModule.FissionFragmentData.moniker:
             self.data = {'fissionFragmentData': None}
+        elif name == fluxModule.Fluxes.moniker:
+            self.data = {'fluxes': None}
+        elif name == groupModule.Groups.moniker:
+            self.data = {'groups': None}
         else:
             raise TypeError('Invalid XML file with top element = "%s"' % name)
         raise GNDSTypeException()
@@ -130,6 +136,10 @@ def read(fileName, reactionSuite=None, warningNoReactionSuite=True, verbosity=1,
         return mapModule.Map.readXML_file(fileName)
     elif name == databaseModule.Database.moniker:
         return databaseModule.read(fileName)
+    elif name == fluxModule.Fluxes.moniker:
+        return fluxModule.read(fileName)
+    elif name == groupModule.Groups.moniker:
+        return groupModule.read(fileName)
     elif name == fissionFragmentDataModule.FissionFragmentData.moniker:
         element = cElementTree.parse(fileName).getroot()
         element = xmlNodeModule.XML_node(element, xmlNodeModule.XML_node.etree)
@@ -151,6 +161,7 @@ class GNDSTypeHandlerPreview(xml.sax.handler.ContentHandler):
         self.parser = parser
         self.childMonikers = childMonikers
         self.GNDS_level = 0
+        self.rootMoniker = rootMoniker
         self.haltParsingMoniker = rootMoniker
         self.GNDS_previewLine = -1
         self.GNDS_previewColumn = None
@@ -172,6 +183,8 @@ class GNDSTypeHandlerPreview(xml.sax.handler.ContentHandler):
         self.GNDS_previewLine = self.parser.getLineNumber()
         self.GNDS_level -= 1
 
+        if name == self.rootMoniker:
+            raise GNDSTypeException()
 
 def preview(fileName, haltParsingMoniker=stylesModule.Styles.moniker):
     """

@@ -301,7 +301,7 @@ def generatePlot(observable, dataSets, xyData=None, xydyData=None, xdxydyData=No
 # stuff for interacting with various data sources
 # ---------------------------------------------------
 
-def getEXFORSets(sym, A, reaction=None, quantity="SIG", nox4evals=True, nox4legend=False,
+def getEXFORSets(sym, A, metastable, reaction=None, quantity="SIG", nox4evals=True, nox4legend=False,
                  forceLegend=False, plotSyle=None, verbose=True):
     exforData = []
     try:
@@ -318,7 +318,16 @@ def getEXFORSets(sym, A, reaction=None, quantity="SIG", nox4evals=True, nox4lege
 
     db = exfor_manager.X4DBManagerPlainFS()
     i = 0
-    subents = db.retrieve(target=sym + '-' + str(A), reaction=reaction, quantity=quantity)
+    M = ""
+    if metastable:
+        metastableIndex = int(metastable.replace('m',''))
+        if metastableIndex == 1:
+            M = "-M"  # reformat for exfor retrieval
+        else:
+            print("***WARNING: EXFOR data retrieval not supported for metastable %s***" % metastable)
+            return exforData
+
+    subents = db.retrieve(target=sym + '-' + str(A) + M, reaction=reaction, quantity=quantity)
     if verbose:
         print(fudge.core.utilities.brb.banner(
             "Preparing EXFOR data for " + sym + '-' + str(A) + '(' + reaction.upper() + ')' + ', ' + quantity))
@@ -676,7 +685,7 @@ def makeCrossSectionPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=No
     exforData = []
     if (not nox4) and (reactionName is not None):
         sym, A, m = miscENDLModule.elementAFromName(target)
-        exforData = getEXFORSets(sym, A, reaction=projectile + ',' + reactionName, quantity="SIG", nox4evals=nox4evals,
+        exforData = getEXFORSets(sym, A, m, reaction=projectile + ',' + reactionName, quantity="SIG", nox4evals=nox4evals,
                                  nox4legend=nox4legend, plotSyle=plotStyle)
 
     # Actually make the plot
@@ -1000,7 +1009,7 @@ def makeMultiplicityPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=No
     exforData = []
     if (not nox4) and (reactionName is not None):
         sym, A, m = miscENDLModule.elementAFromName(target)
-        exforData = getEXFORSets(sym, A, reaction=projectile + ',' + reactionName, quantity="NU",
+        exforData = getEXFORSets(sym, A, m, reaction=projectile + ',' + reactionName, quantity="NU",
                                  nox4evals=nox4evals, nox4legend=nox4legend, plotSyle=plotStyle)
 
     # Actually make the plot

@@ -11,6 +11,7 @@ Baryons include the neutron and proton.
 """
 
 from .. import misc as miscModule
+from .. import intId as intIdModule
 from . import particle as particleModule
 
 class Alias( particleModule.Alias ) :
@@ -31,13 +32,12 @@ class Particle( particleModule.Particle ) :
 
     def intid(self, intidDB={}):
 
-        sign = -1 if self.isAnti else 1
         base, anti, qualifier = miscModule.baseAntiQualifierFromID(self.id)
         baryonIndex = {'n': 0, 'p': 1}.get(base)
         if baryonIndex is None:
-            ValueError('Baryon "%s" does not have a defined intid.' % (self.id))
+            raise ValueError('Baryon "%s" does not have a defined intid.' % (self.id))
 
-        return sign * (2**30 + 2 * 2**26 + baryonIndex)
+        return intIdModule.intidHelper(anti, intIdModule.Family.baryon, baryonIndex)
 
 class Suite( particleModule.Suite ) :
 

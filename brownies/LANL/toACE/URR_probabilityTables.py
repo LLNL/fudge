@@ -31,7 +31,7 @@ def getILF_IOA(self, skipILF_logic=False):
     IOAs = []
 
     unresolved = self.resonances.unresolved
-    if not skipILF_logic:
+    if unresolved and not skipILF_logic:
         for reaction in self.reactions:
             if isinstance(reaction.crossSection[0], crossSectionModule.ResonancesWithBackground):
                 continue
@@ -71,7 +71,7 @@ def toACE_tables(reactionCrossSection, GNDS_URR_data, cumulatives):
 
     return ACE_URR_data
 
-def URR_probabilityTable(self, styleLabel, fromPDF=False, numberOfProbabilities=20, skipILF_logic=False):
+def URR_probabilityTable(self, styleLabel, fromPDF=False, numberOfProbabilities=20, skipILF_logic=False, verbose=0):
     """
     Dump probability tables to ACE. By default use the probability table
     data from <applicationData>, or if fromPDF=True compute the probability
@@ -85,8 +85,9 @@ def URR_probabilityTable(self, styleLabel, fromPDF=False, numberOfProbabilities=
     URR_styles = [style for style in self.styles.getStylesOfClass(stylesModule.URR_probabilityTables)
                   if style.findDerivedFromStyle(stylesModule.GriddedCrossSection).label == styleLabel]
     if len(URR_styles) != 1:
-        print("Skipping URR as no unique URR style corresponding to label %s found" % styleLabel)
-        return URRPT
+        if verbose > 0:
+            print("Skipping URR as no unique URR style corresponding to label %s found" % styleLabel)
+        return ILF, IOA, URRPT
 
     URR_style = URR_styles[0]
 

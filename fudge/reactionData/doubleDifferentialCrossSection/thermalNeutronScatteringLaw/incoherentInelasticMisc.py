@@ -291,11 +291,14 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ):
         """
 
         if level > max_depth: return
-        xMid = 0.5 * (x1 + x2)
+        xMid = RoundToSigFigs(0.5 * (x1 + x2), 12)
+        if xMid in (x1, x2):
+            return
         yMid, yMidSpectrum = evaluator(xMid)
         yEstimate = 0.5 * (y1 + y2)
         if abs(yEstimate - yMid) <= accuracy * yMid:
             return
+
         if (xMid - x1) > (2 * epsilon * x1):
             bisectionTest2D(surface, x1, y1, xMid, yMid, evaluator, epsilon, accuracy, level + 1, max_depth)
         surface.append([xMid, yMid, yMidSpectrum])
@@ -465,7 +468,7 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ):
         else:
             raise AssertionError("Order must be 'energy-angle' or 'angle-energy'")
 
-        return evaluator(energy, distributionAxes, significant_digits=14)
+        return evaluator(energy, distributionAxes, significant_digits=12)
 
     def computeAtEnergies(energies):
         """

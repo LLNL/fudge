@@ -166,17 +166,19 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         for section in self.covarianceSections: section.convertUnits( unitMap )
         for mpsection in self.parameterCovariances: mpsection.convertUnits( unitMap )
 
-    def check( self, **kwargs ):
+    def check(self, **kwargs):
         """
         Check all covariance sections, returning a list of warnings. 
         
         :keyword bool checkUncLimits: Should we check the uncertainty limits? (default: True)
         :keyword float minRelUnc: Minimum allowable relative uncertainty (default: 0.0)
         :keyword float maxRelUnc: Maximum allowable relative uncertainty (default: 10.0)
-        :keyword theData: A reference to the data for this covariance.  This is useful for converting between relative and absolute covariance (default: None)
+        :keyword theData: A reference to the data for this covariance.
+                          This is useful for converting between relative and absolute covariance (default: None)
         :keyword float negativeEigenTolerance: Ignore negative eigenvalues smaller than this (default: -1e-6) 
         :keyword float eigenvalueRatioTolerance: Warn if smallest eigenvalue < this value * biggest (default: 1e-8)
         :keyword float eigenvalueAbsoluteTolerance: Warn if smallest eigenvalue < this value (default: 1e-14)
+        :keyword bool verbose: Be verbose while running checks
         :rtype: warning.Context
         """
 
@@ -191,16 +193,17 @@ class CovarianceSuite(ancestryModule.AncestryIO):
             'negativeEigenTolerance': -1e-6,  # ignore smaller negative eigenvalues
             'eigenvalueRatioTolerance': 1e-8, # warn if smallest eival < 1e-8 * biggest
             'eigenvalueAbsoluteTolerance': 1e-14,
+            'verbose': False,
         }
         for key in kwargs:
             if key in options:
                 options[key] = kwargs[key]
             else:
-                raise KeyError( "check() received unknown keyword argument '%s'" % key )
+                raise KeyError("check() received unknown keyword argument '%s'" % key)
 
         # assemble some useful info, to be handed down to children's check() functions:
-        info = { 'covarianceSuite': self, 'style': 'eval' }
-        info.update( options )
+        info = {'covarianceSuite': self, 'style': 'eval'}
+        info.update(options)
 
         warnings = []
 
@@ -225,29 +228,29 @@ class CovarianceSuite(ancestryModule.AncestryIO):
                         stack.pop()
             return None
 
-        def get_edges( section_, style ):   #: return list of all pointers from this section
-            natDat = section_[style]
-            if isinstance(natDat, summedModule.SummedCovariance): return [v.link for v in natDat]
-            elif isinstance(natDat, mixedModule.MixedForm):
+        def get_edges(section_, style):   #: return list of all pointers from this section
+            form = section_[style]
+            if isinstance(form, summedModule.SummedCovariance): return [v.link for v in form]
+            elif isinstance(form, mixedModule.MixedForm):
                 edges = []
-                for part in natDat:
+                for part in form:
                     if isinstance(part, summedModule.SummedCovariance): edges += [v.link for v in part]
                 return edges
-        nodes = [sec for sec in self.covarianceSections if get_edges( sec, info['style'] )]  # sections that contain pointers
+        nodes = [sec for sec in self.covarianceSections if get_edges(sec, info['style'])]  # sections that contain pointers
 
         if nodes:
             cycle = find_cycle(nodes, get_edges, info['style'])
             if cycle:
-                warnings.append( warning.CyclicDependency( cycle ) )
+                warnings.append(warning.CyclicDependency(cycle))
 
         # check each section
         for section_ in self.covarianceSections:
-            sectionWarnings = section_.check( info )
+            sectionWarnings = section_.check(info)
             if sectionWarnings:
-                warnings.append( warning.Context("covarianceSection '%s':" % section_.label, sectionWarnings ) )
+                warnings.append(warning.Context("covarianceSection '%s':" % section_.label, sectionWarnings))
 
         for parameterCovariance in self.parameterCovariances:
-            pcwarnings = parameterCovariance.check( info )
+            pcwarnings = parameterCovariance.check(info)
             if pcwarnings:
                 warnings.append(warning.Context("parameterCovariance '%s':" % parameterCovariance.label, pcwarnings))
 
@@ -323,7 +326,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
 
         interaction = self.interaction
         if interaction == enumsModule.Interaction.TNSL:
-            interaction = enumsModule.Interaction.getTNSLInteration(formatVersion)
+            interaction = enumsModule.Interaction.getTNSL_interaction(formatVersion)
         xmlString = ['%s<%s projectile="%s" target="%s" evaluation="%s" interaction="%s" format="%s">'
                 % (indent, self.moniker, self.projectile, self.target, self.evaluation, interaction, formatVersion)]
         xmlString += self.externalFiles.toXML_strList(indent2, **kwargs)

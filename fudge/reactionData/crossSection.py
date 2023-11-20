@@ -1026,7 +1026,8 @@ class Component(abstractClassesModule.Component):
         upper = PQUModule.PQU(self.domainMax, self.domainUnit)
 # BRB6 hardwired
         thresh = PQUModule.PQU(0, 'eV')
-        if 'Q' in info:
+        # FIXME skipping Q-value vs. threshold check for continuum channels (e.g. MT=91) since GNDS only stores final Q
+        if 'Q' in info and not info['ContinuumOutputChannel']:
             thresh = -info['Q'] * info['kinematicFactor']
             if not isinstance(info['Q'], PQUModule.PQU): thresh = PQUModule.PQU(thresh, 'eV')
 
@@ -1093,6 +1094,14 @@ class Component(abstractClassesModule.Component):
         if thresh.value > 0:
             if linearCrossSection[0][1] != 0:
                 warnings.append(warning.NonZero_crossSection_at_threshold(linearCrossSection[0][1], self))
+
+        interpolations = []
+        if isinstance(evaluatedCrossSection, XYs1d):
+            interpolations = [evaluatedCrossSection.interpolation]
+        elif isinstance(evaluatedCrossSection, Regions1d):
+            interpolations = [region.interpolation for region in evaluatedCrossSection]
+        if any([interp is xDataEnumsModule.Interpolation.flat for interp in interpolations]):
+            warnings.append(warning.CrossSectionFlatInterpolation())
 
         return warnings
 

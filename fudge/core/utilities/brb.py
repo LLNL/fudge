@@ -106,7 +106,7 @@ def tylist( l, w = 5, sep = None, rightJustify = 0 ) :
         s = tlistMaxLen( ll, rightJustify )
     else :
         ll = l
-    r = ( len( ll ) + w - 1 ) / w
+    r = ( len( ll ) + w - 1 ) // w
     for ir in range( r ) :
         iw = 0
         for i in range( ir, len( ll ), r ) :

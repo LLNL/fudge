@@ -155,7 +155,7 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
             minProb = min(energy_outs.keys())
             if minProb < 0:
                 warnings.append(
-                    warning.NegativeProbability(PQU.PQU(energy_in.outerDomainValue, axes[0].unit), value=minProb,
+                    warning.NegativeProbability(minProb, PQU.PQU(energy_in.outerDomainValue, axes[0].unit),
                                                 energy_out=PQU.PQU(energy_outs[minProb], axes[1].unit), obj=energy_in))
             if self.interpolationQualifier is xDataEnumsModule.InterpolationQualifier.unitBase:
                 # check for more than one outgoing distribution integrating to 0 at high end of incident energies

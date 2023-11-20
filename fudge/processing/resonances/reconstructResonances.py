@@ -2748,7 +2748,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
         competitiveSum = [0,] * nCompetitive
 
         eliminatedReaction = [rr for rr in self.RR.resonanceReactions if rr.eliminated]
-        if len(eliminatedReaction) != 1:
+        if self.RR.approximation is resolvedModule.RMatrix.Approximation.ReichMoore and len(eliminatedReaction) != 1:
             raise TypeError("Only 1 reaction can be eliminated in Reich-Moore approximation!")
         haveEliminated = False  # only set to true if at least one non-zero width is present
 

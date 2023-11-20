@@ -44,7 +44,9 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">styles</span> <span class="k">as</span> <span class="n">stylesModule</span>
+<span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Store and report warnings and errors in GNDS data, in order to discover problems in the library.</span>
@@ -62,6 +64,27 @@
 
 <span class="sd">    &gt;&gt;&gt; flat = warnings.flatten()</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Level"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Level">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">total_ordering</span>
+<span class="k">class</span> <span class="nc">Level</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define severity levels for warnings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Pedantic</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">Minor</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">Moderate</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">Severe</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">Fatal</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Level</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span><span class="p">[</span><span class="n">other</span><span class="p">]</span></div>
+
+
+<span class="n">Level</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Level</span><span class="p">)}</span>
 
 
 <div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
@@ -88,26 +111,57 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">message</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">warningList</span>
 
-<div class="viewcode-block" id="Context.filter"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Context.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter warning list to only include (or exclude) specific classes of Warning. For example:</span>
+<div class="viewcode-block" id="Context.filter"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Context.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter warning list to only include warnings at or greater than specified threshold,</span>
+<span class="sd">        or to include (or exclude) specific classes of Warning.</span>
+<span class="sd">        Returns new Context instance with screened list, plus dictionary indicating how many warnings were screened.</span>
+<span class="sd">        Examples:</span>
 
-<span class="sd">            &gt;&gt;&gt; newWarnings = warnings.filter( exclude=[Warning.EnergyImbalance, Warning.Q_mismatch] )</span>
+<span class="sd">            &gt;&gt;&gt; context = Context()</span>
+<span class="sd">            &gt;&gt;&gt; newWarnings, screened = context.filter( threshold=Level.Moderate )</span>
+<span class="sd">            # or</span>
+<span class="sd">            &gt;&gt;&gt; newWarnings, screened = context.filter( exclude=[Warning.EnergyImbalance, Warning.Q_mismatch] )</span>
 
-<span class="sd">        Note that if both &#39;include&#39; and &#39;exclude&#39; lists are provided, exclude is ignored.&quot;&quot;&quot;</span>
+<span class="sd">        &#39;include&#39; takes precedence over &#39;exclude&#39;, &#39;threshold&#39; can be used with either &#39;include&#39; or &#39;exclude&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span>
         <span class="n">newWarningList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">screened</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="n">Context</span><span class="p">):</span>
-                <span class="n">newContext</span> <span class="o">=</span> <span class="n">warning</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="p">)</span>
+                <span class="n">newContext</span><span class="p">,</span> <span class="n">newScreened</span> <span class="o">=</span> <span class="n">warning</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">newContext</span><span class="p">:</span> <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newContext</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">newScreened</span><span class="p">:</span>
+                    <span class="n">screened</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">screened</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">newScreened</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">warning</span><span class="o">.</span><span class="n">level</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">in</span> <span class="n">include</span><span class="p">:</span>
+                            <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">screened</span><span class="p">[</span><span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span> <span class="o">=</span> <span class="n">screened</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+                            <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">screened</span><span class="p">[</span><span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span> <span class="o">=</span> <span class="n">screened</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">screened</span><span class="p">[</span><span class="n">warning</span><span class="o">.</span><span class="n">level</span><span class="p">]</span> <span class="o">=</span> <span class="n">screened</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">level</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">elif</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">in</span> <span class="n">include</span><span class="p">:</span>
                     <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">screened</span><span class="p">[</span><span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span> <span class="o">=</span> <span class="n">screened</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># exclude is not None:</span>
                 <span class="k">if</span> <span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
                     <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">newWarningList</span><span class="p">)</span></div>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">screened</span><span class="p">[</span><span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span> <span class="o">=</span> <span class="n">screened</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">Context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">newWarningList</span><span class="p">),</span> <span class="n">screened</span></div>
 
 <div class="viewcode-block" id="Context.flatten"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Context.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;From a nested hierarchy of warnings, get back a flat list for easier searching:</span>
@@ -242,7 +296,8 @@
 <span class="sd">    and information about the warning or error.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="n">Level</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">level</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;toXLink&#39;</span><span class="p">):</span>
@@ -255,7 +310,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span>
 
 <div class="viewcode-block" id="Warning.toStringList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Warning.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">WARNING: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="p">)]</span></div></div>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1"> warning: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">,</span> <span class="bp">self</span><span class="p">)]</span></div></div>
 
 
 <span class="c1">#</span>
@@ -264,7 +319,7 @@
 
 <div class="viewcode-block" id="NotImplemented"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NotImplemented">[docs]</a><span class="k">class</span> <span class="nc">NotImplemented</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -276,7 +331,7 @@
 
 <div class="viewcode-block" id="UnorthodoxParticleNotImplemented"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnorthodoxParticleNotImplemented">[docs]</a><span class="k">class</span> <span class="nc">UnorthodoxParticleNotImplemented</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particleId</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">particleId</span> <span class="o">=</span> <span class="n">particleId</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -288,7 +343,7 @@
 
 <div class="viewcode-block" id="ElementalTarget"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ElementalTarget">[docs]</a><span class="k">class</span> <span class="nc">ElementalTarget</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particleId</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">particleId</span> <span class="o">=</span> <span class="n">particleId</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -302,8 +357,8 @@
 <span class="c1"># external files:</span>
 
 <div class="viewcode-block" id="MissingExternalFile"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingExternalFile">[docs]</a><span class="k">class</span> <span class="nc">MissingExternalFile</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -312,8 +367,8 @@
 
 <div class="viewcode-block" id="WrongExternalFileChecksum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WrongExternalFileChecksum">[docs]</a><span class="k">class</span> <span class="nc">WrongExternalFileChecksum</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">computed</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">computed</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expected</span> <span class="o">=</span> <span class="n">expected</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">computed</span> <span class="o">=</span> <span class="n">computed</span>
@@ -329,9 +384,12 @@
 
 <div class="viewcode-block" id="BadScatteringRadius"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadScatteringRadius">[docs]</a><span class="k">class</span> <span class="nc">BadScatteringRadius</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">gotAP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expectedAP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">E</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">gotAP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expectedAP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">E</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">factor</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gotAP</span> <span class="o">=</span> <span class="n">gotAP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expectedAP</span> <span class="o">=</span> <span class="n">expectedAP</span>
@@ -352,7 +410,11 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">gJ</span><span class="p">,</span> <span class="n">expectedgJ</span><span class="p">,</span> <span class="n">reaction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">gJ</span><span class="p">)</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">L</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">reaction</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gJ</span> <span class="o">=</span> <span class="n">gJ</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expectedgJ</span> <span class="o">=</span> <span class="n">expectedgJ</span>
@@ -370,8 +432,8 @@
 
 <div class="viewcode-block" id="InvalidAngularMomentaCombination"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.InvalidAngularMomentaCombination">[docs]</a><span class="k">class</span> <span class="nc">InvalidAngularMomentaCombination</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">J</span> <span class="o">=</span> <span class="n">J</span>
@@ -384,8 +446,8 @@
 
 <div class="viewcode-block" id="InvalidParity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.InvalidParity">[docs]</a><span class="k">class</span> <span class="nc">InvalidParity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Pi</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Pi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">J</span> <span class="o">=</span> <span class="n">J</span>
@@ -399,8 +461,8 @@
 
 <div class="viewcode-block" id="UnknownMass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnknownMass">[docs]</a><span class="k">class</span> <span class="nc">UnknownMass</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particle</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particle</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">particle</span> <span class="o">=</span> <span class="n">particle</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -409,8 +471,8 @@
 
 <div class="viewcode-block" id="UnknownSpinParity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnknownSpinParity">[docs]</a><span class="k">class</span> <span class="nc">UnknownSpinParity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reaction</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span> <span class="o">=</span> <span class="n">reaction</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -419,8 +481,8 @@
 
 <div class="viewcode-block" id="MissingResonanceChannel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingResonanceChannel">[docs]</a><span class="k">class</span> <span class="nc">MissingResonanceChannel</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">J</span> <span class="o">=</span> <span class="n">J</span>
@@ -433,8 +495,8 @@
 
 <div class="viewcode-block" id="InvalidSpinCombination"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.InvalidSpinCombination">[docs]</a><span class="k">class</span> <span class="nc">InvalidSpinCombination</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ia</span><span class="p">,</span> <span class="n">Ib</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ia</span><span class="p">,</span> <span class="n">Ib</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ia</span> <span class="o">=</span> <span class="n">Ia</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ib</span> <span class="o">=</span> <span class="n">Ib</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span>
@@ -447,8 +509,13 @@
 
 <div class="viewcode-block" id="PotentialScatteringNotConverged"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.PotentialScatteringNotConverged">[docs]</a><span class="k">class</span> <span class="nc">PotentialScatteringNotConverged</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">fom</span><span class="p">,</span> <span class="n">fomTarget</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">fom</span><span class="p">,</span> <span class="n">fomTarget</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">fom</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">fom</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="n">E</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fom</span> <span class="o">=</span> <span class="n">fom</span>
@@ -463,7 +530,7 @@
 <div class="viewcode-block" id="RRmultipleRegions"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.RRmultipleRegions">[docs]</a><span class="k">class</span> <span class="nc">RRmultipleRegions</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Use of more than one resolved resonance regions is deprecated&quot;</span></div>
@@ -472,7 +539,7 @@
 <div class="viewcode-block" id="URRdomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRdomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">URRdomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lval</span><span class="p">,</span> <span class="n">Jval</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">=</span> <span class="n">Lval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">=</span> <span class="n">Jval</span>
 
@@ -486,7 +553,7 @@
 <div class="viewcode-block" id="URRinsufficientEnergyGrid"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRinsufficientEnergyGrid">[docs]</a><span class="k">class</span> <span class="nc">URRinsufficientEnergyGrid</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lval</span><span class="p">,</span> <span class="n">Jval</span><span class="p">,</span> <span class="n">eLow</span><span class="p">,</span> <span class="n">eHigh</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">=</span> <span class="n">Lval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">=</span> <span class="n">Jval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eLow</span> <span class="o">=</span> <span class="n">eLow</span>
@@ -504,7 +571,7 @@
 <div class="viewcode-block" id="URRunphysicalLevelSpacing"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRunphysicalLevelSpacing">[docs]</a><span class="k">class</span> <span class="nc">URRunphysicalLevelSpacing</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lval</span><span class="p">,</span> <span class="n">Jval</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">=</span> <span class="n">Lval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">=</span> <span class="n">Jval</span>
 
@@ -518,7 +585,7 @@
 <div class="viewcode-block" id="URRunphysicalWidth"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRunphysicalWidth">[docs]</a><span class="k">class</span> <span class="nc">URRunphysicalWidth</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lval</span><span class="p">,</span> <span class="n">Jval</span><span class="p">,</span> <span class="n">resonanceReaction</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">=</span> <span class="n">Lval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">=</span> <span class="n">Jval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resonanceReaction</span> <span class="o">=</span> <span class="n">resonanceReaction</span>
@@ -534,11 +601,11 @@
 <div class="viewcode-block" id="UnresolvedLink"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnresolvedLink">[docs]</a><span class="k">class</span> <span class="nc">UnresolvedLink</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">link</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Unresolved link to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="s2">&quot;Unresolved link to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="p">)</span></div>
 
 
 <span class="c1"># reaction objects:</span>
@@ -546,7 +613,7 @@
 <div class="viewcode-block" id="WicksLimitError"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WicksLimitError">[docs]</a><span class="k">class</span> <span class="nc">WicksLimitError</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percentErr</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">percentErr</span> <span class="o">=</span> <span class="n">percentErr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
 
@@ -559,6 +626,9 @@
 
 <div class="viewcode-block" id="ZAbalanceWarning"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ZAbalanceWarning">[docs]</a><span class="k">class</span> <span class="nc">ZAbalanceWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;ZA doesn&#39;t balance for this reaction!&quot;</span></div>
 
@@ -566,7 +636,16 @@
 <div class="viewcode-block" id="Q_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Q_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Q_mismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Qcalc</span><span class="p">,</span> <span class="n">Qactual</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Qactual</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ratio</span> <span class="o">=</span> <span class="n">Qcalc</span> <span class="o">/</span> <span class="n">Qactual</span>
+            <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">ratio</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">ratio</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+            <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.999</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+            <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.99</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+            <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.95</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>  <span class="c1"># 0 vs non-zero</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Qcalc</span> <span class="o">=</span> <span class="n">Qcalc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Qactual</span> <span class="o">=</span> <span class="n">Qactual</span>
 
@@ -580,7 +659,7 @@
 <div class="viewcode-block" id="BadFissionEnergyRelease"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadFissionEnergyRelease">[docs]</a><span class="k">class</span> <span class="nc">BadFissionEnergyRelease</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worstCase</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">worstCase</span> <span class="o">=</span> <span class="n">worstCase</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -593,7 +672,7 @@
 <div class="viewcode-block" id="NegativeDelayedRate"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeDelayedRate">[docs]</a><span class="k">class</span> <span class="nc">NegativeDelayedRate</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -606,7 +685,13 @@
 <div class="viewcode-block" id="Threshold_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Threshold_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Threshold_mismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">thresholdCalc</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">threshold</span> <span class="o">/</span> <span class="n">thresholdCalc</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">ratio</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">ratio</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.999</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.99</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.95</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalc</span> <span class="o">=</span> <span class="n">thresholdCalc</span>
 
@@ -620,6 +705,11 @@
 
 <div class="viewcode-block" id="Coulomb_threshold_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Coulomb_threshold_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Coulomb_threshold_mismatch</span><span class="p">(</span><span class="n">Threshold_mismatch</span><span class="p">):</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">thresholdCalc</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalc</span> <span class="o">=</span> <span class="n">thresholdCalc</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Tabulated threshold </span><span class="si">%s</span><span class="s2"> below calculated threshold </span><span class="si">%s</span><span class="s2">!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalc</span><span class="p">)</span></div>
 
@@ -627,7 +717,7 @@
 <div class="viewcode-block" id="NonZero_crossSection_at_threshold"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NonZero_crossSection_at_threshold">[docs]</a><span class="k">class</span> <span class="nc">NonZero_crossSection_at_threshold</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -640,7 +730,7 @@
 <div class="viewcode-block" id="GapInCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.GapInCrossSection">[docs]</a><span class="k">class</span> <span class="nc">GapInCrossSection</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minGapEnergy</span><span class="p">,</span> <span class="n">maxGapEnergy</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minGapEnergy</span> <span class="o">=</span> <span class="n">minGapEnergy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxGapEnergy</span> <span class="o">=</span> <span class="n">maxGapEnergy</span>
 
@@ -652,10 +742,16 @@
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxGapEnergy</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">maxGapEnergy</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="NegativeCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeCrossSection">[docs]</a><span class="k">class</span> <span class="nc">NegativeCrossSection</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+<div class="viewcode-block" id="CrossSectionFlatInterpolation"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.CrossSectionFlatInterpolation">[docs]</a><span class="k">class</span> <span class="nc">CrossSectionFlatInterpolation</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Cross section uses unphysical flat interpolation&quot;</span></div>
+
+<div class="viewcode-block" id="NegativeCrossSection"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeCrossSection">[docs]</a><span class="k">class</span> <span class="nc">NegativeCrossSection</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
 
@@ -669,6 +765,9 @@
 
 <div class="viewcode-block" id="BadCrossSectionReference"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadCrossSectionReference">[docs]</a><span class="k">class</span> <span class="nc">BadCrossSectionReference</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Cross section reference outside of current reactionSuite not allowed!&quot;</span></div>
 
@@ -676,7 +775,13 @@
 <div class="viewcode-block" id="SummedCrossSectionMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedCrossSectionMismatch">[docs]</a><span class="k">class</span> <span class="nc">SummedCrossSectionMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxPercentDiff</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">maxPercentDiff</span> <span class="o">/</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">ratio</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">ratio</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.999</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.99</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.95</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxPercentDiff</span> <span class="o">=</span> <span class="n">maxPercentDiff</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -689,11 +794,17 @@
 
 <div class="viewcode-block" id="SummedCrossSectionDomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedCrossSectionDomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">SummedCrossSectionDomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Cross section domain does not match domain of linked reaction cross section sum&quot;</span></div>
 
 
 <div class="viewcode-block" id="SummedCrossSectionZeroDivision"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedCrossSectionZeroDivision">[docs]</a><span class="k">class</span> <span class="nc">SummedCrossSectionZeroDivision</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Divide by 0 error when comparing summed cross section to components!&quot;</span></div>
@@ -702,7 +813,13 @@
 <div class="viewcode-block" id="SummedMultiplicityMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedMultiplicityMismatch">[docs]</a><span class="k">class</span> <span class="nc">SummedMultiplicityMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxPercentDiff</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">maxPercentDiff</span> <span class="o">/</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">ratio</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">ratio</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.999</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.99</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.95</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxPercentDiff</span> <span class="o">=</span> <span class="n">maxPercentDiff</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -714,18 +831,25 @@
 
 
 <div class="viewcode-block" id="SummedMultiplicityDomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedMultiplicityDomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">SummedMultiplicityDomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Multiplicity domain does not match domain of linked product multiplicity sum&quot;</span></div>
 
 
 <div class="viewcode-block" id="SummedMultiplicityZeroDivision"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SummedMultiplicityZeroDivision">[docs]</a><span class="k">class</span> <span class="nc">SummedMultiplicityZeroDivision</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Divide by 0 error when comparing summed multiplicity to components!&quot;</span></div>
 
 
 <div class="viewcode-block" id="NegativeMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeMultiplicity">[docs]</a><span class="k">class</span> <span class="nc">NegativeMultiplicity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -737,7 +861,7 @@
 
 <div class="viewcode-block" id="NonConstantMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NonConstantMultiplicity">[docs]</a><span class="k">class</span> <span class="nc">NonConstantMultiplicity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Multiplicity should be constant but is energy-dependant!&quot;</span>
@@ -748,7 +872,7 @@
 
 <div class="viewcode-block" id="Domain_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Domain_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Domain_mismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lowBound</span><span class="p">,</span> <span class="n">highBound</span><span class="p">,</span> <span class="n">xscLowBound</span><span class="p">,</span> <span class="n">xscHighBound</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">highBound</span> <span class="o">=</span> <span class="n">lowBound</span><span class="p">,</span> <span class="n">highBound</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xscLowBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xscHighBound</span> <span class="o">=</span> <span class="n">xscLowBound</span><span class="p">,</span> <span class="n">xscHighBound</span>
 
@@ -763,7 +887,7 @@
 
 <div class="viewcode-block" id="MissingDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingDistribution">[docs]</a><span class="k">class</span> <span class="nc">MissingDistribution</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">productName</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">productName</span> <span class="o">=</span> <span class="n">productName</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -782,13 +906,16 @@
 
 
 <div class="viewcode-block" id="MissingRecoilDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingRecoilDistribution">[docs]</a><span class="k">class</span> <span class="nc">MissingRecoilDistribution</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Recoil distribution type specified, but recoil partner has unsupported distribution type!&quot;</span></div>
 
 
 <div class="viewcode-block" id="WrongDistributionComponent"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WrongDistributionComponent">[docs]</a><span class="k">class</span> <span class="nc">WrongDistributionComponent</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">reactionType</span><span class="o">=</span><span class="s1">&#39;2-body&#39;</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="n">component</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reactionType</span> <span class="o">=</span> <span class="n">reactionType</span>
 
@@ -801,13 +928,16 @@
 
 
 <div class="viewcode-block" id="Wrong2BodyFrame"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Wrong2BodyFrame">[docs]</a><span class="k">class</span> <span class="nc">Wrong2BodyFrame</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;2-body reaction not in center-of-mass frame!&quot;</span></div>
 
 
 <div class="viewcode-block" id="UncorrelatedFramesMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UncorrelatedFramesMismatch">[docs]</a><span class="k">class</span> <span class="nc">UncorrelatedFramesMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angleFrame</span><span class="p">,</span> <span class="n">energyFrame</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">angleFrame</span> <span class="o">=</span> <span class="n">angleFrame</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energyFrame</span> <span class="o">=</span> <span class="n">energyFrame</span>
 
@@ -821,21 +951,33 @@
 
 
 <div class="viewcode-block" id="FlatIncidentEnergyInterpolation"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.FlatIncidentEnergyInterpolation">[docs]</a><span class="k">class</span> <span class="nc">FlatIncidentEnergyInterpolation</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;For distributions, flat interpolation along incident energy is unphysical!&quot;</span></div>
 
 
 <div class="viewcode-block" id="MissingInterpolationQualifier"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingInterpolationQualifier">[docs]</a><span class="k">class</span> <span class="nc">MissingInterpolationQualifier</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Missing interpolationQualifier for outgoing energy spectrum (should be &#39;unitBase&#39;, &#39;correspondingPoints&#39;, etc.)&quot;</span></div>
 
 
 <div class="viewcode-block" id="EnergyDistributionBadU"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.EnergyDistributionBadU">[docs]</a><span class="k">class</span> <span class="nc">EnergyDistributionBadU</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;For energy distribution functional form, parameter &#39;U&#39; results in negative outgoing energies!&quot;</span></div>
 
 
 <div class="viewcode-block" id="NegativeDiscreteGammaEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeDiscreteGammaEnergy">[docs]</a><span class="k">class</span> <span class="nc">NegativeDiscreteGammaEnergy</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Discrete gamma energy &lt;= 0&quot;</span></div>
 
@@ -844,7 +986,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Primary gamma energy should be &lt;= available energy (depending on which discrete level it ends up in)&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">fraction</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fraction</span> <span class="o">=</span> <span class="n">fraction</span>
 
@@ -859,7 +1001,7 @@
 
 <div class="viewcode-block" id="MadlandNixBadParameters"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MadlandNixBadParameters">[docs]</a><span class="k">class</span> <span class="nc">MadlandNixBadParameters</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">EFL</span><span class="p">,</span> <span class="n">EFH</span><span class="p">,</span> <span class="n">minTm</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">EFL</span> <span class="o">=</span> <span class="n">EFL</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">EFH</span> <span class="o">=</span> <span class="n">EFH</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minTm</span> <span class="o">=</span> <span class="n">minTm</span>
@@ -874,13 +1016,21 @@
 
 
 <div class="viewcode-block" id="WeightsDontSumToOne"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.WeightsDontSumToOne">[docs]</a><span class="k">class</span> <span class="nc">WeightsDontSumToOne</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Weights don&#39;t sum to 1.0!&quot;</span></div>
 
 
 <div class="viewcode-block" id="UnnormalizedDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnnormalizedDistribution">[docs]</a><span class="k">class</span> <span class="nc">UnnormalizedDistribution</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">integral</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">integral</span> <span class="k">if</span> <span class="n">integral</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="o">/</span><span class="n">integral</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.99</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.9</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">integral</span> <span class="o">=</span> <span class="n">integral</span>
@@ -900,7 +1050,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">integral</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">integral</span> <span class="k">if</span> <span class="n">integral</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="o">/</span><span class="n">integral</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.99</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.9</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">integral</span> <span class="o">=</span> <span class="n">integral</span>
 
@@ -918,7 +1073,7 @@
 
 <div class="viewcode-block" id="KalbachMannDomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.KalbachMannDomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">KalbachMannDomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Kalbach-Mann terms do not span the same incident energy domain!&quot;</span></div>
@@ -926,7 +1081,7 @@
 
 <div class="viewcode-block" id="IncompleteDistribution"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.IncompleteDistribution">[docs]</a><span class="k">class</span> <span class="nc">IncompleteDistribution</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">lowerMu</span><span class="p">,</span> <span class="n">upperMu</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowerMu</span> <span class="o">=</span> <span class="n">lowerMu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">upperMu</span> <span class="o">=</span> <span class="n">upperMu</span>
@@ -942,8 +1097,11 @@
 
 <div class="viewcode-block" id="NegativeProbability"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeProbability">[docs]</a><span class="k">class</span> <span class="nc">NegativeProbability</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">energy_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">energy_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_out</span> <span class="o">=</span> <span class="n">energy_out</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span>
@@ -963,11 +1121,13 @@
 
 
 <div class="viewcode-block" id="ExtraOutgoingEnergy"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ExtraOutgoingEnergy">[docs]</a><span class="k">class</span> <span class="nc">ExtraOutgoingEnergy</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;If an outgoing energy distribution ends with more than one energy with probability=0,</span>
-<span class="sd">    proper unitbase treatment is unclear. Distribution should end with exactly one P=0 point.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If an outgoing energy distribution ends with more than one energy with probability=0,</span>
+<span class="sd">    proper unitbase/correspondingPoints treatment is unclear. Distribution should end with exactly one P=0 point.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -980,7 +1140,7 @@
 
 <div class="viewcode-block" id="MissingCoulombIdenticalParticlesFlag"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingCoulombIdenticalParticlesFlag">[docs]</a><span class="k">class</span> <span class="nc">MissingCoulombIdenticalParticlesFlag</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Need &#39;identicalParticles=</span><span class="se">\&quot;</span><span class="s2">true</span><span class="se">\&quot;</span><span class="s2">&#39; when target==projectile&quot;</span></div>
@@ -988,7 +1148,7 @@
 
 <div class="viewcode-block" id="IncorrectCoulombIdenticalParticlesFlag"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.IncorrectCoulombIdenticalParticlesFlag">[docs]</a><span class="k">class</span> <span class="nc">IncorrectCoulombIdenticalParticlesFlag</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span> <span class="o">=</span> <span class="n">projectile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
 
@@ -1002,17 +1162,25 @@
 
 <div class="viewcode-block" id="EnergyImbalance"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.EnergyImbalance">[docs]</a><span class="k">class</span> <span class="nc">EnergyImbalance</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">availableEnergy</span><span class="p">,</span> <span class="n">deposition_per_product</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">total_deposited</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">deposition_per_product</span><span class="p">])</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">total_deposited</span> <span class="o">/</span> <span class="mi">100</span>
+        <span class="c1"># note: using stricter threshold if we&#39;re exceeding available energy</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+        <span class="k">if</span> <span class="mf">0.95</span> <span class="o">&lt;</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">1.01</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">elif</span> <span class="mf">0.9</span> <span class="o">&lt;</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">1.05</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">elif</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">0.9</span> <span class="ow">or</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mf">1.05</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span> <span class="o">=</span> <span class="n">energy_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span> <span class="o">=</span> <span class="n">availableEnergy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">deposition_per_product</span> <span class="o">=</span> <span class="n">deposition_per_product</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">total_deposited</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">deposition_per_product</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_deposited</span> <span class="o">=</span> <span class="n">total_deposited</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">availableEnergy</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_deposited</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">per_product</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = </span><span class="si">%.4g%%</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deposition_per_product</span><span class="p">[:</span><span class="mi">5</span><span class="p">]])</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deposition_per_product</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">per_product</span> <span class="o">+=</span> <span class="s1">&#39;, ...&#39;</span>
+        <span class="n">non_zero_products</span> <span class="o">=</span> <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deposition_per_product</span> <span class="k">if</span> <span class="n">val</span><span class="p">]</span>
+        <span class="n">per_product</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = </span><span class="si">%.4g%%</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">non_zero_products</span><span class="p">[:</span><span class="mi">5</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_products</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">per_product</span> <span class="o">+=</span> <span class="s1">&#39;, ...&#39;</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Energy imbalance at incident energy </span><span class="si">%s</span><span class="s2"> (index </span><span class="si">%i</span><span class="s2">). Total deposited = </span><span class="si">%.4g%%</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_deposited</span><span class="p">,</span> <span class="n">per_product</span><span class="p">))</span>
 
@@ -1034,7 +1202,7 @@
 
 <div class="viewcode-block" id="ValueOutOfRange"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ValueOutOfRange">[docs]</a><span class="k">class</span> <span class="nc">ValueOutOfRange</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contextMessage</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="n">upperBound</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contextMessage</span> <span class="o">=</span> <span class="n">contextMessage</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowerBound</span> <span class="o">=</span> <span class="n">lowerBound</span>
@@ -1054,7 +1222,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; indicate if test was skipped due to missing information &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">testName</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">testName</span> <span class="o">=</span> <span class="n">testName</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
 
@@ -1069,7 +1237,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;If we run into an exception when running check(), try to exit gracefully and return this warning.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Exception_String</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Exception_String</span> <span class="o">=</span> <span class="n">Exception_String</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1085,6 +1253,9 @@
 
 
 <div class="viewcode-block" id="SkippedCoulombElasticEnergyDeposition"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.SkippedCoulombElasticEnergyDeposition">[docs]</a><span class="k">class</span> <span class="nc">SkippedCoulombElasticEnergyDeposition</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Energy/momentum deposition cannot be computed for charged-particle elastic&quot;</span></div>
 
@@ -1092,7 +1263,7 @@
 <span class="c1"># &lt;editor-fold desc=&quot;covarianceSuite warnings&quot;&gt;</span>
 <div class="viewcode-block" id="CyclicDependency"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.CyclicDependency">[docs]</a><span class="k">class</span> <span class="nc">CyclicDependency</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cycle</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cycle</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1107,7 +1278,7 @@
 
 <div class="viewcode-block" id="NegativeVariance"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeVariance">[docs]</a><span class="k">class</span> <span class="nc">NegativeVariance</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
@@ -1121,7 +1292,7 @@
 
 <div class="viewcode-block" id="VarianceTooSmall"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.VarianceTooSmall">[docs]</a><span class="k">class</span> <span class="nc">VarianceTooSmall</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">relativeUncertainty</span><span class="p">,</span> <span class="n">absoluteUncertainty</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relativeUncertainty</span> <span class="o">=</span> <span class="n">relativeUncertainty</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">absoluteUncertainty</span> <span class="o">=</span> <span class="n">absoluteUncertainty</span>
@@ -1141,7 +1312,7 @@
 
 <div class="viewcode-block" id="VarianceTooLarge"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.VarianceTooLarge">[docs]</a><span class="k">class</span> <span class="nc">VarianceTooLarge</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">relativeUncertainty</span><span class="p">,</span> <span class="n">absoluteUncertainty</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relativeUncertainty</span> <span class="o">=</span> <span class="n">relativeUncertainty</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">absoluteUncertainty</span> <span class="o">=</span> <span class="n">absoluteUncertainty</span>
@@ -1160,7 +1331,7 @@
 
 <div class="viewcode-block" id="CorrelationsOutOfRange"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.CorrelationsOutOfRange">[docs]</a><span class="k">class</span> <span class="nc">CorrelationsOutOfRange</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">badCount</span><span class="p">,</span> <span class="n">worstCase</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">badCount</span> <span class="o">=</span> <span class="n">badCount</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">worstCase</span> <span class="o">=</span> <span class="n">worstCase</span>
 
@@ -1174,7 +1345,11 @@
 
 <div class="viewcode-block" id="NegativeEigenvalues"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeEigenvalues">[docs]</a><span class="k">class</span> <span class="nc">NegativeEigenvalues</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">negativeCount</span><span class="p">,</span> <span class="n">worstCase</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+        <span class="k">if</span> <span class="n">worstCase</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.001</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span>
+        <span class="k">if</span> <span class="n">worstCase</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">if</span> <span class="n">worstCase</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">:</span> <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">negativeCount</span> <span class="o">=</span> <span class="n">negativeCount</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">worstCase</span> <span class="o">=</span> <span class="n">worstCase</span>
 
@@ -1188,7 +1363,7 @@
 
 <div class="viewcode-block" id="BadEigenvalueRatio"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadEigenvalueRatio">[docs]</a><span class="k">class</span> <span class="nc">BadEigenvalueRatio</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Minor</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ratio</span> <span class="o">=</span> <span class="n">ratio</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1200,7 +1375,7 @@
 
 <div class="viewcode-block" id="InvalidShortRangeVarianceData"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.InvalidShortRangeVarianceData">[docs]</a><span class="k">class</span> <span class="nc">InvalidShortRangeVarianceData</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrixType</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrixType</span> <span class="o">=</span> <span class="n">matrixType</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1212,7 +1387,7 @@
 
 <div class="viewcode-block" id="ParameterCovarianceMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.ParameterCovarianceMismatch">[docs]</a><span class="k">class</span> <span class="nc">ParameterCovarianceMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nParams</span><span class="p">,</span> <span class="n">matrixShape</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nParams</span> <span class="o">=</span> <span class="n">nParams</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrixShape</span> <span class="o">=</span> <span class="n">matrixShape</span>
 

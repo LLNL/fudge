@@ -88,6 +88,8 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
     elif 'ice' in fileBaseName.lower():
         ZA = 1001
         scatterers = [('H',2),('O',1)]
+        if 'Oin' in fileBaseName:
+            ZA = 8016
     elif 'Paraffin' in fileBaseName:
         ZA = 1001
         scatterers = [('H',11), ('C',15), ('C',1), ('I',1), ('O',7)]
@@ -101,10 +103,14 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
     elif 'SiO2' in fileBaseName:
         ZA = 14028
         scatterers = [('Si',1),('O',2)]
-    elif 'U-metal-HEU' in fileBaseName:
+        if 'Oin' in fileBaseName:
+            ZA = 8016
+    elif 'Uin' in fileBaseName and 'HEU' in fileBaseName:
         ZA = 92235
     elif 'U-metal' in fileBaseName:
         ZA = 92238
+        if 'HEU' in fileBaseName:
+            ZA = 92235
     elif 'benzene' in fileBaseName.lower() or 'benzine' in fileBaseName.lower():    # ENDF-VII.1 had spelling error
         ZA = 1001
         if fileBaseName.startswith('Cin'):
@@ -125,6 +131,8 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
         if fileBaseName.startswith('Cin'):
             ZA = 6012
         scatterers = [('H',4),('C',1)]
+    elif 'H2inCaH2' in fileBaseName:
+        ZA = 1001  # misleading name: H2 refers to 2nd hydrogen atom, not deuterium
     elif 'toluene' in fileBaseName.lower():
         ZA = 1001
         if fileBaseName.startswith('Cin'):
@@ -142,9 +150,9 @@ def ITYPE_2( fileName, MAT, MTDatas, info, evaluation, verbose ) :
         scatterers = [('H',12),('C',9)]
     elif 'in' in fileBaseName:
         targetSymbol, molecule = fileBaseName.split('in')
-        ZA = {'H': 1001, 'H1': 1001, 'D': 1002, 'H2': 1002, 'Li': 3006, '7Li': 3007, 'Be': 4009, 'C': 6012, 'N': 7014,
+        ZA = {'H': 1001, 'H1': 1001, 'D': 1002, 'H2': 1002, 'Li': 3007, '7Li': 3007, 'Be': 4009, 'C': 6012, 'N': 7014,
               'O': 8016, 'O16': 8016, 'F': 9019, 'Al': 13027, 'Al27': 13027, 'Si': 14028, 'Ca': 20040, 'Y': 39089,
-              'Zr': 40090, 'U': 92238}[targetSymbol]
+              'Zr': 40090, 'U': 92238, 'Pu': 94239}[targetSymbol]
 
         # try extract scattering atoms & number per molecule from molecule name:
         import re
@@ -326,7 +334,7 @@ def readMF7( info, MT, MF7 ) :
         numberPerMolecule = int( b_n[5] )
         freeAtomCrossSection = b_n[0] / numberPerMolecule
         boundAtomCrossSection = incoherentInelasticModule.BoundAtomCrossSection(
-            freeAtomCrossSection * (massAMU + neutronMassAMU) / massAMU**2, 'b')
+            freeAtomCrossSection * ((massAMU + neutronMassAMU) / massAMU)**2, 'b')
 
         principalAtom = {
                     'pid': pid,
@@ -349,7 +357,7 @@ def readMF7( info, MT, MF7 ) :
             numberPerMolecule = int( b_n[6*index+5] )
             freeAtomCrossSection = b_n[6*index+1] / numberPerMolecule
             boundAtomCrossSection = incoherentInelasticModule.BoundAtomCrossSection(
-                freeAtomCrossSection * (massAMU + neutronMassAMU) / massAMU**2, 'b')
+                freeAtomCrossSection * ((massAMU + neutronMassAMU) / massAMU)**2, 'b')
             if b_n[6*index] not in (0., 1.):
                 raise NotImplementedError("Unsupported kernel '%d' found for scattering atom %d" %
                         (b_n[6*index], index+1))
@@ -418,6 +426,10 @@ def readMF7( info, MT, MF7 ) :
             info.doRaise.extend(warnings)
 
         temps, betas, alphas = map( valuesModule.Values, ( temps, betas, alphas ) )
+        for grid, array in (('temps', temps), ('betas', betas), ('alphas', alphas)):
+            if list(array) != sorted(array):
+                warnings.append(f"{grid} grid out of order in S_alpha_beta array!")
+                info.doRaise.append(warnings[-1])
 
         axes = axesModule.Axes(4)
         axes[3] = axesModule.Grid( 'temperature', 3, 'K', xDataEnumsModule.GridStyle.points, values = temps, interpolation = t_interp )

@@ -61,6 +61,25 @@
     <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">string</span> <span class="p">)</span> <span class="o">&lt;=</span> <span class="n">maxLength</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">string</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">string</span><span class="p">[:</span><span class="n">maxLength</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; ...&#39;</span> <span class="p">)</span></div>
 
+<div class="viewcode-block" id="parseParticleList"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.misc.parseParticleList">[docs]</a><span class="k">def</span> <span class="nf">parseParticleList</span><span class="p">(</span><span class="n">particleList</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Breaks a particle list where each particle id can have a leading integer multiplicity into an equivalen list of </span>
+<span class="sd">    particle ids.  That is, each particle in *particleList* to be of the form &quot;id&quot; or &quot;#id&quot; where &quot;#&quot; is an integer.</span>
+<span class="sd">    Examples of the form &quot;#id&quot; include &quot;2n&quot; and &quot;3n&quot;. For example, the paticle list [&quot;2n&quot;, &quot;Pu238&quot;] is returned as [&quot;n&quot;, &quot;n&quot;, &quot;Pu238&quot;].</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">particles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">outgoingParticle</span> <span class="ow">in</span> <span class="n">particleList</span><span class="p">:</span>
+        <span class="n">outgoingParticleId</span> <span class="o">=</span> <span class="n">outgoingParticle</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;0123456789&#39;</span><span class="p">)</span>
+        <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">outgoingParticle</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">outgoingParticle</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">outgoingParticleId</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">multiplicity</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">multiplicity</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">multiplicity</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">multiplicity</span><span class="p">)</span>
+        <span class="n">particles</span> <span class="o">+=</span> <span class="n">multiplicity</span> <span class="o">*</span> <span class="p">[</span><span class="n">outgoingParticleId</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">particles</span></div>
+
+
 <span class="k">def</span> <span class="nf">baseAntiQualifierFromID</span><span class="p">(</span> <span class="nb">id</span><span class="p">,</span> <span class="n">qualifierAllowed</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="nb">id</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;id is not a str: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="nb">id</span> <span class="p">)</span> <span class="p">)</span>

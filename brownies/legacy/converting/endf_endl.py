@@ -580,3 +580,27 @@ def setReactionsOutputChannelFromOutputChannel( info, reaction, outputChannel ) 
 
     for fissionEnergyRelease in outputChannel.fissionFragmentData.fissionEnergyReleases :
         reaction.outputChannel.fissionFragmentData.fissionEnergyReleases.add( fissionEnergyRelease )
+
+
+# NLIB appears on 1st line of ENDF file and identifies the library
+NLIBs = {
+    0: "ENDF/B",
+    1: "ENDF/A",
+    2: "JEFF",
+    3: "EFF",
+    4: "ENDF/B (HE)",
+    5: "CENDL",
+    6: "JENDL",
+    17: "TENDL",
+    18: "ROSFOND",
+    21: "SG-23",
+    31: "INDL/V",
+    32: "INDL/A",
+    33: "FENDL",
+    34: "IRDF",
+    35: "BROND (IAEA version)",
+    36: "INGDB-90",
+    37: "FENDL/A",
+    38: "IAEA/PD",
+    41: "BROND",
+}

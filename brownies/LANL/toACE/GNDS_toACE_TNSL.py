@@ -66,7 +66,10 @@ targetMapping = {   'Be-metal'              : [ 'be-met',   'Be' ],
                     'YinYH2'                : [ 'y-yh2',    'Y' ],
                     'ZrinZrH'               : [ 'zr-zrh',   'Zr' ],
                     'HinC5O2H8'             : [ 'h-luci',   'H1' ],
+                    'CinC5O2H8'             : [ 'c-luci',   'C' ],
+                    'OinC5O2H8'             : [ 'o-luci',   'O' ],
                     'HinCH2'                : [ 'h-poly',   'H1' ],
+                    'CinCH2'                : [ 'c-poly',   'C' ],
                     'SiO2-alpha'            : [ 'sio2',     'SiO2' ] }
 
 def getEqualProbableBins(xs_pdf_cdf, numberOfBins, check=False):
@@ -262,6 +265,7 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
         offset += numberOfIncidentEnergies
         XSS[offset:offset+numberOfIncidentEnergies] = outgoingEnergyLengths
 
+    energyGrid = []
     if ITCE_X is not None:
         JXS[4-1] = len(XSS) + 1
         energyGrid, crossSection = ITCE_X

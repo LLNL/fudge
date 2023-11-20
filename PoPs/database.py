@@ -455,7 +455,8 @@ class Database(ancestryModule.AncestryIO):
         Q = 0.0
 
         ingoingParticles = list(ingoingParticles)
-        outgoingParticles = list(outgoingParticles)
+        ingoingParticles = miscModule.parseParticleList(ingoingParticles)
+        outgoingParticles = miscModule.parseParticleList(outgoingParticles)
 
         removeDuplicates = True
         while(removeDuplicates):

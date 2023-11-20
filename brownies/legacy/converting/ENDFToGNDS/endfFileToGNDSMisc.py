@@ -439,7 +439,7 @@ def completeDocumentation(info, documentation):
         dateString = datetime.datetime.today().strftime("%Y-%m-%d")
         date = datesModule.Date(dateModule.Date.parse(dateString), datesModule.DateType.created)
     documentation.dates.add(date)
-    documentation.title.body = 'ENDF-6 file form %s version %s translated to GNDS by FUDGE.' % (info.library, info.libraryVersion)
+    documentation.title.body = 'ENDF-6 file from %s version %s translated to GNDS by FUDGE.' % (info.library, info.libraryVersion)
     if '&' in info.author:
         info.author = info.author.replace('&', 'and')  # make XML-friendly.  Could also split into two authors
     documentation.authors.add(authorModule.Author(info.author, '', ''))
